@@ -250,7 +250,6 @@
     .ag-row-level-1 {background-color: #f2f2f2 !important;}
 </style>
 
-<script src="/handle/grid/grid_auto_complete.js"></script>
 <script type="text/javascript" charset="utf-8">
     const stores = <?= json_encode(@$stores) ?> ;
 
@@ -487,6 +486,7 @@
 
         rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
         gx3.gridOptions.api.updateRowData({ add: rows });
+        $("#gd-rt-total").html(gx3.getRows().length);
         document.getElementById("final_table_area").scrollIntoView({ behavior: "smooth" });
     }
 

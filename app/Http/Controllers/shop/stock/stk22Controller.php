@@ -19,11 +19,11 @@ const PRODUCT_STOCK_TYPE_STORE_RT = 15;
 class stk22Controller extends Controller
 {
     public function index()
-	{
+    {
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
 
-		$values = [
+        $values = [
             'today'         => date("Y-m-d"),
             'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
@@ -34,41 +34,31 @@ class stk22Controller extends Controller
             'items'			=> SLib::getItems(), // 품목
             'stores'        => $stores, // 매장리스트
             'storages'      => $storages, // 창고리스트
-		];
+        ];
 
         return view(Config::get('shop.shop.view') . '/stock/stk22', $values);
-	}
+    }
 
     // 상품검색
     public function search_goods(Request $request)
     {
         $r = $request->all();
 
-		$code = 200;
-		$where = "";
+        $code = 200;
+        $where = "";
         $orderby = "";
-        
+        $prd_cd_range_text = $request->input("prd_cd_range", '');
+
         // where
-		if($r['prd_cd'] != null) {
+        if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
-			$where .= " and (1!=1";
-			foreach($prd_cd as $cd) {
-				$where .= " or pc.prd_cd = '" . Lib::quote($cd) . "' ";
-			}
-			$where .= ")";
-        }
-        // 상품옵션 범위검색
-        $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
-        parse_str($r['prd_cd_range'] ?? '', $prd_cd_range);
-        foreach ($range_opts as $opt) {
-            $rows = $prd_cd_range[$opt] ?? [];
-            if (count($rows) > 0) {
-                $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
-                $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-                $where .= " and pc.$opt $in_query ($opt_join) ";
+            $where .= " and (1!=1";
+            foreach($prd_cd as $cd) {
+                $where .= " or pc.prd_cd like '" . Lib::quote($cd) . "%' ";
             }
+            $where .= ")";
         }
-        if($r['style_no'] != null) 
+        if($r['style_no'] != null)
             $where .= " and if(pc.goods_no <> '0', g.style_no, p.style_no) = '" . $r['style_no'] . "'";
 
         $goods_no = $r['goods_no'];
@@ -90,15 +80,27 @@ class stk22Controller extends Controller
             }
         }
 
-        // if($r['com_cd'] != null) 
+        // 상품옵션 범위검색
+        $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+        parse_str($prd_cd_range_text, $prd_cd_range);
+        foreach ($range_opts as $opt) {
+            $rows = $prd_cd_range[$opt] ?? [];
+            if (count($rows) > 0) {
+                $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+                $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+                $where .= " and pc.$opt $in_query ($opt_join) ";
+            }
+        }
+
+        // if($r['com_cd'] != null)
         //     $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        // if($r['item'] != null) 
+        // if($r['item'] != null)
         //     $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
         // if(isset($r['brand_cd']))
         //     $where .= " and g.brand = '" . $r['brand_cd'] . "'";
-        if($r['goods_nm'] != null) 
+        if($r['goods_nm'] != null)
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
+        if($r['goods_nm_eng'] != null)
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 
         // ordreby
@@ -114,7 +116,7 @@ class stk22Controller extends Controller
         $limit = " limit $startno, $page_size ";
 
         // search goods
-		$sql = "
+        $sql = "
             select
                 pc.prd_cd
                 , pc.goods_no
@@ -134,16 +136,15 @@ class stk22Controller extends Controller
                 , if(pc.goods_no <> '0', g.wonga, p.wonga) as wonga
             from product_code pc
                 inner join product p on p.prd_cd = pc.prd_cd
-                left outer join goods g on g.goods_no = pc.goods_no
+                inner join goods g on g.goods_no = pc.goods_no
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                 left outer join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
             where pc.type = 'N' $where
             $orderby
             $limit
-		";
-
-		$result = DB::select($sql);
+        ";
+        $result = DB::select($sql);
 
         // pagination
         $total = 0;
@@ -153,7 +154,8 @@ class stk22Controller extends Controller
                 select count(*) as total
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
-                where 1=1 $where
+                    inner join goods g on g.goods_no = pc.goods_no
+                where pc.type = 'N' $where
             ";
 
             $row = DB::selectOne($sql);
@@ -161,69 +163,65 @@ class stk22Controller extends Controller
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
-		return response()->json([
-			"code" => $code,
-			"head" => [
-				"total" => $total,
-				"page" => $page,
-				"page_cnt" => $page_cnt,
-				"page_total" => count($result)
-			],
-			"body" => $result
-		]);
+        return response()->json([
+            "code" => $code,
+            "head" => [
+                "total" => $total,
+                "page" => $page,
+                "page_cnt" => $page_cnt,
+                "page_total" => count($result)
+            ],
+            "body" => $result
+        ]);
     }
 
     // 매장/창고별 상품재고 검색
     public function search_stock(Request $request)
     {
-
         //로그인한 아이디의 매칭된 매장을 불러옴
-		$user_store	= Auth('head')->user()->store_cd;
+        $user_store	= Auth('head')->user()->store_cd;
         $user_store_nm   = Auth('head')->user()->store_nm;
 
-		$code = 200;
-		$prd_cd = $request->input("prd_cd", '');
-        $store_type = $request->input("store_type", '');
+        $code = 200;
+        $prd_cd = $request->input("prd_cd", '');
         $now_date = date('Ymd');
-        $where = "";
 
-        if($store_type != '') $where .= " and s.store_type = $store_type";
-
-		$sql = "
+        $sql = "
             select
-                s.store_cd as dep_store_cd, 
-                s.store_nm as dep_store_nm, 
-                ifnull(ps.qty, 0) as qty, 
+                s.store_cd as dep_store_cd,
+                s.store_nm as dep_store_nm,
+                ifnull(ps.qty, 0) as qty,
                 ifnull(ps.wqty, 0) as wqty,
-                ifnull(pss.qty, 0) as storage_qty, 
+                ifnull(pss.qty, 0) as storage_qty,
                 ifnull(pss.wqty, 0) as storage_wqty,
                 '$user_store' as store_cd,
                 '$user_store_nm' as store_nm
-
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
-            where s.use_yn = 'Y' and s.store_type = '08' and s.rt_yn = 'Y'
+            where
+                s.use_yn = 'Y'
+                and s.store_type = '08'
+                and s.rt_yn = 'Y'
                 and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
 		";
 
-		$result = DB::select($sql);
+        $result = DB::select($sql);
 
-        foreach($result as $r) 
-        {
+        foreach ($result as $r) {
             $r->prd_cd = $prd_cd;
         }
 
-		return response()->json([
-			"code" => $code,
-			"head" => [
-				"total" => count($result),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1,
-			],
-			"body" => $result
-		]);
+        return response()->json([
+            "code" => $code,
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+            ],
+            "body" => $result
+        ]);
     }
 
     // 일반RT등록
@@ -238,7 +236,7 @@ class stk22Controller extends Controller
         try {
             DB::beginTransaction();
 
-			foreach($data as $d) {
+            foreach($data as $d) {
                 DB::table('product_stock_rotation')
                     ->insert([
                         'type' => $rt_type,
@@ -257,17 +255,17 @@ class stk22Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // // 보내는 매장
-                // // product_stock_store -> 보유재고 차감
+                // 보내는 매장
+                // product_stock_store -> 보유재고 차감
                 // DB::table('product_stock_store')
                 //     ->where('prd_cd', '=', $d['prd_cd'])
-                //     ->where('store_cd', '=', $d['dep_store_cd']) 
+                //     ->where('store_cd', '=', $d['dep_store_cd'])
                 //     ->update([
                 //         'qty' => DB::raw('qty - ' . ((int)$d['rt_qty'] ?? 0)),
                 //         'wqty' => DB::raw('wqty - ' . ((int)$d['rt_qty'] ?? 0)),
                 //         'ut' => now(),
                 //     ]);
-                // // 재고이력 등록
+                // 재고이력 등록
                 // DB::table('product_stock_hst')
                 //     ->insert([
                 //         'goods_no' => $d['goods_no'],
@@ -287,9 +285,9 @@ class stk22Controller extends Controller
                 //         'admin_nm' => $admin_nm,
                 //     ]);
 
-                // // 받는 매장
-                // // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-                // $store_stock_cnt = 
+                // 받는 매장
+                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
+                // $store_stock_cnt =
                 //     DB::table('product_stock_store')
                 //         ->where('prd_cd', '=', $d['prd_cd'])
                 //         ->where('store_cd', '=', $d['store_cd'])
@@ -311,13 +309,13 @@ class stk22Controller extends Controller
                 //     // 해당 매장에 상품 기존재고가 이미 존재할 경우
                 //     DB::table('product_stock_store')
                 //         ->where('prd_cd', '=', $d['prd_cd'])
-                //         ->where('store_cd', '=', $d['store_cd']) 
+                //         ->where('store_cd', '=', $d['store_cd'])
                 //         ->update([
                 //             'wqty' => DB::raw('wqty + ' . ((int)$d['rt_qty'] ?? 0)),
                 //             'ut' => now(),
                 //         ]);
                 // }
-                // // 재고이력 등록
+                // 재고이력 등록
                 // DB::table('product_stock_hst')
                 //     ->insert([
                 //         'goods_no' => $d['goods_no'],
@@ -347,7 +345,7 @@ class stk22Controller extends Controller
                         'content' => $d['store_nm'].'에서 일반RT를 요청 하였습니다.',
                         'rt' => now()
                     ]);
-                
+
                 DB::table('msg_store_detail')
                     ->insert([
                         'msg_cd' => $res,
@@ -358,14 +356,14 @@ class stk22Controller extends Controller
                     ]);
             }
 
-			DB::commit();
+            DB::commit();
             $code = 200;
             $msg = "일반RT등록이 정상적으로 완료되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
+        } catch (Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }

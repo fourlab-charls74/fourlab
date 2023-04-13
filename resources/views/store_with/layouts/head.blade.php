@@ -30,6 +30,7 @@
             <script src="/handle/grid/ag-grid/community/dist/ag-grid-community.min.js"></script>
         @endif
         <script src="/handle/grid/grid.js?v=20220707"></script>
+        <script src="/handle/grid/grid_auto_complete.js?v=20230413"></script>
         <script src="/handle/grid/functions.js?v=20220707"></script>
         <script src="/handle/libs.js"></script>
         <script src="/js/init.js"></script>
