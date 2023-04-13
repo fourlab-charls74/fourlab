@@ -19,7 +19,7 @@
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <button id="download-list" onclick="gx.Download();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                         <i class="bx bx-download fs-16"></i> 엑셀다운로드
                     </button>&nbsp;&nbsp;
@@ -131,7 +131,7 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div>
@@ -171,7 +171,6 @@ const pinnedRowData = [{ store_cd : 'total' , "sale_amt" : 0 }];
 
 const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
-    
     let columns = [
         {headerName: "매출월", field: "sale_date", rowGroup: true, hide:true,
             cellRenderer:function(params) {
@@ -219,6 +218,7 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
         Search();
     });
 
+    //검색
     function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/store/stock/stk34/search', data, 1, function(e){
@@ -228,13 +228,14 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     }
 
+    //검색조건 초기화
     const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
         location.reload();
     };
 
-
+    // 매출액 등록 팝업
     function add() {
         const url = '/store/stock/stk34/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");

@@ -178,18 +178,15 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
         {field: "competitors",	headerName: "동종업계 매장",
             children: [
                 @foreach($competitors as $com)
-
                     {headerName: "{{ $com->code_val }}", field: "amt_{{$com->code_id}}",  width: 90, cellClass: 'hd-grid-code', type:'currencyType', cellStyle:{textAlign:'right'},aggFunc: "first"},
-
                 @endforeach
             ]
         },
-
         {width: 'auto'}
     ];
 
     const pApp = new App('',{
-        gridId:"#div-gd",
+        gridId:"#div-gd"
     });
     let gx;
 
@@ -221,18 +218,18 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
 
     }
 
+    //검색조건초기화
     const initSearchInputs = () => {
         document.search.reset(); // 모든 일반 input 초기화
         $('#store_no').val(null).trigger('change'); // 브랜드 select2 박스 초기화
         location.reload();
     };
 
-
+    //추가버튼 팝업 오픈
     function add() {
         const url = '/store/stock/stk33/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
     }
-
 </script>
 
 

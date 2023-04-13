@@ -17,7 +17,7 @@
                     <h4>기본 정보</h4>
                     <div>
                         <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-                        <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                        <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -55,7 +55,7 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>    
+                <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>    
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
@@ -89,7 +89,7 @@
             gridId:"#div-gd",
         });
         let gx;
-        var mutable_cols = [];
+        let mutable_cols = [];
         let date = "";
         let sale_date;
         let in_val = [];
@@ -116,27 +116,19 @@
                             }
                         }
                     }
-
-                    // console.log(e.column.colId,e.data.competitor_cd, e.newValue);
-                    // console.log(e);
                 }
             });
             pApp.BindSearchEnter();
         });
 
-       
-
         function Search() {
             let data = $('form[name="search"]').serialize();
-
             let store_no = document.getElementById('store_no').value;
             date = document.getElementById('date').value;
-
             let date_format = date.split('-');
 
             //매출기간의 월에 따라 일수 구하기
             sale_date = new Date(date_format[0],date_format[1],0).getDate();
-
             data += "&day=" + sale_date;
 
             if(store_no == '') {
@@ -148,7 +140,7 @@
             }
         }
 
-        const formatDate = async (e) => {
+        const formatDate = (e) => {
             days = e.head.day;
             setMutableColumns(days);
         }
@@ -193,7 +185,6 @@
                 alert('매장을 선택해주세요');
                 return false;
             }
-
 
             if(!confirm("매출액을 저장하시겠습니까?")) return;
 

@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
-use DateTime;
-
-use App\Models\Conf;
-
 class stk33Controller extends Controller
 {
     public function index(Request $request)
@@ -76,73 +72,67 @@ class stk33Controller extends Controller
 
         $code_ids = array_map(function($row) {return $row->code_id;}, DB::select($sql));
 
-
-       
         $com = "";
         $t_amt = "";
         foreach($code_ids as $code_id) {
-            // $com .= ", ifnull((select sale_amt from competitor_sale where competitor_cd = '$code_id'), 0 ) as 'amt_$code_id'";
             $com .= ", ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt end), 0) as 'amt_$code_id'";
             $t_amt .= ", sum(a.amt_$code_id) as amt_$code_id";
         }
 
-            $sql = "
-                select 
-                    s.store_nm
-                    , cs.sale_date
-                    , sum(cs.sale_amt) as total_amt
-                    , cs.store_cd
-                    , cs.competitor_cd
-                    , s.store_type
-                    $com
-                from competitor_sale cs
-                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
-                    left outer join store s on s.store_cd = cs.store_cd
-                where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
-                $where
-                group by cs.sale_date, cs.store_cd
-                $orderby
-                $limit
-            ";
+        $sql = "
+            select 
+                s.store_nm
+                , cs.sale_date
+                , sum(cs.sale_amt) as total_amt
+                , cs.store_cd
+                , cs.competitor_cd
+                , s.store_type
+                $com
+            from competitor_sale cs
+                left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                left outer join store s on s.store_cd = cs.store_cd
+            where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
+            $where
+            group by cs.sale_date, cs.store_cd
+            $orderby
+            $limit
+        ";
 
-            $rows = DB::select($sql);
-            
-            
-            // pagination
-            $total = 0;
-            $total_data = '';
-            $page_cnt = 0;
-            if($page == 1) {
-                $query =
-                    "
-                    select
-                        count(a.store_nm) as total,
-                        sum(a.total_amt) as total_amt
-                        $t_amt
-                    from (
-                        select 
-                            s.store_nm
-                            , cs.sale_date
-                            , sum(cs.sale_amt) as total_amt
-                            , cs.store_cd
-                            , cs.competitor_cd
-                            , s.store_type
-                            $com
-                        from competitor_sale cs
-                            left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
-                            left outer join store s on s.store_cd = cs.store_cd
-                        where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
-                        $where
-                        group by cs.sale_date, cs.store_cd
-                        $orderby
-                        $limit
-                    ) a
-                ";
-            }
-            $row = DB::selectOne($query);
-            $total_data = $row;
-            $total = $row->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
+        $rows = DB::select($sql);
+        
+        // pagination
+        $total = 0;
+        $total_data = '';
+        $page_cnt = 0;
+        if($page == 1) {
+            $query =
+                "
+                select
+                    count(a.store_nm) as total,
+                    sum(a.total_amt) as total_amt
+                    $t_amt
+                from (
+                    select 
+                        s.store_nm
+                        , cs.sale_date
+                        , sum(cs.sale_amt) as total_amt
+                        , cs.store_cd
+                        , cs.competitor_cd
+                        , s.store_type
+                        $com
+                    from competitor_sale cs
+                        left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'COMPETITOR'
+                        left outer join store s on s.store_cd = cs.store_cd
+                    where 1=1 and sale_date >= '$sdate' and sale_date <= '$edate'
+                    $where
+                    group by cs.sale_date, cs.store_cd
+                ) a
+            ";
+        }
+        $row = DB::selectOne($query);
+        $total_data = $row;
+        $total = $row->total;
+        $page_cnt = (int)(($total - 1) / $page_size) + 1;
             
         return response()->json([
             "code" => 200,
@@ -159,14 +149,12 @@ class stk33Controller extends Controller
 
     public function create()
     {
-       
         $mutable = Carbon::now();
         $date = $mutable->now()->format('Y-m');
 
         $values = [
             'date' => $date,
         ];
-        
 
         return view(Config::get('shop.store.view') . '/stock/stk33_show', $values);
     }
@@ -203,10 +191,8 @@ class stk33Controller extends Controller
         ";
 
         $result = DB::select($sql);
-        
        
         if(count($result) > 0 ) {
-
             $sql = "
                 select
                     c.code_id as competitor_cd
@@ -220,24 +206,6 @@ class stk33Controller extends Controller
                 group by cs.competitor_cd
                 
             ";
-
-            // $sql = "
-            // select cs.*
-            // from competitor c
-            //     inner join (
-            //         select csa.store_cd, csa.competitor_cd, cd.code_val as competitor_nm
-            //             , sum(if(sale_date = '2023-02-01', sale_amt, 0)) as sale_amt_01
-            //             , sum(if(sale_date = '2023-02-02', sale_amt, 0)) as sale_amt_02
-            //             , sum(if(sale_date = '2023-02-03', sale_amt, 0)) as sale_amt_03
-            //         from competitor_sale csa
-            //             inner join store s on s.store_cd = csa.store_cd
-            //             inner join code cd on cd.code_id = csa.competitor_cd and cd.code_kind_cd = 'COMPETITOR'
-            //         where csa.store_cd = 'H0021' and csa.sale_date >= '2023-02-01' and csa.sale_date <= '2023-02-31'
-            //         group by csa.store_cd, csa.competitor_cd
-            //     ) cs on cs.store_cd = c.store_cd and cs.competitor_cd = c.competitor_cd
-            // where c.use_yn = 'Y'
-            // ";
-
         } else {
 
             $sql = "
@@ -253,7 +221,6 @@ class stk33Controller extends Controller
 
         }
         
-        
         $result = DB::select($sql);
 
         return response()->json([
@@ -268,51 +235,40 @@ class stk33Controller extends Controller
     }
 
 
-     public function save_amt(Request $request)
+    public function save_amt(Request $request)
     {
         $admin_id = Auth('head')->user()->id;
         $data = $request->input('data');
         $date = $request->input('date');
-        $day = $request->input('day');
 
         try {
             DB::beginTransaction();
 
-            $day_arr = [ '00','01','02','03','04','05','06','07','08','09','10'
+            $day_arr = ['01','02','03','04','05','06','07','08','09','10'
                         ,'11','12','13','14','15','16','17','18','19','20'
                         ,'21','22','23','24','25','26','27','28','29','30','31'];
 
-
+            $upsert_array = [];
             foreach($data as $rows) {
-                $store_cd = $rows['store_cd'];
-                $competitor_cd = $rows['competitor_cd'];
-
-                $size = sizeof($rows);
-
-                // if ($size > 3) {
-                    for ($i = 1; $i <= $day; $i++) {
-
-                        $where	= [
-                            'store_cd' => $store_cd, 
-                            'competitor_cd' => $competitor_cd,
-                            'sale_date' => $date.'-'.$day_arr[$i]
-                        ];
-
-                        $values = [
-                            'store_cd' => $store_cd,
-                            'competitor_cd' => $competitor_cd,
-                            'sale_date' => $date.'-'.$day_arr[$i],
-                            'sale_amt' => $rows['sale_amt_'.$day_arr[$i]]??'',
-                            'sale_memo' => $rows['sale_memo']??'',
-                            'admin_id' => $admin_id,
-                            'rt' => now(),
-                            'ut' => now()
-                        ];
-                        
-                        DB::table('competitor_sale')->updateOrInsert($where, $values);;
-                    }
-                // }
+                foreach($day_arr as $day_value) {
+                    $key = $rows['competitor_cd'].$date.$day_value;
+                    $upsert_array[$key]['store_cd']      = $rows['store_cd'];
+                    $upsert_array[$key]['sale_memo']      = $rows['sale_memo']??'';
+                    $upsert_array[$key]['competitor_cd'] = $rows['competitor_cd'];
+                    $upsert_array[$key]['sale_date']     = $date . '-' .$day_value;
+                    $upsert_array[$key]['admin_id']      = $admin_id;
+                    $upsert_array[$key]['rt']            = date("Y-m-d H:i:s");
+                    $upsert_array[$key]['ut']            = date("Y-m-d H:i:s");
+                    $upsert_array[$key]['sale_amt']      = isset($rows['sale_amt_'.$day_value]) ? $rows['sale_amt_'.$day_value] : 0;
+                }
             }
+
+            DB::table('competitor_sale')->upsert(
+                $upsert_array,
+                ['store_cd', 'competitor_cd', 'sale_date'],
+                ['sale_amt','sale_memo', 'rt', 'ut']
+            );
+
             DB::commit();
             $code = 200;
             $msg = "매출액이 저장되었습니다.";

@@ -18,7 +18,7 @@
                     <h4>기본 정보</h4>
                     <div>
                         <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
-                        <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                        <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -56,7 +56,7 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>    
+                <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>    
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
@@ -83,6 +83,7 @@
             {headerName: "#", field: "num",type:'NumType', pinned:'left', width: 30, cellClass: 'hd-grid-code'},
             {headerName: "코드", field: "competitor_cd", pinned:'left',  width: 40, cellClass: 'hd-grid-code'},
             {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 97, cellClass: 'hd-grid-code'},
+            {headerName: "메모", field: "sale_memo",  pinned:'left', width: 100, cellClass: 'hd-grid-code', editable:true, cellStyle:{'background' : '#ffFF99'}},
         ];
 
         const pApp = new App('',{
@@ -116,9 +117,6 @@
                             }
                         }
                     }
-
-                    // console.log(e.column.colId,e.data.competitor_cd, e.newValue);
-                    // console.log(e);
                 }
             });
             pApp.BindSearchEnter();
@@ -128,10 +126,8 @@
 
         function Search() {
             let data = $('form[name="search"]').serialize();
-
             let store_no = document.getElementById('store_no').value;
             date = document.getElementById('date').value;
-
             let date_format = date.split('-');
 
             //매출기간의 월에 따라 일수 구하기
@@ -148,7 +144,7 @@
             }
         }
 
-        const formatDate = async (e) => {
+        const formatDate = (e) => {
             days = e.head.day;
             setMutableColumns(days);
         }
@@ -193,7 +189,6 @@
                 alert('매장을 선택해주세요');
                 return false;
             }
-
 
             if(!confirm("매출액을 저장하시겠습니까?")) return;
 

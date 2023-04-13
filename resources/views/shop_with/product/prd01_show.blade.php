@@ -367,8 +367,8 @@
                                                 <div>상품설명</div>
                                             </dt>
                                             <dd>
-                                                <div class="area_box edit_box">
-                                                    <textarea name="goods_cont" id="goods_cont" class="form-control editor1" readonly>{{ @$goods_info->goods_cont }}</textarea>
+                                                <div class="area_box edit_box" id="goods_cont" style="height:500px;overflow:auto">
+                                                   
                                                 </div>
                                             </dd>
                                         </dl>
@@ -390,34 +390,14 @@
 
         $(document).ready(function(){
             $('#main-tab').trigger("click");
-            $('#goods_cont').summernote('disable');
+
+            //DB에 저장된 태그를 가져와 정규식으로 변환
+            let goods_cont = `{{@$goods_info->goods_cont}}`;
+            let str = goods_cont.replace(/&lt;/g, '<');
+            let str2 = str.replace(/&gt;/g, '>');
+            let str3 = str2.replace(/&quot;/g, '"');
+            document.getElementById('goods_cont').innerHTML = str3;
         }); 
-
-        $(document).ready(function() {
-            var editorToolbar = [
-                ['font', ['bold', 'underline', 'clear']],
-                ['color', ['color']],
-                ['para', ['paragraph']],
-                ['insert', ['picture', 'video']],
-                ['emoji', ['emoji']],
-                ['view', ['undo', 'redo', 'codeview','help']]
-            ];
-            var editorOptions = {
-                lang: 'ko-KR', // default: 'en-US',
-                minHeight: 150,
-                height: 200,
-                dialogsInBody: true,
-                disableDragAndDrop: false,
-                toolbar: editorToolbar,
-                imageupload:{
-                    dir:'/data/head/goods_cont',
-                    maxWidth:1280,
-                    maxSize:10
-                }
-            }
-            ed = new HDEditor('.editor1',editorOptions, true);
-        });
-
 
 		//ESC 클릭시 창 닫기
 		$(document).keydown(function(e){
@@ -428,7 +408,4 @@
 		});
 
     </script>
-
-	<link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css" >
-    <link rel="stylesheet" href="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.css?v=2020081821" >
 @stop

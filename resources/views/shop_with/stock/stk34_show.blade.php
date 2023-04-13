@@ -83,6 +83,7 @@
             {headerName: "#", field: "num",type:'NumType', pinned:'left', width: 30, cellClass: 'hd-grid-code'},
             {headerName: "코드", field: "competitor_cd", pinned:'left',  width: 40, cellClass: 'hd-grid-code'},
             {headerName: "동종업계명", field: "competitor_nm",  pinned:'left', width: 97, cellClass: 'hd-grid-code'},
+            {headerName: "메모", field: "sale_memo",  pinned:'left', width: 100, cellClass: 'hd-grid-code', editable:true, cellStyle:{'background' : '#ffFF99'}},
         ];
 
         const pApp = new App('',{
