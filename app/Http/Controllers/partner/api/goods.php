@@ -98,11 +98,13 @@ class goods extends Controller
 		$not_d_cat_cd = $req->input('not_d_cat_cd', '');
 		$style_nos = $req->input('style_nos', '');       // 스타일넘버 textarea
 		$goods_nos = $req->input('goods_nos', '');       // 상품번호 textarea
+        $sch_style_nos = $req->input('sch_style_nos', '');       // 스타일넘버 textarea
         $sch_goods_nos = $req->input('sch_goods_nos', '');       // 상품번호 textarea
 
-        $com_id = Auth('partner')->user()->com_id;
-
-        if($style_nos != ""){
+		if($sch_style_nos        != ""){
+            $style_no = $sch_style_nos;
+        }
+		if($style_nos != ""){
 			$style_no = $style_nos;
 		}
 		$style_no = preg_replace("/\s/",",",$style_no);
@@ -255,7 +257,7 @@ class goods extends Controller
 		if($site != ""){
 			if($ex_site == "Y"){
 				$join .= " left outer join goods_site s on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and s.site = '$site' ";
-				$where .= " and ifnull(s.site,'') <> '$S_site' ";
+				$where .= " and ifnull(s.site,'') <> '$site' ";
 			} else {
 				$join .= " inner join goods_site s on a.goods_no = s.goods_no and a.goods_sub = s.goods_sub and s.site = '$site' ";
 			}
@@ -284,11 +286,10 @@ class goods extends Controller
                 "
                 select count(*) as total
                 from goods a
-                where 1=1 and a.com_id = :com_id
+                where 1=1 
                     $where
 			";
-            //$row = DB::select($query,['com_id' => $com_id]);
-            $row = DB::select($query,["com_id" => $com_id]);
+            $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
@@ -340,14 +341,14 @@ class goods extends Controller
                 left outer join company cm on a.com_id = cm.com_id
 				left outer join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and cd3.code_id = a.sale_stat_cl
 				left outer join code cd2 on cd2.code_kind_cd = 'G_SPECIAL_YN' and cd2.code_id = a.special_yn
-			where 1=1 and a.com_id = :com_id
+			where 1=1
 				$where
 				$having
 			order by $ord_field $ord
 			$limit
         ";
 
-        $rows = DB::select($sql,["com_id" => $com_id]);
+        $rows = DB::select($sql);
         //echo "<pre>$sql</pre>";
 
         return response()->json([

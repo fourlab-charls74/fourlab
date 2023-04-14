@@ -821,6 +821,70 @@
         }
     });
 
+    $(".option-seq-change-btn").on("click", function(){
+        let seq = [];
+
+        gx2.gridOptions.api.forEachNode(function(node) {
+            seq.push(node.data.pid);
+        });
+
+        if(change_seq.length === 0){
+            alert('순서를 변경할 옵션을 선택해주세요.');
+        } else {
+            if(confirm('순서를 변경하시겠습니까?')){
+                $.ajax({
+                    type: 'post',
+                    url: '/partner/product/prd01/' + goods_no + '/seq-change',
+                    data:{
+                        seq : seq
+                    },  
+                    success: function (res) {
+                        alert('순서를 변경하였습니다.');
+                        Search_opt();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+
+            }
+        }
+    });
+
+    // 작업 진행중
+
+    // function Change_seq() {
+
+    //     let seq = [];
+    //         gx2.gridOptions.api.forEachNode(function(node) {
+    //             seq.push(node.data.pid);
+    //         });
+
+    //     $.ajax({
+    //         method: 'post',
+    //         url: '/store/system/sys02/' + code + '/change-seq',
+    //         data: {
+    //             seq : seq
+    //         },
+    //         dataType: 'json',
+    //         success: function(res) {
+    //             if (res.code == 200) {
+    //                 alert('메뉴순서가 변경 되었습니다.');
+    //                 opener.Search();
+    //                 Search2();
+    //             } else {
+    //                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+    //             }
+    //         },
+    //         error: function(e) {
+    //             console.log(e.responseText)
+    //         }
+    //     });
+
+
+    //     }
+
+
     $(".option-sav-btn").on("click", function(){
         var selectrows = gx2.getSelectedRows();
         if(selectrows.length === 0){

@@ -138,12 +138,12 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::post('prd01/{no}/del-option-name', 'prd01Controller@del_option_name');
 
         Route::get('prd01/{no}/get-option', 'prd01Controller@get_option');
-        Route::post('prd01/{no}/save-option', 'prd01Controller@save_option');
         Route::post('prd01/{no}/del-option', 'prd01Controller@del_option');
         Route::post('prd01/{no}/save-stock', 'prd01Controller@save_stock');
 
         Route::get('prd01/{no}/get-option', 'prd01Controller@get_option');
         Route::post('prd01/{no}/save-option', 'prd01Controller@save_option');
+        Route::post('prd01/{no}/seq-change', 'prd01Controller@seq_change');
         Route::post('prd01/{no}/del-option', 'prd01Controller@del_option');
 
         Route::get('prd01/{no}/get-stock', 'prd01Controller@get_stock');
@@ -271,6 +271,9 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         //brand 리스트
         Route::get('brand/get_brand_nm', 'brand@get_brand_nm');
         Route::get('brand/getlist', 'brand@getlist');
+
+        //업체 검색
+        Route::get('company/getlist', 'company@getlist');
 
         //category 리스트
         Route::get('category/get_category_list/{cat_type}', 'category@get_category_list');

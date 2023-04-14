@@ -107,8 +107,8 @@ class prd01Controller extends Controller
 		if( $is_option_use != "" )	$where .= " and g.is_option_use = '$is_option_use' ";
 		if( $goods_location != "" )	$where .= " and g.goods_location like '%$goods_location%' ";
 
-		if ($sdate != "") $where .= " and g.reg_dm >= '$sdate' ";
-		if ($edate != "") $where .= " and g.reg_dm < date_add('$edate',interval 1 day) ";
+		// if ($sdate != "") $where .= " and g.reg_dm >= '$sdate' ";
+		// if ($edate != "") $where .= " and g.reg_dm < date_add('$edate',interval 1 day) ";
 
         if($goods_nos        != ""){
             $goods_no = $goods_nos;

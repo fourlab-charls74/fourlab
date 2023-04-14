@@ -642,6 +642,7 @@ select.select_cat
                                 <div class="tab-content">
                                     <div class="tab-pane fade show active mt-1" id="option-basic-tab" role="tabpanel">
                                         <div class="pt-1 pb-1 text-right">
+                                            <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-seq-change-btn"><span class="fs-12">순서변경</span></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">추가</span></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-sav-btn"><span class="fs-12">저장</span></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">삭제</span></a>
@@ -651,7 +652,7 @@ select.select_cat
                                             var columns_opt = [
                                                 {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
                                                 {field:"name",headerName:"옵션구분", width:90,rowDrag: true },
-                                                {field:"option",headerName:"옵션", width:13,editable:true,cellClass:['hd-grid-edit'] },
+                                                {field:"option",headerName:"옵션", width:130,editable:true,cellClass:['hd-grid-edit'] },
                                                 {field:"price",headerName:"옵션가", width:90,type: 'numberType',editable:true,cellClass:['hd-grid-number','hd-grid-edit'] },
                                                 {field:"memo",headerName:"메모", width:90, editable:true,cellClass:['hd-grid-edit'],cellStyle:{"text-align":"center"} },
                                                 {field:"option_no",headerName:"option_no", hide:true},
