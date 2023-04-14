@@ -26,10 +26,10 @@
         </div>
     </div>
 
-    <style> 
+    <style>
         .table th {min-width: 130px;}
         .table td {width: 50%;}
-        
+
         @media (max-width: 740px) {
             .table td {float: unset !important;width: 100% !important;}
         }
@@ -97,7 +97,8 @@
                 <div class="table-responsive mt-2">
                     <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
-                <p class="mt-2 text-success">* 해당연월에 <u class="font-weight-bold">마감완료처리</u>된 매장의 기타재반자료는 수정할 수 없습니다.</p>
+                <p class="mt-2 text-danger">* 해당연월에 <u class="text-success font-weight-bold">마감완료처리</u> 된 매장의 기타재반자료는 수정할 수 없습니다.</p>
+                <p class="text-danger">* <u class="font-weight-bold">매장정보 없음</u> 처리된 항목은 등록되지 않습니다.</p>
             </div>
         </div>
     </div>
@@ -127,7 +128,7 @@
                                                     <label class="custom-file-label" for="file"></label>
                                                 </div>
                                                 <a href="/sample/sample_extra_acc.xlsx" class="mt-2" id="sample_file_link" style="text-decoration: underline !important;">일괄등록양식 다운로드</a>
-                                                <a href="/sample/sample_old_extra_acc.xlsx" class="mt-2" id="sample_file_link2" style="text-decoration: underline !important;" hidden>(원부자재포함) 일괄등록양식 다운로드</a>
+                                                <a href="/sample/sample_extra_acc_one.xlsx" class="mt-2" id="sample_file_link2" style="text-decoration: underline !important;" hidden>(원부자재포함) 일괄등록양식 다운로드</a>
                                                 {{-- file_type: G(기본) / S(원부자재포함) --}}
                                                 <input type="hidden" id="file_type" value="G">
                                             </div>
@@ -146,13 +147,13 @@
     </div>
 </div>
 
-<script language="javascript">
+<script type="text/javascript" charset="utf-8">
     const CMD = "{{ @$cmd }}";
     const EXCLUED_TOTAL = "{{ @$extra_etc->exclude_total }}"; // 합계 계산 시 제외타입
     const EXCEPT_VAT = "{{ @$extra_etc->except_vat }}"; // 세금제외타입
     const S_PAYERS = "{{ @$extra_etc->pay_for_s }}"; // 매장부담타입
     const C_PAYERS = "{{ @$extra_etc->pay_for_c }}"; // 본사부담타입
-    
+
     const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
     const PAYER = { 'C': '(본사부담)', 'S': '(매장부담)' };
 
@@ -167,20 +168,27 @@
         { field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 57,
             cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (CLOSED_STATUS[params.value] || '-'),
             cellStyle: (params) => ({
-                ...CENTER, 
+                ...CENTER,
                 "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
                 "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
             }),
         },
-        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: CENTER },
-        { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 170 },
+        { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: (params) => ({ ...CENTER, "background-color": params.data.store_info_yn === 'N' ? '#ff4444' : 'none', "color": params.data.store_info_yn === 'N' ? '#ffffff' : 'none' }) },
+        { field: "store_nm", headerName: "매장명", pinned: 'left', width: 200, cellStyle: (params) => ({ "background-color": params.data.store_info_yn === 'N' ? '#ff4444' : 'none', "color": params.data.store_info_yn === 'N' ? '#ffffff' : 'none' }),
+            cellRenderer: function (params) {
+                if (params.value !== undefined) {
+                    if (params.data.store_info_yn === 'N') return params.value + ' (매장정보 없음)';
+                    return '<a href="javascript:void(0);" onclick="return openStore(\'' + params.data.store_cd + '\');">' + params.value + '</a>';
+                }
+            }
+        },
         @foreach ($extra_cols as $entry_cd => $children)
 			@if ($entry_cd !== '')
 				{ headerName: `{{ $children[0]->entry_nm }} ${ PAYER["{{ $children[0]->payer }}"] || '' }`,
 					children: [
 						@foreach ($children as $child)
 							{ headerName: "{{ $child->type_nm }}", field: "{{ $child->type_cd }}_amt", type: 'currencyType', width: 100,
-                                editable: (params) => setEditable(params, "{{ $child->type_cd }}" !== 'P3'), 
+                                editable: (params) => setEditable(params, "{{ $child->type_cd }}" !== 'P3'),
                                 cellStyle: (params) => setEditable(params, "{{ $child->type_cd }}" !== 'P3') ? YELLOW : {},
                                 cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
                             },
@@ -221,7 +229,7 @@
     const get_total_amt = (payers, obj) => Object.keys(obj).reduce((a,c) => (c.split("_").slice(-1)[0] === "sum" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0]) && payers.includes(c.split("_")[0]) ? (obj[c] * 1) : 0) + a, 0);
 
     $(document).ready(function() {
-        pApp.ResizeGrid(340);
+        pApp.ResizeGrid(352);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
@@ -243,12 +251,12 @@
 						}
 
 						// 각 소계 계산
-						e.data[group_cd + "_sum"] 
+						e.data[group_cd + "_sum"]
 							= Object.keys(e.data).reduce((a,c) => (
-								(c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0])) 
+								(c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0]))
 									? EXCEPT_VAT.split(",").includes(c.split("_")[0])
-                                        ? Math.round(e.data[c] * 1 / 1.1) 
-                                        : (e.data[c] * 1) 
+                                        ? Math.round(e.data[c] * 1 / 1.1)
+                                        : (e.data[c] * 1)
                                     : 0
 							) + a, 0);
 
@@ -268,7 +276,7 @@
 			resizable: false,
 			sortable: true,
 		};
-        
+
         if (CMD === 'update') Search();
         updatePinnedRow();
 
@@ -315,33 +323,33 @@
 		const cols = columns.reduce((a, c) => {
 			let col = {...c};
 			if(col.field === 'G') {
-				col.children = gifts.map(gf => ({ 
-                        headerName: gf.prd_nm, 
-                        field: "G_" + gf.prd_cd + "_amt", 
-                        type: 'currencyType', width: 100, 
+				col.children = gifts.map(gf => ({
+                        headerName: gf.prd_nm,
+                        field: "G_" + gf.prd_cd + "_amt",
+                        type: 'currencyType', width: 100,
                         editable: (params) => setEditable(params),
-                        cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
-                        cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
-                    })).concat({ 
-                        headerName: "소계", 
-                        field: "G_sum", 
-                        type: 'currencyType', width: 100, 
-                        cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
+                        cellStyle: (params) => setEditable(params) ? YELLOW : {},
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0)
+                    })).concat({
+                        headerName: "소계",
+                        field: "G_sum",
+                        type: 'currencyType', width: 100,
+                        cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0)
                     });
 			}
             if(col.field === 'E') {
-				col.children = expandables.map(exp => ({ 
-                    headerName: exp.prd_nm, 
-                    field: "E_" + exp.prd_cd  + "_amt", 
-                    type: 'currencyType', width: 100, 
+				col.children = expandables.map(exp => ({
+                    headerName: exp.prd_nm,
+                    field: "E_" + exp.prd_cd  + "_amt",
+                    type: 'currencyType', width: 100,
                     editable: (params) => setEditable(params),
-                    cellStyle: (params) => setEditable(params) ? YELLOW : {}, 
-                    cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
-                })).concat({ 
-                    headerName: "소계", 
-                    field: "E_sum", 
-                    type: 'currencyType', width: 100, 
-                    cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0) 
+                    cellStyle: (params) => setEditable(params) ? YELLOW : {},
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0)
+                })).concat({
+                    headerName: "소계",
+                    field: "E_sum",
+                    type: 'currencyType', width: 100,
+                    cellRenderer: (params) => params.value !== null ? Comma(params.value || 0) : (CMD === 'add' ? '' : 0)
                 });
 			}
 			a.push(col);
@@ -381,12 +389,12 @@
 		axios({
             url: '/store/account/acc05/save',
             method: 'post',
-            data: { 
-                cmd: CMD, 
+            data: {
+                cmd: CMD,
                 type: file_type,
-                data: rows, 
-                cols: colDef, 
-                sdate: applied_date 
+                data: rows,
+                cols: colDef,
+                sdate: applied_date
             }
         }).then((res) => {
             if (res.data.code === "200") {
@@ -445,8 +453,8 @@
         $("#SelectFileModal").draggable();
         $('#SelectFileModal').modal({ keyboard: false });
     }
-    
-    /** 
+
+    /**
      * 엑셀 관련 함수
      * - read the raw data and convert it to a XLSX workbook
     */
@@ -460,14 +468,14 @@
         is_file_applied = true;
 
         Search(false, () => {
-            
+
             const form_data = new FormData();
             form_data.append('file', file_data);
             form_data.append('_token', "{{ csrf_token() }}");
 
             $("#SelectFileModal").modal('hide');
             alert("엑셀파일을 적용하고 있습니다. 잠시만 기다려주세요.");
-            
+
             axios({
                 url: '/store/account/acc05/batch-import',
                 method: 'post',
@@ -491,38 +499,49 @@
     const populateGrid = async (workbook) => {
         let firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
 		let worksheet = workbook.Sheets[firstSheetName];
+        let storeSheet = workbook.Sheets['매장정보'];
 
+        // 매장정보 시트 읽기
+        const store_columns = { 'A': 'store_cd', 'C': 'store_nm' };
+        let storeIndex = 2;
+        const stores = [];
+        while (storeSheet['A' + storeIndex]) {
+            let st = [];
+            Object.keys(store_columns).forEach(col => {
+                st.push(storeSheet[col + storeIndex].v);
+            });
+            stores.push(st);
+            storeIndex++;
+        }
+
+        // 기타재반자료 시트 읽기
         const file_type = $("#file_type").val(); // G(기본) / S(원부자재포함)
 
 		let excel_columns = {
-			'B': 'store_cd', 'C': 'store_nm',
-			'D': 'M1_amt',
-			'G': 'P1_amt', 'H': 'P2_amt', 'J': 'P4_amt', 'K': 'P5_amt', 'L': 'P6_amt',
-			'N': 'S1_amt', 'O': 'S2_amt', 'P': 'S3_amt', 'R': 'S4_amt',
-			'S': 'O1_amt', 'T': 'O2_amt', 'U': 'O3_amt'
+			'B': 'store_nm',
+			'C': 'M1_amt',
+			'F': 'P1_amt', 'G': 'P2_amt', 'I': 'P4_amt', 'J': 'P5_amt', 'K': 'P6_amt',
+			'M': 'S1_amt', 'N': 'S2_amt', 'O': 'S3_amt', 'Q': 'S4_amt',
+			'R': 'O1_amt', 'S': 'O2_amt', 'T': 'O3_amt'
         };
 
-        let g_types = [];
-        let e_types = [];
+        let g_types = ['V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'];
+        let e_types = ['AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP'];
 
         if (file_type === 'S') {
-            excel_columns = {
-                ...excel_columns,
-                'W': 'G', 'X': 'G', 'Y': 'G', 'Z': 'G', 'AA': 'G', 'AB': 'G', 'AC': 'G', 'AD': 'G', 'AE': 'G', 'AF': 'G',
-			    'AH': 'E', 'AI': 'E', 'AJ': 'E', 'AK': 'E', 'AL': 'E', 'AM': 'E', 'AN': 'E', 'AO': 'E', 'AP': 'E', 'AQ': 'E'
-            };
+            g_types.forEach(col => { excel_columns[col] = 'G' });
+            e_types.forEach(col => { excel_columns[col] = 'E' });
 
-            g_types = ['W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+            g_types = g_types
                 .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'G', colId: v }))
                 .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
-            e_types = ['AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ']
+            e_types = e_types
                 .map(v => ({ prd_nm: worksheet[v + '4']?.v, prd_cd: v, type: 'E', colId: v }))
                 .filter(v => v.prd_nm !== '-' && v.prd_nm !== '');
         }
 
-
         let firstRowIndex = 5; // 엑셀 5행부터 시작 (샘플데이터 참고)
-		let rowIndex = firstRowIndex; 
+		let rowIndex = firstRowIndex;
 
         let rows = [];
         let group_cd = '';
@@ -532,10 +551,7 @@
                 let item = worksheet[column + rowIndex];
 				if (item !== undefined) {
                     let val = item.v;
-                    if (
-                        !['store_cd', 'store_nm'].includes(excel_columns[column]) 
-                        && (isNaN(item.v) || item.v == '' || parseFloat(item.v) < 0)
-                    ) val = 0;
+                    if (column !== 'B' && (isNaN(item.v) || item.v == '')) val = 0;
 
                     if (file_type === 'S') {
                         if (excel_columns[column] === 'G') {
@@ -553,34 +569,44 @@
 				}
 			});
 
+            let c_store_cd = stores.find(st => st[1] === row.store_nm)?.[0] || '';
+            if (rows.find(r => r.store_cd === c_store_cd) !== undefined) {
+                rowIndex++;
+                continue;
+            }
+
             // 온라인항목 처리
-            row = {...row, 'P3_amt': (row['P1_amt'] || 0) - (row['P2_amt'] || 0)};
+            row = {
+                ...row,
+                'P3_amt': (row['P1_amt'] || 0) - (row['P2_amt'] || 0),
+                'store_cd': c_store_cd,
+            };
 
             // 각 소계 계산
             @foreach ($extra_cols as $entry_cd => $children)
                 group_cd = "{{ $entry_cd }}";
                 row[group_cd + "_sum"]
                     = Object.keys(row).reduce((a,c) => (
-                        (c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0])) 
+                        (c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0]))
                             ? EXCEPT_VAT.split(",").includes(c.split("_")[0])
-                                ? Math.round(row[c] * 1 / 1.1) 
-                                : (row[c] * 1) 
+                                ? Math.round(row[c] * 1 / 1.1)
+                                : (row[c] * 1)
                             : 0
-                    ) + a, 0);                
+                    ) + a, 0);
             @endforeach
 
             if (file_type === 'S') {
                 row["G_sum"]
                     = Object.keys(row).reduce((a,c) => (
-                        (c.split("")[0] === 'G' && c.split("_").slice(-1)[0] === "amt") 
+                        (c.split("")[0] === 'G' && c.split("_").slice(-1)[0] === "amt")
                             ? (row[c] * 1) : 0
-                    ) + a, 0);    
-    
+                    ) + a, 0);
+
                 row["E_sum"]
                     = Object.keys(row).reduce((a,c) => (
                         (c.split("")[0] === 'E' && c.split("_").slice(-1)[0] === "amt")
                             ? (row[c] * 1) : 0
-                    ) + a, 0);    
+                    ) + a, 0);
             }
 
             // 총합계 계산
@@ -598,31 +624,30 @@
             await setColumns({ gifts: g_types, expandables: e_types });
         }
 
-        const rowsToUpdate = [];
-        gx.gridOptions.api.forEachNode(function(node) {
-            let data = [];
-            let old_data = node.data;
-            const item = rows.filter(row => row.store_cd === old_data.store_cd);
+        const old_rows = gx.getRows();
 
-            if (item.length > 0) {
+        const rowsToUpdate = rows.map(row => {
+            let old_row = old_rows.find(or => or.store_cd === row.store_cd);
+
+            if (old_row !== undefined) {
                 if (file_type === 'S') {
-                    Object.keys(old_data)
+                    Object.keys(old_row)
                         .filter(key => ['G', 'E'].includes(key.split("")[0]) && key.split("_").slice(-1)[0] === "amt")
                         .forEach(key => {
-                            delete old_data[key];
+                            delete old_row[key];
                         });
                 }
 
-                if (old_data.closed_yn === 'Y') {
-                    data = { ...old_data };
-                } else {
-                    data = { ...old_data, ...item[0], store_nm: old_data.store_nm };
-                }
-                data.C_total = get_total_amt(C_PAYERS, data);
-                data.S_total = get_total_amt(S_PAYERS, data);
+                if (old_row.closed_yn === 'Y') row = old_row;
+                else row = { ...old_row, ...row };
+            } else {
+                row = { ...row, store_info_yn: 'N' };
             }
 
-            rowsToUpdate.push(data);
+            row.C_total = get_total_amt(C_PAYERS, row);
+            row.S_total = get_total_amt(S_PAYERS, row);
+
+            return row;
         });
 
         await gx.gridOptions.api.setRowData([]);

@@ -16,7 +16,7 @@ use Exception;
 // 기타재반자료
 class acc05Controller extends Controller
 {
-    public function index(Request $request) 
+    public function index(Request $request)
     {
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
 
@@ -38,7 +38,7 @@ class acc05Controller extends Controller
 
         $extra_sql = "";
         $sum_extra_sql = "";
-        
+
         // 기타재반타입별 쿼리문 생성
         foreach ($extra_types as $key => $types) {
             if ($key !== '') {
@@ -46,10 +46,10 @@ class acc05Controller extends Controller
                     $extra_sql .= ", sum(if(el.type = '" . $type->type_cd . "', el.extra_amt, null)) as " . $type->type_cd . "_amt";
                     $sum_extra_sql .= ", sum(" . $type->type_cd . "_amt) as " . $type->type_cd . "_amt";
                 }
-    
+
                 $types_arr = array_filter($types, function($t) { return $t->total_include_yn === 'Y'; });
                 $types_str = array_map(function($t) { return "'" . $t->type_cd . "'"; }, $types_arr);
-    
+
                 $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt), 0)) as " . $key . "_sum";
                 $sum_extra_sql .= ", sum(" . $key . "_sum) as " . $key . "_sum";
             }
@@ -111,14 +111,14 @@ class acc05Controller extends Controller
         // 합계에서 제외하는 타입 선별
         $exclude_total_type = array_reduce($extra_cols->toArray(), function($a, $c) {
             $type = array_filter($c, function($tt) { return $tt->total_include_yn === 'N'; });
-            if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
+            if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type));
             else return $a;
         }, []);
 
         // 세금 제외하는 타입 선별
         $except_vat_type = array_reduce($extra_cols->toArray(), function($a, $c) {
             $type = array_filter($c, function($tt) { return $tt->except_vat_yn === 'Y'; });
-            if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
+            if (count($type) > 0) return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type));
             else return $a;
         }, []);
 
@@ -127,9 +127,9 @@ class acc05Controller extends Controller
             $type = array_filter($c, function($tt) use ($cd) { return $tt->payer === $cd; });
             if (count($type) > 0) {
                 if ($type[0]->entry_cd === null) {
-                    return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type)); 
+                    return array_merge($a, array_map(function($tt) { return $tt->type_cd; }, $type));
                 }
-                return array_merge($a, [$type[0]->entry_cd]); 
+                return array_merge($a, [$type[0]->entry_cd]);
             }
             return $a;
         }, []);
@@ -167,14 +167,14 @@ class acc05Controller extends Controller
 
         if ($cmd === 'add' && $cnt > 0) {
             return response()->json(['code' => 400, 'head' => [
-                'total' => 0, 
-                'sdate' => $sdate, 
+                'total' => 0,
+                'sdate' => $sdate,
                 'msg' => '해당연월의 기타재반자료정보가 이미 존재합니다.'
             ]]);
         } else if ($cmd === 'update' && $cnt < 1) {
             return response()->json(['code' => 400, 'head' => [
-                'total' => 0, 
-                'sdate' => $sdate, 
+                'total' => 0,
+                'sdate' => $sdate,
                 'msg' => '해당연월의 기타재반자료정보가 존재하지 않습니다.'
             ]]);
         }
@@ -195,15 +195,15 @@ class acc05Controller extends Controller
             group by el.type, el.prd_cd, el.prd_nm
         ";
         $rows = DB::select($sql, ['sdate' => $sdate]);
-        
+
         if (count($rows) > 0) {
             // 이전에 등록한 자료에 원부자재정보가 포함되어 있을 경우
-            $gifts = array_reduce($rows, function($a, $c) { 
-                if ($c->type === 'G') return array_merge($a, [$c]); 
+            $gifts = array_reduce($rows, function($a, $c) {
+                if ($c->type === 'G') return array_merge($a, [$c]);
                 else return $a;
             }, []); // 사은품
-            $expandables = array_reduce($rows, function($a, $c) { 
-                if ($c->type === 'E') return array_merge($a, [$c]); 
+            $expandables = array_reduce($rows, function($a, $c) {
+                if ($c->type === 'E') return array_merge($a, [$c]);
                 else return $a;
             }, []); // 소모품
         } else {
@@ -228,10 +228,10 @@ class acc05Controller extends Controller
                 foreach ($types as $type) {
                     $extra_sql .= ", sum(if(el.type = '" . $type->type_cd . "', el.extra_amt, null)) as " . $type->type_cd . "_amt";
                 }
-    
+
                 $types_arr = array_filter($types, function($t) { return $t->total_include_yn === 'Y'; });
                 $types_str = array_map(function($t) { return "'" . $t->type_cd . "'"; }, $types_arr);
-    
+
                 $extra_sql .= ", sum(if(el.type in (" . join(',', $types_str) . "), if(el.type in (select type_cd from store_account_extra_type where except_vat_yn = 'Y'), round(el.extra_amt / 1.1), el.extra_amt), null)) as " . $key . "_sum";
             }
         }
@@ -241,7 +241,7 @@ class acc05Controller extends Controller
             return ", sum(if(el.type = 'G' and el.prd_cd = '" . $value->prd_cd . "', el.extra_amt, null)) as G_" . $value->prd_cd . "_amt";
         }, $gifts));
         $extra_sql .= ", sum(if(el.type = 'G', el.extra_amt, null)) as G_sum";
-        
+
         // 소모품 쿼리문 생성
         $extra_sql .= join('', array_map(function($value) {
             return ", sum(if(el.type = 'E' and el.prd_cd = '" . $value->prd_cd . "', el.extra_amt, null)) as E_" . $value->prd_cd . "_amt";
@@ -280,11 +280,11 @@ class acc05Controller extends Controller
                     where c.sday = :f_sdate and c.eday = :f_edate
                 ) c on c.c_store_cd = s.store_cd
             where s.account_yn = 'Y' $where
-            order by s.store_cd
+            order by e.ext_idx, s.store_cd
         ";
 
         $result = DB::select($sql, ['sdate' => $sdate, 'f_sdate' => $f_sdate, 'f_edate' => $f_edate]);
-        
+
         return response()->json([
             'code'	=> 200,
             'head'	=> [
@@ -312,8 +312,7 @@ class acc05Controller extends Controller
 
     public function save(Request $request)
 	{
-        $cmd = $request->input('cmd', 'add');
-        $file_type = $request->input('type', 'G'); // G: 일반, S: 원부자재포함
+        // $file_type = $request->input('type', 'G'); // G: 일반, S: 원부자재포함
 		$data = $request->input('data', []);
 		$cols = $request->input('cols', []);
         $sdate = $request->input('sdate', '');
@@ -327,12 +326,15 @@ class acc05Controller extends Controller
 			DB::beginTransaction();
 
             foreach ($data as $extra) {
+                $store_cd = $extra['store_cd'];
+                $store_info = DB::table('store')->where('store_cd', $store_cd)->where('account_yn', 'Y')->first();
+                if ($store_info === null) continue;
+
                 $amts = array_filter($extra, function($key) {
                     $key_arr = (explode('_', $key));
                     return end($key_arr) === 'amt';
                 }, ARRAY_FILTER_USE_KEY);
                 $ymonth = $extra['ymonth'] ?? $sdate;
-                $store_cd = $extra['store_cd'];
 
                 // 타입별정보 가공
                 $extra_list = [];
@@ -387,7 +389,7 @@ class acc05Controller extends Controller
     }
 
     /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
-	public function import_excel(Request $request) 
+	public function import_excel(Request $request)
     {
 		if (count($_FILES) > 0) {
 			if ( 0 < $_FILES['file']['error'] ) {
@@ -398,17 +400,17 @@ class acc05Controller extends Controller
 				$now = date('YmdHis');
 				$user_id = Auth::guard('head')->user()->id;
 				$extension = $file->extension();
-	
+
 				$save_path = "data/store/acc05/";
 				$file_name = "${now}_${user_id}.${extension}";
-				
+
 				if (!Storage::disk('public')->exists($save_path)) {
 					Storage::disk('public')->makeDirectory($save_path);
 				}
-	
+
 				$file = sprintf("${save_path}%s", $file_name);
 				move_uploaded_file($_FILES['file']['tmp_name'], $file);
-	
+
 				return response()->json(['code' => 1, 'file' => $file], 200);
 			}
 		}
