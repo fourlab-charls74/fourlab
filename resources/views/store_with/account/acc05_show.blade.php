@@ -618,7 +618,6 @@
 		}
 
         if(rows.length < 1) return alert("한 개 이상의 매장자료를 입력해주세요.");
-        rows = rows.filter(r => r.store_cd);
 
         if (file_type === 'S') {
             await setColumns({ gifts: g_types, expandables: e_types });
@@ -629,7 +628,7 @@
         const rowsToUpdate = rows.map(row => {
             let old_row = old_rows.find(or => or.store_cd === row.store_cd);
 
-            if (old_row !== undefined) {
+            if (old_row !== undefined && row.store_cd) {
                 if (file_type === 'S') {
                     Object.keys(old_row)
                         .filter(key => ['G', 'E'].includes(key.split("")[0]) && key.split("_").slice(-1)[0] === "amt")
