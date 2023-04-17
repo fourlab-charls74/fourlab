@@ -198,7 +198,12 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::get('prd07/search', 'prd07Controller@search');
         Route::put('prd07/update', 'prd07Controller@update');
 
+        // 상품이미지 일괄등록
         Route::get('prd08', 'prd08Controller@index');
+        Route::get('prd08/goods-info/goods-no', 'prd08Controller@get_goods_info_by_goodsno');
+        Route::get('prd08/goods-info/style-no', 'prd08Controller@get_goods_info_by_styleno');
+        Route::put('prd08/upload', 'prd08Controller@upload_images');
+
         Route::get('prd09', 'prd09Controller@index');
 
         Route::get('prd10', 'prd10Controller@index');

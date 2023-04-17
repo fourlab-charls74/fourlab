@@ -202,20 +202,15 @@
     <script language="javascript">
 
         var columns= [
-            {field:"opt_kind_nm" ,headerName:"품목",pinned:'left', width: 120},
-            {field:"brand_nm" ,headerName:"브랜드",pinned:'left' },
-            {field:"style_no" ,headerName:"스타일넘버",pinned:'left' },
-            {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:100,cellStyle:StyleGoodsTypeNM},
-            {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:80},
-            {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:80},
-            {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"GoodsNameType", width:400},
+            {field:"goods_type_nm",headerName:"상품구분",width:100,cellStyle:StyleGoodsTypeNM},
+            {field:"is_unlimited_nm",headerName:"재고구분",width:80},
             {field:"sale_stat_cl_nm" ,headerName:"상태",width:100,cellStyle:StyleGoodsState},
             {field:"wonga" ,headerName:"원가", type: 'currencyType'},
             {field:"goods_opt" ,headerName:"옵션",width:210,
                 checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStock(' + params.data.goods_no + ',\'' + params.value +'\');">' + params.value + '</a>';
+                        return '<a href="#" onclick="return openStock(' + params.data.goods_no_hd + ',\'' + params.value +'\');">' + params.value + '</a>';
                     }
                 }
             },
@@ -272,16 +267,41 @@
             gridId:"#div-gd",
         });
         let gx;
+
         $(document).ready(function() {
             pApp.ResizeGrid(310);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
-            gx = new HDGrid(gridDiv, columns);
-            //gx.gridOptions.enterMovesDown = true;
-            //gx.gridOptions.enterMovesDownAfterEdit = true;
+            gx = new HDGrid(gridDiv, columns, {
+                treeData: true,
+                defaultColDef: {
+                    flex: 1,
+                },
+                autoGroupColumnDef: {
+                    headerName: '품목/브랜드/스타일코드/상품코드/상품명',
+                    minWidth: 500,
+                    cellRenderer: 'agGroupCellRenderer',
+                    cellRendererParams: {
+                        innerRenderer: function (params) {
+                            if(params.node.level === 4){
+                                return '<a href="#" onclick="return openProduct(\'' + params.node.allLeafChildren[0].data.goods_no_hd + '\');">' + params.node.allLeafChildren[0].data.goods_nm + '</a>';
+                            }
+
+                            return params.value;
+                        },
+                        suppressDoubleClickExpand: true,
+                        suppressEnterExpand: true
+                    }
+                },
+                groupDefaultExpanded: 4,
+                getDataPath: function(data) {
+                    return data.tree_set.split('/');
+                }
+            });
 
             Search();
         });
+
         function Search() {
             let data = $('form[name="search"]').serialize();
             gx.Request('/partner/stock/stk01/search', data,1 );
@@ -301,7 +321,7 @@
                     if(rowNode.selected == true){
                         data.push(
                             {
-                                'goods_no':rowNode.data.goods_no,
+                                'goods_no':rowNode.data.goods_no_hd,
                                 'goods_opt':rowNode.data.goods_opt,
                                 'qty':rowNode.data.edit_good_qty,
                                 'wqty':rowNode.data.edit_wqty

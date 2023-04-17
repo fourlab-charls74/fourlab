@@ -103,26 +103,28 @@ class stk01Controller extends Controller
         $query = /** @lang text */
             "
           select
-            a.com_nm, o.opt_kind_nm, b.brand_nm, a.style_no,
-            cd.code_val as goods_type_nm, cd2.code_val as is_unlimited_nm,
-            a.goods_no, a.goods_sub, a.goods_nm,
-            cd3.code_val as sale_stat_cl_nm,
-            a.wonga,
-            a.goods_opt, '1' as level,
-            ifnull(if(a.is_unlimited = 'Y', '∞', a.good_qty), 0) as good_qty,
-            ifnull(a.wqty,0) as wqty,
-            ifnull(if(a.is_unlimited = 'Y', '-', a.good_qty), 0) as edit_good_qty,
-            ifnull(a.wqty, 0) as edit_wqty,
-            a.goods_no as goods_no_hd,a.goods_sub as goods_sub_hd,a.is_unlimited
+                CONCAT_WS('/', opt_kind_nm, brand_nm, style_no, goods_no, goods_nm, goods_opt) as tree_set,
+                -- a.com_nm, o.opt_kind_nm, b.brand_nm, a.style_no,
+                cd.code_val as goods_type_nm, cd2.code_val as is_unlimited_nm,
+                -- a.goods_no, a.goods_sub, a.goods_nm,
+                a.goods_nm,
+                cd3.code_val as sale_stat_cl_nm,
+                a.wonga,
+                a.goods_opt, '1' as level,
+                ifnull(if(a.is_unlimited = 'Y', '∞', a.good_qty), 0) as good_qty,
+                ifnull(a.wqty,0) as wqty,
+                ifnull(if(a.is_unlimited = 'Y', '-', a.good_qty), 0) as edit_good_qty,
+                ifnull(a.wqty, 0) as edit_wqty,
+                a.goods_no as goods_no_hd,a.goods_sub as goods_sub_hd,a.is_unlimited
           from (
-            select
-              g.goods_no, g.goods_sub, g.goods_nm, g.sale_stat_cl,g.wonga,
-              g.com_id,c.com_nm, g.opt_kind_cd, g.brand, g.style_no, g.goods_type, g.is_unlimited,
-              s.goods_opt,s.good_qty,s.wqty
-            from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
-              inner join company c on c.com_id = g.com_id
-            where 1=1 and g.com_id = :com_id $where
-            $limit
+                select
+                g.goods_no, g.goods_sub, g.goods_nm, g.sale_stat_cl,g.wonga,
+                g.com_id,c.com_nm, g.opt_kind_cd, g.brand, g.style_no, g.goods_type, g.is_unlimited,
+                s.goods_opt,s.good_qty,s.wqty
+                from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
+                inner join company c on c.com_id = g.com_id
+                where 1=1 and g.com_id = :com_id $where
+                $limit
           ) a
           left outer join brand b on a.brand = b.brand
           inner join opt o on a.opt_kind_cd = o.opt_kind_cd and o.opt_id = 'K'
@@ -131,7 +133,7 @@ class stk01Controller extends Controller
           inner join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd3.code_id
           order by a.goods_no desc,a.goods_opt
         ";
-        //echo "<pre>$query</pre>";
+
         $result = DB::select($query,["com_id" => $com_id]);
 
         return response()->json([
@@ -176,9 +178,16 @@ class stk01Controller extends Controller
             $code = 200;
         } catch(\Exception $e){
             $code = 500;
+
+            return response()->json([
+                "code" => $code,
+                "msg" => $e -> getMessage()
+            ]);
         }
+
         return response()->json([
-            "code" => $code
+            "code" => $code,
+            "msg" => '수정에 성공하였습니다.'
         ]);
     }
 
