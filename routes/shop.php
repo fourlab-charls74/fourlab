@@ -214,6 +214,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
 
         
         Route::get('prd01/{no}', 'prd01Controller@show');
+        Route::get('prd01/goods_img/{no}', 'prd01Controller@show_img');
         Route::get('prd01/{no}/get', 'prd01Controller@get');
        
 

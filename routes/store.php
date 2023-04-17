@@ -459,6 +459,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk26/save-loss', 'stk26Controller@save_loss');
         Route::delete('stk26','stk26Controller@delete');
         Route::get('stk26/batch', 'stk26Controller@show_batch');
+        Route::get('stk26/barcode-batch', 'stk26Controller@barcode_batch');
         Route::post('stk26/batch-import', 'stk26Controller@import_excel');
         Route::post('stk26/batch-getgoods', 'stk26Controller@get_goods');
         

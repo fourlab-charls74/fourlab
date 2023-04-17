@@ -367,7 +367,7 @@
                                                 <div>상품설명</div>
                                             </dt>
                                             <dd>
-                                                <div class="area_box edit_box" id="goods_cont" style="height:500px;overflow:auto">
+                                                <div class="area_box edit_box" id="goods_cont" style="height:500px; width:100%;overflow:auto">
                                                    
                                                 </div>
                                             </dd>
@@ -393,10 +393,15 @@
 
             //DB에 저장된 태그를 가져와 정규식으로 변환
             let goods_cont = `{{@$goods_info->goods_cont}}`;
-            let str = goods_cont.replace(/&lt;/g, '<');
-            let str2 = str.replace(/&gt;/g, '>');
-            let str3 = str2.replace(/&quot;/g, '"');
-            document.getElementById('goods_cont').innerHTML = str3;
+            console.log(goods_cont);
+            let str = goods_cont.replace(/&lt;img/g, '<br><img')
+            let str2 = str.replace(/ - /g, '<br>')
+            let str3 = str2.replace(/&lt;/g, '<');
+            let str4 = str3.replace(/&gt;/g, '>');
+            let str5 = str4.replace(/&quot;/g, '"');
+            let str6 = str5.replace(/&amp;nbsp;/g, ' ');
+            let str7 = str6.replace(/MARGIN: 0px auto;/g, ' ');
+            document.getElementById('goods_cont').innerHTML = str7;
         }); 
 
 		//ESC 클릭시 창 닫기

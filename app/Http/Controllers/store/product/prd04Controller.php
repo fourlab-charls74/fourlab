@@ -74,7 +74,7 @@ class prd04Controller extends Controller
         if ( $storage_cd != "" ) {
             $where	.= " and (1!=1";
             foreach($storage_cd as $storage_cd) {
-                $where .= " or storage_cd = '$storage_cd' ";
+                $where .= " or pss2.storage_cd = '$storage_cd' ";
 
             }
             $where	.= ")";
@@ -159,19 +159,20 @@ class prd04Controller extends Controller
 			"
 				select
 					count(prd_cd) as total,
-					sum(a.goods_sh * a.wqty) as total_goods_sh,
-					sum(a.price * a.wqty) as total_price,
-					sum(a.wonga * a.wqty) as total_wonga,
-					sum(a.wqty) as total_wqty,
-					sum(a.sqty) as total_sqty
+					ifnull(sum(a.goods_sh * a.wqty),0) as total_goods_sh,
+					ifnull(sum(a.price * a.wqty),0) as total_price,
+					ifnull(sum(a.wonga * a.wqty),0) as total_wonga,
+					ifnull(sum(a.wqty),0) as total_wqty,
+					ifnull(sum(a.sqty),0) as total_sqty
 				from (
 					select
 						pc.prd_cd
-						, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
+						-- , (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
 						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
 						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+						, (sum(pss2.wqty) - ifnull(_next_storage.qty, 0)) as wqty
 						, ps.qty as hqty
 						, ps.wqty as hwqty
 						, pss2.storage_cd as storage_cd
@@ -182,6 +183,7 @@ class prd04Controller extends Controller
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id
+						
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
@@ -285,6 +287,7 @@ class prd04Controller extends Controller
 
 			$result[] = $row;
 		}
+
 
 		return response()->json([
 			"code"	=> 200,

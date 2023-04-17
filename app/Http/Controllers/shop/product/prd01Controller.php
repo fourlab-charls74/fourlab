@@ -986,6 +986,43 @@ class prd01Controller extends Controller
         return view(Config::get('shop.shop.view') . '/product/prd01_show',$values);
     }
 
+    public function show_img($goods_no, Request $req)
+    {
+		$conf	= new Conf();
+		$cfg_dlv_fee				= $conf->getConfigValue("delivery","base_delivery_fee");
+		$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery","free_delivery_amt");
+		$cfg_order_point_ratio		= $conf->getConfigValue("point","ratio");
+
+		$type = $req->input("type", '');
+        //$type = $req->input('type', '');	// 단순 페이지 상태 생성:create, XXXXXXXXXXXXXX상품형식-일반/납품/기획:N(혹은 無값)/D/E
+
+        $query = /** @lang text */
+            "
+            select a.class , a.class_nm
+              from code_class a 
+             group by class, class_nm
+        ";
+        $class_items = DB::select($query);
+
+		$values = $this->_get($goods_no);
+		
+		$values = array_merge($values,[
+            'opt_cd_list'		=> SLib::getItems(),
+            'md_list'			=> SLib::getMDs(),
+            'type'				=> $type,
+            'goods_stats'		=> SLib::getCodes('G_GOODS_STAT'),
+            'class_items'		=> $class_items,
+            'goods_types'		=> SLib::getCodes('G_GOODS_TYPE'),
+            'com_info'			=> (object)array("dlv_amt" => 0,"free_dlv_amt_limit" => 0),
+            'g_dlv_fee'			=> $cfg_dlv_fee,
+            'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
+            'g_order_point_ratio'	=> $cfg_order_point_ratio,
+            'img_prefix'            => sprintf("%s",config("shop.image_svr"))
+        ]);
+
+        return view(Config::get('shop.shop.view') . '/product/prd01_goods_img',$values);
+    }
+
     public function get($goods_no){
         return response()->json($this->_get($goods_no));
     }

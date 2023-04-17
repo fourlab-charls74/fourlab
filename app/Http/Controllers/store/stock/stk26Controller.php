@@ -416,4 +416,15 @@ class stk26Controller extends Controller
             "body" => $result
         ]);
     }
+
+      /**
+       * 
+       * 매장 실사 바코드 등록 부분
+       * 
+       */
+
+      public function barcode_batch()
+      {
+          return view(Config::get('shop.store.view') . '/stock/stk26_barcode_batch');
+      }
 }

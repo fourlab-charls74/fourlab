@@ -290,7 +290,7 @@
     <script language="javascript">
         let rel_products = {};
         let columns = [
-            {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true},
+            {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true,},
             {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"},
                 aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
                 cellRenderer: (params) => params.data ? '' : params.value,
@@ -346,21 +346,19 @@
             },
             {field: "rel_qty2", headerName: "배분수량", type: "currencyType", width: 60, valueFormatter: formatNumber,
                 editable: params => {
-                    if (params.data !== undefined) {
-                        if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) return false;
-                    }
+                  if (params.node.level != 0) {
                     return true;
+                  } else {
+                    return false;
+                  }
                 },
                 cellStyle: params => {
-                    let color = "none";
-                    if (params.value !== undefined) {
-                        color = "#ffff99";
-                        if (params.data !== undefined) {
-                            if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#6666ff";
-                            if (params.data.sale_cnt >= 10) color = "#ff6666";
-                        }
+                    if(params.node.level != 0) {
+                        return {'background-color':'#ffff99'};
+                    } else {
+                        return {};
                     }
-                    return { "background-color": color };
+                   
                 },
             },
             // {width: "auto"}
