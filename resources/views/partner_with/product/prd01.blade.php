@@ -275,13 +275,19 @@
                     <div class="fl_box">
                         <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                     </div>
-                    <div class="fr_box">
+                    <div class="fr_box flax_box">
+                        <div class="form-inline-inner text-box">
+                            <div class="custom-control custom-checkbox" style="margin-right: 20px;">
+                                <input type="checkbox" class="custom-control-input" id="show_img" name="show_img" onclick="GridImageShow()" value="Y" checked>
+                                <label class="custom-control-label" for="show_img">상품이미지보기</label>
+                            </div>
+                        </div>
                         <span class="d-none d-sm-inline">선택한 상품을</span>
                         <select id='chg_sale_stat' name='chg_sale_stat' class="form-control form-control-sm" style='width:130px;display:inline'>
                             <option value=''>선택</option>
-                            @foreach ($goods_stats as $goods_stat)
+                        @foreach ($goods_stats as $goods_stat)
                             <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                            @endforeach
+                        @endforeach
                         </select>
                         <span class="d-none d-sm-inline">로</span>
                         <a href="javascript:void(0);" onclick="return UpdateStates();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16 mr-1"></i>상태변경</a>
@@ -289,7 +295,7 @@
                             <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
                             </button>
-                            <div class="dropdown-menu" style="">
+                            <div class="dropdown-menu">
                                 <a class="dropdown-item" href="#" onclick="AddProducts();">일괄등록</a>
                                 <a class="dropdown-item" href="#" onclick="EditProducts();">일괄수정</a>
                                 <a class="dropdown-item" href="#" onclick="ShowProductImages();">이미지보기</a>
@@ -315,7 +321,20 @@
 
     const style_obj = {"line-height": "30px"};
     
-    const columns = [
+    const pApp = new App('', {
+        gridId: "#div-gd",
+    });
+    
+    const gridDiv = document.querySelector(pApp.options.gridId);
+    let gx;
+    $(document).ready(function() {
+        gx = new HDGrid(gridDiv, columnDefs);
+        pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
+        Search();
+    });
+
+    const columnDefs = [
         {headerName: '#', pinned: 'left', type: 'NumType', cellStyle: style_obj},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {field: "goods_no", headerName: "상품번호", width: 80, pinned: 'left', cellStyle: style_obj},
@@ -379,19 +398,7 @@
         {field: "com_type_d", headerName: "com_type", hide: true},
         {field: "", headerName: "", width: "auto"}
     ];
-
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
-    const gridDiv = document.querySelector(pApp.options.gridId);
-    let gx;
-    $(document).ready(function() {
-        gx = new HDGrid(gridDiv, columns);
-        pApp.ResizeGrid(275);
-        pApp.BindSearchEnter();
-        Search();
-    });
-
+    
     function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/partner/product/prd01/search', data, 1);
@@ -452,6 +459,14 @@
 		}
 	}
 
+    function GridImageShow(){
+        if($("#show_img").is(":checked")){
+            gx.gridOptions.columnApi.setColumnVisible('img', true);
+        }else{
+            gx.gridOptions.columnApi.setColumnVisible('img', false);
+        }
+    }
+    
     function AddProduct() {
         var url = '/partner/product/prd01/create';
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
