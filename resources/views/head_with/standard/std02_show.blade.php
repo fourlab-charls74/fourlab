@@ -48,7 +48,7 @@
 												<th class="required">업체아이디</th>
 												<td>
 													<div class="input_box" style="display:flex;">
-														<input type="text" name="com_id" id="com_id" class="form-control form-control-sm search-all" value="{{ $company['com_id'] }}" @if($cmd=='editcmd' ) readonly="readonly" @endif />
+														<input type="text" name="com_id" id="com_id" class="form-control form-control-sm search-all" @if ($cmd === 'editcmd') value="{{ $company['com_id'] }}" readonly="readonly" @endif />
 														<input type="hidden" name="com_id_chk">
 														@if ($cmd == 'addcmd')
 														<button name="com_id_check" class="btn btn-sm btn-primary fs-12 px-1 ml-1" style="width:100px;" onclick="checkdup();return false;">중복확인</button>
@@ -59,7 +59,7 @@
 												<th class="required">비밀번호</th>
 												<td colspan="3">
 													<div class="txt_box flax_box">
-														<input type="password" id="pwd" name="pwd" class="mwidth form-control form-control-sm" style="width:29%; display:inline" value="{{ $company['pwd'] }}">
+														<input type="password" id="pwd" name="pwd" class="mwidth form-control form-control-sm" style="width:29%; display:inline" @if ($cmd === 'addcmd') autocomplete="new-password" @elseif ($cmd == 'editcmd') value="{{ $company['pwd'] }}" @endif">
 														<div class="custom-control custom-checkbox form-check-box ml-1">
 															<input type="checkbox" id="change_pwd" name="change_pwd" class="custom-control-input" value="Y">
 															<label class="custom-control-label" for="change_pwd">비밀번호 변경</label>
@@ -224,7 +224,7 @@
 														</div>
 													</div>
 												</td>
-											</tr>											
+											</tr>
 										</tbody>
 									</table>
 								</div>
@@ -933,7 +933,6 @@
 	 */
 	function SetRepCategory(idx, text, mx_len, cateType) {
 
-		//var cat_cd = 
 		if (cat_cmd == "add_category") {
 			var comId = $("[name=com_id]").val();
 			var act_url = "";
@@ -1182,7 +1181,7 @@
 				$("[name=md_nm]").focus();
 				return false;
 			}
-			
+
 			if ($("[name=settle_nm]").val() == '') {
 				alert('정산담당자 이름을 입력해 주십시오.');
 				$("[name=settle_nm]").focus();
@@ -1479,14 +1478,14 @@
 <script language="javascript">
 
 	const CMD = '{{$cmd}}';
-	
+
 	const popCategory = (type) => {
-		
+
 		if (CMD != 'editcmd') {
 			alert("업체 등록 후 설정 가능합니다.");
 			return false;
 		}
-		
+
 		if (type == 'DISPLAY') {
 			searchCategory.Open('DISPLAY', (code, name, full_name) => {
 				if (searchCategory.type === "ITEM") {
@@ -1533,7 +1532,7 @@
 					}
 				});
 
-				
+
 			});
 		} else if (type == 'ITEM') {
 			searchCategory.Open('ITEM', (code, name, full_name) => {
@@ -1541,7 +1540,7 @@
 					alert("용도 카테고리만 설정가능합니다.");
 					return false;
 				}
-				
+
 				let rows = gx_item.getRows();
 				const codes = rows.map(row => row.d_cat_cd );
 				if (codes.includes(code)) {
@@ -1585,7 +1584,7 @@
 		}
 	};
 
-	
+
 </script>
 
 @stop
