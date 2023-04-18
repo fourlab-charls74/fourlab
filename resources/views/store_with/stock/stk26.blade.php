@@ -136,7 +136,7 @@
             }
         },
         {field: "sc_type", headerName: "실사구분", width: 70, cellStyle: (params) => ({"text-align": "center", "color": params.value === 'B' ? '#2aa876' : 'none'}),
-            cellRenderer: (params) => params.value === 'G' ? '일반' : params.value === 'B' ? '일괄' : '-',
+            cellRenderer: (params) => params.value === 'G' ? '일반' : params.value === 'B' ? '일괄' : params.value === 'C' ? '바코드' : '-',
         },
         {field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 170},

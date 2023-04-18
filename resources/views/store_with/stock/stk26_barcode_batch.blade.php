@@ -8,7 +8,7 @@
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">매장실사바코드등록</h3>
+            <h3 class="d-inline-flex">매장실사 바코드 등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
@@ -53,7 +53,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_stk26.xlsx" class="ml-2" style="text-decoration: underline !important;">실사 바코드등록 양식 다운로드</a>
+                                                    <a href="/sample/sample_stk26_barcode.xlsx" class="ml-2" style="text-decoration: underline !important;">실사 바코드등록 양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -170,9 +170,21 @@
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
         {field: "price", headerName: "판매가", type: "currencyType", width: 70},
         {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType'},
-        {field: "qty", headerName: "실사재고", width: 60, type: 'currencyType', 
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+        {field: "qty", headerName: "실사재고", width: 60, type: 'currencyType',
+            editable: (params) => {
+                if (params.node.level != 0) {
+                    return false;
+                }else {
+                    return true;
+                }
+            },
+            cellStyle: (params) => {
+                if (params.node.level != 0) {
+                    return {};
+                }else {
+                    return {'background-color':'#ffff99'};
+                }
+            }
         },
         {field: "loss_qty", headerName: "LOSS수량", width: 80, type: 'currencyType'},
         {field: "loss_price", headerName: "LOSS금액", width: 80, type: 'currencyType'}
@@ -284,7 +296,6 @@
 
 		let excel_columns = {
 			'B': 'prd_cd',
-			'C': 'qty',
         };
 
         let firstRowIndex = 10; // 엑셀 10행부터 시작 (샘플데이터 참고)
@@ -301,7 +312,7 @@
 				}
 			});
             
-            row.qty = row.qty || 0; // 실사재고 미입력 시 0 처리
+            row.qty = row.qty || 1; // 실사재고 미입력 시 0 처리
             row = { ...row, 
                 count: ++count, isEditable: true,
             };
@@ -343,7 +354,7 @@
         
         axios({
             method: 'post',
-            url: '/store/stock/stk26/batch-import',
+            url: '/store/stock/stk26/batch-import2',
             data: form_data,
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -365,19 +376,47 @@
 
     const getGood = async (values, firstIndex) => {
         axios({
-            url: '/store/stock/stk26/batch-getgoods',
+            url: '/store/stock/stk26/batch-getgoods2',
             method: 'post',
             data: values,
         }).then(async (res) => {
             if (res.data.code != 200) return alert(res.data.msg);
 
             setBasicInfo(res.data.head);
-            await gx.gridOptions.api.applyTransaction({add : res.data.body});
+            const result = res.data.body;
+            let data = mergeDuplicateValues(result);
+
+            for(let i = 0; i< data.length; i++) {
+                data[i].loss_qty = data[i].store_wqty - data[i].qty;
+                data[i].loss_price = data[i].price * data[i].loss_qty;
+            }
+
+            console.log(data);
+            await gx.gridOptions.api.applyTransaction({add : data});
             updatePinnedRow();
         }).catch((error) => {
             console.log(error);
         });
     };
+
+    // 바코드의 중복값을 찾고 qty를 더해주는 부분
+    function mergeDuplicateValues(arr) {
+        let result = {};
+        let merged = [];
+
+        for (let i = 0; i < arr.length; i++) {
+            let key = arr[i].prd_cd;
+
+            if (result.hasOwnProperty(key)) {
+            result[key].qty += arr[i].qty;
+            } else {
+            result[key] = Object.assign({}, arr[i]); // 같은 속성을 가진 배열을 병합하는 부분
+            merged.push(result[key]);
+            }
+        }
+
+        return merged;
+    }
 
     function setBasicInfo(obj) {
         basic_info = {...obj};
@@ -411,7 +450,7 @@
             url: '/store/stock/stk26/save',
             method: 'put',
             data: {
-                sc_type: "B",
+                sc_type: "C", //바코드 등록
                 sc_date,
                 store_cd,
                 md_id,
@@ -420,7 +459,7 @@
             },
         }).then(function (res) {
             if(res.data.code === '200') {
-                alert("실사등록이 성공적으로 완료되었습니다.");
+                alert("실사 바코드 등록이 성공적으로 완료되었습니다.");
                 opener.Search();
                 window.close();
             } else {

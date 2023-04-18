@@ -427,4 +427,118 @@ class stk26Controller extends Controller
       {
           return view(Config::get('shop.store.view') . '/stock/stk26_barcode_batch');
       }
+
+      /** 바코드 등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
+	public function import_excel2(Request $request) {
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+	
+				$save_path = "data/store/stk26/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+	
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+	
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+
+    /** 바코드 등록 상품 개별 조회 */
+    public function get_goods2(Request $request) {
+        $sc_date = $request->input('sc_date', '');
+        $store_cd = $request->input('store_cd', '');
+        $md_id = $request->input('md_id', '');
+        $comment = $request->input('comment', '');
+        
+        $data = $request->input('data', []);
+        $result = [];
+        
+        $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
+        $md = DB::table('mgr_user')->where('id', $md_id)->select('id', 'name')->first();
+        if ($store == null || $md == null || $sc_date == null) {
+            return response()->json(['code' => 404, 'msg' => '실사 기본정보가 올바르지 않습니다. 실사일자/매장코드/담당자아이디 항목을 확인해주세요.']);
+        }
+
+        foreach ($data as $key => $d) {
+            $prd_cd = $d['prd_cd'];
+            $qty = $d['qty'] ?? 0;
+            $count = $d['count'] ?? '';
+
+            $sql = "
+                select
+                    pc.prd_cd
+                    , pc.goods_no
+                    , opt.opt_kind_nm
+                    , b.brand_nm as brand
+                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
+                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
+                    , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                    , pc.color
+                    , pc.size
+                    , pc.goods_opt
+                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                    , if(g.goods_no <> '0', g.price, p.price) as price
+                    , ifnull(pss.wqty, 0) as store_wqty
+                    , $qty as qty
+                    , (ifnull(pss.wqty, 0) - ifnull($qty, 0)) as loss_qty
+                    , (ifnull(pss.wqty, 0) - ifnull($qty, 0)) * g.price as loss_price
+                    , true as isEditable
+                    , '$count' as count
+                from product_code pc
+                    inner join product p on p.prd_cd = pc.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
+                    left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join brand b on b.br_cd = pc.brand
+                where pc.prd_cd = '$prd_cd'
+                limit 1
+            ";
+            $row = DB::selectOne($sql);
+            array_push($result, $row);
+        }
+
+        
+
+        $new_sc_cd = 1;
+        $sql = "
+            select sc_cd
+            from stock_check
+            order by sc_cd desc
+            limit 1
+        ";
+        $row = DB::selectOne($sql);
+        if($row != null) $new_sc_cd = $row->sc_cd + 1;
+
+        return response()->json([
+            "code" => 200,
+            "head" => [
+                "total" => count($result),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
+                "new_sc_cd" => $new_sc_cd,
+                "sc_date" => $sc_date,
+                "store" => $store,
+                "md" => $md,
+                "comment" => $comment,
+            ],
+            "body" => $result
+        ]);
+    }
+
+
+
 }
