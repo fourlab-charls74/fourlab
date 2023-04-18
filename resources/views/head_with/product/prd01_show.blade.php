@@ -61,10 +61,10 @@
         border-bottom-color: transparent;
     }
 
-    .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell, 
-    .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle, 
-    .ag-theme-balham .ag-ltr .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected), 
-    .ag-theme-balham .ag-rtl .ag-cell-range-single-cell, .ag-theme-balham .ag-rtl .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle, 
+    .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell,
+    .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle,
+    .ag-theme-balham .ag-ltr .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected),
+    .ag-theme-balham .ag-rtl .ag-cell-range-single-cell, .ag-theme-balham .ag-rtl .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle,
     .ag-theme-balham .ag-rtl .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected) {
         border: 1px solid transparent;
     }
@@ -72,7 +72,7 @@
     table tr th {
         background : #f5f5f5;
     }
-    
+
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -363,7 +363,7 @@
                                             <th class="required">상품구분</th>
                                             <td>
                                                 <div class="flex">
-                                                    <select name="goods_type" id="goods_type" class="form-control form-control-sm d-inline-block" 
+                                                    <select name="goods_type" id="goods_type" class="form-control form-control-sm d-inline-block"
                                                         style="width: 85%; margin-right: 15px;"
                                                     >
 														<option value="">==상품구분==</option>
@@ -435,7 +435,7 @@
                                                         >
                                                     </div>
                                                     <div class="txt_box ml-1 mr-2">원</div>
-                                                    @if ($type !== 'create')   
+                                                    @if ($type !== 'create')
                                                     <div class="custom-control custom-checkbox form-check-box">
                                                         <input type='hidden' name="sale_yn" value='{{ @$goods_info->sale_yn }}' />
                                                         <input type="checkbox" class="custom-control-input" id="sale_yn" {{ (@$goods_info->sale_yn == "Y") ? "checked" : "" }}>
@@ -445,7 +445,7 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        @if ($type !== 'create')   
+                                        @if ($type !== 'create')
                                         <tr class="sale_control" style="@if (@$goods_info->sale_yn != 'Y') display: none; @endif">
                                             <th>세일설정</th>
                                             <td>
@@ -921,7 +921,7 @@
                                 </div>
                             </div>
                         </div>
-						
+
 						<div class="row use_option_y" style="@if( $type == 'create' || @$goods_info->is_option_use == 'N' )display:none;@endif">
 							<div class="col-lg-4">
 								<div class="card-body pt-2">
@@ -1026,7 +1026,7 @@
                                     </table>
                                     <div class="flax_box" style="justify-content: center;">
                                         <button type="button" class="btn btn-sm btn-primary shadow-sm mr-1" onclick="addOptionKind()"><span class="fs-12">확인</span></button>
-                                        <button type="button" class="btn btn-sm btn-primary shadow-sm option-kind-add-cancel-btn"><span class="fs-12">취소</span></button>                
+                                        <button type="button" class="btn btn-sm btn-primary shadow-sm option-kind-add-cancel-btn"><span class="fs-12">취소</span></button>
                                     </div>
                                 </div>
                                 {{-- // 옵션관리 좌측 옵션추가영역 e --}}
@@ -1123,7 +1123,7 @@
                                         <dl>
                                             <dt class="d-flex align-items-center justify-content-between">
                                                 <div>상품설명</div>
-                                                @if ($type !== 'create')   
+                                                @if ($type !== 'create')
                                                 <button type="button" id="sabang_cont" class="btn btn-sm btn-outline-primary shadow-sm">판매처별</button>
                                                 @endif
                                             </dt>
@@ -1215,7 +1215,7 @@
                                             <dd>
                                                 @if ( $type == "create")
                                                 <div class="txt_box">
-                                                    상품 등록을 완료 하신 후 관련상품을 설정할 수 있습니다. 
+                                                    상품 등록을 완료 하신 후 관련상품을 설정할 수 있습니다.
                                                 </div>
                                                 @else
                                                 <div class="form-inline form-radio-box flax_box txt_box">
@@ -1345,7 +1345,7 @@
                 @endif
                 <form method="post" name="save">
                 @if(count($class_items) > 0 && $type === '')
-                
+
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품정보고시 내역</a>
@@ -1367,7 +1367,7 @@
                                         @endforeach
                                     </select>
                                     <span class="d-none d-sm-inline">로</span>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm goods-info-change-btn"><span class="fs-12">품목변경</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm goods-info-change-btn"><span class="fs-12">분류변경</span></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-save-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="저장"><i class="bx bx-save fs-14"></i></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-delete-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제"><i class="far fa-trash-alt fs-12"></i></a>
                                 </div>
@@ -1392,7 +1392,7 @@
 
         $(document).ready(function(){
             $('#main-tab').trigger("click");
-        }); 
+        });
 
         $(document).ready(function() {
             var editorToolbar = [
@@ -2063,7 +2063,7 @@
                 alert("온라인 재고를 입력해주세요");
                 return;
             }
-        
+
           $.ajax({
               async: true,
               type: 'put',
@@ -2130,7 +2130,7 @@
 				const selectRowCount	= selectedRowData.length;
 
 				if( selectRowCount == 0 ) {
-					alert('품목변경할 정보고시내용을 선택해주세요.');
+					alert('분류변경할 정보고시내용을 선택해주세요.');
 					return;
 				}
 
@@ -2254,10 +2254,10 @@
                             editable: true,
                             minWidth: 100,
                             cellStyle: {'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7'},
-                        }   
+                        }
                         goods_class_columns.push(col_val);
                     });
-                    
+
                     pApp = new App('', { gridId: "#goods-class-grid" });
                     const gridDiv = document.querySelector(pApp.options.gridId);
                     gx = new HDGrid(gridDiv, goods_class_columns);
@@ -2403,7 +2403,7 @@
         .opt-cell-common {
             background: #ffff99 !important;
         }
-        
+
         .ag-input-field-input.ag-text-field-input {
             color: #222 !important;
         }
@@ -2414,7 +2414,7 @@
 
     let gx1;
     let gx2;
-    
+
     let opt1 = [];
 	let opt2 = [];
 
@@ -2430,7 +2430,7 @@
 
 		@endforeach
 	@endif
-    
+
     const CELL_COLOR = {
         LOCKED: {'background' : '#f5f7f7'},
         YELLOW : {'background' : '#ffff99'}
@@ -2482,7 +2482,7 @@
             }
         ];
     };
-    
+
     const optCellClassRules = { // 색 변경 규칙 정의
         "opt-cell-changed": params => {
             const column_name = params.colDef.field;
@@ -2499,7 +2499,7 @@
             headerName: name,
             field: name,
             children: [
-                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW, 
+                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW,
                     suppressMovable: true, cellClassRules: optCellClassRules
                 },
                 {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
@@ -2569,7 +2569,7 @@
     /**
      * DOM 로딩 이후 옵션 관련 그리드 생성 및 초기화
      */
-    
+
     document.addEventListener('DOMContentLoaded', (event) => {
         const pApp1 = new App('', { gridId:"#div-gd-optkind" });
         let gridDiv = document.querySelector(pApp1.options.gridId);
@@ -2581,7 +2581,7 @@
         options = {
             onCellValueChanged: (params) => optEvtAfterEdit(params),
             suppressFieldDotNotation: true // 컬럼명에 . 문자가 들어간 경우 깊은 참조로 처리 되는 것을 방지
-        }   
+        }
         gx2 = new HDGrid(gridDiv, extra_option_stock_columns, options);
 
         searchOptKind();
@@ -2754,7 +2754,7 @@
     };
 
     const setRightOptRows = async (type, { result }) => {
-        
+
         if (type == "기본") {
 
             let list = [];
@@ -2784,7 +2784,7 @@
                     list[idx][`${opt2_kind_name}_wqty`] = wqty;
 
                     return {idx: idx, opt1_kind_name: opt1_kind_name};
-                    
+
                 }, {idx: 0, opt1_kind_name: ""});
 
                 list.shift();
@@ -2792,14 +2792,14 @@
             }
 
             gx2.setRows(list);
-            
+
         } else if (type == "추가") {
 
             try {
                 const { no } = last_option_row;
-                const response = await axios({ 
-                    url: `/head/product/prd01/get-extra-options`, method: 'post', 
-                    data: { 'option_no': no } 
+                const response = await axios({
+                    url: `/head/product/prd01/get-extra-options`, method: 'post',
+                    data: { 'option_no': no }
                 });
 
                 const { data, status } = response;
@@ -2812,7 +2812,7 @@
 
         }
     };
-    
+
     const setRightOptColumns = async (type) => {
 
         if (type == "기본") {
@@ -2821,7 +2821,7 @@
                 const response = await axios({ url: `/head/product/prd01/${goods_no}/get-basic-opts-matrix`, method: 'get' });
                 const { data, status } = response;
                 if (status == 200) {
-                    
+
                     let { opt_matrix } = data;
                     let { opt1, opt2 } = opt_matrix;
 
@@ -2853,7 +2853,7 @@
                     } else {
                         autoSizeColumns(gx2, ["opt1_kind_name"]);
                     }
-                    
+
                 }
             } catch (error) {
                 // console.log(error);
@@ -2864,7 +2864,7 @@
         }
 
     };
-    
+
     /*
     ***
     상품 옵션명 관리 관련
@@ -2889,7 +2889,7 @@
     function addOptionKind() {
 
         const basic_count = gx1.getRows().filter(item => item.type === '기본').length;
-        
+
         if ($("[name='opt_type']").val() === 'basic' && basic_count >= 2) return alert("기본옵션은 최대 2개까지 설정 가능합니다.");
         if ($("[name='opt_type_nm']").val() === '') return alert("옵션구분값을 입력해주세요.");
 
@@ -3003,13 +3003,13 @@
     ***
     */
     $(".option-add-btn").on("click", async function(e) {
-        
+
         e.preventDefault();
 
         const type = last_option_row?.type;
         if (type == "추가") {
             const option_no = last_option_row?.no;
-            const row = { ...last_option_row, 
+            const row = { ...last_option_row,
                 option_no: option_no, soldout_yn: "N",
                 qty: 0, wqty: 0, price: 0
             };
@@ -3020,7 +3020,7 @@
         }
 
         const GOODS_NO = document.f1.goods_no.value;
-        controlOption.Open(GOODS_NO, 
+        controlOption.Open(GOODS_NO,
             /**
              * afterSaveOrDel 콜백 정의
              */
@@ -3028,7 +3028,7 @@
                 initOptGridAndApi();
             }
         );
-        
+
     });
 
     // 옵션 삭제 (공통)
@@ -3042,7 +3042,7 @@
             gx2.gridOptions.api.applyTransaction({remove : rows});
         }
     });
-    
+
     const optDeleteInGrid = async () => {
         let del_opt_list = [];
         const rows = gx2.getSelectedRows();
@@ -3063,8 +3063,8 @@
             if (!confirm("체크된 옵션을 삭제하시겠습니까? \n(하나의 옵션구분만 남게되면 등록된 모든 옵션이 삭제됩니다.)")) return false;
 
             try {
-                const response = await axios({ url: `/head/product/prd01/${goods_no}/delete-basic-options`, 
-                    method: 'post', data: { del_opt_list: del_opt_list } 
+                const response = await axios({ url: `/head/product/prd01/${goods_no}/delete-basic-options`,
+                    method: 'post', data: { del_opt_list: del_opt_list }
                 });
                 const { code, msg } = response?.data;
                 if (code == 200) {
@@ -3077,7 +3077,7 @@
                     controlOption.SetGoodsNo(GOODS_NO);
 
                     initOptGridAndApi();
-                    
+
                 } else alert(msg);
             } catch (error) {
                 console.log(error);
@@ -3112,7 +3112,7 @@
         } else {
 
             const opt_name = `${opt1_kind_nm}^${opt2_kind_nm}`;
-            
+
             rows.map((row, idx) => {
 
                 const keys = Object.keys(row);
@@ -3150,14 +3150,14 @@
                     }
 
                     return obj;
-                    
+
                 }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
 
             });
-            
+
         }
 
-        const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`, 
+        const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`,
             method: 'post', data: { data: data }
         });
         data = response?.data;
@@ -3256,7 +3256,7 @@
     */
 
     let gx3;
-    
+
     $(document).ready(function() {
         SetSimilarTable();
 
@@ -3288,7 +3288,7 @@
         const pApp3 = new App('', { gridId: "#goods-similar-grid" });
         const gridDiv = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv, goods_similar_columns);
-        
+
         SearchSimilarGoods();
     }
 
@@ -3315,7 +3315,7 @@
             error: function(error) {
                 console.log(error)
             }
-        });        
+        });
     }
 
     function DeleteSimilarGoods() {
@@ -3340,7 +3340,7 @@
             error: function(error) {
                 console.log(error)
             }
-        });  
+        });
     }
 
     /*
@@ -3370,18 +3370,18 @@
 
         $("select[name='sale_s_dt_tm']").val(getTime(start));
         $("select[name='sale_e_dt_tm']").val(getTime(end));
-        
+
         // date -> 날짜 추출
         function getDate(str) {
             return str.substr(0, 10);
         }
-        
+
         // date -> 시간 추출
         function getTime(str) {
             return str.substr(11,2);
         }
     }
-    
+
     // 세일기간 사용 미선택 시 해당입력 row -> disabled 처리
     function setUseDisplayDate(is_use) {
         $("[name='sale_dt_yn']").val(is_use ? "Y" : "N");
@@ -3395,7 +3395,7 @@
 
     function setSaleAmount(is_reset, is_sale_rate) {
         if(is_reset) {
-            
+
             $("[name='price']").val(Comma(ori_price));
             $("[name='sale_rate']").val(0);
             $("[name='sale_price']").val(0);
@@ -3474,7 +3474,7 @@
             get_add_info();
         }
         const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
-        hide_related_products 
+        hide_related_products
             ? document.querySelector(".related_goods_area").style.display = "none"
             : null
     });
@@ -3592,7 +3592,7 @@
                 alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
             }
         });
-        
+
     }
 
     function delRelatedGood(row) { // 관련상품 삭제

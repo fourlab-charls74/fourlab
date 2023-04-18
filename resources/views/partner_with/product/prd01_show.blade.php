@@ -55,7 +55,7 @@ select.select_cat
 			<input type="hidden" name="is_def_d_category" value="0">				<!-- 일반카테고리를 선택했는지 -->
 			<input type="hidden" name="d_category_s" id="d_category_s" value="">	<!-- 전시카테고리 string 으로 넘기기 위해서 -->
 			<input type="hidden" name="u_category_s" id="u_category_s" value="">	<!-- 용도카테고리 string 으로 넘기기 위해서 -->
-    
+
 			<div class="card_wrap aco_card_wrap">
                 <div class="card">
                     <div class="card-header mb-0">
@@ -868,7 +868,7 @@ select.select_cat
                                             <dd>
                                                 @if ( $type == "create")
                                                 <div class="txt_box">
-                                                    상품 등록을 완료 하신 후 관련상품을 설정할 수 있습니다. 
+                                                    상품 등록을 완료 하신 후 관련상품을 설정할 수 있습니다.
                                                 </div>
                                                 @else
                                                 <div class="form-inline form-radio-box flax_box txt_box">
@@ -1025,7 +1025,7 @@ select.select_cat
                                         @endforeach
                                     </select>
                                     <span class="d-none d-sm-inline">로</span>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm goods-info-change-btn"><span class="fs-12">품목변경</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm goods-info-change-btn"><span class="fs-12">분류변경</span></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-save-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="저장"><i class="bx bx-save fs-14"></i></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-delete-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제"><i class="far fa-trash-alt fs-12"></i></a>
                                 </div>
@@ -1574,7 +1574,7 @@ select.select_cat
             // const s_goods_class_nm	= $('.goods_class > option:selected').html();
 
             if( s_goods_class_cd === '' ) {
-                alert('품목변경할 정보고시내용을 선택해주세요.');
+                alert('분류변경할 정보고시내용을 선택해주세요.');
                 return;
             }
 
@@ -2154,7 +2154,7 @@ select.select_cat
         }
 
         const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
-        hide_related_products 
+        hide_related_products
             ? document.querySelector(".related_goods_area").style.display = "none"
             : null
     });
@@ -2272,7 +2272,7 @@ select.select_cat
                 alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
             }
         });
-        
+
     }
 
     function delRelatedGood(row) { // 관련상품 삭제

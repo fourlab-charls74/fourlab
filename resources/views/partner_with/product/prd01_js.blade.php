@@ -515,7 +515,7 @@
             // const s_goods_class_nm	= $('.goods_class > option:selected').html();
 
             if( s_goods_class_cd === '' ) {
-                alert('품목변경할 정보고시내용을 선택해주세요.');
+                alert('분류변경할 정보고시내용을 선택해주세요.');
                 return;
             }
 
@@ -837,7 +837,7 @@
                     url: '/partner/product/prd01/' + goods_no + '/seq-change',
                     data:{
                         seq : seq
-                    },  
+                    },
                     success: function (res) {
                         alert('순서를 변경하였습니다.');
                         Search_opt();
@@ -1158,7 +1158,7 @@
             get_add_info();
         }
         const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
-        hide_related_products 
+        hide_related_products
             ? document.querySelector(".related_goods_area").style.display = "none"
             : null
     });
@@ -1276,7 +1276,7 @@
                 alert("[ 관련상품 작업 실패 ] 관리자에게 문의해 주십시오.");
             }
         });
-        
+
     }
 
     function delRelatedGood(row) { // 관련상품 삭제
