@@ -651,7 +651,6 @@ select.select_cat
                                 <div class="tab-content">
                                     <div class="tab-pane fade show active mt-1" id="option-basic-tab" role="tabpanel">
                                         <div class="pt-1 pb-1 text-right">
-                                            <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-seq-change-btn"><span class="fs-12">순서변경</span></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-add-btn"><span class="fs-12">추가</span></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-sav-btn"><span class="fs-12">저장</span></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm option-del-btn"><span class="fs-12">삭제</span></a>

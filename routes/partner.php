@@ -143,7 +143,6 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
 
         Route::get('prd01/{no}/get-option', 'prd01Controller@get_option');
         Route::post('prd01/{no}/save-option', 'prd01Controller@save_option');
-        Route::post('prd01/{no}/seq-change', 'prd01Controller@seq_change');
         Route::post('prd01/{no}/del-option', 'prd01Controller@del_option');
 
         Route::get('prd01/{no}/get-stock', 'prd01Controller@get_stock');
