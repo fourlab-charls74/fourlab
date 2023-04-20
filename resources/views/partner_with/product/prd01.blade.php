@@ -275,22 +275,20 @@
                     <div class="fl_box">
                         <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                     </div>
-                    <div class="fr_box flax_box">
-                        <div class="form-inline-inner text-box">
-                            <div class="custom-control custom-checkbox" style="margin-right: 20px;">
-                                <input type="checkbox" class="custom-control-input" id="show_img" name="show_img" onclick="GridImageShow()" value="Y" checked>
-                                <label class="custom-control-label" for="show_img">상품이미지보기</label>
-                            </div>
-                        </div>
+                    <div class="fr_box">
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" id="show_img" name="show_img" onclick="GridImageShow()" value="Y" checked>
+							<label class="custom-control-label" for="show_img">상품이미지보기</label>
+						</div>
                         <span class="d-none d-sm-inline">선택한 상품을</span>
-                        <select id='chg_sale_stat' name='chg_sale_stat' class="form-control form-control-sm" style='width:130px;display:inline'>
+                        <select id='chg_sale_stat' name='chg_sale_stat' class="form-control form-control-sm mr-1 ml-1" style='width:130px;display:inline'>
                             <option value=''>선택</option>
                         @foreach ($goods_stats as $goods_stat)
                             <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
                         @endforeach
                         </select>
                         <span class="d-none d-sm-inline">로</span>
-                        <a href="javascript:void(0);" onclick="return UpdateStates();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16 mr-1"></i>상태변경</a>
+                        <a href="javascript:void(0);" onclick="return UpdateStates();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1 ml-1"><i class="bx bx-sync fs-16 mr-1"></i>상태변경</a>
                         <div class="btn-group dropleftbtm">
                             <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>

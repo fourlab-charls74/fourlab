@@ -19,6 +19,10 @@ select.select_cat
 		margin:5px 0px;
 		background-color: transparent;
 	}
+
+    table tr th {
+        background : #f5f5f5;
+    }
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -62,85 +66,112 @@ select.select_cat
                         <a href="#">카테고리 연결</a>
                     </div>
                     <div class="card-body">
-                        <ul class="row category_list">
-                            <li class="col-lg-4">
-                                <dl>
-                                    <dt class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            대표 카테고리
-                                        </div>
-                                        <div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary btn-rep-add"  data-toggle="tooltip" data-placement="top" title="" data-original-title="선택" data-toggle="modal" data-target="#category_list_modal">
-                                                <i class="bx bx-search-alt-2"></i>
-                                            </button>
-                                        </div>
-                                    </dt>
-                                    <dd style="white-space:normal;">
-                                        <div class="cate_scroll">
-                                            <ul>
-                                                <li style="word-break:keep-all">
-                                                    @if($type == 'create')
-                                                    <input type="hidden" name="rep_cat_cd" value="">
-													<a href="#" id="txt_rep_cat_nm"></a>
-                                                    @else
-                                                    <input type="hidden" name="rep_cat_cd" value="{{ @$goods_info->rep_cat_cd }}">
-													<a href="#" id="txt_rep_cat_nm">{{ @$goods_info->rep_cat_nm }}</a>
-                                                    @endif
-												</li>
-                                            </ul>
-                                        </div>
-                                    </dd>
-                                </dl>
+                        <ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="main-tab" data-toggle="tab" href="#main" role="tab" aria-controls="main" aria-selected="true">전시 카테고리</a>
                             </li>
-                            <li class="col-lg-4 mt-2 mt-lg-0">
-                                <dl class="choice">
-                                    <dt class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            전시 카테고리
-                                        </div>
-                                        <div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary btn-display-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가"  data-toggle="modal" data-target="#category_list_modal">
-                                                <i class="bx bx-plus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-display-delete" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제">
-                                                <i class="far fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    </dt>
-									<select id="category_select_display" name="d_category" class="select_cat" size="4">
-                                    @forelse($displays as $display)
-                                        <option value="{{$display->d_cat_cd}}|{{$display->seq}}|{{$display->disp_yn}}">{{$display->full_nm}} - {{$display->d_cat_cd}}</option>
-                                    @empty
-                                        <option value=''>카테고리를 추가해 주십시오.</option>
-                                    @endforelse
-                                    </select>
-								</dl>
-                            </li>
-                            <li class="col-lg-4 mt-2 mt-lg-0">
-                                <dl>
-                                    <dt class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            용도 카테고리
-                                        </div>
-                                        <div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
-                                            <button type="button" class="btn btn-sm btn-primary btn-item-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가"  data-toggle="modal" data-target="#category_list_modal">
-                                                <i class="bx bx-plus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-item-delete" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제">
-                                                <i class="far fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    </dt>
-									<select id="category_select_item" name="u_category" class="select_cat" size="4">
-                                    @forelse($items as $item)
-                                        <option value="{{$item->d_cat_cd}}|{{$item->seq}}|{{$item->disp_yn}}">{{$item->full_nm}} - {{$item->d_cat_cd}}</option>
-                                    @empty
-                                        <option value=''>카테고리를 추가해 주십시오.</option>
-                                    @endforelse
-                                    </select>
-								</dl>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="usage-tab" data-toggle="tab" href="#usage" role="tab" aria-controls="usage" aria-selected="false">용도 카테고리</a>
                             </li>
                         </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade" id="main" role="tabpanel" aria-labelledby="main-tab">
+                                <div class="card shadow mb-1">
+                                    <ul class="row category_list">
+                                        <li class="col-lg-6">
+                                            <dl>
+                                                <dt class="d-flex align-items-center justify-content-between">
+                                                    <div class="required">
+                                                        대표 카테고리
+                                                    </div>
+                                                    <div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
+                                                        <button type="button" class="btn btn-sm btn-primary btn-rep-add"  data-toggle="tooltip" data-placement="top" title="" data-original-title="선택" data-toggle="modal" data-target="#category_list_modal">
+                                                            <i class="bx bx-search-alt-2"></i>
+                                                        </button>
+                                                    </div>
+                                                </dt>
+                                                <dd style="white-space:normal;">
+                                                    <div class="cate_scroll">
+                                                        <ul>
+                                                            <li style="word-break:keep-all">
+                                                                <input type="hidden" name="rep_cat_cd" id="rep_cat_cd" value="{{ @$goods_info->rep_cat_cd }}">
+                                                                <a href="#" id="txt_rep_cat_nm" style="cursor:default;">{{ @$goods_info->rep_cat_nm }}</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                        </li>
+                                        <li class="col-lg-6 mt-2 mt-lg-0">
+                                            <dl>
+                                                <dt class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        전시 카테고리
+                                                    </div>
+                                                    <div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
+                                                        <button type="button" class="btn btn-sm btn-primary btn-display-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가"  data-toggle="modal" data-target="#category_list_modal">
+                                                            <i class="bx bx-plus"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-display-display" data-toggle="tooltip" data-placement="top" title="" data-original-title="활성">
+                                                            <i class="far fa-check-circle"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-display-hidden" data-toggle="tooltip" data-placement="top" title="" data-original-title="비활성">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-display-delete" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제">
+                                                            <i class="far fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                </dt>
+                                                <select id="category_select_display" name="d_category" class="select_cat" size="4">
+                                                @forelse($displays as $display)
+                                                    <option value="{{$display->d_cat_cd}}|{{$display->seq}}|{{$display->disp_yn}}">{{$display->full_nm}} - {{$display->d_cat_cd}}</option>
+                                                @empty
+                                                    <option value=''>카테고리를 추가해 주십시오.</option>
+                                                @endforelse
+                                                </select>
+                                            </dl>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="usage" role="tabpanel" aria-labelledby="usage-tab">
+                                <div class="card shadow mb-1">
+                                    <ul class="row category_list">
+                                        <li class="col-lg-12 mt-2 mt-lg-0">
+                                            <dl>
+                                                <dt class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        용도 카테고리
+                                                    </div>
+                                                    <div class="btn-group ml-sm-2 mt-1 mt-sm-0" role="group">
+                                                        <button type="button" class="btn btn-sm btn-primary btn-item-add" data-toggle="tooltip" data-placement="top" title="" data-original-title="추가"  data-toggle="modal" data-target="#category_list_modal">
+                                                            <i class="bx bx-plus"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-item-display" data-toggle="tooltip" data-placement="top" title="" data-original-title="활성">
+                                                            <i class="far fa-check-circle"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-item-hidden" data-toggle="tooltip" data-placement="top" title="" data-original-title="비활성">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary btn-item-delete" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제">
+                                                            <i class="far fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                </dt>
+                                                <select id="category_select_item" name="u_category" class="select_cat" size="4">
+                                                @forelse($items as $item)
+                                                    <option value="{{$item->d_cat_cd}}|{{$item->seq}}|{{$item->disp_yn}}">{{$item->full_nm}} - {{$item->d_cat_cd}}</option>
+                                                @empty
+                                                    <option value=''>카테고리를 추가해 주십시오.</option>
+                                                @endforelse
+                                                </select>
+                                            </dl>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card">
@@ -149,7 +180,7 @@ select.select_cat
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-lg-12">
                                 @if( $type == '' )
                                 <div class="img_box cum_slider_cont p-4">
                                     <img src="{{config('shop.image_svr')}}{{@$goods_info->img}}?{{@$goods_info->img_upate}}" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" alt="{{@$goods_info->goods_nm}}">
@@ -185,22 +216,20 @@ select.select_cat
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-lg-6 mt-4 mt-lg-0">
-                                <div class="table-box">
+                            <div class="col-12 mt-4 mt-lg-4">
+                                <div class="table-box mobile">
                                     <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <tr>
-                                            <th class="required">상품명</th>
-                                            <td>
-                                                <div class="input_box">
-                                                    <input type="text" class="form-control form-control-sm search-all" name="goods_nm" id="goods_nm" maxlength="100" value="{{ @$goods_info->goods_nm  }}" />
+                                            <th class="required" id="th">상품명</th>
+                                            <td style="width:35%">
+                                                <div class="form-inline">
+                                                    <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm" id="goods_nm" maxlength="100" value="{{ @$goods_info->goods_nm  }}" />
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">상품명(영문)</th>
+                                            <th class="required" id="th">상품명(영문)</th>
                                             <td>
                                                 <div class="input_box">
-                                                    <input type="text" class="form-control form-control-sm search-all" name="goods_nm_eng" id="goods_nm_eng" maxlength="100" value="{{ @$goods_info->goods_nm_eng  }}" />
+                                                    <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm_eng" id="goods_nm_eng" maxlength="100" value="{{ @$goods_info->goods_nm_eng  }}" />
                                                 </div>
                                             </td>
                                         </tr>
@@ -211,8 +240,6 @@ select.select_cat
                                                     <input type="text" name="head_desc" class="form-control form-control-sm search-all"z value="{{ @$goods_info->head_desc }}" readonly>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th><p>하단 홍보글</p></th>
                                             <td>
                                                 <div class="input_box">
@@ -232,8 +259,6 @@ select.select_cat
                                                     </select>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th class="required">브랜드</th>
                                             <td>
                                                 <div class="wd300">
@@ -281,8 +306,6 @@ select.select_cat
                                                     </x-tool-tip>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th class="required">스타일넘버</th>
                                             <td>
                                                 <div class="input_box wd300">
@@ -318,15 +341,13 @@ select.select_cat
                                                     @endif
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th class="required">업체</th>
                                             <td>
                                                 <div class="input_box wd300">
 													<div class="form-inline inline_btn_box">
 														<input type="hidden" name="com_type" id="com_type" value="{{ @$goods_info->com_type }}" >
 														<input type="hidden" name="margin_type" id="margin_type" value="{{ @$goods_info->margin_type }}">
-                                                        <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">{{ @$goods_info->com_nm }}</span>
+                                                        <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">{{ @$com_nm }}</span>
 													</div>
                                                 </div>
                                             </td>
@@ -338,8 +359,6 @@ select.select_cat
                                                     <input type='text' class="form-control form-control-sm search-all" name='make' id='make' value='{{ @$goods_info->make  }}' />
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th class="required">원산지</th>
                                             <td>
                                                 <div class="input_box wd300">
@@ -358,8 +377,6 @@ select.select_cat
                                                     <div class="txt_box ml-1">원</div>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th><p>시중가</p></th>
                                             <td>
                                                 <div class="flax_box">
@@ -390,8 +407,6 @@ select.select_cat
                                                     *원가는 자동계산됩니다.
                                                 </p>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th><p>수수료</p></th>
                                             <td>
                                                 <div class="flax_box">
@@ -414,8 +429,6 @@ select.select_cat
                                                     </select>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th class="required">MD선택</th>
                                             <td>
                                                 <div class="wd300">
@@ -450,8 +463,6 @@ select.select_cat
                                                     </div>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th><p>배송비 지불</p></th>
                                             <td>
                                                 <div class="form-inline form-radio-box flax_box txt_box">
@@ -523,8 +534,6 @@ select.select_cat
                                                     </div>
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th class="required">적립금</th>
                                             <td>
                                                 <div class="form-inline form-radio-box flax_box txt_box">
@@ -555,8 +564,6 @@ select.select_cat
                                                     {{ @$goods_info->reg_dm }}
                                                 </div>
                                             </td>
-                                        </tr>
-                                        <tr>
                                             <th><p>수정일시</p></th>
                                             <td>
                                                 <div class="txt_box">
@@ -1062,6 +1069,11 @@ select.select_cat
 
     var ed;
 
+    $(document).ready(function(){
+        $('#main-tab').trigger("click");
+    });
+
+
     $(document).ready(function() {
         var editorToolbar = [
             ['font', ['bold', 'underline', 'clear']],
@@ -1448,8 +1460,11 @@ select.select_cat
                     const TYPE = "{{$type}}";
                     if (TYPE == "create") {
                         alert("상품이 등록되었습니다.");
+                        opener.Search();
+                        location.href="/partner/product/prd01/" + data;
                     } else {
                         alert("변경된 내용이 정상적으로 저장 되었습니다.");
+                        opener.Search();
                         location.href="/partner/product/prd01/" + data;
                     }
                 }

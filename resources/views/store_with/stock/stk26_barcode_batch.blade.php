@@ -53,7 +53,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_stk26_barcode.xlsx" class="ml-2" style="text-decoration: underline !important;">실사 바코드등록 양식 다운로드</a>
+                                                    <a href="/sample/sample_barcode.xlsx" class="ml-2" style="text-decoration: underline !important;">실사 바코드등록 양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -197,7 +197,7 @@
     let basic_info = {};
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 470);
+        pApp.ResizeGrid(275,550);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {

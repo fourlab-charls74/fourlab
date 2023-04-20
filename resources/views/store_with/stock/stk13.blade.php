@@ -290,12 +290,12 @@
     <script language="javascript">
         let rel_products = {};
         let columns = [
-            {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true,},
+            {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true, headerCheckboxSelection: true},
             {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"},
                 aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
                 cellRenderer: (params) => params.data ? '' : params.value,
             },
-            {field: "prd_cd" , headerName: "바코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true, headerCheckboxSelection: true},
+            {field: "prd_cd" , headerName: "바코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true, },
             {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
             {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},

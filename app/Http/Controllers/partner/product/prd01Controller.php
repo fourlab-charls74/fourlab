@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use PDO;
 use Exception;
 
+// ini_set('upload_max_filesize', '10M');
 
 
 class prd01Controller extends Controller
@@ -397,10 +398,12 @@ class prd01Controller extends Controller
 		$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery","free_delivery_amt");
 		$cfg_order_point_ratio		= $conf->getConfigValue("point","ratio");
         $shop_domain = $conf->getConfigValue("shop", "domain");
+        $com_id	= Auth('partner')->user()->com_id;
+        $com_nm	= Auth('partner')->user()->com_nm;
 
 
         $user		= Auth('partner')->user();
-        $com_id     = $user->com_id;
+        // $com_id     = $user->com_id;
         $pay_fee    = $user->pay_fee;
 
         $goods = DB::table("goods")
@@ -457,7 +460,8 @@ class prd01Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT',["40" => "<>"]),
             'class_items'	=> $class_items,
             'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
-
+            'com_id'        => $com_id,
+            'com_nm'        => $com_nm,
             'g_dlv_fee'		=> $cfg_dlv_fee,
             'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
             'g_order_point_ratio'	=> $cfg_order_point_ratio,
@@ -868,9 +872,9 @@ class prd01Controller extends Controller
 				"ad_desc"			=> $req->input('ad_desc', ''),
 				"opt_kind_cd"		=> $req->input('opt_kind_cd', ''),
 				"brand"				=> $req->input('brand_cd', ''),
-				"sale_stat_cl"		=> $req->input('sale_stat_cl', ''),
+				"sale_stat_cl"		=> $req->input('sale_stat_cl', '5'),
 				"style_no"			=> $req->input('style_no', ''),
-				"goods_type"		=> $req->input('goods_type', ''),
+				"goods_type"		=> $req->input('goods_type', 'P'),
 				"com_id"			=> $com_id,
 				"com_type"			=> $req->input('com_type'),
 				//"com_nm"			=> $req->input('com_nm',''),
@@ -1815,9 +1819,9 @@ class prd01Controller extends Controller
 		$goods_nm_eng		= $request->input('goods_nm_eng');
 		$ad_desc			= $request->input('ad_desc');
 		$brand				= $request->input('brand_cd');
-		$sale_stat_cl		= $request->input('sale_stat_cl');
+		$sale_stat_cl		= $request->input('sale_stat_cl', '5');
 		$style_no			= $request->input('style_no');
-		$goods_type			= $request->input('goods_type');
+		$goods_type			= $request->input('goods_type', 'P');
 
 		$point_cfg			= $request->input('point_cfg','S');
 		$point_yn			= $request->input('point_yn','Y');
