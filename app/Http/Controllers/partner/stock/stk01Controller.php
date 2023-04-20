@@ -104,9 +104,9 @@ class stk01Controller extends Controller
             "
           select
                 CONCAT_WS('/', opt_kind_nm, brand_nm, style_no, goods_no, goods_nm, goods_opt) as tree_set,
-                -- a.com_nm, o.opt_kind_nm, b.brand_nm, a.style_no,
+                a.com_nm, o.opt_kind_nm, b.brand_nm, a.style_no,
                 cd.code_val as goods_type_nm, cd2.code_val as is_unlimited_nm,
-                -- a.goods_no, a.goods_sub, a.goods_nm,
+                a.goods_no, a.goods_sub, a.goods_nm,
                 a.goods_nm,
                 cd3.code_val as sale_stat_cl_nm,
                 a.wonga,

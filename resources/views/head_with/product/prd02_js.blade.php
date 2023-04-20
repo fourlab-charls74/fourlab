@@ -2,7 +2,7 @@
 
     let target_file = null;
 
-    const IMG_SIZE = 600;
+    const IMG_SIZE = 700;
 
     $(document).ready(function() {
         $("#img-setting-tab [name=size]").prop('checked', true);

@@ -1,7 +1,9 @@
 <script type="text/javascript">
 
     let target_file = null;
-
+    const IMG_MIN_WIDTH = 700;
+    const IMG_MIN_HEIGHT = 700;
+    
     $(document).ready(function() {
         $("#img-setting-tab [name=size]").prop('checked', true);
 
@@ -95,6 +97,17 @@
         if (target_file[0].size > 10*1024*1024) {
             alert("10M 이상 파일은 업로드 하실 수 없습니다.");
             return false;
+        }
+
+        if (target_file.length > 0) {
+            const img = new Image();
+            const url = window.URL || window.webkitURL;
+
+            img.src = url.createObjectURL(target_file[0]);
+            if(img.width < IMG_MIN_WIDTH || img.height < IMG_MIN_HEIGHT) {
+                alert('이미지 가로 세로 최소 사이즈는 700 X 700 입니다.');
+                return false;
+            }
         }
 
         return true;

@@ -249,10 +249,11 @@ class prd01Controller extends Controller
 				, g.style_no
 				, g.head_desc
 				, '' as img_view
-				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
-					select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
-					from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
-				  )) as img
+				-- , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+				--	select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+				--	from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+				--  )) as img
+				, concat('/images/goods_img/', date_format(reg_dm, '%Y%m%d'), '/', g.goods_no, '/', g.goods_no, '_s_50.jpg') as img
 				, g.goods_nm
 				, g.goods_nm_eng
 				, g.ad_desc

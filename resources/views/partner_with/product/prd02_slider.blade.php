@@ -365,6 +365,8 @@
     const goods_list = <?= json_encode(@$goods_list) ?>;
     let current_row = 0;
     let timer = null;
+    const IMG_MIN_WIDTH = 700;
+    const IMG_MIN_HEIGHT = 700;
 
     function SetSlideList() {
         gx.gridOptions.api.setRowData(goods_list);
@@ -543,6 +545,17 @@
         if(target_file === null) return alert("업로드할 이미지를 선택해주세요.");
         if(!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file.name)) return alert("이미지 형식이 아닙니다.");
         if(target_file.size > 10*1024*1024) return alert("10M 이상 파일은 업로드 하실 수 없습니다.");
+
+        if (target_file !== null) {
+            const url = window.URL || window.webkitURL;
+            const img = new Image();
+	    
+            img.src = url.createObjectURL(target_file);
+            if(img.width < IMG_MIN_WIDTH || img.height < IMG_MIN_HEIGHT) {
+                return alert('이미지 가로 세로 최소 사이즈는 700 X 700 입니다.');
+            }
+        }
+
         return 200;
     }
 

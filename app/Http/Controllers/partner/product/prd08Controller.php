@@ -10,21 +10,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Exception;
+
+use App\Components\SLib;
 
 class prd08Controller extends Controller
 {
-    public function index() {
-
-
+    public function index(Request $req)
+    {
         $values = [
-            'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
-            'items' => SLib::getItems(),
-            'goods_types' => SLib::getCodes('G_GOODS_TYPE'),
-            'is_unlimiteds' => SLib::getCodes('G_IS_UNLIMITED'),
-            'alter_reasons' => SLib::getCodes('G_JAEGO_REASON'),
+            'com_nm' => Auth('partner')->user()-> com_nm,
+            'com_id' => Auth('partner')->user()-> com_id
         ];
-        return view( Config::get('shop.partner.view') . '/product/prd08',$values);
+
+		return view(Config::get('shop.partner.view') . '/product/prd08', $values);
     }
 
     // 상품번호로 상품정보 조회
@@ -193,7 +191,7 @@ class prd08Controller extends Controller
                         DB::commit();
                         array_push($success, $item);
                     } catch (Exception $e) {
-                        // dd($e->getMessage());
+                        return response()->json(['code' => 500, 'msg' => $e->getMessage(), 'body' => ['fail' => 'image upload fail']]);
                     }
                 }
             }
@@ -276,7 +274,7 @@ class prd08Controller extends Controller
                         DB::commit();
                         array_push($success, $item);
                     } catch (Exception $e) {
-                        // dd($e->getMessage());
+                        return response()->json(['code' => 500, 'msg' => $e->getMessage(), 'body' => ['fail' => 'image upload fail']]);
                     }
                 }
             }
