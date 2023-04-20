@@ -78,9 +78,8 @@
                                     <td>
                                         <div class="input_box wd300">
                                             <div class="form-inline inline_btn_box">
-                                                <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm btn-select-company" style="width:70%;background-color:white;" readonly />
-                                                <input type="text" name="com_id" id="com_id" class="form-control form-control-sm btn-select-company ml-1" style="width:28%;" readonly />
-                                                <a href="#" class="btn btn-sm btn-outline-primary btn-select-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                <input type="text" id="com_nm" name="com_nm" value = "{{$com_nm}}" class="form-control form-control-sm btn-select-company" style="width:70%;" readonly disabled/>
+                                                <input type="text" name="com_id" id="com_id" value = "{{$com_id}}" class="form-control form-control-sm btn-select-company ml-1" style="width:28%;" readonly disabled/>
                                             </div>
                                         </div>
                                     </td>
@@ -125,6 +124,7 @@
                         <li>예&#41; &#40;상품번호 - 123456.jpg / 123456_a_700.jpg&#41;, &#40;스타일넘버 - BA2332462.jpg / BA2332462_a_500.jpg&#41;</li>
                         <li>매칭된 상품이미지를 '이미지업로드' 버튼을 클릭하여 업로드하실 수 있습니다.</li>
                         <li>목록이미지의 경우 700*700 이상의 이미지를 업로드해주세요.</li>
+                        <li><strong style="color:red;">목록이미지의 경우 기본 이미지만 적용이 됩니다.</strong></li>
                         <li>상세이미지의 경우 '***이미지영역***' 텍스트가 등록하신 각 이미지로 대체됩니다.</li>
                     </ul>
                 </div>

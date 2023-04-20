@@ -10,13 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Exception;
 
 class prd08Controller extends Controller
 {
     public function index(Request $req)
     {
-        $values = [];
+        $values = [
+            'com_nm' => Auth('partner')->user()-> com_nm,
+            'com_id' => Auth('partner')->user()-> com_id
+        ];
+
 		return view(Config::get('shop.partner.view') . '/product/prd08', $values);
     }
 
@@ -186,7 +189,7 @@ class prd08Controller extends Controller
                         DB::commit();
                         array_push($success, $item);
                     } catch (Exception $e) {
-                        // dd($e->getMessage());
+                        return response()->json(['code' => 500, 'msg' => $e->getMessage(), 'body' => ['fail' => 'image upload fail']]);
                     }
                 }
             }
@@ -269,7 +272,7 @@ class prd08Controller extends Controller
                         DB::commit();
                         array_push($success, $item);
                     } catch (Exception $e) {
-                        // dd($e->getMessage());
+                        return response()->json(['code' => 500, 'msg' => $e->getMessage(), 'body' => ['fail' => 'image upload fail']]);
                     }
                 }
             }

@@ -365,6 +365,8 @@
     const goods_list = <?= json_encode(@$goods_list) ?>;
     let current_row = 0;
     let timer = null;
+    const IMG_MIN_WIDTH = 700;
+    const IMG_MIN_HEIGHT = 700;
 
     function SetSlideList() {
         gx.gridOptions.api.setRowData(goods_list);
@@ -421,6 +423,7 @@
 
             if(validatePhoto() !== 200) {
                 target_file = null;
+                this.value = '';
                 return $('#file-label').html('이미지를 선택해주세요.');
             } else {
                 $('#file-label').html(target_file.name);
@@ -540,10 +543,39 @@
 
     // 업로드파일 유효성 검사
     function validatePhoto() {
-        if(target_file === null) return alert("업로드할 이미지를 선택해주세요.");
-        if(!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file.name)) return alert("이미지 형식이 아닙니다.");
-        if(target_file.size > 10*1024*1024) return alert("10M 이상 파일은 업로드 하실 수 없습니다.");
-        return 200;
+        const result = 200;
+
+        if(target_file === null) {
+            result = 100;  
+            alert("업로드할 이미지를 선택해주세요.");
+        }
+
+        if(!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file.name)) {
+            result = 100; 
+            alert("이미지 형식이 아닙니다.");
+        }
+
+        if(target_file.size > 10*1024*1024) {
+            result = 100;  
+            alert("10M 이상 파일은 업로드 하실 수 없습니다.");
+        }
+
+        if (target_file !== null) {
+            const url = window.URL || window.webkitURL;
+            const img = new Image();
+        
+            img.onload = (e) => {
+                const image = e.target;
+                console.log(image.width);
+                console.log(image.height);
+                if ((image.width < IMG_MIN_WIDTH) || (image.height < IMG_MIN_HEIGHT)) {
+                    alert(`${IMG_MIN_WIDTH} x ${IMG_MIN_HEIGHT} 크기 이상의 이미지를 업로드 해주세요.`);
+                    result = 100;  
+                }
+            }
+        }
+
+        return result;
     }
 
     // 업로드 미리보기 이미지 그리기
