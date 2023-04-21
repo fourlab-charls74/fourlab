@@ -4,11 +4,13 @@ namespace App\Http\Controllers\head\order;
 
 use App\Components\SLib;
 use App\Components\Lib;
+use App\Exports\ExcelExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 use PDO;
 use App\Models\Order;
 use App\Models\Conf;
@@ -64,7 +66,7 @@ class ord22Controller extends Controller
 
         $sql = "
 		select
-		  '' as chk, a.dlv_series_nm, a.dlv_series_no, a.dlv_cd, a.dlv_no, 
+		  '' as chk, a.dlv_series_nm, a.dlv_series_no, a.dlv_cd, a.dlv_no,
 		  ord_type.code_val as ord_type_nm, ord_kind.code_val as ord_kind_nm,
 		  a.user_nm, a.r_nm,
 		  a.ord_no, a.ord_opt_no, ord_state.code_val as ord_state_nm, pay_stat.code_val as pay_stat,
@@ -358,9 +360,21 @@ class ord22Controller extends Controller
     }
 
     public function sale(Request $req) {
-        
+
         $type = 'sale_dlv_inv_dn';
         $s_sale_place	= $req->input("sale_place", "HEAD_OFFICE");
+
+        $cnt = DB::table('columns')->where('type', $type)->count();
+        if ($cnt < 1) {
+            $sql = "
+				insert into columns
+					( type, cn, name, seq, use_yn, use_seq, rt, ut )
+				select '$type' as type, cn, name, seq, use_yn, use_seq, now() as rt, now() as ut
+				from columns where type = 'dlv_inv_dn'
+				order by use_seq
+			";
+            DB::insert($sql);
+        }
 
         $sql = "select cn as name, name as value from columns where type = '$type' order by use_seq";
         $columns = DB::select($sql);
@@ -439,9 +453,9 @@ class ord22Controller extends Controller
             for ($i=0; $i < count($fields); $i++){
                 $cn = $fields[$i];
                 $sql = "
-					update columns 
-					set use_yn = 'Y', 
-						use_seq = '$i', 
+					update columns
+					set use_yn = 'Y',
+						use_seq = '$i',
 						ut = now()
 					where type = '$type' and cn = '$cn'
 				";
@@ -534,13 +548,14 @@ class ord22Controller extends Controller
 
         $this->set_excel_download("delivery_%s.xls");
 
-        return view( Config::get('shop.head.view') . '/order/ord22_pop_excel',[
+        return view(Config::get('shop.head.view') . '/order/ord22_pop_excel', [
             'rows' => DB::select($sql),
             'fields' => $fields
         ]);
     }
 
-    public function download_baesong_list_sale(Request $request) {
+    public function download_baesong_list_sale(Request $request)
+    {
         $condition = $this->get_condition($request);
 
         $where = $condition[0];
@@ -558,9 +573,9 @@ class ord22Controller extends Controller
             for ($i=0; $i < count($fields); $i++){
                 $cn = $fields[$i];
                 $sql = "
-					update columns 
-					set use_yn = 'Y', 
-						use_seq = '$i', 
+					update columns
+					set use_yn = 'Y',
+						use_seq = '$i',
 						ut = now()
 					where type = '$type' and cn = '$cn'
 				";
@@ -614,7 +629,7 @@ class ord22Controller extends Controller
 					 else d.bank_code end bank_code,
 					b.r_zipcode, concat(ifnull(b.r_addr1, ''),ifnull(b.r_addr2, '')) as r_addr, b.r_phone, b.r_mobile, b.dlv_msg, '' as free_gift,
 					concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm, b.r_nm, b.r_jumin,
-					f.com_nm as sale_place, concat('[', ifnull(f.zip_code, ''),']', ifnull(f.addr1, ''), ' ', ifnull(f.addr2, '')) as sale_place_addr, 
+					f.com_nm as sale_place, concat('[', ifnull(f.zip_code, ''),']', ifnull(f.addr1, ''), ' ', ifnull(f.addr2, '')) as sale_place_addr,
                     f.cs_phone as sale_place_phone, b.out_ord_no, c.com_nm, c.baesong_kind, b.ord_date,
 					case a.ord_state
 						when '-20' then null
@@ -649,23 +664,28 @@ class ord22Controller extends Controller
 				left outer join code gt on (a.goods_type = gt.code_id and gt.code_kind_cd = 'G_GOODS_TYPE')
 		";
 
-        $this->set_excel_download("delivery_%s.xls");
-
-        return view( Config::get('shop.head.view') . '/order/ord22_sale_excel',[
-            'rows' => DB::select($sql),
-            'fields' => $fields
-        ]);
+        $filename = sprintf("%s_택배송장목록_%s.xlsx", $sale_place, date("YmdH"));
+        $headers = array_column($fields, 'value', 'name');
+        $sizes = [
+            'ord_no' => 20,
+            'goods_nm' => 50,
+            'goods_opt' => 30,
+            'r_addr' => 40,
+            'r_phone' => 15,
+            'r_mobile' => 15,
+        ];
+        return Excel::download(new ExcelExport($sql, $headers, $sizes), $filename, \Maatwebsite\Excel\Excel::XLSX);
     }
 
-    private function set_excel_download($filename_format) {
-        $filename = sprintf($filename_format,date("YmdH"));
+    private function set_excel_download($filename_format)
+    {
+        $filename = sprintf($filename_format, date("YmdH"));
 
         header("Content-type: application/vnd.ms-excel;charset=UTF-8");
         header("Content-Disposition: attachment; filename=$filename");
-        Header("Content-Transfer-Encoding: binary");
-        Header("Pragma: no-cache");
-        Header("Expires: 0");
-
+        header("Content-Transfer-Encoding: binary");
+        header("Pragma: no-cache");
+        header("Expires: 0");
     }
 
     private function get_condition(Request $request) {
@@ -797,10 +817,10 @@ class ord22Controller extends Controller
                 ];
 
                 $order->AddStateLog($state_log);
-                
+
                 $order->DlvEnd($dlv_cd, $dlv_no);
                 $order->DlvLog($ord_state = 30);
-                
+
                 ################################################################
                 // 보유재고 차감 로직 추가
 
@@ -812,11 +832,11 @@ class ord22Controller extends Controller
 				";
                 $opt	= DB::selectOne($sql);
                 $_qty	= $opt->qty;
-                
+
                 $_goods_no	= $opt->goods_no;
                 $_goods_sub	= $opt->goods_sub;
                 $_goods_opt	= $opt->goods_opt;
-                
+
                 $prd = new Product($user);
 
                 // 재고 차감 처리

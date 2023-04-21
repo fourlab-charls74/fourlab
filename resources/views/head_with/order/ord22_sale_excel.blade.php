@@ -11,7 +11,7 @@
 		}
 	}
 ?>
-<table border="1">
+<table border="1" x:str>
 	<thead>
 		<tr>
 			@foreach ($fields as $field)

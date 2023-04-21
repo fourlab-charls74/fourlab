@@ -35,8 +35,8 @@ class ExcelExport extends DefaultValueBinder implements FromCollection, WithHead
     public function map($row): array
     {
         return array_column(array_map(
-                    function($h) use ($row) { 
-                        return ['key' => $h, 'value' => $row->$h ?? '']; 
+                    function($h) use ($row) {
+                        return ['key' => $h, 'value' => $row->$h ?? ''];
                     }, array_keys($this->headers)
                 ), 'value', 'key');
     }
@@ -60,9 +60,9 @@ class ExcelExport extends DefaultValueBinder implements FromCollection, WithHead
         return [
             AfterSheet::class => function (AfterSheet $event) use ($alphabets) {
                 $sheet = $event->getSheet()->getDelegate();
-                $last = $alphabets[count($this->headers) - 1];
+                $last = $alphabets[(count($this->headers) < 1 ? 1 : count($this->headers)) - 1];
                 $lastnum = $this->collection()->count() + 1;
-                
+
                 foreach (array_slice($alphabets, 0, count($this->headers)) as $key => $columnId) {
                     $size = $this->sizes[array_keys($this->headers)[$key] ?? ''] ?? 10;
                     $sheet->getColumnDimension($columnId)->setAutoSize(false);
