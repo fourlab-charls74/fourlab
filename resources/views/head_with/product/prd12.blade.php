@@ -129,7 +129,7 @@
         {field: "p_cnt", headerName: "조회수", width:60, type: 'numberType' },
         {field: "preview", headerName: "미리보기", width:72,cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
-                return '<a href="https://' + '{{ $domain }}' + '/app/planning/views/' + params.data.p_no + '/' + params.data.no + '?is_preview=y" target="_blank">보기</a>'
+                return '<a href="https://bizest.' + '{{ $domain }}' + '/app/planning/views/' + params.data.p_no + '/' + params.data.no + '?is_preview=y" target="_blank">보기</a>'
             }
         },
         {field: "is_show", headerName: "사용여부", width:58, cellClass: 'hd-grid-code',

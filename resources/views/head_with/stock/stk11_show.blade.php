@@ -319,6 +319,7 @@
         {headerName: "수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right'},
+
         },
         {headerName: "단가", field: "unit_cost", width: 60,
             editable: params => checkIsEditable(params),
@@ -364,7 +365,27 @@
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
-            onCellValueChanged: params => evtAfterEdit(params)
+            /**
+             *  키보드 방향키 누르면 바로 입력할 수 있는 부분(개발중)
+             */
+            // onCellKeyDown : function(e) {
+            //     let key = e.event.key;
+            //     if (key == 'ArrowDown') {
+            //         gx.gridOptions.api.stopEditing();
+            //         let rowIndex = e.rowIndex + 1;
+            //         let column = e.column.colId;
+            //         gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
+
+            //     } else if (key == 'ArrowUp') {
+            //         gx.gridOptions.api.stopEditing();
+            //         let rowIndex = e.rowIndex - 1;
+            //         let column = e.column.colId;
+            //         gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
+            //     } 
+            // },
+            onCellValueChanged: async (params) => {
+                await evtAfterEdit(params);
+            },
         };
         gx = new HDGrid(gridDiv, columns,options);
         $("#img").click(() => {
@@ -575,27 +596,27 @@
             return false;
         }
 
-        const checked_opt = await checkOption(row); // check option
-        if (checked_opt == false) return false;
+        // const checked_opt = await checkOption(row); // check option
+        // if (checked_opt == false) return false;
         
         return true;
     };
 
-    const checkOption = async (row) => {
-        const CMD = 'checkopt';
-        const data = { cmd: CMD, goods_no: row.goods_no, goods_sub: row.goods_sub, opt: row.opt_kor };
-        let code;
-        await axios({ url: COMMAND_URL, method: 'post', data: data })
-            .then((response) => { code = response.data.code; }).catch((error) => { console.log(error); });
-        if (code !=1) {
-            const row_index = row.count - 1;
-            gx.gridOptions.api.stopEditing(); // stop editing
-            alert('옵션을 정확하게 입력해 주십시오.');
-            startEditingCell(row_index, 'opt_kor');
-            return false;
-        }
-        return true;
-    };
+    // const checkOption = async (row) => {
+    //     const CMD = 'checkopt';
+    //     const data = { cmd: CMD, goods_no: row.goods_no, goods_sub: row.goods_sub, opt: row.opt_kor };
+    //     let code;
+    //     await axios({ url: COMMAND_URL, method: 'post', data: data })
+    //         .then((response) => { code = response.data.code; }).catch((error) => { console.log(error); });
+    //     if (code !=1) {
+    //         const row_index = row.count - 1;
+    //         gx.gridOptions.api.stopEditing(); // stop editing
+    //         alert('옵션을 정확하게 입력해 주십시오.');
+    //         startEditingCell(row_index, 'opt_kor');
+    //         return false;
+    //     }
+    //     return true;
+    // };
 
     const startEditingCell = (row_index, col_key) => {
         gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
@@ -682,14 +703,13 @@
     }
 
     var evtAfterEdit = async (params) => { // edit 가능한 셀 수정시 계산하고 고정 row를 업데이트합니다.
-        // console.log(params);
         if (params.oldValue !== params.newValue) {
             const row = params.data;
             const ff = document.search;
             if (row.goods_no > 0) {
                 const [ unit, exchange_rate, custom_tax_rate ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax_rate.value ];
                 await calProduct(row, unit, exchange_rate, custom_tax_rate);
-                checkOption(row);
+                // checkOption(row);
             }
         }
         updatePinnedRow();

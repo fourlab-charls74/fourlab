@@ -109,7 +109,7 @@ function openSchPop(kwd) {
     );
 }
 function openSitePop(surl, goods_no) {
-    const url = `${surl}/app/product/detail/${goods_no}/0`;
+    const url = `bizest.fjallraven.co.kr/app/product/detail/${goods_no}/0`;
     window.open(
         url,
         "_blank",

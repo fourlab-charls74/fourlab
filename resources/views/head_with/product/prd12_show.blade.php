@@ -324,7 +324,12 @@
                                 <div class="fl_box">
                                     <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
                                 </div>
+
                                 <div class="fr_box">
+                                    <div class="custom-control custom-checkbox form-check-box mr-2" style="display:inline-block;">
+                                        <input type="checkbox"  name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input" checked>
+                                        <label class="custom-control-label text-left" for="chk_to_class">이미지출력</label>
+                                    </div>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm" onclick="return AddGoods();"><span class="fs-12">상품추가</span></a>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm" onclick="return DelGoods();"><span class="fs-12">상품삭제</span></a>
                                     <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeGoodsSeq();"><span class="fs-12">순서변경</span></a>
@@ -491,7 +496,11 @@
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
             {field: "goods_no", headerName: "상품번호", width: 82, pinned: 'left',rowDrag: true},
             {field: "head_desc", headerName: "상단홍보글"},
-            {field: "img", headerName: "이미지", width:46, type:'GoodsImageType', cellStyle: {"text-align":"center"}},
+            {field: "img", headerName: "이미지", width:46, cellStyle: {"text-align":"center"},
+                cellRenderer: function(params) {
+                    return '<a href="https://bizest.fjallraven.co.kr/app/product/detail/'+ params.data.goods_no +'/0" target="_blank"><img src="' + params.data.img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>'
+                }
+            },
             {field: "img", headerName: "이미지_url", hide: true},
             {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
             {field: "com_nm", headerName: "공급업체", width: 80},
@@ -543,6 +552,11 @@
 				gx.gridOptions.rowSelection	= 'multiple';
 
                 SearchCategoryGoods();
+
+                 // 이미지 출력 설정
+                $("#chk_to_class").click(function() {
+                    gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
+                });
             }
 
             const gridFolderDiv = document.querySelector("#div-gd_folder");

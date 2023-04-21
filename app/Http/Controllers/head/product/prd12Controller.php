@@ -22,6 +22,9 @@ class prd12Controller extends Controller
         $conf = new Conf();
         $domain = $conf->getConfig("shop","domain");
 
+        $d = explode('.',$domain);
+        $domain = $d[1].'.'.$d[2].'.'.$d[3];
+
         $values = [
             'plan_types' => SLib::getCodes('G_PLAN_TYPE'),
             'plan_kinds' => SLib::getCodes('G_PLAN_KIND'),
