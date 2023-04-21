@@ -14,8 +14,6 @@
 </div>
 
 <form method="get" name="search">
-    <!--<input type="hidden" name="c_id" value="{{$admin_id}}">
-    <input type="hidden" name="c_name" value="{{$admin_nm}}"> -->
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
@@ -88,7 +86,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="row">
@@ -126,7 +123,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="row">
@@ -186,8 +182,12 @@
         <input type="hidden" name="user_email" value="">
         <input type="hidden" name="qa_subject" value="">
         <input type="hidden" name="qa_regi_date" value="">
+        <input type="hidden" name="qa_repl_date" value="">
         <input type="hidden" name="user_question" value="">
         <input type="hidden" name="qna_datas" value="">
+        <input type="hidden" name="prev_ans_yn" value="">
+        <input type="hidden" name="prev_ans_id" value="">
+        <input type="hidden" name="prev_ans_nm" value="">
         <div class="row">
             <div class="col-sm-6">
                 <div class="card_wrap">
@@ -198,12 +198,12 @@
                                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                                 </div>
                                 <div class="fr_box">
-                                    <a href="#" class="btn-sm btn btn-primary mr-1 open-btn" onclick="ChangeShow(document.f1)">일괄출력</a>
+                                    <a href="#" class="btn-sm btn btn-primary open-btn" onclick="ChangeShow(document.f1)">일괄출력</a>
                                 </div>
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                            <div id="div-gd" style="height:750px;width:100%;" class="ag-theme-balham"></div>
                         </div>
                     </div>
                  </div>
@@ -212,7 +212,7 @@
                 <div class="card_wrap">
                     <div class="card shadow">
                         <div class="card-header mb-0">
-                            <h5 class="m-0 font-weight-bold">품목 정보</h5>
+                            <h5 class="m-0 font-weight-bold">문의 상세정보</h5>
                         </div>
                         <div class="card-body pt-3">
                             <div class="table-box-ty2 mobile">
@@ -299,7 +299,7 @@
                                             </td>
                                         </tr>
 										<tr >
-											<th>문의이미지</td>
+											<th>문의이미지</th>
 											<td colspan="3">
 												<span id="qna_image0">&nbsp;</span><br>
 												<span id="qna_image1">&nbsp;</span><br>
@@ -310,12 +310,12 @@
                                             <th>답변자</th>
                                             <td colspan="3">
                                                 <div class="flax_box">
-                                                    <input type="hidden" name="ans_id"  value="{{ $admin_id }}">
+                                                    <input type="hidden" name="ans_id" value="{{ $admin_id }}">
                                                     <div class="form-inline">
                                                         <div><input type="text" name="ans_nm" id="ans_nm" value="{{ $admin_nm }}" class="form-control form-control-sm search-all mr-1"></div>
-                                                        <div><input type="button" name="btn_checkin" id="btn_checkin" class="btn btn-primary mr-1" value=" " onclick="CheckIO();" style="width:auto;"></div>
+                                                        <div><input type="button" name="btn_checkin" id="btn_checkin" class="btn btn-primary mr-1" value="" onclick="return setQnaCheck();" style="width:auto;display: none;"></div>
                                                     </div>
-                                                    <input type="button" name="btn_save" id="btn_save" value="답변완료" onclick="Cmder(document.f1.cmd.value);return false;" class="btn btn-outline-secondary mr-1" style="width:auto;">
+                                                    <input type="button" name="btn_save" id="btn_save" value="" onclick="Cmder(document.f1.cmd.value);return false;" class="btn btn-outline-secondary mr-1" style="width:auto;display: none;">
                                                     @if ($sms_yn == 'Y')
                                                     <div class="form-inline form-check-box">
                                                         <div class="custom-control custom-checkbox">
@@ -376,7 +376,6 @@
                                     </tbody>
                                 </table>
                             </div>
-
                             <!-- 확인
                             <div class="mt-3" style="text-align:center;">
                                 <input type="button" class="btn btn-primary" value="확인" onclick="Cmder('savecmd')">
@@ -391,11 +390,55 @@
 
 <link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css" >
 <link rel="stylesheet" href="/handle/editor/summernote/plugin/summernote-ext-ssm-emoji/summernote-ext-ssm-emoji.css?v=2020081821" >
+
 <script type="text/javascript" charset="utf-8">
-    var ed;
+    const pApp = new App('', { gridId: "#div-gd", height: 260 });
+    let gx;
+    let ed;
+    const CELL_COLOR = { YELLOW: { 'background' : '#ffff99' } };
+
+    const columns = [
+        { headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width: 28, cellStyle: { "background":"#F5F7F7" },
+            cellRenderer: function(params) {
+                if (params.data.group_cd !== undefined && params.data.group_cd !== null) {
+                    return "<input type='checkbox' checked/>";
+                }
+            }
+        },
+        { field: "type", headerName: "문의유형", width: 80, cellStyle: (params) => ({ ...StyleGoodsTypeNM(params), 'text-align': 'center' }) },
+        { field: "subject", headerName: "제목", width: 200,
+            cellRenderer: function(params) {
+                return '<a href="javascript:void(0);" onclick="return setQnaDetail('+ params.data.idx +');">'+ params.value + '</a>';
+            }
+        },
+        { field: "user_nm", headerName: "작성자", width: 75, cellStyle: { 'text-align': 'center' } },
+        { field: "regi_date", headerName: "작성일", width: 120, cellStyle: { 'text-align': 'center' } },
+        { field: "admin_open_state", headerName: "출력", width: 60, cellStyle: { 'text-align': 'center' } },
+        { field: "open_state", headerName: "비밀글여부", width: 80, cellStyle: { 'text-align': 'center' } },
+        { field: "ans_state", headerName: "상태",
+            cellStyle: (params) => ({ 'text-align': 'center', 'color': (params.value === '대기' ? '#FF0000' : '#0000FF') }),
+        },
+        { field: "idx", headerName: "idx", hide: true },
+        { field: "user_id", headerName: "user_id", hide: true },
+        { field: "admin_open_yn", headerName: "admin_open_yn", hide: true },
+        { field: "ans_yn", headerName: "ans_yn", hide: true },
+        { width: "auto" }
+    ];
 
     $(document).ready(function() {
-        var editorToolbar = [
+        pApp.ResizeGrid(260);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns, {
+            getRowStyle: (params) => {
+                if (params.data.ans_yn == "Y") return CELL_COLOR.YELLOW;
+            }
+        });
+
+        Search();
+        setTemplateAutoComplete();
+
+        let editorToolbar = [
             ['font', ['bold', 'underline', 'clear']],
             ['color', ['color']],
             ['para', ['paragraph']],
@@ -403,7 +446,7 @@
             ['emoji', ['emoji']],
             ['view', ['undo', 'redo', 'codeview','help']]
         ];
-        var editorOptions = {
+        let editorOptions = {
             lang: 'ko-KR', // default: 'en-US',
             minHeight: 100,
             height: 150,
@@ -411,75 +454,12 @@
             disableDragAndDrop: false,
             toolbar: editorToolbar,
             imageupload:{
-                dir:'/data/head/mem20',
-                maxWidth:1280,
-                maxSize:10
+                dir: '/data/head/mem20',
+                maxWidth: 1280,
+                maxSize: 10
             }
         }
-        ed = new HDEditor('.editor1',editorOptions);
-    });
-</script>
-
-<script language="javascript">
-
-const CELL_COLOR = {
-    YELLOW: { 'background' : '#ffff99' }
-};
-
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
-
-        {
-            headerName: '',
-            headerCheckboxSelection: true,
-            checkboxSelection: true,
-            width:28,
-			cellStyle: {"background":"#F5F7F7"},
-            cellRenderer: function(params) {
-                if (params.data.group_cd !== undefined && params.data.group_cd !== null) {
-                    return "<input type='checkbox' checked/>";
-                }
-            }
-        },
-        {field:"type",headerName:"문의유형",width:80,cellStyle: (params) => ({...StyleGoodsTypeNM(params), 'text-align': 'center'})},
-        {field:"subject",headerName:"제목",width:200,
-            cellRenderer: function(params) {
-                var qna_data = params.data.idx;
-                return '<a href="javascript:;" onClick="GetContents('+ qna_data +')">'+ params.value+'</a>'
-            }
-        },
-        {field:"user_nm",headerName:"작성자", width:75, cellStyle: {'text-align': 'center'}},
-        {field:"regi_date",headerName:"작성일", width:120, cellStyle: {'text-align': 'center'}},
-        {field:"open_state",headerName:"출력", cellStyle: {'text-align': 'center'}},
-        {field:"ans_state",headerName:"상태",
-            cellStyle: (params) => ({ 'text-align': 'center', 'color': (params.value === '대기' ? '#FF0000' : '#0000FF') }),
-        },
-        {field:"idx",headerName:"idx", hide: true,},
-        {field:"user_id",headerName:"user_id", hide: true,},
-        {field:"admin_open_yn",headerName:"admin_open_yn", hide: true,},
-        {field:"ans_yn",headerName:"ans_yn", hide: true,},
-        { width: "auto" }
-];
-
-</script>
-<script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
-    let gx;
-    $(document).ready(function() {
-        pApp.ResizeGrid(); //270
-        pApp.BindSearchEnter();
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        let options = {
-            getRowStyle: (params) => {
-                // console.log(params);
-                if (params.data.ans_yn == "Y") return CELL_COLOR.YELLOW;
-            }
-        }
-        gx = new HDGrid(gridDiv, columns, options);
-        //Search(1);
-        Search();
+        ed = new HDEditor('.editor1', editorOptions);
     });
 
     function Search() {
@@ -487,138 +467,271 @@ var columns = [
         gx.Request('/head/member/mem20/search', formData, 1);
     }
 
-</script>
-<script type="text/javascript" charset="utf-8">
+    // 좌측테이블에서 제목 클릭 시, 해당문의의 상세정보를 우측테이블에 출력
+    async function setQnaDetail(idx) {
+        const res = await axios({ method: 'get', url: '/head/member/mem20/show/' + idx });
+        if (res.status !== 200 || res.data.code !== 200) {
+            alert('조회 중 에러가 발생했습니다. 질문을 다시 한 번 선택해주세요.');
+            return;
+        }
 
-    function GetContents(idx){
-        const qnaIdx = idx;
+        const qna = res.data.body[0];
+        let ans_subject = '[re]' + qna.subject;
 
-        if(res){
+        $("[name='a_open_yn']")[qna.admin_open_yn === 'Y' ? 0 : 1].checked = true;
+        $("#qa_subject").html(qna.subject);
+        $("#qa_nm").html(`${qna.user_nm} / <a href="javascript:void(0);" onclick="return openUserPopup('${qna.user_id}');">${qna.user_id}</a>`);
+        $("#qa_secret").html(qna.open_yn);
+        $("#qa_type").html(qna.type_cd);
+        $("#qa_tel").html(qna.mobile);
+        $("#qa_date").html(qna.regi_date);
+        $("#qa_content").html(qna.question);
+        $("#ans_nm").val(qna.ans_nm);
+        $("#ans_subject").val(ans_subject);
+        $("#c_ans_yn").val(qna.ans_yn);
+        $("#qa_state").html('');
+        $("#ord_no").html('');
+        $("#qa_goods_nm").html('');
 
-            $.ajax({
-                async: true,
-                type: 'get',
-                url: '/head/member/mem20/show/'+qnaIdx,
-                success: function (data) {
-                    //console.log(data.body);
-                    setQaInfo(data.body);
-                },
-                complete:function(){
-                    _grid_loading = false;
-                },
-                error: function(request, status, error) {
-                    console.log("error")
-                    //console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-                }
-            });
+        $("[name='check_id']").val(qna.check_id);
+        $("[name='user_name']").val(qna.user_nm);
+        $("[name='user_mobile']").val(qna.mobile);
+        $("[name='user_email']").val(qna.email);
+        $("[name='qa_subject']").val(qna.subject);
+        $("[name='qa_regi_date']").val(qna.regi_date);
+        $("[name='qa_repl_date']").val(qna.repl_date);
+        $("[name='user_question']").val(qna.question.replace(/\n/g,'<br />'));
+        $("[name='idx']").val(qna.idx);
+        $("[name='qa_goods_no']").val(qna.goods_no);
+        $("[name='qa_goods_sub']").val(qna.goods_sub);
+        $("[name='prev_ans_yn']").val(qna.ans_yn);
+        $("[name='prev_ans_id']").val(qna.ans_id);
+        $("[name='prev_ans_nm']").val(qna.ans_nm);
 
-        }else{
-            alert("장애가 발생하였습니다. 질문을 다시 한번 선택해 주십시오.");
+        if (qna.ord_no !== null) {
+            $("#ord_no").html(`<a href="javascript:void(0);" onclick="return openOrder('${qna.ord_no}')">${qna.ord_no}</a>`);
+        }
+        if (qna.goods_nm !== null) {
+            $("#qa_goods_nm").html(`<a href="javascript:void(0);" onclick="return openProduct('${qna.goods_no}')">${qna.goods_nm}</a>`);
+        }
+        if (qna.ans_id) {
+            $("[name='ans_id']").val(qna.ans_id);
+        }
+
+        // 답변현황 설정
+        if (qna.check_id !== '' && qna.check_id !== null) {
+            if (qna.check_id !== $("[name='id']").val()) {
+                $("#btn_checkin").val(qna.check_nm + " 접수중").show();
+                $("#btn_checkin").attr("disabled", true);
+                $("#btn_save").attr("disabled", true);
+                $("#btn_save").hide();
+            } else {
+                $("#btn_checkin").val(qna.check_nm + " 접수취소").show();
+                $("#btn_checkin").attr("disabled", false);
+                $("#btn_save").attr("disabled", false);
+                $("#btn_save").val(qna.ans_yn === 'Y' ? "수정완료" : "답변완료").show();
+            }
+            $("#qa_state").html(`<strong>${qna.check_nm}</strong> 접수중`);
+        } else {
+            $("#btn_checkin").val("접수").show();
+            $("#btn_checkin").attr("disabled", false);
+            $("#btn_save").attr("disabled", true);
+            $("#btn_save").hide();
+            if (qna.ans_yn === 'Y') $("#qa_state").html(`<strong class="mr-2">${qna.ans_nm}(${qna.ans_id}) 답변완료</strong>${qna.repl_date}`);
+            else if (qna.ans_yn === 'C') $("#qa_state").html(`<strong class="mr-2">${qna.ans_nm}(${qna.ans_id}) 등록불가처리</strong>${qna.repl_date}`);
+        }
+
+        if (qna.ans_yn === 'N') {
+            $("[name='cmd']").val("addcmd");
+        } else {
+            $("[name='cmd']").val("editcmd");
+        }
+
+        // 답변내용 글 & 이미지 출력
+        ed.editor.summernote("code", qna.answer);
+        const answer_res = await axios({ method: 'put', url: '/head/member/mem20/get-data-image/' + idx });
+        if (answer_res.status === 200) {
+            cbQnaImage(answer_res.data);
+        } else {
+            console.error(answer_res);
         }
     }
 
-    function setQaInfo(res){
-		// console.log(res);
-        var qa_data = res[0];
-        var ans_subject = "[re] " + qa_data.subject;
+    // 문의 작성자 회원 상세정보 팝업 오픈
+    function openUserPopup(user_id) {
+        const url = '/head/member/mem01/show/edit/' + user_id;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=810");
+    }
 
-        // 출력상태
-		if(qa_data.admin_open_yn=='Y') f1.a_open_yn[0].checked = true;
-		else if(qa_data.admin_open_yn=='N') f1.a_open_yn[1].checked = true;
+    // 접수 & 접수취소
+    function setQnaCheck() {
+        const check_id = $("[name='check_id']").val();
+        const cmd_ori = $("#cmd").val();
 
-		// 답변상태
-        //console.log("ans_yn : "+qa_data.ans_yn);
-        $("#c_ans_yn").val(qa_data.ans_yn);
+        $("#cmd").val(check_id === '' ? 'checkin' : 'checkout');
 
-        $("#qa_subject").html(qa_data.subject);
-        $("#qa_nm").html(qa_data.user_nm +"&nbsp;/&nbsp;<a href='#' onclick='PopUser(\""+ qa_data.user_id +"\");'>"+ qa_data.user_id +"</a>" );
-        $("#qa_secret").html(qa_data.open_yn);
-        $("#qa_type").html(qa_data.type_cd);
-        $("#qa_tel").html(qa_data.mobile);
-        $("#qa_date").html(qa_data.regi_date);
-        //$("#a_open_yn").html(res.open_yn);
-        $("#qa_content").html(qa_data.question);
-        $("#qa_state").html('');
-        $("#ans_subject").val(ans_subject);
-        $("#ans_nm").html(qa_data.ans_nm);
+        const data = $("[name='f1']").serialize();
+        const cmd = $("#cmd").val();
 
-        $("[name=check_id]").val(qa_data.check_id);
-        $("[name=user_name]").val(qa_data.user_nm);
-		$("[name=user_mobile]").val(qa_data.mobile);
-		$("[name=user_email]").val(qa_data.email);
-		$("[name=qa_subject]").val(qa_data.subject);
-		$("[name=qa_regi_date]").val(qa_data.regi_date);
-		$("[name=user_question]").val(qa_data.question.replace(/\n/g,'<br />'));
-        $("[name=idx]").val(qa_data.idx);
+        axios({
+            method: 'put',
+            url: '/head/member/mem20/check',
+            data: data
+        }).then((res) => {
+            $("#cmd").val(cmd_ori);
+            if (cmd === 'checkin') cbCheckIn(res.data);
+            else if (cmd === 'checkout') cbCheckOut(res.data);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
 
-        $("[name=qa_goods_no]").val(qa_data.goods_no);
-		$("[namae=qa_goods_sub]").value = qa_data.goods_sub;
+    // 접수처리 완료
+    function cbCheckIn(res) {
+        if (res.qa_code == "1") {
+            const ff = document.f1;
+            $("#btn_checkin").val(ff.ans_nm.value + " 접수취소");
+            $("#btn_save").attr("disabled", false);
+            $("#btn_save").val(ff.prev_ans_yn.value === 'Y' ? "수정완료" : "답변완료").show();
+            $("#qa_state").html(`<strong>${ff.ans_nm.value}</strong> 접수중`);
+            $("[name='check_id']").val($("[name='id']").val());
+        } else if (res.qa_code == "-1") {
+            alert("다른 운영자가 접수중 입니다.");
+            setQnaDetail($("[name=idx]").val());
+        } else {
+            alert("처리 중 오류가 발생하였습니다. 다시 시도하여 주십시오.");
+        }
+    }
 
-        if( qa_data.ord_no != null )
-            $("#ord_no").html("<a href='#' onClick='openOrder(\"" + qa_data.ord_no + "\")'>" + qa_data.ord_no + "</a>");
-        else
-            $("#ord_no").html("");
-
-        if( qa_data.goods_nm != null )
-            $("#qa_goods_nm").html("<a href='#' onClick='openProduct(\"" + qa_data.goods_no + "\")'>" + qa_data.goods_nm + "</a>");
-        else
-            $("#qa_goods_nm").html("");
-
-        if(qa_data.check_id != "" && qa_data.check_id != undefined){
-
-            $("#btn_checkin").val(qa_data.check_nm + " 접수취소 ");
-			$("#btn_save").attr("disabled",false);
-			$("#qa_state").html(qa_data.check_nm + " 접수중 ");
-
-        }else{
-            $("#btn_checkin").show();
+    // 접수취소처리 완료
+    function cbCheckOut(res) {
+        if (res.qa_code == 1) {
             $("#btn_checkin").val("접수");
-            $("#btn_save").attr("disabled",true);
+            $("#btn_save").attr("disabled", true);
+            $("#btn_save").hide();
+            $("#qa_state").html(
+                $("[name='prev_ans_yn']").val() === 'Y'
+                    ? `<strong class="mr-2">${$("[name='prev_ans_nm']").val()}(${$("[name='prev_ans_id']").val()}) 답변완료</strong>${$("[name='qa_repl_date']").val()}`
+                    : $("[name='prev_ans_yn']").val() === 'C'
+                        ? `<strong class="mr-2">${$("[name='prev_ans_nm']").val()}(${$("[name='prev_ans_id']").val()}) 등록불가처리</strong>${$("[name='qa_repl_date']").val()}`
+                        : ''
+            );
+            $("[name=check_id]").val("");
+        } else {
+            alert("처리 중 오류가 발생하였습니다. 다시 시도하여 주십시오.");
         }
+    }
 
-        if(qa_data.ans_yn == "N"){
-            $("[name=cmd]").val("addcmd");
-            if (qa_data.check_id != "" && qa_data.check_id != undefined) {
-                $("#btn_save").val("답변완료").attr("disabled", false);
+    function Cmder(cmd) {
+        if (cmd == "search") {
+            Search(1);
+        } else if (cmd == "addcmd" || cmd == "editcmd") {
+            if (Validate(cmd)) Save(cmd);
+        }
+    }
+
+    // 답변완료 & 수정완료 시 내용체크
+    function Validate(cmd) {
+        if ($("[name='c_ans_yn']").val() === 'Y') {
+            if ($("[name='ans_subject']").val() === '') {
+                alert('답변제목을 입력해 주십시오.');
+                $("[name=ans_subject]").focus();
+                return false;
             }
-			$("[name=ans_subject]").val("[re] " + qa_data.subject);
-			//$("[name=c_ans_yn]").val("Y");
-        }else{
-            $("[name=cmd]").val("editcmd");
-            $("#btn_save").val("수정완료").attr("disabled",true);
-            $("#qa_state").html(qa_data.check_nm + "(" + qa_data.check_id + ")&nbsp;&nbsp;" + qa_data.repl_date);
+
+            if ($("[name='answer']").val() === '' || $("[name='answer']").val() == '<p>&nbsp;</p>') {
+                alert('답변 내용을 입력해 주십시오.');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 답변완료 & 수정완료
+    function Save(cmd) {
+        const check_id = $("[name='check_id']").val();
+        const user_id = $("[name='id']").val();
+        const idx = $("[name='idx']").val();
+
+        if (check_id !== '' && check_id !== user_id) {
+            if (!confirm('다른 운영자가 접수중 입니다. 답변완료를 하시겠습니까?')) {
+                return;
+            }
         }
 
-        if(qa_data.ans_id != "" && qa_data.ans_id != undefined){
-            //console.log("ans_nm : "+ qa_data.ans_nm);
-            $("[name=ans_id]").val(qa_data.ans_id);
-            $("#ans_nm").val(qa_data.ans_nm);
+        if ($("[name='sms_yn']")) {
+            if ($("[name='sms_yn']").checked) {
+                $("[name='sms_yn']").value = "Y";
+            } else {
+                $("[name='sms_yn']").value = "N";
+            }
+        }
+        if ($("[name='email_yn']")) {
+            if ($("[name='email_yn']").checked) {
+                $("[name='email_yn']").value = "Y";
+            } else {
+                $("[name='email_yn']").value = "N";
+            }
         }
 
+        const form_data = $("form[name='f1']").serialize();
 
-        ed.editor.summernote("code", qa_data.answer);
-
-		//관결 글 첨부 이미지 정보 불러오기
         $.ajax({
             async: true,
             type: 'put',
-            url: '/head/member/mem20/get-data-image/' + qa_data.idx,
+            url: '/head/member/mem20/show/' + idx,
+            data : form_data,
             success: function (data) {
-                cbQnaImage(data);
+                cbSave(data);
             },
             complete:function(){
-                //_grid_loading = false;
+                _grid_loading = false;
             },
             error: function(request, status, error) {
-                console.log("error");
-                //console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                console.log("error")
+                console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
             }
         });
-
     }
 
-	function cbQnaImage(res)
-	{
+    // 템플릿 검색 자동완성 지원
+    function setTemplateAutoComplete() {
+        $(".ac-template-q").autocomplete({
+            //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
+            source : function(request, response) {
+                $.ajax({
+                    method: 'get',
+                    url: '/head/auto-complete/template-q',
+                    data: { keyword : this.term },
+                    success: function (data) {
+                        response(data);
+                    },
+                    error: function(request, status, error) {
+                        console.log("error");
+                    }
+                });
+            },
+            minLength: 1,
+            autoFocus: true,
+            delay: 100,
+            focus: function(event, ui) {
+            },
+            select:function(event,ui){
+                //var text = ui.item.value;
+                var item_no = ui.item.no;
+                template_no = item_no;
+                $("#qno").val(item_no);
+                setTemplate();
+
+                //return false;
+            }
+
+        });
+    }
+</script>
+
+<script type="text/javascript" charset="utf-8">
+	function cbQnaImage(res) {
 		//이미지 초기화
 		$("#qna_image0").html("");
 		$("#qna_image1").html("");
@@ -628,8 +741,6 @@ var columns = [
 		{
 
 			var	data	= res.body
-
-			//console.log(data);
 
 			if( data )
 			{
@@ -642,172 +753,15 @@ var columns = [
 		}
 	}
 
-    function Validate(cmd){
-
-        if($("[name=c_ans_yn]").val() == 'Y'){
-            if($("[name=ans_subject]").val() == ''){
-                alert('답변제목을 입력해 주십시오.');
-                $("[name=ans_subject]").focus();
-                return false;
-            }
-
-            //내용 얻기(xqEditor)
-            //var answer = xed.getCurrentContent();
-            //var answer = $();
-            //$("[name=answer]").val(answer);
-            //console.log("answer : " + $("[name=answer]").val());
-
-            if($("[name=answer]").val() == '' || $("[name=answer]").val() == '<p>&nbsp;</p>'){
-                alert('답변 내용을 입력해 주십시오.');
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function Save(cmd){
-        var check_id = $("[name=check_id]").val();
-        var user_id = $("[name=id]").val();
-        var f1 = $("form[name=f1]");
-        const idx = $("[name=idx]").val();
-
-        if(check_id != "" && check_id != user_id){
-            if(!confirm('다른 운영자가 접수중 입니다. 답변완료를 하시겠습니까?')){
-                return;
-            }
-        }
-        if($("[name=sms_yn]")){
-            if($("[name=sms_yn]").checked){
-                $("[name=sms_yn]").value = "Y";
-            } else {
-                $("[name=sms_yn]").value = "N";
-            }
-        }
-        if($("[name=email_yn]")){
-            if($("[name=email_yn]").checked){
-                $("[name=email_yn]").value = "Y";
-            } else {
-                $("[name=email_yn]").value = "N";
-            }
-        }
-
-        $.ajax({
-            async: true,
-            type: 'put',
-            url: '/head/member/mem20/show/'+ idx,
-            data : f1.serialize(),
-            success: function (data) {
-               cbSave(data);
-
-            },
-            complete:function(){
-                _grid_loading = false;
-            },
-            error: function(request, status, error) {
-                console.log("error")
-                console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-    }
-
-    function cbSave(res){
-        if(res.qa_code == "1" ){
-            //$("btn_checkin").style.display = "none";
+    function cbSave(res) {
+        if (res.qa_code == "1") {
             $("#btn_checkin").hide();
+            $("#btn_save").attr("disabled", true);
 
-            if(document.f1.cmd.value == "addcmd"){
-                $("#btn_save").val("답변완료 되었습니다.");
-                $("[name=c_ans_yn]").val("Y");
-            } else {
-                $("#btn_save").val("수정완료 되었습니다.");
-            }
-            $("#btn_save").attr("disabled",true);
-			Search();
-        }else{
+            setQnaDetail($("[name='idx']").val());
+            Search();
+        } else {
             alert("저장 중 오류가 발생하였습니다. 다시 처리하여 주십시요.");
-        }
-    }
-
-    function Cmder(cmd){
-        console.log("cmd : "+ cmd);
-        if(cmd == "search"){
-            //GridListDraw();
-            search(1);
-        } else if( cmd == "addcmd" || cmd == "editcmd" ){
-            if( Validate(cmd) ){
-                Save(cmd);
-            }
-        }
-    }
-
-    function CheckIO(){ // 접수, 접수해제
-        var formData;
-        var check_id = $("[name=check_id]").val();
-        var cmd = "";
-        var cmd_ori = $("#cmd").val();
-
-        if(check_id == ""){
-            $("#cmd").val("checkin");
-        }else if(check_id != ""){
-            $("#cmd").val("checkout");
-        }
-        formData = $("[name=f1]").serialize();
-        cmd = $("[name=cmd]").val();
-
-        $.ajax({
-            async: true,
-            type: 'put',
-            url: '/head/member/mem20/check',
-            data : formData,
-            success: function (data) {
-                $("[name=cmd]").val(cmd_ori);
-                if(cmd == "checkin"){
-                    cbCheckIn(data);
-                }else if(cmd == "checkout"){
-                    cbCheckOut(data);
-                }
-            },
-            complete:function(){
-                _grid_loading = false;
-            },
-            error: function(request, status, error) {
-                console.log("error")
-                //console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-            }
-        });
-
-    }
-
-
-	function PopUser(memId){
-        //const url='/head/member/mem01?cmd=edit&user_id='+memId;
-        const url='/head/member/mem01/show/edit/'+memId;
-        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=810");
-    }
-
-    function cbCheckIn(res){
-        var ff = document.f1;
-        if(res.qa_code == "1"){
-            $("#btn_checkin").val(ff.ans_nm.value + " 접수취소 ").show();
-            $("#btn_save").attr("disabled",false);
-            $("#qa_state").html(ff.ans_nm.value + " 접수중 ");
-            $("[name=check_id]").val($("[name=id]").val());
-        } else if(res.qa_code == "-1"){
-            alert("다른 운영자가 접수중 입니다.");
-            GetContents($("[name=idx]").val());
-        } else {
-            alert("처리 중 오류가 발생하였습니다. 다시 시도하여 주십시오.");
-        }
-    }
-
-    function cbCheckOut(res){
-        if(res.qa_code == 1){
-            $("#btn_checkin").val("접수").show();
-            $("#btn_save").attr("disabled",true);
-            $("#qa_state").html("");
-            $("[name=check_id]").val("");
-        } else {
-            alert("처리 중 오류가 발생하였습니다. 다시 시도하여 주십시오.");
         }
     }
 
@@ -872,42 +826,5 @@ var columns = [
             }
         });
     }
-
-	$(function(){
-		 $(".ac-template-q")
-        .autocomplete({
-            //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
-            source : function(request, response) {
-                $.ajax({
-                    method: 'get',
-                    url: '/head/auto-complete/template-q',
-                    data: { keyword : this.term },
-                    success: function (data) {
-                        response(data);
-                    },
-                    error: function(request, status, error) {
-                        console.log("error");
-                        //console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-                    }
-                });
-            },
-            minLength: 1,
-            autoFocus: true,
-            delay: 100,
-            focus: function(event, ui) {
-            },
-            select:function(event,ui){
-                //var text = ui.item.value;
-                var item_no = ui.item.no;
-                template_no = item_no;
-                $("#qno").val(item_no);
-                setTemplate();
-
-                //return false;
-            }
-
-        });
-	});
-
 </script>
 @stop
