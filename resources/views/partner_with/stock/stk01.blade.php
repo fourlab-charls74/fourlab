@@ -202,15 +202,15 @@
     <script language="javascript">
 
         var columns= [
-            {field:"opt_kind_nm" ,headerName:"품목",  rowGroup: true, hide: true, width: 120},
-            {field:"brand_nm" ,headerName:"브랜드", rowGroup: true, hide: true,},
-            {field:"goods_no" ,headerName:"상품코드", rowGroup: true, hide: true, width:80},
-            {field:"style_no" ,headerName:"스타일넘버", rowGroup: true, hide: true,},
-            {field:"goods_type_nm",headerName:"상품구분", rowGroup: true, width:100, hide: true, cellStyle:StyleGoodsTypeNM},
-            {field:"is_unlimited_nm",headerName:"재고구분", rowGroup: true, hide: true, width:80},
-            {field:"sale_stat_cl_nm" ,headerName:"상태",  rowGroup: true, hide: true, width:100, cellStyle:StyleGoodsState},
-            {field:"wonga" ,headerName:"원가",  rowGroup: true, hide: true, type: 'currencyType'},
-            {field:"goods_nm" ,headerName:"상품명", rowGroup: true, hide: true, width:400, 
+            {field:"opt_kind_nm" ,headerName:"품목", pinned:'left', width: 120},
+            {field:"brand_nm" ,headerName:"브랜드", pinned:'left'},
+            {field:"goods_no" ,headerName:"상품코드", width:80, pinned:'left'},
+            {field:"style_no" ,headerName:"스타일넘버" , pinned:'left'},
+            {field:"goods_type_nm",headerName:"상품구분", width:100, cellStyle:StyleGoodsTypeNM, pinned:'left'},
+            {field:"is_unlimited_nm",headerName:"재고구분", width:80, pinned:'left'},
+            {field:"sale_stat_cl_nm" ,headerName:"상태", width:100, cellStyle:StyleGoodsState, pinned:'left'},
+            {field:"wonga" ,headerName:"원가", type: 'currencyType'},
+            {field:"goods_nm" ,headerName:"상품명", width:400, 
                 cellRenderer: function (params) {
                     if (params.data !== undefined) {
                         return '<a href="#" onclick="return openProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
@@ -285,12 +285,14 @@
             pApp.ResizeGrid(310);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
-            gx = new HDGrid(gridDiv, columns, {
+            gx = new HDGrid(gridDiv, columns
+            /* {
                 rowGroup: true,
                 groupDefaultExpanded: 8,
                 groupHideOpenParents: true,
                 groupDisplayType: 'multipleColumns'
-            });
+            } */
+            );
 
             Search();
         });
