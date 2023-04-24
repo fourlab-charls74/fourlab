@@ -73,9 +73,18 @@ class prd10Controller extends Controller
         ]);
     }
 
+    public function show($d_cat_cd, Request $request)
+    {
+        $d_cat_nm = DB::table('category')->where('d_cat_cd', $d_cat_cd)->value('d_cat_nm');
+        $values = [
+            'd_cat_cd' => $d_cat_cd,
+            'd_cat_nm' => $d_cat_nm,
+        ];
+        return view(Config::get('shop.head.view') . '/product/prd10_seq', $values);
+    }
 
-    public function goods_search($d_cat_cd,Request $req) {
-
+    public function goods_search($d_cat_cd, Request $req)
+    {
         $page = $req->input('page',1);
         if ($page < 1 or $page == "") $page = 1;
 
@@ -83,20 +92,20 @@ class prd10Controller extends Controller
 
         $cat_type	= $req->input('cat_type', 'DISPLAY');
         $goods_stat	= $req->input('goods_stat', '');
-        $style_no = $req->input("style_no");
-        $goods_no = $req->input("goods_no");
-        $brand_nm = $req->input("brand_nm");
-        $brand_cd = $req->input("brand_cd");
-        $goods_nm = $req->input("goods_nm");
+        $style_no = $req->input("style_no", "");
+        $goods_no = $req->input("goods_no", "");
+        $brand_nm = $req->input("brand_nm", "");
+        $brand_cd = $req->input("brand_cd", "");
+        $goods_nm = $req->input("goods_nm", "");
         $com_type = $req->input("com_type", "");
         $com_id = $req->input("com_id", "");
 
-        $head_desc = $req->input("head_desc");
-        $disp_yn = $req->input("disp_yn");
+        $head_desc = $req->input("head_desc", "");
+        $disp_yn = $req->input("disp_yn", "");
 
-        $sale_yn = $req->input("sale_yn");
-        $point_yn = $req->input("point_yn");
-        $div_yn = $req->input("div_yn");
+        $sale_yn = $req->input("sale_yn", "");
+        $point_yn = $req->input("point_yn", "");
+        $div_yn = $req->input("div_yn", "");
 
         $ord = $req->input('ord','desc');
         $ord_field = $req->input('ord_field','g.goods_no');
@@ -168,48 +177,46 @@ class prd10Controller extends Controller
             }
         }
 
-        $query = /** @lang text */
-            "
-        select
-            cg.cat_type, cg.d_cat_cd, cg.goods_no, cg.goods_sub, g.style_no,cg.disp_yn,
-            replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list') as img,
-            replace(g.img, '$cfg_img_size_real', 'a_160') as img_160,
-            g.ad_desc, g.head_desc, g.ad_desc, g.goods_nm, cd.code_val as sale_stat_cl,
-            g.price, g.before_sale_price, g.sale_price, g.sale_s_dt, g.sale_e_dt, ifnull(round((1-(g.price/g.before_sale_price))*100), 0) as sale_rate,
-            g.point_yn, g.point,
-            g.bae_yn, g.dlv_pay_type, g.baesong_price,
-            ifnull((
-                select sum(good_qty)
-                from goods_summary
-                where goods_no = cg.goods_no and goods_sub = cg.goods_sub
-            ), 0) as qty,
-            ifnull(gs.sale_1d, 0) as sale,
-            ifnull(gs.sale_3m, 0) as sale_3m,
-            ifnull(gs.pv_1d, 0) as pv,
-            ifnull(gs.pv_3m, 0) as pv_3m,
-            ifnull(gs.review_1d, 0) as review,
-            ifnull(gs.review_3m, 0) as review_3m,
-            ifnull(gs.grade_1d, '0.0') as grade,
-            ifnull(gs.grade_3m, '0.0') as grade_3m,
-            ifnull(round(gs.qa_1d, 1), 0) as qa,
-            ifnull(round(gs.qa_3m, 1), 0) as qa_3m,
-            c.com_nm,
-            g.reg_dm,g.new_product_type,g.new_product_day,
-            ifnull(date_format(
-            (select max(last_date) from goods_summary
-                where goods_no = g.goods_no and goods_sub = g.goods_sub and good_qty = 0
-                    and last_date >= date_format(date_sub(now(),interval 7 day),'%Y%m%d')),'%Y%m%d'),'') as soldout_day
-        from category_goods cg
-            inner join goods g on cg.goods_no = g.goods_no and cg.goods_sub = g.goods_sub
-            inner join company c on c.com_id = g.com_id
-            left outer join code cd on cd.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = cd.code_id
-            left outer join goods_stat gs on cg.goods_no = gs.goods_no and cg.goods_sub = gs.goods_sub
-        where cg.cat_type = :cat_type and cg.d_cat_cd = :d_cat_cd $where
-        order by $ord_field $ord
-        $limit
-                    ";
-        //echo "<pre>$query</pre>";
-        //dd($query);
+        $query = "
+            select
+                cg.cat_type, cg.d_cat_cd, cg.goods_no, cg.goods_sub, g.style_no,cg.disp_yn,
+                replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list') as img,
+                replace(g.img, '$cfg_img_size_real', 'a_160') as img_160,
+                g.ad_desc, g.head_desc, g.ad_desc, g.goods_nm, cd.code_val as sale_stat_cl,
+                g.price, g.before_sale_price, g.sale_price, g.sale_s_dt, g.sale_e_dt, ifnull(round((1-(g.price/g.before_sale_price))*100), 0) as sale_rate,
+                g.point_yn, g.point,
+                g.bae_yn, g.dlv_pay_type, g.baesong_price,
+                ifnull((
+                    select sum(good_qty)
+                    from goods_summary
+                    where goods_no = cg.goods_no and goods_sub = cg.goods_sub
+                ), 0) as qty,
+                ifnull(gs.sale_1d, 0) as sale,
+                ifnull(gs.sale_3m, 0) as sale_3m,
+                ifnull(gs.pv_1d, 0) as pv,
+                ifnull(gs.pv_3m, 0) as pv_3m,
+                ifnull(gs.review_1d, 0) as review,
+                ifnull(gs.review_3m, 0) as review_3m,
+                ifnull(gs.grade_1d, '0.0') as grade,
+                ifnull(gs.grade_3m, '0.0') as grade_3m,
+                ifnull(round(gs.qa_1d, 1), 0) as qa,
+                ifnull(round(gs.qa_3m, 1), 0) as qa_3m,
+                c.com_nm,
+                g.reg_dm,g.new_product_type,g.new_product_day,
+                ifnull(date_format(
+                (select max(last_date) from goods_summary
+                    where goods_no = g.goods_no and goods_sub = g.goods_sub and good_qty = 0
+                        and last_date >= date_format(date_sub(now(),interval 7 day),'%Y%m%d')),'%Y%m%d'),'') as soldout_day
+            from category_goods cg
+                inner join goods g on cg.goods_no = g.goods_no and cg.goods_sub = g.goods_sub
+                inner join company c on c.com_id = g.com_id
+                left outer join code cd on cd.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = cd.code_id
+                left outer join goods_stat gs on cg.goods_no = gs.goods_no and cg.goods_sub = gs.goods_sub
+            where cg.cat_type = :cat_type and cg.d_cat_cd = :d_cat_cd $where
+            order by $ord_field $ord
+            $limit
+        ";
+
         $result = DB::select($query,["cat_type" => $cat_type,"d_cat_cd" => $d_cat_cd]);
 
 		foreach($result as $row){
@@ -351,4 +358,53 @@ class prd10Controller extends Controller
 
     }
 
+    /** 순서변경팝업 내 조회 */
+    public function goods_search_seq($d_cat_cd, Request $request)
+    {
+        $page_h = $request->input('page_h', 9);
+        $page_v = $request->input('page_v', 5);
+
+        $sql = "
+            select
+                cg.goods_no
+                , cg.goods_sub
+                , g.style_no
+                , g.goods_nm
+                , gs.code_val as sale_stat_cl
+                , g.price
+                , cg.disp_yn
+                , ifnull((
+                select sum(good_qty)
+                from goods_summary
+                where goods_no = cg.goods_no and goods_sub = cg.goods_sub
+                ), 0) as qty
+                , replace(g.img, 'a_500', 's_50') as img
+                , g.reg_dm
+                , g.upd_dm
+                , cg.seq
+                , gseq.spoint
+                , :page_h as page_h
+                , :page_v as page_v
+            from category_goods cg
+                inner join goods g on g.goods_no = cg.goods_no and g.goods_sub = cg.goods_sub
+                left outer join code gs on gs.code_kind_cd = 'G_GOODS_STAT' and gs.code_id = g.sale_stat_cl
+                left outer join goods_seq gseq on gseq.goods_no = cg.goods_no and gseq.goods_sub = cg.goods_sub
+            where cg.d_cat_cd = :d_cat_cd
+            order by cg.seq
+        ";
+
+        $result = DB::select($sql, [ 'd_cat_cd' => $d_cat_cd, 'page_h' => $page_h, 'page_v' => $page_v ]);
+
+        return response()->json([
+            'code' => 200,
+            'msg' => '상품전시순서가 정상적으로 조회되었습니다.',
+            'head' => [
+                'total'         => count($result),
+                'page'          => 1,
+                'page_cnt'      => 1,
+                'page_total'    => 1,
+            ],
+            'body' => $result,
+        ]);
+    }
 }

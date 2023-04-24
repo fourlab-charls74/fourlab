@@ -381,8 +381,10 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         Route::get('prd10', 'prd10Controller@index');
         Route::get('prd10/search', 'prd10Controller@search');
+        Route::get('prd10/show/{code?}', 'prd10Controller@show');
 
         Route::get('prd10/{code?}/search', 'prd10Controller@goods_search');
+        Route::get('prd10/{code?}/search-seq', 'prd10Controller@goods_search_seq');
         Route::post('prd10/{code?}/save', 'prd10Controller@goods_add');
         Route::post('prd10/{code?}/del', 'prd10Controller@goods_del');
         Route::post('prd10/{code?}/seq', 'prd10Controller@goods_seq');

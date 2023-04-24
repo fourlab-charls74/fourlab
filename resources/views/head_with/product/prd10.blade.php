@@ -223,10 +223,9 @@
                                     </select>
                                     <span class="d-none d-sm-inline">로</span>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeDisp();"><span class="fs-12">상태변경</span></a>
-
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return openChangeSeqPopup();"><span class="fs-12">순서변경</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return AddGoods();"><span class="fs-12">상품추가</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DelGoods();"><span class="fs-12">상품삭제</span></a>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeSeq();"><span class="fs-12">순서변경</span></a>
 
                                 </div>
                             </div>
@@ -335,15 +334,16 @@
             width: 28,
             pinned: 'left',
             sort: null,
-            cellStyle: {"background":"#F5F7F7"}        
+            cellStyle: {"background":"#F5F7F7"}
         },
         {
             field: "disp_yn",
             headerName: '출력',
-            cellClass: 'hd-grid-code',
-            width:58,
+            width: 58,
             pinned: 'left',
-            rowDrag: true
+            // rowDrag: true,
+            cellRenderer: (params) => params.value === 'Y' ? '활성' : '비활성',
+            cellStyle: (params) => ({'line-height':'40px', 'text-align':'center', 'color':params.value === 'Y' ? '#4444ff' : '#666666'}),
         },
         {
             field: "img",
@@ -466,7 +466,7 @@
             type: 'currencyType',
             cellRenderer: (params) => {
                 const { sale, sale_3m, pv, pv_3m } = params.data;
-                let render =  
+                let render =
                     `S : ${sale} / ${sale_3m}<br/>
                     P : ${pv} / ${pv_3m}`;
                 return render;
@@ -478,7 +478,7 @@
             type: 'currencyType',
             cellRenderer: (params) => {
                 const { review, grade, grade_3m, qa, qa_3m } = params.data;
-                let render =  
+                let render =
                     `E : ${review}(${grade}) / {${review}(${grade_3m})<br/>
 					Q : {${qa}} / {${qa_3m}}`;
                 return render;
@@ -544,23 +544,23 @@
 <script type="text/javascript" charset="utf-8">
     const pApp2 = new App('', {
         gridId: "#div-gd-goods",
-    }); 
+    });
     let gx2;
     $(document).ready(function() {
         pApp2.ResizeGrid(275);
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, columns_list, {
-            rowDragManaged: true,
-            enableMultiRowDragging: true, // 버젼이슈 문제 - rowDragMultiRow true하니깐 작동 x 이거로 사용하면 작동함
+            // rowDragManaged: true,
+            // enableMultiRowDragging: true, // 버젼이슈 문제 - rowDragMultiRow true하니깐 작동 x 이거로 사용하면 작동함
             rowSelection: 'multiple',
-            animateRows: true,
-            defaultColDef: {
-                suppressMenu: true,
-                flex: 1,
-                resizable: true,
-                autoHeight: true,
-                sortable: false,
-            }
+            // animateRows: true,
+            // defaultColDef: {
+            //     suppressMenu: true,
+            //     flex: 1,
+            //     resizable: true,
+            //     autoHeight: true,
+            //     sortable: false,
+            // }
         });
     });
 
@@ -715,44 +715,53 @@
 
 	/**
 	 * @return {boolean}
+     * 개발중입니다. - 최유현
 	 */
-	function ChangeSeq(){
+	// function ChangeSeq(){
+    //
+	// 	const cat_type	= $('#cat_type').val();
+	// 	const d_cat_cd	= $('input[name="d_cat_cd"]').val();
+    //
+	// 	let goods_nos	= [];
+	// 	gx2.gridOptions.api.forEachNode(function(node) {
+	// 		goods_nos.push(node.data.goods_no);
+	// 	});
+    //
+	// 	if( confirm('순서를 변경 하시겠습니까?') ){
+    //
+	// 		$.ajax({
+	// 			method: 'post',
+	// 			url: '/head/product/prd10/' + d_cat_cd + '/seq',
+	// 			data: {
+	// 				'cat_type': cat_type,
+	// 				'goods_no': goods_nos
+	// 			},
+	// 			dataType: 'json',
+	// 			success: function(res) {
+	// 				if (res.code == '200') {
+	// 					SearchGoods2();
+	// 				} else {
+	// 					console.log(res.code);
+	// 					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+	// 				}
+	// 			},
+	// 			error: function(e) {
+	// 				console.log(e.responseText)
+	// 			}
+	// 		});
+    //
+	// 	}
+    //
+	// 	return true;
+	// }
 
-		const cat_type	= $('#cat_type').val();
-		const d_cat_cd	= $('input[name="d_cat_cd"]').val();
-
-		let goods_nos	= [];
-		gx2.gridOptions.api.forEachNode(function(node) {
-			goods_nos.push(node.data.goods_no);
-		});
-
-		if( confirm('순서를 변경 하시겠습니까?') ){
-			
-			$.ajax({
-				method: 'post',
-				url: '/head/product/prd10/' + d_cat_cd + '/seq',
-				data: {
-					'cat_type': cat_type,
-					'goods_no': goods_nos
-				},
-				dataType: 'json',
-				success: function(res) {
-					if (res.code == '200') {
-						SearchGoods2();
-					} else {
-						console.log(res.code);
-						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-					}
-				},
-				error: function(e) {
-					console.log(e.responseText)
-				}
-			});
-
-		}
-
-		return true;
-	}
+    // 상품 순서변경 팝업 오픈
+    function  openChangeSeqPopup() {
+        const category_cd = $("[name='d_cat_cd']").val();
+        if (!category_cd) return alert("카테고리를 선택해주세요.");
+        const url = `/head/product/prd10/show/${category_cd}`;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1300,height=800");
+    }
 </script>
 
 
