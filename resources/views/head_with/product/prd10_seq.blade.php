@@ -98,18 +98,20 @@
                 <div class="fl_box">
                     <h6 class="m-0 fs-16 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
-                <div class="fr_box">
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-arrows-alt-v fa-sm mr-1"></i> 이동</button>
+                <div class="fr_box d-flex align-items-center">
+                    <input type="text" id="page" name="page" class="form-control form-control-sm text-right" style="width:40px;" value="1">
+                    <span class="ml-2 mr-2">페이지로</span>
+                    <button type="button" onclick="return moveRows('up', 'page-end', true);" class="btn btn-outline-primary"><i class="fas fa-arrows-alt-v fa-sm mr-1"></i> 이동</button>
                     <span class="ml-2 mr-2">|</span>
-                    <button type="button" onclick="return moveRows('up');" class="btn btn-outline-primary"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 위</button>
-                    <button type="button" onclick="return moveRows('down');" class="btn btn-outline-primary"><i class="fas fa-long-arrow-alt-down fa-sm mr-1"></i> 아래</button>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 처음</button>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-long-arrow-alt-down fa-sm mr-1"></i> 끝</button>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 페이지처음</button>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-long-arrow-alt-down fa-sm mr-1"></i> 페이지끝</button>
+                    <button type="button" onclick="return moveRows('up');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 위</button>
+                    <button type="button" onclick="return moveRows('down');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-down fa-sm mr-1"></i> 아래</button>
+                    <button type="button" onclick="return moveRows('up', 'end');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 처음</button>
+                    <button type="button" onclick="return moveRows('down', 'end');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-down fa-sm mr-1"></i> 끝</button>
+                    <button type="button" onclick="return moveRows('up', 'page-end');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 페이지처음</button>
+                    <button type="button" onclick="return moveRows('down', 'page-end');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-down fa-sm mr-1"></i> 페이지끝</button>
                     <span class="ml-2 mr-2">|</span>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-undo fa-sm mr-1"></i> 초기화</button>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-magic fa-sm mr-1"></i> 자동정렬</button>
+                    <button type="button" onclick="return resetRows();" class="btn btn-outline-primary mr-1"><i class="fas fa-undo fa-sm mr-1"></i> 초기화</button>
+                    <button type="button" onclick="return autoSortRows();" class="btn btn-outline-primary"><i class="fas fa-magic fa-sm mr-1"></i> 자동정렬</button>
                 </div>
             </div>
             <div class="card-body">
@@ -200,13 +202,16 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
             suppressRowClickSelection: false,
-            // onRangeSelectionChanged: (e) => {
-                // console.log(e.api);
-                // 셀 드래그해서 row 선택하는 기능 개발필요
-            // }
-            // onRowSelected: (params) => {
-            //     if (params.node.selected) console.log("rowindex", params.rowIndex);
-            // }
+            onRangeSelectionChanged: (e) => {
+                if (e.started) e.api.deselectAll();
+                let start = e.api.rangeController.getDraggingRange()?.startRow.rowIndex;
+                let end = e.api.rangeController.getDraggingRange()?.endRow.rowIndex;
+
+                for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
+                    const node = e.api.getDisplayedRowAtIndex(i);
+                    node.setSelected(true);
+                }
+            }
         });
 
         Search();
@@ -219,39 +224,122 @@
     function Search() {
         const d_cat_cd = "{{ @$d_cat_cd }}";
         const data = $("form[name='search']").serialize();
-        gx.Request('/head/product/prd10/' + d_cat_cd + '/search-seq', data, -1, function (e) {
-            // console.log(e);
-        });
+        gx.Request('/head/product/prd10/' + d_cat_cd + '/search-seq', data, -1);
     }
 
-    function moveRows(direction = '') {
-        const nodes = gx.gridOptions.api.getSelectedNodes();
-        rows = nodes.sort((a,b) => a.rowIndex - b.rowIndex);
+    /** 상품전시 순서변경사항 저장 */
+    function Save() {
+        // 개발중입니다.
 
-        if (rows.length > 0) {
-            if (direction === 'up' && rows[0].rowIndex <= 0) return false;
-            if (direction === 'down' && rows[rows.length - 1].rowIndex > rows[rows.length - 1].gridApi.getDisplayedRowCount() - 2) return false;
+        // function ChangeSeq(){
+        //
+        // 	const cat_type	= $('#cat_type').val();
+        // 	const d_cat_cd	= $('input[name="d_cat_cd"]').val();
+        //
+        // 	let goods_nos	= [];
+        // 	gx2.gridOptions.api.forEachNode(function(node) {
+        // 		goods_nos.push(node.data.goods_no);
+        // 	});
+        //
+        // 	if( confirm('순서를 변경 하시겠습니까?') ){
+        //
+        // 		$.ajax({
+        // 			method: 'post',
+        // 			url: '/head/product/prd10/' + d_cat_cd + '/seq',
+        // 			data: {
+        // 				'cat_type': cat_type,
+        // 				'goods_no': goods_nos
+        // 			},
+        // 			dataType: 'json',
+        // 			success: function(res) {
+        // 				if (res.code == '200') {
+        // 					SearchGoods2();
+        // 				} else {
+        // 					console.log(res.code);
+        // 					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+        // 				}
+        // 			},
+        // 			error: function(e) {
+        // 				console.log(e.responseText)
+        // 			}
+        // 		});
+        //
+        // 	}
+        //
+        // 	return true;
+        // }
 
-            gx.gridOptions.api.applyTransaction({ remove: rows.map(row => row.data) });
-            let row_top = Math.min(...rows.map(row => row.rowIndex)) + (direction === 'up' ? -1 : 1);
-            const result = gx.gridOptions.api.applyTransaction({
-                add: rows.map(row => row.data),
-                addIndex: row_top,
-            });
-            result.add.forEach(r => r.setSelected(true));
+    }
 
-            if (direction === 'up') {
-                gx.gridOptions.api.ensureIndexVisible(row_top - 2, 'top');
-            } else if (direction === 'down') {
-                gx.gridOptions.api.ensureIndexVisible(row_top + rows.length - 1, 'bottom');
-            }
+    /** 상품순서 이동 */
+    function moveRows(direction = 'up', location = '', pick_page = false) {
+        const nodes = gx.gridOptions.api.getSelectedNodes().sort((a, b) => a.rowIndex - b.rowIndex);
+        if (nodes.length < 1) return;
 
-            rows = [];
-            gx.gridOptions.api.forEachNode((node) => {
-                if (node.alreadyRendered) rows.push(node);
-            });
-            gx.gridOptions.api.redrawRows({ rowNodes: rows });
+        let page = 1;
+        let first_index = nodes[0].rowIndex;
+        let last_index = nodes[nodes.length - 1].rowIndex;
+        const total_count = nodes[0].gridApi.getDisplayedRowCount();
+        const page_total = nodes[0].data.page_h * nodes[0].data.page_v;
+
+        if ((direction === 'up' && !pick_page && first_index < 1) || (direction === 'down' && last_index > total_count - 2)) return;
+        if (pick_page) {
+            page = $("#page").val();
+            if (isNaN(page) || page < 1 || page > Math.floor(total_count / page_total + 1)) return alert('페이지번호를 올바르게 입력해주세요.');
         }
+
+        gx.gridOptions.api.applyTransaction({ remove: nodes.map(node => node.data) });
+
+        let top;
+        if (location === 'end') {
+            top = direction === 'up' ? 0 : total_count - nodes.length;
+        } else if (location === 'page-end') {
+            if (pick_page) {
+                top = (page - 1) * page_total;
+            } else {
+                top = Math.floor(first_index / page_total) * page_total;
+            }
+            if (direction === 'down') top = top + page_total - nodes.length;
+        } else {
+            top = Math.min(...nodes.map(node => node.rowIndex)) + (direction === 'up' ? -1 : 1);
+        }
+
+        const result = gx.gridOptions.api.applyTransaction({ add: nodes.map(node => node.data), addIndex: top });
+        result.add.forEach(node => node.setSelected(true));
+
+        // 스크롤처리
+        first_index = Math.min(...result.add.map(node => node.rowIndex));
+        last_index = Math.max(...result.add.map(node => node.rowIndex));
+        if (pick_page) {
+            gx.gridOptions.api.ensureIndexVisible(Math.max(0, top - 2), 'top');
+        } else if (
+            direction === 'up'
+            && (gx.gridOptions.api.getFirstDisplayedRow() > first_index - 2 || last_index + nodes.length + 4 > total_count)
+        ) {
+            gx.gridOptions.api.ensureIndexVisible(Math.max(0, top - 2), 'top');
+        } else if (direction === 'down' && gx.gridOptions.api.getLastDisplayedRow() < last_index + 2) {
+            gx.gridOptions.api.ensureIndexVisible(Math.min(last_index, top + nodes.length + 5), 'bottom');
+        }
+
+        // 페이지컬럼 재설정
+        const all_nodes = [];
+        gx.gridOptions.api.forEachNode(node => {
+            if (node.alreadyRendered) all_nodes.push(node);
+        });
+        gx.gridOptions.api.redrawRows({ rowNodes: all_nodes });
+    }
+
+    /** 순서 초기화 */
+    function resetRows() {
+        if (!confirm("상품순서를 초기화하시겠습니까?")) return;
+        const rows = gx.getRows().sort((a, b) => a.seq - b.seq);
+        gx.gridOptions.api.setRowData(rows);
+    }
+
+    /** 순서 자동정렬 */
+    function autoSortRows() {
+        const rows = gx.getRows().sort((a, b) => b.spoint - a.spoint);
+        gx.gridOptions.api.setRowData(rows);
     }
 </script>
 @stop

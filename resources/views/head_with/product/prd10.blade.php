@@ -712,49 +712,6 @@
 		return true;
 	}
 
-
-	/**
-	 * @return {boolean}
-     * 개발중입니다. - 최유현
-	 */
-	// function ChangeSeq(){
-    //
-	// 	const cat_type	= $('#cat_type').val();
-	// 	const d_cat_cd	= $('input[name="d_cat_cd"]').val();
-    //
-	// 	let goods_nos	= [];
-	// 	gx2.gridOptions.api.forEachNode(function(node) {
-	// 		goods_nos.push(node.data.goods_no);
-	// 	});
-    //
-	// 	if( confirm('순서를 변경 하시겠습니까?') ){
-    //
-	// 		$.ajax({
-	// 			method: 'post',
-	// 			url: '/head/product/prd10/' + d_cat_cd + '/seq',
-	// 			data: {
-	// 				'cat_type': cat_type,
-	// 				'goods_no': goods_nos
-	// 			},
-	// 			dataType: 'json',
-	// 			success: function(res) {
-	// 				if (res.code == '200') {
-	// 					SearchGoods2();
-	// 				} else {
-	// 					console.log(res.code);
-	// 					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-	// 				}
-	// 			},
-	// 			error: function(e) {
-	// 				console.log(e.responseText)
-	// 			}
-	// 		});
-    //
-	// 	}
-    //
-	// 	return true;
-	// }
-
     // 상품 순서변경 팝업 오픈
     function  openChangeSeqPopup() {
         const category_cd = $("[name='d_cat_cd']").val();
