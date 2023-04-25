@@ -715,8 +715,9 @@
     // 상품 순서변경 팝업 오픈
     function  openChangeSeqPopup() {
         const category_cd = $("[name='d_cat_cd']").val();
+        const category_type = $("[name='cat_type']").val();
         if (!category_cd) return alert("카테고리를 선택해주세요.");
-        const url = `/head/product/prd10/show/${category_cd}`;
+        const url = `/head/product/prd10/show/${category_type}/${category_cd}`;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1300,height=800");
     }
 </script>

@@ -381,7 +381,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         Route::get('prd10', 'prd10Controller@index');
         Route::get('prd10/search', 'prd10Controller@search');
-        Route::get('prd10/show/{code?}', 'prd10Controller@show');
+        Route::get('prd10/show/{type?}/{code?}', 'prd10Controller@show');
 
         Route::get('prd10/{code?}/search', 'prd10Controller@goods_search');
         Route::get('prd10/{code?}/search-seq', 'prd10Controller@goods_search_seq');

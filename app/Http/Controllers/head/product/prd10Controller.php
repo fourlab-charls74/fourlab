@@ -73,10 +73,11 @@ class prd10Controller extends Controller
         ]);
     }
 
-    public function show($d_cat_cd, Request $request)
+    public function show($cat_type, $d_cat_cd, Request $request)
     {
         $d_cat_nm = DB::table('category')->where('d_cat_cd', $d_cat_cd)->value('d_cat_nm');
         $values = [
+            'cat_type' => $cat_type,
             'd_cat_cd' => $d_cat_cd,
             'd_cat_nm' => $d_cat_nm,
         ];
@@ -331,14 +332,14 @@ class prd10Controller extends Controller
         return response()->json(['code' => $code,"msg" => $msg]);
     }
 
-    public function goods_seq($d_cat_cd,Request $request){
+    public function goods_seq($d_cat_cd, Request $request){
 
-        $cat_type   = $request->input('cat_type');
-        $goods_nos  = $request->input('goods_no');
+        $cat_type   = $request->input('cat_type', 'DISPLAY');
+        $goods_nos  = $request->input('goods_no', []);
 
         try {
-            DB::transaction(function () use (&$result, $cat_type, $d_cat_cd,$goods_nos) {
-                for( $i = 0; $i < count($goods_nos); $i++ ){
+            DB::transaction(function () use (&$result, $cat_type, $d_cat_cd, $goods_nos) {
+                for ($i = 0; $i < count($goods_nos); $i++) {
                     DB::table('category_goods')
                         ->where('cat_type','=',$cat_type)
                         ->where('d_cat_cd','=',$d_cat_cd)
@@ -355,7 +356,6 @@ class prd10Controller extends Controller
         }
 
         return response()->json(['code' => $code,"msg" => $msg]);
-
     }
 
     /** 순서변경팝업 내 조회 */
@@ -363,34 +363,55 @@ class prd10Controller extends Controller
     {
         $page_h = $request->input('page_h', 9);
         $page_v = $request->input('page_v', 5);
+        $sort_yn = $request->input('sort_yn', 'N');
+        $ord1 = $request->input('ord1', '');
+        $ord2 = $request->input('ord2', '');
+        $ord3 = $request->input('ord3', '');
+        $sort1 = $request->input('sort1', 'desc');
+        $sort2 = $request->input('sort2', 'desc');
+        $sort3 = $request->input('sort3', 'desc');
+
+        $orderby = "order by";
+        if ($sort_yn === 'Y' && !($ord1 === null && $ord2 === null && $ord3 === null)) {
+            if ($ord1 !== null) $orderby .= sprintf(" a.%s %s", $ord1, $sort1);;
+            if ($ord2 !== null) $orderby .= sprintf(", a.%s %s", $ord2, $sort2);;
+            if ($ord3 !== null) $orderby .= sprintf(", a.%s %s", $ord3, $sort3);;
+        } else {
+            $orderby .= " a.seq asc";
+        }
 
         $sql = "
-            select
-                cg.goods_no
-                , cg.goods_sub
-                , g.style_no
-                , g.goods_nm
-                , gs.code_val as sale_stat_cl
-                , g.price
-                , cg.disp_yn
-                , ifnull((
-                select sum(good_qty)
-                from goods_summary
-                where goods_no = cg.goods_no and goods_sub = cg.goods_sub
-                ), 0) as qty
-                , replace(g.img, 'a_500', 's_50') as img
-                , g.reg_dm
-                , g.upd_dm
-                , cg.seq
-                , gseq.spoint
-                , :page_h as page_h
-                , :page_v as page_v
-            from category_goods cg
-                inner join goods g on g.goods_no = cg.goods_no and g.goods_sub = cg.goods_sub
-                left outer join code gs on gs.code_kind_cd = 'G_GOODS_STAT' and gs.code_id = g.sale_stat_cl
-                left outer join goods_seq gseq on gseq.goods_no = cg.goods_no and gseq.goods_sub = cg.goods_sub
-            where cg.d_cat_cd = :d_cat_cd
-            order by cg.seq
+            select a.*
+            from (
+                select
+                    cg.goods_no
+                    , cg.goods_sub
+                    , g.style_no
+                    , g.goods_nm
+                    , gs.code_val as sale_stat_cl
+                    , g.price
+                    , cg.disp_yn
+                    , ifnull((
+                    select sum(good_qty)
+                    from goods_summary
+                    where goods_no = cg.goods_no and goods_sub = cg.goods_sub
+                    ), 0) as qty
+                    , ifnull(gst.sale_1d, 0) as ord_qty
+                    , replace(g.img, 'a_500', 's_50') as img
+                    , g.reg_dm
+                    , g.upd_dm
+                    , cg.seq
+                    , gseq.spoint
+                    , :page_h as page_h
+                    , :page_v as page_v
+                from category_goods cg
+                    inner join goods g on g.goods_no = cg.goods_no and g.goods_sub = cg.goods_sub
+                    left outer join code gs on gs.code_kind_cd = 'G_GOODS_STAT' and gs.code_id = g.sale_stat_cl
+                    left outer join goods_seq gseq on gseq.goods_no = cg.goods_no and gseq.goods_sub = cg.goods_sub
+                    left outer join goods_stat gst on cg.goods_no = gst.goods_no and cg.goods_sub = gst.goods_sub
+                where cg.d_cat_cd = :d_cat_cd
+            ) a
+            $orderby
         ";
 
         $result = DB::select($sql, [ 'd_cat_cd' => $d_cat_cd, 'page_h' => $page_h, 'page_v' => $page_v ]);

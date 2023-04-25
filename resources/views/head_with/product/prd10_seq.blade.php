@@ -32,7 +32,7 @@
                 <a href="javascript:void(0);">검색</a>
                 <div class="fr_box">
                     <button type="button" onclick="return Search();" class="btn btn-primary"><i class="fas fa-search fa-sm mr-1"></i> 조회</button>
-                    <button type="button" onclick="" class="btn btn-outline-primary"><i class="fas fa-cog fa-sm mr-1"></i> 고급</button>
+                    <button type="button" onclick="return setOrderSettingArea();" class="btn btn-outline-primary"><i class="fas fa-cog fa-sm mr-1"></i> 정렬설정</button>
                 </div>
             </div>
             <div class="card-body">
@@ -82,6 +82,82 @@
                                                         <input type="checkbox" class="custom-control-input" name="goods_img" id="goods_img" value="Y" checked>
                                                         <label class="custom-control-label font-weight-light" for="goods_img">이미지출력</label>
                                                     </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr id="ord_set" hidden>
+                                            <th>정렬</th>
+                                            <td colspan="3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="d-flex flex-column">
+                                                        <div class="form-inline d-flex mb-2">
+                                                            <span class="mr-2 fs-16">&#10112;</span>
+                                                            <select name='ord1' class="form-control form-control-sm" style="width:100px;">
+                                                                <option value=''>-- 선택 --</option>
+                                                                <option value='goods_nm'>상품명</option>
+                                                                <option value='sale_stat_cl'>상품상태</option>
+                                                                <option value='price'>판매가</option>
+                                                                <option value='qty'>재고수</option>
+                                                                <option value='ord_qty'>주문수</option>
+                                                                <option value='seq'>순위</option>
+                                                                <option value='reg_dm'>등록일</option>
+                                                                <option value='upd_dm' selected>수정일</option>
+                                                            </select>
+                                                            <div class="custom-control custom-radio form-check-box ml-2" style="display:inline-block;">
+                                                                <input type="radio" class="custom-control-input" name="sort1" id="sort1_asc" value="asc">
+                                                                <label class="custom-control-label font-weight-light" for="sort1_asc">오름차순</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio form-check-box ml-2" style="display:inline-block;">
+                                                                <input type="radio" class="custom-control-input" name="sort1" id="sort1_desc" value="desc" checked>
+                                                                <label class="custom-control-label font-weight-light" for="sort1_desc">내림차순</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-inline d-flex mb-2">
+                                                            <span class="mr-2 fs-16">&#10113;</span>
+                                                            <select name='ord2' class="form-control form-control-sm" style="width:100px;">
+                                                                <option value=''>-- 선택 --</option>
+                                                                <option value='goods_nm'>상품명</option>
+                                                                <option value='sale_stat_cl'>상품상태</option>
+                                                                <option value='price'>판매가</option>
+                                                                <option value='qty'>재고수</option>
+                                                                <option value='ord_qty' selected>주문수</option>
+                                                                <option value='seq'>순위</option>
+                                                                <option value='reg_dm'>등록일</option>
+                                                                <option value='upd_dm'>수정일</option>
+                                                            </select>
+                                                            <div class="custom-control custom-radio form-check-box ml-2" style="display:inline-block;">
+                                                                <input type="radio" class="custom-control-input" name="sort2" id="sort2_asc" value="asc">
+                                                                <label class="custom-control-label font-weight-light" for="sort2_asc">오름차순</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio form-check-box ml-2" style="display:inline-block;">
+                                                                <input type="radio" class="custom-control-input" name="sort2" id="sort2_desc" value="desc" checked>
+                                                                <label class="custom-control-label font-weight-light" for="sort2_desc">내림차순</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-inline d-flex">
+                                                            <span class="mr-2 fs-16">&#10114;</span>
+                                                            <select name='ord3' class="form-control form-control-sm" style="width:100px;">
+                                                                <option value=''>-- 선택 --</option>
+                                                                <option value='goods_nm'>상품명</option>
+                                                                <option value='sale_stat_cl'>상품상태</option>
+                                                                <option value='price'>판매가</option>
+                                                                <option value='qty' selected>재고수</option>
+                                                                <option value='ord_qty'>주문수</option>
+                                                                <option value='seq'>순위</option>
+                                                                <option value='reg_dm'>등록일</option>
+                                                                <option value='upd_dm'>수정일</option>
+                                                            </select>
+                                                            <div class="custom-control custom-radio form-check-box ml-2" style="display:inline-block;">
+                                                                <input type="radio" class="custom-control-input" name="sort3" id="sort3_asc" value="asc">
+                                                                <label class="custom-control-label font-weight-light" for="sort3_asc">오름차순</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio form-check-box ml-2" style="display:inline-block;">
+                                                                <input type="radio" class="custom-control-input" name="sort3" id="sort3_desc" value="desc" checked>
+                                                                <label class="custom-control-label font-weight-light" for="sort3_desc">내림차순</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" onclick="return Search('sort_yn');" class="btn btn-primary ml-3"><i class="fas fa-arrows-alt-v fa-sm mr-1"></i> 정렬하기</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -168,8 +244,14 @@
                 },
             ],
         },
-        {{--{ field: "img", headerName: "이미지", type: 'GoodsImageType', width: 48, surl: "{{ config('shop.front_url') }}" },--}}
-        { field: "img", headerName: "이미지", width: 48 },
+        { field: "img", headerName: "이미지", width: 48, cellStyle: CENTER,
+            cellRenderer: function (params) {
+                if (params.value !== undefined && params.value !== "" && params.value !== null) {
+                    let img = params.data ? params.data.img : params.value;
+                    return '<img src="' + img + '" class="img" alt="' + params?.data?.goods_nm + '" style="width:30px;height:30px;" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'" />';
+                }
+            }
+        },
         { field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: CENTER },
         { field: "style_no", headerName: "스타일넘버", width: 90, cellStyle: CENTER },
         { field: "goods_nm", headerName: "상품명", width: 235, cellStyle: LINE_HEIGHT },
@@ -221,54 +303,38 @@
         });
     });
 
-    function Search() {
+    function Search(params = '') {
         const d_cat_cd = "{{ @$d_cat_cd }}";
-        const data = $("form[name='search']").serialize();
+        let data = $("form[name='search']").serialize();
+        if (params !== '') data += '&' + params+ '=Y';
+
         gx.Request('/head/product/prd10/' + d_cat_cd + '/search-seq', data, -1);
     }
 
     /** 상품전시 순서변경사항 저장 */
     function Save() {
-        // 개발중입니다.
+        if (!confirm("변경된 상품순서를 저장하시겠습니까?")) return;
 
-        // function ChangeSeq(){
-        //
-        // 	const cat_type	= $('#cat_type').val();
-        // 	const d_cat_cd	= $('input[name="d_cat_cd"]').val();
-        //
-        // 	let goods_nos	= [];
-        // 	gx2.gridOptions.api.forEachNode(function(node) {
-        // 		goods_nos.push(node.data.goods_no);
-        // 	});
-        //
-        // 	if( confirm('순서를 변경 하시겠습니까?') ){
-        //
-        // 		$.ajax({
-        // 			method: 'post',
-        // 			url: '/head/product/prd10/' + d_cat_cd + '/seq',
-        // 			data: {
-        // 				'cat_type': cat_type,
-        // 				'goods_no': goods_nos
-        // 			},
-        // 			dataType: 'json',
-        // 			success: function(res) {
-        // 				if (res.code == '200') {
-        // 					SearchGoods2();
-        // 				} else {
-        // 					console.log(res.code);
-        // 					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-        // 				}
-        // 			},
-        // 			error: function(e) {
-        // 				console.log(e.responseText)
-        // 			}
-        // 		});
-        //
-        // 	}
-        //
-        // 	return true;
-        // }
+        const d_cat_cd = "{{ @$d_cat_cd }}";
+        const cat_type = "{{ @$cat_type }}";
+        const goods_nos = gx.getRows().map(row => row?.goods_no);
 
+        axios({
+            url: '/head/product/prd10/' + d_cat_cd + '/seq',
+            method: 'post',
+            data: {
+                cat_type: cat_type,
+                goods_no: goods_nos,
+            }
+        }).then((response) => {
+            if (response.data.code === 200) {
+                alert('상품순서가 정상적으로 저장되었습니다.');
+                opener.SearchGoods2();
+                window.close();
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     /** 상품순서 이동 */
@@ -340,6 +406,13 @@
     function autoSortRows() {
         const rows = gx.getRows().sort((a, b) => b.spoint - a.spoint);
         gx.gridOptions.api.setRowData(rows);
+    }
+
+    /** 정렬설정 td 토글처리 */
+    function setOrderSettingArea() {
+        const hidden = $("tr#ord_set").attr('hidden') !== 'hidden';
+        $("tr#ord_set").attr('hidden', hidden);
+        pApp.ResizeGrid(hidden ? 325 : 452);
     }
 </script>
 @stop
