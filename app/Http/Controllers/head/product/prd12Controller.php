@@ -20,10 +20,7 @@ class prd12Controller extends Controller
     public function index() {
 
         $conf = new Conf();
-        $domain = $conf->getConfig("shop","domain");
-
-        $d = explode('.',$domain);
-        $domain = $d[1].'.'.$d[2].'.'.$d[3];
+        $domain = $conf->getConfig("shop","domain_bizest");
 
         $values = [
             'plan_types' => SLib::getCodes('G_PLAN_TYPE'),
@@ -66,7 +63,7 @@ class prd12Controller extends Controller
     public function show($code) {
 
         $conf = new Conf();
-        $domain = $conf->getConfig("shop","domain");
+        $domain = $conf->getConfig("shop","domain_bizest");
 
         $sql = /** @lang text */
             "

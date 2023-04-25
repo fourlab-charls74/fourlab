@@ -313,7 +313,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="tab-goods" data-toggle="tab" href="#tab-goods-body" role="tab" aria-controls="goods" aria-selected="true">상품</button>
                             </li>
-                            <li class="nav-item" role="presentation">
+                            <li class="nav-item" role="presentation" id="tab_category" style="display:none">
                                 <button class="nav-link" id="tab-category" data-toggle="tab" href="#tab-category-body" role="tab" aria-controls="category" aria-selected="true">카테고리</button>
                             </li>
                         </ul>
@@ -340,7 +340,7 @@
                             <div id="div-gd" style="height:500px; width:100%;" class="ag-theme-balham"></div>
                         </div>
                     </div>
-                    <div id="tab-category-body" class="card-body brtn mt-0 pt-2 tab-pane" role="tabpanel" aria-labelledby="category-tab">
+                    <div id="tab-category-body" class="card-body brtn mt-0 pt-2 tab-pane" role="tabpanel" aria-labelledby="category-tab" >
                         <div class="row_wrap">
                             <div class="row">
                                 <div class="col-12">
@@ -498,7 +498,7 @@
             {field: "head_desc", headerName: "상단홍보글"},
             {field: "img", headerName: "이미지", width:46, cellStyle: {"text-align":"center"},
                 cellRenderer: function(params) {
-                    return '<a href="https://bizest.fjallraven.co.kr/app/product/detail/'+ params.data.goods_no +'/0" target="_blank"><img src="' + params.data.img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>'
+                    return '<a href="https://{{ @$domain }}/app/product/detail/'+ params.data.goods_no +'/0" target="_blank"><img src="' + params.data.img + '" class="img" alt="" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>'
                 }
             },
             {field: "img", headerName: "이미지_url", hide: true},
@@ -572,6 +572,8 @@
 
                 $("#folder_cnt").click(function () {
                     $("#folder_category").toggle();
+                    $("#tab_category").toggle();
+
                 });
             }
 
@@ -589,6 +591,12 @@
             var url = "/app/planning/views/" + p_no +  "/" + no;
             obj.value = obj.value + "<a href='" + url + "'></a>";
         };
+
+        function is_checked() {
+            const checkbox = document.getElementById('folder_cnt');
+        }
+
+        
 
     </script>
 

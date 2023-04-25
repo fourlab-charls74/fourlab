@@ -315,6 +315,8 @@
         {field:"opt_kor",headerName:"옵션",pinned:'left',width:130,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null,
+            cellEditor: 'agRichSelectCellEditor',
+            cellEditorParams: cellOpionsParams,
         },
         {headerName: "수량", field: "qty", width: 60,
             editable: params => checkIsEditable(params),
@@ -368,21 +370,24 @@
             /**
              *  키보드 방향키 누르면 바로 입력할 수 있는 부분(개발중)
              */
-            // onCellKeyDown : function(e) {
-            //     let key = e.event.key;
-            //     if (key == 'ArrowDown') {
-            //         gx.gridOptions.api.stopEditing();
-            //         let rowIndex = e.rowIndex + 1;
-            //         let column = e.column.colId;
-            //         gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
+            onCellKeyDown : function(e) {
+                let key = e.event.key;
 
-            //     } else if (key == 'ArrowUp') {
-            //         gx.gridOptions.api.stopEditing();
-            //         let rowIndex = e.rowIndex - 1;
-            //         let column = e.column.colId;
-            //         gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
-            //     } 
-            // },
+                if (e.column.colId == 'qty' || e.column.colId == 'unit_cost') {
+                    if (key == 'ArrowDown') {
+                        gx.gridOptions.api.stopEditing();
+                        let rowIndex = e.rowIndex + 1;
+                        let column = e.column.colId;
+                        gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
+    
+                    } else if (key == 'ArrowUp') {
+                        gx.gridOptions.api.stopEditing();
+                        let rowIndex = e.rowIndex - 1;
+                        let column = e.column.colId;
+                        gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
+                    } 
+                }
+            },
             onCellValueChanged: async (params) => {
                 await evtAfterEdit(params);
             },
@@ -394,6 +399,42 @@
         const ff = document.search;
         if(ff.cmd.value == "editcmd") productListDraw();
     });
+
+    let _goods_options = {};
+
+
+    function cellOpionsParams(params){
+        var goods_no = params.data.goods_no;
+        var options = [];
+
+        $.ajax({
+            type: "get",
+            url: '/head/product/prd01/' + goods_no + '/get',
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            dataType: 'json',
+            // data: {},
+            success: function (res) {
+                var options = [];
+                for (var j = 0; j < res.options.length; j++) {
+                    if (res.options[j].qty > 0) {
+                        options.push(res.options[j].goods_opt);
+                    }
+                }
+                _goods_options[goods_no] = options;
+            },
+
+            error: function (e) {
+                console.log(e.responseText);
+            }
+        });
+        if(_goods_options.hasOwnProperty(goods_no)){
+            options =  _goods_options[goods_no];
+        } else {
+        }
+        return {
+            values :options
+        }
+    }
 
     const checkIsEditable = (params) => {
         return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
@@ -711,6 +752,10 @@
                 await calProduct(row, unit, exchange_rate, custom_tax_rate);
                 // checkOption(row);
             }
+            let rowIndex = params.rowIndex;
+            let column = params.column.colId;
+            gx.gridOptions.api.stopEditing();
+            gx.gridOptions.api.startEditingCell({rowIndex: rowIndex + 1, colKey: column});
         }
         updatePinnedRow();
     };
