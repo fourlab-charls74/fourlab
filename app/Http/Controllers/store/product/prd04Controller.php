@@ -183,7 +183,7 @@ class prd04Controller extends Controller
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id
-						
+
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
@@ -684,21 +684,44 @@ class prd04Controller extends Controller
 				//재고정보 처리
 				$where	= ['prd_cd'	=> $prd_cd];
 
-				$values	= [
-					//'goods_no'	=> '',
-					'wonga'		=> $wonga,
-					'qty_wonga'	=> $qty * $wonga,
-					'in_qty'	=> $qty,
-					'out_qty'	=> '0',
-					'qty'		=> $qty,
-					'wqty'		=> $qty,
-					//'goods_opt'	=> '',
-					'barcode'	=> $prd_cd,
-					'use_yn'	=> 'Y',
-					'rt'		=> now(),
-					'ut'		=> now()
-				];
-				DB::table('product_stock')->updateOrInsert($where, $values);
+                //창고별 재고등록 오류 수정 시작
+                $sql_ps		= " select count(*) as tot from product_stock where prd_cd = :prd_cd ";
+                $obj_ps	= DB::selectOne($sql_ps, $where);
+
+                if($obj_ps->tot == 0){
+
+                    $values	= [
+                        //'goods_no'	=> '',
+                        'wonga'		=> $wonga,
+                        'qty_wonga'	=> $qty * $wonga,
+                        'in_qty'	=> $qty,
+                        'out_qty'	=> '0',
+                        'qty'		=> $qty,
+                        'wqty'		=> $qty,
+                        //'goods_opt'	=> '',
+                        'barcode'	=> $prd_cd,
+                        'use_yn'	=> 'Y',
+                        'rt'		=> now(),
+                        'ut'		=> now()
+                    ];
+                    DB::table('product_stock')->Insert($where, $values);
+
+                }else{
+                    $sql_ps = "
+                        update product_stock set
+                            wonga       = $wonga ,
+                            qty_wonga   = '" . $qty * $wonga . "',
+                            in_qty      = in_qty + $qty ,
+                            qty         = qty + $qty ,
+                            wqty        = wqty + $qty ,
+                            barcode     = '$prd_cd',
+                            ut          = now()
+                        where
+                            prd_cd = :prd_cd
+                    ";
+                    DB::update($sql_ps, $where);
+                }
+                //창고별 재고등록 오류 수정 종료
 
 				//창고재고 정보 처리
 				$where	= ['prd_cd'	=> $prd_cd, 'storage_cd' => $storage_cd];

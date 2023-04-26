@@ -55,8 +55,8 @@ class BizestStockBatch extends Command
 		//재고 Batch Conf 불러오기
 		$sql    = "
 			select
-				default_storage_cd, ifnull(default_storage_buffer, 0) as default_storage_buffer, 
-				online_storage_cd, ifnull(online_storage_buffer, 0) as online_storage_buffer, 
+				default_storage_cd, ifnull(default_storage_buffer, 0) as default_storage_buffer,
+				online_storage_cd, ifnull(online_storage_buffer, 0) as online_storage_buffer,
 				store_buffer_kind, store_tot_buffer, price_apply_yn
 			from bizest_stock_conf
 			order by idx desc
@@ -169,7 +169,7 @@ class BizestStockBatch extends Command
 						$row->qty = $row->qty - $stock_conf->store_tot_buffer;
 					}
 
-					if( $row->qty > 0){
+					if( $row->qty > 0 ){
 						if( $cnt > 0 )	$sql_insert .= ",";
 
 						$sql_insert	.= " ( '$idx', '$row->store_cd', '$row->prd_cd', '$row->goods_no', '".Lib::quote($row->goods_opt)."', '$row->price', '$row->wonga', '$row->qty' ) ";
@@ -212,7 +212,7 @@ class BizestStockBatch extends Command
 					}
 
 				}
-				
+
 			}
 
 		}
@@ -262,7 +262,7 @@ class BizestStockBatch extends Command
 
 			$sql	= " delete from _tmp_goods_xmd_stock_maxprice ";
 			DB::delete($sql);
-			
+
 			$sql	= "
 				insert into _tmp_goods_xmd_stock_maxprice
 				select goods_no, price as max_price from _tmp_goods_xmd_stock
@@ -289,7 +289,7 @@ class BizestStockBatch extends Command
 			select * from goods_good where opt_price is not null
 		";
 		DB::select($sql);
-		
+
 		$sql	= " truncate table goods_good ";
 		DB::select($sql);
 
@@ -300,7 +300,7 @@ class BizestStockBatch extends Command
 				inner join goods g on g.goods_no = s.goods_no
 		";
 		DB::insert($sql);
-		
+
 		$sql	= "
 			update goods_good a
 				inner join _tmp_goods_good b on a.goods_no = b.goods_no and a.goods_sub = b.goods_sub and a.goods_opt = b.goods_opt
@@ -315,10 +315,10 @@ class BizestStockBatch extends Command
 		//재고 업로드 시 없는 상품 품절 처리
 		$sql	= "
 			UPDATE goods g INNER JOIN (
-				SELECT 
+				SELECT
 					goods_no
 				FROM goods g WHERE sale_stat_cl = '40' AND ( SELECT IFNULL(SUM(good_qty),0) FROM goods_summary WHERE goods_no = g.goods_no ) = 0
-			) a ON g.goods_no = a.goods_no 
+			) a ON g.goods_no = a.goods_no
 				SET sale_stat_cl = 30
 			WHERE sale_stat_cl = '40'
 		";
@@ -328,10 +328,10 @@ class BizestStockBatch extends Command
 		// 품절수동일때 상품 상태 변경 안되게
 		$sql	= "
 			UPDATE goods g INNER JOIN (
-				SELECT 
+				SELECT
 					goods_no
 				FROM goods g WHERE sale_stat_cl = '30' AND ( SELECT SUM(good_qty) FROM goods_summary WHERE goods_no = g.goods_no ) > 0
-			) a ON g.goods_no = a.goods_no 
+			) a ON g.goods_no = a.goods_no
 				SET sale_stat_cl = 10
 			WHERE sale_stat_cl = '30'
 		";
@@ -341,10 +341,10 @@ class BizestStockBatch extends Command
 		// 품절수동일때 상품 상태 변경 안되게
 		$sql	= "
 			UPDATE goods g INNER JOIN (
-				SELECT 
+				SELECT
 					goods_no
 				FROM goods g WHERE sale_stat_cl = '20' AND ( SELECT SUM(good_qty) FROM goods_summary WHERE goods_no = g.goods_no ) > 0
-			) a ON g.goods_no = a.goods_no 
+			) a ON g.goods_no = a.goods_no
 				SET sale_stat_cl = 40
 			WHERE sale_stat_cl = '20'
 		";
