@@ -178,7 +178,7 @@
     <form method="post" name="save" action="/head/stock/stk01">
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
             <div class="card-body">
-                <div class="card-title mb-3">
+                <div class="card-title">
                     <div class="filter_wrap">
                         <div class="fl_box">
                             <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
@@ -222,20 +222,18 @@
         }
     </script>
 
-
-
     <script language="javascript">
 
         var columns= [
-                {field:"opt_kind_nm" ,headerName:"품목", width:80, pinned:'left'},
-                {field:"brand_nm" ,headerName:"브랜드", width:110, pinned:'left' },
-                {field:"style_no" ,headerName:"스타일넘버",pinned:'left', width:80, cellStyle:{'text-align':'center'} },
-                {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:58,cellStyle:StyleGoodsType},
-                {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:58},
-                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58},
+                {field:"opt_kind_nm" ,headerName:"품목", width:80, pinned:'left', cellStyle: {'text-align': 'center'}},
+                {field:"brand_nm" ,headerName:"브랜드", width:80, pinned:'left', cellStyle: {'text-align': 'center'}},
+                {field:"style_no" ,headerName:"스타일넘버",pinned:'left', width:80, cellStyle: {'text-align':'center'}},
+                {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:60, cellStyle: {...StyleGoodsType, 'text-align': 'center'}},
+                {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:60, cellStyle: {'text-align': 'center'}},
+                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:70},
                 {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:360},
                 {field:"sale_stat_cl_nm" ,headerName:"상태",width:58,cellStyle:StyleGoodsState},
-                {field:"wonga" ,headerName:"원가", type: 'currencyType'},
+                {field:"wonga" ,headerName:"원가", type: 'currencyType', width: 60},
                 {field:"goods_opt" ,headerName:"옵션",width:200,
                     checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
                     cellRenderer: function(params) {
@@ -252,7 +250,7 @@
                         return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
                     },
                     cellStyle:StyleChangeYN, onCellValueChanged:EditQty, valueFormatter:formatNumber},
-                {field:"edit_wqty" ,headerName:"보유재고", width:58,
+                {field:"edit_wqty" ,headerName:"보유재고", width:70,
                     editable: function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
                     cellClass:function(params){
                         return (params.data !== undefined && params.data.is_unlimited != 'Y')? ['hd-grid-number','hd-grid-edit']: ['hd-grid-number'];
@@ -353,10 +351,9 @@
                         url: '/head/stock/stk01',
                         data: {'reason':reason,'data':data},
                         success: function (res) {
-                            //console.log(res);
-                            //var res = jQuery.parseJSON(data);
                             if(res.code == '200'){
                                 alert('재고수량을 저장하였습니다.');
+                                Search();
                             } else {
                                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                                 console.log(res);
