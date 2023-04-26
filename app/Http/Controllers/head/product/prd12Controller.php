@@ -774,6 +774,7 @@ class prd12Controller extends Controller
         $sale_amt = $request->input('sale_amt');
         $sale_kind = $request->input('sale_kind','P');
 
+
         if($sale_amt > 0){
             $sale_yn = 'Y';
         } else {

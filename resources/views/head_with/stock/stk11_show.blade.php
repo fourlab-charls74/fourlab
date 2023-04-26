@@ -402,35 +402,9 @@
 
     let _goods_options = {};
 
-
     function cellOpionsParams(params){
-        var goods_no = params.data.goods_no;
-        var options = [];
-
-        $.ajax({
-            type: "get",
-            url: '/head/product/prd01/' + goods_no + '/get',
-            contentType: "application/x-www-form-urlencoded; charset=utf-8",
-            dataType: 'json',
-            // data: {},
-            success: function (res) {
-                var options = [];
-                for (var j = 0; j < res.options.length; j++) {
-                    if (res.options[j].qty > 0) {
-                        options.push(res.options[j].goods_opt);
-                    }
-                }
-                _goods_options[goods_no] = options;
-            },
-
-            error: function (e) {
-                console.log(e.responseText);
-            }
-        });
-        if(_goods_options.hasOwnProperty(goods_no)){
-            options =  _goods_options[goods_no];
-        } else {
-        }
+        let goods_no = params.data.goods_no;
+        let options = _goods_options[goods_no];
         return {
             values :options
         }
@@ -463,6 +437,30 @@
                     row.count = idx + 1;
                     gx.gridOptions.api.applyTransaction({add : [row]})
                 });
+
+                let goods_nos = rows.map(r => r.goods_no);
+        
+                for (let i=0; i<goods_nos.length;i++) {
+                    let goods_no = goods_nos[i];
+                    $.ajax({
+                        type: "get",
+                        url: '/head/product/prd01/' + goods_no + '/get',
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        dataType: 'json',
+                        success: function (res) {
+                            let options = [];
+                            for (var j = 0; j < res.options.length; j++) {
+                                if (res.options[j].qty > 0) {
+                                    options.push(res.options[j].goods_opt);
+                                    _goods_options[goods_no] = options;
+                                }
+                            }
+                        },
+                        error: function (e) {
+                            console.log(e.responseText);
+                        }
+                    });
+                }
                 updatePinnedRow();
             }
         }).catch((error) => {
@@ -524,9 +522,31 @@
     var goodsCallback = (row) => {
         addRow(row);
     };
-
     var multiGoodsCallback = (rows) => {
         if (rows && Array.isArray(rows)) rows.map(row => addRow(row));
+        let goods_nos = rows.map(r => r.goods_no);
+        
+        for (let i=0; i<goods_nos.length;i++) {
+            let goods_no = goods_nos[i];
+            $.ajax({
+                type: "get",
+                url: '/head/product/prd01/' + goods_no + '/get',
+                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                dataType: 'json',
+                success: function (res) {
+                    let options = [];
+                    for (var j = 0; j < res.options.length; j++) {
+                        if (res.options[j].qty > 0) {
+                            options.push(res.options[j].goods_opt);
+                            _goods_options[goods_no] = options;
+                        }
+                    }
+                },
+                error: function (e) {
+                    console.log(e.responseText);
+                }
+            });
+        }
     };
 
     let goods_search_cmd = '';
