@@ -176,7 +176,7 @@
                 </div>
                 <div class="fr_box d-flex align-items-center">
                     <input type="text" id="page" name="page" class="form-control form-control-sm text-right" style="width:40px;" value="1">
-                    <span class="ml-2 mr-2">페이지로</span>
+                    <span class="ml-2 mr-2">/ <strong id="total_page">1</strong> 페이지로</span>
                     <button type="button" onclick="return moveRows('up', 'page-end', true);" class="btn btn-outline-primary"><i class="fas fa-arrows-alt-v fa-sm mr-1"></i> 이동</button>
                     <span class="ml-2 mr-2">|</span>
                     <button type="button" onclick="return moveRows('up');" class="btn btn-outline-primary mr-1"><i class="fas fa-long-arrow-alt-up fa-sm mr-1"></i> 위</button>
@@ -285,7 +285,7 @@
         gx = new HDGrid(gridDiv, columns, {
             suppressRowClickSelection: false,
             onRangeSelectionChanged: (e) => {
-                if (e.started) e.api.deselectAll();
+                // if (e.started && !e.finished) e.api.deselectAll();
                 let start = e.api.rangeController.getDraggingRange()?.startRow.rowIndex;
                 let end = e.api.rangeController.getDraggingRange()?.endRow.rowIndex;
 
@@ -301,6 +301,18 @@
         $("#goods_img").on('click', function(e) {
             gx.gridOptions.columnApi.setColumnVisible("img", $("#goods_img").is(":checked"));
         });
+
+        $(this).on('keydown', function (e) {
+            if (e.altKey) {
+                e.preventDefault();
+                if (e.keyCode === 38) moveRows('up');
+                else if (e.keyCode === 40) moveRows('down');
+                else if (e.keyCode === 84) moveRows('up', 'end');
+                else if (e.keyCode === 66) moveRows('down', 'end');
+                else if (e.keyCode === 89) moveRows('up', 'page-end');
+                else if (e.keyCode === 78) moveRows('down', 'page-end');
+            }
+        });
     });
 
     function Search(params = '') {
@@ -308,7 +320,10 @@
         let data = $("form[name='search']").serialize();
         if (params !== '') data += '&' + params+ '=Y';
 
-        gx.Request('/head/product/prd10/' + d_cat_cd + '/search-seq', data, -1);
+        gx.Request('/head/product/prd10/' + d_cat_cd + '/search-seq', data, -1, function (e) {
+            const page_qty = (e.body[0]?.page_h || 0) * (e.body[0]?.page_v || 0);
+            $("#total_page").text(Math.ceil(e.head.total / page_qty));
+        });
     }
 
     /** 상품전시 순서변경사항 저장 */
@@ -357,21 +372,30 @@
         gx.gridOptions.api.applyTransaction({ remove: nodes.map(node => node.data) });
 
         let top;
-        if (location === 'end') {
-            top = direction === 'up' ? 0 : total_count - nodes.length;
-        } else if (location === 'page-end') {
-            if (pick_page) {
-                top = (page - 1) * page_total;
-            } else {
-                top = Math.floor(first_index / page_total) * page_total;
-            }
-            if (direction === 'down') top = top + page_total - nodes.length;
-        } else {
+        let result;
+        if (location === '') {
+            result = { add: [] };
             top = Math.min(...nodes.map(node => node.rowIndex)) + (direction === 'up' ? -1 : 1);
-        }
+            nodes.forEach(node => {
+                let re = gx.gridOptions.api.applyTransaction({ add: [node.data], addIndex: node.rowIndex + (direction === 'up' ? -1 : 1) });
+                re.add[0].setSelected(true);
+                result['add'].push(re.add[0]);
+            });
+        } else {
+            if (location === 'end') {
+                top = direction === 'up' ? 0 : total_count - nodes.length;
+            } else if (location === 'page-end') {
+                if (pick_page) {
+                    top = (page - 1) * page_total;
+                } else {
+                    top = Math.floor(first_index / page_total) * page_total;
+                }
+                if (direction === 'down') top = top + page_total - nodes.length;
+            }
 
-        const result = gx.gridOptions.api.applyTransaction({ add: nodes.map(node => node.data), addIndex: top });
-        result.add.forEach(node => node.setSelected(true));
+            result = gx.gridOptions.api.applyTransaction({ add: nodes.map(node => node.data), addIndex: top });
+            result.add.forEach(node => node.setSelected(true));
+        }
 
         // 스크롤처리
         first_index = Math.min(...result.add.map(node => node.rowIndex));
