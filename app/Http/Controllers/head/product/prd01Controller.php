@@ -30,7 +30,7 @@ class prd01Controller extends Controller
 	public function index(Request $request)
 	{
 		$conf = new Conf();
-		
+
 		$domain		= $conf->getConfigValue("shop", "domain");
 		$style_no	= $request->input('style_no');
 
@@ -161,7 +161,7 @@ class prd01Controller extends Controller
 		if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
 
         if ($is_unlimited != "") $where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
-		
+
 		if( is_array($goods_stat)) {
 			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
 				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
@@ -210,7 +210,7 @@ class prd01Controller extends Controller
             $query = /** @lang text */
                 "
                 select count(*) as total
-                from goods g 
+                from goods g
 					left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 					left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 					left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
@@ -222,8 +222,8 @@ class prd01Controller extends Controller
 					left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 					left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 					left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
-                where 1=1 
-                    -- g.com_id = :com_id 
+                where 1=1
+                    -- g.com_id = :com_id
                     $where
 			";
             //$row = DB::select($query,['com_id' => $com_id]);
@@ -293,7 +293,7 @@ class prd01Controller extends Controller
 				,g.sale_type,g.sale_yn,g.before_sale_price,g.sale_price,0 as sale_rate,
 				g.sale_dt_yn,g.sale_s_dt,g.sale_e_dt
 				, c.code_id as com_type
-				
+
 			from goods g
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
@@ -345,7 +345,7 @@ class prd01Controller extends Controller
 		$goods_nos = explode(",", $request->input("goods_nos", ""));
 
 		if (count($goods_nos) > 0) {
-			
+
 			/**
 			 * 설정 값 얻기
 			 */
@@ -474,7 +474,7 @@ class prd01Controller extends Controller
 				$row->ed_normal_wonga = $row->normal_wonga;
 				$row->ed_wonga = $wonga;
 				$row->ed_sale_wonga = $row->sale_wonga;
-				
+
 				return $row;
 
 			});
@@ -497,7 +497,7 @@ class prd01Controller extends Controller
 		$conf = new Conf();
 		$cfg_free_delivery_amt = $conf->getConfigValue("delivery", "free_delivery_amt");
 		$cfg_base_delivery_fee = $conf->getConfigValue("delivery", "base_delivery_fee");
-		
+
 		$user = array(
             "id" => Auth('head')->user()->id,
             "name" => Auth('head')->user()->name
@@ -555,7 +555,7 @@ class prd01Controller extends Controller
 			$point_unit		= Lib::Rq($row['point_unit']);
 			$point 			= Lib::Rq($row['point']);
 			$md_id 			= Lib::Rq($row['md_id']);
-			
+
 
 			$com_type 		= Lib::Rq($row['com_type']);
 			$goods_type 		= Lib::Rq($row['goods_type']);
@@ -639,7 +639,7 @@ class prd01Controller extends Controller
 				"sale_dt_yn"		=> $sale_dt_yn,
 				"sale_s_dt"		=> $sale_s_dt,
 				"sale_e_dt"		=> $sale_e_dt,
-	
+
 				"goods_location"	=> $goods_location,
 				"tax_yn"		=> $tax_yn,
 				"new_product_type"	=> $new_product_type,
@@ -661,7 +661,7 @@ class prd01Controller extends Controller
 
 				// $goods->SetGoodsNo( $goods_no );
 				$result = $goods->Edit( $goods_no, $param );
-				
+
 				// 전시카테고리에도 반영
 				$category = new Category($user, "DISPLAY"); // user 설정 및 초기화
 				$category->SetGoodsNoSub( $goods_no, $goods_sub ); // 상품번호 설정
@@ -694,7 +694,7 @@ class prd01Controller extends Controller
 					$sql = " delete from goods_tags where goods_no = :goods_no and goods_sub = :goods_sub ";
 					$inputarr = array("goods_no" => $goods_no, "goods_sub" => $goods_sub);
 					DB::delete($sql, $inputarr);
-					
+
 					for ( $i = 0; $i < count($a_tags); $i++) {
 						$_tag = Lib::Rq(trim($a_tags[$i]));
 						if ( $_tag == "" ) continue;
@@ -749,7 +749,7 @@ class prd01Controller extends Controller
 					$code = $e->getCode();
 					$message = $e->getMessage();
 				}
-				
+
 				return response()->json([
 					"code" => $code,
 					"message" => $message
@@ -770,7 +770,7 @@ class prd01Controller extends Controller
 
     public function options($no, Request $req) {
         $sql = "  -- [".Auth('partner')->user()->com_id."] ". __FILE__ ." > ". __FUNCTION__ ." > ". __LINE__ ."
-            select a.goods_no, a.goods_sub, a.goods_opt, 0 as qty 
+            select a.goods_no, a.goods_sub, a.goods_opt, 0 as qty
              from goods_summary a
             where a.goods_no = '$no' and a.goods_sub = '$req->goods_sub'
               and a.use_yn = 'Y'
@@ -812,9 +812,9 @@ class prd01Controller extends Controller
             $err_msg = "";
 
             $sql = "
-			select opt_name 
-				from goods_summary 
-			where goods_no = '$goods_no' 
+			select opt_name
+				from goods_summary
+			where goods_no = '$goods_no'
 				and goods_sub = '$goods_sub'
 			";
             $row = DB::selectOne($sql);
@@ -930,7 +930,7 @@ class prd01Controller extends Controller
 
 		$query	= "
 			select a.class , a.class_nm
-			from code_class a 
+			from code_class a
 			group by class, class_nm
 		";
 
@@ -977,13 +977,13 @@ class prd01Controller extends Controller
         $query = /** @lang text */
             "
             select a.class , a.class_nm
-              from code_class a 
+              from code_class a
              group by class, class_nm
         ";
         $class_items = DB::select($query);
 
 		$values = $this->_get($goods_no);
-		
+
 		$values = array_merge($values,[
             'opt_cd_list'		=> SLib::getItems(),
             'md_list'			=> SLib::getMDs(),
@@ -1098,21 +1098,21 @@ class prd01Controller extends Controller
 
 		$sql	= /** @lang text */
 			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by opt_nm ";
-		
+
 		if($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
 			if($opt_kind_cnt == 2) $opt['opt2'] = DB::select($sql,['goods_no' => $goods_no, 'index' => -1]);
 		}
-		
+
 		$sql	=
 			"select type, name, required_yn, use_yn from goods_option where goods_no = :goods_no and use_yn = 'Y' and type='basic'";
 		$opt_kind_list	= DB::select($sql, ['goods_no' => $goods_no]);
 
         $sql	= /** @lang text */
-            " 
+            "
                 select opt_name,goods_opt,opt_price,good_qty as qty,wqty,soldout_yn
-                from goods_summary 
-                where goods_no = :goods_no 
+                from goods_summary
+                where goods_no = :goods_no
                 order by goods_opt
           ";
         $options	= DB::select($sql,['goods_no' => $goods_no]);
@@ -1201,7 +1201,7 @@ class prd01Controller extends Controller
 			if( $is_sub != 0 ){
 				$goods_no	= $req->input('goods_no');
 				$goods_sub	= DB::selectOne("
-							select max(goods_sub) + 1 as goods_sub 
+							select max(goods_sub) + 1 as goods_sub
 							from goods
 							where goods_no = $goods_no
 						")->goods_sub;
@@ -1329,9 +1329,9 @@ class prd01Controller extends Controller
 				"new_product_day"	=> $req->input('new_product_day', ''),
 				"reg_dm"			=> DB::raw("now()")
 			);
-			
+
 			$result = DB::table('goods')->insertGetId($a_goods, 'goods_no');
-			
+
 			// goods_type = P 처리 생략 ( 위탁업체 )
 			// goods_wonga 테이블
 			// 도매처리 생략
@@ -1373,8 +1373,8 @@ class prd01Controller extends Controller
 
         $query = "
 			select count(*) as total
-			from goods g 
-			where 1=1 
+			from goods g
+			where 1=1
 			$where
 		";
 
@@ -1396,19 +1396,19 @@ class prd01Controller extends Controller
               )) as img, g.goods_nm, stat.code_val as sale_stat_cl,
               g.goods_no, g.goods_sub, com.com_id,
               (select class_nm from code_class where class = g.class group by class, class_nm) as class,
-              class.item_001, class.item_002, class.item_003, class.item_004, class.item_005, 
-              class.item_006, class.item_007, class.item_008, class.item_009, class.item_010, 
+              class.item_001, class.item_002, class.item_003, class.item_004, class.item_005,
+              class.item_006, class.item_007, class.item_008, class.item_009, class.item_010,
               class.item_011, class.item_012, class.item_013, class.item_014, class.item_015,
               class.item_016, class.item_017, class.item_018, class.item_019, class.item_020,
 			  g.class as class_cd
-           from goods g 
+           from goods g
               left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
               left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
               left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
               left outer join company com on com.com_id = g.com_id
               left outer join brand brand on brand.brand = g.brand
               left outer join goods_class class on g.goods_no = class.goods_no and g.goods_sub = class.goods_sub and g.class = class.class
-          where 1=1 
+          where 1=1
               $where
           order by g.goods_no
           $sql_limit
@@ -1449,7 +1449,7 @@ class prd01Controller extends Controller
 		]);
 	}
 
-	public function get_option_stock(Request $request) 
+	public function get_option_stock(Request $request)
 	{
 		$type = $request->input("data.type", "기본");
 		$goods_no = $request->input("data.goods_no");
@@ -1734,9 +1734,9 @@ class prd01Controller extends Controller
 			$sale_set .= 'sale_e_dt = "'.$sale_e_dt.'",';
 
 			$query	= /** @lang text */
-				"   
+				"
 					update goods
-						set 
+						set
 							head_desc			= '".$head_desc."',
 							goods_nm			= '".$goods_nm."',
 							goods_nm_eng		= '".$goods_nm_eng."',
@@ -1782,7 +1782,7 @@ class prd01Controller extends Controller
 							admin_nm			= '".$name."',
 							$sale_set
 							upd_dm				= NOW()
-					where 
+					where
 						goods_no = '".$goods_no."'
 					limit 1
 			";
@@ -1929,7 +1929,7 @@ class prd01Controller extends Controller
 	{
 		$query = "
 			select
-				date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date, 
+				date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date,
 				a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
 			from goods_modify_hist a
 				inner join mgr_user b on a.id = b.id
@@ -2105,7 +2105,7 @@ class prd01Controller extends Controller
 
 	function delete_category($cat_type, $goods_no){
 		$query = "  delete from  category_goods
-					where 
+					where
 						goods_no = '".$goods_no."'
 						and cat_type ='".$cat_type."'
 				";
@@ -2180,10 +2180,10 @@ class prd01Controller extends Controller
 		$msg = '';
 
 		$sql = "
-			select 
-				count(*) as seq 
-			from goods_option 
-			where goods_no = ':goods_no' and goods_sub = ':goods_sub' 
+			select
+				count(*) as seq
+			from goods_option
+			where goods_no = ':goods_no' and goods_sub = ':goods_sub'
 				and type = '${opt_type}' and name = '${opt_type_nm}'
 		";
 
@@ -2207,7 +2207,7 @@ class prd01Controller extends Controller
 			if ($basic_count == 1) {
 				$sql = "
 					select goods_opt, opt_name, goods_no
-					from goods_summary 
+					from goods_summary
 					where goods_no = :goods_no and use_yn = 'Y'
 					order by seq
 				";
@@ -2221,7 +2221,7 @@ class prd01Controller extends Controller
 					";
 					DB::delete($sql, ["goods_no" => $goods_no]);
 				}
-				
+
 				/**
 				 * 옵션관리 팝업 api의 저장 기능을 활용하여 2단 옵션의 초기 샘플 옵션품목 값 생성
 				 * (saveBasicOptions 데이터 형식에 맞게 가공)
@@ -2239,7 +2239,7 @@ class prd01Controller extends Controller
 					$item->opt_name = "${opt_type_nm}";
 					$arr['opt_list'][$idx] = (array) $item;
 				}
-				
+
 				/**
 				 * 기존 단일옵션들이 반영된 2단옵션 초기 품목 저장
 				 */
@@ -2288,15 +2288,15 @@ class prd01Controller extends Controller
 
 							// goods_good 삭제
 							$sql = "
-								delete from goods_good 
+								delete from goods_good
 								where goods_no = :goods_no and goods_sub = :goods_sub
 							";
 							DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' =>  $goods_sub]);
 						}
-						
+
 						// 3. 재고 삭제 (goods_summary)
 						$sql = "
-							delete from goods_summary 
+							delete from goods_summary
 							where goods_no = :goods_no and goods_sub = :goods_sub
 						";
 						DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' =>  $goods_sub]);
@@ -2304,7 +2304,7 @@ class prd01Controller extends Controller
 				} else if($row->type === "extra") {
 					// 1-2. 추가옵션인 경우
 					$sql = "
-						delete from options 
+						delete from options
 						where option_no = :option_no
 					";
 					DB::delete($sql, ['option_no' => $opt_no]);
@@ -2312,7 +2312,7 @@ class prd01Controller extends Controller
 
 				// 4. 옵션 삭제 (goods_option)
 				$sql = "
-					delete from goods_option 
+					delete from goods_option
 					where no = :no and goods_no = :goods_no and goods_sub = :goods_sub
 				";
 				DB::delete($sql, ['no' => $opt_no, 'goods_no' => $goods_no, 'goods_sub' => $goods_sub]);
@@ -2332,9 +2332,9 @@ class prd01Controller extends Controller
 				$user	= Auth('head')->user();
 				$id		= Auth('head')->user()->id;
 				$name	= Auth('head')->user()->name;
-				
+
 				if($is_option_use == 'N') {
-					// 기본 옵션 등록		
+					// 기본 옵션 등록
 					$sql = "  -- [".$user->com_id."] ". __FILE__ ." > ". __FUNCTION__ ." > ". __LINE__ ."
 						insert into goods_option (
 							goods_no, goods_sub, type, name, required_yn, use_yn, seq, option_no, rt, ut
@@ -2402,7 +2402,7 @@ class prd01Controller extends Controller
 
 			$sql = "
 				select name
-				from goods_option 
+				from goods_option
 				where goods_no = :goods_no and use_yn = 'Y' and type = 'basic'
 				order by no
 			";
@@ -2413,7 +2413,7 @@ class prd01Controller extends Controller
 
 				$sql = "
 					select goods_opt, opt_name, goods_no
-					from goods_summary 
+					from goods_summary
 					where goods_no = :goods_no and use_yn = 'Y'
 					order by seq
 				";
@@ -2424,7 +2424,7 @@ class prd01Controller extends Controller
 
 				$sql = "
 					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
-					from goods_summary 
+					from goods_summary
 					where goods_no = :goods_no and use_yn = 'Y'
 					order by seq
 				";
@@ -2436,7 +2436,7 @@ class prd01Controller extends Controller
 		} catch(Exception $e) {
 			$code = 500;
 		}
-		
+
 		return response()->json([
 			"code" => $code,
 			"head" => array(
@@ -2457,14 +2457,14 @@ class prd01Controller extends Controller
 		$grouped = $collection->mapToGroups(function($item, $key) {
 			return [$item['opt_name'] => $item['goods_opt']];
 		});
-		
+
 		$keys = $grouped->keys()->all();
-		
+
 		/**
 		 * 전달받은 옵션구분 항목이 1개인 경우
 		 */
 		if (count($keys) == 1) {
-			
+
 			$opt_kind_names = [];
 			$sql =
 				" select `name` from goods_option where goods_no = :goods_no and `type` = 'basic' order by seq";
@@ -2508,10 +2508,10 @@ class prd01Controller extends Controller
 					$arr = $item->all();
 					return $arr;
 				})->all();
-		
+
 				$opt1 = $arr[$opt_kind_names[0]];
 				$opt2 = $arr[$opt_kind_names[1]];
-		
+
 				$goods_opts = [];
 				foreach ($opt1 as $opt1_val) {
 					foreach ($opt2 as $opt2_val) {
@@ -2548,9 +2548,9 @@ class prd01Controller extends Controller
 				DB::delete($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
 				for ($i=0; $i<count($goods_opts); $i++) {
 					$goods_opt = $goods_opts[$i];
-					$sql = " 
-						insert into goods_summary 
-							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq) 
+					$sql = "
+						insert into goods_summary
+							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
 						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $i)
 					";
 					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
@@ -2609,9 +2609,9 @@ class prd01Controller extends Controller
 				DB::delete($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
 				for ($i=0; $i<count($goods_opts); $i++) {
 					$goods_opt = $goods_opts[$i];
-					$sql = " 
-						insert into goods_summary 
-							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq) 
+					$sql = "
+						insert into goods_summary
+							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
 						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $i)
 					";
 					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
@@ -2628,7 +2628,7 @@ class prd01Controller extends Controller
 			return response()->json(['code' => $code, 'msg' => $msg], $code);
 
 		}
-		
+
 	}
 
 	// 옵션 품목 삭제 ( 유형 - 기본 )
@@ -2677,9 +2677,9 @@ class prd01Controller extends Controller
 			array_push($opt_kind_names, $name);
 		}
 
-		$sql = 
+		$sql =
 			" select distinct(substring_index(goods_opt, '^', :index)) as opt_nm from goods_summary where goods_no = :goods_no and use_yn = 'Y' order by seq";
-	
+
 		if ($opt_kind_cnt > 0) {
 			$opt['opt1'] = DB::select($sql,['goods_no' => $goods_no, 'index' => 1]);
 			if ($opt_kind_cnt == 2) $opt['opt2'] = DB::select($sql,['goods_no' => $goods_no, 'index' => -1]);
@@ -2695,19 +2695,27 @@ class prd01Controller extends Controller
 			foreach ($data as $item) {
 				$opt_price = $item["opt_price"];
 				$opt_memo = $item["opt_memo"] ? $item["opt_memo"] : "";
-				$good_qty = $item["good_qty"];
+                $wqty = $item["wqty"] ?? 0;
+				$good_qty = $item["good_qty"] ?? 0;
 				$goods_opt = $item["goods_opt"];
+
 				$sql = "
 					update goods_summary set
-					opt_price = :opt_price, opt_memo = :opt_memo,
-					good_qty = :good_qty
+                        opt_price = :opt_price
+                        , opt_memo = :opt_memo
+                        , good_qty = :good_qty
+                        , wqty = :wqty
 					where goods_no = :goods_no
-					and goods_sub = '0'
-					and goods_opt = :goods_opt
-				";
+                        and goods_sub = '0'
+                        and goods_opt = :goods_opt
+                ";
 				DB::update($sql, [
-					'opt_price' => $opt_price, 'opt_memo' => $opt_memo, 'good_qty' => $good_qty,
-					'goods_no' => $goods_no, 'goods_opt' => $goods_opt
+					'opt_price'     => $opt_price
+                    , 'opt_memo'    => $opt_memo
+                    , 'wqty'        => $wqty
+                    , 'good_qty'    => $good_qty
+					, 'goods_no'    => $goods_no
+                    , 'goods_opt'   => $goods_opt
 				]);
 			}
 			DB::commit();
@@ -2723,7 +2731,7 @@ class prd01Controller extends Controller
 		$is_single = false;
 		$sql = "
 			select name
-			from goods_option 
+			from goods_option
 			where goods_no = :goods_no and use_yn = 'Y' and type = 'basic'
 			order by no
 		";
@@ -2739,7 +2747,7 @@ class prd01Controller extends Controller
 
 		$sql = "
 			select *
-			from options 
+			from options
 			where option_no = :option_no
 			order by seq
 		";
@@ -2776,7 +2784,7 @@ class prd01Controller extends Controller
 						where option_no = :option_no and name = :name and `option` = :option
 					";
 					$result = DB::selectOne($sql, ["option_no" => $option_no, 'name' => $name, 'option' => $option]);
-					
+
 					if ($result->count < 1) {
 						$arr = $data[$i];
 						DB::table("options")->insert([
@@ -2793,7 +2801,7 @@ class prd01Controller extends Controller
 							'ut' => DB::raw("now()")
 						]);
 					}
-					
+
 				}
 			});
 		} catch(Exception $e){
@@ -2849,7 +2857,7 @@ class prd01Controller extends Controller
 
 				$jaego = new Jaego($user); // 재고 클래스 호출
 				$jaego->SetLoc($loc);
-				
+
 				foreach ($data as $row) {
 					$qty = $row['qty'];
 					$opt = $row['opt'];
@@ -2871,7 +2879,7 @@ class prd01Controller extends Controller
 						"opt_name"	=>  $opt_name,
 						"wonga_apply_yn" => "Y"
 					));
-		
+
 					if (!$check) {
 						return response()->json(['code'	=> '-1', 'cfg_domain' => $cfg_domain]);
 					}
@@ -2999,10 +3007,10 @@ class prd01Controller extends Controller
 							and brand = :brand and com_id = :com_id and opt_kind_cd = :opt_kind_cd and rep_cat_cd = :rep_cat_cd
 					";
 					$row = DB::selectOne($sql, [
-						'goods_no' => $s_goods_no, 
-						'goods_sub' => $s_goods_sub, 
-						'brand' => $brand, 
-						'com_id' => $com_id, 
+						'goods_no' => $s_goods_no,
+						'goods_sub' => $s_goods_sub,
+						'brand' => $brand,
+						'com_id' => $com_id,
 						'opt_kind_cd' => $opt_kind_cd,
 						'rep_cat_cd' => $rep_cat_cd,
 					]);
@@ -3087,8 +3095,8 @@ class prd01Controller extends Controller
 
 				// goods_similar에서 해당 상품 삭제
 				$sql = "
-					delete 
-					from goods_similar 
+					delete
+					from goods_similar
 					where goods_no = :goods_no and similar_no = :similar_no and goods_sub = :goods_sub
 				";
 				DB::delete($sql, ['goods_no' => $s_goods_no, 'similar_no' => $s_similar_no, 'goods_sub' => $s_goods_sub]);
@@ -3118,7 +3126,7 @@ class prd01Controller extends Controller
 
 					if($chg_similar_no > 0) {
 						$sql = "
-							update goods_similar gs 
+							update goods_similar gs
 								inner join goods g on g.goods_no = gs.goods_no and g.goods_sub = gs.goods_sub set
 									gs.similar_no = '$chg_similar_no',
 									g.similar_no = '$chg_similar_no'
@@ -3156,7 +3164,7 @@ class prd01Controller extends Controller
 		$row = DB::selectOne($sql, ['goods_no' => $goods_no]);
 		$goods_sub = $row->goods_sub;
 		$cont = $row->cont;
-		
+
 		$values = [
 			'goods_no' => $goods_no,
 			'goods_sub' => $goods_sub,
@@ -3241,7 +3249,7 @@ class prd01Controller extends Controller
 			where goods_no = :goods_no and goods_sub = :goods_sub and sale_place = :sale_place
 		";
 		$row = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_sub' => $goods_sub, 'sale_place' => $sale_place]);
-		
+
 		return $row;
 	}
 
@@ -3317,7 +3325,7 @@ class prd01Controller extends Controller
                     WHERE goods_no = :goods_no
                 ";
                 DB::delete($sql, ['goods_no' => $goods_no]);
-                
+
             } else if ( $related_cfg == "G" ) { // 개별 상품 설정
 
                 // 관련상품 등록
@@ -3346,7 +3354,7 @@ class prd01Controller extends Controller
                                 'r_goods_sub' => $r_goods_sub
                             ]);
                             $goods->SetGoodsNo($r_goods_no); // 현재 서비스에서 sub 번호 필요없으므로 이 메서드로 대체
-                            
+
                             // 관련상품 설정 업데이트
                             $goods->Edit( $goods_no , array("related_cfg" => $related_cfg) );
                         }
@@ -3361,10 +3369,10 @@ class prd01Controller extends Controller
 
                     for( $i = 0; $i < count($a_goods); $i++ ){
                         list($goods_no, $goods_sub) = explode("|", $a_goods[$i]);
-                        for ( $j = 0; $j < count($a_cross); $j++ ) { 
+                        for ( $j = 0; $j < count($a_cross); $j++ ) {
                             list($r_goods_no, $r_goods_sub) = explode("|", $a_cross[$j]);
                             if ( $goods_no != $r_goods_no) { // 등록여부 확인
-                                $sql = "SELECT count(*) AS cnt FROM goods_related 
+                                $sql = "SELECT count(*) AS cnt FROM goods_related
                                     WHERE goods_no = '$goods_no' AND goods_sub = '$goods_sub' AND r_goods_no = '$r_goods_no' AND r_goods_sub = '$r_goods_sub' ";
                                 $row = DB::selectOne($sql);
                                 $count = $row->cnt;
@@ -3408,7 +3416,7 @@ class prd01Controller extends Controller
         $goods_sub = $request->input("goods_sub");
         $r_goods_no = $request->input("r_goods_no");
         $r_goods_sub = $request->input("r_goods_sub");
-        
+
         try {
             $sql = "DELETE FROM goods_related
                 WHERE goods_no = :goods_no AND goods_sub = :goods_sub

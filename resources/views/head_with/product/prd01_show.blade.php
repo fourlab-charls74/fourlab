@@ -2459,10 +2459,14 @@
         return [
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, cellClass: "locked-cell", checkboxSelection: true, width: 30, pinned: 'left', sort: null },
             { field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, pinned: 'left', suppressMovable: true },
-            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true, cellClassRules: optCellClassRules },
-            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, cellClassRules: optCellClassRules },
-            { field: "wqty", headerName: "보유재고", width:80, type: 'numberType', editable: true },
-            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true, cellClassRules: optCellClassRules }
+            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true},
+            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true,
+                cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data.good_qty_chg_yn === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data.good_qty_chg_yn === 'Y' ? 'bold' : 'normal'})
+            },
+            { field: "wqty", headerName: "보유재고", width:80, type: 'numberType', editable: true,
+                cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data.wqty_chg_yn === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data.wqty_chg_yn === 'Y' ? 'bold' : 'normal'})
+            },
+            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true}
         ];
     };
 
@@ -2499,10 +2503,13 @@
             headerName: name,
             field: name,
             children: [
-                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW,
-                    suppressMovable: true, cellClassRules: optCellClassRules
+                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, suppressMovable: true,
+                    cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data[`${name}_good_qty_chg_yn`] === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data[`${name}_good_qty_chg_yn`] === 'Y' ? 'bold' : 'normal'})
                 },
-                {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
+                // {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
+                {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, editable: true, suppressMovable: true,
+                    cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data[`${name}_wqty_chg_yn`] === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data[`${name}_wqty_chg_yn`] === 'Y' ? 'bold' : 'normal'})
+                },
             ],
             headerGroupComponent: columnOptDelete
         };
@@ -2631,20 +2638,39 @@
                 // 온라인 재고인 경우 유효성 검사
                 let regExp = /.+(?=_good_qty)/i;
                 let arr = column_name.match(regExp);
-                if (arr) {
+                regExp = /.+(?=_wqty)/i;
+                let arr2 = column_name.match(regExp);
+                if (arr || arr2) {
                     if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
                         alert("숫자만 입력가능합니다.");
                         gx2StartEditingCell(row_index, column_name);
                         return false;
+                    } else {
+                        if (arr) {
+                            params.data[column_name + '_chg_yn'] = 'Y';
+                            params.api.redrawRows({ rowNodes: [params.node] });
+                            gx2.setFocusedWorkingCell();
+                        } else if (arr2) {
+                            let opt_nm = column_name.split('_wqty')[0];
+                            params.data[opt_nm + '_good_qty'] = (isNaN(params.data[opt_nm + '_good_qty'] * 1) ? 0 : params.data[opt_nm + '_good_qty'] * 1) + (params.newValue - params.oldValue);
+                            params.data[[opt_nm + '_good_qty_chg_yn']] = 'Y';
+                            params.data[column_name + '_chg_yn'] = 'Y';
+                            params.api.redrawRows({ rowNodes: [params.node] });
+                            gx2.setFocusedWorkingCell();
+                        }
                     }
                 }
             }
 
             // 단일 옵션 - 온라인 재고인 경우
-            if (column_name == "qty") {
+            if (column_name == "good_qty") {
                 if (isNaN(value) == true || value == "") {
                     alert("숫자만 입력가능합니다.");
                     gx2StartEditingCell(row_index, column_name);
+                } else {
+                    params.data.good_qty_chg_yn = 'Y';
+                    params.api.redrawRows({ rowNodes: [params.node] });
+                    gx2.setFocusedWorkingCell();
                 }
             }
 
@@ -2653,6 +2679,12 @@
                 if (isNaN(value) == true || value == "") {
                     alert("숫자만 입력가능합니다.");
                     gx2StartEditingCell(row_index, column_name);
+                } else {
+                    params.data.good_qty = params.data.good_qty * 1 + (params.newValue - params.oldValue);
+                    params.data.good_qty_chg_yn = 'Y';
+                    params.data.wqty_chg_yn = 'Y';
+                    params.api.redrawRows({ rowNodes: [params.node] });
+                    gx2.setFocusedWorkingCell();
                 }
             }
 
@@ -3120,7 +3152,7 @@
                 keys.reduce((prev, key) => {
 
                     let obj = {};
-                    let { opt1, opt2, goods_opt, good_qty, opt_price, opt_memo } = prev;
+                    let { opt1, opt2, goods_opt, good_qty, wqty, opt_price, opt_memo } = prev;
                     obj.opt1 = opt1;
                     obj.opt_price = opt_price;
                     obj.opt_memo = opt_memo;
@@ -3143,6 +3175,13 @@
                         obj.good_qty = parseInt(row[`${arr_2[0]}_good_qty`]);
                     }
 
+                    obj.wqty = wqty;
+                    regExp = /.+(?=_wqty)/i;
+                    arr_2 = key.match(regExp);
+                    if (arr_2) {
+                        obj.wqty = parseInt(row[`${arr_2[0]}_wqty`]);
+                    }
+
                     // 루프돌면서 백앤드에서 사용하는 형식에 맞는 goods_opt 만들었으면 data에 push함
                     if (obj?.goods_opt) {
                         data.push(obj);
@@ -3151,10 +3190,9 @@
 
                     return obj;
 
-                }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
+                }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, wqty: 0, opt_price: opt_price, opt_memo: opt_memo });
 
             });
-
         }
 
         const response = await axios({ url: `/head/product/prd01/${goods_no}/update-basic-opts-data`,
