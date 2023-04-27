@@ -80,9 +80,10 @@
 
 <script>
     const columns = [
-        {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
-        {field:"goods_opt",headerName:"옵션"},
-        {field:"qty",headerName:"입고수량", editable: true,cellStyle :{ 'background' : '#ffff99', 'text-align' : 'right' } }
+        { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null },
+        { field: "goods_opt", headerName: "옵션", width: 300 },
+        { field: "qty", headerName: "입고수량", editable: true, cellStyle: { 'background': '#ffff99', 'text-align': 'right' } },
+        { width: "auto" }
     ];
 
     const pApp = new App('', { gridId: "#grid" });
@@ -109,6 +110,8 @@
         e.preventDefault();
         const rows = gx.getSelectedRows();
         const rowCount = rows.length;
+        
+        if (rowCount < 1) return alert("입고처리할 옵션을 선택해주세요.");
 
         rows.forEach(function(data, idx) {
             data.stock_date = $('#stock_date').val();
@@ -117,16 +120,18 @@
             $.ajax({
                 async: true,
                 type: 'put',
-                url: `/partner/product/prd01/${goods_no}/in-qty`,
+                url: `/head/product/prd01/${goods_no}/in-qty`,
                 data: data,
                 success: function (res) {
                   if (rowCount - 1 === idx) {
                     alert("변경된 내용이 정상적으로 저장 되었습니다.");
                     opener.location.reload();
+                    window.close();
                   }
                 },
                 error: function(xhr, status, error) {
                     console.log(xhr.responseText);
+                    alert("송장번호를 확인해주세요.");
                 }
             });
         });

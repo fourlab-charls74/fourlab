@@ -2056,7 +2056,8 @@
         }
 
 
-        $(".btn-change-qty").click(function(){
+        $(".btn-change-qty").click(function(e) {
+            e.preventDefault();
             const qty = $('[name=goods_qty]').val();
 
             if (isNaN(qty * 1)) {
@@ -2080,7 +2081,8 @@
         });
 
         $('.btn-qty-in').click(function(){
-            window.open("/head/product/prd01/"+goods_no+"/in-qty","_blank", "Product Detail");
+            var url = "/head/product/prd01/" + goods_no + "/in-qty";
+            window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
         });
 
         //상품정보고시 카드가 나올경우만 실행
@@ -3012,6 +3014,7 @@
                 if(res.code === 200) {
                     searchOptKind();
                     initOptGridAndApi();
+                    $("#goods_qty").val(0);
                 }
                 else alert(res.msg);
             },

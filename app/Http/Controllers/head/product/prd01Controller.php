@@ -769,15 +769,16 @@ class prd01Controller extends Controller
     }
 
     public function options($no, Request $req) {
-        $sql = "  -- [".Auth('partner')->user()->com_id."] ". __FILE__ ." > ". __FUNCTION__ ." > ". __LINE__ ."
+        $sql = "
             select a.goods_no, a.goods_sub, a.goods_opt, 0 as qty
-             from goods_summary a
-            where a.goods_no = '$no' and a.goods_sub = '$req->goods_sub'
-              and a.use_yn = 'Y'
+            from goods_summary as a
+            where a.goods_no = :goods_no
+                and a.goods_sub = :goods_sub
+                and a.use_yn = 'Y'
             order by a.seq
         ";
 
-        $result = DB::select($sql);
+        $result = DB::select($sql, [ 'goods_no' => $no, 'goods_sub' => $req->goods_sub ]);
 
         return response()->json([
             "code" => 200,

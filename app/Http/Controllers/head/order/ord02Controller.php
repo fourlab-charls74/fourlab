@@ -20,7 +20,7 @@ class ord02Controller extends Controller
     {
 
         $mutable = now();
-        $sdate = $mutable->sub(3, 'month')->format('Y-m-d');
+        $sdate = $mutable->sub(3, 'day')->format('Y-m-d');
 
         $values = [
             'sdate' => $sdate,
