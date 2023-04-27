@@ -313,7 +313,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="tab-goods" data-toggle="tab" href="#tab-goods-body" role="tab" aria-controls="goods" aria-selected="true">상품</button>
                             </li>
-                            <li class="nav-item" role="presentation" id="tab_category" style="display:none">
+                            <li class="nav-item" role="presentation" id="tab_category" style="display:{{ (@$plan->folder_cnt >= 1) ? "" : "none" }}">
                                 <button class="nav-link" id="tab-category" data-toggle="tab" href="#tab-category-body" role="tab" aria-controls="category" aria-selected="true">카테고리</button>
                             </li>
                         </ul>
@@ -360,7 +360,7 @@
                                                             <option value='A' @if(@$category->tpl_kind == 'A') selected @endif>A 타임 (이미지 사이즈 140X140,한줄 5개)</option>
                                                             <option value='B' @if(@$category->tpl_kind == 'B') selected @endif>B 타임 (이미지 사이즈 180X180,한줄 4개)</option>
                                                             <option value='C' @if(@$category->tpl_kind == 'C') selected @endif>C 타임 (이미지 사이즈 250X250,한줄 3개)</option>
-                                                            <option value='D' @if(@$category->tpl_kind == 'D') selected @endif>D 타임 (이미지 사이즈 400X400,한줄 2개)</option>
+                                                            <option value='D' @if(@$category->tpl_kind == 'D') selected @endif>D 타임 (이미지 사이즈 400X400,한줄 2개) </option>
                                                             <option value='E' @if(@$category->tpl_kind == 'E') selected @endif>E 타임 (이미지 사이즈 400X400,한줄 2개,최근상품평)</option>
                                                         </select>
                                                     </div>
@@ -571,6 +571,11 @@
                 }
 
                 $("#folder_cnt").click(function () {
+                    if ($('#folder_cnt').is(":checked") === true) {
+                    } else {
+                        $('#tab-goods').trigger("click");
+
+                    }
                     $("#folder_category").toggle();
                     $("#tab_category").toggle();
 
@@ -591,12 +596,6 @@
             var url = "/app/planning/views/" + p_no +  "/" + no;
             obj.value = obj.value + "<a href='" + url + "'></a>";
         };
-
-        function is_checked() {
-            const checkbox = document.getElementById('folder_cnt');
-        }
-
-        
 
     </script>
 

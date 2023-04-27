@@ -385,18 +385,20 @@
 
             var d_cat_cd = '{{ @$plan->p_no }}';
 
+            console.log(d_cat_cd);
+
             $.ajax({
                 method: 'get',
                 url: '/head/product/prd12/' + code + '/search_category',
                 data: {'d_cat_cd': d_cat_cd},
                 dataType: 'json',
                 success: function (res) {
-                    // console.log(res);
-                    if(res.code == '200'){
-                        $('#header_html').val(res.body.header_html);
-                        $('#sale_amt').val(res.body.sale_amt);
-                        $('#sale_kind').val(res.body.sale_kind);
-                        $('#tpl_kind').val(res.body.tpl_kind);
+                    console.log(res);
+                    if(res.code == 200){
+                        // $('#header_html').val(res.body.header_html);
+                        // $('#sale_amt').val(res.body.sale_amt);
+                        // $('#sale_kind').val(res.body.sale_kind);
+                        // $('#tpl_kind').val(res.body.tpl_kind);
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
@@ -426,6 +428,8 @@
                     // console.log(res);
                     if(res.code == '200'){
                         alert("정상적으로 변경 되었습니다.");
+                        window.close();
+                        opener.Search();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }

@@ -89,12 +89,13 @@ class prd12Controller extends Controller
             $sql = /** @lang text */
                 "
                 select
-                    c.d_cat_cd,c.tpl_kind,c.header_html,c.sale_yn,c.sale_amt,c.sale_ratio
+                    c.d_cat_cd,c.tpl_kind,c.header_html,c.sale_yn,c.sale_amt,c.sale_ratio, c.sale_kind
                 from category c
                 where c.cat_type = 'PLAN' and c.p_d_cat_cd = :p_d_cat_cd
                 order by c.seq, c.d_cat_cd limit 0,1
             ";
             $category = DB::selectone($sql,array("p_d_cat_cd" => $plan->p_no));
+
         }
 
         $user = [
@@ -102,14 +103,14 @@ class prd12Controller extends Controller
             'name'	=> Auth('head')->user()->name
         ];
         $d_cat_cd = $plan->d_cat_cd;
-        $category = new Category($user, "DISPLAY");
+        $category2 = new Category($user, "DISPLAY");
 		$categories = array();
 		if ($d_cat_cd != "") {
 			$d_cat_cd = substr($d_cat_cd, 1);
 			$d_cat_cds = explode("s", $d_cat_cd);
 			for($i=0;$i<sizeof($d_cat_cds);$i++){
 				if(!empty($d_cat_cds[$i])){
-					$categories[$d_cat_cds[$i]] = $category->Location($d_cat_cds[$i]);
+					$categories[$d_cat_cds[$i]] = $category2->Location($d_cat_cds[$i]);
 				}
 			}
 		}
@@ -123,6 +124,7 @@ class prd12Controller extends Controller
             'code' => $code,
             'plan' => $plan,
             'category' => $category,
+            'category2' => $category2,
             'd_category' => $categories,
             'is_shows' => SLib::getCodes('IS_SHOW'),
             'plan_types' => SLib::getCodes('G_PLAN_TYPE'),

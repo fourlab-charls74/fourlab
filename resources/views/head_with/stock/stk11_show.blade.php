@@ -450,7 +450,7 @@
                         success: function (res) {
                             let options = [];
                             for (var j = 0; j < res.options.length; j++) {
-                                if (res.options[j].qty > 0) {
+                                if (res.options[j].qty >= 0) {
                                     options.push(res.options[j].goods_opt);
                                     _goods_options[goods_no] = options;
                                 }
@@ -521,7 +521,30 @@
 
     var goodsCallback = (row) => {
         addRow(row);
+
+        let goods_no = row.goods_no;
+
+        $.ajax({
+                type: "get",
+                url: '/head/product/prd01/' + goods_no + '/get',
+                contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                dataType: 'json',
+                success: function (res) {
+                    let options = [];
+                    for (var j = 0; j < res.options.length; j++) {
+                        if (res.options[j].qty >= 0) {
+                            options.push(res.options[j].goods_opt);
+                            _goods_options[goods_no] = options;
+                        }
+                    }
+                },
+                error: function (e) {
+                    console.log(e.responseText);
+                }
+            });
+
     };
+
     var multiGoodsCallback = (rows) => {
         if (rows && Array.isArray(rows)) rows.map(row => addRow(row));
         let goods_nos = rows.map(r => r.goods_no);
@@ -536,7 +559,7 @@
                 success: function (res) {
                     let options = [];
                     for (var j = 0; j < res.options.length; j++) {
-                        if (res.options[j].qty > 0) {
+                        if (res.options[j].qty >= 0) {
                             options.push(res.options[j].goods_opt);
                             _goods_options[goods_no] = options;
                         }
