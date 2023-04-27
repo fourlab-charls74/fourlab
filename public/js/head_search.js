@@ -438,6 +438,50 @@ $( document ).ready(function() {
         }
     });
 
+    /**
+     * 
+     * 공급업체 자동완성 부분
+     * 
+     */
+    $('.select2-sup_company').select2({
+        ajax: {
+            url: "/head/auto-complete/sup_company",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    type:'select2',
+                    keyword: params.term, // search term
+                    page: params.page
+                };
+            },
+            cache: true
+        },
+        width:'100%',
+        placeholder: '',
+        allowClear: true,
+        minimumInputLength: 1,
+        templateResult: function (state) {
+            if (!state.id) {
+                return state.text;
+            }
+
+            var $state = $(
+                '<span>' + '[' + state.id +  '] ' + state.text + '</span>'
+            );
+            return $state;
+        },
+        //templateSelection: formatRepoSelection,
+        language: {
+            // You can find all of the options in the language files provided in the
+            // build. They all must be functions that return the string that should be
+            // displayed.
+            inputTooShort: function () {
+                return "한글자 이상 입력해 주세요.";
+            }
+        }
+    });
+
     $(".select2-user_group").select2();
 
     $( ".sch-brand" ).click(function() {
@@ -839,7 +883,11 @@ SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, bae
 			$('#com_cd').val(null);
 			const option = new Option(name, code, true, true);
 			$('#com_cd').append(option).trigger('change');
-		}
+		} else if ($('#com_cd.select2-sup_company').length > 0) {
+            $('#com_cd').val(null);
+			const option = new Option(name, code, true, true);
+			$('#com_cd').append(option).trigger('change');
+        }
 		else
 		{
             if( $('#com_cd').length > 0 )

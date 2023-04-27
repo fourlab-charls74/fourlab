@@ -410,7 +410,7 @@ class stk10Controller extends Controller
 		$brand_nm = $request->input("brand_nm");
 		$brand_cd = $request->input("brand_cd");
 		$com_type = $request->input("com_type");
-		$com_id = $request->input("com_id");
+		$com_id = $request->input("com_cd");
 		$style_no = $request->input("style_no");
 		$style_nos = $request->input("style_nos");
 		$goods_stat = $request->input("goods_stat");

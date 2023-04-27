@@ -79,9 +79,8 @@
                                 <div class="form-inline inline_select_box">
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_cd" name="com_cd">
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-all search-enter" style="width:100%;">
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                            <select id="com_cd" name="com_cd" class="form-control form-control-sm select2-sup_company"></select>
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
                                 </div>

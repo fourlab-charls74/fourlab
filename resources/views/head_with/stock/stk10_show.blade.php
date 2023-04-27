@@ -87,7 +87,12 @@
                             <div class="form-group">
                                 <label for="style_no">스타일넘버</label>
                                 <div class="flax_box">
-                                    <input type="text" class="form-control form-control-sm search-all ac-style-no search-enter" name="style_no" value="">
+                                    <div class="form-inline-inner input-box w-100">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type="text" class="form-control form-control-sm search-all search-enter ac-style-no w-100" name="style_no" value="">
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-style_nos"><i class="bx bx-plus fs-16"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -117,8 +122,7 @@
                                     </div>
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_id" name="com_id">
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-enter" style="width:100%;">
+                                            <select id="com_cd" name="com_cd" class="form-control form-control-sm select2-company"></select>
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>

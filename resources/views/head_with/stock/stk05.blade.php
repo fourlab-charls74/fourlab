@@ -66,15 +66,10 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="brand_nm">브랜드</label>
-                                <div class="form-inline">
-                                    <div class="inbox" style="width:50%;">
-                                        <div class="form-inline inline_btn_box">
-                                            <input type="text" class="form-control form-control-sm search-all sch-brand" name="brand_nm" id="brand_nm" value="" style="width:100%;">
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-brand" onclick="PopSearchBrand('search');"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                        </div>
-                                    </div>
-                                    <input type="text" id="brand_cd" name="brand_cd" class="form-control form-control-sm" readonly style="width:calc(50% - 10px);margin-left:10px;">
+                                <label for="brand_cd">브랜드</label>
+                                <div class="form-inline inline_btn_box">
+                                    <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
                         </div>

@@ -17,7 +17,7 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" id="search_sbtn" onclick="Search();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
         			<div id="search-btn-collapse" class="btn-group mr-2 mb-0 mb-sm-0"></div>
                 </div>
 			</div>
@@ -28,7 +28,7 @@
 						<div class="form-group">
 							<label for="">주문일자 :</label>
 							<div class="form-inline inline_input_box">
-								<select name="date_type" id="date_type" class="form-control form-control-sm" style="width:auto;">
+								<select name="date_type" id="date_type" class="form-control form-control-sm" style="width:100%;">
 									<option value="1d">전일</option>
 									<option value="1w">최근1주</option>
 									<option value="2w">최근2주</option>
@@ -44,7 +44,7 @@
 						<div class="form-group">
 							<label for="ord_no">성별 :</label>
 							<div class="flax_box">
-								<select name="s_sex" id="s_sex" class="form-control form-control-sm" style="width: 70px">
+								<select name="s_sex" id="s_sex" class="form-control form-control-sm" style="width: 100%">
 									<option value="">전체</option>
 									@foreach($sex_types as $sex_type)
 										<option value="{{ $sex_type->code_id }}">{{ $sex_type->code_val }}</option>
@@ -58,7 +58,7 @@
 						<div class="form-group">
 							<label for="user_nm">상품상태 :</label>
 							<div class="flax_box">
-								<select name="goods_stat" id="goods_stat" class="form-control form-control-sm" style="width:auto;">
+								<select name="goods_stat" id="goods_stat" class="form-control form-control-sm" style="width:100%;">
 									<option value="">전체</option>
 									@foreach($goods_stats as $goods_stat)
 										<option value="{{ $goods_stat->code_id }}">{{ $goods_stat->code_val }}</option>
@@ -76,7 +76,7 @@
 						<div class="form-group">
 							<label for="">품목 :</label>
 							<div class="form-inline inline_input_box">
-								<select name="opt_kind_cd" id="opt_kind_cd" class="form-control form-control-sm" style="width:auto;">
+								<select name="opt_kind_cd" id="opt_kind_cd" class="form-control form-control-sm" style="width:100%;">
                                     <option value="">전체</option>
                                     @foreach($opt_kind_cd_items as $opt_kind_cd)
                                         <option value="{{ $opt_kind_cd->id }}">{{$opt_kind_cd->val}}</option>
@@ -88,29 +88,29 @@
 					</div>
 
 					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="ord_no">브랜드 :</label>
-							<div class="flax_box">
-								<input type=text class='form-control form-control-sm search-all search-enter ac-brand2' name='brand_nm' id='brand_nm' value='' style='width:130px;' autocomplete='off' >
-								<a href="#" class="btn btn-sm btn-secondary brand-add-btn">...</a>
-
-								<!--<input type="button" name="brand_btn" class="brand-add-btn" value="..." onclick="PopSearchBrand('search');">-->
-								<input type=text class='form-control form-control-sm search-all search-enter' name='brand_cd' id='brand_cd' value='' style='width:60px;' readonly>
-							</div>
-						</div>
-					</div>
+                        <div class="form-group">
+                            <label for="brand_cd">브랜드 : </label>
+                            <div class="form-inline inline_btn_box">
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+                    </div>
 
 					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="user_nm">업체 :</label>
-							<div class="flax_box">
-								<input type=text  class="form-control form-control-sm search-all search-enter ac-company2" name='com_nm' id='com_nm' value='' style='width:100px;' autocomplete='off' >
-								<a href="#" class="btn btn-sm btn-secondary company-add-btn">...</a>
-								<!--<input type="button" name="btnSchCom" value="..." onclick="PopSearchCompany('PT=S&ISCLOSE=Y');">-->
-								<input type=text  class="form-control form-control-sm search-all search-enter" name='com_id' id='com_id' value='' style='width:60px;' readonly>
-							</div>
+                        <div class="form-group">
+							<label for="name">업체 : </label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_id" name="com_id">
+                                        <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company search-enter" style="width:100%;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
 						</div>
-					</div>
+                    </div>
 
 				</div>
 
@@ -143,7 +143,7 @@
 						<div class="form-group">
 							<label for="user_nm">출력 :</label>
 							<div class="flax_box">
-								<select  name="limit" class="form-control form-control-sm" style="width:auto;">
+								<select  name="limit" class="form-control form-control-sm" style="width:100%;">
 									<option value=100>100</option>
 									<option value=500>500</option>
 									<option value=1000>1000</option>

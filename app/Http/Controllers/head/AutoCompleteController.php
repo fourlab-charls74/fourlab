@@ -311,6 +311,54 @@ class AutoCompleteController extends Controller
 
     }
 
+    /**
+     * 공급업체 검색 부분
+     */
+    public function sup_company(Request $req) {
+        $type = $req->input('type', 'ac');
+		$keyword = $req->input('keyword', '');
+
+        if ($keyword == '') return '';
+
+        if($type == "select2"){
+            $sql = /** @lang text */
+            "
+                select a.com_id as id, ifnull(com_nm,'-') as text
+                from company a 
+                inner join code cd on cd.code_kind_cd = 'G_COM_TYPE' and cd.code_id = a.com_type
+                where a.use_yn = 'Y'
+                    and a.com_nm like '%$keyword%' 
+                    and a.com_type = '1'
+                order by a.com_type, a.com_nm
+            ";
+            $results =  DB::select($sql);
+
+            return response()->json([
+                "results" => $results
+            ]);
+
+        } else {
+            $where = "";
+            // if ($S_COM_TYPE != "")	$where .= "and a.com_type = '$com_type' ";
+            // if ($S_COM_ID != "")	$where .= "and a.com_id = '$com_id' ";
+            if ($keyword != "")	$where .= "and a.com_nm like '%$keyword%' ";
+            // if ($S_USE_YN != "")	$where .= "and a.use_yn = '$use_yn' ";
+
+            $sql = "
+                select a.com_id as id, ifnull(com_nm,'-') as label
+                  from company a 
+                 inner join code cd on cd.code_kind_cd = 'G_COM_TYPE' and cd.code_id = a.com_type
+                 where a.use_yn = 'Y'
+                       $where
+                       and a.com_type = '1'
+                 order by a.com_type, a.com_nm
+            ";
+
+            return DB::select($sql);
+        }
+
+    }
+
 	public function ad_type(Request $req){
 		$ad_type = $req->input('ad_type', '');
 
