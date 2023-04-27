@@ -546,8 +546,12 @@
 							send_sms_yn : $('#send_sms_yn:checked').val()
 						},
 						success: function (data) {
-							alert("출고완료 상태로 변경되었습니다.");
-							Search();
+                            if(data.code === 200) {
+                                alert("출고완료 상태로 변경되었습니다.");
+                                Search();
+                            } else if(data.code === 206) {
+                                alert(data.msg);
+                            }
 						},
 						error: function(request, status, error) {
 							const msg	= request.responseJSON.msg;

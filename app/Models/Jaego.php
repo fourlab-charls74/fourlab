@@ -30,8 +30,8 @@ class Jaego
     public function SetLoc($loc)
     {
         $this->loc = $loc;
-       
-        
+
+
     }
 
     public function Minus($stock)
@@ -61,7 +61,7 @@ class Jaego
 			from goods
 			where goods_no = '$goods_no' and goods_sub = '$goods_sub'
         ";
-        
+
         $row = DB::selectOne($sql);
         $com_id = $row->com_id;
         $com_type = $row->com_type;
@@ -165,7 +165,7 @@ class Jaego
               ";
             $rows = DB::select($sql);
 
-            if (count($rows) > 0) {
+            if (count($rows) < 1) {
                 // 차감할 보유재고가 없는 경우 온라인재고를 초기화하기 위해
                 if ($plus_qty > 0 && $type == 9) {
                     $this->__DecreaseSummaryQty($plus_qty);
@@ -212,8 +212,8 @@ class Jaego
                                   where goods_no = s.goods_no and goods_sub = s.goods_sub and goods_opt = s.goods_opt
                                 ),0) as qty
                           from goods_summary s
-                          where  s.goods_no = '$goods_no' 
-                            and s.goods_sub = '$goods_sub' 
+                          where  s.goods_no = '$goods_no'
+                            and s.goods_sub = '$goods_sub'
                             and s.goods_opt = '$goods_opt'
                         ";
 
@@ -228,22 +228,22 @@ class Jaego
                             "
                           select qty
                             from goods_location
-                            where goods_no = '$goods_no' 
-                              and goods_sub = '$goods_sub' 
-                              and goods_opt = '$goods_opt' 
-                              and loc = '$loc' 
+                            where goods_no = '$goods_no'
+                              and goods_sub = '$goods_sub'
+                              and goods_opt = '$goods_opt'
+                              and loc = '$loc'
                               and qty >= $stock_minus_qty
                         ";
                         $location = DB::selectOne($sql);
                         if ($location) {
                             $sql = /** @lang text */
                                 "
-                                update goods_location 
+                                update goods_location
                                     set qty = qty - $stock_minus_qty
                                       , ut = now()
-                                where goods_no = '$goods_no' 
-                                  and goods_sub = '$goods_sub' 
-                                  and goods_opt = '$goods_opt' 
+                                where goods_no = '$goods_no'
+                                  and goods_sub = '$goods_sub'
+                                  and goods_opt = '$goods_opt'
                                   and loc = '$loc'
                               ";
                             DB::update($sql);
@@ -313,7 +313,7 @@ class Jaego
                     "ord_no" => $ord_no,
                     "ord_opt_no" => $ord_opt_no
                 );
-                
+
                 $this->__InsertHistory($history);
 
                 array_push($stocks,
@@ -363,7 +363,7 @@ class Jaego
     private function __DecreaseSummaryQty($qty)
     {
         try {
-            return DB::update(" 
+            return DB::update("
         -- [" . $this->user["id"] . "] " . __FILE__ . " > " . __FUNCTION__ . " > " . __LINE__ . "
         update goods_summary set
           wqty = if( (wqty - $qty) < 0, 0, (wqty - $qty))
@@ -495,11 +495,11 @@ class Jaego
         if ($qty <= 0) return 0;
 
         $sql = "
-      update goods_summary 
-         set good_qty = good_qty - $qty 
+      update goods_summary
+         set good_qty = good_qty - $qty
            , ut = now()
-      where goods_no = '$goods_no' 
-        and goods_sub = '$goods_sub' 
+      where goods_no = '$goods_no'
+        and goods_sub = '$goods_sub'
         and goods_opt = '$goods_opt'
         and good_qty >= '$qty'
     ";
@@ -703,20 +703,20 @@ class Jaego
             $rows = DB::selectOne("
           select qty
             from goods_location
-          where goods_no = '$goods_no' 
-            and goods_sub = '$goods_sub' 
-            and goods_opt = '$goods_opt' 
+          where goods_no = '$goods_no'
+            and goods_sub = '$goods_sub'
+            and goods_opt = '$goods_opt'
             and loc = '$loc'
         ");
 
             if ($rows) {
                 DB::update("
-            update goods_location 
+            update goods_location
               set qty = qty + $qty
                 , ut = now()
-            where goods_no = '$goods_no' 
-              and goods_sub = '$goods_sub' 
-              and goods_opt = '$goods_opt' 
+            where goods_no = '$goods_no'
+              and goods_sub = '$goods_sub'
+              and goods_opt = '$goods_opt'
               and loc = '$loc'
           ");
             } else {
@@ -845,11 +845,11 @@ class Jaego
     public function PlusQty($goods_no, $goods_sub, $goods_opt, $qty)
     {
         $sql = "
-        update goods_summary 
-           set good_qty = good_qty + $qty 
+        update goods_summary
+           set good_qty = good_qty + $qty
              , ut = now()
-        where goods_no = '$goods_no' 
-          and goods_sub = '$goods_sub' 
+        where goods_no = '$goods_no'
+          and goods_sub = '$goods_sub'
           and goods_opt = '$goods_opt'
       ";
 
