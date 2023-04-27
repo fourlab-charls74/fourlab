@@ -2691,13 +2691,26 @@ class prd01Controller extends Controller
 	public function updateBasicOptsData(Request $request, $goods_no)
 	{
 		$data = $request->input("data", []);
+        $id = Auth('head')->user()->id;
+        $name = Auth('head')->user()->name;
+        $user = [
+            "id" => $id,
+            "name" => $name
+        ];
+
 		try {
+            $jaego = new Jaego($user);
+
 			foreach ($data as $item) {
 				$opt_price = $item["opt_price"];
 				$opt_memo = $item["opt_memo"] ? $item["opt_memo"] : "";
                 $wqty = $item["wqty"] ?? 0;
 				$good_qty = $item["good_qty"] ?? 0;
 				$goods_opt = $item["goods_opt"];
+
+                if ($jaego->isUnlimited($goods_no) == "N") {
+                    $jaego->SetStockQty($goods_no, 0, $goods_opt, $wqty, '상품옵션재고수정');
+                }
 
 				$sql = "
 					update goods_summary set

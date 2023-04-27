@@ -44,12 +44,12 @@ class ord02Controller extends Controller
     {
         $sql = /** @lang text */
             "
-            select 
+            select
                 concat(code_val,'_',ifnull(code_val2, '')) as 'name',
                 concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
-            from code 
+            from code
             where code_kind_cd ='BANK'
-                and code_id != 'K' 
+                and code_id != 'K'
                 and use_yn = 'Y'
             order by code_seq
         ";
@@ -71,8 +71,8 @@ class ord02Controller extends Controller
             'sale_places' => SLib::getSalePlaces(),
             'dlv_cds' => SLib::getCodes('DELIVERY'),
             'dlv_fee' => array(
-                'base_dlv_fee' => $conf->getConfigValue("delivery", "base_delivery_fee"), 
-                'add_dlv_fee' => $conf->getConfigValue("delivery", "add_delivery_fee"), 
+                'base_dlv_fee' => $conf->getConfigValue("delivery", "base_delivery_fee"),
+                'add_dlv_fee' => $conf->getConfigValue("delivery", "add_delivery_fee"),
                 'free_dlv_amt' => $conf->getConfigValue("delivery", "free_delivery_amt")
             ),
         ];
@@ -640,7 +640,7 @@ class ord02Controller extends Controller
 
         $tel = trim($tel);
 
-        if (strpos($tel, "-") === false) { 
+        if (strpos($tel, "-") === false) {
 
             $len = strlen($tel);
 
@@ -858,7 +858,7 @@ class ord02Controller extends Controller
             ################################
             $jaego = new Jaego($user);
 
-            for($i=0;$i<count($cart);$i++){
+            for ($i=0; $i < count($cart); $i++) {
 
                 $goods_no = $cart[$i]["goods_no"];
                 $goods_sub = Lib::getValue($cart[$i],"goods_sub",0);
@@ -901,7 +901,8 @@ class ord02Controller extends Controller
                     }
                 } else {
                     if ($qty > $good_qty) {
-                        throw new Exception("[$qty/$good_qty]  $goods_opt 재고가 부족하여 수기판매 처리를 할 수 없습니다");
+                        $goods_nm = $goods->goods_nm;
+                        throw new Exception("[재고부족] $goods_nm - $goods_opt 재고가 부족하여 수기판매 처리를 할 수 없습니다. (현재재고 : $good_qty)");
                     }
                 }
 
@@ -1218,12 +1219,10 @@ class ord02Controller extends Controller
                 ]);
         } catch (Exception $e) {
             DB::rollback();
-
-            echo $e->getTraceAsString();
-
             return response()->json([
                 "code" => 500,
-                "msg" => sprintf("[%s %d] %s",$e->getFile(),$e->getLine(),$e->getMessage())
+                "msg" => $e->getMessage(),
+                "error_msg" => sprintf("[%s %d] %s",$e->getFile(),$e->getLine(),$e->getMessage()),
             ],500);
         }
     }

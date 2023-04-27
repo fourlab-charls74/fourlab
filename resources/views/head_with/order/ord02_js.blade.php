@@ -186,7 +186,7 @@
             $("#add_goods").attr("disabled", true);
         }
     }
-    
+
     // com_type별 배송비합계 세팅
     function setDlvFeeOfComType() {
         let rows = gx.getRows();
@@ -658,7 +658,7 @@
             }
         })
         order_data["cart"] = rows;
-        
+
         $.ajax({
             async: true,
             dataType: "json",
@@ -676,6 +676,7 @@
                 var err = JSON.parse(e.responseText);
                 if(err.hasOwnProperty("code") && err.code == "500"){
                     alert(err.msg);
+                    console.log(err.error_msg);
                 }
             },
         });
@@ -819,9 +820,9 @@
 
     $("#point_amt").change(function() {
         var point = parseInt(this.value);
-        
+
         if(isNaN(point)) return this.value = 0;
-        
+
         this.value = point.toLocaleString("ko-KR");
         EditAmtTable();
     })
