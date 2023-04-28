@@ -1301,6 +1301,4 @@ var initSearch = (select2 = [], form_name = "search") => { // 검색 초기화 �
     select2.map(key => {
         if ($(key).length > 0) $(key).val("").trigger('change'); // 전달받은 select2 박스 초기화
     });
-
-
 };

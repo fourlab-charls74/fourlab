@@ -1323,3 +1323,24 @@ ControlOption.prototype.Delete = async function() {
 };
 
 let controlOption = new ControlOption();
+
+/**
+ * @param {Array} select2 초기화할 select2 css 선택자 이름 추가 - ex) ['.test_cd', '#test_cd']
+ * @param {String} form_name 초기화할 검색 폼 이름 - ex ) "search", "search2", "f1"
+ */
+var initSearch = (select2 = [], form_name = "search") => { // 검색 초기화 함수 추가    
+    document[form_name].reset();
+    /**
+     * 기본 초기화
+     */
+    if ($('#brand_cd').length > 0) $('#brand_cd').val("").trigger('change'); // 브랜드 select2 박스 초기화
+    if ($('#cat_cd').length > 0) $('#cat_cd').val("").trigger('change'); // 카테고리 select2 박스 초기화
+    if ($('#com_cd').length > 0) $('#com_cd').val("").trigger('change'); // 업체 select2 박스 초기화
+    if ($("#goods_stat[name='goods_stat[]']").length > 0) $('#goods_stat').val([]).trigger('change'); // 전시상태 select2 박스 초기화
+    /**
+     * 동적 초기화
+     */
+    select2.map(key => {
+        if ($(key).length > 0) $(key).val("").trigger('change'); // 전달받은 select2 박스 초기화
+    });
+};

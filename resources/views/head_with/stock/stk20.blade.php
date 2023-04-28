@@ -45,7 +45,8 @@
                     <h4>검색</h4>
                     <div>
                         <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 자료받기</a>
+                        <a href="#" onclick="initSearch();" class="btn btn-sm btn-outline-primary">검색조건 초기화</a>
+                        <a href="#" onclick="gx.Download();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 자료받기</a>
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
@@ -56,7 +57,7 @@
                                 <label for="">상품상태</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-75 pr-2">
-                                        <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                        <select name="goods_stat[]" id="goods_stat" class="form-control form-control-sm multi_select w-100" multiple>
                                             <option value=''>전체</option>
                                             @foreach ($goods_stats as $goods_stat)
                                                 <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
@@ -124,7 +125,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_stat">재고구분</label>
+                                <label>재고구분</label>
                                 <div class="flax_box">
                                     <select name='is_unlimited' class="form-control form-control-sm">
                                         <option value=''>전체</option>
@@ -137,7 +138,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_stat">보유재고수</label>
+                                <label>보유재고수</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
@@ -157,9 +158,9 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="goods_stat">품목</label>
+                                <label for="item">품목</label>
                                 <div class="flax_box">
-                                    <select name="item" class="form-control form-control-sm">
+                                    <select name="item" id="item" class="form-control form-control-sm">
                                         <option value="">전체</option>
                                         @foreach ($items as $item)
                                             <option value="{{ $item->cd }}">{{ $item->val }}</option>
