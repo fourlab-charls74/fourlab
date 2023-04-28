@@ -811,7 +811,7 @@
                         headerName: col_arr[i][1],
                         editable: true,
                         minWidth: cellWidth || 100,
-                        maxWidth: cellWidth || 100,
+                        maxWidth: 400,
                         lockPosition: true,
                         cellStyle: {'background' : '#ffff99', 'white-space': 'normal'},
                     };
