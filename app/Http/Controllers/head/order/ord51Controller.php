@@ -91,6 +91,8 @@ class ord51Controller extends Controller
 					inner join order_mst m on m.ord_no = o.ord_no
 					inner join order_track t on o.ord_no = t.ord_no
 					inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+					left outer join ad a on a.ad= t.ad
+					left outer join code e on e.code_id = a.type and e.code_kind_cd = 'G_AD_TYPE'
 				where 1=1 $where
 			";
 			$row = DB::select($sql);

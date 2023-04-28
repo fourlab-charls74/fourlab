@@ -54,7 +54,7 @@ class stk20Controller extends Controller
         $goods_no		= $request->input("goods_no");
         $item       	= $request->input("item");
         $com_type       = $request->input("com_type");
-        $com_id         = $request->input("com_id");
+        $com_id         = $request->input("com_cd");
         $brand_nm		= $request->input("brand_nm");
         $brand_cd		= $request->input("brand_cd");
         $goods_nm		= $request->input("goods_nm");

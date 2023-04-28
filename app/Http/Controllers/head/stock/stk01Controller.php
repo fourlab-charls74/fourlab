@@ -27,9 +27,9 @@ class stk01Controller extends Controller
 
     public function search(Request $request){
 
-        $page = $request->input('page',1);
+        $page = $request->input('page', 1);
         if ($page < 1 or $page == "") $page = 1;
-        $limit = $request->input('limit',100);
+        $limit = $request->input('limit', 100);
 
         $goods_stat	    = $request->input("goods_stat");
         $style_no		= $request->input("style_no");
@@ -86,7 +86,7 @@ class stk01Controller extends Controller
 
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
-        //$limit = " limit $startno, $page_size ";
+        $limit = " limit $startno, $page_size ";
 
         $total = 0;
         $page_cnt = 0;
@@ -105,11 +105,11 @@ class stk01Controller extends Controller
         }
 
 
-		if($limit == -1){
-			$limit = "";
-		} else {
-			$limit = " limit $startno, $page_size ";
-		}
+		// if($limit == -1){
+		// 	$limit = "";
+		// } else {
+		// 	$limit = " limit $startno, $page_size ";
+		// }
 
         $query = /** @lang text */
             "
@@ -133,7 +133,6 @@ class stk01Controller extends Controller
             from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
               inner join company c on c.com_id = g.com_id
             where 1=1 $where
-            $limit
           ) a
           left outer join brand b on a.brand = b.brand
           inner join opt o on a.opt_kind_cd = o.opt_kind_cd and o.opt_id = 'K'
@@ -141,6 +140,7 @@ class stk01Controller extends Controller
           inner join code cd2 on cd2.code_kind_cd = 'G_IS_UNLIMITED' and a.is_unlimited = cd2.code_id
           inner join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd3.code_id
           $str_order_by
+          $limit
         ";
         //echo "<pre>$query</pre>";
         $result = DB::select($query);

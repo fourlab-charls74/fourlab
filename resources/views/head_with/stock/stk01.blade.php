@@ -111,7 +111,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="search-area-ext d-none row">
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_stat">품목</label>
@@ -140,17 +140,17 @@
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
 										<select name="limit" class="form-control form-control-sm">
-											<option value="100">100</option>
-											<option value="500">500</option>
 											<option value="1000">1000</option>
 											<option value="2000">2000</option>
+											<option value="5000">5000</option>
+											<option value="10000">10000</option>
 											<option value=-1>모두</option>
 										</select>
 									</div>
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="a.goods_no" >상품번호</option>
+											<option value="a.goods_no" >온라인코드</option>
 											<option value="a.style_no" >스타일넘버</option>
 										</select>
 									</div>
@@ -230,7 +230,7 @@
                 {field:"style_no" ,headerName:"스타일넘버",pinned:'left', width:80, cellStyle: {'text-align':'center'}},
                 {field:"goods_type_nm",headerName:"상품구분",pinned:'left',width:60, cellStyle: {...StyleGoodsType, 'text-align': 'center'}},
                 {field:"is_unlimited_nm",headerName:"재고구분",pinned:'left',width:60, cellStyle: {'text-align': 'center'}},
-                {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:70},
+                {field:"goods_no" ,headerName:"온라인코드",pinned:'left',width:70},
                 {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:360},
                 {field:"sale_stat_cl_nm" ,headerName:"상태",width:58,cellStyle:StyleGoodsState},
                 {field:"wonga" ,headerName:"원가", type: 'currencyType', width: 60},

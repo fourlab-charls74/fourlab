@@ -220,17 +220,20 @@
     </div>
 </div>
 
-<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-    <div class="card-body shadow">
-        <div class="card-title form-inline text-right">
-            <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
+            <div class="card-body">
+                <div class="card-title">
+                    <div class="filter_wrap">
+                        <div class="fl_box">
+                            <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                </div>
+            </div>
         </div>
-        <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-        </div>
-    </div>
-</div>
-
 
 <script language="javascript">
     //const pageNo = -1;

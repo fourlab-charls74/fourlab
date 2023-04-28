@@ -115,7 +115,7 @@
                                     </div>
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
-											<select id="com_id" name="com_id" class="form-control form-control-sm select2-company" style="width:100%;"></select>
+											<select id="com_cd" name="com_cd" class="form-control form-control-sm select2-company" style="width:100%;"></select>
 											<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
