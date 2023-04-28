@@ -112,6 +112,19 @@
             return false;
         }
 
+        /**
+        * 이미지 확장자를 수정한 파일에 대한 false 처리
+        */
+        const file = target_file[0];
+        const filename = file.name;
+        const parts = filename.split(".");
+        const ext = parts[parts.length - 1].toLowerCase();
+
+        if (parts.length > 2 || file.type.split("/")[1].toLowerCase() !== 'jpeg') {
+            alert("파일 확장자가 변경된 이미지입니다. 정상적인 확장자를 가진 이미지를 업로드해주세요.");
+            return false;
+        }
+
         return true;
     }
 

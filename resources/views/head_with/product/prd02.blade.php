@@ -51,7 +51,7 @@
                                                 <td>
                                                     <div class="img_file_cum_wrap">
                                                         <div class="custom-file">
-                                                            <input type="file" class="custom-file-input" id="file" aria-describedby="inputGroupFileAddon03">
+                                                            <input type="file" class="custom-file-input" id="file" aria-describedby="inputGroupFileAddon03" accept=".jpg">
                                                             <label id="file-label" class="custom-file-label" for="file">
                                                             <i class="bx bx-images font-size-16 align-middle mr-1"></i>이미지 찾아보기</label>
                                                         </div>
