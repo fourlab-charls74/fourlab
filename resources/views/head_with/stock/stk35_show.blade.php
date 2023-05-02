@@ -92,9 +92,9 @@
 <script language="javascript">
 	var columnDefs = [
 		{headerName: "#",			field: "num",		width:50,	filter:true,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"상품코드",		field:"xmd_code",	width:100},
+		{headerName:"바코드",		field:"xmd_code",	width:100},
 		{headerName:"아이템코드",	field:"item_code",	width:80},
-		{headerName:"상품코드명",	field:"goods_nm",	width:200},
+		{headerName:"상품명",		field:"goods_nm",	width:200},
 		{headerName:"칼라",			field:"color_code",	width:70},
 		{headerName:"칼라명",		field:"color_nm",	width:120},
 		{headerName:"사이즈",		field:"size_code",	width:70},

@@ -38,7 +38,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품코드</label>
+                            <label for="style_no">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -359,9 +359,9 @@
         },
         {
             field: "goods_no",
-            headerName: "상품번호",
-            width: 58,
-            cellStyle:{'line-height':'40px'}
+            headerName: "온라인코드",
+            width: 70,
+            cellStyle:{'line-height':'40px', 'text-align':'center'}
         },
         {
             field: "style_no",

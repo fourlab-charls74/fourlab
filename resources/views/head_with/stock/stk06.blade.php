@@ -49,7 +49,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품코드</label>
+                                <label for="style_no">스타일넘버/온라인코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -202,7 +202,7 @@
 
         var columns= [
                 {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-                {field:"goods_no", headerName:"상품번호", width:58, cellStyle: {textAlign:"center"}, pinned:'left'},
+                {field:"goods_no", headerName:"온라인코드", width:70, cellStyle: {textAlign:"center"}, pinned:'left'},
                 {field:"goods_type_nm", headerName:"상품구분", width:58, 
                     cellStyle: function (params) {
                         var state = {

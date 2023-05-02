@@ -99,7 +99,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품코드</label>
+                                <label for="style_no">스타일넘버/온라인코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -248,7 +248,7 @@
             {field:"brand_nm", headerName:"브랜드", width: 100},
             {field:"style_no", headerName:"스타일넘버", width:80, cellStyle:{'text-align':'center'}},
             {field:"goods_type", headerName:"상품구분", width:60},
-            {headerName:"상품코드",
+            {headerName:"온라인코드",
                 children: [
                     {headerName: "번호", field: "goods_no", width: 46, cellStyle:{'text-align': 'right'}},
                     {headerName: "보조", field: "goods_sub", width: 34, cellStyle:{'text-align': 'right'}}

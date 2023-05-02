@@ -52,7 +52,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">스타일넘버/상품코드</label>
+                            <label for="">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -283,7 +283,7 @@
 
         { headerName: '', pinned: 'left', headerCheckboxSelection: true, checkboxSelection: true, width: 28 },
         { field: "index", headerName: "인덱스", hide: true },
-        { field: "goods_no", headerName: "상품번호", width: 58, pinned: 'left', cellStyle: {'text-align':'center'}},
+        { field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: {'text-align':'center'}},
         { field: "goods_type", headerName: "상품구분", width: 58, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },
         { field: "opt_kind_nm", headerName: "품목", width: 100, pinned: 'left' },
         { field: "brand_nm", headerName: "브랜드", pinned: 'left' },

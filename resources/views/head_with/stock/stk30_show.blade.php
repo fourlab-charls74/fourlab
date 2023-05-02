@@ -72,7 +72,7 @@
 	var columnDefs = [
 		{headerName: "#", field: "num",filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
 		{headerName:"코드",field:"xmd_code", width:150},
-		{headerName:"상품번호",field:"goods_no", width:100},
+		{headerName:"온라인코드",field:"goods_no", width:100},
 		{headerName:"옵션",field:"goods_opt", width:250},
 	];
 

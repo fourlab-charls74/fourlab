@@ -308,7 +308,7 @@
                                         </div>
                                         <div class="col-lg-6 inner-td">
                                             <div class="form-group">
-                                                <label style="min-width:70px;">상품코드</label>
+                                                <label style="min-width:70px;">온라인코드</label>
                                                 <div class="flax_box">
                                                     <textarea name="sch_goods_nos" id="sch_goods_nos" rows=4 class="form-control form-control-sm" ></textarea>
                                                 </div>

@@ -73,7 +73,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">스타일넘버/상품코드 :</label>
+                            <label for="name">스타일넘버/온라인코드 :</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='s_style_no' id="s_style_no" value="">
@@ -233,7 +233,7 @@
 		{headerName: "#", field: "num",type:'NumType', width:35, cellStyle: {"background":"#F5F7F7"}},
 		{field: "opt_kind_nm", headerName: "품목", width:84},
 		{field: "brand_nm", headerName: "브랜드", width:84},
-		{field: "goods_no", headerName: "상품번호", width: 58, cellStyle:{'text-align':'center'}},
+		{field: "goods_no", headerName: "온라인코드", width: 70, cellStyle:{'text-align':'center'}},
 		{field: "style_no", headerName: "스타일넘버", width:80, cellStyle:{'text-align':'center'},
 			cellRenderer: function(params) {
 				return '<a href="/head/product/prd01/?style_no='+ params.value +'" target="new">'+ params.value+'</a>'

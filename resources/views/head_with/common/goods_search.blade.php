@@ -43,7 +43,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품코드</label>
+                                <label for="style_no">스타일넘버/온라인코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <div class="form-group">
@@ -217,7 +217,7 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="a.goods_no" selected>상품번호</option>
+                                            <option value="a.goods_no" selected>온라인코드</option>
                                             <option value="a.style_no" >스타일넘버</option>
                                             <option value="a.goods_nm" >상품명</option>
                                             <option value="a.price" >판매가</option>
@@ -291,7 +291,7 @@
             width:28,
             pinned:'left'
         },
-        {field: "goods_no", headerName: "상품번호", pinned:'left'},
+        {field: "goods_no", headerName: "온라인코드", pinned:'left'},
         {field: "opt_kind_nm", headerName: "품목", pinned:'left', width:120},
         {
             field: "brand_nm",

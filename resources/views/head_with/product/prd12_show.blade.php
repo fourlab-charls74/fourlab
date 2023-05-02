@@ -494,7 +494,7 @@
         const columns = [
             {headerName: '#', width:35, pinned: 'left', type:'NumType', cellStyle: {"background":"#F5F7F7"}},
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-            {field: "goods_no", headerName: "상품번호", width: 82, pinned: 'left',rowDrag: true},
+            {field: "goods_no", headerName: "온라인코드", width: 82, pinned: 'left',rowDrag: true},
             {field: "head_desc", headerName: "상단홍보글"},
             {field: "img", headerName: "이미지", width:46, cellStyle: {"text-align":"center"},
                 cellRenderer: function(params) {

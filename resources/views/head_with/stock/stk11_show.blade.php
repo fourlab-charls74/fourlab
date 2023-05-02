@@ -305,7 +305,7 @@
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
-        {headerName:"상품코드",
+        {headerName:"온라인코드",
             children: [
                 {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}},
                 {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}

@@ -77,7 +77,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">스타일넘버/상품코드</label>
+                            <label for="">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -171,7 +171,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="goods_no">상품번호</option>
+										<option value="goods_no">온라인코드</option>
 										<option value="goods_nm">상품명</option>
 										<option value="price">판매가</option>
 										<option value="com_nm">공급업체</option>
@@ -424,7 +424,7 @@
         },
         {
             field: "goods_no",
-            headerName: "상품번호",
+            headerName: "온라인코드",
             width: 80,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
@@ -759,7 +759,7 @@
             },
             {
                 field: "goods_no",
-                headerName: "상품번호",
+                headerName: "온라인코드",
                 minWidth: 80,
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {

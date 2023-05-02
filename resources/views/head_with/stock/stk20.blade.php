@@ -77,7 +77,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/상품코드</label>
+                                <label for="style_no">스타일넘버/온라인코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -193,7 +193,7 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:24%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="g.goods_no" selected>상품코드</option>
+                                            <option value="g.goods_no" selected>온라인코드</option>
                                             <option value="g.goods_nm">상품명</option>
                                             <option value="s.wqty" >보유재고</option>
                                             <option value="gsr.sale_qty" >판매수</option>
@@ -284,7 +284,7 @@
     </form>
     <script language="javascript">
 		var columns= [
-            {field:"goods_no" ,headerName:"상품코드",pinned:'left',width:58, cellStyle:{'text-align':'center'}},
+            {field:"goods_no" ,headerName:"온라인코드",pinned:'left',width:70, cellStyle:{'text-align':'center'}},
             {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:70, cellStyle:{'text-align':'center'}},
             {field:"goods_nm" ,headerName:"상품명",pinned:'left', type:"HeadGoodsNameType", width:200},
             {field:"img2",headerName:"img2",hide:true},

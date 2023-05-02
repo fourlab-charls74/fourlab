@@ -41,7 +41,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/상품코드</label>
+							<label for="style_no">스타일넘버/온라인코드</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -154,7 +154,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="goods_no" selected>상품번호</option>
+										<option value="goods_no" selected>온라인코드</option>
 										<option value="goods_nm">상품명</option>
 										<option value="price">판매가</option>
 										<option value="com_nm">공급업체</option>
@@ -323,7 +323,7 @@
 			headerName: "비제스트",
 			children: [{
 					field: "goods_no",
-					headerName: "상품번호",
+					headerName: "온라인코드",
 					width: 58,
 					cellStyle: {'text-align':'center'},
 					type: 'HeadGoodsNameType',
@@ -405,7 +405,7 @@
 			headerName: "사방넷",
 			children: [{
 					field: "shop_goods_no",
-					headerName: "상품번호",
+					headerName: "온라인코드",
 					width: 58
 				},
 				{

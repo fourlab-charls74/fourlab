@@ -1059,7 +1059,7 @@ SearchGoodsNos.prototype.Open = function(id = 'goods_no',callback = null){
 SearchGoodsNos.prototype.SetGrid = function(divId){
     const columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {field: "goods_no", headerName: "상품번호", width: 60, pinned: 'left'},
+        {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left'},
         {field: "style_no", headerName: "스타일넘버", width: 70, pinned: 'left'},
         {field: "img", headerName: "이미지", type:'GoodsImageType',width: 50},
         {field: "img", headerName: "이미지_url", hide: true},

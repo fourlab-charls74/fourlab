@@ -39,7 +39,7 @@
                             </div>
                             <div class="col-lg-4 inner-td">
                                 <div class="form-group">
-                                    <label for="style_no">스타일넘버/상품코드</label>
+                                    <label for="style_no">스타일넘버/온라인코드</label>
                                     <div class="form-inline">
                                         <div class="form-inline-inner input_box">
                                             <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -200,7 +200,7 @@
         const columns = [
             {headerName: '#', pinned: 'left', type:'NumType', cellStyle: {"line-height": "30px"}},
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null, cellStyle: {"line-height": "30px"}},
-            {field: "goods_no", headerName: "상품번호", width: 60, pinned: 'left', cellStyle: {"line-height": "30px"}},
+            {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: {"line-height": "30px"}},
             {field: "goods_type", headerName: "상품구분", width: 60, cellStyle: StyleGoodsTypeNM, pinned: 'left', cellStyle: {"line-height": "30px", 'text-align' : 'center'}},
             {field: "com_nm", headerName: "업체", width: 100, cellStyle: {"line-height": "30px"}},
             {field: "opt_kind_nm", headerName: "품목", cellStyle: {"line-height": "30px", 'text-align' : 'center'}},

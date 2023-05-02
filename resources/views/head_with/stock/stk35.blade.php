@@ -43,7 +43,7 @@
                     </div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/상품코드</label>
+							<label for="style_no">스타일넘버/온라인코드</label>
 					<div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -159,7 +159,7 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num", width:35, type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-		{field: "goods_no", headerName: "상품코드", width: 65, type:'HeadGoodsNameType', cellStyle: {"text-align":"center"}},
+		{field: "goods_no", headerName: "온라인코드", width: 70, type:'HeadGoodsNameType', cellStyle: {"text-align":"center"}},
 		{field: "head_desc", headerName: "XMD 코드", width:180},
 		{field: "goods_nm", headerName: "상품명", width: 320, type:'HeadGoodsNameType'},
 		{field: "goods_opt", headerName: "옵션", width: 220},

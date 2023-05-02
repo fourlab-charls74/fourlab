@@ -31,7 +31,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">상품코드 :</label>
+                            <label for="">바코드 :</label>
 							<div class="flax_box">
 								<input type='text' class="form-control form-control-sm search-all search-enter" name='s_goods_code' value=''>
 							</div>
@@ -98,7 +98,7 @@
 			cellRenderer: 'loadingRenderer',
 			pinned:'left'
 		},
-        {headerName: "상품코드", field: "goods_code", width:150, editable: true, cellStyle:{"background-color":"#FFFF99"}},
+        {headerName: "바코드", field: "goods_code", width:150, editable: true, cellStyle:{"background-color":"#FFFF99"}},
         {headerName: "물류", field: "bonsa_cnt", width:58, editable: true, cellStyle:{"text-align":"right","background-color":"#FFFF99"}},
         {headerName: "매장", field: "store_cnt", width:58, editable: true, cellStyle:{"text-align":"right","background-color":"#FFFF99"}},
         {headerName: "정보", field: "comment", width:220, editable: true, cellStyle:{"background-color":"#FFFF99"}},

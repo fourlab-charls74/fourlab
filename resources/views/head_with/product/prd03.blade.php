@@ -39,7 +39,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">스타일넘버/상품코드</label>
+                            <label for="">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -247,7 +247,7 @@
 
     let columns = [
         { headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left' },
-        { field: "goods_no", headerName: "상품번호", width: 58, type:"HeadGoodsNameType", pinned: 'left' },
+        { field: "goods_no", headerName: "온라인코드", width: 70, type:"HeadGoodsNameType", pinned: 'left' },
         { field: "style_no", headerName: "스타일넘버", width:70, cellStyle: {'text-align':'center'}, pinned: 'left' },
         { field: "opt_kind_nm", headerName: "품목", width: 100, pinned: 'left' },
         { field: "goods_type", headerName: "상품구분", width: 58, cellStyle: (params) => cellStyleGoodsType(params), pinned: 'left' },

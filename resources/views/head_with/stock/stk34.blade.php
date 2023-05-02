@@ -102,7 +102,7 @@
 <script language="javascript">
     var columns = [
         {headerName: "#", field: "num", width:35, type:'NumType', cellStyle: {"background":"#F5F7F7"}},
-		{field: "goods_no",		headerName: "상품번호",		width:80, cellStyle:{"text-align":"center"}},
+		{field: "goods_no",		headerName: "온라인코드",		width:80, cellStyle:{"text-align":"center"}},
 		{field: "xmd_goods_nm", headerName: "XMD 상품명",	width:250},
 		{field: "goods_nm",		headerName: "Bizest 상품명",width:250},
 		{field: "goods_opt",	headerName: "상품옵션",		width:180},

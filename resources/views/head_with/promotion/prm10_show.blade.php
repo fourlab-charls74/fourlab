@@ -759,7 +759,7 @@
             checkboxSelection: true,
             width:28
         },
-        {field:"goods_no", headerName:"상품코드", width:90},
+        {field:"goods_no", headerName:"온라인코드", width:90},
         {field:"style_no", headerName:"스타일넘버", width:100},
         {field:"com_nm", headerName:"업체", width:100},
         {field:"brand_nm", headerName:"브랜드", width:100},
