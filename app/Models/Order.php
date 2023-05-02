@@ -44,7 +44,7 @@ const ORD_STATE_CUST_RECEIPT = 40;	// 배송완료
   CLAIM_STATE
 */
 const CLAIM_STATE_CHANGE = 60;		// 교환
-const CLAIM_STATE_REFUND = 61;		// 환불
+const ORDER_CLAIM_STATE_REFUND = 61;		// 환불
 const CLAIM_STATE_CANCEL_ORDER = 62;	// 주문취소
 const CLAIM_STATE_JAEGO_MODIFY = -30;	// 클레임무효
 

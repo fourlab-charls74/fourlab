@@ -196,12 +196,12 @@ class Claim
 
 		if(empty($this->clm_no)) trigger_error("Use SetClmNo(clm_no) method first !!", E_USER_ERROR);
 
-
 		#########################################
 		#	Order Class Object Create			#
 		#########################################
-		$order = new Order($this->user, $ord_no);
-
+		$order = new Order($this->user);
+		$order->SetOrdNo($ord_no);
+		
 		#########################################
 		#	Jaego Class Object Create			#
 		#########################################

@@ -1177,8 +1177,6 @@
             },
             success: function(res) {
                 alert("클레임 정보가 반영 되었습니다.");
-                //console.log(res);
-                //console.log(res.responseText);
                 location.reload();
             },
             error: function(xhr, status, error) {
