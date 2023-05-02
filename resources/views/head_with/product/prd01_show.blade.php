@@ -73,6 +73,10 @@
         background : #f5f5f5;
     }
 
+    table td {
+        max-width: 300px;
+    }
+
 </style>
 
     <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -447,14 +451,14 @@
                                         </tr>
                                         @if ($type !== 'create')
                                         <tr class="sale_control" style="@if (@$goods_info->sale_yn != 'Y') display: none; @endif">
-                                            <th>세일설정</th>
+                                            <th id="th">세일</th>
                                             <td>
                                                 <div class="wd300 d-flex mb-2">
                                                     <span class="sub_title mr-2">구분</span>
                                                     <select name="sale_type" id="sale_type" class="form-control form-control-sm">
-														<option value="">==세일구분==</option>
+                                                        <option value="">==세일구분==</option>
                                                         @foreach (@$goods_info->sale_types as $sale_type)
-														    <option value="{{ $sale_type['key'] }}" @if ($sale_type['key'] === @$goods_info->sale_type) selected @endif>{{ $sale_type['value'] }}</option>
+                                                            <option value="{{ $sale_type['key'] }}" @if ($sale_type['key'] === @$goods_info->sale_type) selected @endif>{{ $sale_type['value'] }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -492,6 +496,10 @@
                                                     <div class="txt_box ml-1">원)</div>
                                                 </div>
                                                 @endif
+                                                
+                                            </td>
+                                            <th id="th">세일 기간</th>
+                                            <td>
                                                 <div class="wd300 d-flex mb-2">
                                                     <span class="sub_title mr-2">기간</span>
                                                     <div class="custom-control custom-checkbox form-check-box">
@@ -1905,6 +1913,8 @@
 			const type	= 'post';
 			@endif
 
+            console.log(frm.serialize());
+
 			$.ajax({
 				async: true,
 				type: type,
@@ -1968,7 +1978,7 @@
           $("#baesong_price").attr('readonly', this.value === 'N');
         });
 
-        $('#price, #goods_price, #margin').keyup(function(){
+        $('#price, #goods_price, #margin, #goods_sh, #wonga').keyup(function(){
 
 			if( $('#com_id').val() == '' ){
 				alert("업체를 선택해 주십시오.");
@@ -2001,6 +2011,9 @@
 				var price	= unComma($('#price').val());
 				var margin	= unComma($('#margin').val());
 				var wonga	= unComma($('#wonga').val());
+                var goods_sh = unComma($('#goods_sh').val());
+
+                console.log(price, goods_sh);
 
 				@if( $type == 'create' )
 					if( price > 0 ){
@@ -2021,6 +2034,8 @@
 				@endif
 
 				$('#price').val(numberFormat(price));
+				$('#goods_sh').val(numberFormat(goods_sh));
+				$('#wonga').val(numberFormat(wonga));
 
 			}
 
@@ -2099,7 +2114,7 @@
                 {field:"img2",headerName:"img2",hide:true},
                 {field:"img" , headerName:"이미지", type: 'GoodsImageType', cellStyle:{'text-align':'center'}},
                 {field:"sale_stat_cl",headerName:"상품상태",width:100,cellStyle:StyleGoodsState},
-                {field:"goods_no",headerName:"상품번호", width:80,
+                {field:"goods_no",headerName:"온라인코드", width:80,
                     cellRenderer: function(params) {
                         if (params.value !== undefined) {
                             return params.data.goods_no +' ['+ params.data.goods_sub +']';
@@ -2183,6 +2198,12 @@
 				}
 
 				selectedRowData.forEach(function(data, idx) {
+
+                    if(data.class_cd == null) {
+                        alert('선택한 상품의 분류를 지정한 후에 저장해주세요');
+                        return;
+                    }
+
 					$.ajax({
 						async: true,
 						type: 'put',

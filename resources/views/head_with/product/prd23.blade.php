@@ -446,6 +446,12 @@
         let right_cnt = images.filter(item => item.goods_nm !== undefined).length;
         if(right_cnt !== images.length) return alert("상품과 매칭되지 않은 이미지가 존재합니다.\n선택하신 모든 이미지를 상품과 매칭한 후 업로드해주세요.");
 
+
+        let fail = images.filter(img => img.width < IMG_SIZE || img.height < IMG_SIZE);
+
+        if (fail.length > 0) {
+            return alert('이미지 사이즈가 700 X 700인 이미지를 업로드해주세요');
+        }
         const type = $("[name=img_type]:checked").val();
         const sizes = [50, 62, 70, 100, 129, 55, 120, 160, 180, 270, 280, 320, 500];
         const effect = {
@@ -517,6 +523,8 @@
         gx1 = new HDGrid(gridDiv1, columns1);
         pApp1.ResizeGrid(0, 350);
         pApp1.BindSearchEnter();
+
+        console.log(failedIds);
 
         // gx.gridOptions.api.setRowData([]);
         let images = gx.gridOptions.api.getSelectedRows();
