@@ -291,15 +291,18 @@
             width:28,
             pinned:'left'
         },
-        {field: "goods_no", headerName: "온라인코드", pinned:'left'},
-        {field: "opt_kind_nm", headerName: "품목", pinned:'left', width:120},
+        {field: "goods_no", headerName: "온라인코드", pinned:'left', width: 80, cellStyle: {'text-align': 'center'}},
+        {field: "opt_kind_nm", headerName: "품목", pinned:'left', width: 80, cellStyle: {'text-align': 'center'}},
         {
             field: "brand_nm",
             headerName: "브랜드",
-            pinned:'left'
+            pinned:'left',
+            width: 80,
+            cellStyle: {'text-align': 'center'},
         },
-        {field: "goods_type", headerName: "상품구분", pinned:'left', width: 80},
-        {field: "style_no", headerName: "스타일넘버", pinned:'left'},
+        {field: "goods_type", hide: true},
+        {field: "goods_type_nm", headerName: "상품구분", pinned:'left', width: 60, cellStyle: {'text-align': 'center'}},
+        {field: "style_no", headerName: "스타일넘버", pinned:'left', width: 80, cellStyle: {'text-align': 'center'}},
         {
             field: "img",
             headerName: "이미지",
@@ -310,14 +313,14 @@
                 }
             },
         },
-        {field: "head_desc", headerName: "상단홍보글", pinned:'left'},
+        {field: "head_desc", headerName: "상단홍보글", pinned:'left', width: 100},
         {
             field: "goods_nm",
             headerName: "상품명",
             type:"HeadGoodsNameType",
             width:400
         },
-        {field: "com_nm", headerName: "업체", width: 130},
+        {field: "com_nm", headerName: "업체", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "price", headerName: "판매가", type:'currencyType'},
         {
             field: "qty",
@@ -328,10 +331,11 @@
             }
         },
         {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType'},
-        {field: "reg_dm", headerName: "등록일자", width: 130},
+        {field: "reg_dm", headerName: "등록일자", width: 130, cellStyle: {'text-align': 'center'}},
         {
             field: "",
             headerName: "선택",
+            cellStyle: {'text-align': 'center'},
             cellRenderer: function(params) {
                 return "<a href='#' onclick='selectGoods("+JSON.stringify(params.data)+")'>선택</a>";
             }

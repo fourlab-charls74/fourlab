@@ -131,7 +131,7 @@ class goods extends Controller
 		if( $style_no != "" ) {
 			$style_nos = explode(",",$style_no);
 			if(count($style_nos) > 1){
-				if(count($style_nos) > 500) array_splice($style_nos,500);
+				// if(count($style_nos) > 500) array_splice($style_nos,500);
 				$in_style_nos = "";
 				for($i=0; $i<count($style_nos); $i++){
 					if(isset($style_nos[$i]) && $style_nos[$i] != ""){
@@ -149,7 +149,7 @@ class goods extends Controller
         if( $goods_no		!= "" ){
 			$goods_nos = explode(",",$goods_no);
 			if(count($goods_nos) > 1){
-				if(count($goods_nos) > 500) array_splice($goods_nos,500);
+				// if(count($goods_nos) > 500) array_splice($goods_nos,500);
 				$in_goods_nos = join(",",$goods_nos);
 				$where .= " and a.goods_no in ( $in_goods_nos ) ";
 			} else {
@@ -331,6 +331,7 @@ class goods extends Controller
 				, a.goods_nm_eng
 				, a.com_id
 				, a.goods_type
+				, cd4.code_val as goods_type_nm
 				, a.option_kind
                 , a.com_type
                 , a.reg_dm
@@ -340,6 +341,7 @@ class goods extends Controller
                 left outer join company cm on a.com_id = cm.com_id
 				left outer join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and cd3.code_id = a.sale_stat_cl
 				left outer join code cd2 on cd2.code_kind_cd = 'G_SPECIAL_YN' and cd2.code_id = a.special_yn
+				left outer join code cd4 on cd4.code_kind_cd = 'G_GOODS_TYPE' and cd4.code_id = a.goods_type
 			where 1=1
 				$where
 				$having
