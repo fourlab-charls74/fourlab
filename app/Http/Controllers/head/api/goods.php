@@ -38,6 +38,8 @@ class goods extends Controller
     }
 
     public function search(Request $req) {
+        $cmd = $req->input('cmd', '');
+        
 		// 설정 값 얻기
 		$cfg_img_size_list		= SLib::getCodesValue("G_IMG_SIZE","list");
 		$cfg_img_size_real		= SLib::getCodesValue("G_IMG_SIZE","real");
@@ -276,11 +278,12 @@ class goods extends Controller
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
         $limit = " limit $startno, $page_size ";
+        if ($cmd === 'modal') $limit = '';
 
         $total = 0;
         $page_cnt = 0;
 
-        if ($page == 1) {
+        if ($cmd !== 'modal' && $page == 1) {
             $query = /** @lang text */
                 "
                 select count(*) as total
@@ -350,7 +353,7 @@ class goods extends Controller
         ";
 
         $rows = DB::select($sql);
-        //echo "<pre>$sql</pre>";
+        if ($cmd === 'modal') $total = count($rows);
 
         return response()->json([
             "code" => 200,

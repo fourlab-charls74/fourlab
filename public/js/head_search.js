@@ -1072,9 +1072,12 @@ SearchGoodsNos.prototype.SetGrid = function(divId){
 };
 
 SearchGoodsNos.prototype.Search = function(){
-    let data = $('form[name="search_goods_nos"]').serialize();
-    //console.log(data);
-    this.grid.Request('/head/api/goods', data,1);
+    // let data = $('form[name="search_goods_nos"]').serialize();
+    let data = "";
+    data += "sch_goods_nos=" + $("#sch_goods_nos").val().split("\n").filter(v => v).join(",");
+    data += "&sch_style_nos=" + $("#sch_style_nos").val().split("\n").filter(v => v).join(",");
+    data += "&cmd=modal";
+    this.grid.Request('/head/api/goods', data,-1);
 };
 
 SearchGoodsNos.prototype.Choice = function(){
