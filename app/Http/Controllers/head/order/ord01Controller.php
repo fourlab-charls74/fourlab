@@ -274,7 +274,7 @@ class ord01Controller extends Controller
                         where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
                     ), 0
                  ) as stock_qty
-                 , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+                , o.point_amt, o.coupon_amt, o.dc_amt, o.dlv_amt, o.recv_amt
                 , c.refund_amt, o.add_point
                 , g.is_unlimited, g.goods_type
                 , o.opt_amt, o.addopt_amt, o.dlv_comment

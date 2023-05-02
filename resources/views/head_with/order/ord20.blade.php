@@ -205,8 +205,8 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="ord_state" id="ord_state_5" class="custom-control-input" value="5" />
-                                                            <label class="custom-control-label" for="ord_state_5">입금예정</label>
+                                                            <input type="radio" name="ord_state" id="ord_state_1" class="custom-control-input" value="1" />
+                                                            <label class="custom-control-label" for="ord_state_1">입금예정</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="ord_state" id="ord_state_10" class="custom-control-input" value="10"  />

@@ -163,7 +163,6 @@
 
     function EditAmt(params){
         if (params.oldValue !== params.newValue) {
-            console.log(params);
             var rowNode = params.node;
             var qty = params.data.qty;
             var price = params.data.price;
@@ -299,7 +298,6 @@
                 type: 'get',
                 url: "/head/member/mem01/" + user_id + "/get",
                 success: function (res) {
-                    console.log(res);
                     if(res.hasOwnProperty('user')){
                         var user = res.user;
                         $('#user_nm').val(user.name);
@@ -516,25 +514,21 @@
                 }
 
                 $('input[name="ord_state"]').each(function() {
-                    //console.log(this.name + '-' + this.value);
                     if(this.value == ord.ord_state){
                         $(this).prop('checked', true);
                     } else {
                         $(this).prop('checked', false);
                     }
                 });
-                // console.log(count($ord_lists));
 
                 $('input[name="ord_kind"]').each(function() {
-                    //console.log(this.name + '-' + this.value);
                     if(this.value == ord.ord_kind){
                         $(this).prop('checked', true);
                     } else {
                         $(this).prop('checked', false);
                     }
                 });
-
-                console.log(ord_lists);
+                
                 let goods_lists = [];
                 for(i=0;i<ord_lists.length;i++){
                     if(ord_opt_no == "" || ord_opt_no == ord_lists[i]["ord_opt_no"]){
@@ -550,7 +544,6 @@
                             dataType: 'json',
                             // data: {},
                             success: function (res) {
-                                //console.log(res);
                                 var options = [];
                                 for (var j = 0; j < res.options.length; j++) {
                                     if (res.options[j].qty > 0) {
@@ -567,7 +560,6 @@
                     }
                 }
 
-                //console.log(ord_lists);
                 gx.gridOptions.api.setRowData(goods_lists);
             },
             error: function(e){
@@ -620,7 +612,6 @@
             url: "/head/order/ord02/save",
             data: order_data,
             success: function (res) {
-                console.log(res);
                 is_processing = false;
                 alert("저장되었습니다.");
                 document.location.href = '/head/order/ord01/' + res.ord_no;
@@ -656,7 +647,6 @@
                 dataType: 'json',
                 // data: {},
                 success: function(res) {
-                    //console.log(res);
                     qty = 1;
                     gx.addRows([{
                         "goods_no":res.goods_no,
@@ -672,8 +662,7 @@
                         "dc_amt" : 0,
                         "dlv_amt" : res.goods_info.baesong_price,
                     }]);
-
-                    //console.log(res.options);
+                    
                     var options = [];
                     for(var j = 0; j < res.options.length;j++){
                         if(res.options[j].qty > 0){
@@ -695,7 +684,6 @@
      * @return {boolean}
      */
     function DelGoods(){
-        //console.log('삭제');
         gx.delSelectedRows();
     }
 
