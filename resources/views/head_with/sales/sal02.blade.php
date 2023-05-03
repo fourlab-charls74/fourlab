@@ -550,7 +550,7 @@
     let gx;
     $(document).ready(function() {
         @if($brand != '')
-            $("#brand_cd").select2({data:['{{ $brand }}'], tags: true});
+            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
         @endif
 
         pApp.ResizeGrid(300);

@@ -125,9 +125,6 @@ class sal24Controller extends Controller
 
 		$com_nm = $req->input("com_nm");
 
-
-
-
         $values = [
             'sdate' 		=> $sdate,
             'edate' 		=> $edate,

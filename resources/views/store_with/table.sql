@@ -1123,6 +1123,22 @@ CREATE TABLE `product_price_list` (
   PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 
+-- 검색어 바로가기
+CREATE TABLE `search_shortcut` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+  `kwd` varchar(100) NOT NULL COMMENT '검색어',
+  `url` varchar(100) NOT NULL COMMENT 'URL',
+  `disp_yn` varchar(1) DEFAULT 'Y' COMMENT '검색창 출력',
+  `pv` int(11) NOT NULL DEFAULT '0' COMMENT '검색횟수',
+  `use_yn` varchar(1) DEFAULT 'Y' COMMENT '사용여부',
+  `st` datetime DEFAULT NULL COMMENT '최근검색일시',
+  `rt` datetime DEFAULT NULL COMMENT '등록일시',
+  `ut` datetime DEFAULT NULL COMMENT '변경일시',
+  PRIMARY KEY (`idx`),
+  UNIQUE KEY `kwd` (`kwd`),
+  KEY `idx_disp_yn` (`disp_yn`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='검색어 바로가기';
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --

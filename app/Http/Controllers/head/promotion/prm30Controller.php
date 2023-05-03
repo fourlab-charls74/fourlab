@@ -210,12 +210,13 @@ class prm30Controller extends Controller
         return response()->json(null, 204);
     }
 
-    public function edit_point()
+    public function edit_point(Request $request)
     {
         $id = Auth('head')->user()->id;
         $pv = Request("pv", 1);
         $tags = Request("tags", 1);
         $mpv = Request("mpv", 1);
+        $kwd = $request->input('kwd','');
 
         // Save Point Function
         try {
@@ -233,10 +234,15 @@ class prm30Controller extends Controller
             $tags = $row->tags;
             $mpv = $row->mpv;
 
+
             $sql = "
                 update search 
                    set point = $pv * ifnull(pv_1m,0) + $tags * ifnull(tags,0) + $mpv * ifnull(mpv,0)
+                where kwd = '$kwd'
             ";
+
+            dd($sql);
+
             DB::commit();
 
             return response()->json(null, 204);

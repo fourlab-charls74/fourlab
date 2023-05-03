@@ -27,7 +27,7 @@
                         <div class="form-group">
                             <label for="">검색어</label>
                             <div class="flax_box">
-                                <input type="text" name="kwd" id="kwd" class="form-control form-control-sm">
+                                <input type="text" name="kwd" id="kwd" class="form-control form-control-sm search-enter">
                             </div>
                         </div>
                     </div>
@@ -39,13 +39,13 @@
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <div class="form-group">
-                                        <input type="text" class="form-control form-control-sm" name="pv_1m_fr" value="">
+                                        <input type="text" class="form-control form-control-sm search-enter" name="pv_1m_fr" value="">
                                     </div>
                                 </div>
                                 <span class="text_line">~</span>
                                 <div class="form-inline-inner input_box">
                                     <div class="form-group">
-                                        <input type="text" class="form-control form-control-sm" name="pv_1m_to" value="">
+                                        <input type="text" class="form-control form-control-sm search-enter" name="pv_1m_to" value="">
                                     </div>
                                 </div>
                             </div>
@@ -59,13 +59,13 @@
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <div class="form-group">
-                                        <input type="text" class="form-control form-control-sm" name="sch_cnt_fr" value="">
+                                        <input type="text" class="form-control form-control-sm search-enter" name="sch_cnt_fr" value="">
                                     </div>
                                 </div>
                                 <span class="text_line">~</span>
                                 <div class="form-inline-inner input_box">
                                     <div class="form-group">
-                                        <input type="text" class="form-control form-control-sm" name="sch_cnt_to" value="">
+                                        <input type="text" class="form-control form-control-sm search-enter" name="sch_cnt_to" value="">
                                     </div>
                                 </div>
                             </div>
@@ -129,8 +129,8 @@
                                         <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
                                         <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
                                     </div>
-                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                    <input type="radio" name="ord" id="sort_asc" value="asc">
+                                    <input type="radio" name="ord" id="sort_desc" value="desc">
+                                    <input type="radio" name="ord" id="sort_asc" value="asc" checked="">
                                 </div>
                             </div>
                         </div>
@@ -345,17 +345,18 @@
     const pApp = new App('', {
         gridId: "#div-gd"
     });
-    const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columns);
+    let gx;
 
-    gx.gridOptions.rowSelection = 'multiple';
-    gx.gridOptions.rowMultiSelectWithClick = true;
+    $(document).ready(function() {
+        pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns);
+        gx.gridOptions.rowSelection = 'multiple';
+        gx.gridOptions.rowMultiSelectWithClick = true;
 
-    // gx.gridOptions.getRowNodeId = function(data) {
-    //     return data.id;
-    // }
-
-    pApp.ResizeGrid(265);
+        Search();
+    });
 
     const Search = () => {
         let data = $('form[name="search"]').serialize();
@@ -481,8 +482,16 @@
 
     $('.point-btn').click((e) => {
         e.preventDefault();
+        const rows = gx.getSelectedRows();
+
+        let kwd = rows.map(r => ({kwd : r.kwd}));
+
+        if (rows.length == 0) {
+            return alert('검색어를 선택해주세요');
+        }
 
         if (confirm('점수를 변경하시겠습니까?') === false) return;
+
 
         $.ajax({
             async: true,
@@ -491,7 +500,8 @@
             data: {
                 pv: $('#pv').val(),
                 tags: $('#tags').val(),
-                mpv: $('#mpv').val()
+                mpv: $('#mpv').val(),
+                kwd : kwd
             },
             success: function(data) {
                 alert("변경되었습니다.");

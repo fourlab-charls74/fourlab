@@ -32,6 +32,9 @@ class sys05Controller extends Controller
 
         $sql_admin_domain = "select * from conf where type = 'shop' and name = 'domain_bizest'";
         $a_domain = DB::selectOne($sql_admin_domain);
+       
+        $sql_admin_new_domain = "select * from conf where type = 'shop' and name = 'domain_bizest_new'";
+        $a_new_domain = DB::selectOne($sql_admin_new_domain);
 
         $sql_email = "select * from conf where type = 'shop' and name = 'email'";
         $email = DB::selectOne($sql_email);
@@ -384,6 +387,7 @@ class sys05Controller extends Controller
             'phone' => $phone->value ?? '',
             's_domain' => $s_domain->value ?? '',
             'a_domain' => $a_domain->value ?? '',
+            'a_new_domain' => $a_new_domain->value ?? '',
             'email' => $email->value ?? '',
             'title' => $title->value ?? '',
             'title_main' => $title_main->value ?? '',

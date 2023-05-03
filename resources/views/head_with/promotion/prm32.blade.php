@@ -27,7 +27,7 @@
                         <div class="form-group">
                             <label for="">키워드</label>
                             <div class="flax_box">
-                                <input type="text" name="kwd" id="kwd" class="form-control form-control-sm">
+                                <input type="text" name="kwd" id="kwd" class="form-control form-control-sm search-enter">
                             </div>
                         </div>
                     </div>
@@ -79,18 +79,22 @@
         {field:"rt", headerName:"등록일시", width:130},
         {field:"ut" , headerName:"최근수정일시", width:130}
     ];
+    const pApp = new App('', {
+        gridId: "#div-gd",
+    });
+    let gx;
 
-    const pApp = new App('', { gridId: "#div-gd" });
-    const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columns);
-
-    pApp.ResizeGrid();
+    $(document).ready(function() {
+        pApp.ResizeGrid(275);
+        pApp.BindSearchEnter();
+        let gridDiv = document.querySelector(pApp.options.gridId);
+        gx = new HDGrid(gridDiv, columns);
+        Search();
+    });
 
     function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/head/promotion/prm32/search', data, 1);
     }
-
-    Search();
 </script>
 @stop

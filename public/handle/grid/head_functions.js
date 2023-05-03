@@ -97,11 +97,11 @@ function openSchDetail(idx = "") {
     window.open(
         url,
         "_blank",
-        "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800"
+        "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=400"
     );
 }
 function openSchPop(kwd) {
-    const url = `https://www.netpx.co.kr/app/product2/search?q=${kwd}`;
+    const url = `https://bizest.fjallraven.co.kr/app/product/search?q=${kwd}`;
     window.open(
         url,
         "_blank",

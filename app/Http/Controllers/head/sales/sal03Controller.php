@@ -103,8 +103,11 @@ class sal03Controller extends Controller
 				, (t.dc_amt_30 + t.dc_amt_60 + t.dc_amt_61) as sum_dc_amt
 				, (t.taxation_amt_30 + t.taxation_amt_60 + t.taxation_amt_61) as sum_taxation_amt
 				, (t.tax_amt_30 + t.tax_amt_60 + t.tax_amt_61) as sum_tax_amt
+				, ifnull(p.pg_fee,0) as exp_pg_fee
+				
 			from (
-				select date_format(d,'%Y%m') as sale_date
+				select 
+					date_format(d,'%Y%m') as sale_date
 				from mdate	
 				where d >='$sdate' and d <= '$edate'
 				group by sale_date
@@ -164,7 +167,31 @@ class sal03Controller extends Controller
 						$inner_where2 $inner_where
 					group by sale_date, w.ord_state
 				) b group by b.sale_date
-			) t on a.sale_date = t.sale_date
+			) t on a.sale_date = t.sale_date left outer join (
+				select
+					ord_state_date,
+					sum(cal_pg_fee(a.ord_state,a.ord_state_date,p.pay_type,p.pay_amt,p.pay_date,a.refund_amt)) as pg_fee
+				from (
+					select
+						o.ord_no,ord_state_date,
+						w.ord_state,
+						sum(if(clm.refund_yn = 'y',refund_amt,0)) as refund_amt
+					from order_opt o
+						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+						left outer join company c on o.sale_place = c.com_id
+						left outer join claim clm on w.ord_opt_no = clm.ord_opt_no
+					where
+						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
+						and w.ord_state in ('$ord_state',60,61)
+						and o.ord_state >= '$ord_state'
+						$inner_where2 $inner_where
+					group by o.ord_no,w.ord_state,ord_state_date
+				) a inner join order_mst m on a.ord_no = m.ord_no
+					inner join payment p on m.ord_no = p.ord_no
+				where m.ord_type = 0 && m.sale_place = 'HEAD_OFFICE'  && p.tno <> ''
+				group by a.ord_state_date
+			) p on a.sale_date = p.ord_state_date
         ";
 
         //echo "<pre>$sql</pre>";exit;
@@ -174,6 +201,7 @@ class sal03Controller extends Controller
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $result = [];
+
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
             $row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"];
@@ -181,8 +209,16 @@ class sal03Controller extends Controller
             $row["sum_taxation_no_vat"]	= round($row["sum_taxation_amt"]/1.1);		// 과세 부가세 별도
             $row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
             $row["margin"] = $row["sum_amt"]? round((1 - $row["sum_wonga"]/$row["sum_amt"])*100, 2):0;
-            $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
-            $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
+            $row["margin1"] = $row["sum_amt"] - (int)$row["sum_wonga"];
+            $row["margin2"] = $row["sum_amt"] - (int)$row["sum_wonga"] - $row["vat"];
+			$row['exp_point'] = $row['sum_point_amt'];
+			$row['exp_ad'] = 0;
+			$row['sum_tax'] = $row['sum_tax_amt'];
+			$row['exp_sum'] = $row['exp_point'] + $row['exp_pg_fee'];
+			$row['biz_profit'] = $row['sum_amt'] - (int)$row['sum_wonga'] - $row['exp_sum'];
+			$row['biz_profit_after'] = $row['biz_profit'] - $row['sum_tax'];
+			$row['biz_margin'] = ($row['sum_amt'] > 0)? ($row['biz_profit'] / $row['sum_amt']) * 100 : 0;
+
 
             $result[] = $row;
         }

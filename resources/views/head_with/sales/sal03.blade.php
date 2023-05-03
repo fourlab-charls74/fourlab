@@ -224,6 +224,7 @@
             <li>매출원가 = 실제판매원가</li>
             <li>부가세 = 과세 - ( 과세 / 1.1 )</li>
             <li>세전 매출이익 = 매출액 - 매출원가</li>
+            <li>세후 매출이익 = 매출액 - 매출원가 - 부가세 </li>
         </ul>
     </div>
 </div>
@@ -238,7 +239,7 @@
                 let s_ord_type = $(".ord_type:checked").map(function() {return this.value;}).get().join(",");
                 let s_ord_state = $('[name=ord_state]:checked').val();
                 let s_item = $("[name=item]").val();
-                let s_brand = $("[name=brand_cd]").val();
+                let s_brand = $(".select2-brand").val()??'';
                 let s_prd_nm = $("[name=goods_nm]").val();
                 let s_stat_pay_type = $(".stat_pay_type:checked").map(function() {return this.value;}).get().join(",");
 				return '<a href="/head/sales/sal02?sdate='+ params.data.date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_prd_nm + '&stat_pay_type='+ s_stat_pay_type +'" target="_new">'+ params.value+'</a>';
@@ -340,6 +341,58 @@
                 {
                     headerName: "세후",
                     field: "margin2",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
+        {
+            headerName: '비용',
+            children: [
+                {
+                    headerName: "PG수수료",
+                    field: "exp_pg_fee",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "적립금",
+                    field: "exp_point",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "광고비",
+                    field: "exp_ad",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "소계",
+                    field: "exp_sum",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
+        {
+            headerName: "이익율(%)",
+            field: "biz_margin",
+            type: 'percentType',
+            aggregation: true
+        },
+        {
+            headerName: '이익',
+            children: [
+                {
+                    headerName: "세전",
+                    field: "biz_profit",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+                {
+                    headerName: "세후",
+                    field: "biz_profit_after",
                     type: 'currencyType',
                     aggregation: true
                 },

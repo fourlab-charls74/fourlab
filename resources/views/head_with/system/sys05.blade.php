@@ -133,6 +133,15 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
+                                                            <th>관리자 도메인 NEW</th>
+                                                            <td>
+                                                                <div class="flax_box">
+                                                                    <input type='text' class="form-control form-control-sm w-100" name='domain_bizest_new' value='{{@$a_new_domain}}'>
+                                                                    <div style="color:gray;">* 외부 서비스 연동 시 관리자 도메인 NEW을 사용하게 되며, 기본값은 "handle" 입니다. "http://"는 생략합니다.    EX)handle.domain.co.kr</div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
                                                             <th>상점 이메일</th>
                                                             <td>
                                                                 <div class="flax_box">
