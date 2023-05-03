@@ -435,7 +435,7 @@ class prd30Controller extends Controller
 	{
 		// 설정 값 얻기
         $conf	= new Conf();
-		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_bizest");
+		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_handle");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
 		$cfg_domain_bizest	.= "/head";
 
@@ -501,7 +501,7 @@ class prd30Controller extends Controller
 			$option_qty	= $row->opt_info;
 
 			//$url = sprintf("http://%s/api/sabangnet/goods_xml.php?c=stock_view&goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
-			$url = sprintf("http://%s/api/sabangnet/goods_xml/summary_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
+			$url = sprintf("https://%s/api/sabangnet/goods_xml/summary_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
 			$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info2.html?xml_url=%s",urlencode($url));
 
 			$response = Http::get($url);
