@@ -17,8 +17,8 @@
                 <div class="flax_box">
                     <a href="#" onclick="Search()" class="btn btn-sm btn-primary mr-1 shadow-sm">검색</a>
                     <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
-                    <a href="#" onclick="window.close()" class="btn btn-sm btn-outline-primary mr-1 shadow-sm">닫기</a>
-                    <div id="search-btn-collapse" class="btn-group mr-2 mb-0 mb-sm-0"></div>
+{{--                    <a href="#" onclick="window.close()" class="btn btn-sm btn-outline-primary mr-1 shadow-sm">닫기</a>--}}
+                    <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
                 <div class="card-body">
@@ -50,9 +50,9 @@
                                         </div>
                                         <div class="docs-datepicker-container"></div>
                                     </div>
-                                    <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="주문일자 사용">
-                                        <input type="checkbox" class="custom-control-input" id="switch4" checked="">
-                                        <label class="" for="switch4" data-on-label="ON" data-off-label="OFF"></label>
+                                    <div class="custom-control custom-switch date-switch-pos"  data-toggle="tooltip" data-placement="top" data-original-title="주문일자 사용">
+                                        <input type="checkbox" class="custom-control-input" name="s_nud" id="s_nud" checked="" value="N" onClick="ManualNotUseData();">
+                                        <label class="" for="s_nud" data-on-label="ON" data-off-label="OFF"></label>
                                     </div>
                                 </div>
                             </div>
@@ -159,8 +159,7 @@
                         </div>
 
                     </div>
-                    <!-- end row -->
-                    <div class="row d-none search-area-ext">
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="name">주문/입금상태</label>
@@ -484,7 +483,7 @@
             </div>
         </form>
     </div>
-    <div class="card shadow mb-3">
+    <div class="card shadow">
         <div class="card-body shadow">
             <div class="card-title">
                 <div class="filter_wrap">
@@ -500,7 +499,7 @@
     </div>
 </div>
 
-<script>
+<script type="text/javascript" charset="utf-8">
 /**
  * 파일 : 상품 검색 팝업
  *
@@ -520,40 +519,53 @@
             cellRenderer: function(params) {
                 return `<a href="#" onClick="selectOrder('${params.node.rowIndex}')">선택</a>`;
             },
-            pinned: 'left'
+            pinned: 'left',
+            cellStyle: { 'text-align': 'center' },
         },
-        {field:"ord_date" , headerName:"주문일", pinned: 'left',
+        {field:"ord_date" , headerName:"주문일", pinned: 'left', width: 80, cellStyle: { 'text-align': 'center' },
             cellRenderer: function(params) {
                 return params.value.substr(0, 10);
             }
          },
-        {field:"ord_no" , headerName:"주문번호", width:170, cellStyle:StyleOrdNo, type:'HeadOrderNoType', pinned: 'left'},
-        {field:"goods_nm" , headerName:"상품명",type:"HeadGoodsNameType"},
-        {field:"style_no" , headerName:"스타일넘버"  },
-        {field:"opt_val" , headerName:"옵션"  },
-        {field:"qty" , headerName:"수량"},
-        {field:"user_nm" , headerName:"주문자"  },
-        {field:"r_nm" , headerName:"수령자"  },
-        {field:"price" , headerName:"판매가", type: 'currencyType'  },
-        {field:"pay_type" , headerName:"결제방법"   },
-        {field:"head_desc" , headerName:"상단홍보글", width:180},
-        {field:"coupon_nm" , headerName:"쿠폰"  },
-        {field:"ord_type" , headerName:"출고형태", width:180},
+        {field:"ord_no" , headerName:"주문번호", width: 140, cellStyle: StyleOrdNo, type: 'HeadOrderNoType', pinned: 'left'},
+        {field:"goods_nm" , headerName:"상품명", width: 200, type: "HeadGoodsNameType"},
+        {field:"style_no" , headerName:"스타일넘버", width: 80, cellStyle: { 'text-align': 'center' }},
+        {field:"opt_val" , headerName:"옵션", width: 150},
+        {field:"qty" , headerName:"수량", type: "currencyType"},
+        {field:"user_nm" , headerName:"주문자", cellStyle: { 'text-align': 'center' }},
+        {field:"r_nm" , headerName:"수령자", cellStyle: { 'text-align': 'center' }},
+        {field:"price" , headerName:"판매가", type: 'currencyType'},
+        {field:"pay_type" , headerName:"결제방법", cellStyle: { 'text-align': 'center' }},
+        {field:"head_desc" , headerName:"상단홍보글", width: 150},
+        {field:"coupon_nm" , headerName:"쿠폰"},
+        {field:"ord_type" , headerName:"출고형태", width: 60, cellStyle: { 'text-align': 'center' }},
         {field:"ord_kind",headerName:"출고구분",cellStyle:StyleOrdKind},
         {field:"ord_state" , headerName:"주문상태",cellStyle:StyleOrdState},
         {field:"clm_state" , headerName:"클레임상태",cellStyle:StyleClmState },
         {field:"com_nm" , headerName:"업체구분" },
         {field:"com_nm" , headerName:"업체" },
-        {field:"baesong_kind" , headerName:"배송구분"  },
-        {field:"baesong_info" , headerName:"배송정보"  },
-        {field:"dlv_end_date" , headerName:"배송완료일"  },
-        {field:"upd_date" , headerName:"최종처리일"  },
+        {field:"baesong_kind" , headerName:"배송구분", cellStyle: { 'text-align': 'center' }},
+        {field:"baesong_info" , headerName:"배송정보", cellStyle: { 'text-align': 'center' }},
+        {field:"dlv_end_date" , headerName:"배송완료일", width: 120, cellStyle: { 'text-align': 'center' }},
+        {field:"upd_date" , headerName:"최종처리일", width: 120, cellStyle: { 'text-align': 'center' }},
     ];
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 190 });
     const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columns);
+    let gx;
 
-    pApp.ResizeGrid();
+    $(document).ready(function() {
+        pApp.ResizeGrid(190);
+        gx = new HDGrid(gridDiv, columns);
+    
+        document.search.user_id.onkeyup	= checkNotUseDate;
+        document.search.user_nm.onkeyup	= checkNotUseDate;
+        document.search.ord_no.onkeyup  = checkNotUseDate;
+        document.search.r_nm.onkeyup	= checkNotUseDate;
+        document.search.cols.onchange	= checkNotUseDate;
+        document.search.key.onkeyup		= checkNotUseDate;
+    
+        Search();
+    });
 
     function Search(){
         let data = $('form[name="search"]').serialize();
@@ -572,6 +584,52 @@
         document.search.reset();
     }
 
-    Search();
+    function IsNotUseDate() {
+        let ff = document.search;
+        let is_not_use_date = false;
+    
+        // 주문번호, 회원아이디, 주문자, 수령자, 주문자핸드폰/전화, 수령자 핸드폰 일때 날짜 검색 무시
+    
+        if( ff.user_id.value != "" )
+            is_not_use_date = true;
+        else if( ff.user_nm.value != "" )
+            is_not_use_date = true;
+        else if( ff.ord_no.value != "" )
+            is_not_use_date = true;
+        else if( ff.r_nm.value.length >= 2 )
+            is_not_use_date = true;
+        else if(ff.cols.value == "b.mobile" && ff.key.value.length >= 8)
+            is_not_use_date = true;
+        else if(ff.cols.value == "b.phone" && ff.key.value.length >= 8)
+            is_not_use_date = true;
+        else if(ff.cols.value == "b.r_mobile" && ff.key.value.length >= 8)
+            is_not_use_date = true;
+    
+        return is_not_use_date;
+    }
+
+    function checkNotUseDate() {    
+        const is_not_use_date = IsNotUseDate();
+    
+        if( is_not_use_date ) {
+            $("[name=sdate]").prop("disabled", true);
+            $("[name=edate]").prop("disabled", true);
+            $('#s_nud').prop("checked", false);
+        } else {
+            $("[name=sdate]").prop("disabled", false);
+            $("[name=edate]").prop("disabled", false);
+            $('#s_nud').prop("checked", true);
+        }
+    }
+    
+    function ManualNotUseData() {
+        if( $("[name=s_nud]").is(":checked") == true ) {
+            $("[name=sdate]").prop("disabled", false);
+            $("[name=edate]").prop("disabled", false);
+        } else {
+            $("[name=sdate]").prop("disabled", true);
+            $("[name=edate]").prop("disabled", true);
+        }
+    }
 </script>
 @stop

@@ -182,32 +182,85 @@
             params.data.recv_amt = recv_amt;
             gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
 
-            setDlvFeeOfComType();
+            if ($("input[name=dlv_apply]:checked").val() === "Y") {
+                setDlvFeeOfComType();
+            } else {
+                EditAmtTable(0);
+                let list = gx.getRows().map(g => ({...g, dlv_amt: 0}));
+                gx.gridOptions.api.setRowData(list);
+                gx.setFocusedWorkingCell();
+            }
+            
             $("#add_goods").attr("disabled", true);
         }
     }
 
     // com_type별 배송비합계 세팅
-    function setDlvFeeOfComType() {
+    function setDlvFeeOfComType(direct_dlv = '', direct_com_id = '') {
         let rows = gx.getRows();
         let nodes = [], dlv_amts = [];
         let count = 0;
 
+        if (direct_dlv !== '' && direct_com_id !== '' && !isNaN(direct_dlv * 1) && direct_dlv > 0) {
+            $("#dlv_apply_y").prop('checked', true);
+        }
+
         gx.gridOptions.api.forEachNode(node => {
             count++;
-            if(!node.data.goods_no) {
-                nodes.push(node);
-                let total = rows.splice(0, count).reduce((a,c) => (c.price || 0) * (c.qty || 0) + a, 0);
-                let dlv = total < free_dlv_amt ? base_dlv_fee : 0;
-                node.data.dlv_amt = dlv;
-                dlv_amts.push(dlv);
+            let dlv;
+            
+            if ($("input[name=dlv_apply]:checked").val() === "N") {
+                dlv = 0;
+            } else if (!node.data.goods_no) {
+                let arr = rows.splice(0, count);
+                let total = arr.reduce((a, c) => (c.price || 0) * (c.qty || 0) + a, 0);
+                
+                if (direct_dlv !== '' && node.data.com_id === direct_com_id && !isNaN(direct_dlv * 1)) {
+                    dlv = direct_dlv * 1;
+                    node.data.direct_dlv = dlv;
+                } else if (node.data.direct_dlv !== undefined) {
+                    dlv = node.data.direct_dlv;
+                } else if (direct_dlv !== '' && direct_dlv < 1) {
+                    dlv = node.data.dlv_amt;
+                } else {
+                    dlv = total < free_dlv_amt ? base_dlv_fee : 0;
+                }
+
+                if (isNaN(dlv)) dlv = 0;
+                dlv_amts.push([node.data.com_id, dlv, arr.length - 1]);
                 count = 0;
+            } else {
+                dlv = (node.data?.price * node.data?.qty) < free_dlv_amt ? base_dlv_fee : 0;
+                if (isNaN(dlv)) dlv = 0;
             }
-        })
+            
+            node.data.dlv_amt = dlv;
+            nodes.push(node);
+        });
+        
+        let com_dlv_cnt = 0, com_dlv_sum = 0;
+        nodes = nodes.map(node => {
+            if (node.data.goods_no) {
+                com_dlv_cnt++;
+                let com_id = node.data.com_type === 2 ? node.data.com_id : 'etc';
+                let dlv_amt = dlv_amts.find(d => d[0] === com_id) || [];
+                if (com_dlv_cnt >= dlv_amt[2]) {
+                    node.data.dlv_amt = dlv_amt[1] - com_dlv_sum;
+                } else {
+                    node.data.dlv_amt = Math.floor(dlv_amt[1] / dlv_amt[2]);
+                    com_dlv_sum += node.data.dlv_amt;
+                }
+            } else {
+                com_dlv_cnt = 0;
+                com_dlv_sum = 0;
+            }
+            return node;
+        });
 
-        gx.gridOptions.api.redrawRows({rowNodes:nodes});
+        gx.gridOptions.api.redrawRows({ rowNodes: nodes });
+        gx.setFocusedWorkingCell();
 
-        EditAmtTable(dlv_amts.reduce((a,c) => a+c, 0));
+        EditAmtTable(dlv_amts.reduce((a, c) => a + c[1], 0));
     }
 
     function EditAmtTable(total_dlv_amt) {
@@ -218,7 +271,7 @@
         var ord_amt_total = rows.reduce((a,c) => c.goods_no ? c.ord_amt + a : a, 0); // 주문액합계
 
         if(total_dlv_amt !== undefined) {
-            $("[name='dlv_amt']").val(dlv_amt_total);
+            $("[name='dlv_amt']").val(dlv_amt_total.toLocaleString('ko-KR'));
             $("[name='ord_amt']").val(ord_amt_total.toLocaleString('ko-KR'));
         }
 
@@ -347,7 +400,6 @@
                 type: 'get',
                 url: "/head/member/mem01/" + user_id + "/get",
                 success: function (res) {
-                    console.log(res);
                     if(res.hasOwnProperty('user')){
                         var user = res.user;
                         $('#user_nm').val(user.name);
@@ -498,7 +550,7 @@
 
     function PopSearchOrder() {
         const url='/head/api/order?isld=Y';
-        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+        window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1400,height=800");
     }
 
     function PopOrder(obj){
@@ -832,7 +884,7 @@
         if(is_use) setDlvFeeOfComType();
         else {
             EditAmtTable(0);
-            let list = gx.getRows().map(g => g.goods_no ? g : {...g, dlv_amt: 0});
+            let list = gx.getRows().map(g => ({...g, dlv_amt: 0, direct_dlv: undefined}));
             gx.gridOptions.api.setRowData(list);
         }
     }

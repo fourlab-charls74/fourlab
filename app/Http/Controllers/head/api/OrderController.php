@@ -16,7 +16,7 @@ class OrderController extends Controller
 {
     public function index(Request $req){
         $mutable = now();
-        $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
+        $sdate	= $mutable->sub(1, 'week')->format('Y-m-d');
 
         $values = [
             'ord_no'        => $req->input('ord_no', ''),

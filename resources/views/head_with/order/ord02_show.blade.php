@@ -19,7 +19,8 @@
             </div>
         </div>
         <div>
-            <input type="button" value="판매등록" class="btn btn-sm btn-primary shadow-sm mr-1 save-btn" onclick="return Validate(document.f1);"/>
+            <a href="javascript:Validate(document.f1);" class="btn btn-sm btn-primary submit-btn"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 판매등록</a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm" onclick="window.close()"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
 
@@ -435,8 +436,8 @@
         </div>
     </form>
     <div class="resul_btn_wrap mt-3 d-block">
-        <a href="javascript:Validate(document.f1);" class="btn btn-sm btn-primary submit-btn">저장</a>
-        <a href="javascript:;" class="btn btn-sm btn-primary shadow-sm" onclick="window.close()">취소</a>
+        <a href="javascript:Validate(document.f1);" class="btn btn-sm btn-primary submit-btn"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 판매등록</a>
+        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm" onclick="window.close()"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
     </div>
 </div>
 <!-- script -->
@@ -445,30 +446,26 @@
 <script type="text/javascript">
 
     const columns = [
-        {headerName: '', headerCheckboxSelection: true, checkboxSelection: function(params) {
-            if(params.data.goods_no) return true;
-            return false;
-        }, width:50},
-        {field:"ord_opt_no" , headerName:"주문일련번호", width:100,sortable:"ture", type: function(params) {
-            if(params.data.goods_no) return 'HeadOrdOptNoType';
-            return "none";
-        }},
-        {field:"goods_nm" , headerName:"상품명",type:"HeadGoodsNameType",width:200,wrapText:true,autoHeight:true},
-        {field:"opt_val" , headerName:"옵션",width:100,
-            editable: true,
-            cellClass:['hd-grid-edit'],
+        {headerName: '', headerCheckboxSelection: true, width: 28,
+            checkboxSelection: function(params) {
+                if(params.data.goods_no) return true;
+                return false;
+            },
+        },
+        {field:"ord_opt_no" , headerName:"주문일련번호", width: 80, sortable:"ture", cellStyle: { 'text-align': 'center' },
+            type: function(params) {
+                if(params.data.goods_no) return 'HeadOrdOptNoType';
+                return "none";
+            }
+        },
+        {field: "goods_nm" ,headerName: "상품명",type:"HeadGoodsNameType", width: 300, wrapText: true, autoHeight: true},
+        {field: "opt_val" ,headerName: "옵션", width: 200,
+            editable: function(params) {if(params.data.goods_no) return true; return false;},
+            cellClass: ['hd-grid-edit'],
             cellEditor: 'agRichSelectCellEditor',
             cellEditorParams: cellOpionsParams,
-            // cellEditorSelector: function(params) {
-            //     return {
-            //         component: 'agRichSelectCellEditor',
-            //         params: {
-            //             values: []
-            //         }
-            //     };
-            // }
         },
-        {field:"qty" , headerName:"수량", width:90,type: 'numberType',
+        {field:"qty" , headerName:"수량", width: 60,type: 'numberType',
             editable: function(params) {
                 if(params.data.goods_no) return true;
                 return false;
@@ -476,14 +473,18 @@
             cellClass:['hd-grid-number','hd-grid-edit'],onCellValueChanged:EditAmt,
             //cellStyle:StyleChangeYN,
         },
-        {field:"price" , headerName:"판매가", width:90, type: 'currencyType', editable: function(params) {if(params.data.goods_no) return true; return false;}, cellClass: ['hd-grid-number', 'hd-grid-edit'], onCellValueChanged: EditAmt },
-        {field:"ord_amt" , headerName:"주문액", width:90, type: 'currencyType'  },
+        {field:"price" , headerName:"판매가", width: 100, type: 'currencyType', editable: function(params) {if(params.data.goods_no) return true; return false;}, cellClass: ['hd-grid-number', 'hd-grid-edit'], onCellValueChanged: EditAmt },
+        {field:"ord_amt" , headerName:"주문액", width: 100, type: 'currencyType'},
         // {field:"recv_amt" , headerName:"입금액", width:90, type: 'currencyType',onCellValueChanged:EditAmt },
-        {field:"point_amt" , headerName:"(-)적립금", width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
-        {field:"coupon_amt" , headerName:"(-)쿠폰", width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
-        {field:"dc_amt" , headerName:"(-)할인", width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
-        {field:"dlv_amt" , headerName:"(+)배송비", width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
-        {headerName: "", field: "nvl"}
+        {field:"point_amt" , headerName:"(-)적립금", hide: true, width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
+        {field:"coupon_amt" , headerName:"(-)쿠폰", hide: true, width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
+        {field:"dc_amt" , headerName:"(-)할인", hide: true, width:90, type: 'currencyType',editable: function(params) {if(params.data.goods_no) return true; return false;}, onCellValueChanged:EditAmt },
+        {field:"dlv_amt" , headerName:"(+)배송비", width: 100, type: 'currencyType',
+            onCellValueChanged: (e) => setDlvFeeOfComType(e.newValue, e.data?.com_id || ''),
+            editable: function(params) {if(params.data.goods_no) return false; return true;},
+            cellStyle: function(params) { return {'background-color': params.data.goods_no ? 'none' : '#ffff99'} },
+        },
+        {width: "auto"}
     ];
 
     const pApp = new App('',{

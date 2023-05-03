@@ -737,7 +737,7 @@ class ord02Controller extends Controller
         $ord_state = $req->input("ord_state", "");
         $sale_place = $req->input("sale_place", "");
 
-        $cart = $req->input("cart");
+        $cart = $req->input("cart", []);
 
         $ord_amt = 0;
         $recv_amt = 0;
