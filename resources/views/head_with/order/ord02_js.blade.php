@@ -50,16 +50,26 @@
             alert("수기판매등록하실 상품을 검색해 주십시오.");
             return false;
         } else {
-            var is_option = true;
+            let is_option = true;
+            let is_nan = false;
+            
             gx.gridOptions.api.forEachNode(function(node) {
-                if(node.data.opt_val === undefined || node.data.opt_val === ""){
+                if (node.data.opt_val === undefined || node.data.opt_val === "") {
                     if(node.data.goods_no !== undefined) is_option = false;
                     gx.gridOptions.api.setFocusedCell(node.rowIndex,"opt_val");
                     return false;
                 }
+                if (isNaN(node.data.qty) || isNaN(node.data.price)) {
+                    if(node.data.goods_no !== undefined) is_nan = true;
+                }
             });
-            if(is_option === false){
+            
+            if (!is_option) {
                 alert('옵션을 선택 해 주십시오.');
+                return false;
+            }
+            if (is_nan) {
+                alert('상품의 수량과 판매가를 올바르게 입력해 주십시오.');
                 return false;
             }
         }
@@ -199,7 +209,7 @@
     function setDlvFeeOfComType(direct_dlv = '', direct_com_id = '') {
         let rows = gx.getRows();
         let nodes = [], dlv_amts = [];
-        let count = 0;
+        let count = 0, ord_amt = 0;
 
         if (direct_dlv !== '' && direct_com_id !== '' && !isNaN(direct_dlv * 1) && direct_dlv > 0) {
             $("#dlv_apply_y").prop('checked', true);
@@ -232,6 +242,13 @@
             } else {
                 dlv = (node.data?.price * node.data?.qty) < free_dlv_amt ? base_dlv_fee : 0;
                 if (isNaN(dlv)) dlv = 0;
+            }
+            
+            if (!node.data.goods_no) {
+                node.data.ord_amt = ord_amt;
+                ord_amt = 0;
+            } else {
+                ord_amt += node.data.ord_amt || 0;
             }
             
             node.data.dlv_amt = dlv;
