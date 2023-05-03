@@ -572,10 +572,13 @@
         {field:"qty" , headerName:"수량", width:46, cellStyle:{"text-align" : "right"}},
         {field:"user_nm" , headerName:"주문자(아이디)", width:96,
             cellRenderer: function(params) {
-                if(params.data.user_nm == '비회원()'){
+                let orderer = params.data.user_nm + '(' + params.data.user_id + ')';
+                if(params.data.user_nm == '비회원'){
+                    return params.data.user_nm;
+                } else if (params.data.user_id == '') {
                     return params.data.user_nm;
                 } else {
-                    return '<a href="#" onclick="return openUserInfo(\'' + params.data.user_nm + '\');">' + params.value + '</a>';
+                    return '<a href="#" onclick="return openUserInfo(\'' + orderer + '\');">' + orderer + '</a>';
                 }
             }
         },

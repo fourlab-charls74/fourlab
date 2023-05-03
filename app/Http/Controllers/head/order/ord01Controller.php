@@ -1512,7 +1512,7 @@ class ord01Controller extends Controller
 				select
 					'' as chkbox, a.ord_no, a.ord_opt_no, ord_state.code_val ord_state_nm, a.ord_state , clm_state.code_val clm_state, pay_stat.code_val as pay_stat,
 					ifnull(gt.code_val,'N/A') as goods_type_nm, a.style_no, '' as img_view, a.goods_nm,
-					replace(a.goods_opt, '^', ' : ') as opt_val, a.goods_addopt, a.qty, a.user_nm, a.r_nm, a.price,
+					replace(a.goods_opt, '^', ' : ') as opt_val, a.goods_addopt, a.qty, a.user_nm, a.user_id, a.r_nm, a.price,
 					a.sale_amt, a.gift, a.dlv_amt, 0 as pay_fee, pay_type.code_val as pay_type, fintech,
 					a.cash_apply_yn,
 					a.cash_yn,
@@ -1534,7 +1534,11 @@ class ord01Controller extends Controller
 				from (
 					select
 						b.ord_no, a.ord_opt_no, a.ord_state, d.pay_stat, c.goods_type, c.style_no, a.goods_nm,
-						a.goods_opt, a.qty, concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm, b.r_nm,
+						a.goods_opt, a.qty
+                        -- , concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm
+                        , ifnull(b.user_nm, '') as user_nm
+                        , ifnull(b.user_id, '') as user_id
+                        , b.r_nm,
 						a.price, (a.coupon_amt+a.dc_amt) as sale_amt,
 						(
 							select group_concat(gf.name)
