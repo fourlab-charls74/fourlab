@@ -263,7 +263,7 @@
             ] 
         },
         { field: "price", headerName: "판매가", type: 'numberType', width: 58 },
-        { field: "wonga", headerName: "원가", type: 'numberType', width: 58, cellRenderer: (params) => `<a href="#" onclick="openWongaPopup(event, ${params.data.goods_no}, ${params.data.goods_sub})">${params.value}</a>` },
+        { field: "wonga", headerName: "원가", type: 'numberType', width: 58, cellRenderer: (params) => `<a href="#" onclick="openWongaPopup(event, ${params.data.goods_no}, ${params.data.goods_sub})">${Comma(params.value)}</a>` },
         { field: "margin", headerName: "원가대비 마진율", type: 'numberType', width: 100 },
     ];
 

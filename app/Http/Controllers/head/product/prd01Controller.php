@@ -996,7 +996,8 @@ class prd01Controller extends Controller
             'g_dlv_fee'			=> $cfg_dlv_fee,
             'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
             'g_order_point_ratio'	=> $cfg_order_point_ratio,
-            'img_prefix'            => sprintf("%s",config("shop.image_svr"))
+            'img_prefix'            => sprintf("%s",config("shop.image_svr")),
+            'avg_wonga'             => $this->_get_avg_wonga($goods_no),
         ]);
 
         return view(Config::get('shop.head.view') . '/product/prd01_show',$values);
@@ -1156,6 +1157,21 @@ class prd01Controller extends Controller
             'options'           => $options,
 			'opt_kind_list'		=> $opt_kind_list,
         ];
+    }
+    
+    /** 상품의 평균원가 조회 */
+    private function _get_avg_wonga($goods_no)
+    {
+        $sql = "
+            select
+                round(sum(wonga * qty) / sum(qty)) as g_wonga
+            from goods_good
+            where goods_no=:goods_no
+                and goods_sub=:goods_sub
+                and qty > 0
+        ";
+        $row = DB::selectOne($sql, [ 'goods_no' => $goods_no, 'goods_sub' => 0 ]);
+        return $row->g_wonga ?? 0;
     }
 
 	public function create_goods(Request $req) {

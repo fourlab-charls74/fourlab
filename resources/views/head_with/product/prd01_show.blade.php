@@ -414,13 +414,13 @@
                                             <td>
                                                 <div class="txt_box flax_box">
                                                     <input
-                                                    type='text'
-                                                    style="width:74%"
-                                                    class="form-control form-control-sm search-all text-right"
-                                                    name='price'
-                                                    id='price'
-                                                    value='{{ @number_format(@$goods_info->price) }}'
-                                                    @if (@$goods_info->sale_yn == "Y") readonly @endif
+                                                        type='text'
+                                                        style="width:74%"
+                                                        class="form-control form-control-sm search-all text-right"
+                                                        name='price'
+                                                        id='price'
+                                                        value='{{ @number_format(@$goods_info->price) }}'
+                                                        @if (@$goods_info->sale_yn == "Y") readonly @endif
                                                     >
                                                     <div class="txt_box ml-1 mr-2">원</div>
                                                     @if ($type !== 'create')
@@ -548,7 +548,7 @@
                                                 </div>
                                             </td>
                                             <th class="required">원가</th>
-                                            <td>
+                                            <td class="pb-0">
                                                 <div class="txt_box flax_box">
                                                     <input
                                                     type='text'
@@ -563,9 +563,14 @@
                                                     >
                                                     <div class="txt_box ml-1">원</div>
                                                 </div>
-                                                <p class="font-size-12 mt-1 mb-0">
-                                                    *원가는 자동계산됩니다.
-                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <p class="font-size-12 mt-1 mb-0">
+                                                        *원가는 자동계산됩니다.
+                                                    </p>
+                                                    @if (@$goods_info->goods_type === 'S')
+                                                        <a href="javascript:void(0);" class="txt_box ml-1" onclick="return openWongaPopup();">(평균 {{ number_format(@$avg_wonga) }}원)</a>
+                                                    @endif
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
@@ -3670,6 +3675,12 @@
             }
         });
 
+    }
+
+    // 평균원가 히스토리 조회팝업 오픈
+    function openWongaPopup() {
+        const url = "/head/product/prd03/wonga?goods_no=" + document.f1.goods_no.value + "&goods_sub=" + document.f1.goods_sub.value;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=200,width=1024,height=900");
     }
 
 	</script>

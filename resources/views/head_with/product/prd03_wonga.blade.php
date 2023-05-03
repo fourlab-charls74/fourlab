@@ -19,7 +19,7 @@
             </div>
         </div>
         <div>
-            <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="window.close()">닫기</a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm" onclick="window.close()"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
 
@@ -40,11 +40,11 @@
                                 </tr>
                                 <tr>
                                     <th>판매가</th>
-                                    <td>{{ @$price }}</td>
+                                    <td>{{ number_format(@$price ?? 0) }}원</td>
                                 </tr>
                                 <tr>
                                     <th>평균원가</th>
-                                    <td>현재고 총원가 ( <strong class="strong">{{ number_format(@$sum_wonga) }}</strong> ) / 현재고 ( <strong class="strong">{{ number_format(@$avail_qty) }}</strong> ) = <strong class="strong">{{ number_format(@$avg_wonga) }}</strong>원</td>
+                                    <td>현재고 총원가 ( <strong class="strong">{{ number_format(@$sum_wonga) }}</strong> ) / 현재고 ( <strong class="strong">{{ number_format(@$avail_qty) }}</strong> ) = <strong class="strong text-danger">{{ number_format(@$avg_wonga) }}</strong>원</td>
                                 </tr>
                             </table>
                         </div>
@@ -52,8 +52,8 @@
                 </div>
             </div>
         </div>
-        <div class="card shadow-none mb-0 ty2 last-card">
-            <div class="card-body">
+        <div class="card shadow-none mb-0 pt-0 ty2 last-card">
+            <div class="card-body border-0">
                 <div class="card-title mt-2 mb-3 ml-2">
                     <div class="filter_wrap">
                         <div class="fl_box">
@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<script language="javascript">
+<script type="text/javascript">
     let gx; 
     const pApp = new App('', { gridId: "#div-gd" });
     const goods_no = '{{ @$goods_no }}';
@@ -77,17 +77,19 @@
     const price = '{{ @$price }}';
 
     let columns = [
-        { headerName: '#', valueGetter: 'node.id', cellRenderer: 'loadingRenderer', width: 50 },
-        { field: "invoice_no", headerName: "송장번호", width: 100, cellClass:'hd-grid-number' },
-        { field: "regi_date", headerName: "입고일자", width: 100 },
-        { field: "com_nm", headerName: "공급처", width: 150 },
-        { field: "h_wonga", headerName: "원가", type: "numberType", width: 100 },
-        { field: "qty", headerName: "수량", type: "numberType", width: 100 },
-        { field: "goods_opt", headerName: "옵션", width: 120 },
-        { field: "margin", headerName: "마진율(%)", width: 100, cellClass:'hd-grid-number' },
+        { headerName: '#', valueGetter: 'node.id', cellRenderer: 'loadingRenderer', width: 40, cellStyle: { 'text-align': 'center' } },
+        { field: "invoice_no", headerName: "송장번호", width: 130, cellClass:'hd-grid-number', cellStyle: { 'text-align': 'center' } },
+        { field: "regi_date", headerName: "입고일자", width: 80, cellStyle: { 'text-align': 'center' } },
+        { field: "com_nm", headerName: "공급처", width: 100, cellStyle: { 'text-align': 'center' } },
+        { field: "h_wonga", headerName: "원가", type: "numberType", width: 80 },
+        { field: "qty", headerName: "수량", type: "numberType", width: 80 },
+        { field: "goods_opt", headerName: "옵션", width: 200 },
+        { field: "margin", headerName: "마진율(%)", width: 80, cellClass: 'hd-grid-number' },
+        { width: "auto" }
     ];
 
     $(document).ready(function() {
+        pApp.ResizeGrid(275);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
 
