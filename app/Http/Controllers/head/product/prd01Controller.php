@@ -1163,8 +1163,6 @@ class prd01Controller extends Controller
 		$id		= Auth('head')->user()->id;
 		$name	= Auth('head')->user()->name;
 
-		dd($req->input('opt_kind_cd'));
-
 		$conf	= new Conf();
 		$cfg_dlv_fee				= $conf->getConfigValue("delivery","base_delivery_fee");
 		$cfg_free_dlv_fee_limit		= $conf->getConfigValue("delivery","free_delivery_amt");

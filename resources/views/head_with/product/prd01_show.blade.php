@@ -1925,6 +1925,8 @@
                         const TYPE = "{{$type}}";
                         if (TYPE == "create") {
                             alert("상품이 등록되었습니다.");
+                            opener.Search();
+                            window.close();
                         } else {
 						    alert("변경된 내용이 정상적으로 저장 되었습니다.");
 						    location.href="/head/product/prd01/" + data;
