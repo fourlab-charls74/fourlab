@@ -101,7 +101,7 @@ class prm31Controller extends Controller
                 s.rt, 
                 s.kwd,
                 s.qry, 
-                
+                a.synonym,
                 ifnull(a.pv_1m,0) as pv_1m, 
                 s.sch_cnt, 
                 s.ip, 

@@ -126,8 +126,8 @@
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
                                     <div class="btn-group" role="group">
-                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+                                        <label class="btn btn-secondary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+                                        <label class="btn btn-primary primary" id="asc" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
                                     </div>
                                     <input type="radio" name="ord" id="sort_desc" value="desc">
                                     <input type="radio" name="ord" id="sort_asc" value="asc" checked="">
@@ -473,6 +473,7 @@
             },
             success: function(data) {
                 alert("변경되었습니다.");
+                Search();
             },
             error: function(request, status, error) {
                 console.log("error")
@@ -484,14 +485,7 @@
         e.preventDefault();
         const rows = gx.getSelectedRows();
 
-        let kwd = rows.map(r => ({kwd : r.kwd}));
-
-        if (rows.length == 0) {
-            return alert('검색어를 선택해주세요');
-        }
-
         if (confirm('점수를 변경하시겠습니까?') === false) return;
-
 
         $.ajax({
             async: true,
@@ -501,11 +495,10 @@
                 pv: $('#pv').val(),
                 tags: $('#tags').val(),
                 mpv: $('#mpv').val(),
-                kwd : kwd
             },
             success: function(data) {
                 alert("변경되었습니다.");
-                location.reload();
+                Search();
             },
             error: function(request, status, error) {
                 console.log("error")
@@ -528,8 +521,9 @@
                 mpv: $('#mpv').val()
             },
             success: function(data) {
+                console.log(data);
                 alert("변경되었습니다.");
-                location.reload();
+                Search();
             },
             error: function(request, status, error) {
                 console.log("error")

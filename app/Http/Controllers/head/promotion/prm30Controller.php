@@ -8,6 +8,7 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Exception;
 use Carbon\Carbon;
 
 class prm30Controller extends Controller
@@ -187,6 +188,7 @@ class prm30Controller extends Controller
     {
         $kwd    = Request("kwd");
         $synonym    = Request("synonym");
+
         $sql = "
             select count(*) as cnt from search where kwd = '$kwd'
         ";
@@ -216,7 +218,6 @@ class prm30Controller extends Controller
         $pv = Request("pv", 1);
         $tags = Request("tags", 1);
         $mpv = Request("mpv", 1);
-        $kwd = $request->input('kwd','');
 
         // Save Point Function
         try {
@@ -234,17 +235,13 @@ class prm30Controller extends Controller
             $tags = $row->tags;
             $mpv = $row->mpv;
 
-
             $sql = "
                 update search 
-                   set point = $pv * ifnull(pv_1m,0) + $tags * ifnull(tags,0) + $mpv * ifnull(mpv,0)
-                where kwd = '$kwd'
+                    set point = $pv * ifnull(pv_1m,0) + $tags * ifnull(tags,0) + $mpv * ifnull(mpv,0)
             ";
-
-            dd($sql);
-
+                
+            DB::update($sql);
             DB::commit();
-
             return response()->json(null, 204);
         } catch (Exception $e) {
             DB::rollback();
@@ -283,11 +280,14 @@ class prm30Controller extends Controller
             ";
             DB::update($sql);
 
+            // dd($aa);
+
             DB::commit();
-            return response()->json(null, 204);
+            // return response()->json(null, 204);
+            return response()->json(["msg" => "성공"], 200);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['msg' => $e->getMessage()], 500);
         }
     }
 }

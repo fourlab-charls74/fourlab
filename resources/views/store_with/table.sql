@@ -1207,6 +1207,9 @@ ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `dp_soldout_yn` CHAR(1) NULL DEFAUL
 ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `gift_price` INT(11) NULL DEFAULT NULL COMMENT '사은품가격' AFTER `apply_amt`;
 ALTER TABLE `bizest_smart`.`gift` ADD COLUMN `apply_group` VARCHAR(20) NULL DEFAULT NULL COMMENT '증정대상' AFTER `apply_com`;
 
+
+-- 검색
+ALTER TABLE `bizest_smart`.'search' ADD COLUMN `synonym` VARCHAR(50) NULL COMMENT '동의어' AFTER `ex_pop_yn`;
 --
 -- 기존 테이블 컬럼 추가 종료
 --
