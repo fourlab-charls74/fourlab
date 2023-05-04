@@ -144,14 +144,14 @@
 											<option value="2000">2000</option>
 											<option value="5000">5000</option>
 											<option value="10000">10000</option>
-											<option value=-1>모두</option>
+											<option value="-1">모두</option>
 										</select>
 									</div>
 									<span class="text_line">/</span>
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
-											<option value="a.goods_no" >온라인코드</option>
-											<option value="a.style_no" >스타일넘버</option>
+											<option value="a.goods_no">온라인코드</option>
+											<option value="a.style_no">스타일넘버</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">

@@ -241,7 +241,7 @@
                                     <div class="row">
                                         <div class="col-lg-12 inner-td">
                                             <div class="form-group">
-                                                <label style="min-width:60px;">공급업체명</label>
+                                                <label class="mr-2" style="min-width:60px;">공급업체명</label>
                                                 <div class="flax_box">
                                                     <input type='text' class="form-control form-control-sm sch-sup-company" name='com_nm' value=''>
                                                 </div>

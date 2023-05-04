@@ -179,7 +179,7 @@
         // logics
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/head/stock/stk11/search', data);
+            gx.Request('/head/stock/stk11/search', data, -1);
         };
 
         const add = () => {

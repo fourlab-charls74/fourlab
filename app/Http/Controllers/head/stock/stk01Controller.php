@@ -86,7 +86,12 @@ class stk01Controller extends Controller
 
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
-        $limit = " limit $startno, $page_size ";
+        
+        if ($limit == -1) {
+            $limits = "";
+        } else {
+            $limit = " limit $startno, $page_size ";
+        }
 
         $total = 0;
         $page_cnt = 0;
@@ -103,13 +108,6 @@ class stk01Controller extends Controller
             $total = $row[0]->total;
             $page_cnt=(int)(($total-1)/$page_size) + 1;
         }
-
-
-		// if($limit == -1){
-		// 	$limit = "";
-		// } else {
-		// 	$limit = " limit $startno, $page_size ";
-		// }
 
         $query = /** @lang text */
             "
