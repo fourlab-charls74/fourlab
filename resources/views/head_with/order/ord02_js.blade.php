@@ -255,21 +255,19 @@
             nodes.push(node);
         });
         
-        let com_dlv_cnt = 0, com_dlv_sum = 0;
+        let com_dlv_cnt = 0
         nodes = nodes.map(node => {
             if (node.data.goods_no) {
                 com_dlv_cnt++;
                 let com_id = node.data.com_type === 2 ? node.data.com_id : 'etc';
                 let dlv_amt = dlv_amts.find(d => d[0] === com_id) || [];
                 if (com_dlv_cnt >= dlv_amt[2]) {
-                    node.data.dlv_amt = dlv_amt[1] - com_dlv_sum;
+                    node.data.dlv_amt = dlv_amt[1];
                 } else {
-                    node.data.dlv_amt = Math.floor(dlv_amt[1] / dlv_amt[2]);
-                    com_dlv_sum += node.data.dlv_amt;
+                    node.data.dlv_amt = 0;
                 }
             } else {
                 com_dlv_cnt = 0;
-                com_dlv_sum = 0;
             }
             return node;
         });
