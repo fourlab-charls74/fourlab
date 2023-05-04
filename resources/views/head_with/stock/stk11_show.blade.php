@@ -367,27 +367,6 @@
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
-            /**
-             *  키보드 방향키 누르면 바로 입력할 수 있는 부분(개발중)
-             */
-            onCellKeyDown : function(e) {
-                let key = e.event.key;
-
-                if (e.column.colId == 'qty' || e.column.colId == 'unit_cost') {
-                    if (key == 'ArrowDown') {
-                        gx.gridOptions.api.stopEditing();
-                        let rowIndex = e.rowIndex + 1;
-                        let column = e.column.colId;
-                        gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
-    
-                    } else if (key == 'ArrowUp') {
-                        gx.gridOptions.api.stopEditing();
-                        let rowIndex = e.rowIndex - 1;
-                        let column = e.column.colId;
-                        gx.gridOptions.api.startEditingCell({ rowIndex: rowIndex, colKey: column });
-                    } 
-                }
-            },
             onCellValueChanged: async (params) => {
                 await evtAfterEdit(params);
             },

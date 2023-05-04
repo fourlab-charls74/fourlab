@@ -353,6 +353,18 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         //     }
         // },
 
+        // 셀 입력중, 키보드 아래방향키로 셀 이동
+        onCellKeyDown: function(e) {
+            let key = e.event.key;
+            
+            if (e.column.isCellEditable(e.node)) {
+                if (key == 'ArrowDown' && e.api.getDisplayedRowCount() > e.rowIndex + 1) {
+                    this.api.stopEditing();
+                    this.api.startEditingCell({ rowIndex: e.rowIndex + 1, colKey: e.column.colId });    
+                }
+            }
+        },
+
         onColumnVisible: function (params) {
             params.api.resetRowHeights();
         },
