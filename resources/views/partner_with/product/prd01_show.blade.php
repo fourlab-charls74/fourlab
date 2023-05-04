@@ -317,8 +317,8 @@ select.select_cat
                                             <th class="required">상품구분</th>
                                             <td>
                                                 <div class="wd300">
+                                                    <input name="goods_type" id="goods_type" value="P" type="hidden"/>
                                                     @if($type == 'create')
-                                                    <input value="P" type="hidden"/>
                                                     <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">위탁상품</span>
                                                     <x-tool-tip>
                                                         <x-slot name="arrow">top</x-slot>
@@ -367,7 +367,7 @@ select.select_cat
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th><p>판매가</p></th>
+                                            <th><p class="required">판매가</p></th>
                                             <td>
                                                 <div class="flax_box">
                                                     <div class="input_box wd200">
@@ -398,8 +398,15 @@ select.select_cat
                                             <td>
                                                 <div class="flax_box">
                                                     <div class="input_box wd200">
-                                                        <input type='text' class="form-control form-control-sm search-all text-right" name='wonga' id='wonga' value='{{@number_format(@$goods_info->wonga)}}'
-                                                            @if( $type == "" || @$goods_info->sale_stat_cl >= 30) readonly @endif>
+                                                        <input 
+                                                            type='text' 
+                                                            class="form-control form-control-sm search-all text-right" 
+                                                            name='wonga' 
+                                                            id='wonga' 
+                                                            value='{{@number_format(@$goods_info->wonga)}}' 
+                                                            readonly
+                                                            {{-- @if( $type == "" || @$goods_info->sale_stat_cl >= 30) readonly @endif --}}
+                                                        >
                                                     </div>
                                                     <div class="txt_box ml-1">원</div>
                                                 </div>
@@ -1540,6 +1547,7 @@ select.select_cat
                 var margin	= unComma($('#margin').val());
                 if( margin == '' )	margin = 0;
                 var wonga = parseInt(Math.round(price * (1-margin/100)),10);
+                $('#price').val(Comma(price));
                 $("#wonga").val(Comma(wonga));
             }
         }
@@ -2167,7 +2175,7 @@ select.select_cat
             get_add_info();
         }
 
-        const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
+        const hide_related_products = document.f1.related_cfg?.value == "A" ? true : false;
         hide_related_products
             ? document.querySelector(".related_goods_area").style.display = "none"
             : null

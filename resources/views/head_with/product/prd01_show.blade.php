@@ -548,7 +548,7 @@
                                                 </div>
                                             </td>
                                             <th class="required">원가</th>
-                                            <td class="pb-0">
+                                            <td class="pb-1">
                                                 <div class="txt_box flax_box">
                                                     <input
                                                     type='text'
@@ -2001,8 +2001,6 @@
 				var margin	= unComma($('#margin').val());
 				var wonga	= unComma($('#wonga').val());
                 var goods_sh = unComma($('#goods_sh').val());
-
-                console.log(price, goods_sh);
 
 				@if( $type == 'create' )
 					if( price > 0 ){
