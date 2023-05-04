@@ -99,15 +99,17 @@
             return false;
         }
 
-        if (target_file.length > 0) {
-            const img = new Image();
-            const url = window.URL || window.webkitURL;
+        /**
+         * 이미지 확장자를 수정한 파일에 대한 false 처리
+         */
+        const file = target_file[0];
+        const filename = file.name;
+        const parts = filename.split(".");
+        const ext = parts[parts.length - 1].toLowerCase();
 
-            img.src = url.createObjectURL(target_file[0]);
-            if(img.width < IMG_MIN_WIDTH || img.height < IMG_MIN_HEIGHT) {
-                alert('이미지 가로 세로 최소 사이즈는 700 X 700 입니다.');
-                return false;
-            }
+        if (parts.length > 2 || file.type.split("/")[1].toLowerCase() !== 'jpeg') {
+            alert("파일 확장자가 변경된 이미지입니다. 정상적인 확장자를 가진 이미지를 업로드해주세요.");
+            return false;
         }
 
         return true;
@@ -115,9 +117,27 @@
 
     function previewImage() {
         var fr = new FileReader();
-        fr.onload = drawImage;
+        fr.onload = (e) => {
+            const image = new Image();
+            image.src = fr.result;
+            image.onload = (evt) => {
+                if (checkImageSize(evt) === false) return;
+                drawImage(e);
+            };
+        }
         fr.readAsDataURL(target_file[0]);
     }
+
+    const checkImageSize = (evt) => { // 기본 이미지 크기 이내일 경우 alert 처리
+        const image = evt.target;
+        if ((image.width < IMG_MIN_WIDTH) || (image.height < IMG_MIN_HEIGHT)) {
+            alert(`${IMG_MIN_WIDTH} x ${IMG_MIN_HEIGHT} 크기 이상의 이미지를 업로드 해주세요.`);
+            target_file = null;
+            $('#file-label').html('이미지를 선택해주세요.');
+            return false;
+        }
+        return true;
+    };
 
     function drawImage(e) {
 
