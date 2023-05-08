@@ -167,6 +167,27 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::put('prd01/goods-class-update', 'prd01Controller@goods_class_update');
         Route::put('prd01/goods-class-delete', 'prd01Controller@goods_class_delete');
 
+        // 옵션 관리
+        Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
+        Route::post('prd01/get-option-stock', 'prd01Controller@get_option_stock');
+        Route::post("prd01/{no}/option-kind-add", "prd01Controller@add_option_kind");
+        Route::post("prd01/{no}/option-kind-del", "prd01Controller@del_option_kind");
+
+        Route::get("prd01/{no}/get-basic-options", "prd01Controller@getBasicOptions");
+        Route::get("prd01/{no}/get-basic-opts-matrix", "prd01Controller@getBasicOptsMatrix");
+        Route::post("prd01/{no}/save-basic-options", "prd01Controller@saveBasicOptions");
+        Route::post("prd01/{no}/delete-basic-options", "prd01Controller@deleteBasicOptions");
+
+        Route::post("prd01/get-extra-options", "prd01Controller@getExtraOptions");
+        Route::post("prd01/{no}/update-basic-opts-data", "prd01Controller@updateBasicOptsData");
+        Route::post("prd01/update-extra-opts-data", "prd01Controller@updateExtraOptsData");
+        Route::get('prd01/{no}/stock', 'prd01Controller@stock');
+        Route::post('prd01/stock-in', 'prd01Controller@stockIn');
+
+        Route::get("prd01/{no}/get-similar-goods", "prd01Controller@get_similar_goods");
+        Route::post("prd01/{no}/similar-goods-add", "prd01Controller@save_similar_goods");
+        Route::delete("prd01/{no}/similar-goods-del", "prd01Controller@delete_similar_goods");
+
 
         // 이미지 관리
         Route::post('prd02/{idx}/upload', 'prd02Controller@upload');
