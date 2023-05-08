@@ -175,5 +175,11 @@ $( document ).ready(function() {
         }
     });*/
 
+    // ESC키로 팝업창 닫기
+    window.onkeyup = function(e) {
+        if (e.key === 'Escape') {
+            if (opener !== null) window.close();
+        }
+    }
 });
 
