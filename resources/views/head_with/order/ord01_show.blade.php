@@ -1628,14 +1628,6 @@
         window.open(receiptWin, "", "width=455, height=815"); 
     }
 
-    //ESC 누를때 창닫기
-    $(document).keydown(function(e) {
-        // ESCAPE key pressed
-        if (e.keyCode == 27) {
-            window.close();
-        }
-    });
-
     $(document).ready(function(e) {
         $("#release_num").val(getReleaseNum());
     });

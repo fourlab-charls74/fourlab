@@ -372,8 +372,7 @@
 					var rowNode = params.node;
 					rowNode.setSelected(true);
 					gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
-					//gridOptions.api.refreshCells({rowNodes:[rowNode]});
-					gx.gridOptions.api.setFocusedCell(rowNode.rowIndex, params.colDef.field);
+                    gx.setFocusedWorkingCell();
 				}
 			}
 
@@ -388,8 +387,7 @@
 					gx.gridOptions.api.updateRowData({ update: [params.data]});
 
 					gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
-					//gridOptions.api.refreshCells({rowNodes:[rowNode]});
-					gx.gridOptions.api.setFocusedCell(rowNode.rowIndex, params.colDef.field);
+                    gx.setFocusedWorkingCell();
 				}
 			}
     </script>

@@ -124,7 +124,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <th>관리자 도메인</th>
+                                                            <th>관리자 도메인 <p style="color:red">* 추후 삭제 예정 *</p></th>
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <input type='text' class="form-control form-control-sm w-100" name='domain_bizest' value='{{@$a_domain}}'>

@@ -105,7 +105,7 @@
 </div>
 
 <!-- 엑셀파일 선택 및 적용 모달 -->
-<div id="SelectFileModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SelectFileModalLabel" aria-hidden="true">
+<div id="SelectFileModal" class="modal fade" role="dialog" aria-labelledby="SelectFileModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

@@ -980,7 +980,7 @@
                 </div>
             </div>
             {{-- 매장환불 모달 --}}
-            <div id="StoreClaimModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="StoreClaimModalLabel" aria-hidden="true">
+            <div id="StoreClaimModal" class="modal fade" role="dialog" aria-labelledby="StoreClaimModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -1871,14 +1871,6 @@
         receiptWin	+= "trade_mony=" + amount ;
         window.open(receiptWin, "", "width=455, height=815"); 
     }
-
-    //ESC 누를때 창닫기
-    $(document).keydown(function(e) {
-        // ESCAPE key pressed
-        if (e.keyCode == 27) {
-            window.close();
-        }
-    });
 
     $(document).ready(function(e) {
         $("#release_num").val(getReleaseNum());

@@ -402,15 +402,7 @@
             let str6 = str5.replace(/&amp;nbsp;/g, ' ');
             let str7 = str6.replace(/MARGIN: 0px auto;/g, ' ');
             document.getElementById('goods_cont').innerHTML = str7;
-        }); 
-
-		//ESC 클릭시 창 닫기
-		$(document).keydown(function(e){
-			// ESCAPE key pressed
-			if (e.keyCode == 27) {
-				window.close();
-			}
-		});
+        });
 
     </script>
 @stop

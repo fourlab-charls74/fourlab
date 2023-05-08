@@ -3,7 +3,7 @@
 <!-- 상품관리(코드) > 상품매칭 > 상품코드별 매칭 상품번호 검색 기능-->
 
 <!-- 상품번호 검색 -->
-<div id="SearchGoodsNoModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchGoodsNoModalLabel" aria-hidden="true">
+<div id="SearchGoodsNoModal2" class="modal fade" role="dialog" aria-labelledby="SearchGoodsNoModalLabel" aria-hidden="true">
         <div class="modal-dialog" >
             <div class="modal-content">
                 <div class="modal-header">

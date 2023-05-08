@@ -159,7 +159,7 @@
 </div>
 
 <!-- 도움말 모달 -->
-<div id="HelpModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="HelpModalLabel" aria-hidden="true">
+<div id="HelpModal" class="modal fade" role="dialog" aria-labelledby="HelpModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="min-width: 30%;max-width: 500px;">
         <div class="modal-content">
             <div class="modal-header">

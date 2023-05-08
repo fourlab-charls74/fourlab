@@ -39,7 +39,7 @@
                             <div class="flax_box">
                                 <select name="use_yn" class="form-control form-control-sm">
                                     <option value="">선택</option>
-                                    <option value="Y">Y</option>
+                                    <option value="Y" selected>Y</option>
                                     <option value="N">N</option>
                                 </select>
                             </div>
@@ -69,15 +69,16 @@
 
 <script>
     const columns = [
-        {field:"idx" , headerName:"번호"},
-        {field:"kwd",headerName:"검색어",width:130, type:"SearchDetailType"},
+        {field:"idx" , headerName:"번호", cellStyle:{'text-align' : 'center'}},
+        {field:"kwd",headerName:"검색어",width:130, type:"SearchDetailType", cellStyle:{'text-align' : 'center'}},
         {field:"url" , headerName:"URL", width:250},
-        {field:"disp_yn",headerName:"검색창출력"},
+        {field:"disp_yn",headerName:"검색창출력", cellStyle:{'text-align' : 'center'}},
         {field:"pv" , headerName:"검색횟수", type:"currencyType"},
         {field:"st" , headerName:"최근검색일시", width:130},
-        {field:"use_yn", headerName:"사용여부"},
-        {field:"rt", headerName:"등록일시", width:130},
-        {field:"ut" , headerName:"최근수정일시", width:130}
+        {field:"use_yn", headerName:"사용여부", cellStyle:{'text-align' : 'center'}},
+        {field:"rt", headerName:"등록일시", width:130, cellStyle:{'text-align' : 'center'}},
+        {field:"ut" , headerName:"수정일시", width:130, cellStyle:{'text-align' : 'center'}},
+        { width: "auto" }
     ];
     const pApp = new App('', {
         gridId: "#div-gd",

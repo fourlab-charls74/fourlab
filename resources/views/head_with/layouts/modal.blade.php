@@ -1,6 +1,6 @@
 
 <!-- sample modal content -->
-<div id="SearchBrandModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchBrandModalLabel" aria-hidden="true">
+<div id="SearchBrandModal" class="modal fade" role="dialog" aria-labelledby="SearchBrandModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -95,7 +95,7 @@
 </div><!-- /.modal -->
 
 
-<div id="SearchCategoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCategoryModalLabel"
+<div id="SearchCategoryModal" class="modal fade" role="dialog" aria-labelledby="SearchCategoryModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" style="max-width:850px;">
         <div class="modal-content">
@@ -162,7 +162,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div id="SearchCompanyModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCompanyModalLabel" aria-hidden="true">
+<div id="SearchCompanyModal" class="modal fade" role="dialog" aria-labelledby="SearchCompanyModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -223,7 +223,7 @@
 
 <!-- 공급업체 모달 -->
 
-<div id="SearchSupCompanyModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchSupCompanyModalLabel" aria-hidden="true">
+<div id="SearchSupCompanyModal" class="modal fade" role="dialog" aria-labelledby="SearchSupCompanyModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -282,7 +282,7 @@
 </div><!-- /.modal -->
 
 
-<div id="SearchGoodsNosModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchGoodsNosModalLabel" aria-hidden="true">
+<div id="SearchGoodsNosModal" class="modal fade" role="dialog" aria-labelledby="SearchGoodsNosModalLabel" aria-hidden="true">
     <div class="modal-dialog" >
         <div class="modal-content" style="width:700px">
             <div class="modal-header">
@@ -377,7 +377,7 @@
         display: inline;
     }
 </style>
-<div id="ControlOptionModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ControlOptionModalLabel"
+<div id="ControlOptionModal" class="modal fade" role="dialog" aria-labelledby="ControlOptionModalLabel"
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

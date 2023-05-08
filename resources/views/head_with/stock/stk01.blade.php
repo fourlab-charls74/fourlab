@@ -192,7 +192,7 @@
                                 @endforeach
                             </select>
                             <input type="hidden" name="data" id="data" value=""/>
-                            <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>저장</a>
+                            <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-save fa-sm text-white-50 mr-2"></i>저장</a>
                         </div>
                     </div>
                 </div>
@@ -269,8 +269,7 @@
 					var rowNode = params.node;
 					rowNode.setSelected(true);
 					gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
-					//gridOptions.api.refreshCells({rowNodes:[rowNode]});
-					gx.gridOptions.api.setFocusedCell(rowNode.rowIndex, params.colDef.field);
+                    gx.setFocusedWorkingCell();
 				}
 			}
 
@@ -285,8 +284,7 @@
 					gx.gridOptions.api.updateRowData({ update: [params.data]});
 
 					gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
-					//gridOptions.api.refreshCells({rowNodes:[rowNode]});
-					gx.gridOptions.api.setFocusedCell(rowNode.rowIndex, params.colDef.field);
+                    gx.setFocusedWorkingCell();
 				}
 			}
     </script>

@@ -576,17 +576,16 @@
                                         <tr>
                                             <th class="required">마진율</th>
                                             <td>
-                                                <div class="flax_box">
-                                                    <div class="input_box wd200">
-                                                        <input
-                                                        type='text'
-                                                        id="margin"
-                                                        name="margin"
-                                                        class="form-control form-control-sm search-all text-right"
-                                                        value='{{ round(@$goods_info->prf, 2) }}'
-                                                        @if ($type === '') readonly @endif
-                                                        >
-                                                    </div>
+                                                <div class="txt_box flax_box">
+                                                    <input
+                                                    type='text'
+                                                    id="margin"
+                                                    name="margin"
+                                                    class="form-control form-control-sm search-all text-right"
+                                                    value='{{ round(@$goods_info->prf, 2) }}'
+                                                    @if ($type === '') readonly @endif
+                                                    style="width:93%";
+                                                    >
                                                     <div class="txt_box ml-1">%</div>
                                                 </div>
                                             </td>
@@ -1369,7 +1368,7 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <div id="goods-class-grid" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+                            <div id="goods-class-grid" style="height:85px;width:100%;" class="ag-theme-balham"></div>
                         </div>
                     </div>
                 </div>
@@ -1991,9 +1990,32 @@
 			}
 
 			if( $('#goods_type').val() == "P" ){
-				//입점업체
-				//작업해야함
-				// alert("working ~");
+                var price	= unComma($('#price').val());
+				var margin	= unComma($('#margin').val());
+				var wonga	= unComma($('#wonga').val());
+                var goods_sh = unComma($('#goods_sh').val());
+
+				@if( $type == 'create' )
+					if( price > 0 ){
+						if( margin == '' )	margin = 0;
+						var wonga = parseInt(Math.round(price * (1-margin/100)),10);
+						$("#wonga").val(Comma(wonga));
+					}
+				@else
+					if( wonga > 0 ){
+						if( this.id == "margin" ){
+							price	= parseInt(Math.round(wonga / (1 - (margin / 100))),10);
+							$("#price").val(Comma(price));
+						}else if( this.id == "price" ){
+							margin	= parseFloat(((price - wonga) / price) * 100).toFixed(2);
+							$("#margin").val(margin);
+						}
+					}
+				@endif
+
+				$('#price').val(numberFormat(price));
+				$('#goods_sh').val(numberFormat(goods_sh));
+				$('#wonga').val(numberFormat(wonga));
 			}
 			else if( $('#goods_type').val() == "S" ){
 				//공급업체
@@ -2112,6 +2134,7 @@
                 {field:"goods_sub",headerName:"goods_sub",hide:true},
                 {field:"class",headerName:"분류" },
                 {field:"class_cd",headerName:"class_cd", hide:true },
+                {width : "auto"}
                 // {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
                 // {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
                 // {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},
@@ -2200,7 +2223,8 @@
 							if (selectRowCount -1 === idx) {
 							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
                                 goodsClassSearch();
-                                window.close();
+                                // window.close();
+                                // location.reload();
                                 opener.Search();
 							}
 						},
@@ -2235,7 +2259,8 @@
 							success: function (data) {
 								if (selectRowCount -1 === idx) {
 									alert("정상적으로 삭제 되었습니다.");
-									goodsClassSearch();
+									// goodsClassSearch();
+                                    location.reload();
 								}
 							},
 							error: function(request, status, error) {
@@ -2381,14 +2406,6 @@
             setSaleDate('{{ @$goods_info->sale_s_dt }}', '{{ @$goods_info->sale_e_dt }}');
             setSaleOnclickEvent();
         });
-
-		//ESC 클릭시 창 닫기
-		$(document).keydown(function(e){
-			// ESCAPE key pressed
-			if (e.keyCode == 27) {
-				window.close();
-			}
-		});
 
     </script>
 

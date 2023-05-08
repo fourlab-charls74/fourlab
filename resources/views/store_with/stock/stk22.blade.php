@@ -402,7 +402,7 @@
                     let arr = stores.filter(s => s.store_nm === e.newValue);
                     e.data.store_cd = arr.length > 0 ? arr[0].store_cd : null;
                     e.api.redrawRows({rowNodes:[e.node]});
-                    e.api.setFocusedCell(e.rowIndex, e.colDef.field);
+                    gx2.setFocusedWorkingCell();
                 }
             }
         });
