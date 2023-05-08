@@ -354,13 +354,17 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         // },
 
         // 셀 입력중, 키보드 아래방향키로 셀 이동
-        onCellKeyDown: function(e) {
+        suppressKeyboardEvent: function(e) {
             let key = e.event.key;
             
             if (e.column.isCellEditable(e.node)) {
-                if (key == 'ArrowDown' && e.api.getDisplayedRowCount() > e.rowIndex + 1) {
-                    this.api.stopEditing();
-                    this.api.startEditingCell({ rowIndex: e.rowIndex + 1, colKey: e.column.colId });    
+                if (key == 'ArrowDown') {
+                    if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
+                        e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
+                    } else {
+                        e.api.stopEditing();
+                        e.api.setFocusedCell(e.node.rowIndex, e.column);
+                    }
                 }
             }
         },
