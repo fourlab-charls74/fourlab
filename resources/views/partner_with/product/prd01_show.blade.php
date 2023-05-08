@@ -274,7 +274,6 @@ select.select_cat
                                             <th class="required">상품상태</th>
                                             <td>
                                                 <div class="txt_box flax_box">
-                                                    <div class="mr-1">
                                                     @if( $type != '' )
                                                         @foreach ($goods_stats as $goods_stat)
                                                             @if ($goods_stat->code_id === @$goods_info->sale_stat_cl )
@@ -283,7 +282,7 @@ select.select_cat
                                                             @endif
                                                         @endforeach
                                                     @else
-                                                        <select name="sale_stat_cl" id="sale_stat_cl" class="form-control form-control-sm">
+                                                        <select name="sale_stat_cl" id="sale_stat_cl" class="form-control form-control-sm" style="width:61%; margin-right:7px">
 															<option value="">상품상태</option>
                                                         @foreach ($goods_stats as $goods_stat)
                                                             <option value="{{$goods_stat->code_id}}" @if ($goods_stat->code_id == @$goods_info->sale_stat_cl ) selected @endif>
@@ -292,7 +291,6 @@ select.select_cat
                                                         @endforeach
                                                         </select>
                                                     @endif
-                                                    </div>
                                                     <div class="custom-control custom-checkbox form-check-box mr-1">
                                                         <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
                                                         <label class="custom-control-label" for="restock">재 입고함</label>
@@ -369,26 +367,23 @@ select.select_cat
                                         <tr>
                                             <th><p class="required">판매가</p></th>
                                             <td>
-                                                <div class="flax_box">
-                                                    <div class="input_box wd200">
-                                                        <input type='text' class="form-control form-control-sm search-all text-right" name='price' id='price' value='{{ @number_format(@$goods_info->price) }}'
-                                                            @if( $type == "" && @$goods_info->sale_stat_cl >= 30) readonly @endif>
-                                                    </div>
+                                                <div class="txt_box flax_box">
+                                                    <input type='text' class="form-control form-control-sm search-all text-right" style="width:93%" name='price' id='price' value='{{ @number_format(@$goods_info->price) }}'
+                                                        @if( $type == "" && @$goods_info->sale_stat_cl >= 30) readonly @endif>
                                                     <div class="txt_box ml-1">원</div>
                                                 </div>
                                             </td>
                                             <th><p>시중가</p></th>
                                             <td>
-                                                <div class="flax_box">
-                                                    <div class="input_box wd200">
-                                                        <input
-                                                        type='text'
-                                                        class="form-control form-control-sm search-all text-right"
-                                                        name='goods_sh'
-                                                        id='goods_sh'
-                                                        value='{{@number_format(@$goods_info->goods_sh)}}'
-                                                        >
-                                                    </div>
+                                                <div class="txt_box flax_box">
+                                                    <input
+                                                    type='text'
+                                                    style="width:93%"
+                                                    class="form-control form-control-sm search-all text-right"
+                                                    name='goods_sh'
+                                                    id='goods_sh'
+                                                    value='{{@number_format(@$goods_info->goods_sh)}}'
+                                                    >
                                                     <div class="txt_box ml-1">원</div>
                                                 </div>
                                             </td>
@@ -396,18 +391,17 @@ select.select_cat
                                         <tr>
                                             <th><p>원가</p></th>
                                             <td>
-                                                <div class="flax_box">
-                                                    <div class="input_box wd200">
-                                                        <input 
-                                                            type='text' 
-                                                            class="form-control form-control-sm search-all text-right" 
-                                                            name='wonga' 
-                                                            id='wonga' 
-                                                            value='{{@number_format(@$goods_info->wonga)}}' 
-                                                            readonly
-                                                            {{-- @if( $type == "" || @$goods_info->sale_stat_cl >= 30) readonly @endif --}}
-                                                        >
-                                                    </div>
+                                                <div class="txt_box flax_box">
+                                                    <input 
+                                                        type='text' 
+                                                        style="width:93%"
+                                                        class="form-control form-control-sm search-all text-right" 
+                                                        name='wonga' 
+                                                        id='wonga' 
+                                                        value='{{@number_format(@$goods_info->wonga)}}' 
+                                                        readonly
+                                                        {{-- @if( $type == "" || @$goods_info->sale_stat_cl >= 30) readonly @endif --}}
+                                                    >
                                                     <div class="txt_box ml-1">원</div>
                                                 </div>
                                                 <p class="font-size-12 mt-1 mb-0">
@@ -416,11 +410,9 @@ select.select_cat
                                             </td>
                                             <th><p>수수료</p></th>
                                             <td>
-                                                <div class="flax_box">
-                                                    <div class="input_box wd200">
-                                                        <input type='text' id="margin" name="margin" class="form-control form-control-sm search-all text-right"
-                                                            value='{{@sprintf("%.2f",$goods_info->pay_fee)}}' readonly>
-                                                    </div>
+                                                <div class="txt_box flax_box">
+                                                    <input type='text' id="margin" name="margin" style="width:93%" class="form-control form-control-sm search-all text-right"
+                                                        value='{{@sprintf("%.2f",$goods_info->pay_fee)}}' readonly>
                                                     <div class="txt_box ml-1">%</div>
                                                 </div>
                                             </td>

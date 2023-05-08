@@ -523,7 +523,8 @@ class prd01Controller extends Controller
             'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
             'g_order_point_ratio'	=> $cfg_order_point_ratio,
             'shop_domain'           => $shop_domain,
-            'img_prefix'            => sprintf("%s",config("shop.image_svr"))
+            'img_prefix'            => sprintf("%s",config("shop.image_svr")),
+            'com_nm'                => Auth('partner')->user()->com_nm
         ]);
 
         return view(Config::get('shop.partner.view') . '/product/prd01_show',$values);
