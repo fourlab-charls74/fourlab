@@ -1056,6 +1056,8 @@
     const pr_codes = <?= json_encode(@$pr_codes) ?>; // 행사명
 
 	$(document).ready(function() {
+        window.onkeyup = null;
+        
 		pApp.ResizeGrid(275, 470);
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {

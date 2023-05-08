@@ -178,7 +178,11 @@ $( document ).ready(function() {
     // ESC키로 팝업창 닫기
     window.onkeyup = function(e) {
         if (e.key === 'Escape') {
-            if (opener !== null) window.close();
+            if ($(".modal.show").length > 0) {
+                $(".modal.show").modal('hide');
+            } else if (opener !== null) {
+                window.close();
+            }
         }
     }
 });

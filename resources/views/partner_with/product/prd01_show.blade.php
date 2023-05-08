@@ -1727,14 +1727,6 @@ select.select_cat
         });
     });
 
-    //ESC 클릭시 창 닫기
-    $(document).keydown(function(e){
-        // ESCAPE key pressed
-        if (e.keyCode == 27) {
-            window.close();
-        }
-    });
-
 </script>
 
 

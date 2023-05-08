@@ -397,13 +397,9 @@
         let data = '';
         gx2.Request('/store/system/sys02/' + code + '/search-seq');
     }
-
-    //ESC 누를때 창닫기
+    
     $(document).keydown(function(e) {
-        // ESCAPE key pressed
-        if (e.keyCode == 27) {
-            window.close();
-        } else if (e.ctrlKey && e.keyCode === 83) {
+        if (e.ctrlKey && e.keyCode === 83) {
             Save();
             e.preventDefault();
         }

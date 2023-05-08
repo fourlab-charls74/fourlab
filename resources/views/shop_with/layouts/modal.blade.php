@@ -1,6 +1,6 @@
 
     <!-- sample modal content -->
-    <div id="SearchBrandModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchBrandModalLabel" aria-hidden="true">
+    <div id="SearchBrandModal" class="modal fade" role="dialog" aria-labelledby="SearchBrandModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -93,7 +93,7 @@
     </div><!-- /.modal -->
 
     <!-- sample modal content -->
-    <div id="SearchStoreModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchStoreModalLabel" aria-hidden="true">
+    <div id="SearchStoreModal" class="modal fade" role="dialog" aria-labelledby="SearchStoreModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -160,7 +160,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div id="SearchStorageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchStorageModalLabel" aria-hidden="true">
+    <div id="SearchStorageModal" class="modal fade" role="dialog" aria-labelledby="SearchStorageModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -228,7 +228,7 @@
     </div><!-- /.modal -->
     
 
-    <div id="SearchCategoryModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCategoryModalLabel"
+    <div id="SearchCategoryModal" class="modal fade" role="dialog" aria-labelledby="SearchCategoryModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" style="max-width:850px;">
         <div class="modal-content">
@@ -295,7 +295,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-    <div id="SearchCompanyModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchCompanyModalLabel" aria-hidden="true">
+    <div id="SearchCompanyModal" class="modal fade" role="dialog" aria-labelledby="SearchCompanyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -355,7 +355,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-    <div id="SearchGoodsNosModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchGoodsNosModalLabel" aria-hidden="true">
+    <div id="SearchGoodsNosModal" class="modal fade" role="dialog" aria-labelledby="SearchGoodsNosModalLabel" aria-hidden="true">
         <div class="modal-dialog" >
             <div class="modal-content" style="width:600px">
                 <div class="modal-header">
@@ -425,7 +425,7 @@
             height:30px;
         }
     </style>
-    <div id="SearchGoodsNoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchGoodsNoModalLabel" aria-hidden="true">
+    <div id="SearchGoodsNoModal" class="modal fade" role="dialog" aria-labelledby="SearchGoodsNoModalLabel" aria-hidden="true">
         <div class="modal-dialog" >
             <div class="modal-content">
                 <div class="modal-header">
@@ -500,7 +500,7 @@
     </div><!-- /.modal -->
 
 <!-- 담당자(MD) 검색 -->
-<div id="SearchMdModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchMdModalLabel" aria-hidden="true">
+<div id="SearchMdModal" class="modal fade" role="dialog" aria-labelledby="SearchMdModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -553,7 +553,7 @@
 </div><!-- /.modal -->
 
 <!-- 상품코드 검색 -->
-<div id="SearchPrdcdModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">
+<div id="SearchPrdcdModal" class="modal fade" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -668,7 +668,7 @@
 </div><!-- /.modal -->
 
 <!-- 상품옵션 범위검색 검색 -->
-<div id="SearchPrdcdRangeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdRangeModalLabel" aria-hidden="true">
+<div id="SearchPrdcdRangeModal" class="modal fade" role="dialog" aria-labelledby="SearchPrdcdRangeModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -731,7 +731,7 @@
 
 
 <!-- 원부자재코드 검색 -->
-<div id="SearchPrdcd_sub_Modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">
+<div id="SearchPrdcd_sub_Modal" class="modal fade" role="dialog" aria-labelledby="SearchPrdcdModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 1200px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -827,7 +827,7 @@
 </div><!-- /.modal -->
 
 <!-- 판매유형 다중검색 -->
-<div id="SearchSellTypeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchSellTypeModalLabel" aria-hidden="true">
+<div id="SearchSellTypeModal" class="modal fade" role="dialog" aria-labelledby="SearchSellTypeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -884,7 +884,7 @@
 
 
 <!-- 행사코드 다중검색 -->
-<div id="SearchPrCodeModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="SearchPrCodeModalLabel" aria-hidden="true">
+<div id="SearchPrCodeModal" class="modal fade" role="dialog" aria-labelledby="SearchPrCodeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

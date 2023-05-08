@@ -388,7 +388,7 @@
 {{-- MODAL --}}
 <div id="pos-modal" class="show_layout">
     {{-- 대기내역 검색 --}}
-    <div class="modal fade" id="searchWaitingModal" tabindex="-1" role="dialog" aria-labelledby="searchWaitingModalLabel" aria-hidden="true">
+    <div class="modal fade" id="searchWaitingModal" role="dialog" aria-labelledby="searchWaitingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 33%;min-width: 500px;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -417,7 +417,7 @@
         </div>
     </div>
     {{-- 상품검색모달 --}}
-    <div class="modal fade" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="searchProductModalLabel" aria-hidden="true">
+    <div class="modal fade" id="searchProductModal" role="dialog" aria-labelledby="searchProductModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 90%;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -450,7 +450,7 @@
         </div>
     </div>
     {{-- 고객등록모달 --}}
-    <div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addMemberModal" role="dialog" aria-labelledby="addMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -603,7 +603,7 @@
         </div>
     </div>
     {{-- 고객검색모달 --}}
-    <div class="modal fade" id="searchMemberModal" tabindex="-1" role="dialog" aria-labelledby="searchMemberModalLabel" aria-hidden="true">
+    <div class="modal fade" id="searchMemberModal" role="dialog" aria-labelledby="searchMemberModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -635,7 +635,7 @@
         </div>
     </div>
     {{-- 신용카드모달 --}}
-    <div class="modal fade" id="payModal" tabindex="-1" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
+    <div class="modal fade" id="payModal" role="dialog" aria-labelledby="payModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px;">
             <div class="modal-content">
                 <div class="modal-body">
@@ -682,7 +682,7 @@
         </div>
     </div>
     {{-- 매장환불 모달 --}}
-    <div id="StoreClaimModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="StoreClaimModalLabel" aria-hidden="true">
+    <div id="StoreClaimModal" class="modal fade" role="dialog" aria-labelledby="StoreClaimModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -824,7 +824,7 @@
         </div>
     </div>
     {{-- 환불 시, 주문번호 검색모달 --}}
-    <div class="modal fade" id="searchOrdNoModal" tabindex="-1" role="dialog" aria-labelledby="searchOrdNoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="searchOrdNoModal" role="dialog" aria-labelledby="searchOrdNoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">

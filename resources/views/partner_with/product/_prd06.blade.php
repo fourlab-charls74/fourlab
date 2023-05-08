@@ -254,7 +254,7 @@
 
     </div>
 
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" id="brand_list_modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal fade bd-example-modal-lg" id="brand_list_modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">
@@ -311,7 +311,7 @@
     </div>
 
     <!-- 카테고리 선택 모달 영역 -start -->
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" id="category_list_modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal fade bd-example-modal-lg" id="category_list_modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
             <div class="modal-header">
