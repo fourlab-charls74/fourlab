@@ -416,18 +416,21 @@
         })
 
         // 이미지 업로드
-        $('#file').on("change", function(){
+        $('#file').on("change", function(e){
             if(this.files.length < 1) return;
             if(this.files.length > 1) return alert("파일은 한 개만 올려주세요.");
             target_file = this.files[0];
+            const result = validatePhoto();
 
-            if(validatePhoto() !== 200) {
-                target_file = null;
-                return $('#file-label').html('이미지를 선택해주세요.');
+            if(result !== 200) {
+                $('#file-label').html('이미지를 선택해주세요.');
+                return;
             } else {
-                $('#file-label').html(target_file.name);
                 previewImage();
             }
+
+            $('#file').val('');
+            target_file = null;
         });
 
         // 이미지 적용
@@ -546,16 +549,6 @@
         if(!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file.name)) return alert("이미지 형식이 아닙니다.");
         if(target_file.size > 10*1024*1024) return alert("10M 이상 파일은 업로드 하실 수 없습니다.");
 
-        if (target_file !== null) {
-            const url = window.URL || window.webkitURL;
-            const img = new Image();
-	    
-            img.src = url.createObjectURL(target_file);
-            if(img.width < IMG_MIN_WIDTH || img.height < IMG_MIN_HEIGHT) {
-                return alert('이미지 가로 세로 최소 사이즈는 700 X 700 입니다.');
-            }
-        }
-
         return 200;
     }
 
@@ -566,6 +559,11 @@
         let tmpImg = new Image();
         tmpImg.onload = function() {
             let ratio = this.height / this.width;
+
+            if(this.width < IMG_MIN_WIDTH && this.height < IMG_MIN_HEIGHT) {
+                return alert('이미지 가로 세로 최소 사이즈는 700 X 700 입니다.');
+            }
+            
             let img_type = $('[name=img_type]:checked').val();
 
             $("#upload-tab").html('<div class="p-4"><img src="" id="img-preview" width="500px" alt=""></div>');
@@ -602,6 +600,8 @@
                     ctx.drawImage(this, 0, 0, width,height);
                 }
             });
+
+            $('#file-label').html(target_file.name);
 
         };
         tmpImg.src = e.target.result;
