@@ -426,9 +426,11 @@
                 this.value = '';
                 return $('#file-label').html('이미지를 선택해주세요.');
             } else {
-                $('#file-label').html(target_file.name);
                 previewImage();
             }
+
+            $('#file').val('');
+            target_file = null;
         });
 
         // 이미지 적용
@@ -560,21 +562,6 @@
             alert("10M 이상 파일은 업로드 하실 수 없습니다.");
         }
 
-        if (target_file !== null) {
-            const url = window.URL || window.webkitURL;
-            const img = new Image();
-        
-            img.onload = (e) => {
-                const image = e.target;
-                console.log(image.width);
-                console.log(image.height);
-                if ((image.width < IMG_MIN_WIDTH) || (image.height < IMG_MIN_HEIGHT)) {
-                    alert(`${IMG_MIN_WIDTH} x ${IMG_MIN_HEIGHT} 크기 이상의 이미지를 업로드 해주세요.`);
-                    result = 100;  
-                }
-            }
-        }
-
         return result;
     }
 
@@ -586,6 +573,10 @@
         tmpImg.onload = function() {
             let ratio = this.height / this.width;
             let img_type = $('[name=img_type]:checked').val();
+
+            if(this.width < IMG_MIN_WIDTH && this.height < IMG_MIN_HEIGHT) {
+                return alert('이미지 가로 세로 최소 사이즈는 700 X 700 입니다.');
+            }
 
             $("#upload-tab").html('<div class="p-4"><img src="" id="img-preview" width="500px" alt=""></div>');
             $("#img-preview").attr("src", this.src);
@@ -621,6 +612,8 @@
                     ctx.drawImage(this, 0, 0, width,height);
                 }
             });
+
+            $('#file-label').html(target_file.name);
 
         };
         tmpImg.src = e.target.result;
