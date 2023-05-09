@@ -218,9 +218,12 @@ class stk21Controller extends Controller
 		]);
     }
 
-    // RT요청
+    // 요청RT 등록
     public function request_rt(Request $request)
     {
+        $code = 200;
+        $msg = '';
+        
         $state = 10;
         $rt_type = 'R';
         $admin_id = Auth('head')->user()->id;
@@ -228,6 +231,27 @@ class stk21Controller extends Controller
 
         try {
             DB::beginTransaction();
+            
+            $prd_store_qtys = array_reduce($data, function ($a, $c) {
+                $idx = $c['dep_store_cd'] . '^' . $c['prd_cd'];
+                if (isset($a[$idx])) {
+                    $a[$idx] += $c['rt_qty'];
+                } else {
+                    $a[$idx] = $c['rt_qty'];
+                }
+                return $a;
+            }, []);
+            
+            $over_qtys = array_filter($prd_store_qtys, function ($val, $key) {
+                list($dep_store_cd, $prd_cd) = explode('^', $key);
+                $store_wqty = DB::table('product_stock_store')->where('store_cd', $dep_store_cd)->where('prd_cd', $prd_cd)->value('wqty');
+                return $val > $store_wqty;
+            }, ARRAY_FILTER_USE_BOTH);
+            
+            if (count($over_qtys) > 0) {
+                $code = 400;
+                throw new Exception('보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.');
+            }
 
 			foreach($data as $d) {
                 DB::table('product_stock_rotation')
@@ -268,14 +292,14 @@ class stk21Controller extends Controller
             }
 
 			DB::commit();
-            $code = 200;
+            
             $msg = "RT요청이 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
-			$code = 500;
+			if ($code === 200) $code = 500;
 			$msg = $e->getMessage();
 		}
 
-        return response()->json(["code" => $code, "msg" => $msg]);
+        return response()->json([ "code" => $code, "msg" => $msg ]);
     }
 }

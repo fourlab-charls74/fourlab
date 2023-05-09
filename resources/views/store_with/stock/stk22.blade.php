@@ -475,12 +475,21 @@
         });
         if(over_qty_rows.length > 0) return alert(`보내는 매장의 보유재고보다 많은 수량을 요청하실 수 없습니다.\n보내는 매장명 : ${over_qty_rows.map(o => o.dep_store_nm).join(", ")}`);
 
-        let same_item_rows = gx3.getRows().filter(final => {
+        let finals = gx3.getRows();
+        let same_item_rows = finals.filter(final => {
             if(rows.filter(row => row.prd_cd === final.prd_cd && row.store_cd === final.store_cd && row.dep_store_cd === final.dep_store_cd).length > 0) return true;
             return false;
         });
-        if(same_item_rows.length > 0) return alert('이미 등록된 항목입니다.');
+        if(same_item_rows.length > 0) return alert(`이미 등록된 항목입니다.\n[보내는 매장] ${same_item_rows[0].dep_store_nm}\n[상품번호] ${same_item_rows[0].prd_cd}`);
 
+        over_qty_rows = rows.filter(row => {
+            let already_qty = finals.reduce((a, c) => {
+                if (c.prd_cd === row.prd_cd && c.dep_store_cd === row.dep_store_cd) return (c.rt_qty * 1) + a;
+                return a;
+            }, 0);
+            return already_qty + (row.rt_qty * 1) > row.wqty;
+        });
+        if(over_qty_rows.length > 0) return alert(`보내는 매장의 보유재고를 초과하여 RT리스트에 등록할 수 없습니다.\n[보내는 매장] ${over_qty_rows[0].dep_store_nm}\n[상품번호] ${over_qty_rows[0].prd_cd}`);
 
         rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
         gx3.gridOptions.api.updateRowData({ add: rows });
@@ -511,6 +520,8 @@
             if(res.data.code === 200) {
                 alert(res.data.msg);
                 location.href = "/store/stock/stk20";
+            } else if (res.data.code === 400) {
+                alert(res.data.msg);
             } else {
                 console.log(res.data);
                 alert("RT등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

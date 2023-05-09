@@ -432,8 +432,7 @@
             if(rows.filter(row => row.prd_cd === final.prd_cd && row.store_cd === final.store_cd && row.dep_store_cd === final.dep_store_cd).length > 0) return true;
             return false;
         });
-        if(same_item_rows.length > 0) return alert('이미 등록된 항목입니다.');
-
+        if(same_item_rows.length > 0) return alert(`이미 등록된 항목입니다.\n[보내는 매장] ${same_item_rows[0].dep_store_nm}\n[상품번호] ${same_item_rows[0].prd_cd}`);
 
         rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
         gx3.gridOptions.api.updateRowData({ add: rows });
@@ -464,6 +463,8 @@
             if(res.data.code === 200) {
                 alert(res.data.msg);
                 location.href = "/shop/stock/stk20";
+            } else if (res.data.code === 400) {
+                alert(res.data.msg);
             } else {
                 console.log(res.data);
                 alert("RT등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
