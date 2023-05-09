@@ -23,9 +23,9 @@
                     <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
                     <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 알림전송</a>
                     @if(@$cmd == 'receive')
-                        <a href="/shop/stock/stk32?is_send_msg=true" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
+                        <a href="/shop/community/comm02?is_send_msg=true" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 보낸알림 보관함</a>
                     @elseif(@$cmd == 'send')
-                        <a href="/shop/stock/stk32" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 받은알림 보관함</a>
+                        <a href="/shop/community/comm02" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"> 받은알림 보관함</a>
                     @endif
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -115,7 +115,7 @@
             </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/shop/stock/stk31/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="/shop/community/comm01/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div>
@@ -225,7 +225,7 @@
     function Search() {
         let data = $('form[name="search"]').serialize();
         data += "&msg_type=" + "{{ @$cmd }}";
-        gx.Request('/shop/stock/stk32/search', data);
+        gx.Request('/shop/community/comm02/search', data);
     }
 
     const initSearchInputs = () => {
@@ -234,12 +234,12 @@
     };
 
     function openPopup() {
-        const url = '/shop/stock/stk32/create';
+        const url = '/shop/community/comm02/create';
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1100,height=700");
     }
 
     function showContent(msg_cd) {
-        const url = '/shop/stock/stk32/showContent?msg_type=' + '{{@$cmd}}&msg_cd=' + msg_cd;
+        const url = '/shop/community/comm02/showContent?msg_type=' + '{{@$cmd}}&msg_cd=' + msg_cd;
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
 
@@ -259,7 +259,7 @@
  
         $.ajax({
             method: 'put',
-            url: '/shop/stock/stk32/msg_read',
+            url: '/shop/community/comm02/msg_read',
             data: {msg_cd : msg_cds},
             dataType : 'json',
             success: function(data) {
@@ -294,7 +294,7 @@
         if(confirm("삭제하시겠습니까?")) {
             $.ajax({
                 method: 'post',
-                url: '/shop/stock/stk32/msg_del',
+                url: '/shop/community/comm02/msg_del',
                 data: {msg_cd : msg_cds},
                 dataType : 'json',
                 success: function(data) {

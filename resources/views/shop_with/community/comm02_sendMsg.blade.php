@@ -158,7 +158,7 @@
 
         $.ajax({
             method: 'post',
-            url: '/shop/stock/stk32/store',
+            url: '/shop/community/comm02/store',
             data: frm,
             dataType: 'json',
             success: function(data) {

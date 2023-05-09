@@ -48,7 +48,7 @@ class comm01Controller extends Controller
         $orderby = "";
         if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
-        if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'";
+        if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
         if ($store_type != "") $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
 
         // ordreby
@@ -68,7 +68,7 @@ class comm01Controller extends Controller
         $query = /** @lang text */
             "
             select 
-                c2.code_val as store_notice_type,
+                (select code_val from code where code_kind_cd  = 'STORE_NOTICE_TYPE' and code_id = store_notice_type) as store_notice_type,
                 s.ns_cd,
                 s.subject,
                 s.content,
@@ -86,9 +86,11 @@ class comm01Controller extends Controller
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-                left outer join code c2 on c2.code_kind_cd = 'STORE_NOTICE_TYPE' and c2.code_val = '$notice_id'
-            where s.rt >= :sdate and s.rt < date_add(:edate, interval 1 day)
-                and store_notice_type = c2.code_id $where
+            where s.rt >= :sdate and s.rt < date_add(:edate, interval 1 day) 
+                and store_notice_type in (
+                    select code_id from code c2 where  c2.code_kind_cd  = 'STORE_NOTICE_TYPE' and c2.code_val = '$notice_id'
+                )
+                $where
             group by s.ns_cd
             $orderby
             $limit

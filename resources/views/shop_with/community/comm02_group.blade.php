@@ -120,7 +120,7 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
-            gx.Request('/shop/stock/stk32/search_group');
+            gx.Request('/shop/community/comm02/search_group');
 
             pApp2.ResizeGrid(275);
             pApp2.BindSearchEnter();
@@ -131,7 +131,7 @@
                 
             }
             });
-            gx2.Request('/shop/stock/stk32/search_group2');
+            gx2.Request('/shop/community/comm02/search_group2');
 
         });
         $(document).ready(function() {
@@ -150,7 +150,7 @@
             cur_store_cd = store_cd;
             cur_group_cd = group_cd;
 
-            gx2.Request('/shop/stock/stk32/search_group2','group_cd='+ group_cd);
+            gx2.Request('/shop/community/comm02/search_group2','group_cd='+ group_cd);
         }
 
        $(document).ready(function() {
@@ -190,7 +190,7 @@
             if(confirm('그룹을 삭제하면 매장목록도 같이 삭제됩니다.\n그래도 삭제하시겠습니까?')) {
                 $.ajax({
                     method: 'post',
-                    url: '/shop/stock/stk32/del_group',
+                    url: '/shop/community/comm02/del_group',
                     data: {group_cd : group_cd},
                     dataType: 'json',
                     success: function(data) {
@@ -240,7 +240,7 @@
 
             $.ajax({
                 method: 'post',
-                url: '/shop/stock/stk32/add_group',
+                url: '/shop/community/comm02/add_group',
                 data: frm,
                 dataType: 'json',
                 success: function(data) {
@@ -296,7 +296,7 @@
             
             $.ajax({
                 method: 'post',
-                url: '/shop/stock/stk32/mod_group',
+                url: '/shop/community/comm02/mod_group',
                 data: frm,
                 dataType: 'json',
                 success: function(data) {

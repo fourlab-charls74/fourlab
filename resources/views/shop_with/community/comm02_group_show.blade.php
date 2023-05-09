@@ -141,7 +141,7 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
-            gx.Request('/shop/stock/stk32/search_group');
+            gx.Request('/shop/community/comm02/search_group');
 
             pApp2.ResizeGrid(405);
             pApp2.BindSearchEnter();
@@ -152,7 +152,7 @@
                 
             }
             });
-            gx2.Request('/shop/stock/stk32/search_group2');
+            gx2.Request('/shop/community/comm02/search_group2');
 
         });
 
@@ -174,7 +174,7 @@
             cur_store_cd = store_cd;
             cur_group_cd = group_cd;
 
-            gx2.Request('/shop/stock/stk32/search_group2','group_cd='+ group_cd);
+            gx2.Request('/shop/community/comm02/search_group2','group_cd='+ group_cd);
         }
 
         //매장 다중 선택
@@ -244,7 +244,7 @@
             if(confirm('그룹을 삭제하면 매장목록도 같이 삭제됩니다.\n그래도 삭제하시겠습니까?')) {
                 $.ajax({
                     method: 'post',
-                    url: '/shop/stock/stk32/del_group',
+                    url: '/shop/community/comm02/del_group',
                     data: {rows : rows},
                     dataType: 'json',
                     success: function(data) {
@@ -302,7 +302,7 @@
             console.log(frm);
             $.ajax({
                 method: 'post',
-                url: '/shop/stock/stk32/update',
+                url: '/shop/community/comm02/update',
                 data: frm,
                 dataType: 'json',
                 success: function(data) {
@@ -322,7 +322,7 @@
 
         //그룹 추가 팝업
         function openGroupAdd() {
-            const url = '/shop/stock/stk32/addGroup';
+            const url = '/shop/community/comm02/addGroup';
             const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=800");
         }
     </script>

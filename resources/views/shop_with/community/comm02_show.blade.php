@@ -135,7 +135,7 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/shop/stock/stk32/search-store', data);
+        gx.Request('/shop/community/comm02/search-store', data);
     }
     
   
@@ -158,7 +158,7 @@
         if(rows.length > 1) {
             alert('한 개의 매장만 선택해주세요');
         } else {
-            const url = '/shop/stock/stk32/sendMsg?store_cd=' + sc + '&check=' + check_radio;
+            const url = '/shop/community/comm02/sendMsg?store_cd=' + sc + '&check=' + check_radio;
             const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
         }
     }

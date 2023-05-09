@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\shop\stock;
+namespace App\Http\Controllers\shop\community;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -13,23 +13,24 @@ use Exception;
 
 use App\Models\Conf;
 
-class stk31Controller extends Controller
+class comm01Controller extends Controller
 {
-    public function index()
+    public function index($notice_id, Request $request)
     {
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
+            'store_notice_type' => strval($notice_id),
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
-        return view(Config::get('shop.shop.view') . '/stock/stk31', $values);
+        return view(Config::get('shop.shop.view') . '/community/comm01', $values);
     }
 
     // 검색
-    public function search(Request $request)
+    public function search($notice_id, Request $request)
     {
 
         $r = $request->all();
@@ -48,7 +49,9 @@ class stk31Controller extends Controller
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
 
         if ($store_no != "") {
-            $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%'  or s.all_store_yn = 'Y'";
+            if($notice_id === 'notice') {
+                $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
+            }
         } else {
             $where .= " and s.all_store_yn = 'Y'";
         }
@@ -73,6 +76,7 @@ class stk31Controller extends Controller
         $query = /** @lang text */
             "
             select 
+                (select code_val from code where code_kind_cd  = 'STORE_NOTICE_TYPE' and code_id = store_notice_type) as store_notice_type,
                 s.ns_cd,
                 s.subject,
                 s.content,
@@ -84,12 +88,17 @@ class stk31Controller extends Controller
                 group_concat(a.store_nm separator ', ') as stores,
                 s.rt,
                 c.code_val as store_type_nm,
-                s.ut
+                s.ut,
+                (case when ifnull(char_length(s.attach_file_url), 0) > 0 then 'Y' else 'N' end ) as attach_file_yn
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-            where s.rt >= :sdate and s.rt < date_add(:edate, interval 1 day) $where
+            where s.rt >= :sdate and s.rt < date_add(:edate, interval 1 day) 
+                and store_notice_type in (
+                    select code_id from code c2 where c2.code_kind_cd  = 'STORE_NOTICE_TYPE' and c2.code_val = '$notice_id'
+                )
+                $where
             group by s.ns_cd
             $orderby
             $limit
@@ -138,10 +147,10 @@ class stk31Controller extends Controller
             'storeCode' => $storeCodes,
         ];
 
-        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.shop.view') . '/community/comm01_show', $values);
     }
 
-    public function show($no)
+    public function show($notice_id, $no)
     {
         $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
@@ -163,7 +172,8 @@ class stk31Controller extends Controller
         $values = [
             'no' => $no,
             'user' => $user,
-            'storeCode' => $storeCodes
+            'storeCode' => $storeCodes,
+            'store_notice_type' => $notice_id
         ];
 
         //읽음 처리
@@ -196,7 +206,7 @@ class stk31Controller extends Controller
             DB::insert($sql);
         }
 
-        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
+        return view(Config::get('shop.shop.view') . '/community/comm01_show', $values);
     }
 
     public function popup_chk(Request $request)
@@ -293,7 +303,7 @@ class stk31Controller extends Controller
             'storeCode' => $storeCodes,
         ];  
 
-        return view(Config::get('shop.shop.view') . '/stock/stk31_show_pop', $values);
+        return view(Config::get('shop.shop.view') . '/community/comm01_show_pop', $values);
     }
 
     public function notice_read(Request $request)
@@ -350,183 +360,5 @@ class stk31Controller extends Controller
             "code" => $code,
             "msg" => $msg
         ]);
-    }
-    
-    /* 2023.02.16 김나영 - 사용하지 않음
-    // 추가
-    public function create(Request $request)
-    {
-
-        $name =  Auth('head')->user()->name;
-        $no = $request->input('ns_cd');
-
-        $user = new \stdClass();
-        $user->name = $name;
-        $user->subject = '';
-        $user->content = '';
-        $user->ns_cd = $no;
-        $user->store_cd = '';
-        $user->store_nm = '';
-
-        $values = ['no' => $no, 'user' => $user];
-
-        return view(Config::get('shop.shop.view') . '/stock/stk31_show', $values);
-
-    }
-
-    public function store(Request $request)
-    {
-
-        $id =  Auth('head')->user()->id;
-        $email = Auth('head')->user()->email;
-
-        $ns_cd = $request->input('ns_cd');
-        $subject = $request->input('subject');
-        $content = $request->input('content');
-        $admin_id = $id;
-        $admin_nm = $request->input('name');
-        $store_cd = $request->input('store_no', '');
-        $rt = DB::raw('now()');
-        $store_nm = $request->input('store_nm');
-        $rt2 = DB::raw('now()');
-
-        if ($store_cd == null) {
-            $all_store_yn = "Y";
-        } else {
-            $all_store_yn = "N";
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $res = DB::table('notice_store')
-                ->insertGetId([
-                    'ns_cd' => $ns_cd,
-                    'subject' => $subject,
-                    'content' => $content,
-                    'admin_id' => $admin_id,
-                    'admin_nm' => $admin_nm,
-                    'admin_email' => $email,
-                    'all_store_yn' => $all_store_yn,
-                    'cnt' => 0,
-                    'rt' => $rt
-                ]);
-
-            if ($store_cd != '') {
-                foreach ($store_cd as $sc) {
-                    DB::table('notice_store_detail')
-                        ->insert([
-                            'ns_cd' => $res,
-                            'store_cd' => $sc,
-                            'check_yn' => 'N',
-                            'rt' => $rt2
-                        ]);
-                }
-            }
-
-            DB::commit();
-            $code = 200;
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-
-    }
-
-
-    public function update($no, Request $request)
-    {
-
-        $id =  Auth('head')->user()->id;
-
-        $subject = $request->input('subject');
-        $content = $request->input('content');
-        $store_cd = $request->input('store_no', '');
-        $ns_cd = $no;
-        $ut = DB::raw('now()');
-        $rt2 = DB::raw('now()');
-
-        if ($store_cd == null) {
-            $all_store_yn = "Y";
-        } else {
-            $all_store_yn = "N";
-        }
-
-        $notice_store = [
-            'subject' => $subject,
-            'content' => $content,
-            'all_store_yn' => $all_store_yn,
-            'ut' => $ut
-        ];
-
-        try {
-            DB::beginTransaction();
-
-            DB::table('notice_store')
-                ->where('ns_cd', '=', $ns_cd)
-                ->update($notice_store);
-
-            if ($store_cd != '') {
-                foreach ($store_cd as $sc) {
-                    DB::table('notice_store_detail')
-                        ->insert([
-                            'ns_cd' => $ns_cd,
-                            'store_cd' => $sc,
-                            'check_yn' => 'N',
-                            'rt' => $rt2
-                        ]);
-                }
-            }
-            DB::commit();
-            $code = 200;
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-    }
-
-    public function del_store(Request $request)
-    {
-        $store_cd = $request->input('data_store');
-        $ns_cd = $request->input('ns_cd');
-
-        try {
-            DB::beginTransaction();
-
-            $sql = "
-                delete 
-                from notice_store_detail
-                where ns_cd = '$ns_cd' and store_cd = '$store_cd'
-            ";
-
-            DB::delete($sql);
-
-            DB::commit();
-            $code = '200';
-            $msg = "";
-        } catch (Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = "실패!";
-        }
-
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
-    }
-
-        */
+    }   
 }

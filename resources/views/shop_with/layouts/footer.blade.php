@@ -19,14 +19,14 @@
             $.ajax({
 				async: true,
 				type: 'get',
-				url: '/shop/stock/stk32/popup_chk',
+				url: '/shop/community/comm02/popup_chk',
 				data: {
 					"store_cd": store_cd
 				},
 				success: function(data) {
 					if (data.code == 200) {
                         $.each(data.msgs, function(i, item){
-                            const url = '/shop/stock/stk32/showContent?msg_type=pop&msg_cd=' + item.msg_cd;
+                            const url = '/shop/community/comm02/showContent?msg_type=pop&msg_cd=' + item.msg_cd;
                             const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
                         });
 					} else {

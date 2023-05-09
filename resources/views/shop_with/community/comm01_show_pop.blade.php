@@ -77,7 +77,7 @@
 
         $.ajax({
             method: 'put',
-            url: '/shop/stock/stk31/notice_read',
+            url: '/shop/community/comm01/notice_read',
             data: {
                 ns_cd : ns_cd,
                 store_cd : store_cd,
@@ -106,7 +106,7 @@
 
         axios({
             method: 'put',
-            url: '/shop/stock/stk31/notice_read',
+            url: '/shop/community/comm01/notice_read',
             data: {
                 ns_cd : ns_cd,
                 store_cd : store_cd,
@@ -114,7 +114,7 @@
         }).then(function (res) {
             if(res.data.code == '200') {
                 alert('읽음 처리 되었습니다.');
-                window.opener.location.href = "/shop/stock/stk31";
+                window.opener.location.href = "/shop/community/comm01";
                 window.close();
             } else {
                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
