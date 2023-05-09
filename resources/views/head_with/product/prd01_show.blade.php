@@ -1338,8 +1338,8 @@
                 </div>
                 @endif
                 <form method="post" name="save">
-                @if(count($class_items) > 0 && $type === '')
 
+                @if(count($class_items) > 0)
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품정보고시 내역</a>
@@ -1351,6 +1351,7 @@
                                     <h6 class="m-0 font-weight-bold">총 : <span id="goods-class-grid-total" class="text-primary">0</span> 건</h6>
                                 </div>
                                 <div class="fr_box">
+                                @if (@$type === '')
                                     <span class="d-none d-sm-inline">선택한 상품을</span>
                                     <select id="to_class" name="to_class" class="form-control form-control-sm goods_class" style="width:130px;display:inline">
                                         <option value="">선택</option>
@@ -1364,6 +1365,17 @@
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm goods-info-change-btn"><span class="fs-12">분류변경</span></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-save-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="저장"><i class="bx bx-save fs-14"></i></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-delete-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제"><i class="far fa-trash-alt fs-12"></i></a>
+                                @elseif (@$type === 'create')
+                                    <span class="d-none d-sm-inline">분류 : </span>
+                                    <select id="create_to_class" name="create_to_class" class="form-control form-control-sm" style="width:130px;display:inline">
+                                        <option value="">선택</option>
+                                        @foreach ($class_items as $class_item)
+                                            <option value='{{ $class_item->class }}'>
+                                                {{ $class_item->class_nm }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
                                 </div>
                             </div>
                         </div>
@@ -1381,14 +1393,14 @@
     <script type="text/javascript" charset="utf-8">
         const goods_no = '{{$goods_no}}';
         const goods_sub = '{{@$goods_info->goods_sub}}';
+        const type = '{{@$type}}';
 
 		var ed;
-
-        $(document).ready(function(){
-            $('#main-tab').trigger("click");
-        });
+        let gxc; // 상품정보고시 테이블
 
         $(document).ready(function() {
+            $('#main-tab').trigger("click");
+            
             var editorToolbar = [
                 ['font', ['bold', 'underline', 'clear']],
                 ['color', ['color']],
@@ -1657,6 +1669,10 @@
 
 					$('#baesong_kind').val(baesong_kind);
 					$('#baesong_info').val(baesong_info);
+
+                    $('#com_id').trigger("change");
+                    $('#com_nm').trigger("change");
+                    $('#goods_type').trigger("change");
 				}
 				else if( com_type == "1" )
 				{	// 공급업체
@@ -1675,6 +1691,10 @@
 
 					$('#baesong_kind').val(baesong_kind);
 					$('#baesong_info').val(baesong_info);
+
+                    $('#com_id').trigger("change");
+                    $('#com_nm').trigger("change");
+                    $('#goods_type').trigger("change");
 				}
 
 			});
@@ -1893,23 +1913,21 @@
 
 			$("#u_category_s").val(u_cat_str);
 
-			@if ($type === '')
-			const type	= 'put';
-			@else
-			const type	= 'post';
-			@endif
-
-            console.log(frm.serialize());
+            const save_method = type === '' ? 'put' : 'post';
+            
+            let save_data = frm.serialize();
+            if ($("#create_to_class").val() !== '') {
+                save_data += "&goods_class=" + JSON.stringify(gxc.getRows()?.[0]);
+            }
 
 			$.ajax({
 				async: true,
-				type: type,
+				type: save_method,
 				url: '/head/product/prd01',
-				data: frm.serialize(),
+				data: save_data,
 				success: function (data) {
 					if (!isNaN(data * 1)) {
-                        const TYPE = "{{$type}}";
-                        if (TYPE == "create") {
+                        if (type == "create") {
                             alert("상품이 등록되었습니다.");
                             opener.Search();
                             window.close();
@@ -2108,33 +2126,45 @@
             var url = "/head/product/prd01/" + goods_no + "/in-qty";
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
         });
+        
+        /** 상품정보고시 관련 */
+        
+        if ($("#goods-class-grid").length > 0) {
+            const CENTER = {'text-align': 'center'};
+            let pApp;
+            const goods_class = "{{ @$goods_info->class ?? '' }}";
 
-        //상품정보고시 카드가 나올경우만 실행
-        if( $('#goods-class-grid').length > 0 ){
-
-            var goods_class_columns = [
-                // this row shows the row index, doesn't use any data from the row
-                {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-                {field:"goods_type",headerName:"상품구분",width:80,cellStyle:StyleGoodsTypeNM,pinned:'left'},
-                {field:"com_nm",headerName:"업체",pinned:'left'},
-                {field:"opt_kind_nm",headerName:"품목",pinned:'left'},
-                {field:"brand_nm",headerName:"브랜드"},
-                {field:"style_no",headerName:"스타일넘버"},
-                {field:"img2",headerName:"img2",hide:true},
-                {field:"img" , headerName:"이미지", type: 'GoodsImageType', cellStyle:{'text-align':'center'}},
-                {field:"sale_stat_cl",headerName:"상품상태",width:100,cellStyle:StyleGoodsState},
-                {field:"goods_no",headerName:"온라인코드", width:80,
-                    cellRenderer: function(params) {
+            const goods_class_columns = [
+                {
+                    field: "chk",
+                    headerName: '',
+                    cellClass: 'hd-grid-code',
+                    headerCheckboxSelection: true,
+                    checkboxSelection: true,
+                    width: 28,
+                    pinned: 'left',
+                    sort: null
+                },
+                {field: "goods_type", headerName: "상품구분", width: 70, cellStyle: StyleGoodsTypeNM, pinned: 'left'},
+                {field: "com_nm", headerName: "업체", width: 80, cellStyle: CENTER, pinned: 'left'},
+                {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: CENTER, pinned: 'left'},
+                {field: "brand_nm", headerName: "브랜드", minWidth: 80, maxWidth: 80, cellStyle: CENTER},
+                {field: "style_no", headerName: "스타일넘버", minWidth: 80, maxWidth: 80, cellStyle: CENTER},
+                {field: "img2", headerName: "img2", hide: true},
+                {field: "img", headerName: "이미지", type: 'GoodsImageType', minWidth: 60, maxWidth: 60, cellStyle: CENTER},
+                {field: "sale_stat_cl", headerName: "상품상태", minWidth: 80, maxWidth: 80, cellStyle: StyleGoodsState},
+                {
+                    field: "goods_no", headerName: "온라인코드", minWidth: 80, maxWidth: 80, cellStyle: CENTER,
+                    cellRenderer: function (params) {
                         if (params.value !== undefined) {
-                            return params.data.goods_no +' ['+ params.data.goods_sub +']';
-
+                            return params.data.goods_no + ' [' + params.data.goods_sub + ']';
                         }
                     }
                 },
-                {field:"goods_sub",headerName:"goods_sub",hide:true},
-                {field:"class",headerName:"분류" },
-                {field:"class_cd",headerName:"class_cd", hide:true },
-                {width : "auto"}
+                {field: "goods_sub", headerName: "goods_sub", hide: true},
+                {field: "class", headerName: "분류", minWidth: 80, cellStyle: CENTER},
+                {field: "class_cd", headerName: "class_cd", hide: true},
+                {width: "auto"}
                 // {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
                 // {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
                 // {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},
@@ -2149,179 +2179,246 @@
                 // {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
             ];
 
-			//선택한 항목 상태변경
-			$('.goods-info-change-btn').click(function(e){
-				e.preventDefault();
+            if (type === 'create') {
+                // 상품등록 시 상품정보고시 설정
 
-				const selectedRowData	= gx.gridOptions.api.getSelectedRows();
-				const selectRowCount	= selectedRowData.length;
-
-				if( selectRowCount == 0 ) {
-					alert('분류변경할 정보고시내용을 선택해주세요.');
-					return;
-				}
-
-				const s_goods_class_cd	= $('.goods_class').val();
-				const s_goods_class_nm	= $('.goods_class > option:selected').html();
-                const good_no           = '{{$goods_no}}';
-
-				if( s_goods_class_cd === '' ) {
-					alert('변경할 품목을 선택해주세요.');
-					return;
-				}
-
-                if( confirm("선택하신 상품정보고시 품목으로 변경하시겠습니까?") ){
-					$.ajax({
-						method: 'put',
-						url: '/head/product/prd01/goods-class-opt-update',
-						data: {
-							'goods_class': s_goods_class_cd,
-							'goods_no': goods_no
-						},
-						dataType: 'json',
-						success: function(res) {
-							if (res.code == '200') {
-                                location.reload();
-								// goodsClassSearch();
-							} else {
-								console.log(res);
-								alert(res.msg);
-							}
-						},
-						error: function(e) {
-							console.log(e.responseText)
-						}
-					});
+                pApp = new App('', {gridId: "#goods-class-grid"});
+                const gridDiv = document.querySelector(pApp.options.gridId);
+                gxc = new HDGrid(gridDiv, goods_class_columns);
+                gxc.gridOptions.getRowNodeId = function (data) {
+                    return data.rownum;
                 }
-			});
+                gxc.gridOptions.api.setRowData([{}]);
+                $("#goods-class-grid-total").text('1');
+                
+                $("#create_to_class").on("change", async function (e) {
+                    const value = e.target.options[e.target.selectedIndex].value ? e.target.options[e.target.selectedIndex].text : '';
+                    setGoodsClassValue('class', value);
+                    setGoodsClassValue('class_cd', e.target.options[e.target.selectedIndex].value);
+                    
+                    const res = await axios({ 'method': 'get', url: "/head/product/prd05/column_search?class=" + e.target.value });
+                    if (res.status === 200) {
+                        const cols = goods_class_columns.filter(c => c.field).concat(res.data.columns.reduce((a, c) => a.concat({
+                            field: c[0],
+                            headerName: c[1],
+                            editable: true,
+                            minWidth: 100,
+                            maxWidth: 400,
+                            cellStyle: { 'background': '#ffff99', 'border-right': '1px solid #e0e7e7' },
+                        }), []));
+                        cols.push({ 'width': 'auto' });
 
-            //선택된 상품정보고시 저장
-            $('.goods-info-save-btn').click(function(e){
-				e.preventDefault();
+                        gxc.gridOptions.api.setColumnDefs([]);
+                        gxc.gridOptions.api.setColumnDefs(cols);
+                    } else {
+                        alert('상품정보고시 분류항목 조회 중 에러가 발생했습니다. 다시 시도해주세요.');
+                        console.error(res);
+                    }
+                });
+                
+                $("#goods_type").on("change", function (e) {
+                    const value = e.target.options[e.target.selectedIndex].value ? e.target.options[e.target.selectedIndex].text : '';
+                    setGoodsClassValue('goods_type', value);
+                });
+                $("#opt_kind_cd").on("change", function (e) {
+                    const value = e.target.options[e.target.selectedIndex].value ? e.target.options[e.target.selectedIndex].text : '';
+                    setGoodsClassValue('opt_kind_nm', value);
+                });                
+                $("#sale_stat_cl").on("change", function (e) {
+                    const value = e.target.options[e.target.selectedIndex].value ? e.target.options[e.target.selectedIndex].text : '';
+                    setGoodsClassValue('sale_stat_cl', value);
+                });
+                $("#com_nm").on("change", function (e) {
+                    setGoodsClassValue('com_nm', e.target.value);
+                });
+                $("#brand_nm").on("change", function (e) {
+                    setGoodsClassValue('brand_nm', e.target.value);
+                });
+                $("#style_no").on("change", function (e) {
+                    setGoodsClassValue('style_no', e.target.value);
+                });
+                
+                function setGoodsClassValue(colId, value) {
+                    const row = gxc.getRows()?.[0];
+                    if (row) {
+                        row[colId] = value;
+                        gxc.gridOptions.api.applyTransaction({ update: [row] });
+                    }
+                }
+            } else {
+                // 상품수정 시 상품정보고시 설정
+                
+                //선택한 항목 분류변경
+                $('.goods-info-change-btn').click(function(e){
+                    e.preventDefault();
 
-				const selectedRowData	= gx.gridOptions.api.getSelectedRows();
-				const selectRowCount	= selectedRowData.length;
+                    const selectedRowData	= gxc.gridOptions.api.getSelectedRows();
+                    const selectRowCount	= selectedRowData.length;
 
-				if( selectRowCount == 0 ) {
-					alert('저장하실 정보고시 내용을 선택해주세요.');
-					return;
-				}
-
-				selectedRowData.forEach(function(data, idx) {
-
-                    if(data.class_cd == null) {
-                        alert('선택한 상품의 분류를 지정한 후에 저장해주세요');
+                    if( selectRowCount == 0 ) {
+                        alert('분류변경할 정보고시내용을 선택해주세요.');
                         return;
                     }
 
-					$.ajax({
-						async: true,
-						type: 'put',
-						url: `/head/product/prd01/goods-class-update`,
-						data: data,
-						success: function (data) {
-							if (selectRowCount -1 === idx) {
-							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
-                                goodsClassSearch();
-                                // window.close();
-                                // location.reload();
-                                opener.Search();
-							}
-						},
-						error: function(request, status, error) {
-							console.log("error")
-						}
-					});
-				});
-			});
+                    const s_goods_class_cd	= $('.goods_class').val();
+                    const s_goods_class_nm	= $('.goods_class > option:selected').html();
+                    const good_no           = '{{$goods_no}}';
 
-			//선택된 상품정보고시 삭제
-			$('.goods-info-delete-btn').click(function(e){
-				e.preventDefault();
-
-				const selectedRowData	= gx.gridOptions.api.getSelectedRows();
-				const selectRowCount	= selectedRowData.length;
-
-				if( selectRowCount == 0 ) {
-					alert('삭제하실 정보고시 내용을 선택해주세요.');
-					return;
-				}
-
-				if( confirm("삭제하시겠습니까?") ){
-
-					selectedRowData.forEach(function(data, idx) {
-						$.ajax({
-							async: true,
-							type: 'put',
-							url: `/head/product/prd01/goods-class-delete`,
-							data: data,
-                            dataType: "json",
-							success: function (data) {
-								if (selectRowCount -1 === idx) {
-									alert("정상적으로 삭제 되었습니다.");
-									// goodsClassSearch();
-                                    location.reload();
-								}
-							},
-							error: function(request, status, error) {
-								console.log("error")
-							}
-						});
-					});
-
-				}
-			});
-
-            let pApp, gx;
-            const goods_class = "{{ @$goods_info->class ?? '' }}";
-
-            $.ajax({
-                async: true,
-                type: 'get',
-                url: '/head/product/prd05/column_search',
-                data: "class=" + goods_class,
-                success: function(data) {
-                    let col_arr = data['columns'];
-                    col_arr.forEach((col, i) => {
-                        let col_val = {
-                            field: col[0],
-                            headerName: col[1],
-                            editable: true,
-                            minWidth: 100,
-                            cellStyle: {'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7'},
-                        }
-                        goods_class_columns.push(col_val);
-                    });
-
-                    pApp = new App('', { gridId: "#goods-class-grid" });
-                    const gridDiv = document.querySelector(pApp.options.gridId);
-                    gx = new HDGrid(gridDiv, goods_class_columns);
-                    gx.gridOptions.getRowNodeId = function(data) {
-                        return data.rownum;
+                    if( s_goods_class_cd === '' ) {
+                        alert('변경할 품목을 선택해주세요.');
+                        return;
                     }
 
-                    goodsClassSearch();
-                },
-                error: function(request, status, error) {
-                    alert("error");
-                    console.log(request);
+                    if( confirm("선택하신 상품정보고시 품목으로 변경하시겠습니까?") ){
+                        $.ajax({
+                            method: 'put',
+                            url: '/head/product/prd01/goods-class-opt-update',
+                            data: {
+                                'goods_class': s_goods_class_cd,
+                                'goods_no': goods_no
+                            },
+                            dataType: 'json',
+                            success: function(res) {
+                                if (res.code == '200') {
+                                    location.reload();
+                                    // goodsClassSearch();
+                                } else {
+                                    console.log(res);
+                                    alert(res.msg);
+                                }
+                            },
+                            error: function(e) {
+                                console.log(e.responseText)
+                            }
+                        });
+                    }
+                });
+
+                //선택된 상품정보고시 저장
+                $('.goods-info-save-btn').click(function(e){
+                    e.preventDefault();
+
+                    const selectedRowData	= gxc.gridOptions.api.getSelectedRows();
+                    const selectRowCount	= selectedRowData.length;
+
+                    if( selectRowCount == 0 ) {
+                        alert('저장하실 정보고시 내용을 선택해주세요.');
+                        return;
+                    }
+
+                    selectedRowData.forEach(function(data, idx) {
+
+                        if(data.class_cd == null) {
+                            alert('선택한 상품의 분류를 지정한 후에 저장해주세요');
+                            return;
+                        }
+
+                        $.ajax({
+                            async: true,
+                            type: 'put',
+                            url: `/head/product/prd01/goods-class-update`,
+                            data: data,
+                            success: function (data) {
+                                if (selectRowCount -1 === idx) {
+                                    alert("변경된 내용이 정상적으로 저장 되었습니다.");
+                                    goodsClassSearch();
+                                    // window.close();
+                                    // location.reload();
+                                    opener.Search();
+                                }
+                            },
+                            error: function(request, status, error) {
+                                console.log("error")
+                            }
+                        });
+                    });
+                });
+
+                //선택된 상품정보고시 삭제
+                $('.goods-info-delete-btn').click(function(e){
+                    e.preventDefault();
+
+                    const selectedRowData	= gxc.gridOptions.api.getSelectedRows();
+                    const selectRowCount	= selectedRowData.length;
+
+                    if( selectRowCount == 0 ) {
+                        alert('삭제하실 정보고시 내용을 선택해주세요.');
+                        return;
+                    }
+
+                    if( confirm("삭제하시겠습니까?") ){
+
+                        selectedRowData.forEach(function(data, idx) {
+                            $.ajax({
+                                async: true,
+                                type: 'put',
+                                url: `/head/product/prd01/goods-class-delete`,
+                                data: data,
+                                dataType: "json",
+                                success: function (data) {
+                                    if (selectRowCount -1 === idx) {
+                                        alert("정상적으로 삭제 되었습니다.");
+                                        // goodsClassSearch();
+                                        location.reload();
+                                    }
+                                },
+                                error: function(request, status, error) {
+                                    console.log("error")
+                                }
+                            });
+                        });
+
+                    }
+                });
+
+                $.ajax({
+                    async: true,
+                    type: 'get',
+                    url: '/head/product/prd05/column_search',
+                    data: "class=" + goods_class,
+                    success: function(data) {
+                        let col_arr = data['columns'];
+                        col_arr.forEach((col, i) => {
+                            let col_val = {
+                                field: col[0],
+                                headerName: col[1],
+                                editable: true,
+                                minWidth: 100,
+                                cellStyle: {'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7'},
+                            }
+                            goods_class_columns.push(col_val);
+                        });
+
+                        pApp = new App('', { gridId: "#goods-class-grid" });
+                        const gridDiv = document.querySelector(pApp.options.gridId);
+                        gxc = new HDGrid(gridDiv, goods_class_columns.filter(c => c.field).concat({width: "auto"}));
+                        gxc.gridOptions.getRowNodeId = function(data) {
+                            return data.rownum;
+                        }
+
+                        goodsClassSearch();
+                    },
+                    error: function(request, status, error) {
+                        alert("error");
+                        console.log(request);
+                    }
+                });
+
+                function goodsClassSearch() {
+                    const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
+                    gxc.Request(`/head/product/prd01/${goods_no}/goods-class`, data, -1);
                 }
-            });
 
-            function goodsClassSearch() {
-                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
-                gx.Request(`/head/product/prd01/${goods_no}/goods-class`, data, -1);
-            }
+                function checkEdit(params) {
+                    return params.data.class;
+                }
 
-            function checkEdit(params) {
-              return params.data.class;
+                // function editerStyle(params) {
+                //     if (params.data.class != null)
+                //         return { 'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7' }
+                // }
             }
-
-            function editerStyle(params) {
-              if (params.data.class != null)
-                  return { 'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7' }
-            }
-        }
+        } // 상품정보고시 관련 end
 
         $(document).ready(function(){
             var popSlideWidth = 0;
@@ -3324,7 +3421,7 @@
     let gx3;
 
     $(document).ready(function() {
-        SetSimilarTable();
+        if (type !== 'create') SetSimilarTable();
 
         $(".similar-add-btn").on("click", function(e) {
             e.preventDefault();
@@ -3539,7 +3636,7 @@
         if(goods_no > 0){
             get_add_info();
         }
-        const hide_related_products = document.f1.related_cfg.value == "A" ? true : false;
+        const hide_related_products = document.f1.related_cfg?.value == "A" ? true : false;
         hide_related_products
             ? document.querySelector(".related_goods_area").style.display = "none"
             : null

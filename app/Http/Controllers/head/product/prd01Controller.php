@@ -1211,7 +1211,8 @@ class prd01Controller extends Controller
 		$is_option_use = $req->input('is_option_use', 'Y');
 		$goods_qty = $req->input('goods_qty', 0);
 
-		// $good_qty =
+        $goods_class = (array) json_decode($req->input('goods_class', '')) ?? [];
+
 		try {
 			DB::beginTransaction();
 
@@ -1353,7 +1354,46 @@ class prd01Controller extends Controller
 			// goods_wonga 테이블
 			// 도매처리 생략
 			// 상품 컬러 생략
+            
+            // 상품정보고시 내용 저장
+            if (isset($goods_class['class_cd'])) {
+                $values = [
+                    'item_001' => $goods_class['item_001'] ?? '',
+                    'item_002' => $goods_class['item_002'] ?? '',
+                    'item_003' => $goods_class['item_003'] ?? '',
+                    'item_004' => $goods_class['item_004'] ?? '',
+                    'item_005' => $goods_class['item_005'] ?? '',
+                    'item_006' => $goods_class['item_006'] ?? '',
+                    'item_007' => $goods_class['item_007'] ?? '',
+                    'item_008' => $goods_class['item_008'] ?? '',
+                    'item_009' => $goods_class['item_009'] ?? '',
+                    'item_010' => $goods_class['item_010'] ?? '',
+                    'item_011' => $goods_class['item_011'] ?? '',
+                    'item_012' => $goods_class['item_012'] ?? '',
+                    'item_013' => $goods_class['item_013'] ?? '',
+                    'item_014' => $goods_class['item_014'] ?? '',
+                    'item_015' => $goods_class['item_015'] ?? '',
+                    'item_016' => $goods_class['item_016'] ?? '',
+                    'item_017' => $goods_class['item_017'] ?? '',
+                    'item_018' => $goods_class['item_018'] ?? '',
+                    'item_019' => $goods_class['item_019'] ?? '',
+                    'item_020' => $goods_class['item_020'] ?? '',
+                ];
+                
+                $class_cd = $goods_class['class_cd'] ?? '';
+                if ($class_cd !== '') {
+                    $values['class'] = $class_cd;
+                
+                    DB::table('goods')
+                        ->where('goods_no', $goods_no)
+                        ->where('goods_sub', $goods_sub)
+                        ->update([ 'class' => $class_cd ]);
+                }
 
+                $where = [ 'goods_no' => $goods_no, 'goods_sub' => $goods_sub ];
+                DB::table('goods_class')->updateOrInsert($where, $values);
+            }
+            
 			DB::commit();
 			return response()->json($goods_no, 201);
 		} catch(Exception $e){
