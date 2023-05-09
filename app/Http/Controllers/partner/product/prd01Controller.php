@@ -3002,8 +3002,8 @@ class prd01Controller extends Controller
 		$code = 200;
 		$msg = '';
 
-		$admin_id = Auth('head')->user()->id;
-		$admin_nm = Auth('head')->user()->name;
+		$admin_id = Auth('partner')->user()->id;
+		$admin_nm = Auth('partner')->user()->name;
 		$goods_sub = $request->goods_sub;
 
 		// 해당 상품 정보 조회
@@ -3210,6 +3210,7 @@ class prd01Controller extends Controller
 
 		return response()->json(['code' => $code, 'message' => $msg], $code);
 	}
+
 
 	/*
 	***

@@ -249,15 +249,17 @@
 
         function Choice(){
             let goods_nos = [];
+            let goods = [];
             gx.getSelectedRows().forEach((selectedRow, index) => {
                 goods_nos.push(selectedRow.goods_no);
+                goods.push(`${selectedRow.goods_no}||${selectedRow.goods_sub}`);
             });
 
             try{
                 if(parent.window.opener != null && !parent.window.opener.closed)
                 {
                     parent.window.opener.focus();
-                    parent.window.opener.ChoiceGoodsNo(goods_nos);
+                    parent.window.opener.ChoiceGoodsNo(goods_nos, goods);
                     if($("input:checkbox[name='chk_close']").is(":checked") == true){
                         self.close();
                     }

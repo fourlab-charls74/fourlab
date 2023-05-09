@@ -6,7 +6,7 @@
     select.select_cat
     {
         width:100%;
-        height:116px;
+        height:100px;
         border:0px;
         overflow:auto;
         background-image:none;
@@ -35,14 +35,17 @@
     .sub_title.sub::before {
         content: '';
     }
+
     .img {
         height: 40px;
     }
+
     /* 기본옵션 ag grid 3단 가운데 정렬 css 적용 */
     .basic-option .ag-header-row.ag-header-row-column-group + .ag-header-row.ag-header-row-column > .bizest.ag-header-cell {
         transform: translateY(-65%);
         height: 320%;
     }
+
     /* 옵션 컬럼 셀 잠금 */
     .locked-cell.ag-cell:focus{  border:none !important;  outline: none; border-right: 1px solid #bdc3c7 !important }
     .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-left {
@@ -57,6 +60,7 @@
     .locked-cell.ag-cell.ag-cell-range-selected:not(.ag-cell-range-single-cell).ag-cell-range-bottom {
         border-bottom-color: transparent;
     }
+
     .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell,
     .ag-theme-balham .ag-ltr .locked-cell.ag-cell-range-single-cell.ag-cell-range-handle,
     .ag-theme-balham .ag-ltr .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected),
@@ -64,9 +68,15 @@
     .ag-theme-balham .ag-rtl .ag-has-focus .locked-cell.ag-cell-focus:not(.ag-cell-range-selected) {
         border: 1px solid transparent;
     }
+
     table tr th {
         background : #f5f5f5;
     }
+
+    table td {
+        max-width: 300px;
+    }
+
 </style>
 
 <script type="text/javascript" src="/handle/editor/editor.js"></script>
@@ -1103,7 +1113,7 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <div id="goods-class-grid" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+                            <div id="goods-class-grid" style="height:95px;width:100%;" class="ag-theme-balham"></div>
                         </div>
                     </div>
                 </div>
@@ -1111,8 +1121,6 @@
             </div>
         </form>
     </div>
-
-
 
     <script type="text/javascript" charset="utf-8">
         const goods_no = '{{$goods_no}}';
@@ -1141,7 +1149,7 @@
                 disableDragAndDrop: false,
                 toolbar: editorToolbar,
                 imageupload:{
-                    dir:'/images/goods_cont',
+                    dir:'/data/partner/goods_cont',
                     maxWidth:1280,
                     maxSize:10
                 }
@@ -1459,7 +1467,7 @@
         }
 
         function pop_prd_page(){
-            url = "https://www.fjallraven.com/app/product/detail/"+goods_no+"/"+goods_sub;
+            url = "{{config('shop.front_url')}}/app/product/detail/"+goods_no+"/"+goods_sub;
             window.open(url);
         }
 
@@ -1496,9 +1504,9 @@
                 $("#opt_kind_cd").focus();
                 return false;
             }
-            if( $("#brand_nm").val() == "" ){
+            if( $("#brand_cd").val() == "" ){
                 alert("브랜드를 선택해 주십시오.");
-                $("#brand_nm").focus();
+                $(".sch-brand").click();
                 return false;
             }
 			if( $('#sale_stat_cl').val() == "" ){
@@ -1518,7 +1526,7 @@
 			}
 			if( $('#com_id').val() == "" ){
 				alert('업체를 선택해 주십시오.');
-				$('#com_nm').focus();
+				$('.btn-select-company').click();
 				return false;
 			}
             if( $("#org_nm").val() == "" ) {
@@ -1635,6 +1643,8 @@
 			const type	= 'post';
 			@endif
 
+            console.log(frm.serialize());
+
 			$.ajax({
 				async: true,
 				type: type,
@@ -1642,8 +1652,15 @@
 				data: frm.serialize(),
 				success: function (data) {
 					if (!isNaN(data * 1)) {
-						alert("변경된 내용이 정상적으로 저장 되었습니다.");
-						location.href="/partner/product/prd01/" + data;
+                        const TYPE = "{{$type}}";
+                        if (TYPE == "create") {
+                            alert("상품이 등록되었습니다.");
+                            opener.Search();
+                            window.close();
+                        } else {
+						    alert("변경된 내용이 정상적으로 저장 되었습니다.");
+						    location.href="/partner/product/prd01/" + data;
+                        }
 					}
 				},
 				error: function(e) {
@@ -1695,99 +1712,87 @@
 
         $('#price, #goods_price, #margin, #goods_sh, #wonga').keyup(function(){
 
-            if( $('#com_id').val() == '' ){
-                alert("업체를 선택해 주십시오.");
-                $('#price').val('0');
+			if( $('#com_id').val() == '' ){
+				alert("업체를 선택해 주십시오.");
+				$('#price').val('0');
 
-                return false;
-            }
+				return false;
+			}
 
-            if( $('#goods_type').val() == '' ){
-                alert("상품구분을 선택해주십시오.");
-                $('#price').val('0');
+			if( $('#goods_type').val() == '' ){
+				alert("상품구분을 선택해주십시오.");
+				$('#price').val('0');
 
-                return false;
-            }
+				return false;
+			}
 
-            if( $('#margin').val() > 100 ){
-                alert("마진율은 100%를 넘을 수 없습니다.");
-                $('#margin').val('0');
+			if( $('#margin').val() > 100 ){
+				alert("마진율은 100%를 넘을 수 없습니다.");
+				$('#margin').val('0');
 
-                return false;
-            }
+				return false;
+			}
 
-            if( $('#goods_type').val() == "P" ){
+			if( $('#goods_type').val() == "P" ){
                 var price	= unComma($('#price').val());
-                var margin	= unComma($('#margin').val());
-                var wonga	= unComma($('#wonga').val());
+				var margin	= unComma($('#margin').val());
+				var wonga	= unComma($('#wonga').val());
                 var goods_sh = unComma($('#goods_sh').val());
 
-                @if( $type == 'create' )
-                    if( price > 0 ){
-                        if( margin == '' )	margin = 0;
-                        var wonga = parseInt(Math.round(price * (1-margin/100)),10);
-                        $("#wonga").val(Comma(wonga));
-                    }
-                @else
-                    if( wonga > 0 ){
-                        if( this.id == "margin" ){
-                            price	= parseInt(Math.round(wonga / (1 - (margin / 100))),10);
-                            $("#price").val(Comma(price));
-                        }else if( this.id == "price" ){
-                            margin	= parseFloat(((price - wonga) / price) * 100).toFixed(2);
-                            $("#margin").val(margin);
-                        }
-                    }
-                @endif
+				@if( $type == 'create' )
+					if( price > 0 ){
+						if( margin == '' )	margin = 0;
+						var wonga = parseInt(Math.round(price * (1-margin/100)),10);
+						$("#wonga").val(Comma(wonga));
+					}
+				@else
+					if( wonga > 0 ){
+						if( this.id == "margin" ){
+							price	= parseInt(Math.round(wonga / (1 - (margin / 100))),10);
+							$("#price").val(Comma(price));
+						}else if( this.id == "price" ){
+							margin	= parseFloat(((price - wonga) / price) * 100).toFixed(2);
+							$("#margin").val(margin);
+						}
+					}
+				@endif
 
-                $('#price').val(numberFormat(price));
-                $('#goods_sh').val(numberFormat(goods_sh));
-                $('#wonga').val(numberFormat(wonga));
-            }
-            else if( $('#goods_type').val() == "S" ){
-                //공급업체
-                var price	= unComma($('#price').val());
-                var margin	= unComma($('#margin').val());
-                var wonga	= unComma($('#wonga').val());
+				$('#price').val(numberFormat(price));
+				$('#goods_sh').val(numberFormat(goods_sh));
+				$('#wonga').val(numberFormat(wonga));
+			}
+			else if( $('#goods_type').val() == "S" ){
+				//공급업체
+				var price	= unComma($('#price').val());
+				var margin	= unComma($('#margin').val());
+				var wonga	= unComma($('#wonga').val());
                 var goods_sh = unComma($('#goods_sh').val());
 
-                @if( $type == 'create' )
-                    if( price > 0 ){
-                        if( margin == '' )	margin = 0;
-                        var wonga = parseInt(Math.round(price * (1-margin/100)),10);
-                        $("#wonga").val(Comma(wonga));
-                    }
-                @else
-                    if( wonga > 0 ){
-                        if( this.id == "margin" ){
-                            price	= parseInt(Math.round(wonga / (1 - (margin / 100))),10);
-                            $("#price").val(Comma(price));
-                        }else if( this.id == "price" ){
-                            margin	= parseFloat(((price - wonga) / price) * 100).toFixed(2);
-                            $("#margin").val(margin);
-                        }
-                    }
-                @endif
+				@if( $type == 'create' )
+					if( price > 0 ){
+						if( margin == '' )	margin = 0;
+						var wonga = parseInt(Math.round(price * (1-margin/100)),10);
+						$("#wonga").val(Comma(wonga));
+					}
+				@else
+					if( wonga > 0 ){
+						if( this.id == "margin" ){
+							price	= parseInt(Math.round(wonga / (1 - (margin / 100))),10);
+							$("#price").val(Comma(price));
+						}else if( this.id == "price" ){
+							margin	= parseFloat(((price - wonga) / price) * 100).toFixed(2);
+							$("#margin").val(margin);
+						}
+					}
+				@endif
 
-                $('#price').val(numberFormat(price));
-                $('#goods_sh').val(numberFormat(goods_sh));
-                $('#wonga').val(numberFormat(wonga));
+				$('#price').val(numberFormat(price));
+				$('#goods_sh').val(numberFormat(goods_sh));
+				$('#wonga').val(numberFormat(wonga));
 
-            }
+			}
 
         });
-
-
-
-
-
-
-
-
-
-
-
-
 
         // 초기 옵션사용여부
         let prevOptionUsed = $("[name=is_option_use]:checked").val();
@@ -1819,7 +1824,8 @@
         }
 
 
-        $(".btn-change-qty").click(function(){
+        $(".btn-change-qty").click(function(e) {
+            e.preventDefault();
             const qty = $('[name=goods_qty]').val();
 
             if (isNaN(qty * 1)) {
@@ -1843,7 +1849,8 @@
         });
 
         $('.btn-qty-in').click(function(){
-            window.open("/partner/product/prd01/"+goods_no+"/in-qty","_blank", "Product Detail");
+            var url = "/partner/product/prd01/" + goods_no + "/in-qty";
+            window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
         });
 
         //상품정보고시 카드가 나올경우만 실행
@@ -1858,15 +1865,9 @@
                 {field:"brand_nm",headerName:"브랜드"},
                 {field:"style_no",headerName:"스타일넘버"},
                 {field:"img2",headerName:"img2",hide:true},
-                {field:"img" , headerName:"이미지",
-                    cellRenderer: function(params) {
-                        if (params.value !== undefined && params.data.img != "") {
-                            return '<img src="{{config('shop.image_svr')}}/' + params.data.img + '"/>';
-                        }
-                    }
-                },
+                {field:"img" , headerName:"이미지", type: 'GoodsImageType', cellStyle:{'text-align':'center'}},
                 {field:"sale_stat_cl",headerName:"상품상태",width:100,cellStyle:StyleGoodsState},
-                {field:"goods_no",headerName:"상품번호", width:80,
+                {field:"goods_no",headerName:"온라인코드", width:80,
                     cellRenderer: function(params) {
                         if (params.value !== undefined) {
                             return params.data.goods_no +' ['+ params.data.goods_sub +']';
@@ -1876,44 +1877,66 @@
                 },
                 {field:"goods_sub",headerName:"goods_sub",hide:true},
                 {field:"class",headerName:"분류" },
-                {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
-                {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_004",headerName:"제조사(수입자/병행수입)",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_005",headerName:"제조국",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_006",headerName:"세탁방법 및 취급시 주의사항",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_007",headerName:"제조연월",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_008",headerName:"품질보증기준",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_009",headerName:"A/S 책임자와 전화번호",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_010",headerName:"KC안전인증 대상 유무",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_011",headerName:"수입여부",editable: checkEdit,cellStyle : editerStyle},
-                {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
+                {field:"class_cd",headerName:"class_cd", hide:true },
+                {width : "auto"}
+                // {field:"item_001",headerName:"제품소재",editable: checkEdit,cellStyle:editerStyle },
+                // {field:"item_002",headerName:"색상",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_003",headerName:"치수",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_004",headerName:"제조사(수입자/병행수입)",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_005",headerName:"제조국",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_006",headerName:"세탁방법 및 취급시 주의사항",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_007",headerName:"제조연월",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_008",headerName:"품질보증기준",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_009",headerName:"A/S 책임자와 전화번호",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_010",headerName:"KC안전인증 대상 유무",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_011",headerName:"수입여부",editable: checkEdit,cellStyle : editerStyle},
+                // {field:"item_012",headerName:"종류",editable: checkEdit,cellStyle : editerStyle},
             ];
 
 			//선택한 항목 상태변경
 			$('.goods-info-change-btn').click(function(e){
 				e.preventDefault();
 
-				const s_goods_class_cd	= $('.goods_class').val();
-				const s_goods_class_nm	= $('.goods_class > option:selected').html();
+				const selectedRowData	= gx.gridOptions.api.getSelectedRows();
+				const selectRowCount	= selectedRowData.length;
 
-				if( s_goods_class_cd === '' ) {
-					alert('품목변경할 정보고시내용을 선택해주세요.');
+				if( selectRowCount == 0 ) {
+					alert('분류변경할 정보고시내용을 선택해주세요.');
 					return;
 				}
 
-				gx.getSelectedRows().forEach(function(data) {
-					const nodeRow	= gx.gridOptions.api.getRowNode(data.rownum);
+				const s_goods_class_cd	= $('.goods_class').val();
+				const s_goods_class_nm	= $('.goods_class > option:selected').html();
+                const good_no           = '{{$goods_no}}';
 
-					data.class		= s_goods_class_nm.replace(/(\s)|(\t)|(\n)/g,"");
-					data.class_cd	= s_goods_class_cd;
+				if( s_goods_class_cd === '' ) {
+					alert('변경할 품목을 선택해주세요.');
+					return;
+				}
 
-					nodeRow.setData(data);
-
-					gx.gridOptions.api.redrawRows({
-						rowNodes : [nodeRow]
+                if( confirm("선택하신 상품정보고시 품목으로 변경하시겠습니까?") ){
+					$.ajax({
+						method: 'put',
+						url: '/partner/product/prd01/goods-class-opt-update',
+						data: {
+							'goods_class': s_goods_class_cd,
+							'goods_no': goods_no
+						},
+						dataType: 'json',
+						success: function(res) {
+							if (res.code == '200') {
+                                location.reload();
+								// goodsClassSearch();
+							} else {
+								console.log(res);
+								alert(res.msg);
+							}
+						},
+						error: function(e) {
+							console.log(e.responseText)
+						}
 					});
-				});
+                }
 			});
 
             //선택된 상품정보고시 저장
@@ -1929,6 +1952,12 @@
 				}
 
 				selectedRowData.forEach(function(data, idx) {
+
+                    if(data.class_cd == null) {
+                        alert('선택한 상품의 분류를 지정한 후에 저장해주세요');
+                        return;
+                    }
+
 					$.ajax({
 						async: true,
 						type: 'put',
@@ -1938,6 +1967,9 @@
 							if (selectRowCount -1 === idx) {
 							    alert("변경된 내용이 정상적으로 저장 되었습니다.");
                                 goodsClassSearch();
+                                // window.close();
+                                // location.reload();
+                                opener.Search();
 							}
 						},
 						error: function(request, status, error) {
@@ -1971,7 +2003,8 @@
 							success: function (data) {
 								if (selectRowCount -1 === idx) {
 									alert("정상적으로 삭제 되었습니다.");
-									goodsClassSearch();
+									// goodsClassSearch();
+                                    location.reload();
 								}
 							},
 							error: function(request, status, error) {
@@ -1983,18 +2016,44 @@
 				}
 			});
 
-            const pApp = new App('', { gridId: "#goods-class-grid" });
-            const gridDiv = document.querySelector(pApp.options.gridId);
-            const gx = new HDGrid(gridDiv, goods_class_columns);
+            let pApp, gx;
+            const goods_class = "{{ @$goods_info->class ?? '' }}";
 
-            gx.gridOptions.getRowNodeId = function(data) {
-              return data.rownum;
-            }
+            $.ajax({
+                async: true,
+                type: 'get',
+                url: '/partner/product/prd05/column_search',
+                data: "class=" + goods_class,
+                success: function(data) {
+                    let col_arr = data['columns'];
+                    col_arr.forEach((col, i) => {
+                        let col_val = {
+                            field: col[0],
+                            headerName: col[1],
+                            editable: true,
+                            minWidth: 100,
+                            cellStyle: {'background' : '#ffff99', 'border-right' : '1px solid #e0e7e7'},
+                        }
+                        goods_class_columns.push(col_val);
+                    });
+
+                    pApp = new App('', { gridId: "#goods-class-grid" });
+                    const gridDiv = document.querySelector(pApp.options.gridId);
+                    gx = new HDGrid(gridDiv, goods_class_columns);
+                    gx.gridOptions.getRowNodeId = function(data) {
+                        return data.rownum;
+                    }
+
+                    goodsClassSearch();
+                },
+                error: function(request, status, error) {
+                    alert("error");
+                    console.log(request);
+                }
+            });
 
             function goodsClassSearch() {
-                const class_value = $('.goods_class').val();
-                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}&class=${class_value}`;
-
+                const data = `goods_no=${goods_no}&goods_sub=${goods_sub}`;
                 gx.Request(`/partner/product/prd01/${goods_no}/goods-class`, data, -1);
             }
 
@@ -2092,19 +2151,6 @@
             setSaleOnclickEvent();
         });
 
-		//ESC 클릭시 창 닫기
-		$(document).keydown(function(e){
-			let modalObj = $('.modal-dialog');
-            if (e.keyCode == 27) {
-                if(modalObj.is(':visible')) {
-                    modalObj.dialog('close');
-                }
-            }
-		});
-
-<<<<<<< Updated upstream
-</script>
-=======
     </script>
 
 @if($type == 'create')
@@ -2114,7 +2160,6 @@
         }
     </style>
 @endif
->>>>>>> Stashed changes
 
 
     <style>
@@ -2185,10 +2230,14 @@
         return [
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, cellClass: "locked-cell", checkboxSelection: true, width: 30, pinned: 'left', sort: null },
             { field: "opt1_kind_name", headerName: opt1_kind_nm, width:100, pinned: 'left', suppressMovable: true },
-            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true, cellClassRules: optCellClassRules },
-            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, cellClassRules: optCellClassRules },
-            { field: "wqty", headerName: "보유재고", width:80, type: 'numberType', editable: true },
-            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true, cellClassRules: optCellClassRules }
+            { field: "opt_price", headerName: "옵션가격", width:100, type: 'numberType', editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true},
+            { field: "good_qty", headerName: "온라인재고", width:80, type: 'numberType', editable: true,
+                cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data.good_qty_chg_yn === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data.good_qty_chg_yn === 'Y' ? 'bold' : 'normal'})
+            },
+            { field: "wqty", headerName: "보유재고", width:80, type: 'numberType', editable: true,
+                cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data.wqty_chg_yn === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data.wqty_chg_yn === 'Y' ? 'bold' : 'normal'})
+            },
+            { field: "opt_memo", headerName: "옵션메모", width:90, cellStyle: {"text-align":"center"}, editable: true, cellStyle: CELL_COLOR.YELLOW, suppressMovable: true}
         ];
     };
 
@@ -2225,10 +2274,13 @@
             headerName: name,
             field: name,
             children: [
-                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, cellStyle: CELL_COLOR.YELLOW,
-                    suppressMovable: true, cellClassRules: optCellClassRules
+                {headerName: "온라인재고", field: `${name}_good_qty`, type: 'numberType', width: 70, editable: true, suppressMovable: true,
+                    cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data[`${name}_good_qty_chg_yn`] === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data[`${name}_good_qty_chg_yn`] === 'Y' ? 'bold' : 'normal'})
                 },
-                {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
+                // {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, suppressMovable: true},
+                {headerName: "보유재고", field: `${name}_wqty`, type: 'numberType', width: 58, editable: true, suppressMovable: true,
+                    cellStyle: (params) => ({...CELL_COLOR.YELLOW, 'color': params.data[`${name}_wqty_chg_yn`] === 'Y' ? '#ff4444' : 'none', 'font-weight': params.data[`${name}_wqty_chg_yn`] === 'Y' ? 'bold' : 'normal'})
+                },
             ],
             headerGroupComponent: columnOptDelete
         };
@@ -2357,20 +2409,39 @@
                 // 온라인 재고인 경우 유효성 검사
                 let regExp = /.+(?=_good_qty)/i;
                 let arr = column_name.match(regExp);
-                if (arr) {
+                regExp = /.+(?=_wqty)/i;
+                let arr2 = column_name.match(regExp);
+                if (arr || arr2) {
                     if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
                         alert("숫자만 입력가능합니다.");
                         gx2StartEditingCell(row_index, column_name);
                         return false;
+                    } else {
+                        if (arr) {
+                            params.data[column_name + '_chg_yn'] = 'Y';
+                            params.api.redrawRows({ rowNodes: [params.node] });
+                            gx2.setFocusedWorkingCell();
+                        } else if (arr2) {
+                            let opt_nm = column_name.split('_wqty')[0];
+                            params.data[opt_nm + '_good_qty'] = (isNaN(params.data[opt_nm + '_good_qty'] * 1) ? 0 : params.data[opt_nm + '_good_qty'] * 1) + (params.newValue - params.oldValue);
+                            params.data[[opt_nm + '_good_qty_chg_yn']] = 'Y';
+                            params.data[column_name + '_chg_yn'] = 'Y';
+                            params.api.redrawRows({ rowNodes: [params.node] });
+                            gx2.setFocusedWorkingCell();
+                        }
                     }
                 }
             }
 
             // 단일 옵션 - 온라인 재고인 경우
-            if (column_name == "qty") {
+            if (column_name == "good_qty") {
                 if (isNaN(value) == true || value == "") {
                     alert("숫자만 입력가능합니다.");
                     gx2StartEditingCell(row_index, column_name);
+                } else {
+                    params.data.good_qty_chg_yn = 'Y';
+                    params.api.redrawRows({ rowNodes: [params.node] });
+                    gx2.setFocusedWorkingCell();
                 }
             }
 
@@ -2379,6 +2450,12 @@
                 if (isNaN(value) == true || value == "") {
                     alert("숫자만 입력가능합니다.");
                     gx2StartEditingCell(row_index, column_name);
+                } else {
+                    params.data.good_qty = params.data.good_qty * 1 + (params.newValue - params.oldValue);
+                    params.data.good_qty_chg_yn = 'Y';
+                    params.data.wqty_chg_yn = 'Y';
+                    params.api.redrawRows({ rowNodes: [params.node] });
+                    gx2.setFocusedWorkingCell();
                 }
             }
 
@@ -2706,6 +2783,7 @@
                 if(res.code === 200) {
                     searchOptKind();
                     initOptGridAndApi();
+                    $("#goods_qty").val(0);
                 }
                 else alert(res.msg);
             },
@@ -2846,7 +2924,7 @@
                 keys.reduce((prev, key) => {
 
                     let obj = {};
-                    let { opt1, opt2, goods_opt, good_qty, opt_price, opt_memo } = prev;
+                    let { opt1, opt2, goods_opt, good_qty, wqty, opt_price, opt_memo } = prev;
                     obj.opt1 = opt1;
                     obj.opt_price = opt_price;
                     obj.opt_memo = opt_memo;
@@ -2869,6 +2947,13 @@
                         obj.good_qty = parseInt(row[`${arr_2[0]}_good_qty`]);
                     }
 
+                    obj.wqty = wqty;
+                    regExp = /.+(?=_wqty)/i;
+                    arr_2 = key.match(regExp);
+                    if (arr_2) {
+                        obj.wqty = parseInt(row[`${arr_2[0]}_wqty`]);
+                    }
+
                     // 루프돌면서 백앤드에서 사용하는 형식에 맞는 goods_opt 만들었으면 data에 push함
                     if (obj?.goods_opt) {
                         data.push(obj);
@@ -2877,10 +2962,9 @@
 
                     return obj;
 
-                }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, opt_price: opt_price, opt_memo: opt_memo });
+                }, { goods_opt : "", opt1 : opt1_kind_name, opt2: "", good_qty: 0, wqty: 0, opt_price: opt_price, opt_memo: opt_memo });
 
             });
-
         }
 
         const response = await axios({ url: `/partner/product/prd01/${goods_no}/update-basic-opts-data`,
@@ -3000,13 +3084,7 @@
     function SetSimilarTable() {
         const goods_similar_columns = [
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left'},
-            {field:"img" , headerName:"이미지",
-                cellRenderer: function(params) {
-                    if (params.value !== undefined && params.data.img != "") {
-                        return '<img src="' + params.data.img + '"/>';
-                    }
-                }
-            },
+            {field: "img" , headerName:"이미지", type: 'GoodsImageType'},
             {field: 'goods_nm', headerName: "상품명", width: 200},
             {field: 'brand', headerName: "브랜드"},
             {field: 'com_nm', headerName: "업체"},
@@ -3081,7 +3159,7 @@
     ***
     */
 
-    const ori_price = '{{  @$goods_info->normal_price }}';
+    const ori_price = '{{  @$goods_info->price }}';
     const ori_sale_rate = '{{  @$goods_info->sale_rate }}';
     const ori_sale_price = '{{  @$goods_info->sale_price }}';
     const ori_sale_margin = '{{  @$goods_info->sale_margin }}';
@@ -3356,6 +3434,12 @@
             }
         });
 
+    }
+
+    // 평균원가 히스토리 조회팝업 오픈
+    function openWongaPopup() {
+        const url = "/partner/product/prd03/wonga?goods_no=" + document.f1.goods_no.value + "&goods_sub=" + document.f1.goods_sub.value;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=200,width=1024,height=900");
     }
 
 	</script>
