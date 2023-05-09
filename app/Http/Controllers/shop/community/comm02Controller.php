@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\shop\stock;
+namespace App\Http\Controllers\shop\community;
 
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
@@ -14,7 +14,7 @@ use Exception;
 
 use App\Models\Conf;
 
-class stk32Controller extends Controller
+class comm02Controller extends Controller
 {
     public function index(Request $request)
     {
@@ -29,7 +29,7 @@ class stk32Controller extends Controller
             'sdate' => $sdate,
             'edate' => date("Y-m-d")
         ];
-        return view(Config::get('shop.shop.view') . '/stock/stk32', $values);
+        return view(Config::get('shop.shop.view') . '/community/comm02', $values);
     }
 
 
@@ -134,7 +134,7 @@ class stk32Controller extends Controller
             'store_types' => SLib::getCodes("STORE_TYPE"),
         ];
 
-        return view( Config::get('shop.shop.view') . '/stock/stk32_show', $values);
+        return view( Config::get('shop.shop.view') . '/community/comm02_show', $values);
     }
 
     public function search_store(Request $request)
@@ -221,7 +221,7 @@ class stk32Controller extends Controller
 
         ];
 
-        return view( Config::get('shop.shop.view') . '/stock/stk32_sendMsg', $values);
+        return view( Config::get('shop.shop.view') . '/community/comm02_sendMsg', $values);
     }
 
 
@@ -338,7 +338,7 @@ class stk32Controller extends Controller
             ];
         }
 
-        return view( Config::get('shop.shop.view') . '/stock/stk32_showContent', $values);
+        return view( Config::get('shop.shop.view') . '/community/comm02_showContent', $values);
     }
 
 

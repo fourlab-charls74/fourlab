@@ -94,7 +94,7 @@
 
         $.ajax({
             method: 'put',
-            url: '/shop/stock/stk32/msg_read',
+            url: '/shop/community/comm02/msg_read',
             data: { 
                 msg_cd : msg_cd
             },
@@ -118,7 +118,7 @@
         let msg_cd = "{{$msg_cd}}";
 
         if(kind == 'S' || kind == '') {
-            url = "/shop/stock/stk32";
+            url = "/shop/community/comm02";
             msg = '매장알림 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
         } else if(kind == 'RT') {
             url = "/shop/stock/stk20";
@@ -134,7 +134,7 @@
 
         axios({
             method: 'put',
-            url: '/shop/stock/stk32/msg_read',
+            url: '/shop/community/comm02/msg_read',
             data: { 
                 msg_cd : msg_cd
             }

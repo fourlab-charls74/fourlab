@@ -325,6 +325,48 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
     });
 
     //매장관리
+    Route::prefix("community")->namespace('community')->group(function () {
+
+        // 매장 공지사항
+        Route::get('comm01/{notice_id}','comm01Controller@index');
+        Route::get('comm01/{notice_id}/search', 'comm01Controller@search');
+        // Route::get('comm01/create', 'comm01Controller@create');
+        Route::get('comm01/{notice_id}/{no}', 'comm01Controller@show');
+        Route::get('comm01/popup_chk', 'comm01Controller@popup_chk');
+        Route::get('comm01/popup_notice/{no}', 'comm01Controller@show_notice');
+        Route::put('comm01/notice_read', 'comm01Controller@notice_read');
+        // Route::put('comm01/store', 'comm01Controller@store');
+        // Route::put('comm01/edit/{no}', 'comm01Controller@update');
+        // Route::post('comm01/del_store', 'comm01Controller@del_store');
+
+        //알림
+        Route::get('comm02','comm02Controller@index');
+        Route::get('comm02/search', 'comm02Controller@search');
+        Route::get('comm02/search-store', 'comm02Controller@search_store');
+        Route::get('comm02/search-groupstore', 'comm02Controller@search_groupStore');
+        Route::get('comm02/search_group', 'comm02Controller@search_group');
+        Route::get('comm02/search_group_show', 'comm02Controller@search_group_show');
+        Route::get('comm02/search_group2{group_cd?}', 'comm02Controller@search_group2');
+        Route::get('comm02/create', 'comm02Controller@create');
+        Route::get('comm02/sendMsg', 'comm02Controller@sendMsg');
+        Route::get('comm02/showContent', 'comm02Controller@showContent');
+        Route::get('comm02/show/{no?}', 'comm02Controller@show');
+        Route::get('comm02/msg{no?}', 'comm02Controller@msg');
+        Route::post('comm02/store', 'comm02Controller@store');
+        Route::put('comm02/msg_read', 'comm02Controller@msg_read');
+        Route::post('comm02/msg_del', 'comm02Controller@msg_del');
+        Route::get('comm02/popup_chk', 'comm02Controller@popup_chk');
+        Route::get('comm02/group', 'comm02Controller@group');
+        Route::get('comm02/group_show', 'comm02Controller@group_show');
+        Route::post('comm02/add_group', 'comm02Controller@add_group');
+        Route::get('comm02/addGroup', 'comm02Controller@addGroup');
+        Route::get('comm02/addGroup', 'comm02Controller@addGroup_show');
+        Route::post('comm02/update', 'comm02Controller@update');
+        Route::post('comm02/del_group', 'comm02Controller@del_group');
+        Route::post('comm02/del_store', 'comm02Controller@del_store');
+
+    });
+    //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {
 
         // 생산입고관리
@@ -462,42 +504,42 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::put('stk30/save', 'stk30Controller@save');
  
         // 매장 공지사항
-        Route::get('stk31','stk31Controller@index');
-        Route::get('stk31/search', 'stk31Controller@search');
-        // Route::get('stk31/create', 'stk31Controller@create');
-        Route::get('stk31/notice/{no}', 'stk31Controller@show');
-        Route::get('stk31/popup_chk', 'stk31Controller@popup_chk');
-        Route::get('stk31/popup_notice/{no}', 'stk31Controller@show_notice');
-        Route::put('stk31/notice_read', 'stk31Controller@notice_read');
-        // Route::put('stk31/store', 'stk31Controller@store');
-        // Route::put('stk31/edit/{no}', 'stk31Controller@update');
-        // Route::post('stk31/del_store', 'stk31Controller@del_store');
+        Route::get('comm01','comm01Controller@index');
+        Route::get('comm01/search', 'comm01Controller@search');
+        // Route::get('comm01/create', 'comm01Controller@create');
+        Route::get('comm01/notice/{no}', 'comm01Controller@show');
+        Route::get('comm01/popup_chk', 'comm01Controller@popup_chk');
+        Route::get('comm01/popup_notice/{no}', 'comm01Controller@show_notice');
+        Route::put('comm01/notice_read', 'comm01Controller@notice_read');
+        // Route::put('comm01/store', 'comm01Controller@store');
+        // Route::put('comm01/edit/{no}', 'comm01Controller@update');
+        // Route::post('comm01/del_store', 'comm01Controller@del_store');
 
         //알림
-        Route::get('stk32','stk32Controller@index');
-        Route::get('stk32/search', 'stk32Controller@search');
-        Route::get('stk32/search-store', 'stk32Controller@search_store');
-        Route::get('stk32/search-groupstore', 'stk32Controller@search_groupStore');
-        Route::get('stk32/search_group', 'stk32Controller@search_group');
-        Route::get('stk32/search_group_show', 'stk32Controller@search_group_show');
-        Route::get('stk32/search_group2{group_cd?}', 'stk32Controller@search_group2');
-        Route::get('stk32/create', 'stk32Controller@create');
-        Route::get('stk32/sendMsg', 'stk32Controller@sendMsg');
-        Route::get('stk32/showContent', 'stk32Controller@showContent');
-        Route::get('stk32/show/{no?}', 'stk32Controller@show');
-        Route::get('stk32/msg{no?}', 'stk32Controller@msg');
-        Route::post('stk32/store', 'stk32Controller@store');
-        Route::put('stk32/msg_read', 'stk32Controller@msg_read');
-        Route::post('stk32/msg_del', 'stk32Controller@msg_del');
-        Route::get('stk32/popup_chk', 'stk32Controller@popup_chk');
-        Route::get('stk32/group', 'stk32Controller@group');
-        Route::get('stk32/group_show', 'stk32Controller@group_show');
-        Route::post('stk32/add_group', 'stk32Controller@add_group');
-        Route::get('stk32/addGroup', 'stk32Controller@addGroup');
-        Route::get('stk32/addGroup', 'stk32Controller@addGroup_show');
-        Route::post('stk32/update', 'stk32Controller@update');
-        Route::post('stk32/del_group', 'stk32Controller@del_group');
-        Route::post('stk32/del_store', 'stk32Controller@del_store');
+        Route::get('comm02','comm02Controller@index');
+        Route::get('comm02/search', 'comm02Controller@search');
+        Route::get('comm02/search-store', 'comm02Controller@search_store');
+        Route::get('comm02/search-groupstore', 'comm02Controller@search_groupStore');
+        Route::get('comm02/search_group', 'comm02Controller@search_group');
+        Route::get('comm02/search_group_show', 'comm02Controller@search_group_show');
+        Route::get('comm02/search_group2{group_cd?}', 'comm02Controller@search_group2');
+        Route::get('comm02/create', 'comm02Controller@create');
+        Route::get('comm02/sendMsg', 'comm02Controller@sendMsg');
+        Route::get('comm02/showContent', 'comm02Controller@showContent');
+        Route::get('comm02/show/{no?}', 'comm02Controller@show');
+        Route::get('comm02/msg{no?}', 'comm02Controller@msg');
+        Route::post('comm02/store', 'comm02Controller@store');
+        Route::put('comm02/msg_read', 'comm02Controller@msg_read');
+        Route::post('comm02/msg_del', 'comm02Controller@msg_del');
+        Route::get('comm02/popup_chk', 'comm02Controller@popup_chk');
+        Route::get('comm02/group', 'comm02Controller@group');
+        Route::get('comm02/group_show', 'comm02Controller@group_show');
+        Route::post('comm02/add_group', 'comm02Controller@add_group');
+        Route::get('comm02/addGroup', 'comm02Controller@addGroup');
+        Route::get('comm02/addGroup', 'comm02Controller@addGroup_show');
+        Route::post('comm02/update', 'comm02Controller@update');
+        Route::post('comm02/del_group', 'comm02Controller@del_group');
+        Route::post('comm02/del_store', 'comm02Controller@del_store');
 
         //일별동종업계매출관리
         Route::get('stk33','stk33Controller@index');

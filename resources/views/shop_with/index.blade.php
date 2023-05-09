@@ -137,7 +137,7 @@
     $(document).ready(function(){
         $('#order_amt-tab').trigger("click");
         $('#bar-tab').trigger("click");
-        openNoticePopup();
+        //openNoticePopup();
     });
 </script>
 
@@ -232,7 +232,7 @@
 
 <script>
      function showContent(msg_cd) {
-        const url = '/shop/stock/stk32/showContent?msg_type=receive&msg_cd=' + msg_cd;
+        const url = '/shop/community/comm02/showContent?msg_type=receive&msg_cd=' + msg_cd;
         const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
     }
 
@@ -241,7 +241,7 @@
     }
 
     function msg() {
-        window.location.href = "/shop/stock/stk32";
+        window.location.href = "/shop/community/comm02";
     }
 
     function sale_amt_store() {
@@ -258,14 +258,14 @@
             $.ajax({
 				async: true,
 				type: 'get',
-				url: '/shop/stock/stk31/popup_chk',
+				url: '/shop/community/comm01/popup_chk',
 				data: {
 					"store_cd": store_cd
 				},
 				success: function(data) {
-					if (data.code == 200) {
+					if (data.code === 200) {
                         $.each(data.nos, function(i, item){
-                            const url = '/shop/stock/stk31/popup_notice/' + item.ns_cd;
+                            const url = '/shop/community/comm01/popup_notice/' + item.ns_cd;
                             const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=600,height=500");
                         });
 					} else {

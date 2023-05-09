@@ -107,7 +107,7 @@
                 
             }
             });
-            gx.Request('/shop/stock/stk32/search_group2');
+            gx.Request('/shop/community/comm02/search_group2');
 
         });
 
@@ -170,7 +170,7 @@
 
             $.ajax({
                 method: 'post',
-                url: '/shop/stock/stk32/add_group',
+                url: '/shop/community/comm02/add_group',
                 data: frm,
                 dataType: 'json',
                 success: function(data) {

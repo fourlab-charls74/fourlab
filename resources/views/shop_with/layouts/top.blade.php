@@ -80,7 +80,7 @@
             $.ajax({
 				async: true,
 				type: 'get',
-				url: '/shop/stock/stk31/popup_chk',
+				url: '/shop/community/comm01/popup_chk',
 				data: {
 					"store_cd": store_cd
 				},
@@ -100,8 +100,18 @@
                         nReadMsg = JSON.parse(nReadMsg);
 
                         $.each(nReadMsg, function(i, item){
-                            $('#em_subject').prepend(`<a class="dropdown-item" href="/shop/stock/stk31/notice/${i}">${item}</a>`);
+                            $('#em_subject').prepend(`<a class="dropdown-item" href="/shop/community/comm01/notice/${i}">${item}</a>`);
                         });
+
+                        if (data.code === 200) {
+                            $.each(data.nos, function(i, item){
+                                const url = '/shop/community/comm01/popup_notice/' + item.ns_cd;
+                                const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=600,height=500");
+                            });
+                        } else {
+                            alert("공지사항 팝업을 표시할 수 없습니다.\n관리자에게 문의해 주십시오.");
+                        }
+                        
                     } else if(data.cnt == 0) {
                         $('#em_subject').prepend(`<a class="dropdown-item" href="#">공지사항을 모두 읽었습니다.</a>`);
                     }
