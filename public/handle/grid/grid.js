@@ -512,6 +512,8 @@ HDGrid.prototype._Request = function(callback) {
             //const res = jQuery.parseJSON(data);
             res = data;
 
+            console.log(res);
+
             //console.log(_gx);
 
             if (_gx.page === -1) {
