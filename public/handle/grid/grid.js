@@ -397,6 +397,27 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         // maxBlocksInCache: 10,
 
         // debug: true,
+
+        excelStyles: [
+            {
+                id: 'header',
+                alignment: {
+                    vertical: 'Center',
+                    horizontal: 'Center',
+                },
+                interior: {
+                    color: '#f2f2f2',
+                    pattern: 'Solid',
+                },
+                borders: {
+                    borderBottom: {
+                        color: '#333',
+                        lineStyle: 'Continuous',
+                        weight: 2,
+                    },
+                },
+            },
+        ],
     };
 
     Object.keys(optionMixin).forEach((key) => {
@@ -697,10 +718,34 @@ HDGrid.prototype.HideLoadingLayer = function(){
     $("#is_loading_layer").remove();
 };
 
-HDGrid.prototype.Download = function(title = 'export.csv'){
-    this.gridOptions.api.exportDataAsCsv({
-        fileName:title
-    });
+/** CSV & EXCEL 다운로드
+ * - options.type이 'excel'일 경우, title의 확장자를 반드시 'xlsx' 형태로 작성 (그 외에는 'csv'로 작성)
+ * - levels는 배열형태로 작성
+ */
+HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
+
+    const values = {
+        fileName: title,
+        skipPinnedTop: options.hasOwnProperty('addPinnedTop') ? !options.addPinnedTop : true,
+        skipGroups: options.hasOwnProperty('skipGroups') ? options.skipGroups : false,
+        shouldRowBeSkipped: (params) => {
+            return options.hasOwnProperty('levels') && Array.isArray(options.levels) ? !options.levels.includes(params.node.level) : false;
+        },
+        processRowGroupCallback: (params) => params.node.key,
+        headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : 30,
+        processCellCallback: (params) => {
+            return params.value || (options.skipGroups ? params.node.data?.[params.column.userProvidedColDef?.showRowGroup] : '');
+        },
+        // processHeaderCallback: (params) => {
+        //     return (params.column.parent.originalColumnGroup.colGroupDef.headerName ? `${params.column.parent.originalColumnGroup.colGroupDef.headerName} > ` : '') + params.columnApi.getDisplayNameForColumn(params.column, null);
+        // },
+    };
+    
+    if (options.type === 'excel') {
+        this.gridOptions.api.exportDataAsExcel(values);
+    } else {
+        this.gridOptions.api.exportDataAsCsv(values);
+    }
 };
 
 HDGrid.prototype.getRows = function () {
@@ -765,7 +810,7 @@ HDGrid.prototype.deleteRows = function (rows) {
     return this.setRows([]);
 };
 
-// 롤업 시 level param row의 count 조회 (최유현)
+// 롤업 시 level param row의 count 조회
 HDGrid.prototype.getRowCountForLevel = function (level = 1) {
     var cnt = 0;
     this.gridOptions.api.forEachNode(function(node) {
@@ -778,7 +823,7 @@ HDGrid.prototype.getRowCountForLevel = function (level = 1) {
     return cnt;
 };
 
-// 방금 작업하던 셀에 포커스 (최유현)
+// 방금 작업하던 셀에 포커스
 HDGrid.prototype.setFocusedWorkingCell = function () {
     let cell = this.gridOptions.api.getFocusedCell();
     if (cell) {
