@@ -202,14 +202,14 @@
     <script language="javascript">
 
         var columns= [
-            {field:"opt_kind_nm" ,headerName:"품목", pinned:'left', width: 120},
-            {field:"brand_nm" ,headerName:"브랜드", pinned:'left'},
-            {field:"goods_no" ,headerName:"상품코드", width:80, pinned:'left'},
-            {field:"style_no" ,headerName:"스타일넘버" , pinned:'left'},
-            {field:"goods_type_nm",headerName:"상품구분", width:100, cellStyle:StyleGoodsTypeNM, pinned:'left'},
-            {field:"is_unlimited_nm",headerName:"재고구분", width:80, pinned:'left'},
-            {field:"sale_stat_cl_nm" ,headerName:"상태", width:100, cellStyle:StyleGoodsState, pinned:'left'},
-            {field:"wonga" ,headerName:"원가", type: 'currencyType'},
+            {field:"opt_kind_nm" ,headerName:"품목", pinned:'left', width: 120, aggFunc: "first"},
+            {field:"brand_nm" ,headerName:"브랜드", pinned:'left', aggFunc: "first"},
+            {field:"goods_no" ,headerName:"상품코드", width:80, pinned:'left', rowGroup: true, hide: true},
+            {field:"style_no" ,headerName:"스타일넘버" , pinned:'left', aggFunc: "first"},
+            {field:"goods_type_nm",headerName:"상품구분", width:100, cellStyle:StyleGoodsTypeNM, pinned:'left', aggFunc: "first"},
+            {field:"is_unlimited_nm",headerName:"재고구분", width:80, pinned:'left', aggFunc: "first"},
+            {field:"sale_stat_cl_nm" ,headerName:"상태", width:100, cellStyle:StyleGoodsState, pinned:'left', aggFunc: "first"},
+            {field:"wonga" ,headerName:"원가", type: 'currencyType', aggFunc: "first"},
             {field:"goods_nm" ,headerName:"상품명", width:400, 
                 cellRenderer: function (params) {
                     if (params.data !== undefined) {
@@ -279,17 +279,29 @@
         });
         let gx;
 
+        const basic_autoGroupColumnDef = (headerName, width = 150) => ({
+            headerName: headerName,
+            headerClass: 'bizest',
+            minWidth: width,
+            maxWidth: width,
+            cellRenderer: 'agGroupCellRenderer',
+            pinned: 'left'
+        });
+        
         $(document).ready(function() {
             pApp.ResizeGrid(310);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
-            gx = new HDGrid(gridDiv, columns
-            /* {
-                rowGroup: true,
-                groupDefaultExpanded: 8,
-                groupHideOpenParents: true,
-                groupDisplayType: 'multipleColumns'
-            } */
+            gx = new HDGrid(gridDiv, columns, 
+                {
+                    rollup: true,
+                    autoGroupColumnDef: basic_autoGroupColumnDef('상품코드'),
+                    groupDefaultExpanded: 0, // 0: close, 1: open
+                    suppressAggFuncInHeader: true,
+                    animateRows: true,
+                    suppressDragLeaveHidesColumns: true,
+                    suppressMakeColumnVisibleAfterUnGroup: true,
+                }
             );
 
             Search();
