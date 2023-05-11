@@ -165,6 +165,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std09/show', 'std09Controller@show');
         Route::get('std09/search', 'std09Controller@search');
         Route::post('std09/save', 'std09Controller@save');
+        Route::get('std09/search-store-type/{store_channel_cd?}', 'std09Controller@search_store_type');
+        Route::post('std09/delete', 'std09Controller@delete');
+        Route::post('std09/delete-channel', 'std09Controller@delete_channel');
 
         // 수선관리
         Route::get('std11', 'std11Controller@index');

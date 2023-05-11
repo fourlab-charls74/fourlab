@@ -302,6 +302,7 @@ CREATE TABLE `store` (
 	`store_nm_s` varchar(50) NOT NULL COMMENT '매장명(약칭)',
 	`store_type` varchar(30) NOT NULL COMMENT '매장구분 - code : store_type',
 	`store_kind` varchar(30) NOT NULL COMMENT '매장종류 - code : store_kind',
+	`store_channel` varchar(10) NOT NULL COMMENT '판매채널코드'
 	`grade_cd` varchar(2) DEFAULT NULL COMMENT '매장등급 - code : store_grade : grade_cd',
 	`store_area` varchar(30) NOT NULL COMMENT '지역코드 - code : store_area',
 	`zipcode` varchar(7) DEFAULT NULL COMMENT '우편번호',
@@ -1138,6 +1139,21 @@ CREATE TABLE `search_shortcut` (
   UNIQUE KEY `kwd` (`kwd`),
   KEY `idx_disp_yn` (`disp_yn`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='검색어 바로가기';
+
+
+--판매채널관리
+CREATE TABLE `store_channel` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
+  `store_type` char(1) DEFAULT NULL COMMENT '구분 (C : 판매채널, S : 매장구분)',
+  `store_channel_cd` varchar(10) DEFAULT NULL COMMENT '판매채널코드',
+  `store_channel` varchar(30) DEFAULT NULL COMMENT '판매채널명',
+  `store_kind_cd` varchar(10) DEFAULT NULL COMMENT '매장구분코드',
+  `store_kind` varchar(30) DEFAULT NULL COMMENT '매장 구분명',
+  `dep` int(11) DEFAULT NULL COMMENT '뎁스',
+  `seq` int(11) DEFAULT NULL COMMENT '순서',
+  `use_yn` char(1) DEFAULT NULL COMMENT '사용여부',
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 
 --
 -- 기존 테이블 컬럼 추가 시작

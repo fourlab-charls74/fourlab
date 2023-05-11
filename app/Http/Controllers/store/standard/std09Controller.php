@@ -100,10 +100,12 @@ class std09Controller extends Controller
 
     public function search(Request $request) {
 
-        $use_yn		= $request->input('use_yn', '');
+        $store_channel  = $request->input('store_channel', '');
+        $use_yn		    = $request->input('use_yn', '');
 
         $where = "";
 
+        if ($store_channel != "")  	$where .= " and store_channel like '%" . Lib::quote($store_channel) . "%' ";
         if ($use_yn != "")  		$where .= " and use_yn = '" . Lib::quote($use_yn) . "' ";
 
         $sql = /** @lang text */
@@ -130,6 +132,48 @@ class std09Controller extends Controller
 
     }
 
+    public function search_store_type($store_channel_cd, Request $request) {
+
+        $code = 200;
+        $store_kind     = $request->input('store_kind', '');
+
+		$rows = $this->_get_store_channel($store_channel_cd, $store_kind);
+
+		return response()->json([
+			"code" => $code,
+			"head" => [
+				"total" => count($rows),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1
+			],
+			"body" => $rows
+		]);
+
+    }
+
+    public function _get_store_channel($store_channel_cd) 
+	{
+		$sql = "
+            select 
+                store_type
+                , store_channel_cd
+                , store_channel
+                , store_kind_cd
+                , store_kind
+                , seq
+                , dep
+                , use_yn
+            from store_channel
+            where 1=1 and store_type = 'T' and dep = 2 and store_channel_cd = '$store_channel_cd'
+
+		";
+
+		$rows = DB::select($sql, ["store_channel_cd" => $store_channel_cd]);
+		return $rows;
+	}
+
+    //삭제
     public function save(Request $request) {
 
         $add_type = $request->input('add_type');
@@ -205,6 +249,72 @@ class std09Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
+
+    }
+
+    //삭제
+    public function delete(Request $request) {
+
+        $data = $request->input('data');
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($data as $d) {
+
+                DB::table('store_channel')
+                    ->where('store_channel_cd', '=', $d['store_channel_cd'])
+                    ->where('store_kind_cd', '=', $d['store_kind_cd'])
+                    ->where('dep', '=', 2)
+                    ->delete();
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = "";
+
+        } catch(Exception $e){
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
+
+    }
+
+    //판매채널 삭제
+    public function delete_channel(Request $request) {
+
+        $data = $request->input('data');
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($data as $d) {
+
+                DB::table('store_channel')
+                    ->where('store_channel_cd', '=', $d['store_channel_cd'])
+                    ->delete();
+            }
+
+            DB::commit();
+            $code = 200;
+            $msg = "";
+
+        } catch(Exception $e){
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json([
+            "code" => $code,
+            "msg" => $msg
+        ]);
 
     }
 }
