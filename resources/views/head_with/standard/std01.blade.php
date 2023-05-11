@@ -1,6 +1,7 @@
 @extends('head_with.layouts.layout')
 @section('title','품목')
 @section('content')
+    
 <div class="page_tit">
     <h3 class="d-inline-flex">품목</h3>
     <div class="d-inline-flex location">
@@ -67,7 +68,7 @@
 
 <div id="filter-area" class="card shadow-none search_cum_form ty2 last-card">
     <div class="card-body shadow">
-        <div class="card-title mb-3">
+        <div class="card-title mb-2">
             <div class="filter_wrap">
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">상품 세부 정보</h6>
@@ -83,114 +84,46 @@
 </div>
 
 <!-- <a href="https://bizest.netpx.co.kr/head/webapps/standard/std03.php">품목관리 링크</a> -->
-<script language="javascript">
-    var columns = [
-        // this row shows the row index, doesn't use any data from the row
-
-        {
-            headerName: '#',
-            width: 35,
-            maxWidth: 100,
-            // it is important to have node.id here, so that when the id changes (which happens
-            // when the row is loaded) then the cell is refreshed.
-            valueGetter: 'node.id',
-            cellRenderer: 'loadingRenderer',
-            cellStyle: {"background":"#F5F7F7"}
-        },
-        {
-            field: "opt_kind_cd",
-            headerName: "품목코드",
-            cellStyle: StyleGoodsTypeNM,
-            editable: true,
-            cellRenderer: function(params) {
-                        if (params.value !== undefined) {
-                            return '<a href="#" onClick="return openCodePopup(\'' + params.data.opt_kind_cd + '\');">' + params.value + '</a>';
-                        }
-                    }
-        },
-        {
-            field: "opt_kind_nm",
-            headerName: "품목명",
-            width:150,
-            editable: true,
-        },
-        {
-            field: "goods_cnt",
-            headerName: "상품갯수",
-            width:58,
-            editable: true,
-            cellStyle: {'text-align':'right'},
-        },
-        {
-            field: "use_yn",
-            headerName: "사용여부",
-            width:58,
-            editable: true,
-            cellStyle: {'text-align':'center'},
-            cellRenderer: function(params) {
-				if(params.value == 'Y') return "사용"
-				else if(params.value == 'N') return "미사용"
-                else return params.value
-			}
-        },
-        {
-            field: "regi_date",
-            headerName: "등록일시",
-            width: 120,
-            editable: true,
-        },
-        {
-            field: "upd_date",
-            headerName: "수정일시",
-            width: 120,
-            editable: true,
-        },
-        {
-            field: "",
-            headerName: "",
-            width: 'auto',
-        },
-    ];
-</script>
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
+    const columns = [
+        { headerName: '#', width: 35, maxWidth: 100, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: { "text-align": "center" } },
+        { field: "opt_kind_cd", headerName: "품목코드", cellStyle: StyleGoodsTypeNM, width: 150,
+            cellRenderer: function(params) {
+                if (params.value !== undefined) {
+                    return '<a href="#" onClick="return openCodePopup(\'' + params.data.opt_kind_cd + '\');">' + params.value + '</a>';
+                }
+            }
+        },
+        { field: "opt_kind_nm", headerName: "품목명", width: 150 },
+        { field: "goods_cnt", headerName: "상품갯수", width: 70, type: "numberType" },
+        { field: "use_yn", headerName: "사용여부", width: 60,
+            cellStyle: (params) => ({ "text-align": "center", "color": params.value === 'Y' ? "#4444ff" : "#999999" }),
+            cellRenderer: (params) => params.value === 'Y' ? '사용' : params.value === 'N' ? '미사용' : params.value
+        },
+        { field: "regi_date", headerName: "등록일시", width: 130, cellStyle: { "text-align": "center" } },
+        { field: "upd_date", headerName: "수정일시", width: 130, cellStyle: { "text-align": "center" } },
+        { width: 'auto' },
+    ];
+
+    const pApp = new App('', { gridId: "#div-gd", height: 270 });
     let gx;
+    let _isloading = false;
+    
     $(document).ready(function() {
-        pApp.ResizeGrid(275); //280
+        pApp.ResizeGrid(270);
+        pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
+        
         Search(1);
     });
 
-    pApp.BindSearchEnter();
-
-    /*
-    function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Aggregation({
-            "sum":"top",
-        });
-        gx.Request('/partner/cs/cs72/search', data);
-    }
-    */
-</script>
-<script type="text/javascript" charset="utf-8">
-    var _isloading = false;
-
     function onscroll(params) {
-
-
         if (_isloading === false && params.top > gridDiv.scrollHeight) {
 
-            var rowtotal = gridOptions.api.getDisplayedRowCount();
-            // console.log('getLastDisplayedRow : ' + gridOptions.api.getLastDisplayedRow());
-            // console.log('rowTotalHeight : ' + rowtotal * 25);
-            // console.log('params.top : ' + params.top);
+            let rowtotal = gridOptions.api.getDisplayedRowCount();
 
             if (gridOptions.api.getLastDisplayedRow() > 0 && gridOptions.api.getLastDisplayedRow() == rowtotal - 1) {
-                // console.log(params);
                 Search(0);
             }
             // var rowtotal = gridOptions.api.getDisplayedRowCount();
@@ -210,12 +143,12 @@
         }
     }
 
-    var _page = 1;
-    var _total = 0;
-    var _grid_loading = false;
-    var _code_items = "";
-    var columns_arr = {};
-    var option_key = {};
+    let _page = 1;
+    let _total = 0;
+    let _grid_loading = false;
+    let _code_items = "";
+    let columns_arr = {};
+    let option_key = {};
 
     function Search(page) {
         let data = $('form[name="search"]').serialize();
@@ -286,11 +219,11 @@
     function openCodePopup(opt_kind_cd){
 
         if(opt_kind_cd == '') {
-            var url = '/head/standard/std01/create';
-            var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=435");
+            let url = '/head/standard/std01/create';
+            window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=435");
         } else {
-            var url = '/head/standard/std01/show?opt_kind_cd=' + encodeURIComponent(opt_kind_cd);
-            var stock = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=550");
+            let url = '/head/standard/std01/show?opt_kind_cd=' + encodeURIComponent(opt_kind_cd);
+            window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=550");
         }
     }
 
