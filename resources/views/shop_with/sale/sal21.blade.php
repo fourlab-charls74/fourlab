@@ -17,7 +17,8 @@
                 <div>
                     <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
-                    <a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                    <a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                    <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
             <div class="card-body">
@@ -113,7 +114,10 @@
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+            <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
+            <a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+            <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
         </div>
     </form>
 </div>
@@ -158,7 +162,7 @@
         {field: "store_type_nm", headerName: "매장구분", rowGroup: true, hide: true},
         {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
         {headerName: '매장구분', showRowGroup: 'store_type_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 130, pinned: 'left'},
-        {field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}, pinned: 'left',
+        {field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}, pinned: 'left', groupDepth: 1,
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
 		},
@@ -273,6 +277,16 @@
         // 매장 다중검색
         $( ".sch-store" ).on("click", function() {
             searchStore.Open(null, "multiple");
+        });
+
+        // 엑셀다운로드 레이어 오픈
+        $(".export-excel").on("click", function (e) {
+            depthExportChecker.Open({
+                depths: ['매장구분별', '매장별'],
+                download: (level) => {
+                    gx.Download('매장수불집계표_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                }
+            });
         });
     });
 

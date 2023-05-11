@@ -1636,6 +1636,45 @@ SearchGoodsNo.prototype.Choice = function(){
 
 let searchGoodsNo = new SearchGoodsNo();
 
+// 엑셀다운로드모달
+function DepthExportChecker() {
+    this.depths = null;
+    this.download = null;
+}
+
+DepthExportChecker.prototype.Open = function({ depths = [], download = null }) {
+    if (this.depths === null) {
+        if (Array.isArray(depths)) this.SetDepths(depths);
+        $("#CheckExportDepthModal").draggable();
+        this.download = download;
+    }
+    $('#CheckExportDepthModal').modal({ keyboard: false });
+};
+
+DepthExportChecker.prototype.SetDepths = function(depths) {
+    this.depths = depths;
+    this.depths.push(['No Group']);
+
+    $("#CheckExportDepthModal #depth_check_list").html(this.depths.map((depth, i) => `
+        <div class="col-lg-4 inner-td">
+            <div class="form-inline form-radio-box">
+                <div class="custom-control custom-radio">
+                    <input type="radio" name="export_depth" value="${i}" id="export_depth_${i}" class="custom-control-input" checked>
+                    <label class="custom-control-label" for="export_depth_${i}">${depth}</label>
+                </div>
+            </div>
+        </div>
+    `));
+}
+
+DepthExportChecker.prototype.Download = function () {
+    if (this.download !== null) {
+        const level = $("#CheckExportDepthModal input[name=export_depth]:checked").val();
+        this.download(level * 1);
+    }
+}
+
+let depthExportChecker = new DepthExportChecker();
 
 $( document ).ready(function() {
     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용

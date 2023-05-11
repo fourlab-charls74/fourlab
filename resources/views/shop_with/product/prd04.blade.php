@@ -18,8 +18,8 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div>
-					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+					<a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -157,7 +157,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="prd_cd_p">등록일(코드일련별)</option>
+										<option value="prd_cd_p">등록일(품번별)</option>
 										<option value="pc.rt">등록일</option>
 										<option value="pc.prd_cd">상품코드</option>
 										<option value="pc.goods_no">상품번호</option>
@@ -179,9 +179,9 @@
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+            <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+            <a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+            <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 		</div>
 	</div>
 
@@ -262,7 +262,7 @@
 				}
 			}
 		},
-		{field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
+		{field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
 			cellRenderer: function (params) {
 				if(params.value === undefined) return "";
 				return `<a href="javascript:void(0);" onclick="return OpenStockPopup('${params.value}', '${$("[name=sdate]").val() || ''}');">${params.value}</a>`;
@@ -316,7 +316,7 @@
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
             },
 			rollup: true,
-			autoGroupColumnDef: basic_autoGroupColumnDef('코드일련'),
+			autoGroupColumnDef: basic_autoGroupColumnDef('품번'),
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,
@@ -337,6 +337,16 @@
         @endif
 
 		Search();
+
+        // 엑셀다운로드 레이어 오픈
+        $(".export-excel").on("click", function (e) {
+            depthExportChecker.Open({
+                depths: ['품번별'],
+                download: (level) => {
+                    gx.Download('상품재고관리_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                }
+            });
+        });
 	});
 
 	function blank_goods_no() {
