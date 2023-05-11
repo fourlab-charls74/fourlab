@@ -1,8 +1,8 @@
-@extends('partner_with.layouts.layout')
+@extends('partner_with.layouts.layout-nav')
 @section('title','상품일괄수정')
 @section('content')
 
-<div class="show_layout py-3">
+<div class="show_layout py-3 px-sm-3">
   <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
     <div>
       <h3 class="d-inline-flex">상품일괄수정</h3>
@@ -64,6 +64,8 @@
                                             </select>
                                         </div>
                                       </td>
+                                  </tr>
+                                  <tr>
                                       <th class="required">브랜드</th>
                                       <td>
                                         <div class="form-inline inline_btn_box">
@@ -71,8 +73,6 @@
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                       </td>
-                                  </tr>
-                                  <tr>
                                       <th class="required">상품상태</th>
                                       <td>
                                         <div class="select_box">
@@ -84,6 +84,8 @@
                                           </select>
                                         </div>
                                       </td>
+                                  </tr>
+                                  <tr>
                                       <th class="required">대표카테고리</th>
                                       <td>
                                         <div class="form-inline inline_btn_box">
@@ -96,22 +98,20 @@
                                                 });"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                       </td>
-                                  </tr>
-                                  <tr>
                                       <th>제조사</th>
                                       <td>
                                         <div class="input_box">
                                             <input type="text" name="make" id="make" class="form-control form-control-sm search-all" />
                                         </div>
                                       </td>
+                                  </tr>
+                                  <tr>
                                       <th class="required">원산지</th>
                                       <td>
                                         <div class="input_box">
                                             <input type="text" name="org_nm" id="org_nm" class="form-control form-control-sm search-all" />
                                         </div>
                                       </td>
-                                  </tr>
-                                  <tr>
                                     <th>배송비</th>
                                     <td>
                                       <div class="form-inline form-radio-box flax_box txt_box">
@@ -140,6 +140,8 @@
                                           </div>
                                       </div>
                                     </td>
+                                  </tr>
+                                  <tr>
                                     <th>예약/배송</th>
                                     <td>
                                       <div class="input_box flax_box txt_box">
@@ -150,8 +152,6 @@
                                         </div>
                                       </div>
                                     </td>
-                                  </tr>
-                                  <tr>
                                     <th>재입고 알람</th>
                                     <td>
                                       <div class="flax_box select_box">
@@ -161,14 +161,14 @@
                                           </select>
                                       </div>
                                     </td>
+                                  </tr>
+                                  <tr>
                                     <th>상품상세</th>
                                     <td>
                                       <div class="input_box">
                                         <input type="text" name="goods_cont" id="goods_cont" class="form-control form-control-sm"/>
                                       </div>
                                     </td>
-                                  </tr>
-                                  <tr>
                                     <th>제품사양</th>
                                     <td>
                                       <div class="input_box flax_box txt_box">
@@ -179,7 +179,9 @@
                                         </div>
                                       </div>
                                     </td>
-                                    <th>MD 상품평</th>
+                                  </tr>
+                                  <tr>
+                                  <th>MD 상품평</th>
                                     <td>
                                       <div class="input_box flax_box txt_box">
                                         <input type="text" name="opinion" id="opinion" class="form-control form-control-sm" style="width:75%" />
@@ -189,6 +191,8 @@
                                         </div>
                                       </div>
                                     </td>
+                                    <th></th>
+                                    <td></td>
                                   </tr>
                           </table>
                       </div>
@@ -201,27 +205,29 @@
   </form>
 </div>
 
-<div class="card shadow mb-3">
-  <form method="post" name="save" id ="insert_form" action="/partner/stock/stk01">
-      @csrf
-      <textarea style="display:none" name="form_str" id="csvResult"></textarea>
-      <div class="card-body shadow">
-          <div class="card-title">
-              <div class="filter_wrap">
-                  <div class="fl_box">
-                      <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                  </div>
-                  <div class="fr_box">
-          <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('save')">저장</a>
-          <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('del');">삭제</a>
+<div class="show_layout px-sm-3">
+  <div class="card shadow mb-3">
+    <form method="post" name="save" id ="insert_form" action="/partner/stock/stk01">
+        @csrf
+        <textarea style="display:none" name="form_str" id="csvResult"></textarea>
+        <div class="card-body shadow">
+            <div class="card-title">
+                <div class="filter_wrap">
+                    <div class="fl_box">
+                        <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+                    </div>
+                    <div class="fr_box">
+            <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('save')">저장</a>
+            <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('del');">삭제</a>
+          </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <div id="div-gd" style="width:100%;min-height:400px;" class="ag-theme-balham"></div>
+            </div>
         </div>
-              </div>
-          </div>
-          <div class="table-responsive">
-              <div id="div-gd" style="width:100%;min-height:400px;" class="ag-theme-balham"></div>
-          </div>
-      </div>
-  </form>
+    </form>
+  </div>
 </div>
 
   <script language="javascript">

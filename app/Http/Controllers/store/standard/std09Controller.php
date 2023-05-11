@@ -29,7 +29,7 @@ class std09Controller extends Controller
         return view( Config::get('shop.store.view') . '/standard/std09_show',$values);
     }
 
-    public function show($code) {
+    public function show() {
 
         //판매채널코드 자동으로 만들어지는 부분
         $sql = "
@@ -109,9 +109,13 @@ class std09Controller extends Controller
         $sql = /** @lang text */
             "
             select 
-                * 
+                 store_type
+                 , store_channel_cd
+                 , store_channel
+                 , dep
+                 , use_yn
             from store_channel
-            where 1=1 $where
+            where 1=1 and store_type = 'C' and dep = 1 $where
         ";
 
         $rows = DB::select($sql);
@@ -136,8 +140,6 @@ class std09Controller extends Controller
         $store_kind = $request->input('store_kind');
         $use_yn = $request->input('use_yn');
 
-        $seq = 1;
-
 
         try {
             DB::beginTransaction();
@@ -153,8 +155,36 @@ class std09Controller extends Controller
             }
 
             if ($add_type == 'T') {
+
+                $sql = "
+                    select
+                        store_channel
+                    from store_channel
+                    where store_channel_cd = '$sel_channel'
+                ";
+
+                $select_store_channel = DB::selectOne($sql);
+
+                $sql = "
+                    select
+                        count(*) as cnt
+                    from store_channel
+                    where store_channel_cd = '$sel_channel' and dep = 2
+                ";
+
+                $cnt = DB::selectOne($sql);
+
+
+                if ($cnt->cnt == 0) {
+                    $seq = 1;
+                } else {
+                    $seq = $cnt->cnt + 1;
+                }
+
                 DB::table('store_channel')->insert([
+                    'store_type' => $add_type,
                     'store_channel_cd' => $sel_channel,
+                    'store_channel' => $select_store_channel->store_channel,
                     'store_kind_cd' => $store_kind_cd,
                     'store_kind' => $store_kind,
                     'dep' => 2,

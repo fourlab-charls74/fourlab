@@ -115,7 +115,7 @@ class prd01Controller extends Controller
         $cat_cd = $request->input("cat_cd");
         $is_unlimited = $request->input("is_unlimited");
 
-		$com_id = $request->input("com_cd");
+		$com_id = Auth('partner')->user()->com_id;
 
         $head_desc = $request->input("head_desc");
 		$ad_desc = $request->input("ad_desc");
@@ -211,11 +211,11 @@ class prd01Controller extends Controller
                 from goods g
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
                 where 1=1
-                    -- g.com_id = :com_id
+                	and g.com_id = :com_id
                     $where
 			";
-            //$row = DB::select($query,['com_id' => $com_id]);
-            $row = DB::select($query);
+            $row = DB::select($query,['com_id' => $com_id]);
+            // $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
@@ -958,7 +958,7 @@ class prd01Controller extends Controller
             $goods_info->rep_cat_cd = $goods->rep_cat_cd;
             $goods_info->cat_nm	= $this->get_cat_nm($goods_info->rep_cat_cd);
             $category	= new Category($user, "DISPLAY");
-            $goods_info->rep_cat_nm	= substr( $category->Location( $goods_info->rep_cat_cd ), 0 );
+            // $goods_info->rep_cat_nm	= substr( $category->Location( $goods_info->rep_cat_cd ), 0 );
         }
 
         $values = [

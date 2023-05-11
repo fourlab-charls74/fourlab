@@ -1339,7 +1339,7 @@
                 @endif
                 <form method="post" name="save">
 
-                @if(count($class_items) > 0)
+                @if(count($class_items) > 0 && $type === '')
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품정보고시 내역</a>

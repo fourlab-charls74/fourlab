@@ -1,8 +1,8 @@
-@extends('partner_with.layouts.layout')
+@extends('partner_with.layouts.layout-nav')
 @section('title','상품일괄등록')
 @section('content')
 
-<div class="show_layout py-3">
+<div class="show_layout py-3 px-sm-3">
     <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
         <div>
             <h3 class="d-inline-flex">상품일괄등록</h3>
@@ -266,28 +266,29 @@
         </div>
     </form>
 </div>
-
-<div class="card shadow mb-3">
-    <form method="post" name="save" id ="insert_form" action="/partner/stock/stk01">
-        @csrf
-        <textarea style="display:none" name="form_str" id="csvResult"></textarea>
-        <div class="card-body shadow">
-            <div class="card-title">
-                <div class="filter_wrap">
-                    <div class="fl_box">
-                        <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+<div class="show_layout px-sm-3">
+    <div class="card shadow">
+        <form method="post" name="save" id ="insert_form" action="/partner/stock/stk01">
+            @csrf
+            <textarea style="display:none" name="form_str" id="csvResult"></textarea>
+            <div class="card-body shadow">
+                <div class="card-title">
+                    <div class="filter_wrap">
+                        <div class="fl_box">
+                            <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+                        </div>
+                        <div class="fr_box">
+                            <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('save')">저장</a>
+                            <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('del');">삭제</a>
+                        </div>
                     </div>
-                    <div class="fr_box">
-						<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('save')">저장</a>
-						<a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="Cmder('del');">삭제</a>
-					</div>
+                </div>
+                <div class="table-responsive">
+                    <div id="div-gd" style="width:100%;min-height:400px;" class="ag-theme-balham"></div>
                 </div>
             </div>
-            <div class="table-responsive">
-                <div id="div-gd" style="width:100%;min-height:400px;" class="ag-theme-balham"></div>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {{-- <style>
     #toc-content {

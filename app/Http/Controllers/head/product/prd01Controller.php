@@ -944,7 +944,7 @@ class prd01Controller extends Controller
 				'goods_info'	=> [],
 				'md_list'		=> SLib::getMDs(),
 				'opt_cd_list'	=> SLib::getItems(),
-				'com_info'		=> Auth('partner')->user(),
+				'com_info'		=> Auth('head')->user(),
 				'qty'			=> 0,
 				'wqty'			=> 0,
 				'coupon_list'	=> [],

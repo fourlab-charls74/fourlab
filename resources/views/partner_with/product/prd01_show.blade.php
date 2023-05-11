@@ -331,7 +331,7 @@
                                                     @if( $type != '' )
                                                         @foreach ($goods_stats as $goods_stat)
                                                             @if ($goods_stat->code_id === @$goods_info->sale_stat_cl )
-                                                                {{ $goods_stat->code_val }}
+                                                                <span class="ml-1" style="font-size: 13px; margin-right: 2px; font-weight:500;">{{ $goods_stat->code_val }}</span>
                                                                 @break
                                                             @endif
                                                         @endforeach
@@ -345,7 +345,7 @@
                                                         @endforeach
                                                         </select>
                                                     @endif
-                                                    <div class="custom-control custom-checkbox form-check-box mr-1">
+                                                    <div class="custom-control custom-checkbox form-check-box mr-1 ml-1">
                                                         <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
                                                         <label class="custom-control-label" for="restock">재 입고함</label>
                                                     </div>
@@ -2192,15 +2192,7 @@
     let basic_is_single = false; // basic 옵션 기준 싱글, 멀티 구분
     let last_option_row = {};
 
-	@if (count(@$opt['opt2']) > 0)
-		@foreach (@$opt['opt2'] as $i => $op)
-
-		opt2[{{$i}}]	= "{{ $op->opt_nm }}";
-
-		@php $i++; @endphp
-
-		@endforeach
-	@endif
+	
 
     const CELL_COLOR = {
         LOCKED: {'background' : '#f5f7f7'},

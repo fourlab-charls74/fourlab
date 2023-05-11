@@ -69,20 +69,29 @@
     </form>
 </div>
 
-<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-    <div class="card-body shadow">
-        <div class="card-title mb-3">
-            <div class="filter_wrap">
-                <div class="fl_box">
-                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                </div>
-                <div class="fr_box">
-
+<div class="row show_layout">
+    <div class="col-lg-4 pr-1">
+        <div class="card shadow-none mb-0">
+            <div class="card-header mb-0 pt-1 pb-1">
+                <h5 class="m-0">판매채널</h5>
+            </div>
+            <div class="card-body shadow pt-2">
+                <div class="table-responsive">
+                    <div id="div-gd" class="ag-theme-balham"></div>
                 </div>
             </div>
         </div>
-        <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card shadow-none mb-0">
+            <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
+                <h5 class="m-0 mb-3 mb-sm-0">매장구분</h5>
+            </div>
+            <div class="card-body shadow pt-2">
+                <div class="table-responsive">
+                    <div id="div-gd-type" class="ag-theme-balham"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -91,18 +100,28 @@
     const columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {field: "store_type", headerName: "구분"},
-        {field: "store_channel_cd", headerName: "판매채널코드"},
-        {field: "store_channel", headerName: "판매채널"},
-        {field: "store_kind_cd", headerName: "매장구분코드"},
-        {field: "store_kind", headerName: "매장구분"},
+        {field: "store_channel_cd", headerName: "판매채널코드", width: 110},
+        {field: "store_channel", headerName: "판매채널", width: 100},
         {field: "use_yn", headerName: "사용여부"},
         {width: 'auto'}
         
     ]
 
+    const store_type_columns = [
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+        {field: "store_type", headerName: "구분"},
+        {field: "store_channel_cd", headerName: "판매채널코드", width: 110},
+        {field: "store_channel", headerName: "판매채널", width: 100},
+        {field: "store_kind_cd", headerName: "매장구분코드", width: 100},
+        {field: "store_kind", headerName: "매장구분", width: 100},
+        {field: "seq", headerName: "순서"},
+        {field: "use_yn", headerName: "사용여부"},
+        {width: 'auto'}
+    ]
+
 </script>
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('', {
+   const pApp = new App('', {
         gridId: "#div-gd",
     });
     let gx;
@@ -112,7 +131,7 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
-        // Search();
+        Search();
     });
 
     function Search() {
@@ -121,13 +140,13 @@
     }
 
 
-    function openCodePopup(a) {
-        const url = '/store/standard/std09/' + $(a).attr('data-code');
-        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
-    }
+    // function openCodePopup(a) {
+    //     const url = '/store/standard/std09/' + $(a).attr('data-code');
+    //     const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    // }
 
     function openAddPopup() {
-        const url = '/store/standard/std09/create';
+        const url = '/store/standard/std09/show';
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
     }
 </script>
