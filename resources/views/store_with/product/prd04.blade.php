@@ -18,11 +18,11 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div>
-					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="#" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
-					<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 2. 창고 재고 업로드</a>
-					<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 3. 매장 재고 업로드</a>
-					<a href="#" onclick="gx.Download('상품재고관리_{{ date('YmdH') }}.xlsx', { type: 'excel', skipGroups: true });" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+					<a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="javascript:void(0);" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
+					<a href="javascript:void(0);" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 2. 창고 재고 업로드</a>
+					<a href="javascript:void(0);" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 3. 매장 재고 업로드</a>
+					<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -196,11 +196,11 @@
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="#" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
-			<a href="#" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>2. 창고 재고 업로드</a>
-			<a href="#" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>3. 매장 재고 업로드</a>
-			<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+			<a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+			<a href="javascript:void(0);" onclick="AddStock('wonga');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 1. 원가/상품 업로드</a>
+			<a href="javascript:void(0);" onclick="AddStock('storage');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>2. 창고 재고 업로드</a>
+			<a href="javascript:void(0);" onclick="AddStock('store');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>3. 매장 재고 업로드</a>
+			<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -370,6 +370,20 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		Search();
+        
+        // 엑셀다운로드 레이어 오픈
+        $(".export-excel").on("click", function (e) {
+            if ($('[name=ord_field]').val() === 'prd_cd_p') {
+                depthExportChecker.Open({
+                    depths: ['품번별'],
+                    download: (level) => {
+                        gx.Download('상품재고관리_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                    }
+                });
+            } else {
+                gx.Download('상품재고관리_{{ date('YmdH') }}.xlsx', { type: 'excel' });
+            }
+        });
 	});
 
 	function blank_goods_no() {

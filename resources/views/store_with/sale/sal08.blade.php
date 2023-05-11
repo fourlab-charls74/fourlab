@@ -18,7 +18,7 @@
 				<div class="flax_box">
 					<a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
-					<a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+					<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -148,7 +148,7 @@
 		<div class="resul_btn_wrap mb-3">
 			<a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 			<a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
-			<a href="javascript:void(0);" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+			<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -192,13 +192,13 @@
 		{field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
 		{field: "brand_nm", headerName: "브랜드명", rowGroup: true, hide: true},
 		{headerName: '매장구분', showRowGroup: 'store_type_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
-		{field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"},
+		{field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}, groupDepth: 1, 
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
 		},
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150},
-		{field: "brand", headerName: "브랜드", width: 55, cellStyle: {"text-align": "center"},
-			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+		{field: "brand", headerName: "브랜드", width: 55, cellStyle: {"text-align": "center"}, groupDepth: 2,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 2 ? params.value : '',
 		},
 		{headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 100},
@@ -243,6 +243,16 @@
 		$( ".sch-store" ).on("click", function() {
 			searchStore.Open(null, "multiple");
 		});
+
+        // 엑셀다운로드 레이어 오픈
+        $(".export-excel").on("click", function (e) {
+            depthExportChecker.Open({
+                depths: ['매장구분별', '매장별', '브랜드별'],
+                download: (level) => {
+                    gx.Download('매장브랜드별매출분석_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                }
+            });
+        });
 	});
 	
 	function Search() {

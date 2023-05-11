@@ -17,12 +17,10 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div class="flax_box">
-                    <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-                    <a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-                    <button id="download-list" onclick="gx.Download();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                        <i class="bx bx-download fs-16"></i> 엑셀다운로드
-                    </button>&nbsp;&nbsp;
+                    <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+                    <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="javascript:void(0);" class="export-excel btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -130,9 +128,11 @@
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
-            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+            <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+            <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+            <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="javascript:void(0);" class="export-excel btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+            <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
         </div>
     </div>
 </form>
@@ -180,7 +180,7 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
         },
         {headerName: "매장명", field: "store_nm", rowGroup: true, hide:true},
         {headerName: '매출월', showRowGroup: 'sale_date', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left', sortable: false},
-        { field: "store_cd", headerName: "매장코드", pinned:'left', width:60, cellStyle: { 'text-align': "center" },
+        { field: "store_cd", headerName: "매장코드", pinned:'left', width:60, cellStyle: { 'text-align': "center" }, groupDepth: 1,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
         },
@@ -216,6 +216,16 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 			animateRows: true,
         });
         Search();
+
+        // 엑셀다운로드 레이어 오픈
+        $(".export-excel").on("click", function (e) {
+            depthExportChecker.Open({
+                depths: ['매출월별', '매장별'],
+                download: (level) => {
+                    gx.Download('월별동종업계매출_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                }
+            });
+        });
     });
 
     //검색

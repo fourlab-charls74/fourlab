@@ -59,8 +59,8 @@
 						<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록</a>
 						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
 						<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
-						<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-						<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+						<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary">검색조건 초기화</a>
+						<a href="#" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -237,7 +237,7 @@
 				<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
 				<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
 				<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
-				<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+				<a href="#" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -418,6 +418,20 @@
 				pApp.ResizeGrid(275);
 				pApp.BindSearchEnter();
 				Search();
+
+                // 엑셀다운로드 레이어 오픈
+                $(".export-excel").on("click", function (e) {
+                    if ($('[name=ord_field]').val() === 'prd_cd1') {
+                        depthExportChecker.Open({
+                            depths: ['품번별'],
+                            download: (level) => {
+                                gx.Download('상품코드관리_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                            }
+                        });
+                    } else {
+                        gx.Download('상품코드관리_{{ date('YmdH') }}.xlsx', { type: 'excel' });
+                    }
+                });
 			});
 
 		function onCellValueChanged(e) {

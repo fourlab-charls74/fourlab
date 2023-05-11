@@ -939,3 +939,34 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- 엑셀다운로드 항목체크 모달 -->
+<div id="CheckExportDepthModal" class="modal fade" role="dialog" aria-labelledby="CheckExportDepthModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="checkExportDepthModalLabel">엑셀다운로드</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body show_layout" style="background:#f5f5f5;">
+                <div class="card_wrap search_cum_form write">
+                    <div class="card shadow">
+                        <form name="check_export_depth" method="get" onsubmit="return false">
+                            <div class="card-body">
+                                <div class="row_wrap">
+                                    <div class="row" id="depth_check_list">
+                                    </div>
+                                </div>
+                                <div class="resul_btn_wrap pt-4" style="text-align:center;display:block;">
+                                    <a href="javascript:void(0);" onclick="return depthExportChecker.Download();" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

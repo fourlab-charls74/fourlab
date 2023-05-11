@@ -533,8 +533,6 @@ HDGrid.prototype._Request = function(callback) {
             //const res = jQuery.parseJSON(data);
             res = data;
 
-            //console.log(_gx);
-
             if (_gx.page === -1) {
 
                 _total = res.head.total;
@@ -718,7 +716,7 @@ HDGrid.prototype.HideLoadingLayer = function(){
 
 /** CSV & EXCEL 다운로드
  * - options.type이 'excel'일 경우, title의 확장자를 반드시 'xlsx' 형태로 작성 (그 외에는 'csv'로 작성)
- * - levels는 배열형태로 작성
+ * - level은 int 형태로 작성
  */
 HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
 
@@ -727,12 +725,44 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
         skipPinnedTop: options.hasOwnProperty('addPinnedTop') ? !options.addPinnedTop : true,
         skipGroups: options.hasOwnProperty('skipGroups') ? options.skipGroups : false,
         shouldRowBeSkipped: (params) => {
-            return options.hasOwnProperty('levels') && Array.isArray(options.levels) ? !options.levels.includes(params.node.level) : false;
+            return options.hasOwnProperty('level') && Number.isInteger(options.level) ? options.level !== params.node.level : false;
         },
         processRowGroupCallback: (params) => params.node.key,
         headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : 30,
         processCellCallback: (params) => {
-            return params.value || (options.skipGroups ? params.node.data?.[params.column.userProvidedColDef?.showRowGroup] : '');
+            let val = params.value;
+
+            if (options.hasOwnProperty('level')) {
+                if (params.column.userProvidedColDef) {
+                    if (params.column.userProvidedColDef.showRowGroup) {
+                        if (params.node.data) {
+                            val = params.node.data[params.column.userProvidedColDef.showRowGroup];
+                        } else if (params.node.childrenAfterGroup) {
+                            if (params.node.childrenAfterGroup[0].childrenAfterGroup) {
+                                if (params.node.childrenAfterGroup[0].childrenAfterGroup[0].childrenAfterGroup) {
+                                    val = params.node.childrenAfterGroup[0].childrenAfterGroup[0].childrenAfterGroup[0]?.data?.[params.column.userProvidedColDef.showRowGroup];
+                                } else {
+                                    val = params.node.childrenAfterGroup[0].childrenAfterGroup[0]?.data?.[params.column.userProvidedColDef.showRowGroup];
+                                }
+                            } else {
+                                val = params.node.childrenAfterGroup[0]?.data?.[params.column.userProvidedColDef.showRowGroup];
+                            }
+                        }
+                    }
+    
+                    if (!isNaN(params.column.userProvidedColDef.groupDepth) && params.column.userProvidedColDef.groupDepth > options.level) {
+                        val = '';
+                    } else if (!isNaN(params.column.colId) && params.column.colId * 1 > options.level) {
+                        val = '';
+                    }
+                } else if (params.node.parent.childrenAfterGroup) {
+                    if (params.node.parent.childrenAfterGroup[0].data) {
+                        val = params.node.parent.childrenAfterGroup[0].data?.[params.node.parent.field];
+                    }
+                }
+            }
+                
+            return val;
         },
         // processHeaderCallback: (params) => {
         //     return (params.column.parent.originalColumnGroup.colGroupDef.headerName ? `${params.column.parent.originalColumnGroup.colGroupDef.headerName} > ` : '') + params.columnApi.getDisplayNameForColumn(params.column, null);
