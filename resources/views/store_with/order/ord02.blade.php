@@ -356,7 +356,7 @@
 
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.node.level === 0, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 135,
+        {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 135, cellClass: 'hd-grid-string',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
             cellRenderer: (params) => {
                 if (params.node.level != 0) return '';
@@ -625,7 +625,7 @@
             depthExportChecker.Open({
                 depths: ['주문번호별'],
                 download: (level) => {
-                    gx.Download('온라인주문접수_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
+                    gx.Download('온라인주문접수_{{ date('YmdH') }}.csv', { type: 'csv', level: level });
                 }
             });
         });

@@ -1671,6 +1671,7 @@ DepthExportChecker.prototype.Download = function () {
     if (this.download !== null) {
         const level = $("#CheckExportDepthModal input[name=export_depth]:checked").val();
         this.download(level * 1);
+        $('#CheckExportDepthModal').modal('toggle');
     }
 }
 

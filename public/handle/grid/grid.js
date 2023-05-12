@@ -417,6 +417,16 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                     },
                 },
             },
+            {
+                id: 'hd-grid-number',
+                numberFormat: {
+                    format: '#,##0',
+                },
+            },            
+            // {
+            //     id: 'hd-grid-string',
+            //     dataType: 'String',
+            // },
         ],
     };
 
@@ -722,13 +732,14 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
 
     const values = {
         fileName: title,
+        sheetName: 'Sheet1',
+        headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : 30,
         skipPinnedTop: options.hasOwnProperty('addPinnedTop') ? !options.addPinnedTop : true,
         skipGroups: options.hasOwnProperty('skipGroups') ? options.skipGroups : false,
         shouldRowBeSkipped: (params) => {
             return options.hasOwnProperty('level') && Number.isInteger(options.level) ? options.level !== params.node.level : false;
         },
         processRowGroupCallback: (params) => params.node.key,
-        headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : 30,
         processCellCallback: (params) => {
             let val = params.value;
 
@@ -761,7 +772,7 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
                     }
                 }
             }
-                
+
             return val;
         },
         // processHeaderCallback: (params) => {
