@@ -89,29 +89,46 @@
 													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
-											<th class="required">매장구분/매장종류</th>
+											<th class="required">판매채널/매장구분</th>
 											<td>
 												<div class="d-flex align-items-center">
 													<div class="flex_box w-100">
-														<select name='store_type' class="form-control form-control-sm">
+														<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
 															<option value=''>전체</option>
-															@foreach ($store_types as $store_type)
-																<option value='{{ $store_type->code_id }}' @if(@$store->store_type == $store_type->code_id) selected @endif>{{ $store_type->code_val }}</option>
+															@foreach ($store_channel as $sc)
+																<option value='{{ $sc->store_channel_cd }}' @if($cmd == 'update') @if( $sc->store_channel_cd == $store->store_channel) selected @endif @endif>{{ $sc->store_channel }}</option>
 															@endforeach
 														</select>
 													</div>
 													<span class="mr-2 ml-2">/</span>
 													<div class="flex_box w-100">
-														<select id='store_kind' name='store_kind' class="form-control form-control-sm">
+														<select id='store_kind' name='store_kind' class="form-control form-control-sm" disabled>
 															<option value=''>전체</option>
-															@foreach ($store_kinds as $store_kind)
-																<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
-															@endforeach
+															@if ($cmd == 'update') 
+																@foreach ($store_kind as $sk)
+																	<option value='{{ $sk->store_kind_cd }}' @if(@$sk->store_kind_cd == $store->store_channel_kind) selected @endif>{{ $sk->store_kind }}</option>
+																@endforeach
+															@endif
 														</select>
 													</div>
 												</div>
 											</td>
                                         </tr>
+										<tr>
+											<th class="required">매장종류</th>
+											<td>
+												<div class="flex_box w-100">
+													<select id='store_kind2' name='store_kind2' class="form-control form-control-sm">
+														<option value=''>전체</option>
+														@foreach ($store_kinds as $store_kind)
+															<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th></th>
+											<td></td>
+										</tr>
 										<tr>
 											<th class="required">주소</th>
 											<td colspan="3">
@@ -1082,14 +1099,19 @@
 			f1.store_nm_s.focus();
 			return alert("매장명(약칭)을 입력해주세요.");
 		}
+		// 판매채널 선택여부
+		if(f1.store_channel.selectedIndex == 0) {
+			f1.store_channel.focus();
+			return alert("판매채널을 선택해주세요.");
+		}
 		// 매장구분 선택여부
-		if(f1.store_type.selectedIndex == 0) {
-			f1.store_type.focus();
+		if(f1.store_kind.selectedIndex == 0) {
+			f1.store_kind.focus();
 			return alert("매장구분을 선택해주세요.");
 		}
 		// 매장종류 선택여부
-		if(f1.store_kind.selectedIndex == 0) {
-			f1.store_kind.focus();
+		if(f1.store_kind2.selectedIndex == 0) {
+			f1.store_kind2.focus();
 			return alert("매장종류를 선택해주세요.");
 		}
 		// 매장지역 선택여부
@@ -1128,6 +1150,53 @@
         } else {
             $('#' + select_id).hide();
         }
+	}
+
+	// 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
+	$(document).ready(function() {
+		const store_channel = document.getElementById("store_channel");
+		const store_kind = document.getElementById("store_kind");
+
+		store_channel.addEventListener("change", () => {
+			if (store_channel.value) {
+				store_kind.disabled = false;
+			} else {
+				store_kind.disabled = true;
+			}
+		});
+	});
+
+	// 판매채널이 변경되면 해당 판매채널의 매장구분을 가져오는 부분
+	function chg_store_channel() {
+
+		const sel_channel = document.getElementById("store_channel").value;
+
+		$.ajax({
+			method: 'post',
+			url: '/store/standard/std02/show/chg-store-channel',
+			data: {
+				'store_channel' : sel_channel
+				},
+			dataType: 'json',
+			success: function (res) {
+				if(res.code == 200){
+					$('#store_kind').empty();
+					let select =  $("<option value=''>전체</option>");
+					$('#store_kind').append(select);
+
+					for(let i = 0; i < res.store_kind.length; i++) {
+						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+						$('#store_kind').append(option);
+					}
+
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
 	}
 
 </script>

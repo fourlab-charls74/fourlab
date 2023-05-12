@@ -107,6 +107,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02', 'std02Controller@index');
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{store_cd?}', 'std02Controller@show');
+        Route::post('std02/show/chg-store-channel/{store_cd?}', 'std02Controller@change_store_channel');
         Route::get('std02/charge/{store_cd?}', 'std02Controller@charge');
         Route::get('std02/charge_search', 'std02Controller@charge_search');
         Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');

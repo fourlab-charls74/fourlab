@@ -34,7 +34,8 @@ class std02Controller extends Controller
 		if( $page < 1 or $page == "" )	$page = 1;
 		$limit	= $request->input('limit', 100);
 
-		$store_type	= $request->input("store_type");
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kin	= $request->input("store_channel_kind");
 		$store_kind	= $request->input("store_kind");
 		$store_area	= $request->input("store_area");
 		$store_nm	= $request->input("store_nm");
@@ -47,7 +48,7 @@ class std02Controller extends Controller
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 		
 		$where = "";
-		if( $store_type != "" )	$where .= " and a.store_type = '$store_type' ";
+		// if( $store_type != "" )	$where .= " and a.store_type = '$store_type' ";
 		if( $store_kind != "" )	$where .= " and a.store_kind = '$store_kind' ";
 		if( $store_area != "" )	$where .= " and a.store_area = '$store_area' ";
 		if( $store_nm != "" )	$where .= " and ( a.store_nm like '%" . Lib::quote($store_nm) . "%' or a.store_nm_s like '%" . Lib::quote($store_nm) . "%' ) ";
@@ -76,11 +77,15 @@ class std02Controller extends Controller
 		$query	= "
 			select
 				a.*,
+				sc.store_channel as store_channel,
+				sc2.store_kind as store_channel_kind,
 				c.code_val as store_type_nm,
 				d.code_val as store_kind_nm,
 				e.code_val as store_area_nm,
 				if(sg.name <> '', sg.name, a.grade_cd) as grade_nm
 			from store a
+			left outer join store_channel sc on sc.store_channel_cd = a.store_channel and dep = 1
+			left outer join store_channel sc2 on sc2.store_kind_cd = a.store_channel_kind and sc2.dep = 2
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
@@ -90,7 +95,7 @@ class std02Controller extends Controller
 				where concat(sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
 					and concat(edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00') 
 			) sg on a.grade_cd = sg.grade_cd
-			where 1=1 
+			where 1=1
 				$where
 			$orderby
 			$limit
@@ -127,6 +132,7 @@ class std02Controller extends Controller
 		$store	= "";
 		$store_img	= "";
 		$map_key = "";
+		$store_kind = "";
 		$grades = [];
 
 		if($store_cd != '') {
@@ -137,7 +143,7 @@ class std02Controller extends Controller
 
 			$store = DB::selectOne($sql, ["store_cd" => $store_cd]);
 		}
-
+		
 		if($store_cd != '') {
 			$img_sql = "
 					select * from store_img
@@ -184,6 +190,31 @@ class std02Controller extends Controller
 
 		// }
 
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+
+		if($store_cd != '') {
+			$sql = "
+				select
+					store_kind
+					, store_kind_cd
+					, use_yn
+				from store_channel
+				where dep = 2 and use_yn = 'Y'
+			";
+
+			$store_kind = DB::select($sql);
+		}
+
 			
 		$values = [
 			"cmd"	=> $store_cd == '' ? "" : "update",
@@ -196,6 +227,8 @@ class std02Controller extends Controller
 			'grades' => SLib::getValidStoreGrades(),
 			'prioritys' => SLib::getCodes("PRIORITY"),
 			'store_match' => $store_match,
+			'store_channel' => $store_channel,
+			'store_kind' => $store_kind
 		];
 		
 
@@ -257,8 +290,10 @@ class std02Controller extends Controller
 			$values	= [
 				'store_nm'		=> $request->input('store_nm'),
 				'store_nm_s'	=> $request->input('store_nm_s'),
-				'store_type'	=> $request->input('store_type'),
-				'store_kind'	=> $request->input('store_kind'),
+				// 'store_type'	=> $request->input('store_type'),
+				'store_channel'	=> $request->input('store_channel'),
+				'store_channel_kind'	=> $request->input('store_kind'),
+				'store_kind'	=> $request->input('store_kind2'),
 				'store_area'	=> $request->input('store_area'),
 				'grade_cd'		=> $grade_cd,
 				'zipcode'		=> $request->input('zipcode'),
@@ -513,6 +548,34 @@ class std02Controller extends Controller
 		]);
 
 
+	}
+
+	//판매채널 셀렉트값이 변경되면 해당 판매채널의 매장구분을 가져오는 코드
+	public function change_store_channel(Request $request) {
+
+		$store_channel = $request->input('store_channel');
+
+        try {
+            DB::beginTransaction();
+                $sql = "
+					select 
+						store_kind_cd
+						, store_kind
+					from store_channel
+					where store_channel_cd = '$store_channel' and dep = 2 and use_yn = 'Y'
+                ";
+            $store_kind = DB::select($sql);
+
+			DB::commit();
+            $code = 200;
+            $msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind]);
 	}
 
 }
