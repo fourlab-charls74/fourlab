@@ -105,7 +105,11 @@
                 }
             }
         },
-        {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},},
+        {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},
+            cellRenderer: function(params) {
+                return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_channel_cd}", "${params.data.store_type}")'>${params.value}</a>`;
+            }
+        },
         {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.data.store_channel_cd}", "${params.value}")'>${params.value}</a>`;
@@ -126,11 +130,15 @@
                 }
             }
         },
-        {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},},
-        {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'}},
-        {field: "store_kind_cd", headerName: "매장구분코드", width: 100, cellStyle:{'text-align' : 'center'},},
+        // {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},},
+        // {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'}},
+        {field: "store_kind_cd", headerName: "매장구분코드", width: 100, cellStyle:{'text-align' : 'center'},
+            cellRenderer: function(params) {
+                return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_kind_cd}", "${params.data.store_type}")'>${params.value}</a>`;
+            }
+        },
         {field: "store_kind", headerName: "매장구분", width: 100, cellStyle:{'text-align' : 'center'},},
-        {field: "seq", headerName: "순서", cellStyle:{'text-align' : 'center'},},
+        // {field: "seq", headerName: "순서", cellStyle:{'text-align' : 'center'},},
         {field: "use_yn", headerName: "사용여부", cellStyle:{'text-align' : 'center'},},
         {width: 'auto'}
     ]
@@ -184,6 +192,11 @@
 
     function openAddPopup() {
         const url = '/store/standard/std09/show';
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
+    }
+
+    function openEditPopup(code, type) {
+        const url = '/store/standard/std09/show/' + code + '/' + type;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
     }
 

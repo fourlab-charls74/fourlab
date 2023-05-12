@@ -1,15 +1,20 @@
+@php
+if ($code == '') $title = '판매채널관리 추가';
+else $title = '판매채널관리 수정';
+@endphp
+
 @extends('store_with.layouts.layout-nav')
-@section('title','판매채널관리 추가')
+@section('title', $title)
 @section('content')
     <div class="show_layout py-3 px-sm-3">
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
-                <h3 class="d-inline-flex">판매채널관리 추가</h3>
+                <h3 class="d-inline-flex">{{@$title}}</h3>
                 <div class="d-inline-flex location">
                     <span class="home"></span>
                     <span>/코드관리</span>
                     <span>/판매채널관리</span>
-                    <span>/추가</span>
+                    <span></span>
                 </div>
             </div>
         </div>
@@ -34,12 +39,12 @@
                                                 <th>구분</th>
                                                 <td>
                                                     <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="add_type" id="add_c" class="custom-control-input" value="C" checked/>
+                                                        <div class="custom-control custom-radio" style="@if($type == 'T') display:none @endif">
+                                                            <input type="radio" name="add_type" id="add_c" class="custom-control-input" value="C" @if($type == 'C' || $code == '') checked @endif/>
                                                             <label class="custom-control-label" for="add_c">판매채널</label>
                                                         </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="add_type" id="add_t" class="custom-control-input" value="T"/>
+                                                        <div class="custom-control custom-radio" style="@if($type == 'C') display:none @endif" >
+                                                            <input type="radio" name="add_type" id="add_t" class="custom-control-input" value="T" @if($type == 'T') checked @endif/>
                                                             <label class="custom-control-label" for="add_t">매장구분</label>
                                                         </div>
                                                     </div>
@@ -49,7 +54,11 @@
                                                 <th>판매채널코드</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$sc_seq}}'>
+                                                        @if ($code == '')
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$sc_seq}}' readonly>
+                                                        @else 
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$store_channel->store_channel_cd}}' readonly>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -57,7 +66,7 @@
                                                 <th>판매채널명</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_channel' id="store_channel" value=''>
+                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_channel' id="store_channel" value='{{@$store_channel->store_channel}}'>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -68,7 +77,11 @@
                                                         <select name="sel_channel" id="sel_channel" class="form-control form-control-sm">
                                                             <option value="">선택</option>
                                                         @foreach ($channels as $c)
-                                                            <option value="{{ $c->store_channel_cd }}">{{ $c->store_channel }}</option>
+                                                            @if ($code == '')
+                                                                <option value="{{ $c->store_channel_cd }}">{{ $c->store_channel }}</option>
+                                                            @else
+                                                                <option value="{{ $c->store_channel_cd }}" @if($store_kind->store_channel_cd == $c->store_channel_cd) selected @endif>{{ $c->store_channel }}</option>
+                                                            @endif
                                                         @endforeach
                                                         </select>
                                                     </div>
@@ -78,7 +91,11 @@
                                                 <th>매장구분코드</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='{{@$sk_seq}}'>
+                                                        @if ($code == '')
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='{{@$sk_seq}}' readonly>
+                                                        @else 
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='{{@$store_kind->store_kind_cd}}' readonly>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -86,23 +103,36 @@
                                                 <th>매장구분명</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_kind' id="store_kind" value=''>
+                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_kind' id="store_kind" value='{{@$store_kind->store_kind}}'>
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th>사용여부</th>
                                                 <td>
-                                                    <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$data_code_kind->use_yn != 'N') checked @endif />
-                                                            <label class="custom-control-label" for="use_y">사용</label>
+                                                    @if ($type == 'C')
+                                                        <div class="form-inline form-radio-box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$store_channel->use_yn != 'N') checked @endif />
+                                                                <label class="custom-control-label" for="use_y">사용</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="N" @if(@$store_channel->use_yn == 'N') checked @endif />
+                                                                <label class="custom-control-label" for="use_n">미사용</label>
+                                                            </div>
                                                         </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="N" @if(@$data_code_kind->use_yn == 'N') checked @endif />
-                                                            <label class="custom-control-label" for="use_n">미사용</label>
+                                                    @else
+                                                        <div class="form-inline form-radio-box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$store_kind->use_yn != 'N') checked @endif />
+                                                                <label class="custom-control-label" for="use_y">사용</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="N" @if(@$store_kind->use_yn == 'N') checked @endif />
+                                                                <label class="custom-control-label" for="use_n">미사용</label>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    @endif
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -116,16 +146,34 @@
             </div>
         </form>
         <div class="resul_btn_wrap mt-3 d-block">
-            <a href="javascript:Save();" class="btn btn-sm btn-primary submit-btn">저장</a>
+            @if ($code != '')
+                <a href="javascript:Edit();" class="btn btn-sm btn-primary submit-btn">저장</a>
+            @else
+                <a href="javascript:Save();" class="btn btn-sm btn-primary submit-btn">저장</a>
+            @endif
             <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">닫기</a>
         </div>
     </div>
     <script>
 
         $(document).ready(function() {
-            $('#type1').hide();
-            $('#type2').hide();
-            $('#type3').hide();
+            let type = "{{@$type}}";
+            let code = "{{@$code}}";
+
+            if (type == 'C' || code == '') {
+                $('#type1').hide();
+                $('#type2').hide();
+                $('#type3').hide();
+
+            } else {
+                $('#channel1').hide();
+                $('#channel2').hide();
+                $('#type1').show();
+                $('#type2').show();
+                $('#type3').show();
+                window.resizeTo(800,550);
+            }
+
 
             $('input[type=radio][name="add_type"]').change(function() {
                 if ($("input[name='add_type']:checked").val() === 'C') {
@@ -202,6 +250,73 @@
                 success: function (res) {
                     if(res.code == '200'){
                         alert("정상적으로 저장 되었습니다.");
+                        self.close();
+                        opener.Search(1);
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                        console.log(res.msg);
+                    }
+                },
+                error: function(e) {
+                    console.log(e.responseText)
+                }
+            });
+
+        }
+
+        function Edit() {
+
+            if ($("input[name='add_type']:checked").val() === 'C') {
+                
+                if ($('#store_channel_cd').val() === '') {
+                    $('#store_channel_cd').focus();
+                    alert('판매채널코드를 입력해주세요');
+                    return false;
+                }
+                
+                if ($('#store_channel').val() === '') {
+                    $('#store_channel').focus();
+                    alert('판매채널명을 입력해주세요');
+                    return false;
+                }
+
+            }
+
+            if ($("input[name='add_type']:checked").val() === 'T') {
+                
+                if ($('#sel_channel').val() === '') {
+                    alert('판매채널을 선택해주세요');
+                    return false;
+                }
+                
+                if ($('#store_kind_cd').val() === '') {
+                    $('#store_kind_cd').focus();
+                    alert('매장구분코드를 입력해주세요');
+                    return false;
+                }
+
+                if ($('#store_kind').val() === '') {
+                    $('#store_kind').focus();
+                    alert('매장구분명을 입력해주세요');
+                    return false;
+                }
+
+            }
+
+            if(!confirm('수정하시겠습니까?')){
+                return false;
+            }
+
+            var frm = $('form[name=detail]').serialize();
+
+            $.ajax({
+                method: 'post',
+                url: '/store/standard/std09/edit',
+                data: frm,
+                dataType: 'json',
+                success: function (res) {
+                    if(res.code == '200'){
+                        alert("정상적으로 수정 되었습니다.");
                         self.close();
                         opener.Search(1);
                     } else {

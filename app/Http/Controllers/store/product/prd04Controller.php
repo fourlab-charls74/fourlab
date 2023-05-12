@@ -159,20 +159,20 @@ class prd04Controller extends Controller
 			"
 				select
 					count(prd_cd) as total,
-					ifnull(sum(a.goods_sh * a.wqty),0) as total_goods_sh,
-					ifnull(sum(a.price * a.wqty),0) as total_price,
-					ifnull(sum(a.wonga * a.wqty),0) as total_wonga,
+					ifnull(sum(a.goods_sh),0) as total_goods_sh,
+					ifnull(sum(a.price),0) as total_price,
+					ifnull(sum(a.wonga),0) as total_wonga,
 					ifnull(sum(a.wqty),0) as total_wqty,
 					ifnull(sum(a.sqty),0) as total_sqty
 				from (
 					select
 						pc.prd_cd
-						-- , (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
+						, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
 						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
 						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-						, (sum(pss2.wqty) - ifnull(_next_storage.qty, 0)) as wqty
+						-- , (sum(pss2.wqty) - ifnull(_next_storage.qty, 0)) as wqty
 						, ps.qty as hqty
 						, ps.wqty as hwqty
 						, pss2.storage_cd as storage_cd
@@ -205,6 +205,8 @@ class prd04Controller extends Controller
 					$having
 				) a
 			";
+
+			// dd($query);
 
 			$row	= DB::select($query);
 			$total	= $row[0]->total;

@@ -29,7 +29,7 @@ class std09Controller extends Controller
         return view( Config::get('shop.store.view') . '/standard/std09_show',$values);
     }
 
-    public function show() {
+    public function show($code='', $type = '') {
 
         //판매채널코드 자동으로 만들어지는 부분
         $sql = "
@@ -88,11 +88,39 @@ class std09Controller extends Controller
 
         $channels = DB::select($sql);
 
+        if ($code != '') {
+            $sql = "
+                select
+                    store_channel
+                    , store_channel_cd
+                    , use_yn
+                from store_channel
+                where store_channel_cd = '$code'
+            ";
+
+            $edit = DB::selectOne($sql);
+
+            $sql = "
+                select
+                    store_kind_cd
+                    , store_channel_cd
+                    , store_kind
+                    , use_yn
+                from store_channel
+                where store_kind_cd = '$code' and dep = 2
+            ";
+
+            $edit2  = DB::selectOne($sql);
+        }
 
         $values = [
             'sc_seq' => $sc_seq,
             'sk_seq' => $sk_seq,
-            'channels' => $channels
+            'channels' => $channels,
+            'code' => $code == '' ? "" : "update",
+            'type' => $type,
+            'store_channel' => $edit??'',
+            'store_kind' => $edit2??'',
         ];
 
         return view( Config::get('shop.store.view') . '/standard/std09_show',$values);
@@ -173,7 +201,7 @@ class std09Controller extends Controller
 		return $rows;
 	}
 
-    //삭제
+    //저장
     public function save(Request $request) {
 
         $add_type = $request->input('add_type');
@@ -241,6 +269,55 @@ class std09Controller extends Controller
             DB::commit();
 			$code = 200;
 			$msg = "판매채널 등록이 완료되었습니다.";
+
+		} catch (\Exception $e) {
+            DB::rollback();
+            $code = 500;
+            $msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+
+    }
+
+    public function edit(Request $request) {
+
+        $add_type = $request->input('add_type');
+        $store_channel_cd = $request->input('store_channel_cd');
+        $store_channel = $request->input('store_channel');
+        $sel_channel = $request->input('sel_channel');
+        $store_kind_cd = $request->input('store_kind_cd');
+        $store_kind = $request->input('store_kind');
+        $use_yn = $request->input('use_yn');
+
+        try {
+            DB::beginTransaction();
+
+            if ($add_type == 'C') {
+                DB::table('store_channel')
+                    ->where('store_channel_cd','=',$store_channel_cd)
+                    ->update([
+                        'store_channel' => $store_channel,
+                        'use_yn' => $use_yn
+                    ]);
+            }
+
+            if ($add_type == 'T') {
+
+                DB::table('store_channel')
+                    ->where('store_kind_cd','=',$store_kind_cd)
+                    ->where('dep','=',2)
+                    ->update([
+                        'store_channel_cd' => $sel_channel,
+                        'store_kind' => $store_kind,
+                        'use_yn' => $use_yn
+                    ]);
+            }
+           
+
+            DB::commit();
+			$code = 200;
+			$msg = "판매채널 수정이 완료되었습니다.";
 
 		} catch (\Exception $e) {
             DB::rollback();
