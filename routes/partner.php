@@ -127,45 +127,40 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::get('prd01/search', 'prd01Controller@search');
         Route::get('prd01/create', 'prd01Controller@create');
 
+        Route::match(['get', 'post'], 'prd01/edit', 'prd01Controller@edit_index');
+        Route::post('prd01/edit/search', 'prd01Controller@edit_search');
+        Route::post('prd01/edit/save', 'prd01Controller@edit_save');
+
         Route::get('prd01/{no}', 'prd01Controller@show');
         Route::get('prd01/{no}/get', 'prd01Controller@get');
         Route::get('prd01/{no}/get-addinfo', 'prd01Controller@get_addinfo');
         Route::get('prd01/{no}/in-qty', 'prd01Controller@show_in_qty');
         Route::get('prd01/{no}/options', 'prd01Controller@options');
-
-        Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
-        Route::post('prd01/{no}/save-option-name', 'prd01Controller@save_option_name');
-        Route::post('prd01/{no}/del-option-name', 'prd01Controller@del_option_name');
-
-        Route::get('prd01/{no}/get-option', 'prd01Controller@get_option');
-        Route::post('prd01/{no}/del-option', 'prd01Controller@del_option');
-        Route::post('prd01/{no}/save-stock', 'prd01Controller@save_stock');
-
-        Route::get('prd01/{no}/get-option', 'prd01Controller@get_option');
-        Route::post('prd01/{no}/save-option', 'prd01Controller@save_option');
-        Route::post('prd01/{no}/del-option', 'prd01Controller@del_option');
-
-        Route::get('prd01/{no}/get-stock', 'prd01Controller@get_stock');
-        Route::post('prd01/{no}/save-stock', 'prd01Controller@save_stock');
-
-        Route::get('prd01/{no}/get-option-extra', 'prd01Controller@get_option_extra');
-        Route::post('prd01/{no}/save-option-extra', 'prd01Controller@save_option_extra');
-        Route::post('prd01/{no}/del-option-extra', 'prd01Controller@del_option_extra');
-
-        Route::post('prd01/add-related-goods', 'prd01Controller@addRelatedGoods');
-        Route::post('prd01/del-related-good', 'prd01Controller@delRelatedGood');
-
-        //Route::get('prd01/{no}/get-option-stock', 'prd01Controller@get_option_stock');
+        Route::get('prd01/{no}/goods-class', 'prd01Controller@goods_class');
+        Route::get('prd01/{no}/get-option-stock', 'prd01Controller@get_option_stock');
+        Route::get("prd01/{no}/get-similar-goods", "prd01Controller@get_similar_goods");
+        Route::get("prd01/{no}/goods-cont", "prd01Controller@index_cont");
+        Route::get("prd01/{no}/search/sale-place-cont", "prd01Controller@search_sale_place_cont");
 
         Route::post('prd01', 'prd01Controller@create_goods');
 
         Route::put('prd01', 'prd01Controller@update');
         Route::put('prd01/{no}/in-qty', 'prd01Controller@update_in_qty');
         Route::put('prd01/update/state', 'prd01Controller@update_state');
-
-        Route::get('prd01/{no}/goods-class', 'prd01Controller@goods_class');
+        Route::put('prd01/update/qty', 'prd01Controller@update_qty');
         Route::put('prd01/goods-class-update', 'prd01Controller@goods_class_update');
         Route::put('prd01/goods-class-delete', 'prd01Controller@goods_class_delete');
+        Route::put('prd01/{no}/save/sale-place-cont', 'prd01Controller@save_sale_place_cont');
+
+        Route::put('prd01/goods-class-opt-update', 'prd01Controller@goods_class_opt_update');
+        Route::put('prd01/goods-class-update', 'prd01Controller@goods_class_update');
+        Route::put('prd01/goods-class-delete', 'prd01Controller@goods_class_delete');
+        Route::put('prd01/{no}/save/sale-place-cont', 'prd01Controller@save_sale_place_cont');
+
+        Route::post("prd01/{no}/planing-delete", 'prd01Controller@delete_planing');
+        Route::post("prd01/{no}/coupon-delete", 'prd01Controller@delete_coupon');
+
+        Route::post("prd01/update", 'prd01Controller@update_selected');
 
         // 옵션 관리
         Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
