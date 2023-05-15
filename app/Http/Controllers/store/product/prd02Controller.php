@@ -1685,4 +1685,41 @@ class prd02Controller extends Controller
 
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
+
+
+	public function create_barcode(Request $request)
+	{
+		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
+			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
+
+		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' order by field(brand_nm, '헤스트라', '프리머스', '한바그', '피엘라벤') desc, brand_nm asc";
+		$brands	= DB::select($sql);
+
+		$item_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_item' order by code_val asc ";
+		$items = DB::select($item_sql);
+
+		$opt_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_opt' order by code_val asc ";
+		$opts = DB::select($opt_sql);
+
+		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
+		$colors = DB::select($color_sql);
+
+
+		$values = [
+			'brands' 	=> $brands,
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
+			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
+			'items'		=> $items,
+			'opts' 		=> $opts,
+			'colors' 	=> $colors,
+			'sizes'		=> SLib::getCodes("PRD_CD_SIZE_MATCH"),
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'sup_coms' 	=> $sup_coms,
+			'units' 	=> SLib::getCodes("PRD_CD_UNIT"),
+			'images' 	=> []
+		];
+
+		return view( Config::get('shop.store.view') . '/product/prd02_create_barcode',$values);
+	}
 }

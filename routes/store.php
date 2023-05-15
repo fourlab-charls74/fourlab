@@ -240,6 +240,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/batch-getproducts','prd02Controller@get_products'); 
         Route::post('prd02/batch-products','prd02Controller@batch_products'); 
 
+        Route::get('prd02/create_barcode', 'prd02Controller@create_barcode');
+
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');
         Route::get('prd03/search','prd03Controller@search');

@@ -57,6 +57,7 @@
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 						<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록</a>
+						<a href="#" onclick="AddProduct_upload_new();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록(NEW)</a>
 						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
 						<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
 						<a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary">검색조건 초기화</a>
@@ -498,6 +499,11 @@
 
 		function AddProduct_upload() {
 			var url = '/store/product/prd02/product_upload';
+			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
+		}
+
+		function AddProduct_upload_new() {
+			var url = '/store/product/prd02/create_barcode';
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
 		}
 
