@@ -505,7 +505,7 @@ $( document ).ready(function() {
     });
 
     $( ".sch-sup-company" ).on("click", () => {
-        searchSupCompany.Open(null, '1');
+        searchCompany.Open(null, '1');
     });
 
     $( ".sch-goods_nos" ).click(function() {
@@ -823,6 +823,7 @@ SearchCompany.prototype.Open = function(callback = null, type = "", wonboo = fal
         this.SetGrid("#div-gd-company");
         //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
         $("#SearchCompanyModal").draggable();
+        if (this.type === '1') $("#SearchCompanyModalLabel").text('공급업체 검색');
         this.callback = callback;
     }
 
@@ -926,111 +927,105 @@ if ($('.ac-company').length > 0) {
  * 공급업체
  * 
  */
-
-function SearchSupCompany(){
-    this.grid = null;
-}
-
-SearchSupCompany.prototype.Open = function(callback = null, type = "", wonboo = false){
-    if(this.grid === null){
-        this.isWonboo = wonboo === "wonboo";
-        this.type = type;
-        this.SetGrid("#div-gd-sup-company");
-        //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
-        $("#SearchSupCompanyModal").draggable();
-        this.callback = callback;
-    }
-
-    $('#SearchSupCompanyModal').modal({
-        keyboard: false
-    });
-
-    $('#SearchSupCompanyModal').keydown((evt) => {
-        // 엔터키 입력시 모달 창이 아닌 부모 창에서 검색되는 문제 수정
-        if ((evt.keyCode || evt.which) === 13) {
-            evt.preventDefault();
-            let data = $('form[name="search_company"]').serialize();
-            data += "&com_type=" + this.type;
-            const url = '/head/api/company/getlist/';
-            this.grid.Request(url, data);
-        }
-    });
-};
-
-SearchSupCompany.prototype.SetGrid = function(divId) {
-    const columns = [
-        {field:"com_type_nm" , headerName:"업체구분", width:80},
-        {field:"com_id" , headerName:"업체코드", width:80},
-        {field:"com_nm" , headerName: this.isWonboo === true ? "원부자재업체명" : "업체명", width:100},
-        {field:"biz_num" , headerName:"사업자번호", width:115},
-        {field:"md_nm" , headerName:"담당MD", width:70, hide:true},
-        {field:"com_type", headerName:"업체타입", hide:true},
-        {field:"baesong_kind", headerName:"배송업체", hide:true},
-        {field:"baesong_info", headerName:"배송지역", hide:true},
-        {field:"margin_type", headerName:"수수료타입", hide:true},
-        {field:"dlv_amt", headerName:"배송료", hide:true},
-        {field:"choice" , headerName:"선택", width:50,cellClass:'hd-grid-code',
-            cellRenderer: function (params) {
-                return '<a href="javascript:void(0);" onclick="return searchSupCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
-            }
-        },
-    ];
-
-    this.grid = new HDGrid(document.querySelector( divId ), columns);
-};
-
-SearchSupCompany.prototype.Search = function() {
-    let data = $('form[name="search_company"]').serialize();
-    data += "&com_type=" + this.type;
-    data += "&wonboo=" + this.isWonboo;
-    const url = '/head/api/company/getlist/';
-    this.grid.Request(url, data);
-};
-
-SearchSupCompany.prototype.Choice = function(code,name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt, com_type_nm)
-{
-	if( this.callback !== null )
-	{
-		this.callback(code, name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt, com_type_nm);
-	}
-	else
-	{
-		if( $('#com_cd.select2-company').length > 0 )
-		{
-			$('#com_cd').val(null);
-			const option = new Option(name, code, true, true);
-			$('#com_cd').append(option).trigger('change');
-		} else if ($('#com_cd.select2-sup_company').length > 0) {
-            $('#com_cd').val(null);
-			const option = new Option(name, code, true, true);
-			$('#com_cd').append(option).trigger('change');
-        }
-		else
-		{
-            if( $('#com_cd').length > 0 )
-			{
-				$('#com_cd').val(code);
-			}
-            if( $('#com_id').length > 0 )
-            {
-                $('#com_id').val(code);
-            }
-			if( $('#com_nm').length > 0 )
-			{
-                $('#com_nm').val(name);
-			}
-		}
-	}
-	$('#SearchSupCompanyModal').modal('toggle');
-};
-
-let searchSupCompany = new SearchSupCompany();
-if ($('.ac-company').length > 0) {
-    //#com_nm가 수정되어 빈값이 될 경우 #com_cd값 초기화
-    $("#com_nm").on("change", (e) => {
-        if(e.target.value === '') $("#com_cd").val('');
-    });
-}
+//
+// function SearchSupCompany(){
+//     this.grid = null;
+// }
+//
+// SearchSupCompany.prototype.Open = function(callback = null, type = "", wonboo = false){
+//     if(this.grid === null){
+//         this.isWonboo = wonboo === "wonboo";
+//         this.type = type;
+//         this.SetGrid("#div-gd-sup-company");
+//         //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
+//         $("#SearchSupCompanyModal").draggable();
+//         this.callback = callback;
+//     }
+//
+//     $('#SearchSupCompanyModal').modal({
+//         keyboard: false
+//     });
+//
+//     $('#SearchSupCompanyModal').keydown((evt) => {
+//         // 엔터키 입력시 모달 창이 아닌 부모 창에서 검색되는 문제 수정
+//         if ((evt.keyCode || evt.which) === 13) {
+//             evt.preventDefault();
+//             let data = $('form[name="search_company"]').serialize();
+//             data += "&com_type=" + this.type;
+//             const url = '/head/api/company/getlist/';
+//             this.grid.Request(url, data);
+//         }
+//     });
+// };
+//
+// SearchSupCompany.prototype.SetGrid = function(divId) {
+//     const columns = [
+//         {field:"com_type_nm" , headerName:"업체구분", width:80},
+//         {field:"com_id" , headerName:"업체코드", width:80},
+//         {field:"com_nm" , headerName: this.isWonboo === true ? "원부자재업체명" : "업체명", width:100},
+//         {field:"biz_num" , headerName:"사업자번호", width:115},
+//         {field:"md_nm" , headerName:"담당MD", width:70, hide:true},
+//         {field:"com_type", headerName:"업체타입", hide:true},
+//         {field:"baesong_kind", headerName:"배송업체", hide:true},
+//         {field:"baesong_info", headerName:"배송지역", hide:true},
+//         {field:"margin_type", headerName:"수수료타입", hide:true},
+//         {field:"dlv_amt", headerName:"배송료", hide:true},
+//         {field:"choice" , headerName:"선택", width:50,cellClass:'hd-grid-code',
+//             cellRenderer: function (params) {
+//                 return '<a href="javascript:void(0);" onclick="return searchSupCompany.Choice(\'' + params.data.com_id + '\',\'' + params.data.com_nm + '\',\'' + params.data.com_type + '\',\'' + params.data.baesong_kind + '\',\'' + params.data.baesong_info + '\',\'' + params.data.margin_type + '\',\'' + params.data.dlv_amt + '\',\'' + params.data.com_type_nm + '\');">선택</a>';
+//             }
+//         },
+//     ];
+//
+//     this.grid = new HDGrid(document.querySelector( divId ), columns);
+// };
+//
+// SearchSupCompany.prototype.Search = function() {
+//     let data = $('form[name="search_company"]').serialize();
+//     data += "&com_type=" + this.type;
+//     data += "&wonboo=" + this.isWonboo;
+//     const url = '/head/api/company/getlist/';
+//     this.grid.Request(url, data);
+// };
+//
+// SearchSupCompany.prototype.Choice = function(code,name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt, com_type_nm)
+// {
+// 	if( this.callback !== null )
+// 	{
+// 		this.callback(code, name, com_type, baesong_kind, baesong_info, margin_type, dlv_amt, com_type_nm);
+// 	}
+// 	else
+// 	{
+// 		if( $('#com_cd.select2-company').length > 0 )
+// 		{
+// 			$('#com_cd').val(null);
+// 			const option = new Option(name, code, true, true);
+// 			$('#com_cd').append(option).trigger('change');
+// 		} else if ($('#com_cd.select2-sup_company').length > 0) {
+//             $('#com_cd').val(null);
+// 			const option = new Option(name, code, true, true);
+// 			$('#com_cd').append(option).trigger('change');
+//         }
+// 		else
+// 		{
+//             if( $('#com_cd').length > 0 )
+// 			{
+// 				$('#com_cd').val(code);
+// 			}
+//             if( $('#com_id').length > 0 )
+//             {
+//                 $('#com_id').val(code);
+//             }
+// 			if( $('#com_nm').length > 0 )
+// 			{
+//                 $('#com_nm').val(name);
+// 			}
+// 		}
+// 	}
+// 	$('#SearchSupCompanyModal').modal('toggle');
+// };
+//
+// let searchSupCompany = new SearchSupCompany();
 
 
 
