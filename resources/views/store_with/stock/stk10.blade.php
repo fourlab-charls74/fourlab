@@ -276,6 +276,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
+                        @if(Auth('head')->user()->logistics_group_yn == 'N')
                         <div class="d-flex mr-1 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
@@ -299,11 +300,12 @@
                         </div>
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+                        @endif
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
                         @if(Auth('head')->user()->logistics_group_yn == 'N')
-                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a>
-                        @endif
+                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a
                         <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
+                        @endif
                     </div>
 				</div>
 			</div>
