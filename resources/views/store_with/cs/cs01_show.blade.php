@@ -25,13 +25,21 @@
                     <h4>기본 정보</h4>
                     <div>
                         @if (@$super_admin == 'true' || (@$state > 0 && @$state < 40))
-                        <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
+                            @if(Auth('head')->user()->logistics_group_yn == 'Y')
+                                @if(@$state != 30)
+                                    <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
+                                @endif
+                            @else
+                                <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>   
+                            @endif
                             @if (@$stock_no != "" && @$state < 30)
                             <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
                             @endif
                             @if ($state == 30)
-                            <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">추가입고</a>
-                            <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고취소</a>
+                                @if(Auth('head')->user()->logistics_group_yn == 'N')
+                                <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">추가입고</a>
+                                <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고취소</a>
+                                @endif
                             @endif
                         @endif
                         <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
