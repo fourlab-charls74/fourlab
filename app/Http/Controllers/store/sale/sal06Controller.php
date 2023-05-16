@@ -13,6 +13,27 @@ use Carbon\Carbon;
 class sal06Controller extends Controller
 {
 	public function index(Request $request) {
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
 
 		$sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
 		$edate = Carbon::now()->format("Y-m-d");
@@ -38,6 +59,8 @@ class sal06Controller extends Controller
 			'event_cds'		=> $event_cds,
 			'sale_kinds' 	=> $sale_kinds,
 			'items'			=> SLib::getItems(), // 품목
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
         return view( Config::get('shop.store.view') . '/sale/sal06', $values );
 	}
@@ -60,6 +83,9 @@ class sal06Controller extends Controller
 
 		$sale_yn = $request->input('sale_yn','Y');
 		$sale_kind = $request->input('sale_kind', "");
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
+
 
 		/**
 		 * 검색조건 필터링
@@ -89,7 +115,8 @@ class sal06Controller extends Controller
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";
-		if ($store_type) $where2 .= " and c.code_id = " . Lib::quote($store_type);
+		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 	
 		// 판매유형별 쿼리 추가

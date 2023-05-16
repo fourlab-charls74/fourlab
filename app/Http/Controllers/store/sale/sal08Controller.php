@@ -14,6 +14,27 @@ use Carbon\Carbon;
 class sal08Controller extends Controller
 {
 	public function index(Request $request) {
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
 
 		$sdate = Carbon::now()->sub(4, 'week')->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
@@ -23,6 +44,8 @@ class sal08Controller extends Controller
 			'edate'         => $edate,
 			'store_types'	=> SLib::getStoreTypes(), // 매장구분
 			'items'			=> SLib::getItems(), // 품목
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
         return view( Config::get('shop.store.view') . '/sale/sal08', $values );
 	}
@@ -34,7 +57,6 @@ class sal08Controller extends Controller
 		$sdate = str_replace('-', '', $sdate);
 		$edate = str_replace('-', '', $edate);
 
-		$store_type = $request->input('store_type', ''); // 매장구분
 		$store_no = $request->input('store_no', []); // 매장명 리스트
         $brand_cd = $request->input('brand_cd', ''); // 브랜드
 		$goods_nm = $request->input('goods_nm', ''); // 상품명
@@ -42,13 +64,16 @@ class sal08Controller extends Controller
 		$prd_cd	= $request->input('prd_cd', ''); // 상품코드
 		$prd_cd_range_text = $request->input('prd_cd_range', ''); // 상품옵션범위
 		$item = $request->input('item', ''); // 품목
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		/** 검색조건 필터링 */
 		$where = "";
 		$where2 = "";
 		
 		$where .= " and w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate' ";
-		if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+		if ($store_channel != "") $where .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		if (count($store_no) > 0) {
 			$where .= " and (1<>1 ";
 			foreach ($store_no as $store_cd) {

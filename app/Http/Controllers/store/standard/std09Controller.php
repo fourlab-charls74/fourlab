@@ -59,11 +59,13 @@ class std09Controller extends Controller
             select
                 store_kind_cd
             from store_channel
+            where dep = 2
             order by idx desc
             limit 1
         ";
 
         $store_kind_cd = DB::selectOne($sql);
+
 
         if ($store_kind_cd == '') {
             $sk_seq = '01';

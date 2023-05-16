@@ -19,9 +19,33 @@ class prd04Controller extends Controller
 	public function index()
 	{
 
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		$values = [
 			'sdate'			=> date('Y-m-d'),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd04',$values);
@@ -45,6 +69,8 @@ class prd04Controller extends Controller
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 		$storage_cd = $request->input('storage_no');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd_p');
@@ -126,11 +152,27 @@ class prd04Controller extends Controller
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
-		if( $store_no == "" && $store_type != "" ){
+		if( $store_no == "" && $store_channel != "" ){
 			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
 
-			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
-			$result = DB::select($sql,['store_type' => $store_type]);
+			$sql	= " select store_cd from store where store_channel = :store_channel and use_yn = 'Y' ";
+			$result = DB::select($sql,['store_channel' => $store_channel]);
+
+			$where	.= " and ( 1<>1";
+			foreach($result as $row){
+				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+			}
+			$where	.= ")";
+
+			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$store_qty_sql	= "sum(pss.qty)";
+		}
+
+		if( $store_no == "" && $store_channel != "" && $store_channel_kind ){
+			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+
+			$sql	= " select store_cd from store where store_channel = :store_channel and store_channel_kind = :store_channel_kind and use_yn = 'Y' ";
+			$result = DB::select($sql,['store_channel' => $store_channel, 'store_channel_kind' => $store_channel_kind]);
 
 			$where	.= " and ( 1<>1";
 			foreach($result as $row){

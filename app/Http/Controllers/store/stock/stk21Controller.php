@@ -17,6 +17,28 @@ class stk21Controller extends Controller
 {
     public function index()
 	{
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
 
@@ -30,6 +52,8 @@ class stk21Controller extends Controller
             'items'			=> SLib::getItems(), // 품목
             'stores'        => $stores, // 매장리스트
             'storages'      => $storages, // 창고리스트
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk21', $values);
@@ -176,11 +200,14 @@ class stk21Controller extends Controller
     {
 		$code = 200;
 		$prd_cd = $request->input("prd_cd", '');
-        $store_type = $request->input("store_type", '');
+        // $store_type = $request->input("store_type", '');
+        $store_channel = $request->input('store_channel', '');
+        $store_channel_kind = $request->input('store_channel_kind', '');
         $now_date = date('Ymd');
         $where = "";
 
-        if($store_type != '') $where .= " and s.store_type = $store_type";
+        if($store_channel != '') $where .= " and s.store_channel = $store_channel";
+        if($store_channel_kind != '') $where .= " and s.store_channel_kind = $store_channel_kind";
 
 		$sql = "
             select

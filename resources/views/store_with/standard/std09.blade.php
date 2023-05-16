@@ -36,11 +36,11 @@
                             <label for="dlv_kind">사용여부</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="use_yn" id="use_yn" class="custom-control-input" checked="" value="">
+                                    <input type="radio" name="use_yn" id="use_yn" class="custom-control-input" value="">
                                     <label class="custom-control-label" for="use_yn">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="y">
+                                    <input type="radio" name="use_yn" id="use_y" class="custom-control-input" checked="" value="y">
                                     <label class="custom-control-label" for="use_y">Y</label>
                                 </div>
                                 <div class="custom-control custom-radio">
@@ -177,9 +177,9 @@
     function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/store/standard/std09/search', data, -1, function(e){
-            if (e.body.length > 0) {
-                SearchDetail(e.body[0].store_channel_cd, e.body[0].store_channel);
-            }
+            // if (e.body.length > 0) {
+            //     SearchDetail(e.body[0].store_channel_cd, e.body[0].store_channel);
+            // }
         });
     }
 

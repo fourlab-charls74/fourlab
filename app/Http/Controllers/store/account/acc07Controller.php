@@ -16,12 +16,36 @@ class acc07Controller extends Controller
 {
     public function index()
     {
+		$sql = "
+            select
+                store_channel
+                , store_channel_cd
+                , use_yn
+            from store_channel
+            where dep = 1 and use_yn = 'Y'
+        ";
+
+        $store_channel = DB::select($sql);
+
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+
+        $store_kind = DB::select($sql);
+
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m");
 
         $values = [ 
 			'sdate' => $sdate, 
 			'store_types' => SLib::getStoreTypes(),
-			'store_kinds' => SLib::getCodes("STORE_KIND")
+			'store_kinds' => SLib::getCodes("STORE_KIND"),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
         return view( Config::get('shop.store.view') . '/account/acc07', $values );
@@ -35,17 +59,19 @@ class acc07Controller extends Controller
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 		$sdate = Lib::quote(str_replace('-', '', $sdate));
 
-        $store_type = $request->input('store_type', '');
         $store_kind = $request->input('store_kind', '');
         $store_cd = $request->input('store_cd', '');
 		$closed_yn = $request->input('closed_yn', '');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		// 검색조건 필터링
 		$where = "";
-		if ($store_type != '') $where .= " and s.store_type = '" . Lib::quote($store_type) . "'";
         if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
         if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
         if ($closed_yn != '') $where .= " and c.closed_yn = '" . Lib::quote($closed_yn) . "'";
+		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		$sql = "
 			select c.idx, c.store_cd, c.sday, c.eday, c.sale_amt, c.clm_amt, c.dc_amt

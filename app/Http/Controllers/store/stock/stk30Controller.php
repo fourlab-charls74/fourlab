@@ -21,6 +21,28 @@ class stk30Controller extends Controller
 {
     public function index()
 	{
+        $sql = "
+            select
+                store_channel
+                , store_channel_cd
+                , use_yn
+            from store_channel
+            where dep = 1 and use_yn = 'Y'
+        ";
+
+        $store_channel = DB::select($sql);
+
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+
+        $store_kind = DB::select($sql);
+
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
 
         $sql= "
@@ -42,6 +64,8 @@ class stk30Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
             // 'sr_state'      => $sr_state->sr_state,
 		];
 
@@ -58,9 +82,10 @@ class stk30Controller extends Controller
         $sr_state   = $request->input("sr_state", "");
         $sr_reason  = $request->input("sr_reason", "");
         $storage_cd = $request->input("storage_cd", "");
-        $store_type = $request->input("store_type", "");
         $store_nm   = $request->input("store_nm", "");
         $store_no   = $request->input("store_no", "");
+        $store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
         
         // where
         $sdate = str_replace("-", "", $sdate);
@@ -72,8 +97,9 @@ class stk30Controller extends Controller
         if($sr_state != "")     $where .= " and sr.sr_state = '" . $sr_state . "'";
         if($sr_reason != "")    $where .= " and sr.sr_reason = '" . $sr_reason . "'";
         if($storage_cd != "")   $where .= " and sr.storage_cd = '" . $storage_cd . "'";
-        if($store_type != "")   $where .= " and store.store_type = '" . $store_type . "'";
         if($store_no != "")     $where .= " and sr.store_cd = '" . $store_no . "'";
+        if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
         // ordreby
         $ord_field  = $request->input("ord_field", "sr.sr_cd");

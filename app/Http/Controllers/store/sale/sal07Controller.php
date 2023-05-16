@@ -14,6 +14,28 @@ class sal07Controller extends Controller
 {
 	public function index() 
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
 
@@ -35,6 +57,8 @@ class sal07Controller extends Controller
             'items'			=> SLib::getItems(),
             // 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
             // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
         return view( Config::get('shop.store.view') . '/sale/sal07', $values);
 	}
@@ -46,13 +70,14 @@ class sal07Controller extends Controller
 		$sdate = str_replace("-", "", $sdate);
 		$edate = str_replace("-", "", $edate);
 
-		$store_type = $request->input('store_type');
 		$store_cd = $request->input('store_cd');
 		$prd_cd = $request->input('prd_cd', '');
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$com_id = $request->input("com_cd");
 		$com_nm = $request->input("com_nm");
 		$com_type = $request->input("com_type");
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
@@ -73,8 +98,9 @@ class sal07Controller extends Controller
 
 		$where	= "";
 		if ($com_type != "") $where .= " and g.com_type = '$com_type' ";
-		if ($store_type != "")	$where .= " and s.store_type = '" . $store_type . "' ";
 		if ($store_cd != "")	$where .= " and m.store_cd = '" . $store_cd . "' ";
+		if ($store_channel != "") $where .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		if ( $prd_cd != "" ) {
 			$prd_cd = explode(',', $prd_cd);

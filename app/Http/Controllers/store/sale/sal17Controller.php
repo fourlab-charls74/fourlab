@@ -15,6 +15,28 @@ class sal17Controller extends Controller
 	//
 	public function index(Request $request)
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		$is_searched = $request->input('is_searched', 'y');
         $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
         $edate = $request->input('edate', now()->format("Y-m"));
@@ -62,7 +84,9 @@ class sal17Controller extends Controller
             'edate'         => $edate,
 			'months'	    => $months,
 			'store_types'	=> $store_types,
-			'is_searched' 	=> $is_searched
+			'is_searched' 	=> $is_searched,
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 			// 'event_cds'	=> $event_cds,
 			// 'sell_types'	=> $sell_types
 		];
@@ -76,14 +100,16 @@ class sal17Controller extends Controller
 
 		$months_count = Carbon::parse($sdate)->diffInMonths(Carbon::parse($edate)->lastOfMonth());
 
-		$store_type = $request->input('store_type', "");
 		$store_cd = $request->input('store_cd', "");
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$where = "";
-		if ($store_type) $where .= " and c.code_id = " . Lib::quote($store_type);
 		if ($store_cd != "") {
 			$where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 		}
+		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		/**
 		 * 합계 쿼리 작성

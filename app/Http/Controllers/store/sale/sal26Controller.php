@@ -14,6 +14,28 @@ class sal26Controller extends Controller
 {
     // 업체별 매출 통계
     public function index() {
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 
         $mutable = Carbon::now();
         $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
@@ -26,6 +48,8 @@ class sal26Controller extends Controller
             'store_types'   => SLib::getCodes('STORE_TYPE'),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
         return view( Config::get('shop.store.view') . '/sale/sal26',$values);
     }
@@ -46,7 +70,8 @@ class sal26Controller extends Controller
         $sell_type  = $request->input('sell_type');
         $pr_code    = $request->input('pr_code');
         $store_cd   = $request->input('store_no');
-        $store_type = $request->input('store_type');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 
 		$inner_where	= "";
@@ -111,10 +136,8 @@ class sal26Controller extends Controller
 			$where	.= ")";
 		}
 
-        //매장구분 검색
-        if($store_type != '') {
-            $where .= " and s.store_type = $store_type";
-        }
+		if ($store_channel != "") $where .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
         // 매장검색
         if ( $store_cd != "" ) {

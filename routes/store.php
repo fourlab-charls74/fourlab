@@ -108,6 +108,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02/search', 'std02Controller@search');
         Route::get('std02/show/{store_cd?}', 'std02Controller@show');
         Route::post('std02/show/chg-store-channel/{store_cd?}', 'std02Controller@change_store_channel');
+        Route::post('std02/show/chg-store-channel_kind/{store_cd?}', 'std02Controller@change_store_channel_kind');
         Route::get('std02/charge/{store_cd?}', 'std02Controller@charge');
         Route::get('std02/charge_search', 'std02Controller@charge_search');
         Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');
@@ -241,6 +242,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/batch-products','prd02Controller@batch_products'); 
 
         Route::get('prd02/create_barcode', 'prd02Controller@create_barcode');
+        Route::post('prd02/dup-style-no', 'prd02Controller@dup_style_no');
 
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');

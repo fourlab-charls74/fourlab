@@ -15,13 +15,37 @@ class acc06Controller extends Controller
 {
     public function index(Request $request) 
 	{
+		$sql = "
+            select
+                store_channel
+                , store_channel_cd
+                , use_yn
+            from store_channel
+            where dep = 1 and use_yn = 'Y'
+        ";
+
+        $store_channel = DB::select($sql);
+
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+
+        $store_kind = DB::select($sql);
+
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
 
         $values = [
             'sdate'         => $sdate,
             'store_types'	=> SLib::getStoreTypes(),
             'store_kinds'	=> SLib::getCodes("STORE_KIND"),
-            'pr_codes'      => $this->_get_prcodes()
+            'pr_codes'      => $this->_get_prcodes(),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
 
         return view( Config::get('shop.store.view') . '/account/acc06', $values );
@@ -36,20 +60,22 @@ class acc06Controller extends Controller
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 		$nowdate = now()->format("Ymd");
 
-        $store_type = $request->input('store_type', '');
         $store_kind = $request->input('store_kind', '');
         $store_cd = $request->input('store_cd', '');
         $closed_yn = $request->input('closed_yn', '');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		// 검색조건 필터링
 		$where = "";
-		if ($store_type != '') $where .= " and s.store_type = '" . Lib::quote($store_type) . "'";
         if ($store_kind != '') $where .= " and s.store_kind = '". Lib::quote($store_kind) . "'";
         if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
 		if ($closed_yn != '') {
 			if ($closed_yn == 'Z') $where .= " and c.closed_yn is null ";
 			else $where .= " and c.closed_yn = '" . Lib::quote($closed_yn) . "'";
 		}
+		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		
         // 행사코드별 매출구분
         $pr_codes = $this->_get_prcodes();

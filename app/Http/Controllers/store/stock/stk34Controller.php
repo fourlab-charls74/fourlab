@@ -17,11 +17,35 @@ class stk34Controller extends Controller
 {
     public function index()
     {
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
             'competitors' => SLib::getCodes("COMPETITOR"),
             'sdate' => date("Y-m"),
-            'edate' => date("Y-m")
+            'edate' => date("Y-m"),
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
         return view(Config::get('shop.store.view') . '/stock/stk34', $values);
     }
@@ -33,12 +57,14 @@ class stk34Controller extends Controller
         $sdate = $request->input('sdate');
         $edate = $request->input('edate');
         $store_no = $request->input('store_no', '');
-        $store_type    = $request->input("store_type", '');
+        $store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         $where = "";
         $orderby = "";
         if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
-        if ($store_type != "") $where .= " and s.store_type = '$store_type'";
+        if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';

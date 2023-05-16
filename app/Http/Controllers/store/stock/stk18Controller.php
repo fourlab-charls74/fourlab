@@ -20,6 +20,28 @@ class stk18Controller extends Controller
 {
     public function index()
 	{
+        $sql = "
+            select
+                store_channel
+                , store_channel_cd
+                , use_yn
+            from store_channel
+            where dep = 1 and use_yn = 'Y'
+        ";
+
+        $store_channel = DB::select($sql);
+
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+
+        $store_kind = DB::select($sql);
+
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();//전체매장
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
@@ -31,6 +53,8 @@ class stk18Controller extends Controller
             'rel_orders' => SLib::getCodes("REL_ORDER"), // 출고차수
             'stores' => $stores, // 전체 매장리스트
             'storages' => $storages, // 창고리스트
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk18', $values);

@@ -14,6 +14,28 @@ class sal02Controller extends Controller
 {
 	public function index() {
 
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
 		$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
@@ -48,7 +70,9 @@ class sal02Controller extends Controller
             'sdate'         => $sdate,
 			'store_types'	=> $store_types,
 			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types
+			'sell_types'	=> $sell_types,
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
         return view( Config::get('shop.store.view') . '/sale/sal02',$values);
 	}
@@ -57,7 +81,6 @@ class sal02Controller extends Controller
 	{
 		$sdate = $request->input('sdate', now()->format("Y-m"));
 		$list_type = $request->input('list_type', "qty");
-		$store_type = $request->input('store_type', "");
 		$store_cd = $request->input('store_cd', "");
 		$goods_no = $request->input('goods_no', "");
 		$goods_nm = $request->input('goods_nm', "");
@@ -66,6 +89,8 @@ class sal02Controller extends Controller
 		$sale_yn = $request->input('sale_yn','Y');
 		// 판매 유형은 추후 반영 예정
 		$sell_type = $request->input('sell_type');
+		$store_channel	= $request->input("store_channel", '');
+		$store_channel_kind	= $request->input("store_channel_kind", '');
 
 		$ym = str_replace("-", "", $sdate);
 		$edate = Carbon::parse($sdate)->firstOfMonth()->addMonth()->format("Y-m-d");
@@ -96,8 +121,9 @@ class sal02Controller extends Controller
 
         $where2 = "";
         if ($sale_yn == "Y") $where2 .= " and qty is not null";
-		if ($store_type) $where2 .= " and c.code_id = " . Lib::quote($store_type);
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
+		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		// 전달 받은 리스트 타입에 따라 합계 쿼리 구분
 		$sum = "";

@@ -14,6 +14,28 @@ class acc04Controller extends Controller
 {
     public function index(Request $request) 
     {
+        $sql = "
+            select
+                store_channel
+                , store_channel_cd
+                , use_yn
+            from store_channel
+            where dep = 1 and use_yn = 'Y'
+        ";
+
+        $store_channel = DB::select($sql);
+
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+
+        $store_kind = DB::select($sql);
+        
         $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 저번 달 기준
         $extra_types = collect($this->_get_extra_type_columns())->whereIn('entry_cd', ['P', 'S', 'O'])->groupBy('entry_cd');
 
@@ -23,6 +45,8 @@ class acc04Controller extends Controller
             'store_types'	=> SLib::getStoreTypes(),
             'store_kinds'	=> SLib::getCodes("STORE_KIND"),
             'extra_types'   => $extra_types,
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
         return view( Config::get('shop.store.view') . '/account/acc04', $values );
     }
@@ -36,15 +60,15 @@ class acc04Controller extends Controller
         $f_edate = Carbon::parse($sdate)->lastOfMonth()->format("Ymd");
 		$nowdate = now()->format("Ymd");
 
-        $store_type = $request->input('store_type', '');
         $store_kind = $request->input('store_kind', '');
 		$store_no = $request->input('store_no', []);
         $closed_yn = $request->input('closed_yn', ''); // 마감상태
         $sale_yn = $request->input('sale_yn', 'Y'); // 매출여부
+        $store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         // 검색조건 필터링
         $where = "";
-        if ($store_type != '') $where .= " and s.store_type = '" . Lib::quote($store_type) . "' ";
         if (count($store_no) > 0) $where .= " and s.store_cd in (" . join(",", array_map(function($cd) { return "'$cd'"; }, $store_no)) . ") ";
         if ($store_kind != '') $where .= " and s.store_kind = '" . Lib::quote($store_kind) . "' ";
         if ($closed_yn != '') {
@@ -53,6 +77,9 @@ class acc04Controller extends Controller
 		}
         if ($sale_yn == 'Y') $where .= " and w.sales_amt > 0 ";
         else if ($sale_yn == 'N') $where .= " and (w.sales_amt <= 0 or w.sales_amt is null) ";
+
+        if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
         $pr_codes = SLib::getCodes('PR_CODE'); // 행사코드목록
         $pr_code_query1 = "";

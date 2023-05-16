@@ -20,6 +20,28 @@ class stk12Controller extends Controller
     public function index()
 	{
         $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
+        $sql = "
             select
                 *
             from code
@@ -38,7 +60,9 @@ class stk12Controller extends Controller
             'items'			=> SLib::getItems(), // 품목
             // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'storages'      => $storages, // 창고리스트
-            'rel_order_res' => $rel_order_res //초도출고차수
+            'rel_order_res' => $rel_order_res, //초도출고차수
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk12', $values);
@@ -124,6 +148,9 @@ class stk12Controller extends Controller
         if(($r['ext_storage_qty'] ?? 'false') == 'true')
             $where .= " and (p.wqty != '' and p.wqty != '0')";
 
+        // if ($r['store_channel'] != '') $where .= "and s.store_channel ='" . Lib::quote($r['store_channel']). "'";
+        // if ($r['store_channel_kind'] ?? '' != '') $where .= "and s.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
+
         // orderby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "g.goods_no";
@@ -140,19 +167,20 @@ class stk12Controller extends Controller
 
         // search
         $store_cds = $r['store_no'] ?? [];
-        $store_type = $r['store_type'] ?? '';
+        $store_channel = $r['store_channel'] ?? '';
+        $store_channel_kind = $r['store_channel_kind'] ?? '';
         $stores = [];
         $store_select_sql = "";
         foreach($store_cds as $store_cd) {
-            $row = DB::table('store')->select('store_cd', 'store_nm', 'store_type')->where('store_cd', '=', $store_cd)->first();
-            if($store_type == '' or ($store_type != '' and $row->store_type == $store_type)) {
+            $row = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_cd', '=', $store_cd)->first();
+            if($store_channel == '' or ($store_channel != '' and $row->store_channel == $store_channel and $row->store_channel_kind == $store_channel_kind)) {
                 array_push($stores, $row);
                 $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
                 $store_select_sql .= "(select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_wqty,";
             }
         }
         if(count($store_cds) < 1) {
-            $stores = DB::table('store')->select('store_cd', 'store_nm')->where('store_type', '=', $store_type)->get();
+            $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_channel', '=', $store_channel)->get();
             foreach($stores as $s) {
                 $store_cd = $s->store_cd;
                 $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";

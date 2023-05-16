@@ -19,6 +19,28 @@ class stk13Controller extends Controller
 	{
 		$sql = "
 			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
+		$sql = "
+			select
 				*
 			from code
 			where code_kind_cd = 'rel_order' and code_id like 'S_%'
@@ -37,7 +59,9 @@ class stk13Controller extends Controller
             'items'			=> SLib::getItems(), // 품목
             // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'storages'      => $storages, // 창고리스트
-			'rel_order_res'	=> $rel_order_res //판매분 출고차수
+			'rel_order_res'	=> $rel_order_res, //판매분 출고차수
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk13', $values);
@@ -83,8 +107,8 @@ class stk13Controller extends Controller
 		}
 
         // where
-		if($r['store_type'] != null)
-			$where .= " and store.store_type = '" . $r['store_type'] . "'";
+		// if($r['store_type'] != null)
+		// 	$where .= " and store.store_type = '" . $r['store_type'] . "'";
 		if($r['prd_cd'] != null) {
 			$prd_cd = explode(',', $r['prd_cd']);
 			$where .= " and (1!=1";
@@ -141,6 +165,9 @@ class stk13Controller extends Controller
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 		if(($r['ext_storage_qty'] ?? 'false') == 'true')
 			$where .= " and (pss.wqty != '' and pss.wqty != '0')";
+
+		if ($r['store_channel'] != '') $where .= "and store.store_channel ='" . Lib::quote($r['store_channel']). "'";
+		if ($r['store_channel_kind'] ?? '' != '') $where .= "and store.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
 
         // orderby
         $ord = $r['ord'] ?? 'desc';

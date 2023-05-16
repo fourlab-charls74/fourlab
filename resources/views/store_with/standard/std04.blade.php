@@ -30,18 +30,29 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-							<label for="store_type">매장구분</label>
-                            <div class="form-inline">
-                                <select name="store_type" id="store_type" class="form-control form-control-sm w-100">
-                                    <option value="">전체</option>
-                                    @foreach (@$store_types as $type)
-                                        <option value="{{ $type->code_id }}">{{ $type->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+						<div class="form-group">
+							<label for="good_types">판매채널/매장구분</label>
+							<div class="d-flex align-items-center">
+								<div class="flex_box w-100">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<option value=''>전체</option>
+									@foreach ($store_channel as $sc)
+										<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+									@endforeach
+									</select>
+								</div>
+								<span class="mr-2 ml-2">/</span>
+								<div class="flex_box w-100">
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<option value=''>전체</option>
+									@foreach ($store_kind as $sk)
+										<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+									@endforeach
+									</select>
+								</div>
+							</div>
 						</div>
-                    </div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
 							<label for="store_cd">매장코드</label>
@@ -270,5 +281,52 @@
             )
         );
     }
+
+    // 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
+	$(document).ready(function() {
+		const store_channel = document.getElementById("store_channel");
+		const store_channel_kind = document.getElementById("store_channel_kind");
+
+		store_channel.addEventListener("change", () => {
+			if (store_channel.value) {
+				store_channel_kind.disabled = false;
+			} else {
+				store_channel_kind.disabled = true;
+			}
+		});
+	});
+
+	// 판매채널이 변경되면 해당 판매채널의 매장구분을 가져오는 부분
+	function chg_store_channel() {
+
+		const sel_channel = document.getElementById("store_channel").value;
+
+		$.ajax({
+			method: 'post',
+			url: '/store/standard/std02/show/chg-store-channel',
+			data: {
+				'store_channel' : sel_channel
+				},
+			dataType: 'json',
+			success: function (res) {
+				if(res.code == 200){
+					$('#store_channel_kind').empty();
+					let select =  $("<option value=''>전체</option>");
+					$('#store_channel_kind').append(select);
+
+					for(let i = 0; i < res.store_kind.length; i++) {
+						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+						$('#store_channel_kind').append(option);
+					}
+
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
+	}	
 </script>
 @stop

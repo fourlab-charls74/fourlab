@@ -17,8 +17,32 @@ class std07Controller extends Controller
 {
 	public function index()
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		$values = [
 			"store_types" => SLib::getCodes("STORE_TYPE"),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 		return view(Config::get('shop.store.view') . '/standard/std07', $values);
 	}
@@ -29,6 +53,8 @@ class std07Controller extends Controller
 		$store_cd = $request->input("store_cd");
 		$store_nm = $request->input("store_nm");
 		$use_yn = $request->input("use_yn");
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$code = 200;
 		$where = "";
@@ -41,6 +67,9 @@ class std07Controller extends Controller
 			$where .= " and (s.store_nm like '%$store_nm%' or s.store_nm_s like '%$store_nm%')";
 		if($use_yn != null) 
 			$where .= " and s.use_yn = '$use_yn'";
+
+		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		$sql = "
 			select s.store_cd, s.store_nm as store_nm, s.use_yn, c.code_val as store_type

@@ -16,12 +16,35 @@ class sys01Controller extends Controller
 {
     public function index()
     {
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
 
         $values = [
             'section_types' => SLib::getCodes('G_SECTION_TYPE'),
             'types' => SLib::getCodes('G_AD_TYPE'),
             'states' => SLib::getCodes('IS_SHOW'),
             "store_types" => SLib::getCodes("STORE_TYPE"),
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
         return view(Config::get('shop.store.view') . '/system/sys01', $values);
     }
@@ -69,15 +92,17 @@ class sys01Controller extends Controller
         $name        = $req->input('name', '');
         $part        = $req->input('part', '');
         $grade	     = $req->input('grade', '');
-        $store_type  = $req->input("store_type", '');
 		$store_no    = $req->input("store_no", '');
+        $store_channel	= $req->input("store_channel");
+		$store_channel_kind	= $req->input("store_channel_kind");
 
         $where = "";
 
         if ($name != "")        $where .= " and mu.name like '%" . Lib::quote($name) . "%' ";
         if ($part != "")        $where .= " and mu.part like '%" . Lib::quote($part) . "%' ";
         if ($grade != "")  		$where .= " and mu.grade = '" . Lib::quote($grade) . "' ";
-        if ($store_type != "")  $where .= " and s.store_type = '" . Lib::quote($store_type) . "' ";
+        if ($store_channel != "") $where .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		if ($store_no != "") {
             $where .= " and ( 1<>1";
             foreach($store_no as $store_cd) {

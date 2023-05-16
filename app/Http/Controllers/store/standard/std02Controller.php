@@ -19,10 +19,34 @@ class std02Controller extends Controller
 {
 	public function index() 
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		$values = [
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
 			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
-			'store_areas'	=> SLib::getCodes("STORE_AREA")		// 매장지역
+			'store_areas'	=> SLib::getCodes("STORE_AREA"),	// 매장지역
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02',$values);
@@ -35,8 +59,9 @@ class std02Controller extends Controller
 		$limit	= $request->input('limit', 100);
 
 		$store_channel	= $request->input("store_channel");
-		$store_channel_kin	= $request->input("store_channel_kind");
+		$store_channel_kind	= $request->input("store_channel_kind");
 		$store_kind	= $request->input("store_kind");
+		// $store_type	= $request->input("store_type");
 		$store_area	= $request->input("store_area");
 		$store_nm	= $request->input("store_nm");
 		$store_cd	= $request->input("store_cd");
@@ -54,6 +79,8 @@ class std02Controller extends Controller
 		if( $store_nm != "" )	$where .= " and ( a.store_nm like '%" . Lib::quote($store_nm) . "%' or a.store_nm_s like '%" . Lib::quote($store_nm) . "%' ) ";
 		if( $store_cd != "" )	$where .= " and a.store_cd like '%" . Lib::quote($store_cd) . "%' ";
 		if( $use_yn != "" )		$where .= " and a.use_yn = '$use_yn' ";
+		if ($store_channel != "") $where .= "and a.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and a.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;
@@ -576,6 +603,33 @@ class std02Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind]);
+	}
+
+	public function change_store_channel_kind(Request $request) {
+
+		$store_channel_kind = $request->input('store_channel_kind');
+
+        try {
+            DB::beginTransaction();
+                $sql = "
+					select
+						store_cd
+						, store_nm
+					from store
+					where store_channel_kind = '$store_channel_kind' and use_yn = 'Y'
+                ";
+            $stores = DB::select($sql);
+
+			DB::commit();
+            $code = 200;
+            $msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg, 'stores' => $stores]);
 	}
 
 }

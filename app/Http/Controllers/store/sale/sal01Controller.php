@@ -26,6 +26,29 @@ class sal01Controller extends Controller
 	//
 	public function index() {
 
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
+
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
@@ -69,6 +92,8 @@ class sal01Controller extends Controller
 			'event_cds'		=> $event_cds,
 			'sell_types'	=> $sell_types,
 			'code_kinds'	=> $code_kinds,
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
 		return view( Config::get('shop.store.view') . '/sale/sal01',$values);
@@ -82,12 +107,13 @@ class sal01Controller extends Controller
 
 		$sdate		= $request->input('sdate',Carbon::now()->sub(2, 'year')->format('Ymd'));
 		$edate		= $request->input('edate',date("Ymd"));
-		$com_type	= $request->input('com_type');
 		$com_nm		= $request->input('com_nm');
 		$goods_code	= $request->input('goods_code');
 		$event_cd	= $request->input('event_cd');
 		$user_id	= $request->input('user_id');
 		$sell_type	= $request->input('sell_type');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$limit		= $request->input("limit",100);
 		$ord		= $request->input('ord','desc');
@@ -95,12 +121,13 @@ class sal01Controller extends Controller
 		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 
 		$where	= "";
-		if( $com_type != "" )	$where .= " and a.com_type = '" . $com_type . "' ";
 		if( $com_nm != "" )		$where .= " and a.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if( $goods_code != "" )	$where .= " and a.goods_code like '" . Lib::quote($goods_code) . "%' ";
 		if( $event_cd != "" )	$where .= " and a.event_cd = '" . $event_cd . "' ";
 		if( $user_id != "" )	$where .= " and a.user_id = '" . Lib::quote($user_id) . "%' ";
 		if( $sell_type != "" )	$where .= " and a.sell_type = '" . $sell_type . "' ";
+		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		$page_size	= $limit;
 		$startno	= ($page - 1) * $page_size;
@@ -113,6 +140,7 @@ class sal01Controller extends Controller
 			$query	= "
 				select count(*) as total
 				from __tmp_order a
+				left outer join store s on s.store_cd = a.com_id
 				where 1=1 
 					and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
 					$where
@@ -143,6 +171,7 @@ class sal01Controller extends Controller
 			left outer join __tmp_code f on f.code_kind_cd = 'sell_type' and f.code_id = a.sell_type
 			left outer join __tmp_code g on g.code_kind_cd = 'event_cd' and g.code_id = a.event_cd
 			-- left outer join code g on g.code_kind_cd = 'PR_CODE' and g.code_id = a.event_cd
+			left outer join store s on s.store_cd = a.com_id
 			where 1=1 
 				and ( a.ord_date >= :sdate and a.ord_date < date_add(:edate,interval 1 day))
 				$where

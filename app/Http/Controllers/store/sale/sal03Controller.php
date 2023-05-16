@@ -15,6 +15,28 @@ class sal03Controller extends Controller
 {
 	public function index() 
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
 
@@ -36,6 +58,8 @@ class sal03Controller extends Controller
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'items'			=> SLib::getItems(),
             'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
         return view( Config::get('shop.store.view') . '/sale/sal03', $values);
 	}
@@ -47,7 +71,6 @@ class sal03Controller extends Controller
 		$sdate2 = str_replace("-", "", $sdate);
 		$edate2 = str_replace("-", "", $edate);
 
-		$store_type = $request->input('store_type');
 		$store_cd = $request->input('store_cd');
 		$prd_cd = $request->input('prd_cd');
 		$com_id = $request->input("com_cd");
@@ -65,6 +88,9 @@ class sal03Controller extends Controller
         $goods_nm_eng = $request->input("goods_nm_eng");
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$best_worst = $request->input('best_worst');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
+
 
         $type = $request->input("type");
         $goods_type = $request->input("goods_type");
@@ -103,7 +129,6 @@ class sal03Controller extends Controller
 		$in_where	= "";
 
 		if ($com_type != "") $where .= " and final.com_type = '$com_type' ";
-		if ($store_type != "")	$in_where .= " and s.store_type = '" . $store_type . "' ";
 		if ($store_cd != "")	$in_where .= " and oo.store_cd = '" . $store_cd . "' ";
 		if ($prd_cd != "")	$in_where .= " and oo.prd_cd like '" . $prd_cd . "%' ";
 		if ($com_id != "") $where .= " and final.com_id = '" . Lib::quote($com_id) . "'";
@@ -117,6 +142,9 @@ class sal03Controller extends Controller
 		}
 		if ($goods_nm != "") $where .= " and final.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
 		if ($goods_nm_eng != "") $where .= " and final.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+
+		if ($store_channel != "") $in_where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $in_where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		if ($goods_nos != "") {
 			$goods_no = $goods_nos;

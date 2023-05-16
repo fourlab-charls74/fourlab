@@ -28,6 +28,28 @@ class stk10Controller extends Controller
 
     public function index()
 	{
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 
         $sql = "
             select
@@ -50,6 +72,8 @@ class stk10Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk10', $values);
@@ -79,8 +103,6 @@ class stk10Controller extends Controller
 			$where .= " and psr.state = '" . $r['state'] . "'";
         if($r['ext_done_state'] ?? '' != '')
             $where .= " and psr.state != '40'";
-		if($r['store_type'] != null) 
-			$where .= " and s.store_type = '" . $r['store_type'] . "'";
 		if(isset($r['store_no'])) 
 			$where .= " and s.store_cd = '" . $r['store_no'] . "'";
 		if($r['prd_cd'] != null) {
@@ -91,6 +113,10 @@ class stk10Controller extends Controller
 			}
 			$where .= ")";
         }
+
+        if ($r['store_channel'] != '') $where .= "and s.store_channel ='" . Lib::quote($r['store_channel']). "'";
+        if ($r['store_channel_kind'] ?? '' != '') $where .= "and s.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
+
         // 상품옵션 범위검색
         $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
         parse_str($r['prd_cd_range'] ?? '', $prd_cd_range);

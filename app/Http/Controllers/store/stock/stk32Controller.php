@@ -124,8 +124,32 @@ class stk32Controller extends Controller
 
     public function create()
     {
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
 
         return view( Config::get('shop.store.view') . '/stock/stk32_show', $values);
@@ -135,7 +159,8 @@ class stk32Controller extends Controller
     {
         $store_nm = $request->input('store_nm');
         $div_store = $request->input('store');
-        $store_type = $request->input('store_type', "");
+        $store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         // pagination
         $page = $r['page'] ?? 1;
@@ -144,15 +169,8 @@ class stk32Controller extends Controller
         $where = "";
         if($store_nm != "" && $div_store == 'O') $where .= " and store_nm like '%" . $store_nm . "%' ";
        
-        $sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
-        $result = DB::select($sql,['store_type' => $store_type]);
-        if($store_type != "") {
-            $where	.= " and (1!=1";
-            foreach($result as $row){
-                $where .= " or store_cd = '" . Lib::quote($row->store_cd) . "' ";
-            }
-            $where	.= ")";
-        }
+        if ($store_channel != "") $where .= " and store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= " and store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
           
             $sql = 
                 "

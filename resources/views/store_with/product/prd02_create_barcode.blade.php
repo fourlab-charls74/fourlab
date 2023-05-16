@@ -111,56 +111,11 @@
 											<th class="required">품목</th>
 											<td>
 												<div class="flax_box">
-													<select name='opt' id='opt' class="form-control form-control-sm prd_code">
-														<option value=''>선택</option>
-														@foreach ($opts as $opt)
-															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-											<th class="required">하위품목</th>
-											<td>
-												<div class="flax_box">
 													<select name='item' id='item' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($items as $item)
 														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
 														@endforeach
-													</select>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th class="required">순서</th>
-											<td>
-												<div class="flax_box">
-													<select name='seq' id='seq' class="form-control form-control-sm" onclick="sel_seq();" onchange="changeSelect();">
-													<!-- <option value=''>선택</option> -->
-													</select>
-												</div>
-											</td>
-											<th class="required">컬러</th>
-											<td>
-												<div class="flax_box">
-													<select name='color' id='color' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														@foreach ($colors as $color)
-														<option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th class="required">사이즈</th>
-											<td>
-												<div class="flax_box">
-													<select name='size' id='size' class="form-control form-control-sm">
-														<option value=''>선택</option>
-														<!-- @foreach ($sizes as $size)
-														<option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
-														@endforeach -->
 													</select>
 												</div>
 											</td>
@@ -172,20 +127,53 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">컬러</th>
+											<td>
+												<div class="flax_box">
+													<select name='color' id='color' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($colors as $color)
+														<option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">사이즈</th>
+											<td>
+												<div class="flax_box">
+													<select name='size' id='size' class="form-control form-control-sm">
+														<option value=''>선택</option>
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="required">기획구분</th>
+											<td>
+												<div class="flax_box">
+													<select name='plan_category' id="plan_category" class="form-control form-control-sm">
+														<option value=''>선택</option>
+														<option value='01'>정상매장</option>
+														<option value='02'>전매장</option>
+														<option value='03'>이월취급점</option>
+														<option value='04'>아울렛전용</option>
+													</select>
+												</div>
+											</td>
 											<th class="required">상품명</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
+										</tr>
+                                        <tr>
 											<th class="required">상품명(영문)</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
 												</div>
 											</td>
-										</tr>
-                                        <tr>
 											<th class="required">공급업체</th>
 											<td>
 												<div class="flax_box">
@@ -197,26 +185,30 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">원가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>TAG가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+											<th></th>
+											<td></td>
 										</tr>
 										<tr>
 											<th>이미지</th>
@@ -468,16 +460,10 @@
 			return alert("성별을 선택해주세요.");
 		}
 
-		// 아이템 선택여부
+		// 품목 선택여부
 		if (f1.item.selectedIndex == 0) {
 			f1.item.focus();
 			return alert("아이템을 선택해주세요.");
-		}
-
-		// 품목 선택여부
-		if (f1.opt.selectedIndex == 0) {
-			f1.opt.focus();
-			return alert("품목을 선택해주세요.");
 		}
 
 		// 컬러 선택여부
@@ -682,18 +668,20 @@
 		}
 	}
 
-	//순서 선택
+	/**
+	 * 브랜드+년도+시즌+성별+품목값을 합친 값을 조회해서 같은 품번을 가지고있는 상품이 있으면 해당 상품의 스타일 넘버를 자동완성 시켜주고
+	 * 없을 시 새로운 스타일넘버를 입력하고 뒤에 (신규)라고 출력하는 부분
+	 */
 	let count = 0;
-	function sel_seq() {
+	function dulplicationStyleNo() {
 		count++;
-		let brand = document.getElementById('brand').value;
-		let year = document.getElementById('year').value;
-		let season = document.getElementById('season').value;
-		let gender = document.getElementById('gender').value;
-		let item = document.getElementById('item').value;
-		let opt = document.getElementById('opt').value;
+		let brand = $('#brand').val();
+		let year = $('#year').val();
+		let season = $('#season').val();
+		let gender = $('#gender').val();
+		let item = $('#item').val();
 
-		let prd_cd = brand+year+season+gender+item;
+		let prd_cd_p = brand + year + season + gender + item;
 
 		if (brand == "") {
 			$('#brand').focus();
@@ -709,57 +697,53 @@
 			alert('성별을 선택해주세요.');
 		} else if (item == "") {
 			$('#item').focus();
-			alert('아이템을 선택해주세요.');
-		} else if (opt == "") {
-			$('#opt').focus();
 			alert('품목을 선택해주세요.');
 		}
 			$.ajax({
 					method: 'post',
-					url: '/store/product/prd02/sel_seq',
+					url: '/store/product/prd02/dup-style-no',
 					data: {
-						prd_cd : prd_cd
+						prd_cd_p : prd_cd_p
 					},
 					success: function(data) {
 						if (data.code == '200') {
-							if (count == 1) {
-								if (data.result == '') {
-									let sel = "<option value=''>선택</option>"
-									let option = "<option value='01'>01 : 신규 생성</option>"
-									$('#seq').append(sel);
-									$('#seq').append(option);
-								} else {
-									let sel = "<option value=''>선택</option>"
-									$('#seq').append(sel);
-									let seq;
-									for(let i = 0; i < data.result.length; i++){
-										let pc = data.result[i].prd_cd;
-										seq = data.result[i].seq;
-										let option = "";
-										if (seq >= 10) {
-											option = '<option value='+ seq +'>'+ seq +' : '+ data.result[i].prd_nm +'</option>'
-										} else {
-											option = '<option value=0'+ seq +'>0'+ seq +' : '+ data.result[i].prd_nm +'</option>'
-										}
-										$('#seq').append(option);
-									}
-									let new_save = "";
-									if(seq >= 9){
-										new_save = '<option value='+ (seq+1) +'>'+ (seq+1) +' : 신규 생성</option>';
-									}else{
-										new_save = '<option value=0'+(seq+1) +'>0'+(seq+1) +' : 신규 생성</option>';
-									}
-									$('#seq').append(new_save);
-								}
-							}
+							// if (count == 1) {
+							// 	if (data.result == '') {
+							// 		let sel = "<option value=''>선택</option>"
+							// 		let option = "<option value='01'>01 : 신규 생성</option>"
+							// 		$('#seq').append(sel);
+							// 		$('#seq').append(option);
+							// 	} else {
+							// 		let sel = "<option value=''>선택</option>"
+							// 		$('#seq').append(sel);
+							// 		let seq;
+							// 		for(let i = 0; i < data.result.length; i++){
+							// 			let pc = data.result[i].prd_cd;
+							// 			seq = data.result[i].seq;
+							// 			let option = "";
+							// 			if (seq >= 10) {
+							// 				option = '<option value='+ seq +'>'+ seq +' : '+ data.result[i].prd_nm +'</option>'
+							// 			} else {
+							// 				option = '<option value=0'+ seq +'>0'+ seq +' : '+ data.result[i].prd_nm +'</option>'
+							// 			}
+							// 			$('#seq').append(option);
+							// 		}
+							// 		let new_save = "";
+							// 		if(seq >= 9){
+							// 			new_save = '<option value='+ (seq+1) +'>'+ (seq+1) +' : 신규 생성</option>';
+							// 		}else{
+							// 			new_save = '<option value=0'+(seq+1) +'>0'+(seq+1) +' : 신규 생성</option>';
+							// 		}
+							// 		$('#seq').append(new_save);
+							// 	}
+							// }
 						
 
-							$(document).on('change', '.prd_code', function(){
-								$('#seq').empty();
-								count = 0;
-							});
+							// $(document).on('change', '.prd_code', function(){
+							// 	$('#seq').empty();
+							// 	count = 0;
+							// });
 
-							// count = 0;
 						} else {
 							alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
 						}
@@ -804,66 +788,66 @@
 	
 
 	
-	//순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
-	function changeSelect() {
-		let selectList = document.getElementById('seq');
-		let option_text = selectList.options[selectList.selectedIndex].text;
-		let prd_nm = option_text.split(' : ');
+	// //순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
+	// function changeSelect() {
+	// 	let selectList = document.getElementById('seq');
+	// 	let option_text = selectList.options[selectList.selectedIndex].text;
+	// 	let prd_nm = option_text.split(' : ');
 
-		$.ajax({
-			method: 'post',
-			url: '/store/product/prd02/change_seq',
-			data: {
-				prd_nm : prd_nm[1],
-				prd_seq : prd_nm[0]
-			},
-			success: function(data) {
-				if (data.code == '200') {
-						if (prd_nm[1] != '신규 생성') {
-								document.getElementById('prd_nm').value = data.result[0].prd_nm;
-								document.getElementById('prd_nm_eng').value = data.result[0].prd_nm_eng;
-								document.getElementById('style_no').value = data.result[0].style_no;
-								document.getElementById('tag_price').value = data.result[0].tag_price;
-								document.getElementById('price').value = data.result[0].price;
-								document.getElementById('wonga').value = data.result[0].wonga;
-								document.getElementById('sup_com').value = data.result[0].com_id;
+	// 	$.ajax({
+	// 		method: 'post',
+	// 		url: '/store/product/prd02/change_seq',
+	// 		data: {
+	// 			prd_nm : prd_nm[1],
+	// 			prd_seq : prd_nm[0]
+	// 		},
+	// 		success: function(data) {
+	// 			if (data.code == '200') {
+	// 					if (prd_nm[1] != '신규 생성') {
+	// 							document.getElementById('prd_nm').value = data.result[0].prd_nm;
+	// 							document.getElementById('prd_nm_eng').value = data.result[0].prd_nm_eng;
+	// 							document.getElementById('style_no').value = data.result[0].style_no;
+	// 							document.getElementById('tag_price').value = data.result[0].tag_price;
+	// 							document.getElementById('price').value = data.result[0].price;
+	// 							document.getElementById('wonga').value = data.result[0].wonga;
+	// 							document.getElementById('sup_com').value = data.result[0].com_id;
 								
-								document.getElementById('prd_nm').readOnly = true;
-								document.getElementById('prd_nm_eng').readOnly = true;
-								document.getElementById('style_no').readOnly = true;
-								document.getElementById('tag_price').readOnly = true;
-								document.getElementById('price').readOnly = true;
-								document.getElementById('wonga').readOnly = true;
-								document.getElementById('sup_com').disabled = true;
+	// 							document.getElementById('prd_nm').readOnly = true;
+	// 							document.getElementById('prd_nm_eng').readOnly = true;
+	// 							document.getElementById('style_no').readOnly = true;
+	// 							document.getElementById('tag_price').readOnly = true;
+	// 							document.getElementById('price').readOnly = true;
+	// 							document.getElementById('wonga').readOnly = true;
+	// 							document.getElementById('sup_com').disabled = true;
 
-							} else {
-								document.getElementById('prd_nm').value = '';
-								document.getElementById('prd_nm_eng').value = '';
-								document.getElementById('style_no').value = '';
-								document.getElementById('tag_price').value = '';
-								document.getElementById('price').value = '';
-								document.getElementById('wonga').value = '';
-								document.getElementById('sup_com').value = '';
+	// 						} else {
+	// 							document.getElementById('prd_nm').value = '';
+	// 							document.getElementById('prd_nm_eng').value = '';
+	// 							document.getElementById('style_no').value = '';
+	// 							document.getElementById('tag_price').value = '';
+	// 							document.getElementById('price').value = '';
+	// 							document.getElementById('wonga').value = '';
+	// 							document.getElementById('sup_com').value = '';
 
 
-								document.getElementById('prd_nm').readOnly = false;
-								document.getElementById('prd_nm_eng').readOnly = false;
-								document.getElementById('style_no').readOnly = false;
-								document.getElementById('tag_price').readOnly = false;
-								document.getElementById('price').readOnly = false;
-								document.getElementById('wonga').readOnly = false;
-								document.getElementById('sup_com').disabled = false;
+	// 							document.getElementById('prd_nm').readOnly = false;
+	// 							document.getElementById('prd_nm_eng').readOnly = false;
+	// 							document.getElementById('style_no').readOnly = false;
+	// 							document.getElementById('tag_price').readOnly = false;
+	// 							document.getElementById('price').readOnly = false;
+	// 							document.getElementById('wonga').readOnly = false;
+	// 							document.getElementById('sup_com').disabled = false;
 
-							}
-						} else {
-							alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-						}
-					},
-					error: function(res, status, error) {
-						console.log(error);
-					}
-				});
-		}
+	// 						}
+	// 					} else {
+	// 						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+	// 					}
+	// 				},
+	// 				error: function(res, status, error) {
+	// 					console.log(error);
+	// 				}
+	// 			});
+	// 	}
 
 		// 상품관리(코드) 엑셀 일괄등록 팝업 오픈
 		const openBatchPopup = () => {

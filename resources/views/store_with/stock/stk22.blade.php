@@ -200,13 +200,26 @@
                     <h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14 text-danger font-weight-normal"></strong></h6>
                     <div class="d-flex justify-content-between mt-1">
                         <div class="d-flex">
-                            <span class="mr-2">보내는매장 매장구분</span>
-                            <select id="store_type" name="store_type" class="form-control form-control-sm mr-2" style="width:140px;">
-                                <option value="">전체</option>
-                                @foreach ($store_types as $store_type)
-                                    <option value='{{ $store_type->code_id }}' @if($store_type->code_id == '08') selected @endif>{{ $store_type->code_val }}</option>
-                                @endforeach
-                            </select>
+                            <span class="mr-2">보내는매장 판매채널 / 매장구분</span>
+                            <div class="d-flex align-items-center">
+                                <div class="flex_box w-100">
+                                    <select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+                                        <option value=''>전체</option>
+                                    @foreach ($store_channel as $sc)
+                                        <option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+                                <span class="mr-2 ml-2">/</span>
+                                <div class="flex_box w-100">
+                                    <select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled >
+                                        <option value=''>전체</option>
+                                    @foreach ($store_kind as $sk)
+                                        <option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="d-flex">
                             <p class="mr-2">(대표)창고재고 <span id="storage_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개</p>
@@ -414,7 +427,11 @@
         let gridDiv3 = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv3, rt_columns);
 
-        $("[name=store_type]").on("change", function(e) {
+        $("[name=store_channel]").on("change", function(e) {
+            SearchStock();
+        })
+
+        $("[name=store_channel_kind]").on("change", function(e) {
             SearchStock();
         })
 
@@ -443,8 +460,9 @@
         }
         if(!selected_prd.prd_cd) return alert("좌측에서 상품을 선택해주세요.");
 
-        let store_type = $("[name=store_type]").val();
-        let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
+        let store_channel = $("[name=store_channel]").val();
+        let store_channel_kind = $("[name=store_channel_kind]").val();
+        let data = 'prd_cd=' + selected_prd.prd_cd + "&store_channel=" + store_channel + "&store_channel_kind=" + store_channel_kind;
         gx2.Request('/store/stock/stk22/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
             $("#storage_stock").html(d.body[0]?.storage_qty + ' / ' + d.body[0]?.storage_wqty);
@@ -534,5 +552,52 @@
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
     }
+
+    // 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
+	$(document).ready(function() {
+		const store_channel = document.getElementById("store_channel");
+		const store_channel_kind = document.getElementById("store_channel_kind");
+
+		store_channel.addEventListener("change", () => {
+			if (store_channel.value) {
+				store_channel_kind.disabled = false;
+			} else {
+				store_channel_kind.disabled = true;
+			}
+		});
+	});
+
+	// 판매채널이 변경되면 해당 판매채널의 매장구분을 가져오는 부분
+	function chg_store_channel() {
+
+		const sel_channel = document.getElementById("store_channel").value;
+
+		$.ajax({
+			method: 'post',
+			url: '/store/standard/std02/show/chg-store-channel',
+			data: {
+				'store_channel' : sel_channel
+				},
+			dataType: 'json',
+			success: function (res) {
+				if(res.code == 200){
+					$('#store_channel_kind').empty();
+					let select =  $("<option value=''>전체</option>");
+					$('#store_channel_kind').append(select);
+
+					for(let i = 0; i < res.store_kind.length; i++) {
+						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+						$('#store_channel_kind').append(option);
+					}
+
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
+	}	
 </script>
 @stop

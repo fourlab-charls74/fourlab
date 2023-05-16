@@ -28,6 +28,28 @@ class stk16Controller extends Controller
 
     public function index()
     {
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $values = [
             'sdate' => now()->sub(1, 'week')->format('Y-m-d'),
             'edate' => date("Y-m-d"),
@@ -36,7 +58,9 @@ class stk16Controller extends Controller
             'rel_states' => $this->rel_states, // 출고상태
             'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
             'types' => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
-            'opts' => SLib::getCodes("PRD_MATERIAL_OPT") // 원부자재 품목
+            'opts' => SLib::getCodes("PRD_MATERIAL_OPT"), // 원부자재 품목
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
 
         return view(Config::get('shop.store.view') . '/stock/stk16', $values);
@@ -80,8 +104,6 @@ class stk16Controller extends Controller
             $where .= " and psr.state = '" . Lib::quote($req['state']) . "'";
         if ($req['ext_done_state'] ?? '' != '')
             $where .= " and psr.state != '40'";
-        if ($req['store_type'] != null)
-            $where .= " and s.store_type = '" . Lib::quote($req['store_type']) . "'";
         if (isset($req['store_no']))
             $where .= " and s.store_cd = '" . Lib::quote($req['store_no']) . "'";
         if ($req['prd_cd_sub'] != null) {
@@ -92,6 +114,8 @@ class stk16Controller extends Controller
             }
             $where .= ")";
         }
+        if ($req['store_channel'] != '') $where .= "and s.store_channel ='" . Lib::quote($req['store_channel']). "'";
+        if ($req['store_channel_kind'] ?? '' != '') $where .= "and s.store_channel_kind ='" . Lib::quote($req['store_channel_kind']). "'";
 
         // ordreby
         $ord = $req['ord'] ?? 'desc';

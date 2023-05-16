@@ -15,10 +15,34 @@ class sal21Controller extends Controller
 {
 	public function index()
 	{
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $values = [
             'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
             'edate' => date('Y-m-d'),
             'store_types' => SLib::getStoreTypes(),
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
         return view(Config::get('shop.store.view') . '/sale/sal21', $values);
 	}
@@ -28,17 +52,17 @@ class sal21Controller extends Controller
         $sdate = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
         $edate = $request->input('edate', date('Y-m-d'));
         $next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
-        $store_type = $request->input('store_type', '');
         $store_cds = $request->input('store_no', []);
         $close_yn = $request->input('close_yn', 'N');
         $prd_cds = $request->input('prd_cd', '');
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $ext_term_qty = $request->input('ext_term_qty', ''); // 기간재고 0 제외여부
+        $store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         $where = "";
         $store_where = "";
 
-        if ($store_type != '') $where .= " and store.store_type = '$store_type' ";
         if ($prd_cds != '') {
 			$prd_cd = explode(',', $prd_cds);
 			$where .= " and (1!=1";
@@ -54,6 +78,8 @@ class sal21Controller extends Controller
         } else if ($close_yn == 'Y') {
             $where .= " and (store.edate != '' and store.edate is not null and store.edate < date_format(now(), '%Y%m%d')) ";
         }
+        if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
         // store_where
 		foreach($store_cds as $key => $cd) {

@@ -19,6 +19,28 @@ class comm01Controller extends Controller
 {
     public function index($notice_id, Request $request)
     {
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
 
@@ -26,7 +48,9 @@ class comm01Controller extends Controller
             'store_types' => SLib::getCodes("STORE_TYPE"),
             'store_notice_type' => strval($notice_id),
             'sdate' => $sdate,
-            'edate' => date("Y-m-d")
+            'edate' => date("Y-m-d"),
+            'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
         ];
         return view(Config::get('shop.store.view') . '/community/comm01', $values);
     }
@@ -42,15 +66,16 @@ class comm01Controller extends Controller
         $subject = $request->input('subject', '');
         $content = $request->input('content', '');
         $store_no = $request->input('store_no', '');
-        $store_type    = $request->input("store_type", '');
+        $store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         $where = "";
         $orderby = "";
         if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
         if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
-        if ($store_type != "") $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
-
+        if ($store_channel != "") $where .= " and a.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= " and a.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "s.rt";

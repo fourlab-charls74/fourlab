@@ -18,6 +18,27 @@ class prd03Controller extends Controller
 
 	public function index() 
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
 
 		$mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
@@ -45,6 +66,8 @@ class prd03Controller extends Controller
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
 			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd03',$values);
@@ -65,6 +88,8 @@ class prd03Controller extends Controller
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 		$ext_store_qty = $request->input("ext_store_qty", "");
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$limit = $request->input("limit", 100);
 		$ord = $request->input('ord','desc');
@@ -100,11 +125,11 @@ class prd03Controller extends Controller
 			$store_qty_sql	= "pss.qty";
 		}
 
-		if( $store_no == "" && $store_type != "" ){
+		if( $store_no == "" && $store_channel != "" ){
 			$in_store_sql	= " inner join product_stock_store pss3 on pc.prd_cd = pss3.prd_cd ";
 
-			$sql	= " select store_cd from store where store_type = :store_type and use_yn = 'Y' ";
-			$result = DB::select($sql,['store_type' => $store_type]);
+			$sql	= " select store_cd from store where store_channel = :store_channel and use_yn = 'Y' ";
+			$result = DB::select($sql,['store_channel' => $store_channel]);
 
 			$where	.= " and (1!=1";
 			foreach($result as $row){
@@ -113,6 +138,20 @@ class prd03Controller extends Controller
 			$where	.= ")";
 
 		}
+
+		if( $store_no == "" && $store_channel != "" && $store_channel_kind != ""){
+			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+
+			$sql	= " select store_cd from store where store_channel = :store_channel and store_channel_kind = :store_channel_kind and use_yn = 'Y' ";
+			$result = DB::select($sql,['store_channel' => $store_channel, 'store_channel_kind' => $store_channel_kind]);
+
+			$where	.= " and (1!=1";
+			foreach($result as $row){
+				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+			}
+			$where	.= ")";
+		}
+
 
 		// $where3 = "";
 		// if ($store_no != "") $where3 .= "and pss.store_cd = '$store_no'";
