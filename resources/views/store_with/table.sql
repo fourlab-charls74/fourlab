@@ -1141,7 +1141,7 @@ CREATE TABLE `search_shortcut` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='검색어 바로가기';
 
 
---판매채널관리
+-- 판매채널관리
 CREATE TABLE `store_channel` (
   `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '인덱스',
   `store_type` char(1) DEFAULT NULL COMMENT '구분 (C : 판매채널, S : 매장구분)',

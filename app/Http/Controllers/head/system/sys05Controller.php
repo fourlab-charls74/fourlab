@@ -526,6 +526,7 @@ class sys05Controller extends Controller
         $phone = $request->input('phone');
         $domain = $request->input('domain');
         $domain_bizest = $request->input('domain_bizest');
+		$domain_bizest_new = $request->input('domain_bizest_new');
         $email = $request->input('email');
         $title = $request->input('title');
         $title_main = $request->input('title_main');
@@ -675,6 +676,9 @@ class sys05Controller extends Controller
 
                 $sql_domain_bizest = "update conf set value='$domain_bizest', ut = '$ut' where type='shop' and name='domain_bizest'";
                 DB::update($sql_domain_bizest);
+
+				$sql_domain_bizest_new = "update conf set value='$domain_bizest_new', ut = '$ut' where type='shop' and name='domain_bizest_new'";
+				DB::update($sql_domain_bizest_new);
 
                 $sql_email = "update conf set value='$email', ut = '$ut' where type='shop' and name='email'";
                 DB::update($sql_email);

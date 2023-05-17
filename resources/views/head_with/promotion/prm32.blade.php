@@ -69,15 +69,15 @@
 
 <script>
     const columns = [
-        {field:"idx" , headerName:"번호", cellStyle:{'text-align' : 'center'}},
-        {field:"kwd",headerName:"검색어",width:130, type:"SearchDetailType", cellStyle:{'text-align' : 'center'}},
+        {field:"idx" , headerName:"번호", cellClass: 'hd-grid-code'},
+        {field:"kwd",headerName:"검색어",width:130, type:"SearchDetailType"},
         {field:"url" , headerName:"URL", width:250},
-        {field:"disp_yn",headerName:"검색창출력", cellStyle:{'text-align' : 'center'}},
+        {field:"disp_yn",headerName:"검색창출력", cellClass: 'hd-grid-code'},
         {field:"pv" , headerName:"검색횟수", type:"currencyType"},
-        {field:"st" , headerName:"최근검색일시", width:130},
-        {field:"use_yn", headerName:"사용여부", cellStyle:{'text-align' : 'center'}},
-        {field:"rt", headerName:"등록일시", width:130, cellStyle:{'text-align' : 'center'}},
-        {field:"ut" , headerName:"수정일시", width:130, cellStyle:{'text-align' : 'center'}},
+        {field:"st" , headerName:"최근검색일시", type: 'DateTimeType'},
+        {field:"use_yn", headerName:"사용여부", cellClass: 'hd-grid-code'},
+        {field:"rt", headerName:"등록일시", type: 'DateTimeType'},
+        {field:"ut" , headerName:"수정일시", type: 'DateTimeType'},
         { width: "auto" }
     ];
     const pApp = new App('', {

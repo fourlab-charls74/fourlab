@@ -192,9 +192,9 @@
 				data: data,
 				success: function (res) {
                     if (IDX) {
-                        alert("변경된 내용이 정상적으로 저장 되었습니다.");
+                        alert("변경된 내용이 정상적으로 저장되었습니다.");
                     } else {
-                        alert("정상적으로 등록 되었습니다.");
+                        alert("정상적으로 등록되었습니다.");
                     }
 					opener.Search(1);
 					window.close();

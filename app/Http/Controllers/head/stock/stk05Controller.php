@@ -31,6 +31,8 @@ class stk05Controller extends Controller
         // 일자
         $sdate = $request->input("sdate");
         $edate = $request->input("edate");
+        $sdate = str_replace('-', '', $sdate);
+        $edate = str_replace('-', '', $edate);
 
         // 브랜드
         $brand_nm = $request->input("brand_nm");

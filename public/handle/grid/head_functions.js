@@ -550,38 +550,3 @@ function stringCut(str, max_length){
 
 	return str.substring(0, i);
 }
-
-/* grid selected cell delete & backspace key 클릭 시 내용 삭제 기능 관련 */
-function getDeleteCellColumnObject() {
-    return {
-        suppressKeyboardEvent: params => {
-            if (!params.editing) {
-                let isBackspaceKey = params.event.keyCode === 8;
-                let isDeleteKey = params.event.keyCode === 46;
-
-                if(isDeleteKey || isBackspaceKey){
-                    params.api.getCellRanges().forEach(r => {
-                        const editable_obj = r.columns.reduce((a,c) => ({...a, [c.colId]: c.userProvidedColDef.editable}), {});
-                        let colIds = r.columns.map(col => col.colId);
-                        let startRowIndex = Math.min(r.startRow.rowIndex, r.endRow.rowIndex);
-                        let endRowIndex = Math.max(r.startRow.rowIndex, r.endRow.rowIndex);
-
-                        let itemsToUpdate = [];
-
-                        for (let i = startRowIndex; i <= endRowIndex; i++) {
-                            let data = params.api.rowModel.rowsToDisplay[i].data;
-                            colIds.forEach(column => {
-                                if(editable_obj[column]) {
-                                    data[column] = "";
-                                }
-                            });
-                            itemsToUpdate.push(data);
-                        }
-                        params.api.applyTransaction({ update: itemsToUpdate });
-                    });
-                }
-            }
-            return false;
-        },
-    }
-}

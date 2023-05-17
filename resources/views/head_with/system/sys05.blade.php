@@ -13,7 +13,7 @@
 <div class="card shadow mb-1">
     <div class="card-body">
         <div style="text-align:right;">
-            <a href="/head/system/sys04" id="code_view" class="btn btn-sm btn-primary shadow-sm">코드별 보기</a>
+            <a href="/head/system/sys04" id="code_view" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-sync fs-16"></i> 코드별 보기</a>
         </div>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
