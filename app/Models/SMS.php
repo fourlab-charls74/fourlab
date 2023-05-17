@@ -185,4 +185,91 @@ class SMS
         }
 	}
 
+	public function SendAligoSMS( $phone, $msg, $name,$callback = '1566-8911' )
+	{
+		$apikey		= "ytzme8l0zjqg17dej17phjm6cn6phugf";
+		$userid		= "alpeninter";
+		$sender		= $callback;
+		$phone		= str_replace("-", "", $phone);
+
+		/**************** 문자전송하기 예제 필독항목 ******************/
+		// 동일내용의 문자내용을 다수에게 동시 전송하실 수 있습니다
+		// 대량전송시에는 반드시 컴마분기하여 1천건씩 설정 후 이용하시기 바랍니다. (1건씩 반복하여 전송하시면 초당 10~20건정도 발송되며 컨텍팅이 지연될 수 있습니다.)
+		// 전화번호별 내용이 각각 다른 문자를 다수에게 보내실 경우에는 send 가 아닌 send_mass(예제:curl_send_mass.html)를 이용하시기 바랍니다.
+
+		/****************** 인증정보 시작 ******************/
+		$sms_url		= "https://apis.aligo.in/send/";		// 전송요청 URL
+		$sms['user_id']	= $userid;								// SMS 아이디
+		$sms['key']		= $apikey;								//인증키
+		/****************** 인증정보 끝 ********************/
+
+		/****************** 전송정보 설정시작 ****************/
+		$sms['msg']			= stripslashes(iconv("UTF-8", "UTF-8", $msg));					// 메세지 내용 : utf-8로 치환이 가능한 문자열만 사용하실 수 있습니다. (이모지 사용불가능)
+		$sms['receiver']	= $phone;								// 수신번호
+		$sms['destination']	= $phone . "|" . iconv("UTF-8", "UTF-8", $name);					// 수신인 %고객명% 치환
+		$sms['sender']		= $sender;								// 발신번호
+		$sms['rdate']		= "";									// 예약일자 - 20161004 : 2016-10-04일기준
+		$sms['rtime']		= "";									// 예약시간 - 1930 : 오후 7시30분
+		$sms['testmode_yn']	= "";									// Y 인경우 실제문자 전송X , 자동취소(환불) 처리
+		$sms['title']		= "";									//  LMS, MMS 제목 (미입력시 본문중 44Byte 또는 엔터 구분자 첫라인)
+		// $sms['image']	= '/tmp/pic_57f358af08cf7_sms_.jpg';	// MMS 이미지 파일 위치 (저장된 경로)
+		$sms['msg_type']	= "SMS";								//  SMS, LMS, MMS등 메세지 타입을 지정
+		// ※ msg_type 미지정시 글자수/그림유무가 판단되어 자동변환됩니다. 단, 개행문자/특수문자등이 2Byte로 처리되어 SMS 가 LMS로 처리될 가능성이 존재하므로 반드시 msg_type을 지정하여 사용하시기 바랍니다.
+		/****************** 전송정보 설정끝 ***************/
+
+		/*****/
+		$host_info	= explode("/", $sms_url);
+		$port		= $host_info[0] == 'https:' ? 443 : 80;
+
+		$oCurl		= curl_init();
+		curl_setopt($oCurl, CURLOPT_PORT, $port);
+		curl_setopt($oCurl, CURLOPT_URL, $sms_url);
+		curl_setopt($oCurl, CURLOPT_POST, 1);
+		curl_setopt($oCurl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($oCurl, CURLOPT_POSTFIELDS, $sms);
+		curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, FALSE);
+		$ret = curl_exec($oCurl);
+		curl_close($oCurl);
+
+		//echo $ret;
+		$retArr = json_decode($ret); // 결과배열
+		// print_r($retArr); // Response 출력 (연동작업시 확인용)
+
+		//로그 데이터 저장
+		$sql = "
+			insert into aligo_log (
+				apikey, userid, token, senderkey, tpl_code, sender, receiver, recvname, subject, message, button, regdate
+			) values (
+				:apikey, :userid, :token, :senderkey, :tpl_code, :sender, :receiver, :recvname, :subject, :message, :button, now()
+			)
+		";
+		DB::insert($sql,
+			[
+				"apikey"	=> $apikey,
+				"userid"	=> $userid,
+				"token"		=> "",
+				"senderkey"	=> "",
+				"tpl_code"	=> "SMS",
+				"sender"	=> $sender,
+				"receiver"	=> $phone,
+				"recvname"	=> $name,
+				"subject"	=> "",
+				"message"	=> $msg,
+				"button"	=> ""
+			]
+		);
+
+		if( $retArr->result_code == "1" )	return "1";
+		else								return "0";
+
+		/**** Response 항목 안내 ****/
+		// result_code : 전송성공유무 (성공:1 / 실패: -100 부터 -999)
+		// message : success (성공시) / reserved (예약성공시) / 그외 (실패상세사유가 포함됩니다)
+		// msg_id : 메세지 고유ID = 고유값을 반드시 기록해 놓으셔야 sms_list API를 통해 전화번호별 성공/실패 유무를 확인하실 수 있습니다
+		// error_cnt : 에러갯수 = receiver 에 포함된 전화번호중 문자전송이 실패한 갯수
+		// success_cnt : 성공갯수 = 이동통신사에 전송요청된 갯수
+		// msg_type : 전송된 메세지 타입 = SMS / LMS / MMS (보내신 타입과 다른경우 로그로 기록하여 확인하셔야 합니다)
+		/**** Response 예문 끝 ****/
+	}
+
 }
