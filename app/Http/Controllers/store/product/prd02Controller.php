@@ -1169,7 +1169,6 @@ class prd02Controller extends Controller
 
 	public function save_product(Request $request){
 		$admin_id = Auth('head')->user()->id;
-        $data = $request->input("data");
 		$sel_data = $request->input("sel_data");
 
 		try {
@@ -1183,28 +1182,27 @@ class prd02Controller extends Controller
 				$season		= $row['season'];
 				$gender		= $row['gender'];
 				$item 		= $row['item'];
-				$opt 		= $row['opt'];
 				$color 		= $row['color'];
 				$size 		= $row['size'];
 				$prd_nm		= $row['prd_nm'];
 				$prd_nm_eng	= $row['prd_nm_eng']??'';
 				$style_no 	= $row['style_no'];
 				$sup_com 	= $row['sup_com'];
-				
-				$seq 		= $row['seq'];
 				$price 		= $row['price'];
 				$wonga 		= $row['wonga'];
 				$tag_price 	= $row['tag_price'];
+				$plan_category 	= $row['plan_category'];
+
 
 				$brand 		= explode(' : ', $brand);
 				$year 		= explode(' : ', $year);
 				$season 	= explode(' : ', $season);
 				$gender 	= explode(' : ', $gender);
 				$item 		= explode(' : ', $item);
-				$opt 		= explode(' : ', $opt);
 				$color 		= explode(' : ', $color);
 				$size 		= explode(' : ', $size);
 				$sup_com 	= explode(' : ', $sup_com);
+				$plan_category 	= explode(' : ', $plan_category);
 
 				$unit = "";
 
@@ -1241,26 +1239,26 @@ class prd02Controller extends Controller
 					$base64_src = $row['image'];
 					$save_path = "/images/prd02";
 
-					$unique_img_name = $prd_cd . $seq;
+					$unique_img_name = $prd_cd . $style_no;
 
 					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 
-					$prd_cd_p	= $brand[0] . $year[0] . $season[0] . $gender[0] . $item[0] . $seq . $opt[0];
+					$prd_cd_p	= $brand[0] . $year[0] . $season[0] . $gender[0] . $item[0] . $style_no;
 		
 					DB::table('product_code')->insert([
 						'prd_cd'	=> $prd_cd,
 						'prd_cd_p'	=> $prd_cd_p,
-						'seq'		=> $seq,
 						'goods_no'	=> $goods_no,
+						'style_no'	=> $style_no,
 						'goods_opt'	=> $goods_opt,
 						'brand'		=> $brand[0],
 						'year'		=> $year[0],
 						'season'	=> $season[0],
 						'gender'	=> $gender[0],
 						'item'		=> $item[0],
-						'opt'		=> $opt[0],
 						'color'		=> $color[0],
 						'size'		=> $size[0],
+						'plan_category' => $plan_category[0],
 						'rt'		=> now(),
 						'ut'		=> now(),
 						'admin_id'	=> $admin_id
@@ -1268,7 +1266,6 @@ class prd02Controller extends Controller
 					
 					DB::table('product_image')->insert([
 						'prd_cd' => $prd_cd,
-						'seq' => $seq,
 						'img_url' => $img_url,
 						'rt' => now(),
 						'ut' => now(),
@@ -1366,24 +1363,22 @@ class prd02Controller extends Controller
 		$brand = $request->input('brand');
 		$year = $request->input('year');
 		$season = $request->input('season');
+		$gender = $request->input('gender');
 		$item = $request->input('item');
-		$opt = $request->input('opt');
 
 		$sql = " 
-			select ifnull(max(seq),'00') as seq 
+			select *
 			from product_code 
 			where 
 				brand = :brand
 				and year = :year
 				and season = :season
 				and item = :item
-				and opt = :opt
+				and gender = :gender
 		";
-		$result	= DB::selectOne($sql, ['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
-		$seq = $result->seq + 1;
-		if (strlen($seq) == "1") $seq = "0" . $seq;
+		$result	= DB::selectOne($sql, ['brand' => $brand, 'year' => $year, 'season' => $season, 'item' => $item, 'gender' => $gender]);
 
-		return response()->json(['seq' => $seq , 'code' => 200]);
+		return response()->json(['result' => $result , 'code' => 200]);
 	}
 
 	public function delImg(Request $request)

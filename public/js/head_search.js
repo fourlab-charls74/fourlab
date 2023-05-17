@@ -96,6 +96,63 @@ $( document ).ready(function() {
         }
     });
 
+    
+    $(".dup-style-no").on('focus', function() {
+
+        console.log('포커스 인');
+        let brand = $('#brand').val();
+        let year = $('#year').val();
+        let season = $('#season').val();
+        let gender = $('#gender').val();
+        let item = $('#item').val();
+    
+        $(this).autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    method: 'get',
+                    url: '/head/auto-complete/dup-style-no',
+                    data: {
+                        brand: brand,
+                        year: year,
+                        season: season,
+                        gender: gender,
+                        item: item
+                    },
+                    success: function(data) {
+                        response(data);
+                    },
+                    error: function(request, status, error) {
+                        console.log("error");
+                    }
+                });
+            },
+            minLength: 0,
+            autoFocus: false,
+            delay: 100,
+            create: function(event, ui) {
+                $(this).data('ui-autocomplete')._renderItem = function(ul, item) {
+                    let txt;
+                    if (item.img !== undefined && item.img !== "") {
+                        txt = '<div><img src=\"' + item.img + '\" style=\"width:30px\" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + item.label + '</div>';
+                    } else {
+                        txt = '<div>' + item.label + '</div>';
+                    }
+                    return $("<li>")
+                        .append(txt)
+                        .appendTo(ul);
+                };
+            },
+            response: function(event, ui) {
+                if (ui.content.length === 0) {
+                    ui.content.push({ label: '신규', value: '' });
+                }
+            },
+            focus: function() {
+                $(this).autocomplete("search", "");
+            }
+        });
+    });
+
     $(".ac-brand").autocomplete({
         //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
         source : function(request, response) {

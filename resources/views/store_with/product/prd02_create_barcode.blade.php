@@ -122,7 +122,7 @@
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
-													<input type='text' class="form-control form-control-sm" name='style_no' id="style_no" value=''>
+													<input type='text' class="form-control form-control-sm dup-style-no" name='style_no' id="style_no" value='' onfocus="dulplicationStyleNo();">
 												</div>
 											</td>
 										</tr>
@@ -153,10 +153,10 @@
 												<div class="flax_box">
 													<select name='plan_category' id="plan_category" class="form-control form-control-sm">
 														<option value=''>선택</option>
-														<option value='01'>정상매장</option>
-														<option value='02'>전매장</option>
-														<option value='03'>이월취급점</option>
-														<option value='04'>아울렛전용</option>
+														<option value='01'>01 : 정상매장</option>
+														<option value='02'>02 : 전매장</option>
+														<option value='03'>03 : 이월취급점</option>
+														<option value='04'>04 : 아울렛전용</option>
 													</select>
 												</div>
 											</td>
@@ -270,8 +270,7 @@
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null},
 		{field: "brand", headerName: "브랜드", width: 70},
 		{field: "image_url", headerName: "이미지 경로", hide: true},
-		{field: "opt", headerName: "품목", width: 80},
-		{field: "item", headerName: "하위품목", width: 80},
+		{field: "item", headerName: "품목", width: 80},
 		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
 		},
@@ -285,14 +284,14 @@
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
 		{field: "style_no", headerName: "스타일넘버", width: 100},
-		{field: "seq", headerName: "순서", width: 50},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
+		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
 		{field: "year", headerName: "년도", width: 80},
 		{field: "season", headerName: "시즌",width: 80},
 		{field: "gender", headerName: "성별", width: 80},
 		{field: "sup_com", headerName: "공급업체", width: 120},
+		{field: "plan_category", headerName: "기획구분", width: 120},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -358,8 +357,8 @@
 				brand: document.f1.brand.value,
 				year: document.f1.year.value,
 				season: document.f1.season.value,
+				gender: document.f1.gender.value,
 				item: document.f1.item.value,
-				opt: document.f1.opt.value
 			}
 
 		});
@@ -368,17 +367,17 @@
 		if (code == 200) {
 
 			const idx = added_rows.length;
-			const seq = document.f1.seq.value;
 			const brand = document.f1.brand.value;
-			
+			let style_no_value = document.f1.style_no.value;
+			let style_no = style_no_value.padStart(8, '0');
+
 			const no_color_size_prd_cd = 
 				brand
 				+ document.f1.year.value
 				+ document.f1.season.value
 				+ document.f1.gender.value
 				+ document.f1.item.value
-				+ seq
-				+ document.f1.opt.value
+				+ style_no
 			;
 
 			const prd_cd = no_color_size_prd_cd + document.f1.color.value + document.f1.size.value;
@@ -391,19 +390,18 @@
 				gender: document.f1.gender.value,
 				item: document.f1.item.value,
 				image: added_base64_image,
-				opt: document.f1.opt.value,
 				color: document.f1.color.value,
 				size: document.f1.size.value,
 				prd_nm: document.f1.prd_nm.value,
 				prd_nm_eng: document.f1.prd_nm_eng.value,
-				style_no: document.f1.style_no.value,
+				style_no: style_no,
 				sup_com: document.f1.sup_com.value,
 				year: document.f1.year.value,
 				prd_cd: prd_cd,
-				seq: seq,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value,
-                tag_price: document.f1.tag_price.value
+                tag_price: document.f1.tag_price.value,
+				plan_category : document.f1.plan_category.value
 			});
 
 			let rows = {
@@ -414,19 +412,19 @@
 				gender: document.f1.gender[document.f1.gender.selectedIndex].text,
 				item: document.f1.item[document.f1.item.selectedIndex].text,
 				image: added_base64_image,
-				opt: document.f1.opt[document.f1.opt.selectedIndex].text,
 				color: document.f1.color[document.f1.color.selectedIndex].text,
 				size: document.f1.size[document.f1.size.selectedIndex].text,
 				prd_nm: document.f1.prd_nm.value,
 				prd_nm_eng: document.f1.prd_nm_eng.value,
-				style_no: document.f1.style_no.value,
+				style_no: style_no,
 				sup_com: document.f1.sup_com[document.f1.sup_com.selectedIndex].text,
 				year: document.f1.year[document.f1.year.selectedIndex].text,
 				prd_cd: no_color_size_prd_cd,
-				seq: seq,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value,
-                tag_price: document.f1.tag_price.value
+                tag_price: document.f1.tag_price.value,
+				plan_category: document.f1.plan_category[document.f1.plan_category.selectedIndex].text,
+
 			};
 
 			addRow(rows);
@@ -463,7 +461,13 @@
 		// 품목 선택여부
 		if (f1.item.selectedIndex == 0) {
 			f1.item.focus();
-			return alert("아이템을 선택해주세요.");
+			return alert("품목을 선택해주세요.");
+		}
+
+		// 스타일넘버 입력여부
+		if (f1.style_no.value.trim() === '') {
+			f1.style_no.focus();
+			return alert("스타일넘버를 입력해주세요.");
 		}
 
 		// 컬러 선택여부
@@ -478,6 +482,12 @@
 			return alert("사이즈를 선택해주세요.");
 		}
 
+		// 기획구분 선택여부
+		if (f1.plan_category.selectedIndex == 0) {
+			f1.plan_category.focus();
+			return alert("기획구분을 선택해주세요.");
+		}
+
 		// 상품명 입력여부
 		if (f1.prd_nm.value.trim() === '') {
 			f1.prd_nm.focus();
@@ -490,10 +500,10 @@
 			return alert("상품명(영문)을 입력해주세요.");
 		}
 
-		// 스타일넘버 입력여부
-		if (f1.style_no.value.trim() === '') {
-			f1.style_no.focus();
-			return alert("스타일넘버를 입력해주세요.");
+		// 공급업체 선택여부
+		if (f1.sup_com.selectedIndex == 0) {
+			f1.sup_com.focus();
+			return alert("공급업체를 선택해주세요.");
 		}
 
 		// 원가 입력여부
@@ -686,72 +696,31 @@
 		if (brand == "") {
 			$('#brand').focus();
 			alert('브랜드를 선택해주세요.');
+			return false;
 		} else if (year == "") {
 			$('#year').focus();
 			alert('년도를 선택해주세요.');
+			return false;
 		} else if (season == "") {
 			$('#season').focus();
 			alert('시즌을 선택해주세요.');
+			return false;
 		} else if (gender == "") {
 			$('#gender').focus();
 			alert('성별을 선택해주세요.');
+			return false;
 		} else if (item == "") {
 			$('#item').focus();
 			alert('품목을 선택해주세요.');
+			return false;
 		}
-			$.ajax({
-					method: 'post',
-					url: '/store/product/prd02/dup-style-no',
-					data: {
-						prd_cd_p : prd_cd_p
-					},
-					success: function(data) {
-						if (data.code == '200') {
-							// if (count == 1) {
-							// 	if (data.result == '') {
-							// 		let sel = "<option value=''>선택</option>"
-							// 		let option = "<option value='01'>01 : 신규 생성</option>"
-							// 		$('#seq').append(sel);
-							// 		$('#seq').append(option);
-							// 	} else {
-							// 		let sel = "<option value=''>선택</option>"
-							// 		$('#seq').append(sel);
-							// 		let seq;
-							// 		for(let i = 0; i < data.result.length; i++){
-							// 			let pc = data.result[i].prd_cd;
-							// 			seq = data.result[i].seq;
-							// 			let option = "";
-							// 			if (seq >= 10) {
-							// 				option = '<option value='+ seq +'>'+ seq +' : '+ data.result[i].prd_nm +'</option>'
-							// 			} else {
-							// 				option = '<option value=0'+ seq +'>0'+ seq +' : '+ data.result[i].prd_nm +'</option>'
-							// 			}
-							// 			$('#seq').append(option);
-							// 		}
-							// 		let new_save = "";
-							// 		if(seq >= 9){
-							// 			new_save = '<option value='+ (seq+1) +'>'+ (seq+1) +' : 신규 생성</option>';
-							// 		}else{
-							// 			new_save = '<option value=0'+(seq+1) +'>0'+(seq+1) +' : 신규 생성</option>';
-							// 		}
-							// 		$('#seq').append(new_save);
-							// 	}
-							// }
-						
 
-							// $(document).on('change', '.prd_code', function(){
-							// 	$('#seq').empty();
-							// 	count = 0;
-							// });
+		// 키보드의 아무 키나 누릅니다.
+		document.getElementById("style_no").focus();
+  		document.getElementById("style_no").dispatchEvent(new KeyboardEvent("keydown", { keyCode: 30 }));
 
-						} else {
-							alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-						}
-					},
-					error: function(res, status, error) {
-						console.log(error);
-					}
-				});
+
+			
 		}
 
 	//성별에 따라 사이즈 값 다르게 출력
@@ -784,71 +753,7 @@
 			}
 		});
 	}
-
 	
-
-	
-	// //순서에 신규생성이 아닌 값을 클릭시 하위 목록 자동 입력 및 비활성화하는 부분
-	// function changeSelect() {
-	// 	let selectList = document.getElementById('seq');
-	// 	let option_text = selectList.options[selectList.selectedIndex].text;
-	// 	let prd_nm = option_text.split(' : ');
-
-	// 	$.ajax({
-	// 		method: 'post',
-	// 		url: '/store/product/prd02/change_seq',
-	// 		data: {
-	// 			prd_nm : prd_nm[1],
-	// 			prd_seq : prd_nm[0]
-	// 		},
-	// 		success: function(data) {
-	// 			if (data.code == '200') {
-	// 					if (prd_nm[1] != '신규 생성') {
-	// 							document.getElementById('prd_nm').value = data.result[0].prd_nm;
-	// 							document.getElementById('prd_nm_eng').value = data.result[0].prd_nm_eng;
-	// 							document.getElementById('style_no').value = data.result[0].style_no;
-	// 							document.getElementById('tag_price').value = data.result[0].tag_price;
-	// 							document.getElementById('price').value = data.result[0].price;
-	// 							document.getElementById('wonga').value = data.result[0].wonga;
-	// 							document.getElementById('sup_com').value = data.result[0].com_id;
-								
-	// 							document.getElementById('prd_nm').readOnly = true;
-	// 							document.getElementById('prd_nm_eng').readOnly = true;
-	// 							document.getElementById('style_no').readOnly = true;
-	// 							document.getElementById('tag_price').readOnly = true;
-	// 							document.getElementById('price').readOnly = true;
-	// 							document.getElementById('wonga').readOnly = true;
-	// 							document.getElementById('sup_com').disabled = true;
-
-	// 						} else {
-	// 							document.getElementById('prd_nm').value = '';
-	// 							document.getElementById('prd_nm_eng').value = '';
-	// 							document.getElementById('style_no').value = '';
-	// 							document.getElementById('tag_price').value = '';
-	// 							document.getElementById('price').value = '';
-	// 							document.getElementById('wonga').value = '';
-	// 							document.getElementById('sup_com').value = '';
-
-
-	// 							document.getElementById('prd_nm').readOnly = false;
-	// 							document.getElementById('prd_nm_eng').readOnly = false;
-	// 							document.getElementById('style_no').readOnly = false;
-	// 							document.getElementById('tag_price').readOnly = false;
-	// 							document.getElementById('price').readOnly = false;
-	// 							document.getElementById('wonga').readOnly = false;
-	// 							document.getElementById('sup_com').disabled = false;
-
-	// 						}
-	// 					} else {
-	// 						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-	// 					}
-	// 				},
-	// 				error: function(res, status, error) {
-	// 					console.log(error);
-	// 				}
-	// 			});
-	// 	}
-
 		// 상품관리(코드) 엑셀 일괄등록 팝업 오픈
 		const openBatchPopup = () => {
 			const url = '/store/product/prd02/batch';

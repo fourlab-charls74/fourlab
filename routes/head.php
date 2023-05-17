@@ -56,6 +56,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('/template', 'AutoCompleteController@template');
         Route::get('/template-q', 'AutoCompleteController@template_q');
         Route::get('/style-no', 'AutoCompleteController@style_no');
+        Route::get('/dup-style-no', 'AutoCompleteController@dup_style_no');
         Route::get('/brand', 'AutoCompleteController@brand');
         Route::get('/company', 'AutoCompleteController@company');
         Route::get('/sup_company', 'AutoCompleteController@sup_company');

@@ -137,6 +137,36 @@ class AutoCompleteController extends Controller
 
     }
 
+    public function dup_style_no(Request $request)
+    {
+        $brand = $request->input('brand');
+        $year = $request->input('year');
+        $season = $request->input('season');
+        $gender = $request->input('gender');
+        $item = $request->input('item');
+
+        $prd_cd_p = $brand . $year . $season . $gender . $item;
+
+
+        $sql = "
+            select 
+                g.style_no as label
+                , g.goods_no
+                , concat(:image_svr,REPLACE(g.img,'_a_500','_s_50')) AS img
+            from goods g
+            left outer join product p on p.style_no = g.style_no
+            where p.prd_cd like '$prd_cd_p%'
+            limit 0, 10
+        ";
+
+            $results =  DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+            ]);
+
+            return response()->json($results);
+
+    }
+
     public function brand(Request $req) {
 
         $type = $req->input('type', 'ac');
