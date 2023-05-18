@@ -139,14 +139,7 @@ class AutoCompleteController extends Controller
 
     public function dup_style_no(Request $request)
     {
-        $brand = $request->input('brand');
-        $year = $request->input('year');
-        $season = $request->input('season');
-        $gender = $request->input('gender');
-        $item = $request->input('item');
-
-        $prd_cd_p = $brand . $year . $season . $gender . $item;
-
+        $prd_cd_p = $request->input('prd_cd_p');
 
         $sql = "
             select 

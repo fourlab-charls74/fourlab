@@ -90,7 +90,7 @@ class std11Controller extends Controller
             "select
 				a.*
 				, s.store_nm as store_nm
-			from after_service2 a
+			from repair_service a
 				left outer join store s on s.store_cd = a.store_cd 
 			where 1=1 and a.store_cd = '$user_store'
 			$where
@@ -129,7 +129,7 @@ class std11Controller extends Controller
 
 	public function showDetail($idx = "")
 	{
-		$row = DB::table('after_service2')->where("idx", "=", $idx)->first();
+		$row = DB::table('repair_service')->where("idx", "=", $idx)->first();
 		$mobile = $row->mobile;
 		$items = SLib::getItems();
 		if ($mobile != "") $row->mobile = explode("-", $mobile);
@@ -344,7 +344,7 @@ class std11Controller extends Controller
 		try {
 			DB::beginTransaction();
 
-			DB::table('after_service2')
+			DB::table('repair_service')
 				->insert([
 					'receipt_date' => $data['edate'],
 					'as_state' => $as_state,
@@ -412,7 +412,7 @@ class std11Controller extends Controller
 			DB::beginTransaction();
 			if ($data['as_type'] == '1') { // 매장접수(A/S)
 				
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -442,7 +442,7 @@ class std11Controller extends Controller
 
 			} elseif ($data['as_type'] == '2') { //매장접수(불량)
 
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -472,7 +472,7 @@ class std11Controller extends Controller
 
 			} elseif ($data['as_type'] == '3') { //매장접수(심의)
 
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -502,7 +502,7 @@ class std11Controller extends Controller
 
 			} elseif ($data['as_type'] == '4') { // 본사 A/S 접수인 경우
 
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -530,7 +530,7 @@ class std11Controller extends Controller
 
 			} elseif($data['as_type'] == '5') { //본사 A/S 완료인 경우
 
-					DB::table('after_service2')
+					DB::table('repair_service')
 						->where('idx', '=', $data['idx'])
 						->update([
 							'receipt_date' => $data['edate'],
@@ -559,7 +559,7 @@ class std11Controller extends Controller
 
 			} elseif ($data['as_type'] == '6') { //본사불량인 경우
 
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -587,7 +587,7 @@ class std11Controller extends Controller
 
 			} elseif ($data['h_receipt_date'] != '') { //본사접수일이 입력되어있으면 접수구분이 자동으로 본사 A/S접수 진행으로 변경 수선진행상태를 수선진행으로 변경
 
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -615,7 +615,7 @@ class std11Controller extends Controller
 				
 			} elseif ($data['end_date'] != '') { //수선완료일이 빈값이 아니면 자동으로 접수구분이 본사A/S완료로 변경 수선진행상태를 수선완료로 변경
 
-					DB::table('after_service2')
+					DB::table('repair_service')
 						->where('idx', '=', $data['idx'])
 						->update([
 							'receipt_date' => $data['edate'],
@@ -644,7 +644,7 @@ class std11Controller extends Controller
 
 			} elseif ($data['err_date'] != '') { // 불량등록일이 빈값이 아닐때 접수구분을 본사불량으로 변경 수선진행상태를 본사 불량 처리
 
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $data['idx'])
 					->update([
 						'receipt_date' => $data['edate'],
@@ -695,7 +695,7 @@ class std11Controller extends Controller
 			DB::beginTransaction();
 
 			for ($i = 0; $i < count($idx); $i++){
-				DB::table('after_service2')
+				DB::table('repair_service')
 					->where('idx', '=', $idx[$i])
 					->delete();
 			}

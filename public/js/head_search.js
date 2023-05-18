@@ -99,7 +99,6 @@ $( document ).ready(function() {
     
     $(".dup-style-no").on('focus', function() {
 
-        console.log('포커스 인');
         let brand = $('#brand').val();
         let year = $('#year').val();
         let season = $('#season').val();
@@ -384,6 +383,58 @@ $( document ).ready(function() {
         placeholder: '',
         allowClear: true,
         minimumInputLength: 1,
+        templateResult: function (state) {
+            if (!state.id) {
+                return state.text;
+            }
+            if(state.img !== ""){
+                var $state = $(
+                    '<span><img src="' + state.img + '" style="width:30px" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + state.text + '</span>'
+                );
+            } else {
+                var $state = $(
+                    '<span><span style="padding:0 15px;"></span> ' + state.text + '</span>'
+                );
+            }
+            return $state;
+        },
+        //templateSelection: formatRepoSelection,
+        language: {
+            // You can find all of the options in the language files provided in the
+            // build. They all must be functions that return the string that should be
+            // displayed.
+            inputTooShort: function () {
+                return "한글자 이상 입력해 주세요.";
+            }
+        }
+    });
+
+
+    $('.select2-dup-style_no').select2({
+        ajax: {
+            url: "/head/auto-complete/dup-style-no",
+            dataType: 'json',
+            delay: 250,
+            cache: true,
+            data: function (params) {
+                let brand = $('#brand').val();
+                let year = $('#year').val();
+                let season = $('#season').val();
+                let gender = $('#gender').val();
+                let item = $('#item').val();
+
+                let prd_cd_p = brand + year + season + gender + item;
+                return {
+                    type:'select2',
+                    keyword: params.term, // search term
+                    page: params.page,
+                    prd_cd_p : prd_cd_p
+                };
+            },
+        },
+        placeholder: '',
+        allowClear: true,
+        minimumInputLength: 0,
         templateResult: function (state) {
             if (!state.id) {
                 return state.text;

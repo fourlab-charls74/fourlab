@@ -122,7 +122,7 @@
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
-													<input type='text' class="form-control form-control-sm dup-style-no" name='style_no' id="style_no" value='' onfocus="dulplicationStyleNo();">
+													<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-dup-style_no"></select>
 												</div>
 											</td>
 										</tr>

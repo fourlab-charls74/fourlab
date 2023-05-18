@@ -947,7 +947,7 @@ CREATE TABLE `after_service` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 고객수선2
-CREATE TABLE `after_service2` (
+CREATE TABLE `repair_service` (
   `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '접수번호',
   `receipt_date` date DEFAULT NULL COMMENT '접수일자',
   `as_state` smallint(6) DEFAULT NULL COMMENT '수선진행상태 (10 : 수선요청, 11 : 불량요청, 12 : 본사심의요청, 20 : 수선접수, 30 : 수선진행, 40 : 수선완료, 50 : 불량)',
