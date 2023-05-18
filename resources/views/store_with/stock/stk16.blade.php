@@ -422,7 +422,7 @@
             // },
             cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + (params.value) || '' + (params.value || '');
+                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
             }
         },
         {field: "req_comment", headerName: "매장메모", width: 300},

@@ -154,7 +154,8 @@ class stk16Controller extends Controller
                 sg.storage_nm, 
                 psr.state, 
                 cast(psr.exp_dlv_day as date) as exp_dlv_day, 
-                psr.rel_order, 
+                -- psr.rel_order,
+                c7.code_val3 as rel_order, 
                 psr.comment,
                 psr.req_comment,
                 psr.req_id, 
@@ -175,6 +176,7 @@ class stk16Controller extends Controller
                 left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
                 left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
                 left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
+                left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
             where 1=1 $where

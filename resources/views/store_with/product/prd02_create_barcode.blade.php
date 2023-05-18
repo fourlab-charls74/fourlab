@@ -1,16 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @section('title', '바코드 등록(new)')
 @section('content')
-<head>
-	<!-- jQuery UI CSS -->
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-<!-- jQuery Core -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- jQuery UI JS -->
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-</head>
 
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
@@ -129,12 +119,6 @@
 													</select>
 												</div>
 											</td>
-											<!-- <th class="required">스타일넘버</th>
-											<td>
-												<div class="flax_box">
-													<select id="style_no" name="style_no" class="form-control form-control-sm select2-dup-style_no"></select>
-												</div>
-											</td> -->
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
