@@ -139,24 +139,47 @@ class AutoCompleteController extends Controller
 
     public function dup_style_no(Request $request)
     {
+        $type = $request->input('type', 'ac');
+        $keyword = $request->input('keyword', '');
+
+      
         $prd_cd_p = $request->input('prd_cd_p');
 
-        $sql = "
-            select 
-                g.style_no as label
-                , g.goods_no
-                , concat(:image_svr,REPLACE(g.img,'_a_500','_s_50')) AS img
-            from goods g
-            left outer join product p on p.style_no = g.style_no
-            where p.prd_cd like '$prd_cd_p%'
-            limit 0, 10
-        ";
+        if ($keyword == '') {
+            $sql = "
+                select 
+                    g.style_no as id
+                    , g.style_no as text
+                    , g.goods_no
+                    , concat(:image_svr,REPLACE(g.img,'_a_500','_s_50')) AS img
+                from goods g
+                left outer join product p on p.style_no = g.style_no
+                where p.prd_cd like '$prd_cd_p%'
+                limit 0, 10
+            ";
 
             $results =  DB::select($sql, [
                 "image_svr" => config('shop.image_svr'),
             ]);
 
+            return response()->json([
+                "results" => $results
+            ]);
+        } else {
+            $sql = /** @lang text */
+                "
+                select style_no as label,goods_no,concat(:image_svr,REPLACE(img,'_a_500','_s_50')) AS img
+                from goods 
+                where style_no like :keyword
+                limit 0, 10
+            ";
+            $results =  DB::select($sql, [
+                "image_svr" => config('shop.image_svr'),
+                "keyword" => sprintf("%s%%", $keyword)
+            ]);
             return response()->json($results);
+        }
+        
 
     }
 

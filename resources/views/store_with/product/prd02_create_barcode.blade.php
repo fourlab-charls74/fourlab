@@ -122,7 +122,7 @@
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
-													<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-dup-style_no"></select>
+													<select id="style_no" name="style_no" class="form-control form-control-sm select2-dup-style_no"></select>
 												</div>
 											</td>
 										</tr>
@@ -366,6 +366,8 @@
 		const { code } = response.data;
 		if (code == 200) {
 
+			console.log(document.f1.style_no.id);
+
 			const idx = added_rows.length;
 			const brand = document.f1.brand.value;
 			let style_no_value = document.f1.style_no.value;
@@ -469,6 +471,8 @@
 			f1.style_no.focus();
 			return alert("스타일넘버를 입력해주세요.");
 		}
+
+		console.log(f1.style_no);
 
 		// 컬러 선택여부
 		if (f1.color.selectedIndex == 0) {

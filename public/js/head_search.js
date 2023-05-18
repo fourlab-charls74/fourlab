@@ -415,7 +415,6 @@ $( document ).ready(function() {
             url: "/head/auto-complete/dup-style-no",
             dataType: 'json',
             delay: 250,
-            cache: true,
             data: function (params) {
                 let brand = $('#brand').val();
                 let year = $('#year').val();
@@ -424,6 +423,7 @@ $( document ).ready(function() {
                 let item = $('#item').val();
 
                 let prd_cd_p = brand + year + season + gender + item;
+
                 return {
                     type:'select2',
                     keyword: params.term, // search term
@@ -431,6 +431,7 @@ $( document ).ready(function() {
                     prd_cd_p : prd_cd_p
                 };
             },
+            cache: true
         },
         placeholder: '',
         allowClear: true,
@@ -450,7 +451,7 @@ $( document ).ready(function() {
             }
             return $state;
         },
-        //templateSelection: formatRepoSelection,
+        // templateSelection: formatRepoSelection,
         language: {
             // You can find all of the options in the language files provided in the
             // build. They all must be functions that return the string that should be
