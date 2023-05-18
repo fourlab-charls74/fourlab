@@ -1,6 +1,16 @@
 @extends('store_with.layouts.layout-nav')
 @section('title', '바코드 등록(new)')
 @section('content')
+<head>
+	<!-- jQuery UI CSS -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<!-- jQuery Core -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- jQuery UI JS -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
 
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
@@ -119,10 +129,16 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">스타일넘버</th>
+											<!-- <th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
 													<select id="style_no" name="style_no" class="form-control form-control-sm select2-dup-style_no"></select>
+												</div>
+											</td> -->
+											<th class="required">스타일넘버</th>
+											<td>
+												<div class="flax_box">
+													<input id="style_no" name="style_no" class="form-control form-control-sm dup-style-no" value="" maxlength="8"  oninput="handleInputLength(this, 8)" onfocus="checkData();">
 												</div>
 											</td>
 										</tr>
@@ -472,8 +488,6 @@
 			return alert("스타일넘버를 입력해주세요.");
 		}
 
-		console.log(f1.style_no);
-
 		// 컬러 선택여부
 		if (f1.color.selectedIndex == 0) {
 			f1.color.focus();
@@ -686,9 +700,7 @@
 	 * 브랜드+년도+시즌+성별+품목값을 합친 값을 조회해서 같은 품번을 가지고있는 상품이 있으면 해당 상품의 스타일 넘버를 자동완성 시켜주고
 	 * 없을 시 새로운 스타일넘버를 입력하고 뒤에 (신규)라고 출력하는 부분
 	 */
-	let count = 0;
-	function dulplicationStyleNo() {
-		count++;
+	function checkData() {
 		let brand = $('#brand').val();
 		let year = $('#year').val();
 		let season = $('#season').val();
@@ -719,13 +731,7 @@
 			return false;
 		}
 
-		// 키보드의 아무 키나 누릅니다.
-		document.getElementById("style_no").focus();
-  		document.getElementById("style_no").dispatchEvent(new KeyboardEvent("keydown", { keyCode: 30 }));
-
-
-			
-		}
+	}
 
 	//성별에 따라 사이즈 값 다르게 출력
 	function change_gender() {
@@ -762,6 +768,12 @@
 		const openBatchPopup = () => {
 			const url = '/store/product/prd02/batch';
 			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=800");
+		}
+
+		function handleInputLength(el, max) {
+			if(el.value.length > max) {
+				el.value = el.value.substr(0, max);
+			}
 		}
 
 </script>

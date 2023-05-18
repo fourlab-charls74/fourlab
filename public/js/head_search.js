@@ -96,62 +96,71 @@ $( document ).ready(function() {
         }
     });
 
-    
-    $(".dup-style-no").on('focus', function() {
+    /**
+     * 
+     * store/product/prd02/create_barcode
+     * 바코드등록(new)에서 브랜드+년도+시즌+성별+품목 값을 조합해서 style_no를 검색한 후 처음 자동완성은 해당 style_no를 출력
+     * 값 입력 시 입력한 값의 자동완성값 불러오기
+     * 입력한 스타일넘버가 없으면 입력한 스타일넘버 뒤에 (신규)라고 붙음
+     * 
+     */
+    $(".dup-style-no")
+    .on('focus',function(event){
+        $(this).autocomplete('search', "");
+    })
+    .autocomplete({
+        source : function(request, response) {
+            let brand = $('#brand').val();
+            let year = $('#year').val();
+            let season = $('#season').val();
+            let gender = $('#gender').val();
+            let item = $('#item').val();
 
-        let brand = $('#brand').val();
-        let year = $('#year').val();
-        let season = $('#season').val();
-        let gender = $('#gender').val();
-        let item = $('#item').val();
-    
-        $(this).autocomplete({
-            source: function(request, response) {
-                $.ajax({
-                    method: 'get',
-                    url: '/head/auto-complete/dup-style-no',
-                    data: {
-                        brand: brand,
-                        year: year,
-                        season: season,
-                        gender: gender,
-                        item: item
-                    },
-                    success: function(data) {
-                        response(data);
-                    },
-                    error: function(request, status, error) {
-                        console.log("error");
-                    }
-                });
-            },
-            minLength: 0,
-            autoFocus: false,
-            delay: 100,
-            create: function(event, ui) {
-                $(this).data('ui-autocomplete')._renderItem = function(ul, item) {
-                    let txt;
-                    if (item.img !== undefined && item.img !== "") {
-                        txt = '<div><img src=\"' + item.img + '\" style=\"width:30px\" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + item.label + '</div>';
-                    } else {
-                        txt = '<div>' + item.label + '</div>';
-                    }
-                    return $("<li>")
-                        .append(txt)
-                        .appendTo(ul);
-                };
-            },
-            response: function(event, ui) {
-                if (ui.content.length === 0) {
-                    ui.content.push({ label: '신규', value: '' });
+            let prd_cd_p = brand + year + season + gender + item;
+
+            console.log(prd_cd_p);
+
+            $.ajax({
+                method: 'get',
+                url: '/head/auto-complete/dup-style-no',
+                data: { 
+                    keyword : this.term,
+                    prd_cd_p : prd_cd_p
+                    
+                },
+                success: function (data) {
+                    console.log(data.cnt);
+                    response(data);
+                },
+                error: function(request, status, error) {
+                    console.log("error")
                 }
-            },
-            focus: function() {
-                $(this).autocomplete("search", "");
-            }
-        });
-    });
+            });
+        },
+        minLength: 0,
+        autoFocus: false,
+        delay: 10,
+        create:function(event,ui){
+            $(this).data('ui-autocomplete')._renderItem = function (ul, item) {
+                console.log(item);
+                let txt;
+                if(item.img !== undefined && item.img !== "") {
+                    txt = '<div><img src=\"' + item.img + '\" style=\"width:30px\" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + item.label + '</div>';
+                } else {
+                    txt = '<div>' + item.label + '</div>';
+                }
 
+                if(item.label == null) {
+                    item.value = item.text;
+                    txt = '<div>' + item.keyword + '(신규)</div>';
+                }
+                return $( "<li>" )
+                    .append( txt )
+                    .appendTo( ul );
+            };
+        }
+    });
+    
     $(".ac-brand").autocomplete({
         //keydown 됬을때 해당 값을 가지고 서버에서 검색함.
         source : function(request, response) {
@@ -436,6 +445,7 @@ $( document ).ready(function() {
         placeholder: '',
         allowClear: true,
         minimumInputLength: 0,
+        // tags: true,
         templateResult: function (state) {
             if (!state.id) {
                 return state.text;
@@ -449,6 +459,13 @@ $( document ).ready(function() {
                     '<span><span style="padding:0 15px;"></span> ' + state.text + '</span>'
                 );
             }
+
+            // if($('.select2-search__field').val() != '') {
+            //     var $state = $(
+            //         '<span><span style="padding:0 15px;"></span>테스트</span>'
+            //     );
+            // }
+
             return $state;
         },
         // templateSelection: formatRepoSelection,
