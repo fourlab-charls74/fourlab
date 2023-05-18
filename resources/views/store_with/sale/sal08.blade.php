@@ -171,7 +171,7 @@
 			<div class="filter_wrap">
 				<div class="fl_box">
 					{{-- <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6> --}}
-					<p class="fs-14">* 매장구분 > 매장 > 브랜드</ㅔ>
+					<p class="fs-14">* 매장구분 > 매장 > 브랜드</p>
 				</div>
 				<div class="d-flex justify-content-end">
 					<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
@@ -200,18 +200,18 @@
     let columns = [
 		{field: "store_type", hide: true},
 		{field: "store_type_nm" , headerName: "매장구분", rowGroup: true, hide: true},
-		{field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
-		{field: "brand_nm", headerName: "브랜드명", rowGroup: true, hide: true},
 		{headerName: '매장구분', showRowGroup: 'store_type_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
 		{field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}, groupDepth: 1, 
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
 		},
+		{field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150},
 		{field: "brand", headerName: "브랜드", width: 55, cellStyle: {"text-align": "center"}, groupDepth: 2,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 2 ? params.value : '',
 		},
+		{field: "brand_nm", headerName: "브랜드명", rowGroup: true, hide: true},
 		{headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 100},
 		{field: "pr_code", headerName: "행사코드", width: 55, cellStyle: {"text-align": "center"}},
 		{field: "pr_code_nm", headerName: "행사명", width: 55, cellStyle: {"text-align": "center"}},
