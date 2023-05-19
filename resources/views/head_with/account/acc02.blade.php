@@ -227,7 +227,7 @@
             },
 			onPinnedRowDataChanged: (params) => {
 				let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-				gx.gridOptions.api.setPinnedTopRowData([ { ...pinnedRow.data, closed: '합계' } ]);
+				gx.gridOptions.api.setPinnedTopRowData([ { ...pinnedRow?.data || {}, closed: '합계' } ]);
 			}
         };
 		gx = new HDGrid(gridDiv, columns, options);

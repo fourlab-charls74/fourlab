@@ -689,7 +689,7 @@ class prm10Controller extends Controller
 		$all['coupon_pub_kind']		= Request('coupon_pub_kind', '');
         $all['use_date_alarm_yn']   = Request('use_date_alarm_yn', "");
         $all['use_date_alarm']      = Request('use_date_alarm_day', "");
-        $all['use_date']			= $all['use_date'] ? Lib::uncm($all['use_date']) : 0;
+		$all['use_date']			= isset($all['use_date']) ? Lib::uncm($all['use_date']) : 0;
 
         // 발급일 기준 유효기간 추가
         $use_date_type = $all['use_date_type'];

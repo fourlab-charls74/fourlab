@@ -625,7 +625,7 @@
             depthExportChecker.Open({
                 depths: ['주문번호별'],
                 download: (level) => {
-                    gx.Download('온라인주문접수_{{ date('YmdH') }}.csv', { type: 'csv', level: level });
+                    gx.Download('온라인주문접수_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
                 }
             });
         });

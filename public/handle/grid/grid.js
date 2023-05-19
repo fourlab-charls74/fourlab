@@ -425,7 +425,10 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
             },            
             // {
             //     id: 'hd-grid-string',
-            //     dataType: 'String',
+			// 	dataType: 'String',
+			// 	numberFormat: {
+			// 		format: '@',
+			// 	},
             // },
         ],
     };
@@ -773,7 +776,8 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
                 }
             }
 
-            return val;
+			if (['ord_no'].includes(params.column.colId)) return val + 'ㅤ';
+			else return val;
         },
         // processHeaderCallback: (params) => {
         //     return (params.column.parent.originalColumnGroup.colGroupDef.headerName ? `${params.column.parent.originalColumnGroup.colGroupDef.headerName} > ` : '') + params.columnApi.getDisplayNameForColumn(params.column, null);
