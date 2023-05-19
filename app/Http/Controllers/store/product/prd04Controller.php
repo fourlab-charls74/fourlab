@@ -356,6 +356,28 @@ class prd04Controller extends Controller
 		$color = $request->input('color', '');
 		$size = $request->input('size', '');
 
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		// $sql = "
 		// 	select
 		// 		p.prd_cd
@@ -400,6 +422,8 @@ class prd04Controller extends Controller
 			'size' => $size ?? '',
 			// 'prd' => $rows[0] ?? '',
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
 		return view(Config::get('shop.store.view') . '/product/prd04_show', $values);
@@ -413,8 +437,10 @@ class prd04Controller extends Controller
 		$now_date = date("Ymd");
 		$prd_cd_p = $request->input('prd_cd_p', '');
 		$o_prd_cd_p = $prd_cd_p;
-		$store_type = $request->input('store_type', '');
 		$color = $request->input('color', '');
+		$store_channel	= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
+
 		if ($color != '') $prd_cd_p .= $color;
 
 		$values = [];
@@ -480,7 +506,8 @@ class prd04Controller extends Controller
 
 			// get store stock
 			$where = "";
-            if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+            if ($store_channel != '') $where .= "and store_channel ='" . Lib::quote($store_channel). "'";
+        	if ($store_channel_kind ?? '' != '') $where .= "and store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 			$case_sql = "";
 			foreach ($sizes as $size) {

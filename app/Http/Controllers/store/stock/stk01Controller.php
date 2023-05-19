@@ -198,6 +198,28 @@ class stk01Controller extends Controller
 	/** 재고팝업 */
 	public function show($prd_cd, Request $request)
 	{
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		$sdate = $request->input("date", '');
 		if($sdate == '') $sdate = date("Y-m-d");
 
@@ -273,6 +295,8 @@ class stk01Controller extends Controller
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 			'storages' => $storages, // 창고리스트
 			'prd' => $row,
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 		return view(Config::get('shop.store.view') . '/stock/stk01_show', $values);
 	}
@@ -330,13 +354,18 @@ class stk01Controller extends Controller
 		$prd_cd = $request->input('prd_cd', '');
 		$sdate = $request->input('sdate', date('Y-m-d'));
 		$edate = $request->input('edate', date('Y-m-d'));
-		$store_type = $request->input('store_type', '');
 		$store_cds = $request->input('store_no', []);
+		$store_channel = $request->input('store_channel');
+		$store_channel_kind = $request->input('store_channel_kind');
 
 		$rows = [];
-		if ($store_type != '' || $store_cds != '') {
+		if ($store_channel != '' || $store_channel_kind || $store_cds != '') {
+
 			$where = "";
-			if ($store_type != '') $where .= " and s.store_type = '$store_type' ";
+			if ($store_channel != '') $where .= " and s.store_channel = '$store_channel' ";
+			if ($store_channel_kind != '') $where .= " and s.store_channel_kind = '$store_channel_kind' ";
+
+
 
 			if (count($store_cds) > 0) {
 				$where .= " and s.store_cd in (" . join(',', array_map(function($s) { return "'$s'"; }, $store_cds)) . ")";
@@ -375,8 +404,9 @@ class stk01Controller extends Controller
 		$now_date = date('Ymd');
         $sdate = str_replace("-", "", $sdate);
         $edate = str_replace("-", "", $edate);
-		$store_type = $request->input('store_type', '');
 		$store_cds = $request->input('store_no', []);
+		$store_channel = $request->input('store_channel');
+		$store_channel_kind = $request->input('store_channel_kind');
 		
 		$rows = [];
 		$total_data = [];
@@ -384,7 +414,8 @@ class stk01Controller extends Controller
 		if ($prd_cd == '') return response()->json([ 'code' => 500, 'head' => [ 'total' => 0 ], 'body' => $rows ]);
 
 		$where = " and ps.prd_cd = '$prd_cd' ";
-		if ($store_type) $where .= " and s.store_type = '$store_type' ";
+		if ($store_channel != '') $where .= " and s.store_channel = '$store_channel' ";
+		if ($store_channel_kind != '') $where .= " and s.store_channel_kind = '$store_channel_kind' ";
 
 		if (count($store_cds) > 0) {
 			$where .= " and ps.store_cd in (" . join(',', array_map(function($s) { return "'$s'"; }, $store_cds)) . ")";

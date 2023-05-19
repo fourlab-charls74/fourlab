@@ -115,21 +115,6 @@
 											</td>
                                         </tr>
 										<tr>
-											<th class="required">매장종류</th>
-											<td>
-												<div class="flex_box w-100">
-													<select id='store_kind2' name='store_kind2' class="form-control form-control-sm">
-														<option value=''>전체</option>
-														@foreach ($store_kinds as $store_kind)
-															<option value='{{ $store_kind->code_id }}' @if(@$store->store_kind == $store_kind->code_id) selected @endif>{{ $store_kind->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-											<th></th>
-											<td></td>
-										</tr>
-										<tr>
 											<th class="required">주소</th>
 											<td colspan="3">
 												<div class="d-flex flex-column">

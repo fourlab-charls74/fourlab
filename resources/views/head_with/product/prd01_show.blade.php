@@ -2151,7 +2151,7 @@
                 {field: "brand_nm", headerName: "브랜드", minWidth: 80, maxWidth: 80, cellStyle: CENTER},
                 {field: "style_no", headerName: "스타일넘버", minWidth: 80, maxWidth: 80, cellStyle: CENTER},
                 {field: "img2", headerName: "img2", hide: true},
-                {field: "img", headerName: "이미지", type: 'GoodsImageType', minWidth: 60, maxWidth: 60, cellStyle: CENTER},
+                {field: "img", headerName: "이미지", type: 'GoodsImageType',  minWidth: 60, maxWidth: 60, cellStyle: CENTER, surl:"{{config('shop.front_url')}}"},
                 {field: "sale_stat_cl", headerName: "상품상태", minWidth: 80, maxWidth: 80, cellStyle: StyleGoodsState},
                 {
                     field: "goods_no", headerName: "온라인코드", minWidth: 80, maxWidth: 80, cellStyle: CENTER,

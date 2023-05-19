@@ -219,8 +219,9 @@
             },
         }).then(function (res) {
             if(res.data.code === 200) {
+                console.log(res);
                 alert("매장구분이 삭제되었습니다.");
-                Search();
+                SearchDetail(res.data.store_channel_cd, res.data.store_channel);
             } else {
                 console.log(res.data);
                 alert("매장구분 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

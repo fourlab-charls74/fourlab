@@ -357,10 +357,14 @@
 
         let storage_cd = $('[name=storage]').val();
         if (storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
+        
+        let store_channel = $('[name=store_channel]').val();
+        if (store_channel === '') return alert("상품을 출고할 판매채널을 선택해주세요.");
+        
+        let store_channel_kind = $('[name=store_channel_kin]').val();
+        if (store_channel_kind === '') return alert("상품을 출고할 매장구분을 선택해주세요.");
 
         let store_cd =$('[name=store]').val();
-
-        console.log(store_cd);
         if (store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");
 
         let over_qty_rows = rows.filter(row => {

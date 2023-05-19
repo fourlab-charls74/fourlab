@@ -36,6 +36,7 @@ class std09Controller extends Controller
             select
                 store_channel_cd
             from store_channel
+            where dep = 1
             order by idx desc
             limit 1
         ";
@@ -335,6 +336,7 @@ class std09Controller extends Controller
     public function delete(Request $request) {
 
         $data = $request->input('data');
+        $store_channel_cd = $data[0]['store_channel_cd'];
 
         try {
             DB::beginTransaction();
@@ -348,6 +350,15 @@ class std09Controller extends Controller
                     ->delete();
             }
 
+            $sql = "
+                select 
+                    store_channel
+                from store_channel
+                where store_channel_cd = '$store_channel_cd' and dep = 1
+            ";
+
+            $store_channel = DB::selectOne($sql);
+
             DB::commit();
             $code = 200;
             $msg = "";
@@ -360,7 +371,9 @@ class std09Controller extends Controller
 
         return response()->json([
             "code" => $code,
-            "msg" => $msg
+            "msg" => $msg,
+            "store_channel_cd" => $store_channel_cd,
+            "store_channel" => $store_channel->store_channel
         ]);
 
     }

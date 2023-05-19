@@ -944,12 +944,14 @@ function SearchCompany(){
 
 SearchCompany.prototype.Open = function(callback = null, type = "", wonboo = false){
     if(this.grid === null){
+        console.log(type);
         this.isWonboo = wonboo === "wonboo";
         this.type = type;
         this.SetGrid("#div-gd-company");
         //gxBrand = new HDGrid(document.querySelector("#div-gd-brand"), columnsBrand);
         $("#SearchCompanyModal").draggable();
         if (this.type === '1') $("#SearchCompanyModalLabel").text('공급업체 검색');
+        if (this.type === '6') $("#SearchCompanyModalLabel").text('원부자재업체 검색');
         this.callback = callback;
     }
 

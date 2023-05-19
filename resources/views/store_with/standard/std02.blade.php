@@ -173,8 +173,8 @@
 				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
 			}
 		},
-		{headerName:"매장구분(구)",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
-		{headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
+		// {headerName:"매장구분(구)",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
+		// {headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
 		{headerName:"판매채널",		field:"store_channel",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장구분",		field:"store_channel_kind",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType'},
