@@ -24,7 +24,7 @@
 
     <style> 
         .required:after {content:" *"; color: red;}
-        .table th {min-width:120px;}
+        .table th {min-width:160px;}
         @media (max-width: 740px) {
             .table td {float: unset !important;width:100% !important;}
         }
@@ -53,7 +53,7 @@
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
-					<a href="#">기본 정보</a>
+					<a href="#">매장 정보</a>
 				</div>
 				<div class="card-body">
                     <div class="row">
@@ -83,12 +83,7 @@
 											</td>
                                         </tr>
                                         <tr>
-											<th class="required">매장명(약칭)</th>
-											<td style="width:35%;">
-												<div class="form-inline">
-													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
-												</div>
-											</td>
+											
 											<th class="required">판매채널/매장구분</th>
 											<td>
 												<div class="d-flex align-items-center">
@@ -111,6 +106,14 @@
 															@endif
 														</select>
 													</div>
+												</div>
+											</td>
+											<th></th>
+											<td></td>
+											<th class="required" hidden>매장명(약칭)</th>
+											<td style="width:35%;" hidden>
+												<div class="form-inline">
+													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
                                         </tr>
@@ -161,43 +164,261 @@
 											</td>
 										</tr>
 										<tr>
-											<th>매니져명</th>
-											<td>
-												<div class="form-inline">
-													<input type="text" name="manager_nm" id="manager_nm" value="{{ @$store->manager_nm }}" class="form-control form-control-sm w-100" />
-												</div>
-											</td>
-											<th>매니져연락처</th>
-											<td>
-												<div class="form-inline">
-													<input type="text" name="manager_mobile" id="manager_mobile" value="{{ @$store->manager_mobile }}" class="form-control form-control-sm w-100" />
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th>이메일</th>
-											<td>
-												<div class="form-inline">
-													<input type="text" name="email" id="email" value="{{ @$store->email }}" class="form-control form-control-sm w-100" />
-												</div>
-											</td>
-											<th>점포수수료</th>
-											<td>
+											<th hidden>점포수수료</th>
+											<td hidden>
 												<div class="form-inline">
 													<input type="text" name="fee" id="fee" value="{{ @$store->fee }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
+											
 										</tr>
 										<tr>
-											<!-- <th>판매수수료율</th>
+											<th>오픈일</th>
 											<td>
+												<div class="form-inline">
+													<input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th>종료일</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>매장사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" @if(@$store->use_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="use_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="use_yn_N" name="use_yn" value="N" @if(@$store->use_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="use_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>부가세사용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="vat_yn_Y" name="vat_yn" value="Y" @if(@$store->vat_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="vat_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="vat_yn_N" name="vat_yn" value="N" @if(@$store->vat_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="vat_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th hidden>로스인정률</th>
+											<td hidden>
 												<div class="d-flex flex-column">
 													<div class="d-flex" style="width:100%;line-height:30px;">
-														<input type="text" name="sale_fee" id="sale_fee" value="{{ @$store->sale_fee }}" class="form-control form-control-sm mr-1 w-50" />
+														<input type="text" name="loss_rate" id="loss_rate" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
 														%
 													</div>
 												</div>
-											</td> -->
+											</td>
+										</tr>
+										<tr>
+											<th hidden>입고확인사용여부</th>
+											<td hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ipgo_yn_Y" name="ipgo_yn" value="Y" @if(@$store->ipgo_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="ipgo_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ipgo_yn_N" name="ipgo_yn" value="N" @if(@$store->ipgo_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="ipgo_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											
+										</tr>
+										<tr>
+											<th>정산관리여부(+수수료등급)</th>
+											<td style="width:35%;">
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="account_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="account_n" name="account_yn" value="N" @if(@$store->account_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="account_n">N</label>
+													</div>
+													&nbsp;&nbsp;&nbsp;
+													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
+														<option value=''>미등록</option>
+														@foreach ($grades as $grade)
+															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th>출고우선순위</th>
+											<td style="width:35%;">
+												<div class="flex_box">
+													<select name='priority' class="form-control form-control-sm">
+														<option value=''>전체</option>
+														@foreach ($prioritys as $priority)
+															<option value='{{ $priority->code_id }}' @if(@$store->priority == $priority->code_id) selected @endif>{{ $priority->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th hidden>관리기준</th>
+											<td style="width:35%;" hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="manage_type_M" name="manage_type" value="M" @if(@$store->vat_yn != 'M') checked @endif />
+														<label class="custom-control-label" for="manage_type_M">중간관리식</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="manage_type_P" name="manage_type" value="P" @if(@$store->vat_yn == 'P') checked @endif />
+														<label class="custom-control-label" for="manage_type_P">사입식</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th hidden>경비관리</th>
+											<td style="width:35%;" hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="exp_manage_yn_Y" name="exp_manage_yn" value="Y" @if(@$store->vat_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="exp_manage_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="exp_manage_yn_N" name="exp_manage_yn" value="N" @if(@$store->vat_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="exp_manage_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											
+										</tr>
+										<tr>
+											<th hidden>동종업계정보입력</th>
+											<td hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="competitor_yn_Y" name="competitor_yn" value="Y" checked @if(@$store->competitor_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="competitor_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="competitor_yn_N" name="competitor_yn" value="N" @if(@$store->competitor_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="competitor_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th hidden>POS 사용여부</th>
+											<td hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="pos_yn_Y" name="pos_yn" value="Y" checked/>
+														<label class="custom-control-label" for="pos_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="pos_yn_N" name="pos_yn" value="N"/>
+														<label class="custom-control-label" for="pos_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>타매장재고조회</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ostore_stock_yn_Y" name="ostore_stock_yn" value="Y" @if(@$store->ostore_stock_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="ostore_stock_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="ostore_stock_yn_N" name="ostore_stock_yn" value="N" @if(@$store->ostore_stock_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="ostore_stock_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>판매분배분여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_dist_yn_Y" name="sale_dist_yn" value="Y" @if(@$store->sale_dist_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="sale_dist_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_dist_yn_N" name="sale_dist_yn" value="N" @if(@$store->sale_dist_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="sale_dist_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>매장RT여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="rt_yn_Y" name="rt_yn" value="Y" @if(@$store->rt_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="rt_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="rt_yn_N" name="rt_yn" value="N" @if(@$store->rt_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="rt_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>적립금지급여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_in_yn_Y" name="point_in_yn" value="Y" @if(@$store->point_in_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="point_in_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_in_yn_N" name="point_in_yn" value="N" @if(@$store->point_in_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="point_in_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th hidden>오픈후한달 재고보기제외 여부</th>
+											<td hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y" checked/>
+														<label class="custom-control-label" for="open_month_stock_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N"/>
+														<label class="custom-control-label" for="open_month_stock_n">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>온라인업체매칭</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_place_match_y" name="sale_place_match_yn" value="Y" @if(@$store->sale_place_match_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="sale_place_match_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="sale_place_match_n" name="sale_place_match_yn" value="N" @if(@$store->sale_place_match_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="sale_place_match_n">N</label>
+													</div>
+													&nbsp;&nbsp;&nbsp;
+													<select name='com_id' id="com_id" class="form-control form-control-sm" style="width:70%;">
+														<option value=''>전체</option>
+															@foreach ($store_match as $sm)
+																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
+															@endforeach
+													</select>
+												</div>
+											</td>
 											<th>중간관리여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -211,11 +432,101 @@
 													</div>
 												</div>
 											</td>
-											<th></th>
-											<td>
-
+										</tr>
+										<tr>
+											<th>이미지</th>
+											<td colspan="3">
+												<div style="text-align:center;" id="multi_img">
+													<input type='file' id='btnAdd' name="file" multiple='multiple' accept=".jpg"/>
+												</div>
+												<div id='img_div'></div>
+												@if ($cmd == 'update')
+													@foreach(@$store_img as $src)
+														<div id='img_show_div' data-img="{{$src->seq}}" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
+															<img src="{{$src->img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
+															<input type="button" value="x" onclick= "delete_img('{{$src->store_cd}}','{{$src->seq}}')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
+														</div>
+													@endforeach
+												@endif
 											</td>
 										</tr>
+										@if($cmd !== "")
+                                            @if(@$store->store_type !== '11' && @$store->addr1 !== null && @$store->map_code !== null)
+												<tr>
+													<th>지도</th>
+													<td style="width:100%;">
+														<div class="form-inline">
+															<div id="map" style="width:100%;height:400px;"></div>
+														</div>
+													</td>
+												</tr>
+											@endif
+										@endif
+										<tr>
+											<th>맵 코드</th>
+											<td colspan="3">
+												<div>
+													<input type="text" class="form-control form-control-sm w-100" value="{{@$store->map_code}}" name="map_code" id="map_code">
+													<span>* 위도,경도 순으로 (,)로 구분하여 입력해주세요. EX) 37.5251913154781,126.929112756574</span>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="row">
+						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 관리자 정보</div>
+					</div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
+										<tr>
+											<th>매니저명</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="manager_nm" id="manager_nm" value="{{ @$store->manager_nm }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th>매니저연락처</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="manager_mobile" id="manager_mobile" value="{{ @$store->manager_mobile }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>이메일</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="email" id="email" value="{{ @$store->email }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th></th>
+											<td></td>
+										</tr>
+										
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 정산관련 정보</div>
+					</div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-box-ty2 mobile">
+                                <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                    <tbody>
 										<tr>
 											<th>은행명/계좌/예금주</th>
 											<td colspan="3">
@@ -242,78 +553,11 @@
 												</div>
 											</td>
 										</tr>
-										<tr>
-											<th>오픈일</th>
-											<td>
-												<div class="form-inline">
-													<input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" />
-												</div>
-											</td>
-											<th>종료일</th>
-											<td>
-												<div class="form-inline">
-													<input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" />
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th>로스인정률</th>
-											<td>
-												<div class="d-flex flex-column">
-													<div class="d-flex" style="width:100%;line-height:30px;">
-														<input type="text" name="loss_rate" id="loss_rate" value="{{ @$store->loss_rate }}" class="form-control form-control-sm mr-1 w-50" />
-														%
-													</div>
-												</div>
-											</td>
-											<th>매장사용여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" @if(@$store->use_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="use_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="use_yn_N" name="use_yn" value="N" @if(@$store->use_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="use_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th>입고확인사용여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="ipgo_yn_Y" name="ipgo_yn" value="Y" @if(@$store->ipgo_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="ipgo_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="ipgo_yn_N" name="ipgo_yn" value="N" @if(@$store->ipgo_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="ipgo_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th>부가세사용여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="vat_yn_Y" name="vat_yn" value="Y" @if(@$store->vat_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="vat_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="vat_yn_N" name="vat_yn" value="N" @if(@$store->vat_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="vat_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-										</tr>
-
 									</tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+								</table>
+							</div>
+						</div>
+					</div>
 
 					<div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 사업자 정보</div>
@@ -380,59 +624,7 @@
 						</div>
 					</div>
 			
-					<!-- 매장 정보 시작 -->
-					<div class="row">
-						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 매장 정보</div>
-					</div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-box-ty2 mobile">
-                                <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                    <tbody>
-										<tr>
-											<th>이미지</th>
-											<td colspan="3">
-												<div style="text-align:center;" id="multi_img">
-													<input type='file' id='btnAdd' name="file" multiple='multiple' accept=".jpg"/>
-												</div>
-												<div id='img_div'></div>
-												@if ($cmd == 'update')
-													@foreach(@$store_img as $src)
-														<div id='img_show_div' data-img="{{$src->seq}}" style="display:inline-block;position:relative;width:150px;height:120px;margin:5px;z-index:1">
-															<img src="{{$src->img_url}}" alt="" id="img_show" style="width:100%;height:100%;z-index:none">
-															<input type="button" value="x" onclick= "delete_img('{{$src->store_cd}}','{{$src->seq}}')" style="width:20px;height:20px;position:absolute;right:0px;top:0px;border:none;font-size:large;font-weight:bolder;background:none;color:black;padding-bottom:20px;">
-														</div>
-													@endforeach
-												@endif
-											</td>
-										</tr>
-										@if($cmd !== "")
-                                            @if(@$store->store_type !== '11' && @$store->addr1 !== null && @$store->map_code !== null)
-												<tr>
-													<th>지도</th>
-													<td style="width:100%;">
-														<div class="form-inline">
-															<div id="map" style="width:100%;height:400px;"></div>
-														</div>
-													</td>
-												</tr>
-											@endif
-										@endif
-										<tr>
-											<th>맵 코드</th>
-											<td colspan="3">
-												<div>
-													<input type="text" class="form-control form-control-sm w-100" value="{{@$store->map_code}}" name="map_code" id="map_code">
-													<span>* 위도,경도 순으로 (,)로 구분하여 입력해주세요. EX) 37.5251913154781,126.929112756574</span>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-					<div class="row">
+					<!-- <div class="row">
 						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
 					</div>
                     <div class="row">
@@ -441,8 +633,8 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
 										<tr>
-											<th>관리기준</th>
-											<td style="width:35%;">
+											<th hidden>관리기준</th>
+											<td style="width:35%;" hidden>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="manage_type_M" name="manage_type" value="M" @if(@$store->vat_yn != 'M') checked @endif />
@@ -455,7 +647,7 @@
 												</div>
 											</td>
 											<th>정산관리여부(+수수료등급)</th>
-											<td>
+											<td style="width:35%;">
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
@@ -474,23 +666,8 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
-											<th>경비관리</th>
-											<td style="width:35%;">
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="exp_manage_yn_Y" name="exp_manage_yn" value="Y" @if(@$store->vat_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="exp_manage_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="exp_manage_yn_N" name="exp_manage_yn" value="N" @if(@$store->vat_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="exp_manage_yn_N">N</label>
-													</div>
-												</div>
-											</td>
 											<th>출고우선순위</th>
-											<td>
+											<td style="width:35%;">
 												<div class="flex_box">
 													<select name='priority' class="form-control form-control-sm">
 														<option value=''>전체</option>
@@ -502,11 +679,27 @@
 											</td>
 										</tr>
 										<tr>
-											<th>동종업계정보입력</th>
-											<td>
+											<th hidden>경비관리</th>
+											<td style="width:35%;" hidden>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="competitor_yn_Y" name="competitor_yn" value="Y" @if(@$store->competitor_yn == 'Y') checked @endif />
+														<input type="radio" class="custom-control-input" id="exp_manage_yn_Y" name="exp_manage_yn" value="Y" @if(@$store->vat_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="exp_manage_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="exp_manage_yn_N" name="exp_manage_yn" value="N" @if(@$store->vat_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="exp_manage_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											
+										</tr>
+										<tr>
+											<th hidden>동종업계정보입력</th>
+											<td hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="competitor_yn_Y" name="competitor_yn" value="Y" checked @if(@$store->competitor_yn == 'Y') checked @endif />
 														<label class="custom-control-label" for="competitor_yn_Y">Y</label>
 													</div>
 													<div class="custom-control custom-radio">
@@ -515,15 +708,15 @@
 													</div>
 												</div>
 											</td>
-											<th>POS 사용여부</th>
-											<td>
+											<th hidden>POS 사용여부</th>
+											<td hidden>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="pos_yn_Y" name="pos_yn" value="Y" @if(@$store->pos_yn != 'N') checked @endif />
+														<input type="radio" class="custom-control-input" id="pos_yn_Y" name="pos_yn" value="Y" checked/>
 														<label class="custom-control-label" for="pos_yn_Y">Y</label>
 													</div>
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="pos_yn_N" name="pos_yn" value="N" @if(@$store->pos_yn == 'N') checked @endif />
+														<input type="radio" class="custom-control-input" id="pos_yn_N" name="pos_yn" value="N"/>
 														<label class="custom-control-label" for="pos_yn_N">N</label>
 													</div>
 												</div>
@@ -571,33 +764,6 @@
 													</div>
 												</div>
 											</td>
-											<th>오픈후한달 재고보기제외 여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													@if ($cmd == "")
-														<div class="custom-control custom-radio">
-															<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y"/>
-															<label class="custom-control-label" for="open_month_stock_y">Y</label>
-														</div>
-														<div class="custom-control custom-radio">
-															<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N" checked/>
-															<label class="custom-control-label" for="open_month_stock_n">N</label>
-														</div>
-													@else
-														<div class="custom-control custom-radio">
-															<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y" @if(@$store->open_month_stock_yn == 'Y') checked @endif/>
-															<label class="custom-control-label" for="open_month_stock_y">Y</label>
-														</div>
-														<div class="custom-control custom-radio">
-															<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N" @if(@$store->open_month_stock_yn == 'N') checked @endif/>
-															<label class="custom-control-label" for="open_month_stock_n">N</label>
-														</div>
-
-													@endif
-												</div>
-											</td>
-										</tr>
-										<tr>
 											<th>적립금지급여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -611,6 +777,21 @@
 													</div>
 												</div>
 											</td>
+											<th hidden>오픈후한달 재고보기제외 여부</th>
+											<td hidden>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y" checked/>
+														<label class="custom-control-label" for="open_month_stock_y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N"/>
+														<label class="custom-control-label" for="open_month_stock_n">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th>온라인업체매칭</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -631,12 +812,14 @@
 													</select>
 												</div>
 											</td>
+											<th></th>
+											<td></td>
 										</tr>
 									</tbody>
 								</table>
 							</div>
 						</div>
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>

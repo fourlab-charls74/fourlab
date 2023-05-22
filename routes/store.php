@@ -55,7 +55,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장명 조회
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');
-        Route::get('stores/search-storetype', 'StoreController@search_storetype');
+        Route::get('stores/search-storechannel', 'StoreController@search_storeChannel');
+        Route::get('stores/search-storechannelkind', 'StoreController@search_storeChannelKind');
         Route::post('stores/search-storenm', 'StoreController@search_storenm');
         Route::post('stores/search-storenm-from-type', 'StoreController@search_storenm_from_type');
         Route::get('stores/search-store-info/{store_cd?}', 'StoreController@search_store_info');

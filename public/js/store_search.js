@@ -112,7 +112,8 @@ SearchStore.prototype.Open = async function(callback = null, multiple_type = fal
     if(this.grid === null){
         this.isMultiple = multiple_type === "multiple";
         this.SetGrid("#div-gd-store");
-        this.SetStoreTypeSelect();
+        this.SetStoreChannelSelect();
+        this.SetStoreChannelKindSelect();
         $("#SearchStoreModal").draggable();
         if(this.isMultiple) $("#SearchStoreModal #search_store_cbtn").css("display", "block");
         this.callback = callback;
@@ -122,15 +123,52 @@ SearchStore.prototype.Open = async function(callback = null, multiple_type = fal
     });
 };
 
-// 매장구분 세팅
-SearchStore.prototype.SetStoreTypeSelect = async function(){
+// 판매채널 세팅
+SearchStore.prototype.SetStoreChannelSelect = async function(){
     const { data: { body: types } } = await axios({ 
-        url: `/store/api/stores/search-storetype`, 
+        url: `/store/api/stores/search-storechannel`, 
         method: 'get' 
     });
     for(let type of types) {
-        $("#search_store_type").append(`<option value="${type.code_id}">${type.code_val}</option>`);
+        $("#search_store_channel").append(`<option value="${type.store_channel_cd}">${type.store_channel}</option>`);
     }
+}
+
+// 매장구분 세팅
+SearchStore.prototype.SetStoreChannelKindSelect = async function(){
+    const storeChannelSelect = document.getElementById("search_store_channel");
+   
+    storeChannelSelect.addEventListener("change", function() {
+
+        const sel_channel = document.getElementById("search_store_channel").value;
+
+		$.ajax({
+			method: 'post',
+			url: '/store/standard/std02/show/chg-store-channel',
+			data: {
+				'store_channel' : sel_channel
+				},
+			dataType: 'json',
+			success: function (res) {
+				if(res.code == 200){
+					$('#search_store_channel_kind').empty();
+					let select =  $("<option value=''>전체</option>");
+					$('#search_store_channel_kind').append(select);
+
+					for(let i = 0; i < res.store_kind.length; i++) {
+						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+						$('#search_store_channel_kind').append(option);
+					}
+
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
+      });
 }
 
 SearchStore.prototype.SetGrid = function(divId){
@@ -1318,7 +1356,40 @@ $( document ).ready(function() {
     $( ".sch-prcode" ).on("click", function() {
         searchPrCode.Open();
     });
+    
 });
+
+function chg_store_channel() {
+
+    const sel_channel = document.getElementById("store_channel").value;
+
+    $.ajax({
+        method: 'post',
+        url: '/store/standard/std02/show/chg-store-channel',
+        data: {
+            'store_channel' : sel_channel
+            },
+        dataType: 'json',
+        success: function (res) {
+            if(res.code == 200){
+                $('#store_channel_kind').empty();
+                let select =  $("<option value=''>전체</option>");
+                $('#store_channel_kind').append(select);
+
+                for(let i = 0; i < res.store_kind.length; i++) {
+                    let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+                    $('#store_channel_kind').append(option);
+                }
+
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        },
+        error: function(e) {
+            console.log(e.responseText)
+        }
+    });
+}	
 
 /**
  * @param {Array} select2 초기화할 select2 css 선택자 이름 추가 - ex) ['.test_cd', '#test_cd']

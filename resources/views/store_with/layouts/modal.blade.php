@@ -111,9 +111,21 @@
                                         <div class="row">
                                             <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
+                                                    <label style="min-width:80px;">판매채널</label>
+                                                    <div class="flax_box">
+														<select name='store_channel' class="form-control form-control-sm" id="search_store_channel">
+															<option value=''>전체</option>
+														</select>
+													</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 inner-td">
+                                                <div class="form-group">
                                                     <label style="min-width:80px;">매장구분</label>
                                                     <div class="flax_box">
-														<select name='store_type' class="form-control form-control-sm" id="search_store_type">
+														<select name='store_channel_kind' class="form-control form-control-sm" id="search_store_channel_kind">
 															<option value=''>전체</option>
 														</select>
 													</div>

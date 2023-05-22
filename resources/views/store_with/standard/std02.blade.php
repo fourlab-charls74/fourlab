@@ -47,7 +47,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4 inner-td" style="display:none">
 						<div class="form-group">
 							<label for="">매장종류</label>
 							<div class="flax_box">
@@ -68,17 +68,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-
-				<div class="row">
-					<!-- <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">매장코드 :</label>
-							<div class="flax_box">
-								<input type='text' class="form-control form-control-sm search-enter" name='store_cd' value=''>
-							</div>
-						</div>
-					</div> -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">매장지역</label>
@@ -92,6 +81,17 @@
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<div class="row">
+					<!-- <div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">매장코드 :</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm search-enter" name='store_cd' value=''>
+							</div>
+						</div>
+					</div> -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">사용유무</label>
@@ -168,11 +168,7 @@
 <script language="javascript">
 	var columns = [
 		{headerName: "#",			field: "num",			filter:true,width:40,valueGetter: function(params) {return params.node.rowIndex+1;}, cellStyle:{"text-align":"center"},pinned:'left'},
-		{headerName:"매장코드",		field:"store_cd",			width:60, cellStyle:{"text-align":"center"},
-			cellRenderer: function(params) {
-				return '<a href="#" onClick="popDetail(\''+ params.data.store_cd +'\')">'+ params.value+'</a>'
-			}
-		},
+		{headerName:"매장코드",		field:"store_cd",			width:60, cellStyle:{"text-align":"center"}},
 		// {headerName:"매장구분(구)",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
 		// {headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
 		{headerName:"판매채널",		field:"store_channel",	width:90, cellStyle:{"text-align":"center"}},

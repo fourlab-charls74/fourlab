@@ -26,13 +26,18 @@ class StoreController extends Controller {
      */
     public function search(Request $request)
     {
-        $store_cd = $request->input('store_cd');
         $store_nm = $request->input('store_nm');
-        $store_type = $request->input('store_type', '');
+        $store_cd = $request->input('store_cd');
+        $store_channel = $request->input('store_channel');
+        $store_channel_kind = $request->input('store_channel_kind');
         $where = "";
 
-        if($store_type != '') {
-            $where .= " and store_type = $store_type";
+        if($store_channel != '') {
+            $where .= " and store_channel = $store_channel";
+        }
+
+        if($store_channel_kind != '') {
+            $where .= " and store_channel_kind = $store_channel_kind";
         }
 
         $sql = "
@@ -54,12 +59,43 @@ class StoreController extends Controller {
     }
 
     /**
+     * 판매채널 목록조회
+     */
+    public function search_storeChannel(Request $request)
+    {
+        
+        $sql = "
+            select
+                store_channel
+                , store_channel_cd
+                , use_yn
+            from store_channel
+            where dep = 1 and use_yn = 'Y'
+        ";
+
+        $store_channel = DB::select($sql);
+
+        return response()->json(['code' => 200, 'body' => $store_channel]);
+    }
+
+    /**
      * 매장구분 목록조회
      */
-    public function search_storetype(Request $request)
+    public function search_storeChannelKind(Request $request)
     {
-        $store_types = SLib::getCodes("STORE_TYPE");
-        return response()->json(['code' => 200, 'body' => $store_types]);
+        
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+
+        $store_kind = DB::select($sql);
+
+        return response()->json(['code' => 200, 'body' => $store_kind]);
     }
 
     /**
