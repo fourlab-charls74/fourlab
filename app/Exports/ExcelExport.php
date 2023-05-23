@@ -36,6 +36,9 @@ class ExcelExport extends DefaultValueBinder implements FromCollection, WithHead
     {
         return array_column(array_map(
                     function($h) use ($row) {
+						if (in_array($h, ['ord_no'])) {
+							return ['key' => $h, 'value' => ($row->$h ?? '') . 'ㅤ'];
+						}
                         return ['key' => $h, 'value' => $row->$h ?? ''];
                     }, array_keys($this->headers)
                 ), 'value', 'key');

@@ -279,7 +279,7 @@
 
     // 판매가 변경 시 해당 값에 대한 마진율 & 할인율 계산
     function calculatePriceMargin(e) {
-        if(!Number.isInteger(parseInt(e.newValue))) {
+		if(isNaN(e.newValue * 1)) {
             alert("숫자만 입력해주세요");
             e.data[e.colDef.field] = e.oldValue;
             e.api.refreshCells({columns : [e.colDef.field], rosNodes: [e.node]});
