@@ -1154,8 +1154,6 @@
         $('[name=goods]:checked').each(function(obj) {
             ord_opt_nos.push(this.value);
         });
-		
-		alert(jaego_yn);return;
 
         $.ajax({
             async: true,
