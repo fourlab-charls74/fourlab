@@ -53,12 +53,10 @@ else $title = '판매채널관리 수정';
                                             <tr id="channel1">
                                                 <th>판매채널코드</th>
                                                 <td>
-                                                    <div class="flax_box">
-                                                        @if ($code == '')
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$sc_seq}}' readonly>
-                                                        @else 
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$store_channel->store_channel_cd}}' readonly>
-                                                        @endif
+                                                    <div class="d-flex">
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$store_channel->store_channel_cd}}' style="width:60%" maxlength="2">
+                                                            <button type="button" class="btn btn-primary ml-2" onclick="checkCode()">중복체크</button>
+                                                            &nbsp;&nbsp;&nbsp; <span id="dupcheck" class="pt-1"></span>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -80,7 +78,7 @@ else $title = '판매채널관리 수정';
                                                             @if ($code == '')
                                                                 <option value="{{ $c->store_channel_cd }}">{{ $c->store_channel }}</option>
                                                             @else
-                                                                <option value="{{ $c->store_channel_cd }}" @if($store_kind->store_channel_cd == $c->store_channel_cd) selected @endif>{{ $c->store_channel }}</option>
+                                                                <option value="{{ $c->store_channel_cd }}" @if($c->store_channel_cd == $store_kind->store_channel_cd) selected @endif>{{ $c->store_channel }}</option>
                                                             @endif
                                                         @endforeach
                                                         </select>
@@ -92,7 +90,9 @@ else $title = '판매채널관리 수정';
                                                 <td>
                                                     <div class="flax_box">
                                                         @if ($code == '')
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='{{@$sk_seq}}' readonly>
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='' style="width:60%" maxlength="2">
+                                                            <button type="button" class="btn btn-primary ml-2" onclick="checkCode()">중복체크</button>
+                                                            &nbsp;&nbsp;&nbsp; <span id="dupcheck2" class="pt-1"></span>
                                                         @else 
                                                             <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='{{@$store_kind->store_kind_cd}}' readonly>
                                                         @endif
@@ -306,8 +306,10 @@ else $title = '판매채널관리 수정';
             if(!confirm('수정하시겠습니까?')){
                 return false;
             }
-
+            let idx = '{{@$idx}}'
+            console.log(idx);
             var frm = $('form[name=detail]').serialize();
+            frm += '&idx='+idx;
 
             $.ajax({
                 method: 'post',
@@ -331,9 +333,33 @@ else $title = '판매채널관리 수정';
 
         }
 
-       
+        // 판매채널코드 중복체크
+        async function checkCode() {
+            const store_channel_cd = $("[name=store_channel_cd]").val().trim();
+            const store_kind_cd = $("[name=store_kind_cd").val().trim();
+            const add_type = $("input[name='add_type']:checked").val();
+            
+            if (add_type === 'C') {
+                if( store_channel_cd === '' )	return alert("판매채널코드를 입력해주세요.");
+                url = `/store/standard/std09/check-code/${store_channel_cd}/${add_type}`
+            } else {
+                if( store_kind_cd === '' )	return alert("매장구분코드를 입력해주세요.");
+                url = `/store/standard/std09/check-code/${store_kind_cd}/${add_type}`
+            }
 
-
+            const response = await axios({ 
+                url: url, 
+                method: 'get' 
+            });
+            const {data: {code, msg}} = response;
+            if (add_type === 'C') {
+                $("#dupcheck").text("* " + msg);
+                $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
+            } else {
+                $("#dupcheck2").text("* " + msg);
+                $("#dupcheck2").css("color", code === 200 ? "#00BB00" : "#ff0000");
+            }
+        }
 
     </script>
     

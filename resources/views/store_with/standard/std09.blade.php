@@ -107,7 +107,7 @@
         // },
         {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
-                return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_channel_cd}", "${params.data.store_type}")'>${params.value}</a>`;
+                return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_channel_cd}", "${params.data.store_type}" , "${params.data.idx}")'>${params.value}</a>`;
             }
         },
         {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'},
@@ -195,8 +195,8 @@
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
     }
 
-    function openEditPopup(code, type) {
-        const url = '/store/standard/std09/show/' + code + '/' + type;
+    function openEditPopup(code, type, idx) {
+        const url = '/store/standard/std09/show/' + code + '/' + type + '/' + idx;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
     }
 

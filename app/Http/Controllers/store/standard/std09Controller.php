@@ -29,56 +29,7 @@ class std09Controller extends Controller
         return view( Config::get('shop.store.view') . '/standard/std09_show',$values);
     }
 
-    public function show($code='', $type = '') {
-
-        //판매채널코드 자동으로 만들어지는 부분
-        $sql = "
-            select
-                store_channel_cd
-            from store_channel
-            where dep = 1
-            order by idx desc
-            limit 1
-        ";
-
-        $store_channel_cd = DB::selectOne($sql);
-
-        if ($store_channel_cd == '') {
-            $sc_seq = '01';
-        } else {
-            $sc_seq = (int)$store_channel_cd->store_channel_cd + 1;
-        }
-
-        if ((int)$sc_seq < 10) {
-            $sc_seq = '0'.$sc_seq;
-        } else {
-            $sc_seq = strval($sc_seq);
-        }
-
-        //매장구분 매장구분 코드 자동으로 만들어지는 부분
-        $sql = "
-            select
-                store_kind_cd
-            from store_channel
-            where dep = 2
-            order by idx desc
-            limit 1
-        ";
-
-        $store_kind_cd = DB::selectOne($sql);
-
-
-        if ($store_kind_cd == '') {
-            $sk_seq = '01';
-        } else {
-            $sk_seq = (int)$store_kind_cd->store_kind_cd + 1;
-        }
-
-        if ((int)$sk_seq < 10) {
-            $sk_seq = '0'.$sk_seq;
-        } else {
-            $sk_seq = strval($sk_seq);
-        }
+    public function show($code='', $type = '', $idx = '') {
 
         //셀렉트박스 부분
         $sql = "
@@ -90,6 +41,8 @@ class std09Controller extends Controller
         ";
 
         $channels = DB::select($sql);
+
+        // dd($code, $type);
 
         if ($code != '') {
             $sql = "
@@ -103,25 +56,40 @@ class std09Controller extends Controller
 
             $edit = DB::selectOne($sql);
 
-            $sql = "
-                select
-                    store_kind_cd
-                    , store_channel_cd
-                    , store_kind
-                    , use_yn
-                from store_channel
-                where store_kind_cd = '$code' and dep = 2
-            ";
-
-            $edit2  = DB::selectOne($sql);
+            if($type == 'C') {
+                $sql = "
+                    select
+                        idx
+                        , store_kind_cd
+                        , store_channel_cd
+                        , store_kind
+                        , use_yn
+                    from store_channel
+                    where store_channel_cd = '$code' and dep = 1
+                ";
+    
+                $edit2  = DB::selectOne($sql);
+            } else {
+                $sql = "
+                    select
+                        idx
+                        , store_kind_cd
+                        , store_channel_cd
+                        , store_kind
+                        , use_yn
+                    from store_channel
+                    where store_kind_cd = '$code' and dep = 2
+                ";
+    
+                $edit2  = DB::selectOne($sql);
+            }
         }
 
         $values = [
-            'sc_seq' => $sc_seq,
-            'sk_seq' => $sk_seq,
             'channels' => $channels,
             'code' => $code == '' ? "" : "update",
             'type' => $type,
+            'idx' => $idx,
             'store_channel' => $edit??'',
             'store_kind' => $edit2??'',
         ];
@@ -142,7 +110,8 @@ class std09Controller extends Controller
         $sql = /** @lang text */
             "
             select 
-                 store_type
+                idx
+                 , store_type
                  , store_channel_cd
                  , store_channel
                  , dep
@@ -285,6 +254,7 @@ class std09Controller extends Controller
 
     public function edit(Request $request) {
 
+        $idx = $request->input('idx');
         $add_type = $request->input('add_type');
         $store_channel_cd = $request->input('store_channel_cd');
         $store_channel = $request->input('store_channel');
@@ -298,9 +268,10 @@ class std09Controller extends Controller
 
             if ($add_type == 'C') {
                 DB::table('store_channel')
-                    ->where('store_channel_cd','=',$store_channel_cd)
+                    ->where('idx','=',$idx)
                     ->update([
                         'store_channel' => $store_channel,
+                        'store_channel_cd' => $store_channel_cd,
                         'use_yn' => $use_yn
                     ]);
             }
@@ -308,11 +279,12 @@ class std09Controller extends Controller
             if ($add_type == 'T') {
 
                 DB::table('store_channel')
-                    ->where('store_kind_cd','=',$store_kind_cd)
+                    ->where('idx','=',$idx)
                     ->where('dep','=',2)
                     ->update([
                         'store_channel_cd' => $sel_channel,
                         'store_kind' => $store_kind,
+                        'store_kind_cd' => $store_kind_cd,
                         'use_yn' => $use_yn
                     ]);
             }
@@ -409,4 +381,27 @@ class std09Controller extends Controller
         ]);
 
     }
+
+    // 매장코드 중복체크
+	public function check_code($channel = '', $add_type = '') 
+	{
+
+		$code	= 200;
+		$msg	= "사용가능한 코드입니다.";
+
+        if ($add_type === 'C') {
+            $sql	= " select count(store_channel_cd) as cnt from store_channel where store_channel_cd = :store_channel_cd and dep = 1 ";
+            $cnt	= DB::selectOne($sql, ["store_channel_cd" => $channel])->cnt;
+        } else {
+            $sql	= " select count(store_kind_cd) as cnt from store_channel where store_kind_cd = :store_kind_cd and dep = 2 ";
+            $cnt	= DB::selectOne($sql, ["store_kind_cd" => $channel])->cnt;
+        }
+
+		if( $cnt > 0 ){
+			$code	= 409;
+			$msg	= "이미 사용중인 코드입니다.";
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
 }

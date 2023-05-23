@@ -96,11 +96,13 @@
 													</div>
 													<span class="mr-2 ml-2">/</span>
 													<div class="flex_box w-100">
-														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == 'add') disabled @endif>
+														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == '') disabled @endif>
 															<option value=''>전체</option>
+															@if($cmd == 'update')
 																@foreach ($store_kind as $sk)
 																	<option value='{{ $sk->store_kind_cd }}' @if($cmd == 'update') @if(@$sk->store_kind_cd == $store->store_channel_kind) selected @endif @endif>{{ $sk->store_kind }}</option>
 																@endforeach
+															@endif
 														</select>
 													</div>
 												</div>
