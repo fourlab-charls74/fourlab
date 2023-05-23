@@ -1517,20 +1517,24 @@
                 $("#goods_nm").focus();
                 return false;
             }
-            if( $("#goods_nm").val().match(/[',|]/) ){
-                alert("상품명에 특수문자(\',|)를 입력할 수 없습니다.");
+            if( $("#goods_nm").val().match(/[\,]/) ){
+                alert("상품명에 특수문자(,)를 입력할 수 없습니다.");
                 $("#goods_nm").focus();
                 return false;
             }
-
-            /*
+			
             if( $("#goods_nm_eng").val() == "" ){
                 alert("상품명(영문)을 입력해 주십시오.");
                 $("#goods_nm_eng").focus();
                 return false;
             }
-            */
 
+			if( $("#goods_nm_eng").val().match(/[\,]/) ){
+				alert("상품명(영문)에 특수문자(,)를 입력할 수 없습니다.");
+				$("#goods_nm_eng").focus();
+				return false;
+			}
+			
             if( $("#opt_kind_cd").val() == "" ){
                 alert("품목을 선택해 주십시오.");
                 $("#opt_kind_cd").focus();
