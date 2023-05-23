@@ -134,11 +134,7 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "store_cd", headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"},
-            cellRenderer: function(params) {
-                return `<a href='javascript:void(0)' onclick='SearchDetail("${params.value}", "${params.data.store_nm}")'>${params.value}</a>`;
-            }
-        },
+        {field: "store_cd", headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}},
         {field: "store_type", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 140, 
             cellRenderer: function(params) {
@@ -166,11 +162,11 @@
         {field: "edate", headerName: "종료일", width: 90, cellStyle: {"text-align": "center"}},
         {field: "store_fee", headerName: "매장수수료(%)", width: 120, type: "percentType"},
         {field: "grade_cd", hide: true},
-        {field: "grade_nm", headerName: "매장등급", width: 80, cellStyle: {"text-align": "center"},
-            cellRenderer: (params) => {
-                return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.value || params.data.grade_cd}")'>${params.value || params.data.grade_cd || ''}</a>`;
-            }
-        },
+        // {field: "grade_nm", headerName: "매장등급", width: 80, cellStyle: {"text-align": "center"},
+        //     cellRenderer: (params) => {
+        //         return `<a href='javascript:void(0)' onclick='showStoreGradePopup("${params.value || params.data.grade_cd}")'>${params.value || params.data.grade_cd || ''}</a>`;
+        //     }
+        // },
         // {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType"},
         {field: "comment", headerName: "메모", width: 300},
         {width: "auto"},

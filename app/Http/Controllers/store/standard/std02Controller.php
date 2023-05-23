@@ -316,10 +316,10 @@ class std02Controller extends Controller
 
 			$values	= [
 				'store_nm'		=> $request->input('store_nm'),
-				'store_nm_s'	=> $request->input('store_nm_s'),
+				'store_nm_s'	=> $request->input('store_nm_s')??'',
 				// 'store_type'	=> $request->input('store_type'),
 				'store_channel'	=> $request->input('store_channel'),
-				'store_channel_kind'	=> $request->input('store_kind'),
+				'store_channel_kind'	=> $request->input('store_channel_kind'),
 				'store_area'	=> $request->input('store_area'),
 				'grade_cd'		=> $grade_cd,
 				'zipcode'		=> $request->input('zipcode'),

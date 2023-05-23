@@ -135,7 +135,7 @@ class std07Controller extends Controller
 					on sg.grade_cd = s.grade_cd 
 					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
 					and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
-			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
+			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y' and sf.use_yn = 'Y'
 			order by cd.code_seq
 		";
 

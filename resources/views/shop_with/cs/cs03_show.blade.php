@@ -49,7 +49,7 @@
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
 											<input type="hidden" id="com_cd" name="com_cd" />
-											<input onchange="changeInput();" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+											<input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
 											<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
@@ -459,32 +459,6 @@
         searchCompany.Open(null, '6', 'wonboo');
     });
 
-
-    // function changeInput() {
-	// 	let com_nm = document.getElementById('com_nm');
-
-	// 	$.ajax({
-	// 		method: 'post',
-	// 		url: '/shop/cs/cs03/buy/changeInput',
-	// 		data: {
-	// 			com_nm : com_nm
-	// 		},
-	// 		success: function(data) {
-	// 			if (data.code == '200') {
-    //                 document.getElementById('com_code').value = data.result;
-								
-    //             } else {
-    //                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-    //             }
-    //         },
-    //         error: function(res, status, error) {
-    //             console.log(error);
-    //         }
-    //     });
-    // }
-
- 
-   
 
 </script>
 

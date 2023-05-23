@@ -190,15 +190,15 @@
 			{headerName:"매장",		field:"deposit_cash",	width:72, type: 'currencyType'},
 			{headerName:"담보",		field:"deposit_coll",	width:72, type: 'currencyType'},
 		]},
-		{headerName:"점포수수료",	field:"fee", width:80, type: 'currencyType',
-			cellRenderer:function(params) {
-				if (params.data.fee == 0 || params.data.fee == null) {
-					return 0;
-				} else {
-					return '<a href="#" onClick="chargePopup(\''+ params.data.store_cd +'\')">'+ Comma(params.data.fee)+'</a>'
-				}
-			}
-		},
+		// {headerName:"점포수수료",	field:"fee", width:80, type: 'currencyType',
+		// 	cellRenderer:function(params) {
+		// 		if (params.data.fee == 0 || params.data.fee == null) {
+		// 			return 0;
+		// 		} else {
+		// 			return '<a href="#" onClick="chargePopup(\''+ params.data.store_cd +'\')">'+ Comma(params.data.fee)+'</a>'
+		// 		}
+		// 	}
+		// },
 		{headerName:"판매수수료율",	field:"sale_fee",		width:84, cellStyle:{"text-align":"right"}},
 		{headerName:"사용여부",		field:"use_yn",			width:60, cellStyle:{"text-align":"center"}},
 		{headerName:"",				field:"",				width:"auto"}

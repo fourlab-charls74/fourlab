@@ -83,7 +83,6 @@
 											</td>
                                         </tr>
                                         <tr>
-											
 											<th class="required">판매채널/매장구분</th>
 											<td>
 												<div class="d-flex align-items-center">
@@ -97,13 +96,11 @@
 													</div>
 													<span class="mr-2 ml-2">/</span>
 													<div class="flex_box w-100">
-														<select id='store_kind' name='store_kind' class="form-control form-control-sm" disabled>
+														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == 'add') disabled @endif>
 															<option value=''>전체</option>
-															@if ($cmd == 'update') 
 																@foreach ($store_kind as $sk)
-																	<option value='{{ $sk->store_kind_cd }}' @if(@$sk->store_kind_cd == $store->store_channel_kind) selected @endif>{{ $sk->store_kind }}</option>
+																	<option value='{{ $sk->store_kind_cd }}' @if($cmd == 'update') @if(@$sk->store_kind_cd == $store->store_channel_kind) selected @endif @endif>{{ $sk->store_kind }}</option>
 																@endforeach
-															@endif
 														</select>
 													</div>
 												</div>
@@ -1165,6 +1162,9 @@
 			
 		}
 
+		for (const [key, value] of form.entries()) {
+			console.log(key, value);
+		}
 
         if(!window.confirm("매장정보를 수정하시겠습니까?")) return;
 
@@ -1263,25 +1263,30 @@
 			return alert("매장명을 입력해주세요.");
 		}
 		// 매장명칭(약칭) 입력여부
-		if(f1.store_nm_s.value.trim() === '') {
-			f1.store_nm_s.focus();
-			return alert("매장명(약칭)을 입력해주세요.");
-		}
+		// if(f1.store_nm_s.value.trim() === '') {
+		// 	f1.store_nm_s.focus();
+		// 	return alert("매장명(약칭)을 입력해주세요.");
+		// }
 		// 판매채널 선택여부
 		if(f1.store_channel.selectedIndex == 0) {
 			f1.store_channel.focus();
 			return alert("판매채널을 선택해주세요.");
 		}
 		// 매장구분 선택여부
-		if(f1.store_kind.selectedIndex == 0) {
-			f1.store_kind.focus();
+		if(f1.store_channel_kind.selectedIndex == 0) {
+			f1.store_channel_kind.focus();
 			return alert("매장구분을 선택해주세요.");
 		}
 		// 매장종류 선택여부
-		if(f1.store_kind2.selectedIndex == 0) {
-			f1.store_kind2.focus();
-			return alert("매장종류를 선택해주세요.");
-		}
+		// if(f1.store_kind2.selectedIndex == 0) {
+		// 	f1.store_kind2.focus();
+		// 	return alert("매장종류를 선택해주세요.");
+		// }
+
+		// 주소 입력여부
+		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
+		return true;
+
 		// 매장지역 선택여부
 		if(f1.store_area.selectedIndex == 0) {
 			f1.store_area.focus();
@@ -1293,9 +1298,7 @@
 			return alert('매칭할 업체를 선택해주세요.');
 		}
 
-		// 주소 입력여부
-		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
-		return true;
+		
 	}
 
 	//온라인업체매칭 & 정산관리여부
@@ -1323,13 +1326,13 @@
 	// 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
 	$(document).ready(function() {
 		const store_channel = document.getElementById("store_channel");
-		const store_kind = document.getElementById("store_kind");
+		const store_channel_kind = document.getElementById("store_channel_kind");
 
 		store_channel.addEventListener("change", () => {
 			if (store_channel.value) {
-				store_kind.disabled = false;
+				store_channel_kind.disabled = false;
 			} else {
-				store_kind.disabled = true;
+				store_channel_kind.disabled = true;
 			}
 		});
 	});
@@ -1348,13 +1351,13 @@
 			dataType: 'json',
 			success: function (res) {
 				if(res.code == 200){
-					$('#store_kind').empty();
+					$('#store_channel_kind').empty();
 					let select =  $("<option value=''>전체</option>");
-					$('#store_kind').append(select);
+					$('#store_channel_kind').append(select);
 
 					for(let i = 0; i < res.store_kind.length; i++) {
 						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
-						$('#store_kind').append(option);
+						$('#store_channel_kind').append(option);
 					}
 
 				} else {
@@ -1365,7 +1368,7 @@
 				console.log(e.responseText)
 			}
 		});
-	}
+	}	
 
 </script>
 @stop

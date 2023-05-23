@@ -17,7 +17,7 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="openAddPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="openAddPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="openAddPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="#" onclick="openAddPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>등록</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </form>
@@ -98,13 +98,13 @@
     const columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
-            cellRenderer: function(params) {
-                if (params.value === 'C') {
-                    return '판매채널';
-                }
-            }
-        },
+        // {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
+        //     cellRenderer: function(params) {
+        //         if (params.value === 'C') {
+        //             return '판매채널';
+        //         }
+        //     }
+        // },
         {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_channel_cd}", "${params.data.store_type}")'>${params.value}</a>`;
@@ -123,13 +123,13 @@
     const store_type_columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
-            cellRenderer: function(params) {
-                if (params.value === 'T') {
-                    return '매장구분';
-                }
-            }
-        },
+        // {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
+        //     cellRenderer: function(params) {
+        //         if (params.value === 'T') {
+        //             return '매장구분';
+        //         }
+        //     }
+        // },
         // {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},},
         // {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'}},
         {field: "store_kind_cd", headerName: "매장구분코드", width: 100, cellStyle:{'text-align' : 'center'},

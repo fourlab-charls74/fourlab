@@ -55,22 +55,12 @@
 					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="store_cd">매장코드</label>
-                            <div class="form-inline">
-                                <input type="text" id="store_cd" name="store_cd" class="form-control form-control-sm w-100 search-enter" />
-                            </div>
-						</div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
 							<label for="store_nm">매장명</label>
                             <div class="form-inline">
                                 <input type="text" id="store_nm" name="store_nm" class="form-control form-control-sm w-100 search-enter" />
                             </div>
 						</div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
 							<label>사용여부</label>
@@ -87,6 +77,14 @@
                                     <input type="radio" class="custom-control-input" id="use_yn_N" name="use_yn" value="N" />
                                     <label class="custom-control-label" for="use_yn_N">N</label>
                                 </div>
+                            </div>
+						</div>
+                    </div>
+                    <div class="col-lg-4 inner-td" hidden>
+                        <div class="form-group">
+							<label for="store_cd">매장코드</label>
+                            <div class="form-inline">
+                                <input type="text" id="store_cd" name="store_cd" class="form-control form-control-sm w-100 search-enter" />
                             </div>
 						</div>
                     </div>

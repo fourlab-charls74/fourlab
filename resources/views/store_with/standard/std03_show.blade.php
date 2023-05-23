@@ -132,20 +132,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>LOSS창고여부</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" class="custom-control-input" id="loss_yn_Y" name="loss_yn" value="Y" @if(@$storage->loss_yn != 'N') checked @endif />
-                                                        <label class="custom-control-label" for="loss_yn_Y">Y</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" class="custom-control-input" id="loss_yn_N" name="loss_yn" value="N" @if(@$storage->loss_yn == 'N') checked @endif />
-                                                        <label class="custom-control-label" for="loss_yn_N">N</label>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <th>매장재고조회여부</th>
+                                            
+                                            <th>매장조회여부</th>
                                             <td>
                                                 <div class="form-inline form-radio-box">
                                                     <div class="custom-control custom-radio">
@@ -158,6 +146,21 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <th hidden>LOSS창고여부</th>
+                                            <td hidden>
+                                                <div class="form-inline form-radio-box">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" class="custom-control-input" id="loss_yn_Y" name="loss_yn" value="Y" @if(@$storage->loss_yn != 'N') checked @endif />
+                                                        <label class="custom-control-label" for="loss_yn_Y">Y</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" class="custom-control-input" id="loss_yn_N" name="loss_yn" value="N" @if(@$storage->loss_yn == 'N') checked @endif />
+                                                        <label class="custom-control-label" for="loss_yn_N">N</label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <th></th>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <th>설명</th>
@@ -211,7 +214,7 @@
         if($("#fax").val() != "") alertmsg += "\nFAX번호 : " + $("#fax").val();
         if($("#ceo").val() != "") alertmsg += "\n대표자명 : " + $("#ceo").val();
         if($('input[name="use_yn"]:checked')) alertmsg += "\n창고사용여부 : " + $('input[name="use_yn"]:checked').val();
-        if($('input[name="loss_yn"]:checked')) alertmsg += "\nLOSS창고여부 : " + $('input[name="loss_yn"]:checked').val();
+        // if($('input[name="loss_yn"]:checked')) alertmsg += "\nLOSS창고여부 : " + $('input[name="loss_yn"]:checked').val();
         if($('input[name="stock_check_yn"]:checked')) alertmsg += "\n매장재고조회여부 : " + $('input[name="stock_check_yn"]:checked').val();
         if($("#comment").val() != "") alertmsg += "\n설명 : " + $("#comment").val();
 

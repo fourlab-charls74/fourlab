@@ -17,7 +17,7 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
 		            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -111,12 +111,12 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "storage_cd", headerName: "창고코드", pinned: "left", width: 100,
+        {field: "storage_cd", headerName: "창고코드", pinned: "left", width: 100},
+        {field: "storage_nm", headerName: "창고명", width: 200,
             cellRenderer: function(params) {
-                return `<a href='javascript:void(0)' onclick='openPopup("${params.value}")'>${params.value}</a>`;
+                return `<a href='javascript:void(0)' onclick='openPopup("${params.data.storage_cd}")'>${params.value}</a>`;
             }
         },
-        {field: "storage_nm", headerName: "창고명", width: 200},
         {field: "phone", headerName: "전화번호", width: 120, cellStyle: {"text-align": "center"}},
         {field: "use_yn", headerName: "창고사용", cellStyle: {"text-align": "center"}},
         {field: "stock_check_yn", headerName: "매장조회여부", cellStyle: {"text-align": "center"}},

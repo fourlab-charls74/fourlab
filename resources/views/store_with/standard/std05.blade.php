@@ -17,7 +17,7 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>등록</a>
 		            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -39,7 +39,7 @@
                             </div>
 						</div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td" hidden>
                         <div class="form-group">
 							<label for="sale_type_nm">판매유형명</label>
                             <div class="form-inline">
@@ -66,18 +66,16 @@
                             </div>
 						</div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>사용여부</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="use_yn_A" name="use_yn" value="" checked />
+                                    <input type="radio" class="custom-control-input" id="use_yn_A" name="use_yn" value=""  />
                                     <label class="custom-control-label" for="use_yn_A">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" />
+                                    <input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" checked/>
                                     <label class="custom-control-label" for="use_yn_Y">Y</label>
                                 </div>
                                 <div class="custom-control custom-radio">
@@ -92,7 +90,7 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+            <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i>등록</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div>
@@ -118,7 +116,7 @@
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "sale_kind", headerName: "판매구분코드", pinned: "left", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "sale_kind_nm", headerName: "판매구분", pinned: "left", width: 120},
+        // {field: "sale_kind_nm", headerName: "판매구분", pinned: "left", width: 120},
         {field: "sale_type_nm", headerName: "판매유형명", width: 150,
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openPopup("${params.data.sale_type_cd}")'>${params.value}</a>`;
