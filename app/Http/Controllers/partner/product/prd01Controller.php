@@ -991,6 +991,19 @@ class prd01Controller extends Controller
         ";
         $class_items = DB::select($query);
 
+		$conf_sql = /** @lang text */
+			"
+            select 
+            	value, 
+            	mvalue
+            from conf
+            where 
+            	type = 'shop'
+            	and name = 'domain'
+        ";
+			
+		$conf_items = DB::selectOne($conf_sql);
+		
 		$values = $this->_get($goods_no);
 
 		$values = array_merge($values,[
@@ -1005,6 +1018,7 @@ class prd01Controller extends Controller
             'g_dlv_fee'			=> $cfg_dlv_fee,
             'g_free_dlv_fee_limit'	=> $cfg_free_dlv_fee_limit,
             'g_order_point_ratio'	=> $cfg_order_point_ratio,
+			'front_url'			=> $conf_items
         ]);
 
         return view(Config::get('shop.partner.view') . '/product/prd01_show',$values);

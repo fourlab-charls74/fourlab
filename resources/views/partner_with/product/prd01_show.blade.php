@@ -247,7 +247,7 @@
                                     <button type="button" id="img-setting" class="btn btn-primary waves-effect waves-light" data-no="{{$goods_no}}">
                                         <i class="bx bx-cog font-size-14 align-middle"></i> 이미지 관리
                                     </button>
-                                    <button type="button" id="img-show" class="btn btn-success waves-effect waves-light" data-no="https://{{config('shop.front_url')}}/app/product/detail/{{ $goods_no }}">
+                                    <button type="button" id="img-show" class="btn btn-success waves-effect waves-light" onclick="openFrontUrl()">
                                         <i class="bx bx-images font-size-14 align-middle"></i> 상품보기
                                     </button>
                                 </div>
@@ -1486,10 +1486,10 @@
             }
         }
 
-        function pop_prd_page(){
+        /*function pop_prd_page(){
             url = "https://www.netpx.co.kr/app/product/detail/"+goods_no+"/"+goods_sub;
             window.open(url);
-        }
+        }*/
 
         function validate(){
 	        let f = document.f1;
@@ -3496,6 +3496,21 @@
 
     }
 
+	function isMobile()
+	{
+		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	}
+	
+	function openFrontUrl() 
+	{
+		let url = '{{@$front_url->value}}';
+		
+		if(!isMobile){
+			url = '{{@$front_url->mvalue}}';
+		}
+		
+		window.open(`https://${url}/app/product/detail/{{ @$goods_no }}`, '_blank');
+	}
 	</script>
 
 @stop
