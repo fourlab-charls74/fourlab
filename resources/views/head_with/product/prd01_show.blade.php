@@ -2087,7 +2087,7 @@
 		});
 
         function setOptionArea() {
-            if( $('#is_option_use2').is(":checked") == true ){
+            if( $('#is_option_use_n').is(":checked") == true ){
                 $('.use_option_n').css('display','table-row');
                 $('.use_option_y').css('display','none');
                 resetAddOptionKindBox();

@@ -1815,20 +1815,20 @@
                     $(`[name=is_option_use][value=${prevOptionUsed}]`).prop("checked", true);
                 }
             @else
-                setOptionArea();
+                setOptionArea(e.value);
 			@endif
 		});
 
-        function setOptionArea() {
-            if( $('#is_option_use2').is(":checked") == true ){
-                $('.use_option_n').css('display','table-row');
-                $('.use_option_y').css('display','none');
-                resetAddOptionKindBox();
-            }else{
-                $('.use_option_n').css('display','none');
-                $('.use_option_y').css('display','flex');
-            }
-        }
+		function setOptionArea() {
+			if( $('#is_option_use_n').is(":checked") == true ){
+				$('.use_option_n').css('display','table-row');
+				$('.use_option_y').css('display','none');
+				resetAddOptionKindBox();
+			}else{
+				$('.use_option_n').css('display','none');
+				$('.use_option_y').css('display','flex');
+			}
+		}
 
 
         $(".btn-change-qty").click(function(){
