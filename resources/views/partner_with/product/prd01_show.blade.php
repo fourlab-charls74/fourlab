@@ -455,141 +455,129 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <th class="required">MD선택</th>
-                                            <td>
-                                                <div class="wd300">
-                                                    <input type="hidden" name="md_nm" id="md_nm" value="{{@$goods_info->md_nm}}">
-                                                    <select name="md_id" id="md_id" class="form-control form-control-sm search-all">
-														<option value="">==MD선택==</option>
-                                                        @foreach($md_list as $md)
-                                                            <option value="{{$md->id}}" {{ (@$goods_info->md_id == $md->id) ? "selected" : "" }}>{{$md->name}} ({{$md->id}})</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">배송정보</th>
-                                            <td>
-                                                <div class="form-inline wd400">
-                                                    <div class="form-inline-inner input_box">
-                                                        <select name="baesong_info" id="baesong_info"  class="form-control form-control-sm search-all">
+											<th class="required">배송정보</th>
+											<td>
+												<div class="form-inline wd400">
+													<div class="form-inline-inner input_box">
+														<select name="baesong_info" id="baesong_info"  class="form-control form-control-sm search-all">
 															<option value="" class="required">==배송지역==</option>
-                                                            <option value="1" @if(@$goods_info->baesong_info == "1") selected @endif>국내배송</option>
-                                                            <option value="2" @if(@$goods_info->baesong_info == "2") selected @endif>해외배송</option>
-                                                        </select>
-                                                    </div>
-                                                    <span class="text_line">/</span>
-                                                    <div class="form-inline-inner input_box">
-                                                        <select name="baesong_kind" id="baesong_kind" class="form-control form-control-sm search-all">
+															<option value="1" @if(@$goods_info->baesong_info == "1") selected @endif>국내배송</option>
+															<option value="2" @if(@$goods_info->baesong_info == "2") selected @endif>해외배송</option>
+														</select>
+													</div>
+													<span class="text_line">/</span>
+													<div class="form-inline-inner input_box">
+														<select name="baesong_kind" id="baesong_kind" class="form-control form-control-sm search-all">
 															<option value="" class="required">==배송업체==</option>
-                                                            <option value="1" @if(@$goods_info->baesong_kind == "1") selected @endif >본사배송</option>
-                                                            <option value="2" @if(@$goods_info->baesong_kind == "2") selected @endif >입점업체배송</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <th><p>배송비 지불</p></th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="dlv_pay_type" value="P" id="dlv_pay_type1" class="custom-control-input" {{ (@$goods_info->dlv_pay_type!="F") ? "checked" : "" }} />
-                                                        <label class="custom-control-label" for="dlv_pay_type1">선불</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="dlv_pay_type" value="F" id="dlv_pay_type2" class="custom-control-input" {{ (@$goods_info->dlv_pay_type=="F") ? "checked" : "" }} />
-                                                        <label class="custom-control-label" for="dlv_pay_type2"> 착불 </label>
-                                                    </div>
-                                                </div>
-                                            </td>
+															<option value="1" @if(@$goods_info->baesong_kind == "1") selected @endif >본사배송</option>
+															<option value="2" @if(@$goods_info->baesong_kind == "2") selected @endif >입점업체배송</option>
+														</select>
+													</div>
+												</div>
+											</td>
                                         </tr>
                                         <tr>
-                                            <th class="required">배송비</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="dlv_fee_cfg" value="S" onclick="change_dlv_cfg_form('s')" id="dlv_fee_cfg1" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) checked @endif />
-                                                        <label class="custom-control-label" for="dlv_fee_cfg1">
+											<th><p>배송비 지불</p></th>
+											<td>
+												<div class="form-inline form-radio-box flax_box txt_box">
+													<div class="custom-control custom-radio">
+														<input type="radio" name="dlv_pay_type" value="P" id="dlv_pay_type1" class="custom-control-input" {{ (@$goods_info->dlv_pay_type!="F") ? "checked" : "" }} />
+														<label class="custom-control-label" for="dlv_pay_type1">선불</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" name="dlv_pay_type" value="F" id="dlv_pay_type2" class="custom-control-input" {{ (@$goods_info->dlv_pay_type=="F") ? "checked" : "" }} />
+														<label class="custom-control-label" for="dlv_pay_type2"> 착불 </label>
+													</div>
+												</div>
+											</td>
+											<th class="required">배송비</th>
+											<td>
+												<div class="form-inline form-radio-box flax_box txt_box">
+													<div class="custom-control custom-radio">
+														<input type="radio" name="dlv_fee_cfg" value="S" onclick="change_dlv_cfg_form('s')" id="dlv_fee_cfg1" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) checked @endif />
+														<label class="custom-control-label" for="dlv_fee_cfg1">
+															@if( @$goods_info->dlv_policy == "C" )
+																업체별 설정
+															@else
+																쇼핑몰 설정
+															@endif
+														</label>
+													</div>
+													<div class="custom-control custom-radio mr-2">
+														<input type="radio" name="dlv_fee_cfg" value="G" onclick="change_dlv_cfg_form('g')" id="dlv_fee_cfg2" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "G") checked @endif />
+														<label class="custom-control-label" for="dlv_fee_cfg2">상품 개별 설정</label>
+													</div>
+													<div
+														class="dlv_config_detail_div txt_box"
+														id="dlv_config_detail_s_div"
+														@if(@$goods_info->dlv_fee_cfg == "G") style="display:none;" @endif
+													>
 														@if( @$goods_info->dlv_policy == "C" )
 															업체별 설정
 														@else
-															쇼핑몰 설정
+															유료, 배송비 {{@$g_dlv_fee}}원 ({{@$g_free_dlv_fee_limit}}원 이상 구매 시 무료)
 														@endif
-														</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio mr-2">
-                                                        <input type="radio" name="dlv_fee_cfg" value="G" onclick="change_dlv_cfg_form('g')" id="dlv_fee_cfg2" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "G") checked @endif />
-                                                        <label class="custom-control-label" for="dlv_fee_cfg2">상품 개별 설정</label>
-                                                    </div>
-                                                    <div
-                                                    class="dlv_config_detail_div txt_box"
-                                                    id="dlv_config_detail_s_div"
-                                                    @if(@$goods_info->dlv_fee_cfg == "G") style="display:none;" @endif
-                                                    >
-													@if( @$goods_info->dlv_policy == "C" )
-														업체별 설정
-													@else
-														유료, 배송비 {{@$g_dlv_fee}}원 ({{@$g_free_dlv_fee_limit}}원 이상 구매 시 무료)
-													@endif
-                                                    </div>
-                                                    <div
-                                                    class="dlv_config_detail_div"
-                                                    id="dlv_config_detail_g_div"
-                                                    @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) style="display:none;" @endif
-                                                    >
-                                                        <div class="flax_box">
-                                                            <div class="select">
-                                                                <select name="bae_yn" class="form-control form-control-sm search-all">
-                                                                    <option value="Y" @if (@$goods_info->bae_yn !== 'N') selected @endif>유료</option>
-                                                                    <option value="N" @if (@$goods_info->bae_yn === 'N') selected @endif>무료</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="input_box">
-                                                                <input
-                                                                type="text"
-                                                                name="baesong_price"
-                                                                id="baesong_price"
-                                                                class="form-control form-control-sm search-all"
-                                                                style="width:100px;text-align:right;"
-                                                                value="{{@number_format(@$goods_info->baesong_price)}}"
-                                                                @if (@$goods_info->bae_yn === 'N') readonly @endif
-                                                                />
-                                                            </div>
-                                                            <div class="txt_box">원</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <th class="required">적립금</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    @if($type == "create")
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="point_cfg" class="custom-control-input" value="S" checked/>
-                                                            <label class="custom-control-label" for="point_cfg">쇼핑몰 정책 : 구매 금액의 {{$g_order_point_ratio}}% 적립</label>
-                                                        </div>
-                                                    @else
-                                                        <input type="hidden" name="point_cfg" value="{{$goods_info->point_cfg}}"/>
-                                                        <input type="hidden" name="point_yn" value="{{$goods_info->point_yn}}"/>
-                                                        <input type="hidden" name="point" value="{{$goods_info->point}}"/>
-                                                        @if($goods_info->point_yn == "Y")
-                                                            {{ @$goods_info->point  }} 원 ( 구매 금액의 {{$g_order_point_ratio}}% 적립 )
-                                                        @else
-                                                        <div class="txt_box">
-                                                            지급안함
-                                                        </div>
-                                                        @endif
-                                                    @endif
-                                                </div>
-                                            </td>
+													</div>
+													<div
+														class="dlv_config_detail_div"
+														id="dlv_config_detail_g_div"
+														@if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) style="display:none;" @endif
+													>
+														<div class="flax_box">
+															<div class="select">
+																<select name="bae_yn" class="form-control form-control-sm search-all">
+																	<option value="Y" @if (@$goods_info->bae_yn !== 'N') selected @endif>유료</option>
+																	<option value="N" @if (@$goods_info->bae_yn === 'N') selected @endif>무료</option>
+																</select>
+															</div>
+															<div class="input_box">
+																<input
+																	type="text"
+																	name="baesong_price"
+																	id="baesong_price"
+																	class="form-control form-control-sm search-all"
+																	style="width:100px;text-align:right;"
+																	value="{{@number_format(@$goods_info->baesong_price)}}"
+																	@if (@$goods_info->bae_yn === 'N') readonly @endif
+																/>
+															</div>
+															<div class="txt_box">원</div>
+														</div>
+													</div>
+												</div>
+											</td>
                                         </tr>
                                         <tr>
-                                            <th><p>등록일시</p></th>
-                                            <td>
-                                                <div class="txt_box">
-                                                    {{ @$goods_info->reg_dm }}
-                                                </div>
-                                            </td>
+											<th class="required">적립금</th>
+											<td>
+												<div class="form-inline form-radio-box flax_box txt_box">
+													@if($type == "create")
+														<div class="custom-control custom-radio">
+															<input type="radio" name="point_cfg" class="custom-control-input" value="S" checked/>
+															<label class="custom-control-label" for="point_cfg">쇼핑몰 정책 : 구매 금액의 {{$g_order_point_ratio}}% 적립</label>
+														</div>
+													@else
+														<input type="hidden" name="point_cfg" value="{{$goods_info->point_cfg}}"/>
+														<input type="hidden" name="point_yn" value="{{$goods_info->point_yn}}"/>
+														<input type="hidden" name="point" value="{{$goods_info->point}}"/>
+														@if($goods_info->point_yn == "Y")
+															{{ @$goods_info->point  }} 원 ( 구매 금액의 {{$g_order_point_ratio}}% 적립 )
+														@else
+															<div class="txt_box">
+																지급안함
+															</div>
+														@endif
+													@endif
+												</div>
+											</td>
+											<th><p>등록일시</p></th>
+											<td>
+												<div class="txt_box">
+													{{ @$goods_info->reg_dm }}
+												</div>
+											</td>
+                                        </tr>
+                                        <tr>
                                             <th><p>수정일시</p></th>
                                             <td>
                                                 <div class="txt_box">
@@ -1591,11 +1579,7 @@
 				$('#tax_yn').focus();
 				return false;
 			}
-			if( $("#md_id").val() == "" ){
-				alert("MD를 선택해 주십시오.");
-				$("#md_id").focus();
-				return false;
-			}
+			
             if( $("#baesong_info").val() == "" ){
                 alert("배송지역를 선택해 주십시오.");
                 $("#baesong_info").focus();
@@ -1641,12 +1625,7 @@
 			let frm	= $("#f1");
 			let d_cat_str	= "";
 			let u_cat_str	= "";
-			let md_nm	= $('#md_id > option:selected').html();
-
-			// console.log(md_nm);
-				md_nm = md_nm.replace(/(\s)|(\t)|(\n)/g, "");
-
-			$('#md_nm').val(md_nm);
+			
             $("#goods_cont").val(ed.html());
 
 			//전시 카테고리 전송값

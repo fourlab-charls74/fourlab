@@ -1287,7 +1287,21 @@ class prd01Controller extends Controller
 					DB::insert($sql);
 				}
 			}
-
+			
+			//md 아이디, 네임 가져오기
+			$com_id = Auth('partner')->user()->com_id;
+			$md_sql = " 
+					 select
+					    md_id,
+					    md_nm
+					 from 
+					     company
+ 					 where
+ 					     com_id = '$com_id'
+					";
+			
+			$md_info = DB::selectOne($md_sql);
+	
 			$a_goods = array(
 				"goods_no"			=> $goods_no,
 				"goods_sub"			=> $goods_sub,
@@ -1321,8 +1335,8 @@ class prd01Controller extends Controller
 				"point_unit"		=> $point_unit,
 				"point"				=> $point,
 				"tax_yn"			=> $req->input('tax_yn', 'Y'),
-				"md_id"				=> $req->input('md_id', ''),
-				"md_nm"				=> $req->input('md_nm', ''),
+				"md_id"				=> $md_info->md_id !== null ? $md_info->md_id : Auth('partner')->user()->com_id , 
+				"md_nm"				=> $md_info->md_nm !== null ? $md_info->md_nm : $name ,
 				"is_unlimited"		=> $req->input('is_unlimited', 'N'),
 				"is_option_use"		=> $is_option_use,
 				"rep_cat_cd"		=> $req->input('rep_cat_cd',''),
@@ -1389,7 +1403,8 @@ class prd01Controller extends Controller
 			return response()->json($goods_no, 201);
 		} catch(Exception $e){
 			DB::rollback();
-			return response()->json(['msg' => "업로드 도중 에러가 발생했습니다. 잠시 후 다시시도 해주세요."], 500);
+			return response()->json(['msg' => $e->getMessage()], 500);
+			//return response()->json(['msg' => "업로드 도중 에러가 발생했습니다. 잠시 후 다시시도 해주세요."], 500);
 		}
 	}
 
@@ -1677,8 +1692,6 @@ class prd01Controller extends Controller
 		$wonga				= str_replace(',', '', $request->input('wonga', 0));
 		$margin				= $request->input('margin');
 		$tax_yn				= $request->input('tax_yn');
-		$md_id				= $request->input('md_id');
-		$md_nm				= $request->input('md_nm');
 		$restock_yn			= $request->input('restock_yn', 'N');
 		$goods_sh			= str_replace(',', '', $request->input('goods_sh', 0));
 		$baesong_info		= $request->input('baesong_info');
@@ -1782,6 +1795,22 @@ class prd01Controller extends Controller
 			$sale_set .= 'sale_s_dt = "'.$sale_s_dt.'",';
 			$sale_set .= 'sale_e_dt = "'.$sale_e_dt.'",';
 
+			$com_id = Auth('partner')->user()->com_id;
+			$md_sql = " 
+					 select
+					     md_id,
+					     md_nm
+					 from 
+					     company
+ 					 where
+ 					     com_id = '$com_id'
+					";
+			
+			$md_info = DB::selectOne($md_sql);
+			
+			$md_id = $md_info->md_id !== null ? $md_info->md_id : Auth('partner')->user()->com_id;
+			$md_nm = $md_info->md_nm !== null ? $md_info->md_nm : Auth('partner')->user()->name;
+			
 			$query	= /** @lang text */
 				"
 					update goods
@@ -1801,7 +1830,7 @@ class prd01Controller extends Controller
 							goods_memo			= '".$goods_memo."',
 							price				= '".$price."',
 							tax_yn				= '".$tax_yn."',
-							md_id				= '".$md_id."',
+							md_id				= '".$md_id."' , 
 							md_nm				= '".$md_nm."',
 							baesong_info		= '".$baesong_info."',
 							baesong_kind		= '".$baesong_kind."',
