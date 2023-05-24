@@ -24,7 +24,7 @@
 
     <style> 
         .required:after {content:" *"; color: red;}
-        .table th {min-width:160px;}
+        .table th {min-width:170px;}
         @media (max-width: 740px) {
             .table td {float: unset !important;width:100% !important;}
         }
@@ -66,13 +66,10 @@
                                             <td style="width:35%;">
                                                 <div class="d-flex flex-column">
                                                     <div class="d-flex">
-                                                        <input type="text" name="store_cd" id="store_cd" value="{{ @$store->store_cd }}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" @if($cmd == "update") readonly @endif />
-                                                        @if($cmd == "") 
-                                                        <button type="button" class="btn btn-primary" onclick="checkCode()">중복체크</button>
-                                                        @endif
+                                                        <input type="text" name="store_cd" id="store_cd" value="{{ @$store->store_cd }}" class="form-control form-control-sm mr-2" style="width:100%" readonly/>
                                                     </div>
-                                                    <p id="dupcheck" class="pt-1"></p>
-                                                    <input type="hidden" name="store_only" />
+													<p class="pt-1" style="color:red"> * 매장코드는 판매채널 / 매장구분을 선택하면 자동으로 생성됩니다.</p>
+													<input type="hidden" name="pre_store_cd" id="pre_store_cd" value="{{ @$store->store_cd }}">
                                                 </div>
                                             </td>
 											<th class="required">매장명</th>
@@ -87,22 +84,29 @@
 											<td>
 												<div class="d-flex align-items-center">
 													<div class="flex_box w-100">
-														<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+														<select name='store_channel' id="store_channel" class="form-control form-control-sm"onchange="chg_store_channel();">
 															<option value=''>전체</option>
-															@foreach ($store_channel as $sc)
-																<option value='{{ $sc->store_channel_cd }}' @if($cmd == 'update') @if( $sc->store_channel_cd == $store->store_channel) selected @endif @endif>{{ $sc->store_channel }}</option>
-															@endforeach
+															@if ($cmd == '') 
+																@foreach ($store_channel as $sc)
+																	<option value='{{ $sc->store_channel_cd }}'> {{ $sc->store_channel }} </option>
+																@endforeach
+															@else 
+																@foreach ($store_channel as $sc)
+																	<option value='{{ $sc->store_channel_cd }}' selected> {{ $sc->store_channel }} </option>
+																@endforeach
+															@endif
 														</select>
 													</div>
 													<span class="mr-2 ml-2">/</span>
 													<div class="flex_box w-100">
-														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == '') disabled @endif>
+														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == '') disabled @endif onchange="createStoreCd()">
 															<option value=''>전체</option>
 															@if($cmd == 'update')
-																@foreach ($store_kind as $sk)
-																	<option value='{{ $sk->store_kind_cd }}' @if($cmd == 'update') @if(@$sk->store_kind_cd == $store->store_channel_kind) selected @endif @endif>{{ $sk->store_kind }}</option>
+																@foreach ($sel_store_kind as $sk)
+																	<option value='{{ $sk->store_kind_cd }}' @if($sk->store_kind_cd == $store->store_channel_kind ) selected @endif>{{ $sk->store_kind }}</option>
 																@endforeach
 															@endif
+
 														</select>
 													</div>
 												</div>
@@ -622,203 +626,6 @@
 							</div>
 						</div>
 					</div>
-			
-					<!-- <div class="row">
-						<div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 환경 정보</div>
-					</div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-box-ty2 mobile">
-                                <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                    <tbody>
-										<tr>
-											<th hidden>관리기준</th>
-											<td style="width:35%;" hidden>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="manage_type_M" name="manage_type" value="M" @if(@$store->vat_yn != 'M') checked @endif />
-														<label class="custom-control-label" for="manage_type_M">중간관리식</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="manage_type_P" name="manage_type" value="P" @if(@$store->vat_yn == 'P') checked @endif />
-														<label class="custom-control-label" for="manage_type_P">사입식</label>
-													</div>
-												</div>
-											</td>
-											<th>정산관리여부(+수수료등급)</th>
-											<td style="width:35%;">
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="account_y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="account_n" name="account_yn" value="N" @if(@$store->account_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="account_n">N</label>
-													</div>
-													&nbsp;&nbsp;&nbsp;
-													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
-														<option value=''>미등록</option>
-														@foreach ($grades as $grade)
-															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-											<th>출고우선순위</th>
-											<td style="width:35%;">
-												<div class="flex_box">
-													<select name='priority' class="form-control form-control-sm">
-														<option value=''>전체</option>
-														@foreach ($prioritys as $priority)
-															<option value='{{ $priority->code_id }}' @if(@$store->priority == $priority->code_id) selected @endif>{{ $priority->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th hidden>경비관리</th>
-											<td style="width:35%;" hidden>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="exp_manage_yn_Y" name="exp_manage_yn" value="Y" @if(@$store->vat_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="exp_manage_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="exp_manage_yn_N" name="exp_manage_yn" value="N" @if(@$store->vat_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="exp_manage_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											
-										</tr>
-										<tr>
-											<th hidden>동종업계정보입력</th>
-											<td hidden>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="competitor_yn_Y" name="competitor_yn" value="Y" checked @if(@$store->competitor_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="competitor_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="competitor_yn_N" name="competitor_yn" value="N" @if(@$store->competitor_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="competitor_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th hidden>POS 사용여부</th>
-											<td hidden>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="pos_yn_Y" name="pos_yn" value="Y" checked/>
-														<label class="custom-control-label" for="pos_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="pos_yn_N" name="pos_yn" value="N"/>
-														<label class="custom-control-label" for="pos_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th>타매장재고조회</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="ostore_stock_yn_Y" name="ostore_stock_yn" value="Y" @if(@$store->ostore_stock_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="ostore_stock_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="ostore_stock_yn_N" name="ostore_stock_yn" value="N" @if(@$store->ostore_stock_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="ostore_stock_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th>판매분배분여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="sale_dist_yn_Y" name="sale_dist_yn" value="Y" @if(@$store->sale_dist_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="sale_dist_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="sale_dist_yn_N" name="sale_dist_yn" value="N" @if(@$store->sale_dist_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="sale_dist_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th>매장RT여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="rt_yn_Y" name="rt_yn" value="Y" @if(@$store->rt_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="rt_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="rt_yn_N" name="rt_yn" value="N" @if(@$store->rt_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="rt_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th>적립금지급여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="point_in_yn_Y" name="point_in_yn" value="Y" @if(@$store->point_in_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="point_in_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="point_in_yn_N" name="point_in_yn" value="N" @if(@$store->point_in_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="point_in_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th hidden>오픈후한달 재고보기제외 여부</th>
-											<td hidden>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y" checked/>
-														<label class="custom-control-label" for="open_month_stock_y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="open_month_stock_n" name="open_month_stock_yn" value="N"/>
-														<label class="custom-control-label" for="open_month_stock_n">N</label>
-													</div>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<th>온라인업체매칭</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="sale_place_match_y" name="sale_place_match_yn" value="Y" @if(@$store->sale_place_match_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="sale_place_match_y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="sale_place_match_n" name="sale_place_match_yn" value="N" @if(@$store->sale_place_match_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="sale_place_match_n">N</label>
-													</div>
-													&nbsp;&nbsp;&nbsp;
-													<select name='com_id' id="com_id" class="form-control form-control-sm" style="width:70%;">
-														<option value=''>전체</option>
-															@foreach ($store_match as $sm)
-																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
-															@endforeach
-													</select>
-												</div>
-											</td>
-											<th></th>
-											<td></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div> -->
 				</div>
 			</div>
 		</div>
@@ -925,8 +732,6 @@
 
 		btnAdd.onchange = function(e) {
 			cnt++;
-			console.log(cnt);
-			
 			if (cnt > 1) {
 				const parent = document.getElementById('img_div');
 
@@ -943,7 +748,6 @@
 		imageLoader = function(file) {
 			if (cnt == 1) {
 				sel_files.push(file);
-				console.log(sel_files);
 				var reader = new FileReader();
 				reader.onload = function(ee) {
 					let img = document.createElement('img')
@@ -954,7 +758,6 @@
 			} else {
 				sel_files = [];
 				sel_files.push(file);
-				console.log(sel_files);
 				var reader = new FileReader();
 				reader.onload = function(ee) {
 					let img = document.createElement('img')
@@ -1212,23 +1015,6 @@
             console.log(err);
         });
     }
-    // 매장코드 중복체크
-    async function checkCode() {
-        const store_cd = $("[name=store_cd]").val().trim();
-        if( store_cd === '' )	return alert("매장코드를 입력해주세요.");
-        const response = await axios({ 
-            url: `/store/standard/std02/check-code/${store_cd}`, 
-            method: 'get' 
-        });
-        const {data: {code, msg}} = response;
-        $("#dupcheck").text("* " + msg);
-        $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
-        $("[name=store_only]").val(code === 200 ? "true" : "false");
-    }
-    // 창고코드값 변경 시 중복체크 false 변경
-    function setDupCheckValue() {
-        $("[name=storage_only]").val("false");
-    }
     // 우편번호 검색하기
     function searchZipcode() {
         new daum.Postcode({
@@ -1255,9 +1041,6 @@
 				f1.store_cd.focus();
 				return alert("매장코드를 입력해주세요.");
 			}
-			
-			// 중복체크여부 검사
-			if($("[name='store_only']").val() !== "true") return alert("매장코드 중복체크를 해주세요.");
 		}
 		// 매장명칭 입력여부
 		if(f1.store_nm.value.trim() === '') {
@@ -1362,6 +1145,10 @@
 						$('#store_channel_kind').append(option);
 					}
 
+					let store_cd = document.getElementById('store_cd');
+					store_cd.value = "";
+
+
 				} else {
 					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
 				}
@@ -1370,7 +1157,65 @@
 				console.log(e.responseText)
 			}
 		});
-	}	
+	}
+
+	//매장코드 자동으로 생성하는 부분
+	async function createStoreCd() {
+		let store_channel = document.getElementById("store_channel").value;
+		let store_channel_kind = document.getElementById("store_channel_kind").value;
+		let store_code = store_channel + store_channel_kind;
+		let cnt = 0;
+
+		axios({
+            url: `/store/standard/std02/create-store-cd`,
+            method: 'post',
+			data : {
+				'store_code' : store_code
+			},
+			dataType: 'json',
+        }).then(function (res) {
+            if(res.data.code === 200) {
+				if(res.data.cnt == 0) {
+					cnt = 1;
+					let seq = getSeq(cnt);
+					let code = store_code + seq; 
+					$('#store_cd').val(code)
+				} else if(res.data.cnt > 0) {
+					cnt = res.data.cnt + 1
+					let seq = getSeq(cnt);
+					let code = store_code + seq; 
+
+					const str = code;
+					const front = str.substring(0, str.length - 4);
+					const str2 = $('#pre_store_cd').val();
+					const front2 = str2.substring(0, str2.length - 4);
+
+					if(front == front2) {
+						$('#store_cd').val(str2);
+					} else {
+						$('#store_cd').val(str);
+					}
+				}
+            } else {
+                console.log(res.data);
+                alert("삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+
+	}
+	
+	function getSeq(count) {
+		let seq = count.toString();
+		while (seq.length < 4) {
+			seq = "0" + seq;
+		}
+		return seq;
+	}
+
+
 
 </script>
 @stop

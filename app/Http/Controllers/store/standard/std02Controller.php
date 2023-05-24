@@ -160,7 +160,7 @@ class std02Controller extends Controller
 		$store_img	= "";
 		$map_key = "";
 		$store_kind = "";
-		$grades = [];
+		$sel_store_kind = "";
 
 		if($store_cd != '') {
 			$sql = "
@@ -229,18 +229,41 @@ class std02Controller extends Controller
 		$store_channel = DB::select($sql);
 
 
-		if($store_cd != '') {
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
+		if ($store_cd != '') {
+			$sql = "
+				select 
+					store_channel
+				from store
+				where store_cd = '$store_cd'
+			";
+
+			$sc = DB::selectOne($sql);
+
 			$sql = "
 				select
 					store_kind
 					, store_kind_cd
 					, use_yn
 				from store_channel
-				where dep = 2 and use_yn = 'Y'
+				where dep = 2 and use_yn = 'Y' and store_channel_cd = '$sc->store_channel'
+
 			";
 
-			$store_kind = DB::select($sql);
-		}
+			$sel_store_kind = DB::select($sql);
+		} 
+
+		
 
 			
 		$values = [
@@ -255,10 +278,10 @@ class std02Controller extends Controller
 			'prioritys' => SLib::getCodes("PRIORITY"),
 			'store_match' => $store_match,
 			'store_channel' => $store_channel,
-			'store_kind' => $store_kind
+			'store_kind' => $store_kind,
+			'sel_store_kind' => $sel_store_kind
 		];
 		
-
 		return view( Config::get('shop.store.view') . '/standard/std02_show',$values);
 	}
 
@@ -288,6 +311,7 @@ class std02Controller extends Controller
 		$code		= 200;
 		$msg		= "매장정보가 정상적으로 반영되었습니다.";
 		$store_cd 	= $request->input('store_cd');
+		$pre_store_cd = $request->input('pre_store_cd');
 		$image 		= $request->file('file');
 		// $y 			= $request->input('y');
 		// $x 			= $request->input('x');
@@ -311,10 +335,11 @@ class std02Controller extends Controller
 			DB::beginTransaction();
 
 			$where	= [
-				'store_cd'	=> $request->input('store_cd')
+				'store_cd'	=> $pre_store_cd
 			];
 
 			$values	= [
+				'store_cd' 		=> $request->input('store_cd'),
 				'store_nm'		=> $request->input('store_nm'),
 				'store_nm_s'	=> $request->input('store_nm_s')??'',
 				// 'store_type'	=> $request->input('store_type'),
@@ -630,5 +655,33 @@ class std02Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg, 'stores' => $stores]);
 	}
+
+	public function create_store_cd(Request $request) {
+
+		$store_code = $request->input('store_code');
+
+        try {
+            DB::beginTransaction();
+                $sql = "
+					select 
+						count(*) as cnt
+					from store
+					where store_cd like '$store_code%'
+					
+                ";
+            $cnt = DB::selectOne($sql);
+
+			DB::commit();
+            $code = 200;
+            $msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg, "cnt" => $cnt->cnt]);
+	}
+
 
 }

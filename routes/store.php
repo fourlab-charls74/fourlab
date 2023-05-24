@@ -115,6 +115,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std02/check-code/{storage_cd?}', 'std02Controller@check_code');
         Route::post('std02/update', 'std02Controller@update_store');
         Route::post('std02/del_img', 'std02Controller@del_img');
+        Route::post('std02/create-store-cd', 'std02Controller@create_store_cd');
 
 
         // 창고관리

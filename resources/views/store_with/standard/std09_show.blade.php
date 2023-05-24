@@ -54,9 +54,10 @@ else $title = '판매채널관리 수정';
                                                 <th>판매채널코드</th>
                                                 <td>
                                                     <div class="d-flex">
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" value='{{@$store_channel->store_channel_cd}}' style="width:60%" maxlength="2">
+                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" onkeydown="setDupCheckValue()" value='{{@$store_channel->store_channel_cd}}' style="width:60%" maxlength="2">
                                                             <button type="button" class="btn btn-primary ml-2" onclick="checkCode()">중복체크</button>
                                                             &nbsp;&nbsp;&nbsp; <span id="dupcheck" class="pt-1"></span>
+                                                            <input type="hidden" name="check_dup" />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -89,13 +90,10 @@ else $title = '판매채널관리 수정';
                                                 <th>매장구분코드</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        @if ($code == '')
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='' style="width:60%" maxlength="2">
-                                                            <button type="button" class="btn btn-primary ml-2" onclick="checkCode()">중복체크</button>
-                                                            &nbsp;&nbsp;&nbsp; <span id="dupcheck2" class="pt-1"></span>
-                                                        @else 
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" value='{{@$store_kind->store_kind_cd}}' readonly>
-                                                        @endif
+                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_kind_cd' id="store_kind_cd" onkeydown="setDupCheckValue2()" value='{{@$store_kind->store_kind_cd}}' style="width:60%" maxlength="2">
+                                                        <button type="button" class="btn btn-primary ml-2" onclick="checkCode()">중복체크</button>
+                                                        &nbsp;&nbsp;&nbsp; <span id="dupcheck2" class="pt-1"></span>
+                                                        <input type="hidden" name="check_dup2" />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -211,6 +209,8 @@ else $title = '판매채널관리 수정';
                     return false;
                 }
 
+                if($("[name='check_dup']").val() !== "true") return alert("판매채널코드 중복체크를 해주세요.");
+
             }
 
             if ($("input[name='add_type']:checked").val() === 'T') {
@@ -232,6 +232,8 @@ else $title = '판매채널관리 수정';
                     return false;
                 }
 
+                if($("[name='check_dup2']").val() !== "true") return alert("매장구분코드 중복체크를 해주세요.");
+
             }
 
             if(!confirm('저장하시겠습니까?')){
@@ -239,8 +241,6 @@ else $title = '판매채널관리 수정';
             }
 
             var frm = $('form[name=detail]').serialize();
-
-            console.log(frm);
 
             $.ajax({
                 method: 'post',
@@ -307,9 +307,10 @@ else $title = '판매채널관리 수정';
                 return false;
             }
             let idx = '{{@$idx}}'
-            console.log(idx);
+            let code = "{{@$store_channel_cd}}";
             var frm = $('form[name=detail]').serialize();
             frm += '&idx='+idx;
+            frm += '&code=' + code;
 
             $.ajax({
                 method: 'post',
@@ -355,10 +356,22 @@ else $title = '판매채널관리 수정';
             if (add_type === 'C') {
                 $("#dupcheck").text("* " + msg);
                 $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
+                $("[name=check_dup]").val(code === 200 ? "true" : "false");
             } else {
                 $("#dupcheck2").text("* " + msg);
                 $("#dupcheck2").css("color", code === 200 ? "#00BB00" : "#ff0000");
+                $("[name=check_dup2]").val(code === 200 ? "true" : "false");
             }
+        }
+
+        //판매채널코드 값 변경시 false처리
+        function setDupCheckValue() {
+            $("[name=check_dup]").val("false");
+        }
+
+        //매장구분코드 값 변경시 false처리
+        function setDupCheckValue2() {
+            $("[name=check_dup2]").val("false");
         }
 
     </script>

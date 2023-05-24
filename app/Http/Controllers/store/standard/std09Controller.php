@@ -30,7 +30,6 @@ class std09Controller extends Controller
     }
 
     public function show($code='', $type = '', $idx = '') {
-
         //셀렉트박스 부분
         $sql = "
             select
@@ -88,6 +87,7 @@ class std09Controller extends Controller
         $values = [
             'channels' => $channels,
             'code' => $code == '' ? "" : "update",
+            'store_channel_cd' => $code,
             'type' => $type,
             'idx' => $idx,
             'store_channel' => $edit??'',
@@ -156,7 +156,8 @@ class std09Controller extends Controller
 	{
 		$sql = "
             select 
-                store_type
+                idx
+                , store_type
                 , store_channel_cd
                 , store_channel
                 , store_kind_cd
@@ -262,13 +263,14 @@ class std09Controller extends Controller
         $store_kind_cd = $request->input('store_kind_cd');
         $store_kind = $request->input('store_kind');
         $use_yn = $request->input('use_yn');
+        $code = $request->input('code');
 
         try {
             DB::beginTransaction();
 
             if ($add_type == 'C') {
                 DB::table('store_channel')
-                    ->where('idx','=',$idx)
+                    ->where('store_channel_cd', '=', $code)
                     ->update([
                         'store_channel' => $store_channel,
                         'store_channel_cd' => $store_channel_cd,

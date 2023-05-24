@@ -134,7 +134,7 @@
         // {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'}},
         {field: "store_kind_cd", headerName: "매장구분코드", width: 100, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
-                return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_kind_cd}", "${params.data.store_type}")'>${params.value}</a>`;
+                return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_kind_cd}", "${params.data.store_type}", "${params.data.idx}")'>${params.value}</a>`;
             }
         },
         {field: "store_kind", headerName: "매장구분", width: 100, cellStyle:{'text-align' : 'center'},},
@@ -252,6 +252,7 @@
             if(res.data.code === 200) {
                 alert("판매채널이 삭제되었습니다.");
                 Search();
+                SearchDetail();
             } else {
                 console.log(res.data);
                 alert("판매채널 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
