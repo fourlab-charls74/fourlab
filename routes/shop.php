@@ -452,6 +452,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 매장RT
         Route::get('stk20','stk20Controller@index');
         Route::get('stk20/search','stk20Controller@search');
+		Route::get('stk20/download','stk20Controller@download'); // 전표출력
         Route::post('stk20/receipt','stk20Controller@receipt'); // 접수
         Route::post('stk20/release','stk20Controller@release'); // 출고
         Route::post('stk20/receive','stk20Controller@receive'); // 매장입고

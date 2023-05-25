@@ -238,9 +238,13 @@ class stk22Controller extends Controller
         try {
             DB::beginTransaction();
 
-            foreach($data as $d) {
+			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
+			$document_number = DB::selectOne($sql)->document_number;
+			
+			foreach($data as $d) {
                 DB::table('product_stock_rotation')
                     ->insert([
+						'document_number' => $document_number,
                         'type' => $rt_type,
                         'goods_no' => $d['goods_no'] ?? 0,
                         'prd_cd' => $d['prd_cd'] ?? 0,

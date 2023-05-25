@@ -579,7 +579,7 @@
     }
 	
 	// RT전표 출력
-    async function printRT(document_number, idx) {
+    function printRT(document_number, idx) {
 		location.href = '/store/stock/stk20/download?document_number=' + document_number + '&idx=' + idx;
     }
 
