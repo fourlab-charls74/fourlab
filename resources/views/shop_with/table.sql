@@ -242,6 +242,7 @@ CREATE TABLE `product_stock_release` (
 -- 오프라인 RT
 CREATE TABLE `product_stock_rotation` (
 	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`document_number` INT(11) NOT NULL COMMENT '전표번호',
 	`type` VARCHAR(50) DEFAULT NULL COMMENT '분류',
 	`goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
 	`prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',

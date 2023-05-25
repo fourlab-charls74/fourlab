@@ -399,7 +399,17 @@
         {field: "del_rt", headerName: "RT 삭제", cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 if(params.data.state === 10 || params.data.state === -10) {
-                    return `<a href="javascript:void(0);" onclick="remove(${params.data.idx})" style="color:blue;">삭제</a>`;
+                    return `<a href="javascript:void(0);" onclick="remove(${params.data.idx})" style="color:#ff4444;">삭제</a>`;
+                } else{
+                    return '-';
+                }
+            }
+        },
+		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
+		{field: "del_rt", headerName: "전표 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+            cellRenderer: function(params) {
+                if(params.data.state >= 10) {
+                    return `<a href="javascript:void(0);" style="color: inherit;" onclick="printRT(${params.data.document_number}, ${params.data.idx})">출력</a>`;
                 } else{
                     return '-';
                 }
@@ -409,10 +419,10 @@
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -566,6 +576,11 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
+	
+	// RT전표 출력
+    async function printRT(document_number, idx) {
+		location.href = '/store/stock/stk20/download?document_number=' + document_number + '&idx=' + idx;
     }
 
     function openApi() {

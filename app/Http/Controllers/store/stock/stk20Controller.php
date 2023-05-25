@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
-
-use App\Models\Conf;
+use App\Exports\ExcelViewExport;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 const PRODUCT_STOCK_TYPE_STORE_RT = 15;
 
@@ -144,6 +146,7 @@ class stk20Controller extends Controller
 		$sql = "
             select
                 psr.idx,
+                psr.document_number,
                 psr.type,
                 psr.goods_no, 
                 if(psr.goods_no > 0, g.style_no, p.style_no) as style_no,
@@ -550,4 +553,93 @@ class stk20Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+	
+	// 전표출력
+	public function download(Request $request)
+	{
+		$document_number = $request->input('document_number');
+		$idx = $request->input('idx');
+		
+		$sql = "
+			select p.prd_cd
+			     , g.goods_nm
+			     , pc.color
+			     , pc.size
+			     , p.qty
+			     , p.rec_comment
+			     , if(p.type = 'R', '요청RT', if(p.type = 'G', '일반RT', '')) as type
+			     , (select store_nm from store where store_cd = p.dep_store_cd) as dep_store_nm
+			     , (select store_nm from store where store_cd = p.store_cd) as store_nm
+			     , p.prc_rt
+			     , p.fin_rt
+			from product_stock_rotation p
+				inner join goods g on g.goods_no = p.goods_no
+				inner join product_code pc on pc.prd_cd = p.prd_cd
+			where p.document_number = :document_number
+				and p.dep_store_cd = (select dep_store_cd from product_stock_rotation where idx = :idx)
+				and p.store_cd = (select store_cd from product_stock_rotation where idx = :idx2)
+		";
+		$rows = DB::select($sql, [ 'document_number' => $document_number, 'idx' => $idx, 'idx2' => $idx ]);
+		
+		$data = [
+			'document_number' => sprintf('%04d', $document_number),
+			'products' => $rows
+		];
+		
+		if (count($rows) > 0) {
+			$data['type'] 			= $rows[0]->type ?? '';
+			$data['dep_store_nm'] 	= $rows[0]->dep_store_nm ?? '';
+			$data['store_nm'] 		= $rows[0]->store_nm ?? '';
+			
+			if (isset($rows[0]->prc_rt)) {
+				$prc_rt = Carbon::parse($rows[0]->prc_rt);
+				$data['prc_rt_yyyy'] 	= $prc_rt->format('Y');
+				$data['prc_rt_mm']		= $prc_rt->format('m');
+				$data['prc_rt_dd'] 		= $prc_rt->format('d');
+			}
+
+			if (isset($rows[0]->fin_rt)) {
+				$fin_rt = Carbon::parse($rows[0]->fin_rt);
+				$data['fin_rt_yyyy'] 	= $fin_rt->format('Y');
+				$data['fin_rt_mm'] 		= $fin_rt->format('m');
+				$data['fin_rt_dd'] 		= $fin_rt->format('d');
+			}
+		}
+		
+		$style = [
+			'A6:Z35' => [ 'borders' => [ 'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
+			'U1:Z4' => [ 'borders' => [ 
+				'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
+				'outline' => [ 'borderStyle' => Border::BORDER_MEDIUM ],
+			] ],			
+			'T6:Z7' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'A1:Z35' => [ 
+				'alignment' => [ 
+					'horizontal' => Alignment::HORIZONTAL_CENTER,
+					'vertical' => Alignment::VERTICAL_CENTER,
+				],
+				'font' => [ 'size' => 14 ]
+			],
+			'F9:F33' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'U9:U33' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'A36:A37' => [ 
+				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ],
+				'font' => [ 'size' => 14 ]
+			],
+			'A6:A7' => [ 'font' => [ 'bold' => true ] ],
+			'H6:H7' => [ 'font' => [ 'bold' => true ] ],
+			'Q6:Q7' => [ 'font' => [ 'bold' => true ] ],
+			'V6:V7' => [ 'font' => [ 'bold' => true ] ],
+			'X6:X7' => [ 'font' => [ 'bold' => true ] ],
+			'Z6:Z7' => [ 'font' => [ 'bold' => true ] ],
+			'A8:Z8' => [ 'font' => [ 'bold' => true ] ],
+			'A34:S34' => [ 'font' => [ 'bold' => true ] ],
+			'G3' => [ 'font' => [ 'bold' => true, 'size' => 30 ] ],
+		];
+
+		$view_url = Config::get('shop.store.view') . '/stock/stk20_document';
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => 25, 'cell_width' => 6, 'cell_height' => 33 ];
+		
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $keys), 'RT전표.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 }

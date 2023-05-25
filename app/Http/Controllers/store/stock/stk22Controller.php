@@ -281,9 +281,13 @@ class stk22Controller extends Controller
                 throw new Exception('보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.');
             }
 
+			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
+			$document_number = DB::selectOne($sql)->document_number;
+
 			foreach($data as $d) {
                 DB::table('product_stock_rotation')
                     ->insert([
+						'document_number' => $document_number,
                         'type' => $rt_type,
                         'goods_no' => $d['goods_no'] ?? 0,
                         'prd_cd' => $d['prd_cd'] ?? 0,
