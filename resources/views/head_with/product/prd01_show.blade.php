@@ -876,7 +876,7 @@
                                                         <label class="custom-control-label" for="is_option_use1">사용</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="is_option_use" value="N" id="is_option_use2" class="custom-control-input" {{ (@$goods_info->is_option_use=="N")? "checked" : "" }}>
+                                                        <input type="radio" name="is_option_use" value="N" id="is_option_use2" class="custom-control-input" @if( $type != 'create' ) {{ (@$goods_info->is_option_use=="N")? "checked" : "" }} @else checked @endif>
                                                         <label class="custom-control-label" for="is_option_use2">사용 안함</label>
                                                     </div>
                                                     <x-tool-tip>
