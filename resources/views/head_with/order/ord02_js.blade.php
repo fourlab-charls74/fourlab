@@ -281,7 +281,7 @@
     function EditAmtTable(total_dlv_amt) {
         var rows = gx.getRows();
 
-        var dlv_amt_total = total_dlv_amt !== undefined ? total_dlv_amt : parseInt($("[name='dlv_amt']").val()); // 배송비합계
+        var dlv_amt_total = total_dlv_amt !== undefined ? total_dlv_amt : unComma($("[name='dlv_amt']").val()); // 배송비합계
 
         var ord_amt_total = rows.reduce((a,c) => c.goods_no ? c.ord_amt + a : a, 0); // 주문액합계
 
@@ -290,7 +290,7 @@
             $("[name='ord_amt']").val(ord_amt_total.toLocaleString('ko-KR'));
         }
 
-        var point_amt = parseInt($("[name='point_amt']").val() || 0);
+        var point_amt = unComma($("[name='point_amt']").val());
         var recv_amt_total = ord_amt_total - parseInt(point_amt) + dlv_amt_total; // 총입금액
         $("[name='recv_amt']").val(recv_amt_total.toLocaleString('ko-KR'));
 
@@ -886,11 +886,11 @@
     }
 
     $("#point_amt").change(function() {
-        var point = parseInt(this.value);
+        var point = unComma(this.value);
 
-        if(isNaN(point)) return this.value = 0;
-
-        this.value = point.toLocaleString("ko-KR");
+        if(isNaN(point)) this.value = 0;
+        else this.value = point.toLocaleString("ko-KR");
+		
         EditAmtTable();
     })
 

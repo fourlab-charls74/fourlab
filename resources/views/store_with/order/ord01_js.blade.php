@@ -243,7 +243,7 @@
         $("[name='dlv_amt']").val(dlv_amt_total.toLocaleString('ko-KR'));
         $("[name='ord_amt']").val(ord_amt_total.toLocaleString('ko-KR'));
 
-        let point_amt = parseInt($("[name='point_amt']").val() || 0);
+        let point_amt = unComma($("[name='point_amt']").val());
 
         let recv_amt_total = ord_amt_total - point_amt + dlv_amt_total; // 총입금액
         $("[name='recv_amt']").val(recv_amt_total.toLocaleString('ko-KR'));
@@ -304,9 +304,10 @@
 
     // 적립금사용 금액 변경
     $("#point_amt").change(function() {
-        let point = parseInt(this.value);
+		let point = unComma(this.value);
 
-        if(isNaN(point)) return this.value = 0;
+		if(isNaN(point)) this.value = 0;
+		else this.value = point.toLocaleString("ko-KR");
 
         EditAmtTable();
     });
