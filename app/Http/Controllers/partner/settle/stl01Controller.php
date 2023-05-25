@@ -16,8 +16,8 @@ class stl01Controller extends Controller
     // 정산내역
     public function index() {
         $immutable = CarbonImmutable::now();
-        $sdate	= $immutable->sub(2, 'year')->endOfYear()->format('Y-m-d');
-		$edate	= $immutable->sub(1, 'year')->endOfYear()->format('Y-m-d');
+        $sdate	= $immutable->sub(1, 'week')->format('Y-m-d');
+		$edate	= now()->format('Y-m-d');
         $values = [
             'sdate' => $sdate,
             'edate' => $edate,
@@ -61,7 +61,7 @@ class stl01Controller extends Controller
 					left outer join tax t on a.tax_no = t.idx
 					left outer join code tax_state on tax_state.code_kind_cd = 'G_TAX_STATE' and t.state = tax_state.code_id
 			where
-				a.com_id = '$com_id' and a.sday <= '$edate' and a.eday >= '$sdate' $where
+				a.sday <= '$edate' and a.eday >= '$sdate' $where
 			order by
 				a.sday desc
 			";
