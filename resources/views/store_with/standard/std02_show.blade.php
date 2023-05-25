@@ -933,7 +933,7 @@
             if(res.data.code === 200) {
                 alert(res.data.msg);
                 opener.Search();
-                location.href = "/store/standard/std02/show/" + res.data.data.store_cd;;
+                location.href = "/store/standard/std02/show/" + res.data.store_cd;;
             } else if(res.data.code === 500) {
                 console.log(res.data);
                 alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

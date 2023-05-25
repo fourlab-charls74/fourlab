@@ -40,36 +40,67 @@ class prd05Controller extends Controller
 		$cmd = 'add';
 		$res = '';
 
+		if($code != '') {
+			
+		}
+
 
 		if($code != '') {
 			$cmd = 'update';
+
 			$sql = "
 				select
-					ppl.prd_cd as prd_cd
-					, g.goods_no as goods_no
-					, g.goods_nm as goods_nm
-					, g.goods_nm_eng as goods_nm_eng
-					, pc.prd_cd_p as prd_cd_p
-					, pc.color as color
-					, pc.size as size
-					, pc.goods_opt as goods_opt
-					, p.tag_price as goods_sh
-					, p.price as price
-					, ppl.change_price as change_price
-					, pp.change_date as change_date
-					, ppl.product_price_cd as product_price_cd
-					, pp.apply_yn as apply_yn
-					, pp.change_kind as change_kind
-					, pp.change_val as change_val
-				from product_price_list ppl
-					inner join product p on p.prd_cd = ppl.prd_cd
-					left outer join product_code pc on pc.prd_cd = ppl.prd_cd
-					inner join goods g on g.goods_no = pc.goods_no
-					left outer join product_price pp on pp.idx = ppl.product_price_cd
-				where 1=1 and ppl.product_price_cd = '$code'
+					*
+				from product_price
+				where idx = '$code'
 			";
 
-			$res = DB::selectOne($sql);
+			$product_cnt = DB::selectOne($sql);
+
+			if ($product_cnt->change_cnt == 0) {
+				$sql = "
+					select
+						change_date
+						, change_type
+						, change_kind
+						, change_val
+						, apply_yn
+					from product_price
+					where idx = '$code'
+				";
+
+				$res = DB::selectOne($sql);
+
+			} else {
+				$sql = "
+					select
+						ppl.prd_cd as prd_cd
+						, g.goods_no as goods_no
+						, g.goods_nm as goods_nm
+						, g.goods_nm_eng as goods_nm_eng
+						, pc.prd_cd_p as prd_cd_p
+						, pc.color as color
+						, pc.size as size
+						, pc.goods_opt as goods_opt
+						, p.tag_price as goods_sh
+						, p.price as price
+						, ppl.change_price as change_price
+						, pp.change_date as change_date
+						, ppl.product_price_cd as product_price_cd
+						, pp.apply_yn as apply_yn
+						, pp.change_kind as change_kind
+						, pp.change_val as change_val
+					from product_price_list ppl
+						inner join product p on p.prd_cd = ppl.prd_cd
+						left outer join product_code pc on pc.prd_cd = ppl.prd_cd
+						inner join goods g on g.goods_no = pc.goods_no
+						left outer join product_price pp on pp.idx = ppl.product_price_cd
+					where 1=1 and ppl.product_price_cd = '$code'
+				";
+	
+				$res = DB::selectOne($sql);
+			}
+			
 
 		}
 	
