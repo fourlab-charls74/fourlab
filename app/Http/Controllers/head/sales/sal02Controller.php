@@ -242,6 +242,7 @@ class sal02Controller extends Controller
 				where m.ord_type = 0 && m.sale_place = 'HEAD_OFFICE'  && p.tno <> ''
 				group by a.ord_state_date
 			) p on a.sale_date = p.ord_state_date
+			order by a.sale_date desc
 		";
 
 		$rows = DB::select($sql);
