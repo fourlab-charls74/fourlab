@@ -291,241 +291,230 @@ class ord05Controller extends Controller
 		$ordclass->SetOrdNo($ord_no);
 		$ordclass->__construct($user_arr);
 
+		try {
+			DB::beginTransaction();
+			
+			// 입금상태 확인
+			$ret_pay_stat = $ordclass->CheckPayment();
 
-		// 입금상태 확인
-		$ret_pay_stat = $ordclass->CheckPayment();
+			if($ret_pay_stat != 0 ){ // 입금 확인 상태
+				$pay_result = 0;
+			} else {	// 입금 정보 정상
+				//==============================================================
+				// 입금확인 처리 로그 START
+				//==============================================================
+				$pay_type = $this->GetPayType($ord_no);
 
-		if($ret_pay_stat != 0 ){ // 입금 확인 상태
+				$pay_update_items = [
+					"pay_type" => $pay_type,
+					"bank_inpnm" => $bank_inpnm,
+					"bank_code" => $bank_code,
+					"bank_number" => $bank_number,
+					"ghost_use" => null,
+					"escw_use" => null,
+					"tno" => null,
+					"card_msg" => $card_msg,
+					"confirm_amt" => $confirm_amt,
+					"confirm_id" => $id
+				];
 
-			$pay_result = 0;
+				DB::table('payment')
+					->where('ord_no','=', $ord_no)
+					->update($pay_update_items);
+				
+				$opt_update_items = [
+					"pay_type" => $pay_type
+				];
+				
+				DB::table('order_opt')
+					->where('ord_no','=', $ord_no)
+					->update($opt_update_items);
+			
 
-		} else {	// 입금 정보 정상
-			//==============================================================
-			// 입금확인 처리 로그 START
-			//==============================================================
-			$pay_type = $this->GetPayType($ord_no);
+				//==============================================================
+				// 입금확인 처리 로그 END
+				//==============================================================
 
-			$pay_update_items = [
-				"pay_type" => $pay_type,
-				"bank_inpnm" => $bank_inpnm,
-				"bank_code" => $bank_code,
-				"bank_number" => $bank_number,
-				"ghost_use" => null,
-				"escw_use" => null,
-				"tno" => null,
-				"card_msg" => $card_msg,
-				"confirm_amt" => $confirm_amt,
-				"confirm_id" => $id
-			];
+				$ret_jaego = $ordclass->CheckJaego($ord_opt_no); // 재고 체크
+				$ordclass->SetOrdOptNo($ord_opt_no);	// ord_opt_no
 
-			try {
-                DB::table('payment')
-                ->where('ord_no','=', $ord_no)
-                ->update($pay_update_items);
-                $pay_result = 1;
-            } catch(Exception $e){
-                $pay_result = 0;
-            }
+				if($ret_jaego){
+					/**
+					 * 주문상태 로그
+					 */
+					$state_log = array("ord_no" => $ord_no, "ord_state" => "10", "comment" => "입금확인", "admin_id" => $id, "admin_nm" => $name);
+					$ordclass->AddStateLog($state_log);
 
-			$opt_update_items = [
-				"pay_type" => $pay_type
-			];
+					// 매출정보 저장/재고차감/입금완료 처리
+					$ret = $ordclass->CompleteOrder();
 
-			try {
-                DB::table('order_opt')
-                ->where('ord_no','=', $ord_no)
-                ->update($opt_update_items);
-                $pay_result = 1;
-            } catch(Exception $e){
-                $pay_result = 0;
-            }
+					//////////////////////////////////////////////////////////////////////////////////////////////////////
+					//
+					// PG 사 현금영수증 발행
 
-			//==============================================================
-			// 입금확인 처리 로그 END
-			//==============================================================
+					if($cfg_cash_use_yn == "Y" && $ret == "1")
+					{
 
-			$ret_jaego = $ordclass->CheckJaego($ord_opt_no); // 재고 체크
-			//$ret_jaego
+						// 주문 및 결제 정보 얻기
+						$sql = "
+							select
+								a.ord_no, a.user_nm, a.phone, a.email, a.r_mobile, a.recv_amt
+								, b.pay_type, b.cash_apply_yn
+								, c.goods_nm
+							from order_mst a
+								inner join payment b on a.ord_no = b.ord_no
+								inner join order_opt c on a.ord_no = c.ord_no
+								-- inner join goods d on c.goods_no = d.goods_no and c.goods_sub = d.goods_sub
+							where a.ord_no = '$ord_no'
+							limit 0,1
+						";
+						
+						$row = DB::selectOne($sql);
+						if(!$row){
 
-			$ordclass->SetOrdOptNo($ord_opt_no);	// ord_opt_no
+							$pay_type = $row->pay_type;								// 결제 방식
+							$cash_apply_yn = $row->cash_apply_yn;							// 현금영수증 신청
 
-			if($ret_jaego){
-				/**
-				 * 주문상태 로그
-				 */
-				$state_log = array("ord_no" => $ord_no, "ord_state" => "10", "comment" => "입금확인", "admin_id" => $id, "admin_nm" => $name);
-				$ordclass->AddStateLog($state_log);
+							$req_tx     = "pay";										// 발행
+							$trad_time  = date("Ymdhis");								// 원거래 시각
 
-				// 매출정보 저장/재고차감/입금완료 처리
-				$ret = $ordclass->CompleteOrder();
+							$ordr_idxx  = $row->ord_no;								// 주문 번호
+							$buyr_name  = $row->user_nm;							// 주문자 이름
+							$buyr_tel1  = $row->phone;								// 주문자 전화번호
+							$buyr_mail  = $row->email;								// 주문자 E-Mail
+							$good_name  = substr(trim($row->goods_nm), 0, 30);	// 상품 정보
 
-				//////////////////////////////////////////////////////////////////////////////////////////////////////
-				//
-				// PG 사 현금영수증 발행
+							// 상품명의 특수문자 제한
+							$patten = "/[\^\&\%\'\!\@\#\"]+/";
+							$good_name  = preg_replace($patten, "", $good_name);
 
-				if($cfg_cash_use_yn == "Y" && $ret == "1")
-				{
+							$comment		= "";										// 비고
+							$corp_type     = "0";										// 사업장 구분(0:직접 판매, 1:입점몰 판매)
+							$corp_tax_type = "TG01";									// 과세/면세 구분(TG01:과세, TG02:면세)
+							$corp_tax_no   = "";										// 발행 사업자 번호
+							$corp_nm       = "";										// 상호
+							$corp_owner_nm = "";										// 대표자명
+							$corp_addr     = "";										// 사업장 주소
+							$corp_telno    = "";										// 사업장 대표 연락처
 
-					// 주문 및 결제 정보 얻기
-					$sql = "
-						select
-							a.ord_no, a.user_nm, a.phone, a.email, a.r_mobile, a.recv_amt
-							, b.pay_type, b.cash_apply_yn
-							, c.goods_nm
-						from order_mst a
-							inner join payment b on a.ord_no = b.ord_no
-							inner join order_opt c on a.ord_no = c.ord_no
-							-- inner join goods d on c.goods_no = d.goods_no and c.goods_sub = d.goods_sub
-						where a.ord_no = '$ord_no'
-						limit 0,1
-					";
-					$row = DB::selectOne($sql);
-					if(!$row){
+							$tr_code    = "0";											// 발행용도(0:소득공제용, 1:지출증빙용)
+							$id_info    = str_replace("-", "", $row["r_mobile"]);		// 신분확인 ID(핸드폰번호 또는 주민등록번호 -> 현재는 수령자 핸드폰번호로 처리함.)
+							$amt_tot    = $row->recv_amt;								// 거래금액 총 합
+							$amt_sup    = round(($amt_tot)/1.1);						// 공급가액
+							$amt_tax    = $amt_tot - $amt_sup;							// 부가가치세
+							$amt_svc    = "0";											// 봉사료
 
-						$pay_type = $row->pay_type;								// 결제 방식
-						$cash_apply_yn = $row->cash_apply_yn;							// 현금영수증 신청
+							$mod_type   = "";											// 변경 타입
+							$mod_value  = "";											// 변경 요청 거래번호
+							$mod_gubn   = "";											// 변경 요청 거래번호 구분
+							$mod_mny    = "";											// 변경 요청 금액
+							$rem_mny    = "";											// 변경처리 이전 금액
 
-						$req_tx     = "pay";										// 발행
-						$trad_time  = date("Ymdhis");								// 원거래 시각
+							$admin_id = $id;								// 관리자 아이디
+							$admin_nm = $name;							// 관리자 이름
 
-						$ordr_idxx  = $row->ord_no;								// 주문 번호
-						$buyr_name  = $row->user_nm;							// 주문자 이름
-						$buyr_tel1  = $row->phone;								// 주문자 전화번호
-						$buyr_mail  = $row->email;								// 주문자 E-Mail
-						$good_name  = substr(trim($row->goods_nm), 0, 30);	// 상품 정보
+							$param = array(
+								"req_tx"		=> $req_tx,
+								"trad_time"		=> $trad_time,
+								"ordr_idxx"		=> $ordr_idxx,
+								"buyr_name"		=> $buyr_name,
+								"buyr_tel1"		=> $buyr_tel1,
+								"buyr_mail"		=> $buyr_mail,
+								"good_name"		=> $good_name,
+								"comment"		=> $comment,
+								"corp_type"		=> $corp_type,
+								"corp_tax_type"	=> $corp_tax_type,
+								"corp_tax_no"	=> $corp_tax_no,
+								"corp_nm"		=> $corp_nm,
+								"corp_owner_nm"	=> $corp_owner_nm,
+								"corp_addr"		=> $corp_addr,
+								"corp_telno"	=> $corp_telno,
+								"tr_code"		=> $tr_code,
+								"id_info"		=> $id_info,
+								"amt_tot"		=> $amt_tot,
+								"amt_sup"		=> $amt_sup,
+								"amt_tax"		=> $amt_tax,
+								"amt_svc"		=> $amt_svc,
+								"mod_type"		=> $mod_type,
+								"mod_value"		=> $mod_value,
+								"mod_gubn"		=> $mod_gubn,
+								"mod_mny"		=> $mod_mny,
+								"rem_mny"		=> $rem_mny,
+								"admin_id"		=> $admin_id,
+								"admin_nm"		=> $admin_nm
+							);
 
-						// 상품명의 특수문자 제한
-						$patten = "/[\^\&\%\'\!\@\#\"]+/";
-						$good_name  = preg_replace($patten, "", $good_name);
-
-						$comment		= "";										// 비고
-						$corp_type     = "0";										// 사업장 구분(0:직접 판매, 1:입점몰 판매)
-						$corp_tax_type = "TG01";									// 과세/면세 구분(TG01:과세, TG02:면세)
-						$corp_tax_no   = "";										// 발행 사업자 번호
-						$corp_nm       = "";										// 상호
-						$corp_owner_nm = "";										// 대표자명
-						$corp_addr     = "";										// 사업장 주소
-						$corp_telno    = "";										// 사업장 대표 연락처
-
-						$tr_code    = "0";											// 발행용도(0:소득공제용, 1:지출증빙용)
-						$id_info    = str_replace("-", "", $row["r_mobile"]);		// 신분확인 ID(핸드폰번호 또는 주민등록번호 -> 현재는 수령자 핸드폰번호로 처리함.)
-						$amt_tot    = $row->recv_amt;								// 거래금액 총 합
-						$amt_sup    = round(($amt_tot)/1.1);						// 공급가액
-						$amt_tax    = $amt_tot - $amt_sup;							// 부가가치세
-						$amt_svc    = "0";											// 봉사료
-
-						$mod_type   = "";											// 변경 타입
-						$mod_value  = "";											// 변경 요청 거래번호
-						$mod_gubn   = "";											// 변경 요청 거래번호 구분
-						$mod_mny    = "";											// 변경 요청 금액
-						$rem_mny    = "";											// 변경처리 이전 금액
-
-						$admin_id = $id;								// 관리자 아이디
-						$admin_nm = $name;							// 관리자 이름
-
-						$param = array(
-							"req_tx"		=> $req_tx,
-							"trad_time"		=> $trad_time,
-							"ordr_idxx"		=> $ordr_idxx,
-							"buyr_name"		=> $buyr_name,
-							"buyr_tel1"		=> $buyr_tel1,
-							"buyr_mail"		=> $buyr_mail,
-							"good_name"		=> $good_name,
-							"comment"		=> $comment,
-							"corp_type"		=> $corp_type,
-							"corp_tax_type"	=> $corp_tax_type,
-							"corp_tax_no"	=> $corp_tax_no,
-							"corp_nm"		=> $corp_nm,
-							"corp_owner_nm"	=> $corp_owner_nm,
-							"corp_addr"		=> $corp_addr,
-							"corp_telno"	=> $corp_telno,
-							"tr_code"		=> $tr_code,
-							"id_info"		=> $id_info,
-							"amt_tot"		=> $amt_tot,
-							"amt_sup"		=> $amt_sup,
-							"amt_tax"		=> $amt_tax,
-							"amt_svc"		=> $amt_svc,
-							"mod_type"		=> $mod_type,
-							"mod_value"		=> $mod_value,
-							"mod_gubn"		=> $mod_gubn,
-							"mod_mny"		=> $mod_mny,
-							"rem_mny"		=> $rem_mny,
-							"admin_id"		=> $admin_id,
-							"admin_nm"		=> $admin_nm
-						);
-
-						// PG사를 통해 현금영수증 발행
-						$res_cd = "";
-						$res_msg = "";
-						if($pay_type & 1 && $cash_apply_yn == "Y"){
-							/*
-							$pg_cash = new cash();
-							list($res_cd, $res_msg) = $pg_cash->mod($conn, $param);
-							*/
+							// PG사를 통해 현금영수증 발행
+							$res_cd = "";
+							$res_msg = "";
+							if($pay_type & 1 && $cash_apply_yn == "Y"){
+								/*
+								$pg_cash = new cash();
+								list($res_cd, $res_msg) = $pg_cash->mod($conn, $param);
+								*/
+							}
 						}
 					}
-				}
 
-			}else{
-				/**
-				 * 주문상태 로그
-				 */
-				$state_log = array("ord_no" => $ord_no, "ord_state" => "5", "comment" => "입금확인(품절)");
-				$ordclass->AddStateLog($state_log);
+				}else{
+					/**
+					 * 주문상태 로그
+					 */
+					$state_log = array("ord_no" => $ord_no, "ord_state" => "5", "comment" => "입금확인(품절)");
+					$ordclass->AddStateLog($state_log);
 
-				// 재고 없는 경우 주문상태 변경
-				$ordclass->OutOfScockAfterPaid();
+					// 재고 없는 경우 주문상태 변경
+					$ordclass->OutOfScockAfterPaid();
 
-				if($cfg_sms_yn == "Y" && $cfg_out_of_stock_yn == "Y"){
+					if($cfg_sms_yn == "Y" && $cfg_out_of_stock_yn == "Y"){
 
-					// 품절 알림 SMS
-					$sql = "
+						// 품절 알림 SMS
+						$sql = "
 						select user_nm, mobile
 						from order_mst
 						where ord_no = '$ord_no'
 					";
-					//$result = $conn->Execute($sql);
-					$row = DB::selectOne($sql);
-					if ($row) {
-						$user_nm = $row->user_nm;		// 주문자이름
-						$mobile = $row->mobile;		// 핸드폰번호
+						//$result = $conn->Execute($sql);
+						$row = DB::selectOne($sql);
+						if ($row) {
+							$user_nm = $row->user_nm;		// 주문자이름
+							$mobile = $row->mobile;		// 핸드폰번호
+						}
+
+						$msgarr = array(
+							"SHOP_NAME" => $cfg_shop_name,
+						);
+						$sms = new SMS([
+							'admin_id' => $id,
+							'admin_nm' => $name,
+						]);
+						$sms_msg = $sms->MsgReplace($cfg_out_of_stock_msg, $msgarr);
+						if($mobile != ""){
+							//$sms->Send($sms_msg, $mobile, $user_nm);
+							$sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
+						}
+
+						//$sms->Send($sms_msg, $mobile, $user_nm);
 					}
 
-					$msgarr = array(
-						"SHOP_NAME" => $cfg_shop_name,
-					);
-					$sms = new SMS([
-						'admin_id' => $id,
-						'admin_nm' => $name,
-					]);
-					$sms_msg = $sms->MsgReplace($cfg_out_of_stock_msg, $msgarr);
-					if($mobile != ""){
-						//$sms->Send($sms_msg, $mobile, $user_nm);
-						$sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
-                    }
+					$pay_result = 2;
 
-					//$sms->Send($sms_msg, $mobile, $user_nm);
 				}
-
-				$pay_result = 2;
-
+				DB::commit();
+				//$pay_result = 1;
 			}
-			//$pay_result = 1;
+
+		} catch(Exception $e) {
+			$pay_result = 0;
+
+			return response()->json([
+				"code"			=> 500,
+				"pay_result"	=> $pay_result,
+				"msg"			=> $e->getMessage(),
+				"nodeid"		=> $nodeid
+			]);
 		}
-
-
-		/*
-		echo "ord_no : ".$ord_no;
-		echo "<br>";
-		echo "bank : ".$bank;
-		echo "<br>";
-		echo "bank_inpnm : ".$bank_inpnm;
-		echo "<br>";
-		echo "confirm_amt : ".$confirm_amt;
-		echo "<br>";
-		echo "ret_pay_stat : ". $ret_pay_stat;
-		*/
-		//$result = DB::select($query);
+		
         return response()->json([
             "code"			=> 200,
             "pay_result"	=> $pay_result,

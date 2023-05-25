@@ -684,7 +684,8 @@ class Order
 			$cfg_payment_yn		= $conf->getValue($cfg_sms,"payment_yn");
 			$cfg_payment_msg	= $conf->getValue($cfg_sms,"payment_msg_aligo");
 			$g_bank_code 		= SLib::getCodes('G_BANK_CODE');
-
+            $domain             = $conf->getConfigValue("shop","domain");
+            
 			/// 입금처리 완료 //////////////////////
 			// payment 상태/처리일 변경
 			global $bank_code, $remitter, $account;	// 가상계좌 수동 입금처리 시 사용되는 변수
@@ -718,15 +719,15 @@ class Order
 							"USER_NAME" => $user_nm,
 							"ORDER_NO" => $this->ord_no,
 							"ORDER_AMT" => number_format($recv_amt),
-							"SHOP_URL" => 'http://www.netpx.co.kr/app/mypage/order_list'
+							"SHOP_URL" => "'$domain'/app/mypage/order_list"
 						);
 						$btnarr = array(
 							"BUTTON_TYPE" => '1',
-							"BUTTON_INFO" => '주문내역조회^WL^http://www.netpx.co.kr/app/mypage/order_list'
+							"BUTTON_INFO" => "주문내역조회^WL^'$domain'/app/mypage/order_list"
 						);
 						$sms_msg = $sms->MsgReplace($cfg_payment_msg, $msgarr);
 						
-						if($cfg_kakao_yn == "Y" && $template_code != ""){
+						if($cfg_kakao_yn == 'Y' && $template_code != ''){
 							// 문자 서비스
 							$sms->SendKakao( $template_code, $mobile, $user_nm, $sms_msg, $msgarr, '', $btnarr);
 						} else {
