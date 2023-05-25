@@ -161,6 +161,10 @@
                             <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
                         </div>
                         <div class="fr_box">
+							<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+								<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);">
+								<label class="custom-control-label font-weight-light" for="grid_expand">항목펼쳐보기</label>
+							</div>
                             <span>재고조정</span>
                             <select id='reason' name='reason' class="form-control form-control-sm"  style='width:160px;display:inline'>
                                 <option value=''>선택</option>
@@ -328,6 +332,7 @@
                             {
                                 'goods_no':rowNode.data.goods_no_hd,
                                 'goods_opt':rowNode.data.goods_opt,
+								'goods_sub':rowNode.data.goods_sub_hd,
                                 'qty':rowNode.data.edit_good_qty,
                                 'wqty':rowNode.data.edit_wqty
                             }
@@ -352,6 +357,7 @@
                             //var res = jQuery.parseJSON(data);
                             if(res.code == '200'){
                                 alert('재고수량을 저장하였습니다.');
+								Search();
                             } else {
                                 alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                                 console.log(res);

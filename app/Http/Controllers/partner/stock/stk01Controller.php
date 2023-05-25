@@ -171,7 +171,7 @@ class stk01Controller extends Controller
                     $row = $data[$i];
                     $jaego->SetQty($row["goods_no"], 0, $row["goods_opt"],$row["qty"]);
                     if($jaego->isUnlimited($row["goods_no"]) == "N"){
-                        $jaego->SetStockQty($row["goods_no"],$row["goods_opt"],$row["wqty"],$reason);
+                        $jaego->SetStockQty($row["goods_no"],$row["goods_sub"], $row["goods_opt"],$row["wqty"],$reason);
                     }
                 }
             });
