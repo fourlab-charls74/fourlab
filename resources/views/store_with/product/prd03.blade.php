@@ -40,7 +40,7 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
 						<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 						<a href="/store/cs/cs03" class="btn btn-sm btn-primary shadow-sm pl-2">원부자재관리</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -216,7 +216,14 @@
 		const DEFAULT = { lineHeight : "30px" };
 
 		const columns = [
-			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px"}},
+			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: {"line-height": "30px", 'text-align' : 'center'}},
+			{field: "prd_cd", headerName: "원부자재코드", width:120, cellStyle: DEFAULT,
+				cellRenderer: function(params) {
+					if (params.value !== undefined) {
+						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
+					}
+				}
+			},
 			{
 				field: "prd_nm",
 				headerName: "원부자재명",
@@ -246,13 +253,7 @@
 			},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
 			{field: "img", headerName: "이미지_url", hide: true},
-			{field: "prd_cd", headerName: "원부자재코드", width:120, cellStyle: DEFAULT,
-				cellRenderer: function(params) {
-					if (params.value !== undefined) {
-						return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
-					}
-				}
-			},
+			
 			{
 				field: "color",
 				headerName: "칼라",

@@ -1,8 +1,8 @@
 @extends('store_with.layouts.layout')
-@section('title','상품')
+@section('title','상품재고조회')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">상품재고관리</h3>
+	<h3 class="d-inline-flex">상품재고조회</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 상품관리</span>
@@ -27,7 +27,6 @@
 				</div>
 			</div>
 			<div class="card-body">
-
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">

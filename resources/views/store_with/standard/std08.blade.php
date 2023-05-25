@@ -1,9 +1,9 @@
 @extends('store_with.layouts.layout')
-@section('title','판매수수료코드관리')
+@section('title','중간관리자수수료관리')
 
 @section('content')
 <div class="page_tit">
-    <h3 class="d-inline-flex">판매수수료코드관리</h3>
+    <h3 class="d-inline-flex">중간관리자수수료관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 코드관리</span>
@@ -23,7 +23,8 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-		            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
+		            <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                    <!-- <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a> -->
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -50,7 +51,8 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
+            <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+            <!-- <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a> -->
         </div>
     </div>
 </form>
@@ -63,8 +65,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    <span style="color: blue;">※등급코드가 중복된 경우에는 순서가 제일 아래인 행을 기준으로 종료일이 변경됩니다.<span>
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">추가</span></a>
+                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">등록</span></a>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">저장</span></a>
                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">선택삭제</span></a>
                 </div>
@@ -72,6 +73,14 @@
         </div>
         <div class="table-responsive">
             <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+        </div>
+        <div class="help-area mt-4 mb-4">
+            <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
+            <ul class="help-list">
+                <li>- 기본수수료 : 설정 금액까지의 판매금액</li>
+                <li>- 초과1수수료 : 기본수수료 이후부터 설정 금액까지의 판매금액</li>
+                <li>- 초과2수수료 : 초과1수수료 설정 금액 이후의 판매금액</li>
+            </ul>
         </div>
     </div>
 </div>
@@ -83,43 +92,43 @@
         { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
         { field: "idx", hide: true },
         { field: "seq", hide: true },
-        { field: "grade_cd", headerName: "등급코드", width: 120, rowDrag: true, editable: (params) => isAdded(params), 
+        { field: "grade_cd", headerName: "수수료코드", width: 120, rowDrag: true, editable: (params) => isAdded(params), 
             cellStyle: (params) => isAdded(params) ? YELLOW : {}
         },
-        { field: "name", headerName: "등급명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
+        { field: "name", headerName: "수수료명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
         { field: "sdate", headerName: "시작월", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
         { field: "edate", headerName: "종료월", width: 100, cellStyle: CENTER,
             cellRenderer: (params) => params.data?.edate != "9999-99" && params.data?.edate ? params.data.edate : "-"
         },
-        { field: "g1", headerName: "정상",
+        { field: "g1", headerName: "기본수수료",
             children: [
-                { headerName: "금액", field: "amt1", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
-                { headerName: "수수료율", field: "fee1", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "판매금액", field: "amt1", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "수수료(%)", field: "fee1", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
-        { field: "g2", headerName: "정상2",
+        { field: "g2", headerName: "초과1수수료",
             children: [
-                { headerName: "금액", field: "amt2", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
-                { headerName: "수수료율", field: "fee2", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "판매금액", field: "amt2", type: 'currencyType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "수수료(%)", field: "fee2", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
-        { field: "g3", headerName: "정상3",
+        { field: "g3", headerName: "초과2수수료",
             children: [
                 // 정상3은 정상2 금액을 넘어가는 경우에 적용되며 금액 기준선은 동일
-                { headerName: "금액", field: "amt2", type: 'currencyType', width:100,
+                { headerName: "판매금액", field: "amt2", type: 'currencyType', width:100,
                     valueFormatter: (params) => formatNumber(params) + ' ~'
                 },
-                { headerName: "수수료율", field: "fee3", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
+                { headerName: "수수료(%)", field: "fee3", type: 'percentType', width:100, editable: true, cellStyle: YELLOW },
             ]
         },
-        { field: "fee_10", headerName: "특판", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
+        { field: "fee_10", headerName: "행사", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_11", headerName: "용품", width: 60, type: 'percentType', editable: true, cellStyle: YELLOW },
         { field: "fee_12", headerName: "특약온라인", width: 90, type: 'percentType', editable: true, cellStyle: YELLOW },
-        { headerName: "특가기준",
+        { headerName: "행사기준",
             children: [
-                { field: "fee_10_info", headerName: "기준(%)", width: 80, type: 'percentType', editable: true, cellStyle: YELLOW },
+                { field: "fee_10_info", headerName: "할인율(%)", width: 80, type: 'percentType', editable: true, cellStyle: YELLOW },
                 { field: "fee_10_info_over_yn", hide: true },
-                { field: "fee_10_info_over_yn_nm", headerName: "이상/초과", width: 60, editable: true, cellStyle: {...CENTER, ...YELLOW},
+                { field: "fee_10_info_over_yn_nm", headerName: "이상/초과", width: 64, editable: true, cellStyle: {...CENTER, ...YELLOW},
                     cellEditorSelector: function(params) {
                         return {
                             component: 'agRichSelectCellEditor',
@@ -143,7 +152,7 @@
     const pApp = new App('', { gridId: "#div-gd" });
     
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(410);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {

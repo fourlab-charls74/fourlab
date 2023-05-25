@@ -16,7 +16,8 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="#" onclick="Search()" class="btn btn-sm btn-primary mr-1 shadow-sm">검색</a>
-                    <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+                    <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                    <!-- <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a> -->
                     <a href="#" onclick="window.close()" class="btn btn-sm btn-outline-primary mr-1 shadow-sm">닫기</a>
                     <div id="search-btn-collapse" class="btn-group mr-2 mb-0 mb-sm-0"></div>
                 </div>
@@ -479,7 +480,8 @@
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn mr-1" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()">
+                <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                <!-- <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()"> -->
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
         </form>

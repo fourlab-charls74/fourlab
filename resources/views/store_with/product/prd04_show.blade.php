@@ -45,7 +45,7 @@
                         </div>
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">
-                                <label for="store_cd">코드일련</label>
+                                <label for="store_cd">품번</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
@@ -108,29 +108,29 @@
                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                             <colgroup>
                                 <col width="120px"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
                             </colgroup>
                             <tbody>
                             <tr>
-                                <td rowspan="3" class="img_box brln" id="prd_image">
+                                <td rowspan="4" class="img_box brln" id="prd_image">
                                     @if (@$prd->img !== null)
-                                    <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />
+                                    <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 130px;max-width:130px; min-height: 130px;max-height:130px;" />
                                     @else
-                                    <p class="d-flex align-items-center justify-content-center" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;">이미지 없음</p>
+                                    <p class="d-flex align-items-center justify-content-center" style="min-width: 130px;max-width:130px; min-height: 130px;max-height:130px;">이미지 없음</p>
                                     @endif
                                 </td>
-                                <th>코드일련</th>
+                                <th style="width:30px">품번</th>
                                 <td id="prd_prd_cd_p"></td>
-                                <th>상품번호</th>
+                                <th>온라인코드</th>
                                 <td id="prd_goods_no"></td>
                             </tr>
                             <tr>
                                 <th>스타일넘버</th>
                                 <td id="prd_style_no"></td>
-                                <th>공급처</th>
+                                <th>공급업체명</th>
                                 <td id="prd_com_nm"></td>
                             </tr>
                             <tr>
@@ -141,7 +141,7 @@
                             </tr>
                             <tr>
                                 <th>상품명</th>
-                                <td colspan="2" id="prd_goods_nm"></td>
+                                <td id="prd_goods_nm"></td>
                                 <th>상품명(영문)</th>
                                 <td id="prd_goods_nm_eng"></td>
                             </tr>
@@ -158,16 +158,21 @@
             <div class="card-header mb-0">
                 <div class="filter_wrap">
                     <div class="fl_box">
-                        <a href="#" class="m-0 font-weight-bold">재고현황</a>
+                        <a href="#" class="m-0 font-weight-bold">창고/매장 재고 현황</a>
+                    </div>
+                    <div style="text-align:right"> 
+                        <p style="color:red;font-weight: bold"> * 가용재고 = 재고 - 이동중재고</p>
                     </div>
                 </div>
             </div>
             <div class="card-body pt-3">
-                <h6 class="fs-16">[ 창고 옵션별 기간재고 ]</h6>
+                <!-- <h6 class="fs-16">[ 창고 옵션별 기간재고 ]</h6> -->
+                <h6 class="fs-16"></h6>
                 <div class="table-responsive mb-1">
                     <div id="div-gd-storage-stock" class="ag-theme-balham"></div>
                 </div>
-                <h6 class="fs-16 mt-3">[ 매장 옵션별 기간재고 ]</h6>
+                <!-- <h6 class="fs-16 mt-3">[ 매장 옵션별 기간재고 ]</h6> -->
+                <h6 class="fs-16 mt-3"></h6>
                 <div class="table-responsive">
                     <div id="div-gd-store-stock" class="ag-theme-balham"></div>
                 </div>
@@ -313,11 +318,11 @@
             list.push({
                 headerName: size,
                 children: [
-                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60,
+                    {field: ss + "_qty", headerName: "재고", maxWidth: 60, minWidth: 60,
                         cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                     },
-                    {field: ss + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65,
+                    {field: ss + "_wqty", headerName: "가용재고", maxWidth: 65, minWidth: 65,
                         cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                     },        
@@ -328,10 +333,10 @@
         list.push({
             headerName: "합계",
             children: [
-                {field: "qty", headerName: "실재고", type: "currencyType", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"}, pinned: "right",
+                {field: "qty", headerName: "재고", type: "currencyType", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"}, pinned: "right",
                     aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                 },
-                {field: "wqty", headerName: "보유재고", type: "currencyType", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"}, pinned: "right",
+                {field: "wqty", headerName: "가용재고", type: "currencyType", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"}, pinned: "right",
                     aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                 },
             ],

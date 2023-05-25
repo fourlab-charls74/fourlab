@@ -24,7 +24,8 @@
                 <h4>검색</h4>
                 <div>
                     <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a>
+					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                    <!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a> -->
                     <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
 					<a href="javascript:void(0);" onclick="return moveToStk25()" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용조회</a>
                 </div>
@@ -79,7 +80,8 @@
         </div>
         <div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch()">검색조건 초기화</a>
+			<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+            <!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch()">검색조건 초기화</a> -->
             <a href="javascript:void(0);" onclick="return Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             <a href="javascript:void(0);" onclick="return moveToStk25()" class="btn btn-sm btn-outline-primary shadow-sm pl-2">매장별할인율적용조회</a>
         </div>

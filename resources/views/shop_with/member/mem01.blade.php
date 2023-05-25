@@ -18,7 +18,8 @@
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 					<a href="#" onclick="Batch()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
-					<a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+					<!-- <a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
 					<div class="btn-group dropleftbtm mr-1">
 						<button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
 							<i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
@@ -387,7 +388,8 @@
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 			<a href="#" onclick="Batch()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
-			<a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+			<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+			<!-- <a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
 			<div class="btn-group dropleftbtm mr-1">
 				<button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
 					<i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>

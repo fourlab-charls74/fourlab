@@ -18,7 +18,8 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+                    <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                    <!-- <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
                     <!-- 동종업계정보입력이 'Y'면 추가버튼이 생김 -->
                     @if ($competitor_yn == 'Y')
                         <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
@@ -119,7 +120,8 @@
         </div>
         <div class="resul_btn_wrap mb-3">
             <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a>
+            <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+            <!-- <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
             <!-- 동종업계정보입력이 'Y'면 추가버튼이 생김 -->
             @if ($competitor_yn == 'Y')
                 <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>

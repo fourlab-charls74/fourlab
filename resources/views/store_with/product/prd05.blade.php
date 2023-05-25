@@ -27,42 +27,36 @@
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">변경일자</label>
-								<div class="form-inline date-select-inbox">
-									<div class="docs-datepicker form-inline-inner input_box">
-										<div class="input-group">
-											<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
-											<div class="input-group-append">
-												<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-													<i class="fa fa-calendar" aria-hidden="true"></i>
-												</button>
+								<div class="date-switch-wrap form-inline">
+									<div class="form-inline date-select-inbox">
+										<div class="docs-datepicker form-inline-inner input_box">
+											<div class="input-group">
+												<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
+												<div class="input-group-append">
+													<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+														<i class="fa fa-calendar" aria-hidden="true"></i>
+													</button>
+												</div>
 											</div>
+											<div class="docs-datepicker-container"></div>
 										</div>
-										<div class="docs-datepicker-container"></div>
-									</div>
-									<span class="text_line">~</span>
-									<div class="docs-datepicker form-inline-inner input_box">
-										<div class="input-group">
-											<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-											<div class="input-group-append">
-												<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+										<span class="text_line">~</span>
+										<div class="docs-datepicker form-inline-inner input_box">
+											<div class="input-group">
+												<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+												<div class="input-group-append">
+													<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 													<i class="fa fa-calendar" aria-hidden="true"></i>
-												</button>
+													</button>
+												</div>
 											</div>
+											<div class="docs-datepicker-container"></div>
 										</div>
-										<div class="docs-datepicker-container"></div>
+										<div class="custom-control custom-switch date-switch-pos"  data-toggle="tooltip" data-placement="top" data-original-title="변경일자 사용">
+											<input type="checkbox" class="custom-control-input" name="s_nud" id="s_nud" checked="" value="Y" onClick="ManualNotUseData();">
+											<label class="" for="s_nud" data-on-label="ON" data-off-label="OFF"></label>
+										</div>
 									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="">변경종류</label>
-								<div class="d-flex">
-									<select name='change_kind' class="form-control form-control-sm">
-										<option value=''>전체</option>
-										<option value='P'>%</option>
-										<option value='W'>원</option>
-									</select>
 								</div>
 							</div>
 						</div>
@@ -72,9 +66,9 @@
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
 										<select name="limit" class="form-control form-control-sm">
-											<option value="1000" selected>100</option>
-											<option value="5000">500</option>
-											<option value="10000">1000</option>
+											<option value="100" selected>100</option>
+											<option value="500">500</option>
+											<option value="1000">1000</option>
 										</select>
 									</div>
 									<span class="text_line">/</span>
@@ -154,7 +148,7 @@
 				}
 			},
             {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
-            {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code'},
+            {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
             {field: "change_type", headerName: "적용타입", width: 80, cellClass: 'hd-grid-code',
 				cellStyle: params => {
 					if (params.data.change_type == 'A') {
@@ -261,6 +255,21 @@
 		if (cmd == 'add') {
 			const url = '/store/product/prd05/view/';
 			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+		}
+	}
+
+	//변경일자 사용 on/off
+	function ManualNotUseData()
+	{
+		if( $("[name=s_nud]").is(":checked") == true )
+		{
+			$("[name=sdate]").prop("disabled", false);
+			$("[name=edate]").prop("disabled", false);
+		}
+		else
+		{
+			$("[name=sdate]").prop("disabled", true);
+			$("[name=edate]").prop("disabled", true);
 		}
 	}
 </script>

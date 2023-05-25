@@ -27,14 +27,14 @@
                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                             <colgroup>
                                 <col width="120px"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
                             </colgroup>
                             <tbody>
                             <tr>
-                                <td rowspan="3" class="img_box brln">
+                                <td rowspan="5" class="img_box brln">
                                     @if (@$prd->img !== null)
                                     <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />
                                     @else
@@ -49,7 +49,7 @@
                             <tr>
                                 <th>스타일넘버</th>
                                 <td>{{ @$prd->style_no }}</td>
-                                <th>공급처</th>
+                                <th>공급업체명</th>
                                 <td>{{ @$prd->com_nm }}</td>
                             </tr>
                             <tr>
@@ -60,13 +60,13 @@
                             </tr>
                             <tr>
                                 <th>상품명</th>
-                                <td colspan="2">{{ @$prd->goods_nm }}</td>
+                                <td>{{ @$prd->goods_nm }}</td>
                                 <th>컬러/사이즈</th>
                                 <td>{{ @$prd->color_cd == '00' ? '단일색상' : @$prd->color }} / {{ @$prd->size }}</td>
                             </tr>
                             <tr>
                                 <th>TAG가/판매가</th>
-                                <td colspan="2">{{ number_format(@$prd->goods_sh) }}원 / {{ number_format(@$prd->price) }}원</td>
+                                <td>{{ number_format(@$prd->goods_sh) }}원 / {{ number_format(@$prd->price) }}원</td>
                                 <th>원가</th>
                                 <td>{{ number_format(@$prd->wonga) }}원</td>
                             </tr>
@@ -171,7 +171,7 @@
             <div class="card-header mb-0">
                 <div class="filter_wrap">
                     <div class="fl_box">
-                        <a href="#" class="m-0 font-weight-bold">창고/매장별 재고현황</a>
+                        <a href="#" class="m-0 font-weight-bold">창고/매장 재고 현황</a>
                     </div>
                     <div class="fr_box">
                         <div class="font-weight-light">

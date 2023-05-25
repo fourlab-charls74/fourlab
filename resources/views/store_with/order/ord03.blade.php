@@ -17,7 +17,8 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-					<a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                    <!-- <a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a> -->
                     <a href="javascript:void(0);" onclick="return openBatchPopup();" class="btn btn-sm btn-primary shadow-sm mr-1">택배송장 일괄입력</a>
                     <div class="btn-group dropleftbtm mr-1">
                         <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
@@ -361,7 +362,8 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
             <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            <a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+            <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+            <!-- <a href="javascript:void(0);" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a> -->
             <a href="javascript:void(0);" onclick="return openBatchPopup();" class="btn btn-sm btn-primary shadow-sm mr-1">택배송장 일괄입력</a>
             <div class="btn-group dropleftbtm mr-1">
                 <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">

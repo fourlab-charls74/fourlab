@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','거래처반품')
+@section('title','상품반품')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">거래처반품</h3>
+	<h3 class="d-inline-flex">상품반품</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 생산입고관리</span>
-		<span>/ 거래처반품</span>
+		<span>/ 상품반품</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -16,8 +16,9 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                    <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+                    <!-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()" hidden>검색조건 초기화</a> -->
                     @if(Auth('head')->user()->logistics_group_yn == 'N')
                     <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 등록</a>
                     <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 일괄등록</a>
@@ -60,7 +61,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">반품창고</label>
+                            <label for="">출고창고</label>
                             <div class="d-flex">
                                 <select name='storage_cd' class="form-control form-control-sm">
                                     <option value="">전체</option>
@@ -154,7 +155,8 @@
         
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a>
+            <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+            <!-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> -->
             @if(Auth('head')->user()->logistics_group_yn == 'N')
             <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 등록</a>
             <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 일괄등록</a>

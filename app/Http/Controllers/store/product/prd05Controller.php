@@ -172,9 +172,11 @@ class prd05Controller extends Controller
 		$sdate = $request->input('sdate');
 		$edate = $request->input('edate');
 		$change_kind = $request->input('change_kind');
+		$nud = $request->input("s_nud", "N");
 
 		$where = "";
 		if( $change_kind != "" ) $where .= " and change_kind = '" . $change_kind . "' ";
+		if($nud == 'Y') $where .= " and ( change_date >= '$sdate' and change_date < date_add('$edate',interval 1 day)) ";
 
 		// ordreby
         $ord_field  = $request->input("ord_field", "change_date");
@@ -200,13 +202,13 @@ class prd05Controller extends Controller
 				, rt
 				, ut
 			from product_price
-			where 1=1 and ( change_date >= :sdate and change_date < date_add(:edate,interval 1 day))
+			where 1=1 
 			$where
 			$orderby
 			$limit
 		";
 
-		$result = DB::select($sql, ['sdate' => $sdate,'edate' => $edate]);
+		$result = DB::select($sql);
 
 		// pagination
 		$total = 0;
@@ -215,7 +217,8 @@ class prd05Controller extends Controller
 			$sql = "
 			select
 				count(*) as total
-			from product_price 
+			from product_price
+			where 1=1
 			$where
 			";
 
