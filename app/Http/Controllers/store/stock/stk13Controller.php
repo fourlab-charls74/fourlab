@@ -330,6 +330,9 @@ class stk13Controller extends Controller
 		$admin_nm = Auth('head')->user()->name;
 		$exp_dlv_day = $request->input("exp_dlv_day", '');
 		$rel_order = $request->input("rel_order", '');
+		$exp_day = str_replace("-", "", $exp_dlv_day);
+        $exp_dlv_day_data = substr($exp_day,2,6);
+
 		$data = $request->input("products", []);
 		$failed_result = [];
 
@@ -379,7 +382,7 @@ class stk13Controller extends Controller
 						'storage_cd' => $storage_cd,
 						'state' => $state,
 						'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-						'rel_order' => $rel_order,
+						'rel_order' => $exp_dlv_day_data . '-' . $rel_order,
 						'req_id' => $admin_id,
 						'req_rt' => now(),
 						'rec_id' => $admin_id,

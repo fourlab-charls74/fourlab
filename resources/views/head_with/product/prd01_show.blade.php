@@ -69,13 +69,16 @@
         border: 1px solid transparent;
     }
 
-    table tr th {
+    .table-box th {
         background : #f5f5f5;
+        border: 1px solid #ddd;
     }
 
-    table td {
+    .table-box td {
         max-width: 300px;
+        border: 1px solid #ddd;
     }
+
 
 </style>
 
@@ -217,620 +220,653 @@
                         </div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header mb-0">
-                        <a href="#">상품 세부 정보</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="table-box mobile">
-                                    @if( $type == '' )
-                                    <div class="img_box cum_slider_cont p-4">
-                                        <img src="{{@$goods_info->img}}" alt="{{@$goods_info->goods_nm}}">
-                                    </div>
-                                    <div class="cum_slider_thum_wrap">
-                                        <div class="sd_prev pop_sd_btn bg-secondary"><i class="bx bx-left-arrow"></i></div>
-                                        <div class="inbox">
-                                            <ul class="cum_slider_thum">
-                                                <li>
-                                                    <a href="#" class="active"><img src="{{@$goods_images[0]}}"></a>
-                                                </li>
-                                                @for ($i = 1; $i < count($goods_images); $i++)
-                                                    <li>
-                                                        <a href="#"><img src="{{@$goods_images[$i]}}" alt="22"></a>
-                                                    </li>
-                                                @endfor
-                                            </ul>
+                <div class="card_wrap aco_card_wrap">
+                    <div class="card shadow">
+                        <div class="card-header mb-0">
+                            <a href="#">상품 세부 정보</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="table-box mobile">
+                                        @if( $type == '' )
+                                        <div class="img_box cum_slider_cont p-4">
+                                            <img src="{{@$goods_info->img}}" alt="{{@$goods_info->goods_nm}}">
                                         </div>
-                                        <div class="sd_next pop_sd_btn bg-secondary"><i class="bx bx-right-arrow"></i></div>
-                                    </div>
-                                    @else
-                                    <!-- 상품 복사 및 상품 등록 페이지일경우 표기됨. -->
-                                    <h3 class="pt50 text-center">상품을 먼저 등록 하신 후<br>이미지를 등록할 수 있습니다.</h3>
-                                    @endif
-                                    <div class="text-center mt-2">
-                                        <button type="button" id="img-setting" class="btn btn-primary waves-effect waves-light" data-no="{{$goods_no}}">
-                                            <i class="bx bx-cog font-size-14 align-middle"></i> 이미지 관리
-                                        </button>
-                                        <button type="button" id="img-show" class="btn btn-success waves-effect waves-light" data-no="{{$goods_no}}"  onclick="openFrontUrl()">
-                                            <i class="bx bx-images font-size-14 align-middle"></i> 상품 보기
-                                        </button>
+                                        <div class="cum_slider_thum_wrap">
+                                            <div class="sd_prev pop_sd_btn bg-secondary"><i class="bx bx-left-arrow"></i></div>
+                                            <div class="inbox">
+                                                <ul class="cum_slider_thum">
+                                                    <li>
+                                                        <a href="#" class="active"><img src="{{@$goods_images[0]}}"></a>
+                                                    </li>
+                                                    @for ($i = 1; $i < count($goods_images); $i++)
+                                                        <li>
+                                                            <a href="#"><img src="{{@$goods_images[$i]}}" alt="22"></a>
+                                                        </li>
+                                                    @endfor
+                                                </ul>
+                                            </div>
+                                            <div class="sd_next pop_sd_btn bg-secondary"><i class="bx bx-right-arrow"></i></div>
+                                        </div>
+                                        @else
+                                        <!-- 상품 복사 및 상품 등록 페이지일경우 표기됨. -->
+                                        <h3 class="pt50 text-center">상품을 먼저 등록 하신 후<br>이미지를 등록할 수 있습니다.</h3>
+                                        @endif
+                                        <div class="text-center mt-2">
+                                            <button type="button" id="img-setting" class="btn btn-primary waves-effect waves-light" data-no="{{$goods_no}}">
+                                                <i class="bx bx-cog font-size-14 align-middle"></i> 이미지 관리
+                                            </button>
+                                            <button type="button" id="img-show" class="btn btn-success waves-effect waves-light" data-no="{{$goods_no}}"  onclick="openFrontUrl()">
+                                                <i class="bx bx-images font-size-14 align-middle"></i> 상품 보기
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 mt-4 mt-lg-4">
-                                <div class="table-box mobile">
-                                    <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                        <tr>
-                                            <th class="required" id="th">상품명</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm" id="goods_nm" maxlength="100" value="{{ @$goods_info->goods_nm  }}" />
-                                                </div>
-                                            </td>
-                                            <th id="th" >상품명(영문)</th>
-                                            <td>
-                                                <div class="input_box">
-                                                    <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm_eng" id="goods_nm_eng" maxlength="100" value="{{ @$goods_info->goods_nm_eng  }}" />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th id="th">상단 홍보글</th>
-                                            <td>
-                                                <div class="input_box">
-                                                    <input type="text" name="head_desc" class="form-control form-control-sm search-all" value="{{ @$goods_info->head_desc }}">
-                                                </div>
-                                            </td>
-                                            <th >하단 홍보글</th>
-                                            <td >
-                                                <div class="input_box">
-                                                    <input type="text" class="form-control form-control-sm search-all" name="ad_desc" id="ad_desc" value="{{ @$goods_info->ad_desc }}"/>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">품목</th>
-                                            <td>
-                                                <div class="wd300">
-                                                    <select class="form-control form-control-sm search-all" name="opt_kind_cd" id="opt_kind_cd">
-                                                        <option value="">선택하세요.</option>
-                                                        @foreach($opt_cd_list as $opt_cd)
-                                                        <option value="{{$opt_cd->cd}}" {{ (@$goods_info->opt_kind_cd == $opt_cd->cd) ? "selected" : "" }}>{{$opt_cd->val}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <th class="required">브랜드</th>
-                                            <td>
-                                                <div class="wd300">
-                                                    <div class="form-inline inline_btn_box">
-                                                        <input type="text" name="brand_nm" id="brand_nm" value="{{@$goods_info->brand_nm}}" class="form-control form-control-sm ac-brand" style="width:70%;">
-														<input type="text" name="brand_cd" id="brand_cd" value="{{@$goods_info->brand}}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
-                                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">상품상태</th>
-                                            <td>
-                                                <div class="txt_box flax_box">
-                                                    <select name="sale_stat_cl" id="sale_stat_cl" class="form-control form-control-sm" style="width:61%; margin-right:7px">
-                                                        <option value="">상품상태</option>
-                                                    @foreach ($goods_stats as $goods_stat)
-                                                        <option
-                                                            value="{{$goods_stat->code_id}}"
-                                                            @if ($goods_stat->code_id === @$goods_info->sale_stat_cl ) selected @endif
-                                                        >
-                                                            {{ $goods_stat->code_val }}
-                                                        </option>
-                                                    @endforeach
-                                                    </select>
-                                                    <div class="custom-control custom-checkbox form-check-box mr-1">
-                                                        <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
-                                                        <label class="custom-control-label" for="restock">재 입고함</label>
-                                                    </div>
-                                                    <x-tool-tip>
-                                                        <x-slot name="arrow">top</x-slot>
-                                                        <x-slot name="align">left</x-slot>
-                                                        <x-slot name="html">
-                                                            품절 시 "<b>재입고알림</b>" 버튼이 노출됩니다.
-                                                        </x-slot>
-                                                    </x-tool-tip>
-                                                </div>
-                                            </td>
-                                            <th class="required">스타일넘버</th>
-                                            <td>
-                                                <div class="input_box wd300">
-                                                    <input type='text' class="form-control form-control-sm ac-style-no search-all" name='style_no' id='style_no' value='{{ @$goods_info->style_no  }}'>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">상품구분</th>
-                                            <td>
-                                                <div class="flex">
-                                                    <select name="goods_type" id="goods_type" class="form-control form-control-sm d-inline-block"
-                                                        style="width: 85%; margin-right: 15px;"
-                                                    >
-														<option value="">==상품구분==</option>
-                                                        @foreach($goods_types as $goods_type )
-                                                        <option
-                                                        value="{{$goods_type->code_id}}"
-                                                        @if ($goods_type->code_id === @$goods_info->goods_type) selected @endif
-                                                        >
-                                                            {{ $goods_type->code_val }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <x-tool-tip>
-                                                        <x-slot name="arrow">top</x-slot>
-                                                        <x-slot name="align">left</x-slot>
-                                                        <x-slot name="html">
-                                                            위탁판매 : 입점사가 상품에 대한 판매를 위탁하고 일정한 수수료를 지급하는 상품<br/>
-                                                            위탁매입 : 입점사가 상품에 대한 <u>재고를 선 제공 후, 판매된 매출에 대하여 정산</u>하는 상품<br/>
-                                                            ※ <b>매입, 위탁매입 상품은 보유재고 관리가 가능</b>합니다.
-                                                        </x-slot>
-                                                    </x-tool-tip>
-                                                </div>
-                                            </td>
-                                            <th class="required">업체</th>
-                                            <td>
-                                                <div class="input_box wd300">
-													<div class="form-inline inline_btn_box">
-														<input type="hidden" name="com_type" id="com_type" value="{{ @$goods_info->com_type }}" >
-														<input type="hidden" name="margin_type" id="margin_type" value="{{ @$goods_info->margin_type }}">
-														<input type="text" id="com_nm" name="com_nm" value="{{ @$goods_info->com_nm }}" class="form-control form-control-sm  btn-select-company" style="width:70%;">
-														<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-select-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-														<input type="text" name="com_id" id="com_id" value="{{ @$goods_info->com_id }}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
-													</div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>제조사</th>
-                                            <td>
-                                                <div class="input_box wd300">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='make' id='make' value='{{ @$goods_info->make  }}' />
-                                                </div>
-                                            </td>
-                                            <th class="required">원산지</th>
-                                            <td>
-                                                <div class="input_box wd300">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='org_nm' id='org_nm' value='{{ @$goods_info->org_nm  }}' />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>메모</th>
-                                            <td>
-                                                <div class="input_box wd300">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='goods_memo' id='goods_memo' value='{{ @$goods_info->goods_memo  }}' />
-                                                </div>
-                                            </td>
-                                            <th class="required">판매가</th>
-                                            <td>
-                                                <div class="txt_box flax_box">
-                                                    <input
-                                                        type='text'
-                                                        style="width:74%"
-                                                        class="form-control form-control-sm search-all text-right"
-                                                        name='price'
-                                                        id='price'
-                                                        value='{{ @number_format(@$goods_info->price) }}'
-                                                        @if (@$goods_info->sale_yn == "Y") readonly @endif
-                                                    >
-                                                    <div class="txt_box ml-1 mr-2">원</div>
-                                                    @if ($type !== 'create')
-                                                    <div class="custom-control custom-checkbox form-check-box">
-                                                        <input type='hidden' name="sale_yn" value='{{ @$goods_info->sale_yn }}' />
-                                                        <input type="checkbox" class="custom-control-input" id="sale_yn" {{ (@$goods_info->sale_yn == "Y") ? "checked" : "" }}>
-                                                        <label class="custom-control-label" for="sale_yn">세일</label>
-                                                    </div>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @if ($type !== 'create')
-                                        <tr class="sale_control" style="@if (@$goods_info->sale_yn != 'Y') display: none; @endif">
-                                            <th id="th">세일</th>
-                                            <td>
-                                                <div class="wd300 d-flex mb-2">
-                                                    <span class="sub_title mr-2">구분</span>
-                                                    <select name="sale_type" id="sale_type" class="form-control form-control-sm">
-                                                        <option value="">==세일구분==</option>
-                                                        @foreach (@$goods_info->sale_types as $sale_type)
-                                                            <option value="{{ $sale_type['key'] }}" @if ($sale_type['key'] === @$goods_info->sale_type) selected @endif>{{ $sale_type['value'] }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="wd300 d-flex mb-2">
-                                                    <span class="sub_title mr-2">정상가</span>
-                                                    <input type='text' value='{{ number_format(@$goods_info->normal_price) }}' class="form-control form-control-sm search-all text-right" disabled/>
-                                                    <div class="txt_box ml-1 mr-2">원</div>
-                                                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm cancel-sale-btn" style="width: 180px;">세일취소</a>
-                                                </div>
-                                                <div class="wd300 d-flex mb-2">
-                                                    <span class="sub_title mr-2">세일</span>
-                                                    <input type='text' name='sale_rate' value='{{ @$goods_info->sale_rate }}' class="form-control form-control-sm search-all text-right" numberOnly/>
-                                                    <div class="txt_box ml-1">%</div>
-                                                </div>
-                                                <div class="wd300 d-flex mb-2 pl-5">
-                                                    <span class="sub_title sub mr-2">(세일가</span>
-                                                    <input type='text' name='sale_price' value='{{ number_format(@$goods_info->sale_price) }}' class="form-control form-control-sm search-all text-right" numberOnly/>
-                                                    <div class="txt_box ml-1">원)</div>
-                                                </div>
-                                                <!-- 상품구분이 위탁판매인 경우에만 보여지도록 설정 -->
-                                                @if (@$goods_info->goods_type === 'P')
-                                                <div class="wd300 d-flex mb-2">
-                                                    <span class="sub_title mr-2">마진율</span>
-                                                    <input type='text' name='sale_margin' value='{{ @$goods_info->sale_margin }}' class="form-control form-control-sm search-all text-right" readonly />
-                                                    <div class="txt_box ml-1">%</div>
-                                                </div>
-                                                <div class="wd300 d-flex mb-2 pl-5">
-                                                    <span class="sub_title sub mr-2">(정상원가</span>
-                                                    <input type='text' name='normal_wonga' value='{{ number_format(@$goods_info->normal_wonga) }}' class="form-control form-control-sm search-all text-right" readonly />
-                                                    <div class="txt_box ml-1">원)</div>
-                                                </div>
-                                                <div class="wd300 d-flex mb-2 pl-5">
-                                                    <span class="sub_title sub mr-2">(세일원가</span>
-                                                    <input type='text' name='sale_wonga' value='{{ number_format(@$goods_info->sale_wonga) }}' class="form-control form-control-sm search-all text-right" readonly />
-                                                    <div class="txt_box ml-1">원)</div>
-                                                </div>
+                            <div class="row">
+                                <div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 기본정보</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-box">  
+                                        <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="required">품번(상단홍보글)</th>
+                                                    <td>
+                                                        <div class="form-inline">
+                                                            <input type="text" class="form-control form-control-sm search-all w-100" name="prd_cd_p" id="prd_cd_p" maxlength="100" value="" />
+                                                        </div>
+                                                    </td>
+                                                    <th class="required" >상품명</th>
+                                                    <td>
+                                                        <div class="form-inline">
+                                                            <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm" id="goods_nm" maxlength="100" value="{{ @$goods_info->goods_nm  }}" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th  >상품명(영문)</th>
+                                                    <td>
+                                                        <div class="input_box">
+                                                            <input type="text" class="form-control form-control-sm search-all w-100" name="goods_nm_eng" id="goods_nm_eng" maxlength="100" value="{{ @$goods_info->goods_nm_eng  }}" />
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">업체</th>
+                                                    <td>
+                                                        <div class="input_box wd300">
+                                                            <div class="form-inline inline_btn_box">
+                                                                <input type="hidden" name="com_type" id="com_type" value="{{ @$goods_info->com_type }}" >
+                                                                <input type="hidden" name="margin_type" id="margin_type" value="{{ @$goods_info->margin_type }}">
+                                                                <input type="text" id="com_nm" name="com_nm" value="{{ @$goods_info->com_nm }}" class="form-control form-control-sm  btn-select-company" style="width:70%;">
+                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary btn-select-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                                <input type="text" name="com_id" id="com_id" value="{{ @$goods_info->com_id }}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>제조사/수입자</th>
+                                                    <td>
+                                                        <div class="input_box wd300">
+                                                            <input type='text' class="form-control form-control-sm search-all" name='make' id='make' value='{{ @$goods_info->make  }}' />
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">상품구분</th>
+                                                    <td>
+                                                        <div class="flex">
+                                                            <select name="goods_type" id="goods_type" class="form-control form-control-sm d-inline-block"
+                                                                style="width: 85%; margin-right: 15px;"
+                                                            >
+                                                                <option value="">==상품구분==</option>
+                                                                @foreach($goods_types as $goods_type )
+                                                                <option
+                                                                value="{{$goods_type->code_id}}"
+                                                                @if ($goods_type->code_id === @$goods_info->goods_type) selected @endif
+                                                                >
+                                                                    {{ $goods_type->code_val }}
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
+                                                            <x-tool-tip>
+                                                                <x-slot name="arrow">top</x-slot>
+                                                                <x-slot name="align">left</x-slot>
+                                                                <x-slot name="html">
+                                                                    위탁판매 : 입점사가 상품에 대한 판매를 위탁하고 일정한 수수료를 지급하는 상품<br/>
+                                                                    위탁매입 : 입점사가 상품에 대한 <u>재고를 선 제공 후, 판매된 매출에 대하여 정산</u>하는 상품<br/>
+                                                                    ※ <b>매입, 위탁매입 상품은 보유재고 관리가 가능</b>합니다.
+                                                                </x-slot>
+                                                            </x-tool-tip>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>입고창고</th>
+                                                    <td>
+                                                        <div class="input_box wd300">
+                                                            <input type='text' class="form-control form-control-sm search-all" name='goods_location' id='goods_location' value='{{ @$goods_info->goods_location }}'>
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">브랜드</th>
+                                                    <td>
+                                                        <div class="wd300">
+                                                            <div class="form-inline inline_btn_box">
+                                                                <input type="text" name="brand_nm" id="brand_nm" value="{{@$goods_info->brand_nm}}" class="form-control form-control-sm ac-brand" style="width:70%;">
+                                                                <input type="text" name="brand_cd" id="brand_cd" value="{{@$goods_info->brand}}" class="form-control form-control-sm ml-1" style="width:28%;" readonly>
+                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="required">품목</th>
+                                                    <td>
+                                                        <div class="wd300">
+                                                            <select class="form-control form-control-sm search-all" name="opt_kind_cd" id="opt_kind_cd">
+                                                                <option value="">선택하세요.</option>
+                                                                @foreach($opt_cd_list as $opt_cd)
+                                                                <option value="{{$opt_cd->cd}}" {{ (@$goods_info->opt_kind_cd == $opt_cd->cd) ? "selected" : "" }}>{{$opt_cd->val}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">스타일넘버</th>
+                                                    <td>
+                                                        <div class="input_box wd300">
+                                                            <input type='text' class="form-control form-control-sm ac-style-no search-all" name='style_no' id='style_no' value='{{ @$goods_info->style_no  }}'>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="required">원산지</th>
+                                                    <td>
+                                                        <div class="input_box wd300">
+                                                            <input type='text' class="form-control form-control-sm search-all" name='org_nm' id='org_nm' value='{{ @$goods_info->org_nm  }}' />
+                                                        </div>
+                                                    </td>
+                                                    <th>정상가</th>
+                                                    <td>
+                                                        <div class="txt_box flax_box">
+                                                            <input
+                                                            type='text'
+                                                            class="form-control form-control-sm search-all text-right"
+                                                            name='goods_sh'
+                                                            id='goods_sh'
+                                                            value='{{@number_format(@$goods_info->goods_sh)}}'
+                                                            style="width:93%"
+                                                            >
+                                                            <div class="txt_box ml-1">원</div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="required">판매가</th>
+                                                    <td>
+                                                        <div class="txt_box flax_box">
+                                                            <input
+                                                                type='text'
+                                                                style="width:74%"
+                                                                class="form-control form-control-sm search-all text-right"
+                                                                name='price'
+                                                                id='price'
+                                                                value='{{ @number_format(@$goods_info->price) }}'
+                                                                @if (@$goods_info->sale_yn == "Y") readonly @endif
+                                                            >
+                                                            <div class="txt_box ml-1 mr-2">원</div>
+                                                            @if ($type !== 'create')
+                                                            <div class="custom-control custom-checkbox form-check-box">
+                                                                <input type='hidden' name="sale_yn" value='{{ @$goods_info->sale_yn }}' />
+                                                                <input type="checkbox" class="custom-control-input" id="sale_yn" {{ (@$goods_info->sale_yn == "Y") ? "checked" : "" }}>
+                                                                <label class="custom-control-label" for="sale_yn">세일</label>
+                                                            </div>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">원가</th>
+                                                    <td class="pb-1">
+                                                        <div class="txt_box flax_box">
+                                                            <input
+                                                            type='text'
+                                                            class="form-control form-control-sm search-all text-right"
+                                                            name='wonga'
+                                                            id='wonga'
+                                                            value='{{@number_format(@$goods_info->wonga)}}'
+                                                            @if( $type == "" )
+                                                            readonly
+                                                            @endif
+                                                            style="width:93%"
+                                                            >
+                                                            <div class="txt_box ml-1">원</div>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <p class="font-size-12 mt-1 mb-0">
+                                                                *원가는 자동계산됩니다.
+                                                            </p>
+                                                            @if (@$goods_info->goods_type === 'S')
+                                                                <a href="javascript:void(0);" class="txt_box ml-1" onclick="return openWongaPopup();">(평균 {{ number_format(@$avg_wonga) }}원)</a>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                @if ($type !== 'create')
+                                                <tr class="sale_control" style="@if (@$goods_info->sale_yn != 'Y') display: none; @endif">
+                                                    <th >세일</th>
+                                                    <td>
+                                                        <div class="wd300 d-flex mb-2">
+                                                            <span class="sub_title mr-2">구분</span>
+                                                            <select name="sale_type" id="sale_type" class="form-control form-control-sm">
+                                                                <option value="">==세일구분==</option>
+                                                                @foreach (@$goods_info->sale_types as $sale_type)
+                                                                    <option value="{{ $sale_type['key'] }}" @if ($sale_type['key'] === @$goods_info->sale_type) selected @endif>{{ $sale_type['value'] }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="wd300 d-flex mb-2">
+                                                            <span class="sub_title mr-2">정상가</span>
+                                                            <input type='text' value='{{ number_format(@$goods_info->normal_price) }}' class="form-control form-control-sm search-all text-right" disabled/>
+                                                            <div class="txt_box ml-1 mr-2">원</div>
+                                                            <a href="#" class="btn btn-sm btn-outline-primary shadow-sm cancel-sale-btn" style="width: 180px;">세일취소</a>
+                                                        </div>
+                                                        <div class="wd300 d-flex mb-2">
+                                                            <span class="sub_title mr-2">세일</span>
+                                                            <input type='text' name='sale_rate' value='{{ @$goods_info->sale_rate }}' class="form-control form-control-sm search-all text-right" numberOnly/>
+                                                            <div class="txt_box ml-1">%</div>
+                                                        </div>
+                                                        <div class="wd300 d-flex mb-2 pl-5">
+                                                            <span class="sub_title sub mr-2">(세일가</span>
+                                                            <input type='text' name='sale_price' value='{{ number_format(@$goods_info->sale_price) }}' class="form-control form-control-sm search-all text-right" numberOnly/>
+                                                            <div class="txt_box ml-1">원)</div>
+                                                        </div>
+                                                        <!-- 상품구분이 위탁판매인 경우에만 보여지도록 설정 -->
+                                                        @if (@$goods_info->goods_type === 'P')
+                                                        <div class="wd300 d-flex mb-2">
+                                                            <span class="sub_title mr-2">마진율</span>
+                                                            <input type='text' name='sale_margin' value='{{ @$goods_info->sale_margin }}' class="form-control form-control-sm search-all text-right" readonly />
+                                                            <div class="txt_box ml-1">%</div>
+                                                        </div>
+                                                        <div class="wd300 d-flex mb-2 pl-5">
+                                                            <span class="sub_title sub mr-2">(정상원가</span>
+                                                            <input type='text' name='normal_wonga' value='{{ number_format(@$goods_info->normal_wonga) }}' class="form-control form-control-sm search-all text-right" readonly />
+                                                            <div class="txt_box ml-1">원)</div>
+                                                        </div>
+                                                        <div class="wd300 d-flex mb-2 pl-5">
+                                                            <span class="sub_title sub mr-2">(세일원가</span>
+                                                            <input type='text' name='sale_wonga' value='{{ number_format(@$goods_info->sale_wonga) }}' class="form-control form-control-sm search-all text-right" readonly />
+                                                            <div class="txt_box ml-1">원)</div>
+                                                        </div>
+                                                        @endif
+                                                        
+                                                    </td>
+                                                    <th >세일 기간</th>
+                                                    <td>
+                                                        <div class="wd300 d-flex mb-2">
+                                                            <span class="sub_title mr-2">기간</span>
+                                                            <div class="custom-control custom-checkbox form-check-box">
+                                                                <input type="hidden" name="sale_dt_yn" value='{{ $goods_info->sale_dt_yn }}}' />
+                                                                <input type="checkbox" id="sale_dt_yn" class="custom-control-input" @if (@$goods_info->sale_dt_yn === 'Y') checked @endif />
+                                                                <label class="custom-control-label" for="sale_dt_yn">기간 사용</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="wd300 d-flex pl-5">
+                                                            <div class="docs-datepicker form-inline-inner" id="sale_s_dt">
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control form-control-sm docs-date" name="sale_s_dt" autocomplete="off" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif />
+                                                                    <div class="input-group-append">
+                                                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger sale_s_dt_btn p-0 pl-2 pr-2" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif>
+                                                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="docs-datepicker-container"></div>
+                                                            </div>
+                                                            <div class="form-inline-inner d-flex align-items-center ml-2" style="width: 40%;">
+                                                                <select name="sale_s_dt_tm" class="form-control form-control-sm select-time" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif></select>
+                                                                <span class="pl-1">시</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="wd300 d-flex pl-5 justify-content-center">
+                                                            <span class="text_line">~</span>
+                                                        </div>
+                                                        <div class="wd300 d-flex pl-5">
+                                                            <div class="docs-datepicker form-inline-inner" id="sale_e_dt">
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control form-control-sm docs-date" name="sale_e_dt" autocomplete="off" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif />
+                                                                    <div class="input-group-append">
+                                                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger sale_e_dt_btn p-0 pl-2 pr-2" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif>
+                                                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="docs-datepicker-container"></div>
+                                                            </div>
+                                                            <div class="form-inline-inner d-flex align-items-center ml-2" style="width: 40%;">
+                                                                <select name="sale_e_dt_tm" class="form-control form-control-sm select-time" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif></select>
+                                                                <span class="pl-1">시</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                                 @endif
-                                                
-                                            </td>
-                                            <th id="th">세일 기간</th>
-                                            <td>
-                                                <div class="wd300 d-flex mb-2">
-                                                    <span class="sub_title mr-2">기간</span>
-                                                    <div class="custom-control custom-checkbox form-check-box">
-                                                        <input type="hidden" name="sale_dt_yn" value='{{ $goods_info->sale_dt_yn }}}' />
-                                                        <input type="checkbox" id="sale_dt_yn" class="custom-control-input" @if (@$goods_info->sale_dt_yn === 'Y') checked @endif />
-                                                        <label class="custom-control-label" for="sale_dt_yn">기간 사용</label>
-                                                    </div>
-                                                </div>
-                                                <div class="wd300 d-flex pl-5">
-                                                    <div class="docs-datepicker form-inline-inner" id="sale_s_dt">
-                                                        <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="sale_s_dt" autocomplete="off" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif />
-                                                            <div class="input-group-append">
-                                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger sale_s_dt_btn p-0 pl-2 pr-2" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif>
-                                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                                </button>
+                                                <tr>
+                                                    <th class="required">마진율</th>
+                                                    <td>
+                                                        <div class="txt_box flax_box">
+                                                            <input
+                                                            type='text'
+                                                            id="margin"
+                                                            name="margin"
+                                                            class="form-control form-control-sm search-all text-right"
+                                                            value='{{ round(@$goods_info->prf, 2) }}'
+                                                            @if ($type === '') readonly @endif
+                                                            style="width:93%";
+                                                            >
+                                                            <div class="txt_box ml-1">%</div>
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">과세구분</th>
+                                                    <td>
+                                                        <div class="wd300">
+                                                            <select name="tax_yn" id="tax_yn" class="form-control form-control-sm search-all">
+                                                                <option value="">==과세구분==</option>
+                                                                <option value="Y" {{ (@$goods_info->tax_yn== 'Y') ? "selected" : "" }}>과세</option>
+                                                                <option value="N" {{ (@$goods_info->tax_yn== 'N') ? "selected" : "" }}>비과세</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 전시정보</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-box">
+                                        <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="required">상품상태</th>
+                                                    <td>
+                                                        <div class="txt_box flax_box">
+                                                            <select name="sale_stat_cl" id="sale_stat_cl" class="form-control form-control-sm" style="width:61%; margin-right:7px">
+                                                                <option value="">전시상태</option>
+                                                            @foreach ($goods_stats as $goods_stat)
+                                                                <option
+                                                                    value="{{$goods_stat->code_id}}"
+                                                                    @if ($goods_stat->code_id === @$goods_info->sale_stat_cl ) selected @endif
+                                                                >
+                                                                    {{ $goods_stat->code_val }}
+                                                                </option>
+                                                            @endforeach
+                                                            </select>
+                                                            <div class="custom-control custom-checkbox form-check-box mr-1">
+                                                                <input type="checkbox" class="custom-control-input" value="Y" id="restock" {{ (@$goods_info->restock_yn=="Y") ? "checked" : "" }}>
+                                                                <label class="custom-control-label" for="restock">재 입고함</label>
+                                                            </div>
+                                                            <x-tool-tip>
+                                                                <x-slot name="arrow">top</x-slot>
+                                                                <x-slot name="align">left</x-slot>
+                                                                <x-slot name="html">
+                                                                    품절 시 "<b>재입고알림</b>" 버튼이 노출됩니다.
+                                                                </x-slot>
+                                                            </x-tool-tip>
+                                                        </div>
+                                                    </td>
+                                                    <th >상단 홍보글</th>
+                                                    <td>
+                                                        <div class="input_box">
+                                                            <input type="text" name="head_desc" class="form-control form-control-sm search-all" value="{{ @$goods_info->head_desc }}">
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th >하단 홍보글</th>
+                                                    <td >
+                                                        <div class="input_box">
+                                                            <input type="text" class="form-control form-control-sm search-all" name="ad_desc" id="ad_desc" value="{{ @$goods_info->ad_desc }}"/>
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">MD선택</th>
+                                                    <td>
+                                                        <div class="wd300">
+                                                            <input type="hidden" name="md_nm" id="md_nm" value="{{@$goods_info->md_nm}}">
+                                                            <select name="md_id" id="md_id" class="form-control form-control-sm search-all">
+                                                                <option value="">==MD선택==</option>
+                                                                @foreach($md_list as $md)
+                                                                    <option value="{{$md->id}}" {{ (@$goods_info->md_id == $md->id) ? "selected" : "" }}>{{$md->name}} ({{$md->id}})</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>신상품 적용일</th>
+                                                    <td>
+                                                        <div class="form-inline form-radio-box flax_box txt_box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="new_product_type" value="M" id="new_product_type1" onclick="display_new_prd_day('n')" class="custom-control-input" {{ (@$goods_info->new_product_type=="M")? "checked" : "" }} />
+                                                                <label class="custom-control-label" for="new_product_type1">등록일 기준</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio mr-2">
+                                                                <input type="radio" name="new_product_type" value="R" onclick="display_new_prd_day('y')" id="new_product_type2" class="custom-control-input" {{ (@$goods_info->new_product_type=="R")? "checked" : "" }}/>
+                                                                <label class="custom-control-label" for="new_product_type2">직접입력</label>
                                                             </div>
                                                         </div>
-                                                        <div class="docs-datepicker-container"></div>
-                                                    </div>
-                                                    <div class="form-inline-inner d-flex align-items-center ml-2" style="width: 40%;">
-                                                        <select name="sale_s_dt_tm" class="form-control form-control-sm select-time" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif></select>
-                                                        <span class="pl-1">시</span>
-                                                    </div>
-                                                </div>
-                                                <div class="wd300 d-flex pl-5 justify-content-center">
-                                                    <span class="text_line">~</span>
-                                                </div>
-                                                <div class="wd300 d-flex pl-5">
-                                                    <div class="docs-datepicker form-inline-inner" id="sale_e_dt">
-                                                        <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="sale_e_dt" autocomplete="off" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif />
-                                                            <div class="input-group-append">
-                                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger sale_e_dt_btn p-0 pl-2 pr-2" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif>
+                                                        <div class="docs-datepicker form-inline-inner" id="new_product_day" style="display:none;">
+                                                            <div class="input-group">
+                                                                <input type="text" style="width:90%" class="form-control form-control-sm docs-date" name="new_product_day" value="{{ @$goods_info->new_product_day }}" autocomplete="off" disable>
+                                                                <div class="input-group-append">
+                                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                                </button>
+                                                                    </button>
+                                                                </div>
                                                             </div>
+                                                            <div class="docs-datepicker-container"></div>
                                                         </div>
-                                                        <div class="docs-datepicker-container"></div>
-                                                    </div>
-                                                    <div class="form-inline-inner d-flex align-items-center ml-2" style="width: 40%;">
-                                                        <select name="sale_e_dt_tm" class="form-control form-control-sm select-time" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif></select>
-                                                        <span class="pl-1">시</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @endif
-                                        <tr>
-                                            <th>시중가</th>
-                                            <td>
-                                                <div class="txt_box flax_box">
-                                                    <input
-                                                    type='text'
-                                                    class="form-control form-control-sm search-all text-right"
-                                                    name='goods_sh'
-                                                    id='goods_sh'
-                                                    value='{{@number_format(@$goods_info->goods_sh)}}'
-                                                    style="width:93%"
-                                                    >
-                                                    <div class="txt_box ml-1">원</div>
-                                                </div>
-                                            </td>
-                                            <th class="required">원가</th>
-                                            <td class="pb-1">
-                                                <div class="txt_box flax_box">
-                                                    <input
-                                                    type='text'
-                                                    class="form-control form-control-sm search-all text-right"
-                                                    name='wonga'
-                                                    id='wonga'
-                                                    value='{{@number_format(@$goods_info->wonga)}}'
-                                                    @if( $type == "" )
-                                                    readonly
-                                                    @endif
-                                                    style="width:93%"
-                                                    >
-                                                    <div class="txt_box ml-1">원</div>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <p class="font-size-12 mt-1 mb-0">
-                                                        *원가는 자동계산됩니다.
-                                                    </p>
-                                                    @if (@$goods_info->goods_type === 'S')
-                                                        <a href="javascript:void(0);" class="txt_box ml-1" onclick="return openWongaPopup();">(평균 {{ number_format(@$avg_wonga) }}원)</a>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">마진율</th>
-                                            <td>
-                                                <div class="txt_box flax_box">
-                                                    <input
-                                                    type='text'
-                                                    id="margin"
-                                                    name="margin"
-                                                    class="form-control form-control-sm search-all text-right"
-                                                    value='{{ round(@$goods_info->prf, 2) }}'
-                                                    @if ($type === '') readonly @endif
-                                                    style="width:93%";
-                                                    >
-                                                    <div class="txt_box ml-1">%</div>
-                                                </div>
-                                            </td>
-                                            <th class="required">과세구분</th>
-                                            <td>
-                                                <div class="wd300">
-                                                    <select name="tax_yn" id="tax_yn" class="form-control form-control-sm search-all">
-														<option value="">==과세구분==</option>
-                                                        <option value="Y" {{ (@$goods_info->tax_yn== 'Y') ? "selected" : "" }}>과세</option>
-                                                        <option value="N" {{ (@$goods_info->tax_yn== 'N') ? "selected" : "" }}>비과세</option>
-                                                    </select>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">MD선택</th>
-                                            <td>
-                                                <div class="wd300">
-                                                    <input type="hidden" name="md_nm" id="md_nm" value="{{@$goods_info->md_nm}}">
-                                                    <select name="md_id" id="md_id" class="form-control form-control-sm search-all">
-														<option value="">==MD선택==</option>
-                                                        @foreach($md_list as $md)
-                                                            <option value="{{$md->id}}" {{ (@$goods_info->md_id == $md->id) ? "selected" : "" }}>{{$md->name}} ({{$md->id}})</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <th>배송정보</th>
-                                            <td>
-                                                <div class="form-inline wd400">
-                                                    <div class="form-inline-inner input_box">
-                                                        <select name="baesong_info" id="baesong_info"  class="form-control form-control-sm search-all">
-															<option value="">==배송지역==</option>
-                                                            <option value="1" @if(@$goods_info->baesong_info == "1") selected @endif>국내배송</option>
-                                                            <option value="2" @if(@$goods_info->baesong_info == "2") selected @endif>해외배송</option>
-                                                        </select>
-                                                    </div>
-                                                    <span class="text_line">/</span>
-                                                    <div class="form-inline-inner input_box">
-                                                        <select name="baesong_kind" id="baesong_kind" class="form-control form-control-sm search-all">
-															<option value="">==배송업체==</option>
-                                                            <option value="1" @if(@$goods_info->baesong_kind == "1") selected @endif >본사배송</option>
-                                                            <option value="2" @if(@$goods_info->baesong_kind == "2") selected @endif >입점업체배송</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">배송비 지불</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="dlv_pay_type" value="P" id="dlv_pay_type1" class="custom-control-input" {{ (@$goods_info->dlv_pay_type!="F") ? "checked" : "" }} />
-                                                        <label class="custom-control-label" for="dlv_pay_type1">선불</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="dlv_pay_type" value="F" id="dlv_pay_type2" class="custom-control-input" {{ (@$goods_info->dlv_pay_type=="F") ? "checked" : "" }} />
-                                                        <label class="custom-control-label" for="dlv_pay_type2"> 착불 </label>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <th class="required">배송비</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="dlv_fee_cfg" value="S" onclick="change_dlv_cfg_form('s')" id="dlv_fee_cfg1" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) checked @endif />
-                                                        <label class="custom-control-label" for="dlv_fee_cfg1">
-														@if( @$goods_info->dlv_policy == "C" )
-															업체별 설정
-														@else
-															쇼핑몰 설정
-														@endif
-														</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio mr-2">
-                                                        <input type="radio" name="dlv_fee_cfg" value="G" onclick="change_dlv_cfg_form('g')" id="dlv_fee_cfg2" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "G") checked @endif />
-                                                        <label class="custom-control-label" for="dlv_fee_cfg2">상품 개별 설정</label>
-                                                    </div>
-                                                    <div
-                                                    class="dlv_config_detail_div txt_box"
-                                                    id="dlv_config_detail_s_div"
-                                                    @if(@$goods_info->dlv_fee_cfg == "G") style="display:none;" @endif
-                                                    >
-													@if( @$goods_info->dlv_policy == "C" )
-														업체별 설정
-													@else
-														유료, 배송비 {{@$g_dlv_fee}}원 ({{@$g_free_dlv_fee_limit}}원 이상 구매 시 무료)
-													@endif
-                                                    </div>
-                                                    <div
-                                                    class="dlv_config_detail_div"
-                                                    id="dlv_config_detail_g_div"
-                                                    @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) style="display:none;" @endif
-                                                    >
-                                                        <div class="flax_box">
-                                                            <div class="select">
-                                                                <select name="bae_yn" class="form-control form-control-sm search-all">
-                                                                    <option value="Y" @if (@$goods_info->bae_yn !== 'N') selected @endif>유료</option>
-                                                                    <option value="N" @if (@$goods_info->bae_yn === 'N') selected @endif>무료</option>
+                                                    </td>
+                                                    <th>등록일시</th>
+                                                    <td>
+                                                        <div class="txt_box">
+                                                            {{ @$goods_info->reg_dm }}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>수정일시</th>
+                                                    <td>
+                                                        <div class="txt_box">
+                                                            {{ @$goods_info->upd_dm }}
+                                                        </div>
+                                                    </td>
+                                                    <th>메모</th>
+                                                    <td>
+                                                        <div class="input_box wd300">
+                                                            <input type='text' class="form-control form-control-sm search-all" name='goods_memo' id='goods_memo' value='{{ @$goods_info->goods_memo  }}' />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12" style="padding-top:30px;font-size:18px;font-weight:bold;">+ 주문배송 정보</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="table-box">
+                                        <table class="table incont table-bordered" width="100%" cellspacing="0">
+                                            <tbody>
+                                                <tr>
+                                                    <th>배송정보</th>
+                                                    <td>
+                                                        <div class="form-inline wd400">
+                                                            <div class="form-inline-inner input_box">
+                                                                <select name="baesong_info" id="baesong_info"  class="form-control form-control-sm search-all">
+                                                                    <option value="">==배송지역==</option>
+                                                                    <option value="1" @if(@$goods_info->baesong_info == "1") selected @endif>국내배송</option>
+                                                                    <option value="2" @if(@$goods_info->baesong_info == "2") selected @endif>해외배송</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="input_box">
-                                                                <input
-                                                                type="text"
-                                                                name="baesong_price"
-                                                                id="baesong_price"
-                                                                class="form-control form-control-sm search-all"
-                                                                style="width:100px;text-align:right;"
-                                                                value="{{@number_format(@$goods_info->baesong_price)}}"
-                                                                @if (@$goods_info->bae_yn === 'N') readonly @endif
-                                                                />
-                                                            </div>
-                                                            <div class="txt_box">원</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">적립금</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="point_cfg" value="S" onclick="change_point_cfg_form('s')" id="point_cfg1" class="custom-control-input" @if(@$goods_info->point_cfg == "S" || $type == "create" ) checked @endif />
-                                                        <label class="custom-control-label" for="point_cfg1">쇼핑몰 설정</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio mr-2">
-                                                        <input type="radio" name="point_cfg" value="G" onclick="change_point_cfg_form('g')" id="point_cfg2" class="custom-control-input" @if(@$goods_info->point_cfg == "G") checked @endif />
-                                                        <label class="custom-control-label" for="point_cfg2">상품 개별 설정</label>
-                                                    </div>
-                                                    <div
-                                                    class="point_config_detail_div txt_box"
-                                                    id="point_config_detail_s_div"
-                                                    @if(@$goods_info->point_cfg == "G") style="display:none;" @endif
-                                                    >
-													지급함, 상품 가격의 {{ $g_order_point_ratio }}% 적립금 지급
-                                                    </div>
-                                                    <div
-                                                    class="point_config_detail_div"
-                                                    id="point_config_detail_g_div"
-                                                    @if(@$goods_info->point_cfg == "S" || $type == "create" ) style="display:none;" @endif
-                                                    >
-														<select class="form-control form-control-sm search-all" name='point_yn' id="point_yn">
-															<option value=''>==지급 여부==</option>
-															<option value="Y" @if( @$goods_info->point_yn != 'N' ) selected @endif>지급함</option>
-															<option value="N" @if( @$goods_info->point_yn == 'N' ) selected @endif>지급안함</option>
-														</select>
-
-														<select class="form-control form-control-sm search-all" name='point_unit' id="point_unit">
-															<option value=''>단위</option>
-															<option value="W" @if( @$goods_info->point_uint != 'P' ) selected @endif >원</option>
-															<option value="P" @if( @$goods_info->point_unit == 'P' ) selected @endif>%</option>
-														</select>													<!--
-                                                        <div class="flax_box">
-                                                            <div class="select">
-                                                                <select name="bae_yn" class="form-control form-control-sm search-all">
-                                                                    <option value="Y" @if (@$goods_info->bae_yn !== 'N') selected @endif>유료</option>
-                                                                    <option value="N" @if (@$goods_info->bae_yn === 'N') selected @endif>무료</option>
+                                                            <span class="text_line">/</span>
+                                                            <div class="form-inline-inner input_box">
+                                                                <select name="baesong_kind" id="baesong_kind" class="form-control form-control-sm search-all">
+                                                                    <option value="">==배송업체==</option>
+                                                                    <option value="1" @if(@$goods_info->baesong_kind == "1") selected @endif >본사배송</option>
+                                                                    <option value="2" @if(@$goods_info->baesong_kind == "2") selected @endif >입점업체배송</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="input_box">
-                                                                <input
-                                                                type="text"
-                                                                name="baesong_price"
-                                                                id="baesong_price"
-                                                                class="form-control form-control-sm search-all"
-                                                                style="width:100px;text-align:right;"
-                                                                value="{{@number_format(@$goods_info->baesong_price)}}"
-                                                                @if (@$goods_info->bae_yn === 'N') readonly @endif
-                                                                />
+                                                        </div>
+                                                    </td>
+                                                    <th class="required">배송비 지불</th>
+                                                    <td>
+                                                        <div class="form-inline form-radio-box flax_box txt_box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="dlv_pay_type" value="P" id="dlv_pay_type1" class="custom-control-input" {{ (@$goods_info->dlv_pay_type!="F") ? "checked" : "" }} />
+                                                                <label class="custom-control-label" for="dlv_pay_type1">선불</label>
                                                             </div>
-                                                            <div class="txt_box">원</div>
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="dlv_pay_type" value="F" id="dlv_pay_type2" class="custom-control-input" {{ (@$goods_info->dlv_pay_type=="F") ? "checked" : "" }} />
+                                                                <label class="custom-control-label" for="dlv_pay_type2"> 착불 </label>
+                                                            </div>
                                                         </div>
-													//-->
-                                                    </div>
-												</div>
-
-												<div class="input_box">
-													<input
-													type="text"
-													name="point"
-													id="point"
-													class="form-control form-control-sm search-all"
-													style="width:100px;text-align:right;"
-													value="{{@number_format(@$goods_info->point)}}"
-													@if (@$goods_info->poing_cfg != 'G') readonly @endif
-													/>
-												</div>
-
-											</td>
-                                            <th>상품위치</th>
-                                            <td>
-                                                <div class="input_box wd300">
-                                                    <input type='text' class="form-control form-control-sm search-all" name='goods_location' id='goods_location' value='{{ @$goods_info->goods_location }}'>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>신상품 적용일</th>
-                                            <td>
-                                                <div class="form-inline form-radio-box flax_box txt_box">
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" name="new_product_type" value="M" id="new_product_type1" onclick="display_new_prd_day('n')" class="custom-control-input" {{ (@$goods_info->new_product_type=="M")? "checked" : "" }} />
-                                                        <label class="custom-control-label" for="new_product_type1">등록일 기준</label>
-                                                    </div>
-                                                    <div class="custom-control custom-radio mr-2">
-                                                        <input type="radio" name="new_product_type" value="R" onclick="display_new_prd_day('y')" id="new_product_type2" class="custom-control-input" {{ (@$goods_info->new_product_type=="R")? "checked" : "" }}/>
-                                                        <label class="custom-control-label" for="new_product_type2">직접입력</label>
-                                                    </div>
-                                                </div>
-                                                <div class="docs-datepicker form-inline-inner" id="new_product_day" style="display:none;">
-                                                    <div class="input-group">
-                                                        <input type="text" style="width:90%" class="form-control form-control-sm docs-date" name="new_product_day" value="{{ @$goods_info->new_product_day }}" autocomplete="off" disable>
-                                                        <div class="input-group-append">
-                                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                            </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="required">배송비</th>
+                                                    <td>
+                                                        <div class="form-inline form-radio-box flax_box txt_box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="dlv_fee_cfg" value="S" onclick="change_dlv_cfg_form('s')" id="dlv_fee_cfg1" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) checked @endif />
+                                                                <label class="custom-control-label" for="dlv_fee_cfg1">
+                                                                @if( @$goods_info->dlv_policy == "C" )
+                                                                    업체별 설정
+                                                                @else
+                                                                    쇼핑몰 설정
+                                                                @endif
+                                                                </label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio mr-2">
+                                                                <input type="radio" name="dlv_fee_cfg" value="G" onclick="change_dlv_cfg_form('g')" id="dlv_fee_cfg2" class="custom-control-input" @if(@$goods_info->dlv_fee_cfg == "G") checked @endif />
+                                                                <label class="custom-control-label" for="dlv_fee_cfg2">상품 개별 설정</label>
+                                                            </div>
+                                                            <div
+                                                            class="dlv_config_detail_div txt_box"
+                                                            id="dlv_config_detail_s_div"
+                                                            @if(@$goods_info->dlv_fee_cfg == "G") style="display:none;" @endif
+                                                            >
+                                                            @if( @$goods_info->dlv_policy == "C" )
+                                                                업체별 설정
+                                                            @else
+                                                                유료, 배송비 {{@$g_dlv_fee}}원 ({{@$g_free_dlv_fee_limit}}원 이상 구매 시 무료)
+                                                            @endif
+                                                            </div>
+                                                            <div
+                                                            class="dlv_config_detail_div"
+                                                            id="dlv_config_detail_g_div"
+                                                            @if(@$goods_info->dlv_fee_cfg == "S" || $type == "create" ) style="display:none;" @endif
+                                                            >
+                                                                <div class="flax_box">
+                                                                    <div class="select">
+                                                                        <select name="bae_yn" class="form-control form-control-sm search-all">
+                                                                            <option value="Y" @if (@$goods_info->bae_yn !== 'N') selected @endif>유료</option>
+                                                                            <option value="N" @if (@$goods_info->bae_yn === 'N') selected @endif>무료</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="input_box">
+                                                                        <input
+                                                                        type="text"
+                                                                        name="baesong_price"
+                                                                        id="baesong_price"
+                                                                        class="form-control form-control-sm search-all"
+                                                                        style="width:100px;text-align:right;"
+                                                                        value="{{@number_format(@$goods_info->baesong_price)}}"
+                                                                        @if (@$goods_info->bae_yn === 'N') readonly @endif
+                                                                        />
+                                                                    </div>
+                                                                    <div class="txt_box">원</div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="docs-datepicker-container"></div>
-                                                </div>
-                                            </td>
-                                            <th>등록일시</th>
-                                            <td>
-                                                <div class="txt_box">
-                                                    {{ @$goods_info->reg_dm }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>수정일시</th>
-                                            <td>
-                                                <div class="txt_box">
-                                                    {{ @$goods_info->upd_dm }}
-                                                </div>
-                                            </td>
-                                            <th></th>
-                                            <td>
-                                                <div class="txt_box">
+                                                    </td>
+                                                    <th class="required">적립금</th>
+                                                    <td>
+                                                        <div class="form-inline form-radio-box flax_box txt_box">
+                                                            <div class="custom-control custom-radio">
+                                                                <input type="radio" name="point_cfg" value="S" onclick="change_point_cfg_form('s')" id="point_cfg1" class="custom-control-input" @if(@$goods_info->point_cfg == "S" || $type == "create" ) checked @endif />
+                                                                <label class="custom-control-label" for="point_cfg1">쇼핑몰 설정</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio mr-2">
+                                                                <input type="radio" name="point_cfg" value="G" onclick="change_point_cfg_form('g')" id="point_cfg2" class="custom-control-input" @if(@$goods_info->point_cfg == "G") checked @endif />
+                                                                <label class="custom-control-label" for="point_cfg2">상품 개별 설정</label>
+                                                            </div>
+                                                            <div
+                                                            class="point_config_detail_div txt_box"
+                                                            id="point_config_detail_s_div"
+                                                            @if(@$goods_info->point_cfg == "G") style="display:none;" @endif
+                                                            >
+                                                            지급함, 상품 가격의 {{ $g_order_point_ratio }}% 적립금 지급
+                                                            </div>
+                                                            <div
+                                                            class="point_config_detail_div"
+                                                            id="point_config_detail_g_div"
+                                                            @if(@$goods_info->point_cfg == "S" || $type == "create" ) style="display:none;" @endif
+                                                            >
+                                                                <select class="form-control form-control-sm search-all" name='point_yn' id="point_yn">
+                                                                    <option value=''>==지급 여부==</option>
+                                                                    <option value="Y" @if( @$goods_info->point_yn != 'N' ) selected @endif>지급함</option>
+                                                                    <option value="N" @if( @$goods_info->point_yn == 'N' ) selected @endif>지급안함</option>
+                                                                </select>
 
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                                                <select class="form-control form-control-sm search-all" name='point_unit' id="point_unit">
+                                                                    <option value=''>단위</option>
+                                                                    <option value="W" @if( @$goods_info->point_uint != 'P' ) selected @endif >원</option>
+                                                                    <option value="P" @if( @$goods_info->point_unit == 'P' ) selected @endif>%</option>
+                                                                </select>													<!--
+                                                                <div class="flax_box">
+                                                                    <div class="select">
+                                                                        <select name="bae_yn" class="form-control form-control-sm search-all">
+                                                                            <option value="Y" @if (@$goods_info->bae_yn !== 'N') selected @endif>유료</option>
+                                                                            <option value="N" @if (@$goods_info->bae_yn === 'N') selected @endif>무료</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="input_box">
+                                                                        <input
+                                                                        type="text"
+                                                                        name="baesong_price"
+                                                                        id="baesong_price"
+                                                                        class="form-control form-control-sm search-all"
+                                                                        style="width:100px;text-align:right;"
+                                                                        value="{{@number_format(@$goods_info->baesong_price)}}"
+                                                                        @if (@$goods_info->bae_yn === 'N') readonly @endif
+                                                                        />
+                                                                    </div>
+                                                                    <div class="txt_box">원</div>
+                                                                </div>
+                                                            //-->
+                                                            </div>
+                                                        </div>
+                                                        <div class="input_box">
+                                                            <input
+                                                            type="text"
+                                                            name="point"
+                                                            id="point"
+                                                            class="form-control form-control-sm search-all"
+                                                            style="width:100px;text-align:right;"
+                                                            value="{{@number_format(@$goods_info->point)}}"
+                                                            @if (@$goods_info->poing_cfg != 'G') readonly @endif
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>

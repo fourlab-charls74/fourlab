@@ -277,7 +277,7 @@ class stk12Controller extends Controller
         $data = $request->input("products", []);
         $exp_day = str_replace("-", "", $exp_dlv_day);
         $exp_dlv_day_data = substr($exp_day,2,6);
-        
+
         try {
             DB::beginTransaction();
 
@@ -286,6 +286,15 @@ class stk12Controller extends Controller
 			
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_release order by document_number desc limit 1";
 			$document_number = DB::selectOne($sql)->document_number;
+
+            $sql = "
+                select 
+                    code_val3 
+                from code 
+                where code_kind_cd = 'REL_ORDER' and code_val = '$rel_order'
+            ";
+
+            $rel_order = DB::selectOne($sql);
 
             foreach($data as $d) {
                 $cnt = 0;
@@ -297,10 +306,13 @@ class stk12Controller extends Controller
                     where prd_cd = :prd_cd
                 ";
                 $prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
+
                 if($prd == null) continue;
+
 
                 foreach($stores as $store_cd) {
                     $rel_qty = $d[$store_cd . '_rel_qty'] ?? 0;
+
 
                     DB::table('product_stock_release')
                         ->insert([
