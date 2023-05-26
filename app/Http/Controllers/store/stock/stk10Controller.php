@@ -218,7 +218,7 @@ class stk10Controller extends Controller
                 -- cast(psr.exp_dlv_day as date) as exp_dlv_day, 
                 psr.exp_dlv_day as exp_dlv_day_data,
                 psr.prc_rt as last_release_date,
-                d.code_val3 as rel_order, 
+                psr.rel_order, 
                 psr.req_comment,
                 psr.comment,
                 psr.req_id,
@@ -241,7 +241,6 @@ class stk10Controller extends Controller
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                 left outer join brand on brand.brand = g.brand
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
-                left outer join code d on d.code_kind_cd = 'REL_ORDER' and d.code_id = psr.rel_order
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
             where 1=1 $where
@@ -556,8 +555,8 @@ class stk10Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
-	
-	// 출고 거래명세서 출력
+
+    // 출고 거래명세서 출력
 	public function download(Request $request)
 	{
 		$document_number = $request->input('document_number');

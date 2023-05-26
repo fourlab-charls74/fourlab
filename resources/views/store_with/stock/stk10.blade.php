@@ -305,7 +305,7 @@
                         <div class="d-flex">
                             <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
                                 @foreach ($rel_order_res as $rel_order)
-                                    <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
+                                    <option value='{{ $rel_order->code_val3 }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -404,11 +404,7 @@
                 return params.data.dlv_day;
            }
         },
-		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"},
-            cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
-            }
-        },
+		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"}},
         {field: "last_release_date", headerName: "최근출고일", width: 90,
             cellRenderer: function(params){
                 let last_release_date = params.data.last_release_date;
