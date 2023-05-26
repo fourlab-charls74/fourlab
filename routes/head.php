@@ -358,7 +358,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd05/column_search', 'prd05Controller@column_search');
 
         Route::get('prd05/delete', 'prd05Controller@delete');
-        Route::get('prd05/update', 'prd05Controller@update');
+        Route::post('prd05/update', 'prd05Controller@update');
         Route::post('prd05/load_excel', 'prd05Controller@load_excel');
         Route::get('prd05/show_excel', 'prd05Controller@show_excel');
         Route::get('prd05/down_excel', 'prd05Controller@down_excel');

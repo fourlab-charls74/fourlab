@@ -970,7 +970,7 @@
 
         $.ajax({
             async: true,
-            type: 'get',
+            type: 'post',
             url: '/head/product/prd05/update',
             data: frm.serialize() + '&class=' + class_code,
             success: function(data) {
