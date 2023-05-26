@@ -214,6 +214,7 @@ CREATE TABLE `product_stock_storage` (
 -- 오프라인 출고
 CREATE TABLE `product_stock_release` (
 	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`document_number` INT(11) NOT NULL COMMENT '전표번호',
 	`type` VARCHAR(50) DEFAULT NULL COMMENT '분류 - code : REL_TYPE (초도/판매분/요청분/일반 : F/S/R/G)',
 	`goods_no` INT(11) NOT NULL DEFAULT '0' COMMENT '상품번호',
 	`prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',

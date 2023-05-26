@@ -193,6 +193,7 @@ class stk10Controller extends Controller
 		$sql = "
             select
                 psr.idx,
+                psr.document_number,
                 cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) as dlv_day,
                 c.code_val as rel_type, 
                 psr.goods_no, 
@@ -562,10 +563,42 @@ class stk10Controller extends Controller
 		$document_number = $request->input('document_number');
 		$idx = $request->input('idx');
 
+		$sql = "
+			select p.prd_cd
+			     , g.goods_nm
+			     , pc.color
+			     , pc.size
+			     , p.qty
+			     , g.price
+			     , (g.price * p.qty) as total_price
+			     , round(g.price / 1.1) as release_price
+			     , round(g.price / 1.1 * p.qty) as total_release_price
+				 , s.store_nm
+			     , s.addr1
+			     , s.addr2
+				 , s.phone
+				 , s.fax
+			from product_stock_release p
+				inner join goods g on g.goods_no = p.goods_no
+				inner join product_code pc on pc.prd_cd = p.prd_cd
+				inner join store s on s.store_cd = p.store_cd
+			where p.document_number = :document_number
+				and p.store_cd = (select store_cd from product_stock_release where idx = :idx)
+		";
+		$rows = DB::select($sql, [ 'document_number' => $document_number, 'idx' => $idx ]);
+
 		$data = [
+			'one_sheet_count' => 38,
 			'document_number' => sprintf('%04d', $document_number),
-			'products' => []
+			'products' => $rows
 		];
+
+		if (count($rows) > 0) {
+			$data['store_nm'] 		= $rows[0]->store_nm ?? '';
+			$data['store_addr'] 	= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);
+			$data['store_phone'] 	= $rows[0]->phone ?? '';
+			$data['store_fax'] 		= $rows[0]->fax ?? '';
+		}
 
 		$style = [
 			'A3:AH3' => [
@@ -583,14 +616,16 @@ class stk10Controller extends Controller
 					'horizontal' => Alignment::HORIZONTAL_CENTER,
 					'vertical' => Alignment::VERTICAL_CENTER,
 				],
-				'font' => [ 'size' => 14 ],
+				'font' => [ 'size' => 16 ],
 			],
 			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'AC49:AH52' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_MEDIUM ] ] ],
-			'E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-			'V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],			
+			'E6' => [ 'font' => [ 'size' => 14 ] ],
+			'V6' => [ 'font' => [ 'size' => 14 ] ],
 			'G10:G47' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
 			'W10:AH48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
 			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
@@ -617,9 +652,11 @@ class stk10Controller extends Controller
 			],
 		];
 
-		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
-		$keys = [ 'list_key' => 'products', 'one_sheet_count' => 38, 'cell_width' => 6, 'cell_height' => 33 ];
 
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 6, 'cell_height' => 33 ];
+		$images = [[ 'name' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 120 ]];
+
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }

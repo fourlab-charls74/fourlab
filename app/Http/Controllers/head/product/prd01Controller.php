@@ -1153,7 +1153,7 @@ class prd01Controller extends Controller
 		$n_pr = $goods_info->normal_price;
 		$s_pr = $goods_info->sale_price;
 		if($goods_info->sale_yn == 'Y' && $s_pr > 0) {
-			$rate = ( ($n_pr - $s_pr) / $n_pr );
+			$rate = ( ($n_pr - $s_pr) / ($n_pr === 0 ? 1 : $n_pr) );
 			$goods_info->sale_rate = round($rate * 100);
 		}
 
