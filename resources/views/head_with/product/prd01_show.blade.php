@@ -75,7 +75,7 @@
     }
 
     .table-box td {
-        max-width: 300px;
+        width: 300px;
         border: 1px solid #ddd;
     }
 
@@ -269,11 +269,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="table-box">  
+                                    <div class="table-box mobile">  
                                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                                             <tbody>
                                                 <tr>
-                                                    <th class="required">품번(상단홍보글)</th>
+                                                    <th>품번</th>
                                                     <td>
                                                         <div class="form-inline">
                                                             <input type="text" class="form-control form-control-sm search-all w-100" name="prd_cd_p" id="prd_cd_p" maxlength="100" value="" />
@@ -406,7 +406,7 @@
                                                         <div class="txt_box flax_box">
                                                             <input
                                                                 type='text'
-                                                                style="width:74%"
+                                                                style="width:70%"
                                                                 class="form-control form-control-sm search-all text-right"
                                                                 name='price'
                                                                 id='price'
@@ -453,7 +453,7 @@
                                                 <tr class="sale_control" style="@if (@$goods_info->sale_yn != 'Y') display: none; @endif">
                                                     <th >세일</th>
                                                     <td>
-                                                        <div class="wd300 d-flex mb-2">
+                                                        <div class=" d-flex mb-2">
                                                             <span class="sub_title mr-2">구분</span>
                                                             <select name="sale_type" id="sale_type" class="form-control form-control-sm">
                                                                 <option value="">==세일구분==</option>
@@ -462,35 +462,35 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                        <div class="wd300 d-flex mb-2">
+                                                        <div class=" d-flex mb-2">
                                                             <span class="sub_title mr-2">정상가</span>
                                                             <input type='text' value='{{ number_format(@$goods_info->normal_price) }}' class="form-control form-control-sm search-all text-right" disabled/>
                                                             <div class="txt_box ml-1 mr-2">원</div>
                                                             <a href="#" class="btn btn-sm btn-outline-primary shadow-sm cancel-sale-btn" style="width: 180px;">세일취소</a>
                                                         </div>
-                                                        <div class="wd300 d-flex mb-2">
+                                                        <div class=" d-flex mb-2">
                                                             <span class="sub_title mr-2">세일</span>
                                                             <input type='text' name='sale_rate' value='{{ @$goods_info->sale_rate }}' class="form-control form-control-sm search-all text-right" numberOnly/>
                                                             <div class="txt_box ml-1">%</div>
                                                         </div>
-                                                        <div class="wd300 d-flex mb-2 pl-5">
+                                                        <div class=" d-flex mb-2 pl-5">
                                                             <span class="sub_title sub mr-2">(세일가</span>
                                                             <input type='text' name='sale_price' value='{{ number_format(@$goods_info->sale_price) }}' class="form-control form-control-sm search-all text-right" numberOnly/>
                                                             <div class="txt_box ml-1">원)</div>
                                                         </div>
                                                         <!-- 상품구분이 위탁판매인 경우에만 보여지도록 설정 -->
                                                         @if (@$goods_info->goods_type === 'P')
-                                                        <div class="wd300 d-flex mb-2">
+                                                        <div class=" d-flex mb-2">
                                                             <span class="sub_title mr-2">마진율</span>
                                                             <input type='text' name='sale_margin' value='{{ @$goods_info->sale_margin }}' class="form-control form-control-sm search-all text-right" readonly />
                                                             <div class="txt_box ml-1">%</div>
                                                         </div>
-                                                        <div class="wd300 d-flex mb-2 pl-5">
+                                                        <div class=" d-flex mb-2 pl-5">
                                                             <span class="sub_title sub mr-2">(정상원가</span>
                                                             <input type='text' name='normal_wonga' value='{{ number_format(@$goods_info->normal_wonga) }}' class="form-control form-control-sm search-all text-right" readonly />
                                                             <div class="txt_box ml-1">원)</div>
                                                         </div>
-                                                        <div class="wd300 d-flex mb-2 pl-5">
+                                                        <div class=" d-flex mb-2 pl-5">
                                                             <span class="sub_title sub mr-2">(세일원가</span>
                                                             <input type='text' name='sale_wonga' value='{{ number_format(@$goods_info->sale_wonga) }}' class="form-control form-control-sm search-all text-right" readonly />
                                                             <div class="txt_box ml-1">원)</div>
@@ -500,7 +500,7 @@
                                                     </td>
                                                     <th >세일 기간</th>
                                                     <td>
-                                                        <div class="wd300 d-flex mb-2">
+                                                        <div class=" d-flex mb-2">
                                                             <span class="sub_title mr-2">기간</span>
                                                             <div class="custom-control custom-checkbox form-check-box">
                                                                 <input type="hidden" name="sale_dt_yn" value='{{ $goods_info->sale_dt_yn }}}' />
@@ -508,7 +508,7 @@
                                                                 <label class="custom-control-label" for="sale_dt_yn">기간 사용</label>
                                                             </div>
                                                         </div>
-                                                        <div class="wd300 d-flex pl-5">
+                                                        <div class=" d-flex pl-5">
                                                             <div class="docs-datepicker form-inline-inner" id="sale_s_dt">
                                                                 <div class="input-group">
                                                                     <input type="text" class="form-control form-control-sm docs-date" name="sale_s_dt" autocomplete="off" @if (@$goods_info->sale_dt_yn !== 'Y') disabled @endif />
@@ -585,7 +585,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="table-box">
+                                    <div class="table-box mobile">
                                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                                             <tbody>
                                                 <tr>
@@ -699,11 +699,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="table-box">
+                                    <div class="table-box mobile">
                                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                                             <tbody>
                                                 <tr>
-                                                    <th>배송정보</th>
+                                                    <th class="required">배송정보</th>
                                                     <td>
                                                         <div class="form-inline wd400">
                                                             <div class="form-inline-inner input_box">
@@ -879,7 +879,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <div class="table-box">
+                                <div class="table-box mobile">
                                     <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <tr>
                                             <th width="15%">재고 수량 관리</th>
@@ -1810,64 +1810,48 @@
                 return false;
             }
             */
-
-            if( $("#opt_kind_cd").val() == "" ){
-                alert("품목을 선택해 주십시오.");
-                $("#opt_kind_cd").focus();
-                return false;
-            }
+            if( $('#com_id').val() == "" ){
+				alert('업체를 선택해 주십시오.');
+				$('.btn-select-company').click();
+				return false;
+			}
+            if( $('#goods_type').val() == "" ){
+				alert('상품구분을 선택해 주십시오.');
+				$('#goods_type').focus();
+				return false;
+			}
             if( $("#brand_cd").val() == "" ){
                 alert("브랜드를 선택해 주십시오.");
                 $(".sch-brand").click();
                 return false;
             }
-			if( $('#sale_stat_cl').val() == "" ){
-				alert("상품상태를 선택해 주십시오.");
-				$('#sale_stat_cl').focus();
-				return false;
-			}
+            if( $("#opt_kind_cd").val() == "" ){
+                alert("품목을 선택해 주십시오.");
+                $("#opt_kind_cd").focus();
+                return false;
+            }
             if( $("#style_no").val() == "" ){
                 alert("스타일넘버를 입력해 주십시오.");
                 $("#style_no").focus();
                 return false;
             }
-			if( $('#goods_type').val() == "" ){
-				alert('상품구분을 선택해 주십시오.');
-				$('#goods_type').focus();
-				return false;
-			}
-			if( $('#com_id').val() == "" ){
-				alert('업체를 선택해 주십시오.');
-				$('.btn-select-company').click();
-				return false;
-			}
             if( $("#org_nm").val() == "" ) {
                 alert("원산지를 입력해 주십시오.");
                 $("#org_nm").focus();
                 return false;
             }
-            if( is_sale && $("#sale_type").val() == "" ) {
-                alert("세일구분을 선택해 주십시오.");
-                $("#sale_type").focus();
-                return false;
-            }
-            if( is_sale && ($("[name='sale_rate']").val() == "" || $("[name='sale_rate']").val() == 0) ) {
-                alert("세일율을 입력해 주십시오.");
-                $("[name='sale_rate']").focus();
-                return false;
-            }
-            if( $("#price").val() == "0" ) {
-				if( !confirm("입력하신 정상가는 0원 입니다. 저장 하시겠습니까?") ){
-					$("#price").focus();
-					return false;
-				}
-            }
-			if( $('#tax_yn').val() == "" ){
+            
+            if( $('#tax_yn').val() == "" ){
 				alert("과세구분을 선택해 주십시오.");
 				$('#tax_yn').focus();
 				return false;
 			}
-			if( $("#md_id").val() == "" ){
+			if( $('#sale_stat_cl').val() == "" ){
+				alert("상품상태를 선택해 주십시오.");
+				$('#sale_stat_cl').focus();
+				return false;
+			}
+            if( $("#md_id").val() == "" ){
 				alert("MD를 선택해 주십시오.");
 				$("#md_id").focus();
 				return false;
@@ -1904,6 +1888,23 @@
 					return false;
 				}
 			}
+            if( $("#price").val() == "0" ) {
+				if( !confirm("입력하신 정상가는 0원 입니다. 저장 하시겠습니까?") ){
+					$("#price").focus();
+					return false;
+				}
+            }
+            if( is_sale && $("#sale_type").val() == "" ) {
+                alert("세일구분을 선택해 주십시오.");
+                $("#sale_type").focus();
+                return false;
+            }
+            if( is_sale && ($("[name='sale_rate']").val() == "" || $("[name='sale_rate']").val() == 0) ) {
+                alert("세일율을 입력해 주십시오.");
+                $("[name='sale_rate']").focus();
+                return false;
+            }
+            
 
             return true;
         }
