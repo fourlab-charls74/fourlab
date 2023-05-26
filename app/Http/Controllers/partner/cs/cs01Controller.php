@@ -42,9 +42,7 @@ class cs01Controller extends Controller
         echo "edate : ". $edate;
         echo "<Br>";
         */
-        $sdate = str_replace("-","",$sdate);
-        $edate = str_replace("-","",$edate);
-
+		
         $goods_nm		= $request->input("goods_nm");
         $date_type      = $request->input('date_type');
         $sale_place	    = $request->input("sale_place");
@@ -72,20 +70,20 @@ class cs01Controller extends Controller
 
         if($date_type == "10"){
 			// 조건절 설정
-			if( $sdate != "" ) $where .= " and a.req_date >= '$sdate' ";
-			if( $edate != "" ) $where .= " and a.req_date <= '$edate' ";
+			if( $sdate != "" ) $where .= " and a.req_date >= DATE_FORMAT('$sdate 00:00:00', '%Y-%m-%d %H:%i:%s') ";
+			if( $edate != "" ) $where .= " and a.req_date <= DATE_FORMAT('$edate 23:59:59', '%Y-%m-%d %H:%i:%s') ";
 		}else if($date_type == "20" ){
 			// 조건절 설정
-			if( $sdate != "" ) $where .= " and a.proc_date >= '$sdate' ";
-			if( $edate != "" ) $where .= " and a.proc_date <= '$edate' ";
+			if( $sdate != "" ) $where .= " and a.proc_date >= DATE_FORMAT('$sdate 00:00:00', '%Y-%m-%d %H:%i:%s') ";
+			if( $edate != "" ) $where .= " and a.proc_date <= DATE_FORMAT('$edate 23:59:59', '%Y-%m-%d %H:%i:%s') ";
 		}else if($date_type == "30" ){
 			// 조건절 설정
-			if( $sdate != "" ) $where .= " and a.end_date >= '$sdate' ";
-			if( $edate != "" ) $where .= " and a.end_date <= '$edate' ";
+			if( $sdate != "" ) $where .= " and a.end_date >= DATE_FORMAT('$sdate 00:00:00', '%Y-%m-%d %H:%i:%s') ";
+			if( $edate != "" ) $where .= " and a.end_date <= DATE_FORMAT('$edate 23:59:59', '%Y-%m-%d %H:%i:%s') ";
 		}else{
 			// 조건절 설정
-			if( $sdate != "" ) $where .= " and (a.req_date >= '$sdate' or a.proc_date >= '$sdate' or a.end_date >= '$sdate') ";
-			if( $edate != "" ) $where .= " and ((a.req_date <= '$edate') or (a.proc_date <= '$edate') or (a.end_date <= '$edate'))";
+			if( $sdate != "" ) $where .= " and (a.req_date >= DATE_FORMAT('$sdate 00:00:00', '%Y-%m-%d %H:%i:%s') or a.proc_date >= DATE_FORMAT('$sdate 00:00:00', '%Y-%m-%d %H:%i:%s') or a.end_date >= DATE_FORMAT('$sdate 00:00:00', '%Y-%m-%d %H:%i:%s')) ";
+			if( $edate != "" ) $where .= " and ((a.req_date <= DATE_FORMAT('$edate 23:59:59', '%Y-%m-%d %H:%i:%s')) or (a.proc_date <= DATE_FORMAT('$edate 23:59:59', '%Y-%m-%d %H:%i:%s')) or (a.end_date <=DATE_FORMAT('$edate 23:59:59', '%Y-%m-%d %H:%i:%s')))";
 		}
 
 		if( $user_nm != "" ) 		$where .= " and f.user_nm like '%". Lib::quote($user_nm)."%' ";
