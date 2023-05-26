@@ -936,8 +936,7 @@ class prd01Controller extends Controller
 		";
 
 		$class_items = DB::select($query);
-
-
+		
 		return view(Config::get('shop.head.view') . '/product/prd01_show',
 			[
 				'goods_no'		=> '',
@@ -983,6 +982,19 @@ class prd01Controller extends Controller
         ";
         $class_items = DB::select($query);
 
+		$conf_sql = /** @lang text */
+			"
+            select 
+            	value, 
+            	mvalue
+            from conf
+            where 
+            	type = 'shop'
+            	and name = 'domain'
+        ";
+
+		$conf_items = DB::selectOne($conf_sql);
+		
 		$values = $this->_get($goods_no);
 
 		$values = array_merge($values,[
@@ -991,6 +1003,7 @@ class prd01Controller extends Controller
             'type'				=> $type,
             'goods_stats'		=> SLib::getCodes('G_GOODS_STAT'),
             'class_items'		=> $class_items,
+			'front_url'			=> $conf_items,
             'goods_types'		=> SLib::getCodes('G_GOODS_TYPE'),
             'com_info'			=> (object)array("dlv_amt" => 0,"free_dlv_amt_limit" => 0),
             'g_dlv_fee'			=> $cfg_dlv_fee,

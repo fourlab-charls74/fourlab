@@ -253,7 +253,7 @@
                                         <button type="button" id="img-setting" class="btn btn-primary waves-effect waves-light" data-no="{{$goods_no}}">
                                             <i class="bx bx-cog font-size-14 align-middle"></i> 이미지 관리
                                         </button>
-                                        <button type="button" id="img-show" class="btn btn-success waves-effect waves-light" data-no="{{$goods_no}}" onClick="openSitePop('{{ $goods_no }}');return false;">
+                                        <button type="button" id="img-show" class="btn btn-success waves-effect waves-light" data-no="{{$goods_no}}"  onclick="openFrontUrl()">
                                             <i class="bx bx-images font-size-14 align-middle"></i> 상품 보기
                                         </button>
                                     </div>
@@ -3795,6 +3795,22 @@
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=200,width=1024,height=900");
     }
 
+	function isMobile()
+	{
+		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	}
+
+	function openFrontUrl()
+	{
+		let url = '<?php echo e(@$front_url->value); ?>';
+
+		if(!isMobile){
+			url = '<?php echo e(@$front_url->mvalue); ?>';
+		}
+
+		window.open(`https://${url}/app/product/detail/<?php echo e(@$goods_no); ?>`, '_blank');
+	}
+	
 	</script>
 
 	<link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css" >
