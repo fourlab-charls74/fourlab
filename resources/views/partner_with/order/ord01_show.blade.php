@@ -212,8 +212,8 @@
                         <table class="table table-bordered th_border_none">
                             <thead>
                                 <tr>
-                                    <th>상태/출고구분</th>
-                                    <th>상품명</th>
+                                    <th>출고형태/출고구분</th>
+                                    <th>스타일넘버/상품명/옵션</th>
                                     <th>수량(재고)</th>
                                     <th>판매가</th>
                                     <th>쿠폰</th>
