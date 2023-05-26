@@ -440,7 +440,16 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_nm", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-       
+		// {field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
+		// {field: "del_rt", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+		// 	cellRenderer: function(params) {
+		// 		if(params.data.state >= 10) {
+		// 			return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.document_number}, ${params.data.idx})">출력</a>`;
+		// 		} else{
+		// 			return '-';
+		// 		}
+		// 	}
+		// },
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -627,6 +636,11 @@
 				console.log(e.responseText)
 			}
 		});
-	}	
+	}
+
+	// 출고 거래명세서 출력
+	function printDocument(document_number, idx) {
+		location.href = '/store/stock/stk10/download?document_number=' + document_number + '&idx=' + idx;
+	}
 </script>
 @stop

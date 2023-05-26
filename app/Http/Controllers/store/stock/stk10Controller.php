@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
-
-use App\Models\Conf;
+use App\Exports\ExcelViewExport;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 const PRODUCT_STOCK_TYPE_STORE_IN = 1; // (매장)입고
 const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
@@ -553,4 +555,71 @@ class stk10Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+	
+	// 출고 거래명세서 출력
+	public function download(Request $request)
+	{
+		$document_number = $request->input('document_number');
+		$idx = $request->input('idx');
+
+		$data = [
+			'document_number' => sprintf('%04d', $document_number),
+			'products' => []
+		];
+
+		$style = [
+			'A3:AH3' => [
+				'alignment' => [
+					'vertical' => Alignment::VERTICAL_CENTER,
+				],
+				'font' => [ 'size' => 16 ],
+			],
+			'A4:AH52' => [ 
+				'borders' => [ 
+					'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
+					'outline' => [ 'borderStyle' => Border::BORDER_MEDIUM ],
+				],
+				'alignment' => [
+					'horizontal' => Alignment::HORIZONTAL_CENTER,
+					'vertical' => Alignment::VERTICAL_CENTER,
+				],
+				'font' => [ 'size' => 14 ],
+			],
+			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AC49:AH52' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_MEDIUM ] ] ],
+			'E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'G10:G47' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'W10:AH48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
+			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'B9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 10 ] ],
+			'G9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 28 ] ],
+			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 60 ] ],
+			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 6 ] ],
+			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'M1' => [
+				'alignment' => [
+					'horizontal' => Alignment::HORIZONTAL_CENTER,
+					'vertical' => Alignment::VERTICAL_CENTER,
+				],
+				'font' => [ 'size' => 30 ],
+			],			
+			'M2:T2' => [
+				'borders' => [
+					'bottom' => [ 'borderStyle' => Border::BORDER_THIN ],
+				],
+			],
+		];
+
+		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => 38, 'cell_width' => 6, 'cell_height' => 33 ];
+
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 }

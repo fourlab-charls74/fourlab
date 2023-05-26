@@ -59,7 +59,10 @@ class ExcelOneSheetExport implements FromView, WithStyles
 	public function styles(Worksheet $sheet)
 	{
 		$sheet->getDefaultColumnDimension()->setWidth($this->keys['cell_width'] ?? 10);
-		$sheet->getDefaultRowDimension()->setRowHeight($this->keys['cell_height'] ?? 30);
+		
+		for ($i = 0; $i < 100; $i++) {
+			$sheet->getRowDimension($i)->setRowHeight($this->keys['cell_height'] ?? 30);
+		}
 		
 		return $this->style;
 	}
