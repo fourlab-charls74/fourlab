@@ -131,9 +131,9 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">업체</label>
+                            <label for="name">업체구분/업체명</label>
                             <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-25 pr-1">
+                                <div class="form-inline-inner input-box pr-1" style="width:35%">
                                     <select id="com_type" name="com_type" class="form-control form-control-sm w-100">
                                         <option value="">전체</option>
                                         @foreach ($com_types as $com_type)
@@ -141,7 +141,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-inline-inner input-box w-75">
+                                <div class="form-inline-inner input-box" style="width:65%">
                                     <div class="form-inline inline_btn_box">
                                         <select id="com_cd" name="com_cd" class="form-control form-control-sm select2-company"></select>
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
