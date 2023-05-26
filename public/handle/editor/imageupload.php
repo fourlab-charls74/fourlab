@@ -12,15 +12,17 @@ function auto_rotate_mobile_picture($filename){
             switch($exif['Orientation']) {
                 case 8:
                     $image = imagerotate($image,90,0);
+					imagejpeg($image,$filename);
                     break;
                 case 3:
                     $image = imagerotate($image,180,0);
+					imagejpeg($image,$filename);
                     break;
                 case 6:
                     $image = imagerotate($image,-90,0);
+					imagejpeg($image,$filename);
                     break;
             }
-            imagejpeg($image,$filename);
         }
 
     }
