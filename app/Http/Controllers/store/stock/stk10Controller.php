@@ -604,7 +604,7 @@ class stk10Controller extends Controller
 				'alignment' => [
 					'vertical' => Alignment::VERTICAL_CENTER,
 				],
-				'font' => [ 'size' => 16 ],
+				'font' => [ 'size' => 37 ],
 			],
 			'A4:AH52' => [ 
 				'borders' => [ 
@@ -615,26 +615,33 @@ class stk10Controller extends Controller
 					'horizontal' => Alignment::HORIZONTAL_CENTER,
 					'vertical' => Alignment::VERTICAL_CENTER,
 				],
-				'font' => [ 'size' => 16 ],
+				'font' => [ 'size' => 30 ],
 			],
 			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'AC49:AH52' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_MEDIUM ] ] ],
-			'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],			
-			'E6' => [ 'font' => [ 'size' => 14 ] ],
-			'V6' => [ 'font' => [ 'size' => 14 ] ],
-			'G10:G47' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'E5:E6' => [ 
+				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
+				'font' => [ 'size' => 22 ]
+			],
+			'V5:V6' => [ 
+				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ], 
+				'font' => [ 'size' => 22 ] 
+			],
+			'G10:G47' => [ 
+				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
+				'font' => [ 'size'=> 22 ]
+			],
 			'W10:AH48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
 			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
 			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
 			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
 			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'B9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 10 ] ],
-			'G9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 28 ] ],
-			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 60 ] ],
-			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 6 ] ],
+			'B9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 15 ] ],
+			'G9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 45 ] ],
+			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 90 ] ],
+			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 8 ] ],
 			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
 			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
 			'M1' => [
@@ -642,7 +649,7 @@ class stk10Controller extends Controller
 					'horizontal' => Alignment::HORIZONTAL_CENTER,
 					'vertical' => Alignment::VERTICAL_CENTER,
 				],
-				'font' => [ 'size' => 30 ],
+				'font' => [ 'size' => 50 ],
 			],			
 			'M2:T2' => [
 				'borders' => [
@@ -653,8 +660,8 @@ class stk10Controller extends Controller
 
 
 		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
-		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 6, 'cell_height' => 33 ];
-		$images = [[ 'name' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 120 ]];
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 10, 'cell_height' => 55 ];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 200 ]];
 
 		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}

@@ -73,15 +73,20 @@ class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings
 
 	public function drawings()
 	{
-		$drawing = new Drawing();
+		$list = [];
 		
-		// if ($this->images)
-		// $drawing->setName('Logo');
-		// $drawing->setDescription('This is my logo');
-		// $drawing->setPath(public_path('/img/stamp.png'));
-		// $drawing->setHeight(120);
-		// $drawing->setCoordinates('P4');
+		if ($this->images !== null) {
+			foreach ($this->images as $img) {
+				$drawing = new Drawing();
+				if (isset($img['title'])) $drawing->setName($img['title']);
+				if (isset($img['desc'])) $drawing->setDescription($img['desc']);
+				if (isset($img['public_path'])) $drawing->setPath(public_path($img['public_path']));
+				if (isset($img['cell'])) $drawing->setCoordinates($img['cell']);		
+				if (isset($img['height'])) $drawing->setHeight($img['height']);
+				$list[] = $drawing;
+			}
+		}
 	
-		return $drawing;
+		return $list;
 	}
 }

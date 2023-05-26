@@ -640,6 +640,6 @@ class stk20Controller extends Controller
 		$view_url = Config::get('shop.store.view') . '/stock/stk20_document';
 		$keys = [ 'list_key' => 'products', 'one_sheet_count' => 25, 'cell_width' => 6, 'cell_height' => 33 ];
 		
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $keys), 'RT전표.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, null, $keys), 'RT전표.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }

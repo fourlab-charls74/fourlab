@@ -9,12 +9,12 @@
 		<tr></tr>
 		<tr>
 			<td></td>
-			<td>거래일자: test-te-st</td>
+			<td>거래일자 : 2023-05-26</td>
 		@foreach(range(1, 22) as $i)
 			<td></td>
 		@endforeach
-			<td colspan="5">구분: 출고</td>
-			<td>전표번호: {{ @$document_number }}</td>
+			<td colspan="5">구분 : 출고</td>
+			<td>전표번호 : {{ @$document_number }}</td>
 		</tr>
 		<tr>
 			<td rowspan="5">공 급 자</td>
