@@ -241,7 +241,8 @@
             "threshold" : $("#threshold").val(),
             "quality" : $("#quality").val(),
         };
-
+		
+		$('#img_loading').show();
 
         $.ajax({
             type: "post",
@@ -260,15 +261,17 @@
                 console.log(res);
                 if(res.code == "200"){
                     alert('선택영역을 서버의 이미지 파일에 저장했습니다.');
+					$('#img_loading').hide();
                     document.location.reload();
 					opener.location.reload();
-
+					
 				} else {
                     console.log(res.msg);
+					$('#img_loading').hide();
                 }
             },
             error: function(e) {
-                console.log(e.responseText)
+				$('#img_loading').hide();
             }
         });
     }
