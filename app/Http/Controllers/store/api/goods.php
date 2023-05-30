@@ -87,7 +87,15 @@ class goods extends Controller
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         
         $com_id = $request->input("com_cd");
-        
+
+        $sql = "
+            select
+                com_type
+            from company
+            where com_id = '$com_id'
+        ";
+        $com_type = DB::selectOne($sql);
+
         // $goods_stat = $request->input("goods_stat");
         // $head_desc = $request->input("head_desc");
         // $ad_desc = $request->input("ad_desc");
@@ -175,6 +183,7 @@ class goods extends Controller
             else $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having, ['com_id' => $com_id]);
         }
         else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $orderby, $limit, ['com_id' => $com_id]);
+        else if ($com_type->com_type == 6) $sqls = $this->_wonboo_sql($where, $orderby, $limit, ['com_id' => $com_id]);
         else $sqls = $this->_normal_sql($where, $orderby, $limit, ['com_id' => $com_id]);
 
         $total = 0;
@@ -575,6 +584,66 @@ class goods extends Controller
                 left outer join company com on com.com_id = a.com_id
                 left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
                 left outer join code c on c.code_kind_cd = 'PRD_CD_OPT' and c.code_id = a.opt
+            where 1=1 $inner_where
+            $limit
+        ";
+
+        return (object)['total_sql' => $total_sql, 'sql' => $sql];
+    }
+
+    // 원부자재 상품검색
+    private function _wonboo_sql($where = '', $orderby = '', $limit = '', $values = [])
+    {
+        // dd('원부자재상품검색');
+        $cfg_img_size_real = "a_500";
+        $cfg_img_size_list = "s_50";
+
+       
+        $inner_where = "";
+        if (isset($values['com_id'])) $inner_where .= " and p.com_id = '" . Lib::quote($values['com_id'] ?? '') . "'";
+
+        $total_sql = "
+            select count(p.prd_cd) as total
+            from product p
+                inner join product_code pc on p.prd_cd = pc.prd_cd
+                left outer join company com on com.com_id = p.com_id
+                left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
+				left outer join product_stock_store pss2 on p.prd_cd = pss2.prd_cd
+                left outer join product_image i on p.prd_cd = i.prd_cd
+                left outer join code c on c.code_id = pc.opt and c.code_kind_cd = 'PRD_MATERIAL_OPT'
+                left outer join code d on d.code_id = pc.brand and d.code_kind_cd = 'PRD_MATERIAL_TYPE'
+            where 1=1 $inner_where
+        ";
+
+        $sql = "
+            select 
+                p.prd_cd
+                , pc.goods_no as goods_no
+                , concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt) as prd_cd_p
+                , d.code_val as brand
+                , c.code_val as opt_kind_nm
+                , pc.color as color
+                , pc.size as size
+                , pc.goods_opt
+                , p.prd_nm as goods_nm
+                , p.prd_nm_eng as goods_nm_eng
+                , p.tag_price as goods_sh
+                , p.price
+                , p.wonga
+                , com.com_nm as com_nm
+                , p.rt as reg_dm
+                , i.img_url as img
+                , ifnull(pss.wqty, 0) as sg_qty
+				, ifnull(pss2.wqty, 0) as s_qty
+                , p.com_id as com_id
+            from product p
+                inner join product_code pc on p.prd_cd = pc.prd_cd
+                left outer join company com on com.com_id = p.com_id
+                left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
+				left outer join product_stock_store pss2 on p.prd_cd = pss2.prd_cd
+                left outer join product_image i on p.prd_cd = i.prd_cd
+                left outer join code c on c.code_id = pc.opt and c.code_kind_cd = 'PRD_MATERIAL_OPT'
+                left outer join code d on d.code_id = pc.brand and d.code_kind_cd = 'PRD_MATERIAL_TYPE'
             where 1=1 $inner_where
             $limit
         ";

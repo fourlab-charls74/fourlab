@@ -125,7 +125,7 @@ class prd01Controller extends Controller
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
-		$type = $request->input("type");
+		// $type = $request->input("type");
 		$goods_type = $request->input("goods_type");
 
 		$sale_yn	= $request->input("sale_yn");
@@ -191,7 +191,7 @@ class prd01Controller extends Controller
              }
         }
 
-		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
+		// if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
 		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
 
 		if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";

@@ -1,467 +1,384 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','원부자재입고/반품')
+@section('title','원부자재 입고/반품')
 @section('content')
 
-
-
 <style>
-    /* 테이블 반응형 처리 */
-		.table th {
-			min-width: 120px;
-		}
-
-		@media (max-width: 740px) {
-			.table td {
-				float: unset !important;
-				width: 100% !important;
-			}
-		}
-
-        .img {
-            width: 30px;
-        }
-
+    #help ul li {list-style: disc;list-style-position: inside;text-indent: -20px;padding-left: 20px;font-size: 13px;font-weight: 400;}
+    #help p {font-size: 14px;font-weight: 700;padding-bottom: 5px;}
+    .form-control[readonly] {background: #eeeeee;}
 </style>
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">원부자재입고/반품</h3>
+        <h3 class="d-inline-flex">원부자재 입고/반품</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 생산입고관리</span>
         </div>
     </div>
-    <form method="get" name="search">
-        <div id="search-area" class="search_cum_form">
-            <div class="card mb-3">
-                <div class="d-flex card-header justify-content-between">
-                    <h4>상품 선택</h4>
+    <div id="search-area" class="search_cum_form">
+        <form method="get" name="search">
+            <input type="hidden" name="cmd" value="{{ @$cmd }}">
+            <input type="hidden" name='stock_no' value='{{ @$stock_no }}'>
+            <div class="card mb-3" id="input-area">
+                <div class="card-header d-flex justify-content-between">
+                    <h4>기본 정보</h4>
                     <div>
-                        <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                        <a href="javascript:void(0);" onclick="Cmder('save');" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
-								<label for="com_nm">원부자재 업체</label>
-								<div class="form-inline inline_select_box">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type="hidden" id="com_cd" name="com_cd" />
-											<input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-											<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="prd_nm">원부자재명</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id="prd_nm" name='prd_nm' value=''>
+                                <label for="com_nm" class="required">원부자재업체</label>
+                                <div class="form-inline inline_select_box">
+                                    <div class="form-inline-inner input-box w-75 pr-1">
+                                        <div class="form-inline inline_btn_box">
+                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company sch-sup-company" value="{{ @$com_nm }}">
+                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline-inner input-box w-25 pl-1">
+                                        <input type="text" id="com_id" name="com_id" class="form-control form-control-sm" value="{{ @$com_id }}" readonly />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label>원부자재 코드</label>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+								<label for="sdate" class="required">일자</label>
 								<div class="form-inline">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
+                                    <div class="docs-datepicker form-inline-inner input_box w-100">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" id="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="docs-datepicker-container"></div>
+                                    </div>
+                                </div>
 							</div>
-						</div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+								<label for="type" class="required">구분</label>
+								<div class="flax_box">
+                                    <select name="type" id="type" class="form-control form-control-sm w-100">
+                                        <option value="">선택</option>
+                                        <option value='10'>입고</option>
+                                        <option value='-10'>반품</option>
+                                    </select>
+                                </div>
+							</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 mb-2 mb-lg-0">
+                            <div class="form-group">
+                                <label for="invoice_no" class="required">송장번호</label>
+                                <div class="flex_box">
+                                    <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" name="invoice_no" id="invoice_no" value="{{ @$invoice_no }}">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
-                <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            </div>
-        </div>
-
-        <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
-            <div class="card-body">
-                <div class="card-title mb-3">
-                    <div class="filter_wrap">
-                        <div class="fl_box">
-                            <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6> 
-                        </div>
-                        <div class="fr_box">
-                        </div>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-                </div>
-            </div>
-        </div>
-    </form>
                 
-    <div class="show_layout py-3">
-        <form name="f1" id="f1">
-            <div class="card_wrap aco_card_wrap">
-                <div class="card shadow">
-                    <div class="card-header mb-0">
-                        <a href="#">정보 입력</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table-box-ty2 mobile">
-                                    <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                        <tbody>
-                                            <tr>
-                                                <th class="required"><label for="invoice_no">원부자재 업체</label></th>
-                                                <td style="width:35%;">
-                                                    <div class="form-inline inline_select_box">
-                                                        <div class="form-inline-inner input-box w-100">
-                                                            <div class="flax_box">
-                                                                <input type="hidden" name="com_cd2" id="com_cd2" value="">
-                                                                <input type="text" class="form-control form-control-sm" name="com_code" id="com_code" value="" readonly>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <th class="required"><label for="state">구분</label></th>
-                                                <td style="width:35%;">
-                                                    <div class="flax_box">
-                                                        <select name="state" class="form-control form-control-sm w-100">
-                                                            <option value="">선택</option>
-                                                            <option value='10'>입고</option>
-                                                            <option value='-10'>반품</option>
-                                                        </select>
-                                                    </div>
-                                                </td>
-                                               
-                                            </tr>
-                                            <tr>
-                                                <th class="required"><label for="sdate">일자</label></th>
-                                                <td style="width:35%;">
-                                                    <div class="form-inline">
-                                                        <div class="docs-datepicker form-inline-inner input_box w-100">
-                                                            <div class="input-group">
-                                                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
-                                                                <div class="input-group-append">
-                                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="docs-datepicker-container"></div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <th class="required"><label for="invoice_no">입고/반품번호</label></th>
-                                                <td style="width:35%;">
-                                                    <div class="flax_box">
-                                                        <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" name="invoice_no" value="">
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="required"><label for="prd_ord_type">유형</label></th>
-                                                <td style="width:35%;">
-                                                    <div class="flax_box">
-                                                        <select name="prd_ord_type" class="form-control form-control-sm w-100">
-                                                            <option value="">선택</option>
-                                                            <option value='S'>부자재</option>
-                                                            <option value='G'>사은품</option>
-                                                        </select>
-                                                    </div>
-                                                </td>
-
-                                                <th></th>
-                                                <td style="width:35%;">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <div style="width:100%;padding-top:20px;text-align:center;">
-                                        <a href="#" onclick="add()" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-save mr-1"></i>저장</a>
-                                        <a href="javascript:;" onclick="window.close()" class="btn btn-sm btn-secondary shadow-sm">닫기</a>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </form>
+        <div id="filter-area" class="card shadow-none mb-0 ty2">
+            <div class="card-header d-flex justify-content-between">
+                <h4>상품 정보</h4>
+                <div>
+                    <a href="javascript:void(0);" onclick="return getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur();"><i class="fa fa-plus fa-sm mr-1"></i> 상품 추가</a>
+                    <!-- <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a> -->
+                </div>
+            </div>
+            <div class="card-body pt-3 pt-lg-1">
+                <div class="table-responsive">
+                    <div id="div-gd" class="ag-theme-balham"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- import excel lib -->
 <script type="text/javascript" charset="utf-8">
+    const STATE = "{{ @$state }}";
+    const CMD = "{{ @$cmd }}";
+    const COMMAND_URL = '/store/cs/cs01/comm';
+    const StyleCenter = {"text-align": "center"};
+    const StyleRight = {"text-align": "right"};
 
-    const DEFAULT = { lineHeight : "30px" };
-    const YELLOW = { backgroundColor: '#ffff99' };
-
-    var columns= [
-        {
-            headerName: '#',
-            width:50,
-            maxWidth: 100,
-            // it is important to have node.id here, so that when the id changes (which happens
-            // when the row is loaded) then the cell is refreshed.
-            valueGetter: 'node.id',
-            cellRenderer: 'loadingRenderer',
-            hide: true
+    let columns = [
+        {headerName: '#', pinned: 'left', type: 'NumType', width: 50, cellStyle: StyleCenter,
+            cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
+            sortingOrder: ['desc', 'asc', 'null'],
+            comparator: (valueA, valueB, nodeA, nodeB, isInverted) => { // 번호순으로 정렬이 안되는 문제 수정
+                if (parseInt(valueA) == parseInt(valueB)) return 0;
+                return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
+            },
         },
-        {field:"chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, pinned:'left'},
-        {
-            field: "sup_com_nm",
-            headerName: "공급업체(거래선)",
-            width: 120,
-            cellStyle: DEFAULT
-        },
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
-        {
-            field: "prd_nm",
-            headerName: "원부자재명",
-            width: 100,
-            cellStyle: DEFAULT
-        },
-        {field: "prd_cd", headerName: "원부자재코드", width:120, cellStyle: DEFAULT,
-            cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+        {field: "prd_cd", headerName: "바코드", width: 120, pinned: 'left', cellStyle: StyleCenter},
+        {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: StyleCenter},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 150,
+            cellRenderer: (params) => {
+                if (params.data.goods_no === undefined) return '';
+                if (params.data.goods_no != '0') {
+                    return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                } else {
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 없는 상품입니다.`);">' + params.value + '</a>';
                 }
-            }
+            }   
         },
-        {
-            field: "color",
-            headerName: "칼라",
-            width: 80,
-            cellStyle: DEFAULT
+        {field: "goods_nm_eng", headerName:"상품명(영문)", width: 150},
+        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: StyleCenter},
+        {field: "color", headerName: "컬러", width: 55, cellStyle: StyleCenter},
+        {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleCenter},
+        {field: "opt_kor", headerName: "옵션", width: 130},
+        {field: "item" ,headerName: "품목", width: 70, cellStyle: StyleCenter},
+        {field: "brand" ,headerName:"구분", width: 70, cellStyle: StyleCenter},
+        // {field: "style_no" ,headerName:"스타일넘버", width: 80, cellStyle: StyleCenter},
+        // {field: "total_qty", headerName: "총재고", type:'currencyType', width: 60},
+        {field: "sg_qty", headerName: "창고재고", type:'currencyType', width: 60},
+        @if(@$state < 40)
+        {field: "exp_qty", headerName: "수량(예정)", width: 70,
+            editable: params => checkIsEditable(params),
+            cellStyle: params => ({backgroundColor: checkIsEditable(params) ? '#ffff99' : 'none', textAlign: 'right'}),
         },
-        {
-            field: "size",
-            headerName: "사이즈",
-            width: 80,
-            cellStyle: DEFAULT
+        @endif
+        {field: "qty", headerName: "수량(확정)", width: 70,
+            editable: params => checkIsEditable(params),
+            cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right', color: '#2aa876', fontWeight: 'bold'},
         },
-        {
-            field: "unit",
-            headerName: "단위",
-            width: 120,
-            cellStyle: DEFAULT
-        },
-        {field:"stock_qty", headerName:"창고재고", width:60, type:'numberType', cellStyle: DEFAULT,
-            cellRenderer: function(params) {
-                if (params.value !== undefined) {
-                    return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                }
-            }
-        },
-        {field:"in_qty", headerName:"수량", width:60, type:'numberType', cellStyle: { ...DEFAULT, ...YELLOW } , editable: true},
-        {field:"price", headerName: "단가", width:84, type:'currencyType', cellStyle: { ...DEFAULT, ...{'text-align': 'right'}} },
-        {field:"wonga", headerName: "원가", hide: true},
-        {field:"amount", headerName: "금액", width:84, type:'currencyType', cellStyle: DEFAULT},
-        {field:"sup_com_id", headerName: "공급업체", hide: true},
-        {field:"type", headerName: "원부자재구분", hide: true},
-        {headerName:"", field:"", width:"auto", cellStyle: DEFAULT}
+        {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
+        {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
+        {field: "stock_date", headerName: "최근입고일자", width: 90, cellStyle: StyleCenter},
+        {width: "auto"}
     ];
 
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
+
+    const pApp = new App('', { gridId: "#div-gd" });
     let gx;
+    const pinnedRowData = [{ 
+        prd_cd: '합계', count: 0, exp_qty: 0, qty: 0
+    }];
 
-    $(document).ready(function() {
-        pApp.ResizeGrid(457);
-        pApp.BindSearchEnter();
+    $(document).ready(() => {
+        pApp.ResizeGrid(100, window.screen.width >= 740 ? undefined : 400);
         let gridDiv = document.querySelector(pApp.options.gridId);
-        let options = {
-            getRowId: params => params.data.id,
-            onCellValueChanged: params => evtAfterEdit(params),
-        };
-        gx = new HDGrid(gridDiv, columns,options,{
-            onCellValueChanged: (e) => {
-                e.node.setSelected(true);
-            }
-        })
-        Search();
+        gx = new HDGrid(gridDiv, columns, {
+            pinnedTopRowData: pinnedRowData,
+            getRowStyle: (params) => params.node.rowPinned ? ({'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'}) : false, // 상단고정row styling
+            getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
+            onCellValueChanged: (params) => onCellValueChanged(params),
+            
+        });
     });
-
-    const gxStartEditingCell = (row_index, col_key) => {
-        gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
-    };
-
-    const evtAfterEdit = (params) => {
-        if (params.oldValue !== params.newValue) {
-
-            const row_index = params.rowIndex;
-            const column_name = params.column.colId;
-            const value = params.newValue;
-
-            if (column_name == "in_qty") {
-                params.node.setSelected(true);
-                if (isNaN(value) == true || value == "" || parseInt(value) < 1) {
-                    alert("1 이상의 숫자만 입력가능합니다.");
-                    gxStartEditingCell(row_index, column_name);
-                    return false;
-                }
-            }
-
-            if (params.colDef.field == 'in_qty' || params.colDef.field == 'price') {
-                const row = params.data;
-                row.amount = parseFloat(row.in_qty) * row.price;
-                gx.gridOptions.api.applyTransaction({ update: [row] });
-            };
-        }
-    };
-    
-    const strNumToPrice = (price) => {
-        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    };
-
-
-    function Search() {
-        
-        $('[name=search]').val(10);
-        let data = $('form[name="search"]').serialize();
-        gx.Request('/store/cs/cs03/buy/search', data, 1, (data) => {
-            // console.log(data);
-        });
-        let com_nm = document.getElementById('com_nm').value;
-        let com_cd = document.getElementById('com_cd').value;
-
-        if(com_nm != ''){
-            document.getElementById('com_code').value = com_nm;
-            document.getElementById('com_cd2').value = com_cd;
-        }
-    };
-
-
-    const getInvoiceNo = () => {
-	    const com_id = document.f1.com_cd2.value;
-	    let invoice_no = document.f1.invoice_no.value;
-        if (invoice_no == '' && com_id != "") {
-            axios({
-                url: `/store/cs/cs03/buy/get-invoice-no/${com_id}`,
-                method: 'get'
-            }).then((response) => {
-                invoice_no = response.data;
-                document.f1.invoice_no.value = invoice_no;
-            }).catch((error) => { 
-                // console.log(error);
-            });
-        }
-    };
-
-    const validation = () => {
-
-        // 업체 검색여부
-        if (search.com_cd.value.trim() === '') {
-            search.com_cd.focus();
-            alert('공급업체를 선택하여 주십시오.');
-            $('.sch-sup-company').click();
-            return false;
-        }
-
-        // 입고/반품 상태 선택여부
-        if (f1.state.selectedIndex == 0) {
-            f1.state.focus();
-            alert("구분를 선택해주세요.");
-            return false;
-        }
-
-        // 일자 입력여부
-        if (f1.sdate.value.trim() === '') {
-            f1.sdate.focus();
-            alert("일자를 입력해주세요");
-            return false;
-        }
-
-        // 입고송장번호/반품번호 선택여부
-        if (f1.invoice_no.value.trim() === '') {
-            f1.invoice_no.focus();
-            alert("입고송장번호/반품번호 입력해주세요");
-            return false;
-        }
-
-        // 유형 선택여부
-        if (f1.prd_ord_type.selectedIndex == 0) {
-            f1.prd_ord_type.focus();
-            alert("유형을 선택해주세요.");
-            return false;
-        }
-
-        // 입고/반품 상품 선택여부
-        const arr = gx.getSelectedRows();
-        if (Array.isArray(arr) && !(arr.length > 0)) {
-            alert('상품을 선택 해 주십시오.')
-            return false;
-        } else {
-            // 저장시 수량은 1이상만 입력 가능
-            const rowNodes = gx.gridOptions.api.getModel().rowsToDisplay;
-            for (let i = 0; i < rowNodes.length; i++) {
-                const rowNode = rowNodes[i];
-
-                if (rowNode.selected != true) continue;
-
-                const idx = rowNode.rowIndex;
-                const { in_qty } = rowNode.data;
-
-                if (parseInt(in_qty) < 1) {
-                    alert("1 이상의 숫자만 입력가능합니다.");
-                    gxStartEditingCell(idx, "in_qty");
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    };
-
-    const add = () => {
-        if (!validation()) return;
-        axios({
-            url: '/store/cs/cs03/buy/add',
-            method: 'post',
-            data: { 
-                rows: gx.getSelectedRows(),
-                state: f1.state.value,
-                sdate: f1.sdate.value,
-                invoice_no: f1.invoice_no.value,
-                prd_ord_type: f1.prd_ord_type.value
-            }
-        }).then((response) => {
-            console.log(response);
-            if (response.data.code == 201) {
-                alert("저장되었습니다.");
-                window.opener.Search();
-                window.close();
-            } else if (response.data.code == 202) {
-                alert('창고재고보다 수량이 많습니다. 수량을 수정해주세요.')    
-            } else {
-                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-            }
-        }).catch((error) => {
-            // console.log(error);
-        });
-    };
-
-    function EditProduct(product_code) {
-        var url = '/store/product/prd03/edit/' + product_code;
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
-    }
 
     //원부자재 업체 검색
     $( ".sch-sup-company" ).on("click", () => {
         searchCompany.Open(null, '6', 'wonboo');
     });
 
+    /**********************************
+     * Grid 사용함수
+     *********************************/
+
+    /** 수정가능한 셀인지 판단 */
+    function checkIsEditable(params) {
+        const cols = ['unit_cost', 'prd_tariff_rate'];
+        const super_admin = '{{ @$super_admin }}';
+
+        // 슈퍼관리자 권한설정
+        if (super_admin == 'true') cols.push('qty');
+
+        if (
+            (cols.includes(params.column?.colId || '')) 
+            && STATE > 0 
+            && STATE < (super_admin == 'true' ? 41 : 40)
+            && (STATE < 40 || params.data?.is_last == 1)
+            && params.node.rowPinned != 'top'
+        ) return true; 
+
+        return params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
+    }
+
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>        
+<script>
+    /** 송장번호 생성 */
+    function getInvoiceNo() {
+        const ff = document.search;
+	    const com_id = ff.com_id.value;
+	    const invoice_no = ff.invoice_no.value;
+
+        if (invoice_no == '' && com_id != "") {
+            axios({
+                url: COMMAND_URL,
+                method: 'post',
+                data: {
+                    cmd: 'getinvoiceno',
+                    com_id: com_id
+                }
+            }).then((response) => {
+                ff.invoice_no.value = response.data.invoice_no;
+            }).catch((error) => { 
+                console.log(error);
+            });
+        } else if (invoice_no == '' && com_id == '') {
+            $('.sch-sup-company').click();
+        }
+    }
+
+    /**********************************
+     * 상품 관리
+     *********************************/
+
+    /** 상품검색 팝업 오픈 */
+    function getSearchGoods() {
+        const com_id = document.search.com_id;
+        if (com_id.value === '') {
+            alert("원부자재업체를 선택해주세요.");
+            return document.search.com_nm.click();
+        }
+        const url = '/store/api/goods/show';
+        const pop_up = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
+    }
+
+    /** 선택한 상품 적용 */
+    var goods_search_cmd = '';
+    var goodsCallback = (row) => addRow(row);
+    var multiGoodsCallback = (rows) => {
+        if (rows && Array.isArray(rows)) rows.forEach(row => addRow(row));
+    }
+    var beforeSearchCallback = (api_document) => {
+        api_document.search.com_nm.value = document.search.com_nm.value;
+        api_document.search.com_cd.value = document.search.com_id.value;
+    };
+    var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
+        const count = gx.gridOptions.api.getDisplayedRowCount();
+        row = { ...row, 
+            item: row.opt_kind_nm, opt_kor: row.goods_opt,
+            exp_qty: 0, qty: 0, unit_cost: 0, prd_tariff_rate: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, 
+            isEditable: true, count: count + 1,
+        };
+        gx.gridOptions.api.applyTransaction({ add: [row] });
+    };
+
+    function validate() {
+        const ff = document.search;
+
+        if(ff.com_id.value == "") {
+            alert("원부자재업체를 선택해 주십시오.");
+            $('.sch-sup-company').click();
+            return false;
+        }
+        if(ff.invoice_no.value == "") {
+            alert("송장번호를 입력해 주십시오.");
+            ff.invoice_no.focus();
+            return false;
+        }
+        if(ff.sdate.value.trim().length != 10) {
+            alert("입고/반품 일자를 입력해 주십시오.");
+            ff.sdate.focus();
+            return false;
+        }
+        if(ff.type.value == "") {
+            alert("구분을 선택해 주십시오.");
+            ff.type.focus();
+            return false;
+        }
+
+        const rows = gx.getRows();
+        if (rows.length < 1) {
+            alert("입고/반품 상품을 한 개 이상 등록해주세요.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function Cmder(cmd){
+        if(cmd =="save"){
+            if(validate()){
+                Save();
+            }
+        }
+    } 
+
+    function Save() {
+        let rows = gx.getSelectedRows();
+        let com_id = $('#com_id').val();
+        let sdate = $('#sdate').val();
+        let type = $('#type').val();
+        let invoice_no = $('#invoice_no').val();
+
+        if(rows.length == 0) {
+            return alert('입고/반품할 상품을 선택해주세요.')
+        }
+
+        if(!confirm('저장하시겠습니까?')){
+            return false;
+        }
+
+        axios({
+            url: '/store/cs/cs03/buy/save',
+            method: 'post',
+            data: {
+                rows : rows,
+                com_id : com_id,
+                sdate : sdate,
+                type : type,
+                invoice_no : invoice_no
+            }
+        }).then((res) => {
+
+
+        }).catch((error) => {
+        
+        });
+
+    }
+
+    
+    /** GRID 상단고정ROW 업데이트 */
+    function updatePinnedRow() {
+        const rows = gx.getRows();
+        const exchange_rate = unComma(document.search.exchange_rate.value || '0');
+        let row = {};
+        
+        if (rows.length > 0) {
+            row = rows.reduce((a, c) => ({
+                    exp_qty: a.exp_qty + Number.parseFloat(c.exp_qty),
+                    qty: a.qty + Number.parseFloat(c.qty),
+                    unit_total_cost: a.unit_total_cost + Number.parseFloat(c.unit_total_cost),
+                    income_amt: a.income_amt + Number.parseFloat(c.income_amt),
+                    income_total_amt: a.income_total_amt + Number.parseFloat(c.income_total_amt),
+                    cost: a.cost + Number.parseFloat(c.cost),
+                    total_cost: a.total_cost + Number.parseFloat(c.total_cost),
+                    total_cost_novat: a.total_cost_novat + Number.parseFloat(c.total_cost_novat),
+                    p_custom_amt: a.p_custom_amt + Number.parseFloat((exchange_rate * (c.qty || 0) * (c.unit_cost || 0))),
+                }), { exp_qty: 0, qty: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, p_custom_amt: 0 }
+            );
+        }
+
+        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+        gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
+
+        $("#custom_amt").val(Comma(Math.round(row.p_custom_amt || 0)));
+    }
+
+   
+
+
+</script>
 @stop

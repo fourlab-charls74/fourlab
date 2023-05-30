@@ -908,12 +908,12 @@
                                             <td colspan="3">
                                                 <div class="form-inline form-radio-box flax_box txt_box">
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="is_option_use" value="Y" id="is_option_use1" class="custom-control-input" {{ (@$goods_info->is_option_use=="Y")? "checked" : "" }}>
-                                                        <label class="custom-control-label" for="is_option_use1">사용</label>
+                                                        <input type="radio" name="is_option_use" value="Y" id="is_option_use_y" class="custom-control-input" {{ (@$goods_info->is_option_use=="Y")? "checked" : "" }}>
+                                                        <label class="custom-control-label" for="is_option_use_y">사용</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="is_option_use" value="N" id="is_option_use2" class="custom-control-input" @if( $type != 'create' ) {{ (@$goods_info->is_option_use=="N")? "checked" : "" }} @else checked @endif>
-                                                        <label class="custom-control-label" for="is_option_use2">사용 안함</label>
+                                                        <input type="radio" name="is_option_use" value="N" id="is_option_use_n" class="custom-control-input" @if( $type != 'create' ) {{ (@$goods_info->is_option_use=="N")? "checked" : "" }} @else checked @endif>
+                                                        <label class="custom-control-label" for="is_option_use_n">사용 안함</label>
                                                     </div>
                                                     <x-tool-tip>
                                                         <x-slot name="arrow">top</x-slot>
@@ -2125,10 +2125,12 @@
 
         function setOptionArea() {
             if( $('#is_option_use_n').is(":checked") == true ){
+                console.log('사용안함');
                 $('.use_option_n').css('display','table-row');
                 $('.use_option_y').css('display','none');
                 resetAddOptionKindBox();
             }else{
+                console.log('사용함')
                 $('.use_option_n').css('display','none');
                 $('.use_option_y').css('display','flex');
             }

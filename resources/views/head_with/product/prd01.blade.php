@@ -61,19 +61,11 @@
                         <div class="form-group">
                             <label for="item">상품구분</label>
                             <div class="flex_box">
-                                <select name='type' id="type" class="form-control form-control-sm" style="width: 47%">
+                                <select name='goods_type' id="goods_type" class="form-control form-control-sm w-100">
                                     <option value=''>전체</option>
-                                    <option value='N'>일반</option>
-                                    <option value='D'>납품</option>
-                                    <option value='E'>기획</option>
-                                </select>
-                                <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='goods_type' id="goods_type" class="form-control form-control-sm" style="width: 47%">
-                                    <option value=''>전체</option>
-                                    <option value='S'>매입</option>
-                                    <option value='I'>위탁매입</option>
-                                    <option value='P'>위탁판매</option>
-                                    <option value='O'>구매대행</option>
+                                @foreach($goods_types as $goods_type )
+                                    <option value="{{$goods_type->code_id}}"> {{ $goods_type->code_val }}</option>
+                                @endforeach
                                 </select>
                             </div>
                         </div>
@@ -403,7 +395,7 @@
         {field: "sale_s_dt", headerName: "세일기간", hide: true},
         {field: "sale_e_dt", headerName: "세일기간", hide: true},
         {
-            field: "qty", headerName: "재고수", type: 'numberType', width:46,
+            field: "qty", headerName: "온라인재고", type: 'numberType', width:75,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';
@@ -411,7 +403,7 @@
             }
         },
         {
-            field: "wqty", headerName: "보유재고수", width:70, type: 'numberType',
+            field: "wqty", headerName: "보유재고", width:70, type: 'numberType',
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return openHeadStock(' + params.data.goods_no + ',\'\');">' + params.value + '</a>';

@@ -660,6 +660,7 @@ class cs03Controller extends Controller
 		]);
 	}
 
+	
 	public function addBuy(Request $request) {
 
 		$data = $request->input('rows');
@@ -783,6 +784,47 @@ class cs03Controller extends Controller
 			}
 			DB::commit();
 			return response()->json(['message' => 'created', 'code' => $code]);
+		} catch (Exception $e) {
+			DB::rollBack();
+			return response()->json(['message' => $e->getMessage()], 500);
+		}
+    }
+
+	//저장
+	public function save(Request $request) {
+
+		$rows = $request->input('rows');
+		$com_id = $request->input('com_id');
+		$state = $request->input('state');
+		$type = $request->input('type');
+		$invoice_no = $request->input('invoice_no');
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+
+		try {
+			DB::beginTransaction();
+
+			foreach($rows as $r) {
+				$prd_cd = $r['prd_cd'];
+				$prd_nm = $r['goods_nm'];
+				$com_id = $r['com_id'];
+				$qty = $r['qty'];
+				$price = $r['price'];
+				$wonga = $r['wonga'];
+
+				if ($type == 10) { //입고
+
+
+
+				} else { //반품
+
+				}
+			}
+
+			
+				
+			DB::commit();
+			// return response()->json(['message' => 'created', 'code' => $code]);
 		} catch (Exception $e) {
 			DB::rollBack();
 			return response()->json(['message' => $e->getMessage()], 500);
