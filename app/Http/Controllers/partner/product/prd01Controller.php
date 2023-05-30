@@ -786,9 +786,8 @@ class prd01Controller extends Controller
         $goods_sub = $req->input('goods_sub', '');
         $stock_date =  $req->input('stock_date', date('Ymd'));
         $invoice_no = $req->input('invoice_no', date('Ymd'));
-
-        $opt = $req->input('goods_opt', '');
-        $qty = $req->input('qty', '');
+		
+		$options = $req->input('options', []);
 
         $user = array(
             "id" => Auth('partner')->user()->id,
@@ -800,38 +799,47 @@ class prd01Controller extends Controller
             //재고 클래스 호출
             $prd = new Product($user);
             $err_msg = "";
+			
+			forEach($options as $option) {
+				$goods_no = $option['goods_no'];
+				$goods_sub = $option['goods_sub'];
+				$goods_opt = $option['goods_opt'];
+				$qty = $option['qty'];
+				
+				$sql = "
+					select opt_name
+					from goods_summary
+					where goods_no = '$goods_no'
+						and goods_sub = '$goods_sub'
+						and goods_opt = '$goods_opt'
+				";
+	
+				$row = DB::selectOne($sql);
+				$opt_name = $row->opt_name;
 
-            $sql = "
-			select opt_name
-				from goods_summary
-			where goods_no = '$goods_no'
-				and goods_sub = '$goods_sub'
-			";
-            $row = DB::selectOne($sql);
+				$check = $prd->Plus( array(
+					"type" => 1,
+					"etc" => '',
+					"qty" => $qty,
+					"goods_no" => $goods_no,
+					"goods_sub" => $goods_sub,
+					"goods_opt" => $goods_opt,
+					"invoice_no" => $invoice_no,
+					"opt_name"	=>  $opt_name,
+					"opt_price" => '',
+					'wonga' => '',
+					'ord_no' => '',
+					'ord_opt_no' => '',
+					'ord_state' => '',
+					'opt_seq' => '',
+					"wonga_apply_yn" => "N"
+				));
 
-            $opt_name = $row->opt_name;
-
-            $check = $prd->Plus( array(
-                "type" => 1,
-                "etc" => '',
-                "qty" => $qty,
-                "goods_no" => $goods_no,
-                "goods_sub" => $goods_sub,
-                "goods_opt" => $opt,
-                "invoice_no" => $invoice_no,
-                "opt_name"	=>  $opt_name,
-                "opt_price" => '',
-                'wonga' => '',
-                'ord_no' => '',
-                'ord_opt_no' => '',
-                'ord_state' => '',
-                'opt_seq' => '',
-                "wonga_apply_yn" => "N"
-            ));
-
-            if(! $check) {
-                throw new Exception("재고조정용 발주건 또는 송장번호가 존재하지 않습니다.\\n발주건은 공급처가 [$cfg_domain] 만 가능합니다.\\n");
-            }
+				if(! $check) {
+					throw new Exception("재고조정용 발주건 또는 송장번호가 존재하지 않습니다.\\n발주건은 공급처가 [$cfg_domain] 만 가능합니다.\\n");
+				}
+			}
+            
 
             DB::commit();
             return response()->json(null, 201);

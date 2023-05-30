@@ -1182,8 +1182,7 @@ class Product
 	{
 		$sql = "
           update goods_summary 
-             set good_qty = good_qty + $qty 
-               , ut = now()
+             set good_qty = good_qty + $qty, wqty = wqty + $qty, ut = now()
            where goods_no = '$goods_no' 
              and goods_sub = '$goods_sub' 
              and goods_opt = '$goods_opt'
