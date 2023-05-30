@@ -29,8 +29,8 @@ class sal04Controller extends Controller
 
         $com_id = Auth('partner')->user()->com_id;
 
-        $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
-        $edate = str_replace("-","",$request->input('edate',date("Ymd")));
+        $sdate = str_replace("-", "", $request->input('sdate' ,Carbon::now()->sub(1, 'month')->format('Ymd')));
+        $edate = str_replace("-", "", date('Y-m-d', strtotime($request->input('edate', date("Ymd")).'+1 days')));
 
         $m_cat_all = $request->input("m_cat_all");
         $stat_pay_type = $request->input("stat_pay_type");
@@ -152,7 +152,7 @@ class sal04Controller extends Controller
 							inner join order_opt o on o.ord_opt_no = w.ord_opt_no
 							inner join goods g on w.goods_no = g.goods_no and w.goods_sub = g.goods_sub
 						where
-							w.ord_state_date >= '$sdate' 
+							w.ord_state_date >= '$sdate'
 							and w.ord_state_date <= '$edate' and w.ord_state in ('$ord_state',60,61)
 							and o.ord_state >= '$ord_state'
 							$inner_where2 $inner_where
