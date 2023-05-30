@@ -183,7 +183,10 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::post("prd01/{no}/similar-goods-add", "prd01Controller@save_similar_goods");
         Route::delete("prd01/{no}/similar-goods-del", "prd01Controller@delete_similar_goods");
 
-
+		// 관련 상품
+		Route::post('prd01/add-related-goods', 'prd01Controller@addRelatedGoods');
+		Route::post('prd01/del-related-good', 'prd01Controller@delRelatedGood');
+		
         // 이미지 관리
         Route::post('prd02/{idx}/upload', 'prd02Controller@upload');
         Route::get('prd02/{no}/image', 'prd02Controller@index');
