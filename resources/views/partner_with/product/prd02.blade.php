@@ -281,6 +281,10 @@
     </form>
 </div>
 
+<div id="img_loading" style="position:absolute;top:10%;left:50%;transform:translate(-50%, -50%);display:none;">
+	<img src="/skin/images/loading.gif">
+</div>
+
 <style>
 .custom-file-label::after {
             display: none;
