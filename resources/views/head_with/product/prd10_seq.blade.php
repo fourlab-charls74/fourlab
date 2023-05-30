@@ -37,6 +37,7 @@
             </div>
             <div class="card-body">
                 <form name="search">
+	                <input type="hidden" id="cat_type" name="cat_type" value="{{ $cat_type }}">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">

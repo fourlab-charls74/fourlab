@@ -361,6 +361,7 @@ class prd10Controller extends Controller
     /** 순서변경팝업 내 조회 */
     public function goods_search_seq($d_cat_cd, Request $request)
     {
+		$cat_type = $request->input('cat_type', 'DISPLAY');
         $page_h = $request->input('page_h', 9);
         $page_v = $request->input('page_v', 5);
         $sort_yn = $request->input('sort_yn', 'N');
@@ -393,8 +394,8 @@ class prd10Controller extends Controller
                     , cg.disp_yn
                     , ifnull((
                     select sum(good_qty)
-                    from goods_summary
-                    where goods_no = cg.goods_no and goods_sub = cg.goods_sub
+						from goods_summary
+						where goods_no = cg.goods_no and goods_sub = cg.goods_sub
                     ), 0) as qty
                     , ifnull(gst.sale_1d, 0) as ord_qty
                     , replace(g.img, 'a_500', 's_50') as img
@@ -409,12 +410,12 @@ class prd10Controller extends Controller
                     left outer join code gs on gs.code_kind_cd = 'G_GOODS_STAT' and gs.code_id = g.sale_stat_cl
                     left outer join goods_seq gseq on gseq.goods_no = cg.goods_no and gseq.goods_sub = cg.goods_sub
                     left outer join goods_stat gst on cg.goods_no = gst.goods_no and cg.goods_sub = gst.goods_sub
-                where cg.d_cat_cd = :d_cat_cd
+                where cg.cat_type = :cat_type and cg.d_cat_cd = :d_cat_cd
             ) a
             $orderby
         ";
 
-        $result = DB::select($sql, [ 'd_cat_cd' => $d_cat_cd, 'page_h' => $page_h, 'page_v' => $page_v ]);
+        $result = DB::select($sql, [ 'cat_type' => $cat_type, 'd_cat_cd' => $d_cat_cd, 'page_h' => $page_h, 'page_v' => $page_v ]);
 
         return response()->json([
             'code' => 200,
