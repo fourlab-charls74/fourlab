@@ -233,7 +233,7 @@
                                             <div class="col-lg-2 pl-1">
                                                 <img src='{{ $order_product["img"] }}' height="40" width="40" border="0" align="middle">
                                             </div>
-                                            <div class="col-lg-10">
+                                            <div class="col-lg-8" style="margin-left: 15px;">
                                                 <div>{{ $order_product["style_no"] }}</div>
                                                 <a href="#" onclick="PopPrdDetail({{ $order_product['goods_no'] }},{{ $order_product['goods_sub'] }});" title="{{ $order_product['goods_nm'] }}">{{ $order_product["goods_nm_short"] }}</a>
                                                 {{ $order_product["opt_val"] }}
