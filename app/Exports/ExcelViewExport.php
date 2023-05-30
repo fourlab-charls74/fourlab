@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * ** $view_url
  * ** $data
  * ** $style
+ * ** images
  * ** $keys : list_key / one_sheet_count / cell_width / cell_height
  */
 
@@ -67,6 +68,13 @@ class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings
 		for ($i = 0; $i < 100; $i++) {
 			$sheet->getRowDimension($i)->setRowHeight($this->keys['cell_height'] ?? 30);
 		}
+		
+		$sheet->getPageMargins()->setTop(0.5);
+		$sheet->getPageMargins()->setBottom(0.5);
+		$sheet->getPageMargins()->setLeft(0.25);
+		$sheet->getPageMargins()->setRight(0.25);
+		$sheet->getPageSetup()->setHorizontalCentered(true);
+		$sheet->getPageSetup()->setFitToPage(true);
 		
 		return $this->style;
 	}
