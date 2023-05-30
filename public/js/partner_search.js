@@ -406,9 +406,11 @@ SearchBrand.prototype.Choice = function(code,name){
         } else {
             if($('#brand_cd').length > 0){
                 $('#brand_cd').val(code);
+				$('#brand_cd').trigger("change");
             }
             if($('#brand_nm').length > 0){
                 $('#brand_nm').val(name);
+				$('#brand_nm').trigger("change");
             }
         }
     }
@@ -548,9 +550,11 @@ SearchCompany.prototype.Choice = function(code,name){
         } else {
             if($('#com_cd').length > 0){
                 $('#com_cd').val(code);
+				$('#com_cd').trigger("change");
             }
             if($('#com_nm').length > 0){
                 $('#com_nm').val(name);
+				$('#com_nm').trigger("change");
             }
         }
     }

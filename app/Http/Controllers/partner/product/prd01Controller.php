@@ -1224,8 +1224,9 @@ class prd01Controller extends Controller
 
 		$is_option_use = $req->input('is_option_use', 'Y');
 		$goods_qty = $req->input('goods_qty', 0);
-
-		// $good_qty =
+		
+		$goods_class = (array) json_decode($req->input('goods_class', '')) ?? [];
+		
 		try {
 			DB::beginTransaction();
 

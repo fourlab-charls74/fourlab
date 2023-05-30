@@ -1106,6 +1106,7 @@
                                     <h6 class="m-0 font-weight-bold">총 : <span id="goods-class-grid-total" class="text-primary">0</span> 건</h6>
                                 </div>
                                 <div class="fr_box">
+                                @if (@$type === '')
                                     <span class="d-none d-sm-inline">선택한 상품을</span>
                                     <select class="form-control form-control-sm goods_class" style="width:130px;display:inline">
                                         <option value="">선택</option>
@@ -1119,6 +1120,17 @@
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm goods-info-change-btn"><span class="fs-12">분류변경</span></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-save-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="저장"><i class="bx bx-save fs-14"></i></a>
                                     <a href="#" class="btn btn-sm btn-outline-primary shadow-sm goods-info-delete-btn px-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="삭제"><i class="far fa-trash-alt fs-12"></i></a>
+                                @elseif (@$type === 'create')
+	                                <span class="d-none d-sm-inline">분류 : </span>
+	                                <select id="create_to_class" name="create_to_class" class="form-control form-control-sm" style="width:130px;display:inline">
+		                                <option value="">선택</option>
+		                                @foreach ($class_items as $class_item)
+			                                <option value='{{ $class_item->class }}'>
+				                                {{ $class_item->class_nm }}
+			                                </option>
+		                                @endforeach
+	                                </select>
+                                @endif
                                 </div>
                             </div>
                         </div>
@@ -1652,21 +1664,28 @@
 
 			$("#u_category_s").val(u_cat_str);
 
-			@if ($type === '')
-			const type	= 'put';
-			@else
-			const type	= 'post';
-			@endif
+			const save_method = type === '' ? 'put' : 'post';
+
+			let save_data = frm.serialize();
+			if ($("#create_to_class").val() !== '') {
+				save_data += "&goods_class=" + JSON.stringify(gxc.getRows()?.[0]);
+			}
 
 			$.ajax({
 				async: true,
-				type: type,
+				type: save_method,
 				url: '/partner/product/prd01',
-				data: frm.serialize(),
+				data: save_data,
 				success: function (data) {
 					if (!isNaN(data * 1)) {
-						alert("변경된 내용이 정상적으로 저장 되었습니다.");
-						location.href="/partner/product/prd01/" + data;
+						if (type == "create") {
+							alert("상품이 등록되었습니다.");
+							opener.Search();
+							window.close();
+						} else {
+							alert("변경된 내용이 정상적으로 저장 되었습니다.");
+							location.href="/partner/product/prd01/" + data;
+						}
 					}
 				},
 				error: function(e) {
@@ -1858,7 +1877,7 @@
             window.open("/partner/product/prd01/"+goods_no+"/in-qty","_blank", "Product Detail");
         });
 
-               /** 상품정보고시 관련 */
+       /** 상품정보고시 관련 */
         
         if ($("#goods-class-grid").length > 0) {
             const CENTER = {'text-align': 'center'};
@@ -1919,7 +1938,11 @@
                 gxc.gridOptions.getRowNodeId = function (data) {
                     return data.rownum;
                 }
-                gxc.gridOptions.api.setRowData([{}]);
+                gxc.gridOptions.api.setRowData([{
+					'goods_type': '위탁판매',
+	                'com_nm': '{{ @$com_nm }}',
+	                'sale_stat_cl': '등록대기중',
+                }]);
                 $("#goods-class-grid-total").text('1');
                 
                 $("#create_to_class").on("change", async function (e) {
