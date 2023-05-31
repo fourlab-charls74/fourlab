@@ -1,7 +1,7 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "거래처반품 등록";
-    if($cmd == "update") $title = "거래처반품 관리";
+    $title = "상품반품 등록";
+    if($cmd == "update") $title = "상품반품 관리";
 @endphp
 @section('title', $title)
 @section('content')
@@ -12,7 +12,7 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 생산입고관리</span>
-                <span>/ 거래처반품</span>
+                <span>/ 상품반품</span>
             </div>
         </div>
         <div class="d-flex">

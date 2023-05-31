@@ -619,6 +619,7 @@ class goods extends Controller
             select 
                 p.prd_cd
                 , pc.goods_no as goods_no
+                , pc.brand as brand
                 , concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt) as prd_cd_p
                 , d.code_val as brand
                 , c.code_val as opt_kind_nm

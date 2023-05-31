@@ -66,7 +66,7 @@
                         </div>
                         <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
-                                <label for="invoice_no" class="required">송장번호</label>
+                                <label for="invoice_no" class="required">입고번호</label>
                                 <div class="flex_box">
                                     <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" name="invoice_no" value="{{ @$invoice_no }}">
                                 </div>
@@ -74,7 +74,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="bl_no">B/L No.</label>
+                                <label for="bl_no">인보이스번호</label>
                                 <div class="flex_box">
                                     <input type="text" class="form-control form-control-sm" name="bl_no" value="{{ @$bl_no }}">
                                 </div>
@@ -786,7 +786,7 @@
             return false;
         }
         if(ff.invoice_no.value == "") {
-            alert("송장번호를 입력해 주십시오.");
+            alert("입고번호를 입력해 주십시오.");
             ff.invoice_no.focus();
             return false;
         }

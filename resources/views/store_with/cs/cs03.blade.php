@@ -12,9 +12,9 @@
     <div id="search-area" class="search_cum_form">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
-                <h4>검색</h4>
+                <h4>조회</h4>
                 <div>
-                    <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                    <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
                     <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -166,7 +166,7 @@
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
             <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> </a>
             <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
@@ -201,48 +201,27 @@
 <script type="text/javascript" charset="utf-8">
     // ag-grid set
 
-    var columns = [{
-            field: "chk",
-            headerName: '',
-            cellClass: 'hd-grid-code',
-            headerCheckboxSelection: false,
+    var columns = [
+        // {field: "idx", headerName: "번호" , width:60, cellStyle:{'text-align' : 'center'}},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: false, width: 28, sort: null, pinned: 'left',
             checkboxSelection: (params) => {
                 const state = params.data.state;
                 return state == 10 || state == 20 || state == -10 || state == -20 ? true : false;
             },
-            width: 28,
-            sort: null,
-            pinned: 'left',
         },
-        {
-            field: "reg_date",
-            headerName: "등록일자",
-            width: 100,
-            hide:true
-        },
-        {
-            field: "prd_ord_date",
-            headerName: "일자",
-            width: 100
-        },
-        {
-            field: "prd_ord_no",
-            headerName: "입고/반품번호",
-            width: 120
-        },
-        {
-            field: "state",
-            headerName: "상태",
-            width: 72,
+        {field: "reg_date", headerName: "등록일자", width: 100, hide:true},
+        {field: "prd_ord_date", headerName: "일자", width: 100},
+        { field: "prd_ord_no", headerName: "송장번호", width: 120, cellStyle:{ 'text-align': 'center' }},
+        {field: "state", headerName: "상태", width: 72, cellStyle: {'text-align' : 'center', 'font-weight': '700'},
             cellRenderer: (params) => { // 상태:입고대기(10), 입고처리중(20), 입고완료(30), 반품대기(-10), 반품처리중(-20), 반품완료(-30)
                 const state = params.data.state;
                 switch (state) {
                     case "10":
-                        return "<p style=color:#52cddf>입고대기</p>";
+                        return "<p style=color:#222222>입고대기</p>";
                     case "20":
-                        return "<p style=color:#2099d8>입고처리중</p>";
+                        return "<p style=color:#0000ff>입고처리중</p>";
                     case "30":
-                        return "<p style=color:#1f71d2>입고완료</p>";
+                        return "<p style=color:#2aa876>입고완료</p>";
                     case "-10":
                         return "<p style=color:#eaa500>반품대기</p>";
                     case "-20":
@@ -252,48 +231,14 @@
                 }
             }
         },
-        {
-            field: "sup_com_nm",
-            headerName: "공급업체",
-            width: 100
-        },
-        {   field: "img",
-            headerName: "이미지", 
-            type: 'GoodsImageType', 
-            width:50,
-            cellStyle: {"line-height": "30px"}, 
-            surl:"{{config('shop.front_url')}}"
-        },
-        {
-            field: "prd_cd",
-            headerName: "원부자재코드",
-            width: 130
-        },
-        {
-            field: "prd_nm",
-            headerName: "원부자재명",
-            width: 84
-        },
-        {
-            field: "color",
-            headerName: "칼라",
-            width: 96
-        },
-        {
-            field: "size",
-            headerName: "사이즈",
-            width: 84
-        },
-        {
-            field: "unit",
-            headerName: "단위",
-            width: 84
-        },
-        {
-            field: "qty",
-            headerName: "수량",
-            width: 60,
-            type: 'numberType',
+        {field: "sup_com_nm", headerName: "공급업체", width: 100},
+        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
+        {field: "prd_cd", headerName: "원부자재코드", width: 130},
+        {field: "prd_nm", headerName: "원부자재명", width: 84},
+        {field: "color", headerName: "칼라", width: 96},
+        {field: "size", headerName: "사이즈", width: 84},
+        {field: "unit", headerName: "단위", width: 84},
+        {field: "qty", headerName: "수량", width: 60, type: 'numberType',
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     if (params.data.state == '-10' || params.data.state == '-20' || params.data.state == '-30'){
@@ -304,73 +249,15 @@
                 }
             }
         },
-        {
-            field: "price",
-            headerName: "단가",
-            width: 60,
-            type: 'currencyType'
-        },
-        {
-            field: "amount",
-            headerName: "금액",
-            width: 60,
-            type: 'currencyType'
-        },
-        // {
-        //     field: "user_nm",
-        //     headerName: "아이디",
-        //     width: 96
-        // },
-        // {
-        //     field: "rt",
-        //     headerName: "등록일자",
-        //     width: 110,
-        //     cellStyle: {
-        //         "line-height": "30px"
-        //     }
-        // },
-        {
-            field: "req_nm",
-            headerName: "등록",
-            width: 96
-        },
-        {
-            field: "req_rt",
-            headerName: "등록일자",
-            width: 110,
-            cellStyle: {
-                "line-height": "30px"
-            }
-        },
-        {
-            field: "prc_nm",
-            headerName: "처리중",
-            width: 96
-        },
-        {
-            field: "prc_rt",
-            headerName: "처리중일자",
-            width: 110,
-            cellStyle: {
-                "line-height": "30px"
-            }
-        },
-        {
-            field: "fin_nm",
-            headerName: "완료",
-            width: 96
-        },
-        {
-            field: "fin_rt",
-            headerName: "완료일자",
-            width: 110,
-            cellStyle: {
-                "line-height": "30px"
-            }
-        },
-        {
-            width: "auto"
-        }
+        {field: "price", headerName: "단가", width: 60, type: 'currencyType'},
+        {field: "amount", headerName: "금액", width: 60, type: 'currencyType'},
+        {field: "req_nm", headerName: "등록", width: 96},
+        {field: "req_rt", headerName: "등록일자", width: 110,cellStyle: {"line-height": "30px"}},
+        {field: "prc_nm", headerName: "처리중", width: 96},
+        {field: "prc_rt", headerName: "처리중일자", width: 110, cellStyle: {"line-height": "30px"}},
+        {field: "fin_nm", headerName: "완료", width: 96},
+        {field: "fin_rt", headerName: "완료일자", width: 110, cellStyle: {"line-height": "30px"}},
+        {width: "auto"}
     ];
 
     const pApp = new App('', {

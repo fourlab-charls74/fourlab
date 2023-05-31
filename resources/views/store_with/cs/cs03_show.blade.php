@@ -97,7 +97,7 @@
                 <h4>상품 정보</h4>
                 <div>
                     <a href="javascript:void(0);" onclick="return getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur();"><i class="fa fa-plus fa-sm mr-1"></i> 상품 추가</a>
-                    <!-- <a href="javascript:void(0);" onclick="return deleteRows();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a> -->
+                    <a href="javascript:void(0);" onclick="return delGoods();" class="btn-sm btn btn-outline-primary" onfocus="this.blur();"><i class="fa fa-trash fa-sm mr-1"></i> 상품 삭제</a>
                 </div>
             </div>
             <div class="card-body pt-3 pt-lg-1">
@@ -149,15 +149,9 @@
         // {field: "style_no" ,headerName:"스타일넘버", width: 80, cellStyle: StyleCenter},
         // {field: "total_qty", headerName: "총재고", type:'currencyType', width: 60},
         {field: "sg_qty", headerName: "창고재고", type:'currencyType', width: 60},
-        @if(@$state < 40)
-        {field: "exp_qty", headerName: "수량(예정)", width: 70,
+        {field: "qty", headerName: "수량", width: 70,
             editable: params => checkIsEditable(params),
-            cellStyle: params => ({backgroundColor: checkIsEditable(params) ? '#ffff99' : 'none', textAlign: 'right'}),
-        },
-        @endif
-        {field: "qty", headerName: "수량(확정)", width: 70,
-            editable: params => checkIsEditable(params),
-            cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right', color: '#2aa876', fontWeight: 'bold'},
+            cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right', fontWeight: 'bold'},
         },
         {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
@@ -168,21 +162,74 @@
 
     const pApp = new App('', { gridId: "#div-gd" });
     let gx;
-    const pinnedRowData = [{ 
-        prd_cd: '합계', count: 0, exp_qty: 0, qty: 0
-    }];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0 }];
 
     $(document).ready(() => {
         pApp.ResizeGrid(100, window.screen.width >= 740 ? undefined : 400);
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
-            pinnedTopRowData: pinnedRowData,
-            getRowStyle: (params) => params.node.rowPinned ? ({'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'}) : false, // 상단고정row styling
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
-            onCellValueChanged: (params) => onCellValueChanged(params),
-            
+            pinnedTopRowData: pinnedRowData,
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
+            },
+            onCellValueChanged: (e) => {
+                if (e.column.colId === "qty") {
+                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                        alert("숫자만 입력가능합니다.");
+                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else if(e.newValue < 0) {
+                        alert("음수는 입력할 수 없습니다.");
+                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else {
+                        if ($('#type').val() == -10) {
+                            if(e.column.colId === "qty" && e.data.sg_qty < parseInt(e.data.qty)) {
+                                    alert("창고재고보다 많은 수량을 반품할 수 없습니다.");
+                                    gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                            } else {
+                                e.node.setSelected(true);
+                                e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                                gx.gridOptions.api.updateRowData({update: [e.data]});
+                                updatePinnedRow();
+                            }
+                        } else {
+                            e.node.setSelected(true);
+                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
+                            updatePinnedRow();
+                        }
+                    }
+                }
+            }
         });
     });
+
+    const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
+        let [ qty] = [ 0 ];
+        const rows = gx.getRows();
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+            rows.forEach((row, idx) => {
+                qty += parseFloat(row.qty);
+            });
+        }
+
+        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+        gx.gridOptions.api.setPinnedTopRowData([
+            { ...pinnedRow.data, qty: qty}
+        ]);
+    };
+
+    // 상품 삭제
+    const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
+
+    const delGoods = () => {
+        const ff = document.f1;
+        const rows = gx.getSelectedRows();
+        if (Array.isArray(rows) && !(rows.length > 0)) return alert("삭제할 상품을 선택해주세요.");
+
+        rows.filter((row, idx) => row.isEditable).map((row) => { deleteRow(row); });
+        updatePinnedRow();
+    };
 
     //원부자재 업체 검색
     $( ".sch-sup-company" ).on("click", () => {
@@ -341,43 +388,16 @@
                 invoice_no : invoice_no
             }
         }).then((res) => {
-
-
+            if(res.data.code == 200) alert('선택하신 상품이 입고대기로 저장되었습니다.');
+            if(res.data.code == 201) alert('선택하신 상품이 반품대기로 저장되었습니다.');
+            window.close();
+            opener.Search();
         }).catch((error) => {
-        
+            alert('저장 중 문제가 발생하였습니다. 관리자에게 문의해주세요')
+            console.log(error);
         });
 
     }
-
-    
-    /** GRID 상단고정ROW 업데이트 */
-    function updatePinnedRow() {
-        const rows = gx.getRows();
-        const exchange_rate = unComma(document.search.exchange_rate.value || '0');
-        let row = {};
-        
-        if (rows.length > 0) {
-            row = rows.reduce((a, c) => ({
-                    exp_qty: a.exp_qty + Number.parseFloat(c.exp_qty),
-                    qty: a.qty + Number.parseFloat(c.qty),
-                    unit_total_cost: a.unit_total_cost + Number.parseFloat(c.unit_total_cost),
-                    income_amt: a.income_amt + Number.parseFloat(c.income_amt),
-                    income_total_amt: a.income_total_amt + Number.parseFloat(c.income_total_amt),
-                    cost: a.cost + Number.parseFloat(c.cost),
-                    total_cost: a.total_cost + Number.parseFloat(c.total_cost),
-                    total_cost_novat: a.total_cost_novat + Number.parseFloat(c.total_cost_novat),
-                    p_custom_amt: a.p_custom_amt + Number.parseFloat((exchange_rate * (c.qty || 0) * (c.unit_cost || 0))),
-                }), { exp_qty: 0, qty: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, p_custom_amt: 0 }
-            );
-        }
-
-        let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-        gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
-
-        $("#custom_amt").val(Comma(Math.round(row.p_custom_amt || 0)));
-    }
-
-   
 
 
 </script>

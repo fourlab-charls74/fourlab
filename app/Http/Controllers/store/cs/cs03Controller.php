@@ -108,6 +108,11 @@ class cs03Controller extends Controller
 					inner join sproduct_stock_order p2 on p1.prd_ord_no = p2.prd_ord_no
 					left outer join product p3 on p1.prd_cd = p3.prd_cd
 					left outer join product_code p4 on p3.prd_cd = p4.prd_cd
+					left outer join product_image i on p1.prd_cd = i.prd_cd
+					inner join company cp on p1.com_id = cp.com_id
+					left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
+					left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
+					left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 					left outer join mgr_user m on p2.admin_id = m.id
 				where 1=1 $where
 			";
@@ -118,7 +123,8 @@ class cs03Controller extends Controller
 
 		$sql = /** @lang text */
 		"
-			select  
+			select 
+				p1.idx as idx,
 				p2.rt as reg_date,
 				p2.prd_ord_date as prd_ord_date,
 				p1.prd_ord_no as prd_ord_no,
@@ -795,9 +801,11 @@ class cs03Controller extends Controller
 
 		$rows = $request->input('rows');
 		$com_id = $request->input('com_id');
-		$state = $request->input('state');
+		$sdate = $request->input('sdate');
 		$type = $request->input('type');
 		$invoice_no = $request->input('invoice_no');
+		$prd_ord_date = $request->input('sdate', date("Y-m-d"));
+		$prd_ord_date = str_replace("-", "", $prd_ord_date);
 		$admin_id = Auth('head')->user()->id;
 		$admin_nm = Auth('head')->user()->name;
 
@@ -812,19 +820,101 @@ class cs03Controller extends Controller
 				$price = $r['price'];
 				$wonga = $r['wonga'];
 
+
 				if ($type == 10) { //입고
 
+					$kind = "in";
 
+					DB::table('sproduct_stock_order')->updateOrInsert(
+						['prd_ord_no' => $invoice_no],
+						[
+							'kind' => $kind,
+							'prd_ord_date' => $prd_ord_date,
+							'prd_ord_type' => '',
+							'com_id' => $com_id, // 일단은 송장 내용중 가장 최근의 공급업체로 반영되고 있음
+							'state' => 10,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id' => $admin_id
+						]
+					);
+
+					/**
+					 * 원부자재 상품 입고 slave
+					 */
+					DB::table('sproduct_stock_order_product')->updateOrInsert(
+						[
+							'prd_ord_no' => $invoice_no,
+							'prd_cd' => $prd_cd,
+							'com_id' => $com_id
+						],
+						[
+							'state' => 10,
+							'prd_nm' => $prd_nm,
+							'qty' => $qty,
+							'price' => $price,
+							'wonga' => $wonga,
+							'req_rt' => now(),
+							'req_id' => $admin_id,
+							'ut' => now(),
+						]
+					);
+
+					$code = 200;
 
 				} else { //반품
+
+					$kind = "out";
+
+					/**
+					 * 원부자재 상품 입고 master
+					 */
+					if ($r['sg_qty'] >= $qty ) {
+						DB::table('sproduct_stock_order')->updateOrInsert(
+							['prd_ord_no' => $invoice_no],
+							[
+								'kind' => $kind,
+								'prd_ord_date' => $prd_ord_date,
+								'prd_ord_type' => '',
+								'com_id' => $com_id, // 송장 내용중 가장 최근의 공급업체로 반영되고 있음
+								'state' => -10,
+								'rt' => now(),
+								'ut' => now(),
+								'admin_id' => $admin_id
+							]
+						);
+						/**
+						 * 원부자재 상품 입고 slave
+						 */
+						DB::table('sproduct_stock_order_product')->updateOrInsert(
+							[
+								'prd_ord_no' => $invoice_no,
+								'prd_cd' => $prd_cd,
+								'com_id' => $com_id
+							],
+							[
+								'state' => -10,
+								'prd_nm' => $prd_nm,
+								'qty' => $qty,
+								'price' => $price,
+								'wonga' => $wonga,
+								'req_rt' => now(),
+								'req_id' => $admin_id,
+								'ut' => now(),
+							]
+						);
+
+						$code = 201;
+						
+					} else {
+						$code = 202;
+					}
 
 				}
 			}
 
-			
-				
 			DB::commit();
-			// return response()->json(['message' => 'created', 'code' => $code]);
+			return response()->json(['message' => '성공', 'code' => $code]);
 		} catch (Exception $e) {
 			DB::rollBack();
 			return response()->json(['message' => $e->getMessage()], 500);
