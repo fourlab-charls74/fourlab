@@ -4,7 +4,7 @@
 		@foreach(range(1, 10) as $i)
 			<td></td>
 		@endforeach
-			<td colspan="14" rowspan="2">(출고) 거래명세서</td>
+			<td colspan="14" rowspan="2">(반품) 거래명세서</td>
 		</tr>
 		<tr></tr>
 		<tr>
@@ -13,7 +13,7 @@
 		@foreach(range(1, 21) as $i)
 			<td></td>
 		@endforeach
-			<td colspan="6">구분 : {{ @$rel_type }}</td>
+			<td colspan="6">구분 : 반품</td>
 			<td>전표번호 : {{ @$document_number }}</td>
 		</tr>
 		<tr>
@@ -84,8 +84,8 @@
 			<td colspan="2">{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->qty ?? '' }}</td>
 			<td colspan="2">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->price ?? 0) }} @endif</td>
 			<td colspan="3">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_price ?? 0) }} @endif</td>
-			<td colspan="2">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->release_price ?? 0) }} @endif</td>
-			<td colspan="3">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_release_price ?? 0) }} @endif</td>
+			<td colspan="2">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->return_price ?? 0) }} @endif</td>
+			<td colspan="3">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_return_price ?? 0) }} @endif</td>
 		</tr>
 	@endforeach
 		<tr>
@@ -94,7 +94,7 @@
 			<td colspan="2"></td>
 			<td colspan="3">{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_price * 1); }, 0)) }}</td>
 			<td colspan="2"></td>
-			<td colspan="3">{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_release_price * 1); }, 0)) }}</td>
+			<td colspan="3">{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_return_price * 1); }, 0)) }}</td>
 		</tr>
 		<tr>
 			<td colspan="5" rowspan="2">입금계좌</td>

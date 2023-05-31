@@ -58,7 +58,7 @@
 			$isset_product = isset($products[($i - 1) + ($sheet_num * 25)]);
 		@endphp
 		<tr>
-			<td colspan="1" style="@if ($isset_product) background-color:yellow; @endif">{{ $i + ($sheet_num * 25) }}</td>
+			<td colspan="1" style="@if ($isset_product) background-color:yellow; @endif">@if ($isset_product) {{ $i + ($sheet_num * 25) }} @endif</td>
 			<td colspan="4" style="@if ($isset_product) background-color:yellow; @endif">@if ($isset_product) {{ $products[($i - 1) + ($sheet_num * 25)]->prd_cd ?? '' }} @endif</td>
 			<td colspan="9" style="@if ($isset_product) background-color:yellow; @endif">@if ($isset_product) {{ $products[($i - 1) + ($sheet_num * 25)]->goods_nm ?? '' }} @endif</td>
 			<td colspan="2" style="@if ($isset_product) background-color:yellow; @endif">@if ($isset_product) {{ $products[($i - 1) + ($sheet_num * 25)]->color ?? '' }} @endif</td>

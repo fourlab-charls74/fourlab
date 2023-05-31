@@ -230,7 +230,7 @@
             //     return params.data.sr_state < 40;
             // },
         },
-        {field: "sr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
+        {field: "sr_cd", headerName: "반품코드", width: 80, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 if (params.data.sr_state == '10'){
                     return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
@@ -239,23 +239,32 @@
                 }
             }
         },
-        {field: "sr_date", headerName: "반품일자", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "sr_date", headerName: "반품일자", width: 100, cellClass: 'hd-grid-code'},
         {field: "sr_state", hide: true},
         {field: "sr_state_nm", headerName: "반품상태", width: 65, cellStyle: StyleReturnState},
         {field: "sr_kind", hide: true},
         {field: "storage_cd", hide: true},
-        {field: "storage_nm", headerName: "반품창고", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "storage_nm", headerName: "반품창고", width: 100, cellClass: 'hd-grid-code'},
         {field: "store_type", hide: true},
-        {field: "store_cd", headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "store_type_nm", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "store_nm", headerName: "매장명", width: 200, cellStyle: {"text-align": "center"}},
+        {field: "store_cd", headerName: "매장코드", width: 70, cellClass: 'hd-grid-code'},
+        {field: "store_type_nm", headerName: "매장구분", width: 80, cellClass: 'hd-grid-code'},
+        {field: "store_nm", headerName: "매장명", width: 200, cellClass: 'hd-grid-code'},
         
         {field: "sr_qty", headerName: "반품수량", type: "currencyType", width: 80},
         {field: "sr_price", headerName: "반품금액", type: "currencyType", width: 80},
         
         {field: "sr_reason", hide: true},
-        {field: "sr_reason_nm", headerName: "반품사유", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "sr_reason_nm", headerName: "반품사유", width: 120, cellClass: 'hd-grid-code'},
         {field: "comment", headerName: "메모", width: 300},
+		{field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+			cellRenderer: function(params) {
+				if(params.data.sr_state >= 10) {
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.sr_cd})">출력</a>`;
+				} else{
+					return '-';
+				}
+			}
+		},
         {width: "auto"},
 	];
 </script>
@@ -404,6 +413,11 @@
 				console.log(e.responseText)
 			}
 		});
-	}	
+	}
+
+	// 창고반품 거래명세서 출력
+	function printDocument(sr_cd) {
+		location.href = '/store/stock/stk30/download?sr_cd=' + sr_cd;
+	}
 </script>
 @stop

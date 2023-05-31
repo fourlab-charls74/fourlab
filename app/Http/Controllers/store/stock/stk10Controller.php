@@ -582,7 +582,7 @@ class stk10Controller extends Controller
 			     , s.biz_ceo
 			     , s.biz_uptae
 			     , s.biz_upjong
-				 , (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = 'A0009') as storage_addr
+				 , (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = p.storage_cd) as storage_addr
 				 , (select concat(ifnull(ceo, ''), ' ', phone) from storage where storage_cd = p.storage_cd) as storage_manager
 			from product_stock_release p
 				inner join goods g on g.goods_no = p.goods_no

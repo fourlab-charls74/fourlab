@@ -369,7 +369,7 @@
             }
         },
 		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
-		{field: "del_rt", headerName: "전표 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+		{field: "print", headerName: "전표 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
 			cellRenderer: function(params) {
 				if(params.data.state >= 10) {
 					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printRT(${params.data.document_number}, ${params.data.idx})">출력</a>`;
