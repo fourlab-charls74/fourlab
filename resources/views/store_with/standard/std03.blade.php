@@ -17,7 +17,7 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="openPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
+                    <a href="#" onclick="openAddPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
 		            <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- <a href="#" onclick="formReset('search')" class="btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a> -->
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -159,6 +159,11 @@
     // 등록/상세 팝업창 오픈
     function openPopup(storage_cd = '') {
         const url = "/store/standard/std03/show/" + storage_cd;
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=640");
+    }
+
+    function openAddPopup() {
+        const url = "/store/standard/std03/show";
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=900,height=640");
     }
 </script>

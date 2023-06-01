@@ -202,7 +202,7 @@
                     <h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14 text-danger font-weight-normal"></strong></h6>
                     <div class="d-flex justify-content-between mt-1">
                         <div class="d-flex">
-                            <span class="mr-2">보내는매장 판매채널 / 매장구분</span>
+                            <span class="mr-2">보내는매장 : 판매채널/매장구분</span>
                             <div class="d-flex align-items-center">
                                 <div class="flex_box w-100">
                                     <select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
@@ -318,7 +318,7 @@
             cellEditorPopup: true,
         },
         {field: "store_cd", hide: true},
-        {headerName: "매장재고",
+        {headerName: "보내는매장 재고",
             children: [
                 {field: "qty", headerName: "재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
@@ -467,7 +467,7 @@
         let data = 'prd_cd=' + selected_prd.prd_cd + "&store_channel=" + store_channel + "&store_channel_kind=" + store_channel_kind;
         gx2.Request('/store/stock/stk22/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
-            $("#storage_stock").html(d.body[0]?.storage_qty + ' / ' + d.body[0]?.storage_wqty);
+            $("#storage_stock").html('재고 ' + d.body[0]?.storage_qty + ' / ' + '가용재고 ' + d.body[0]?.storage_wqty);
         });
     }
 

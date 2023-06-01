@@ -64,6 +64,7 @@ class std03Controller extends Controller
 	public function show($storage_cd = '') 
 	{
 		$storage = "";
+		$new_storage_cd = "";
 
 		if($storage_cd != '') {
 			$sql = "
@@ -73,6 +74,29 @@ class std03Controller extends Controller
 			";
 
 			$storage = DB::selectOne($sql, ["storage_cd" => $storage_cd]);
+		} else {
+			//창고코드 자동생성
+			$sql = "
+				select
+					storage_cd
+				from storage
+				where storage_cd like 'S%'
+				order by storage_cd desc
+				limit 1
+			";
+
+			$storage = DB::select($sql);
+
+			if (count($storage) > 0) {
+				$str = $storage[0]->storage_cd;
+				$seq = substr($str,1, 4);
+				$seq = (int)$seq + 1;
+				$formatNumber = sprintf('%04d', $seq);
+				$new_storage_cd = 'S'.$formatNumber;
+			} else {
+				$new_storage_cd = 'S0001';
+			}
+
 		}
 
 		$is_exit_default_storage = DB::table('storage')->where('default_yn', '=', 'Y')->count();
@@ -82,6 +106,7 @@ class std03Controller extends Controller
 		$values = [
 			"cmd" => $storage_cd == '' ? "add" : "update",
 			"storage" => $storage,
+			"new_storage_cd" => $new_storage_cd,
 			"is_exit_default_storage" => $is_exit_default_storage > 0 ? 'true' : 'false',
 			"is_exit_online_storage" => $is_exit_online_storage > 0 ? 'true' : 'false',
 			"prev_default_storage" => $prev_default_storage != "" ? $prev_default_storage : '',

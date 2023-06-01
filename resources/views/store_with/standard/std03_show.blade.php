@@ -51,10 +51,7 @@
                                             <td colspan="3">
                                                 <div class="d-flex flex-column">
                                                     <div class="d-flex align-items-center">
-                                                        <input type="text" name="storage_cd" id="storage_cd" value="{{ @$storage->storage_cd }}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" @if($cmd == "update") readonly @endif />
-                                                        @if($cmd == "add") 
-                                                        <button type="button" class="btn btn-primary mr-2" onclick="duplicateCheckStorageCode()">중복체크</button>
-                                                        @endif
+                                                        <input type="text" name="storage_cd" id="storage_cd" value="@if(@$cmd == 'update') {{@$storage->storage_cd}} @else {{@$new_storage_cd}} @endif" class="form-control form-control-sm w-50 mr-2" style="max-width:280px;" readonly />
                                                         <div class="custom-control custom-checkbox form-check-box mr-2">
                                                             <input type="checkbox" id="default_yn" name="default_yn" value="Y" class="custom-control-input" @if($cmd == 'update' && @$storage->default_yn == 'Y') checked @endif />
                                                             <label class="custom-control-label fs-14" for="default_yn">대표창고</label>
@@ -369,7 +366,7 @@
             }
             
             // 중복체크여부 검사
-            if($("[name='storage_only']").val() !== "true") return alert("창고코드를 중복체크해주세요.");
+            // if($("[name='storage_only']").val() !== "true") return alert("창고코드를 중복체크해주세요.");
         }
 
         // 창고명 입력여부

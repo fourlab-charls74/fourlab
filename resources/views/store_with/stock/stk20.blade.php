@@ -30,12 +30,12 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>구분</label>
+                            <label>RT구분</label>
                             <div class="flex_box">
                                 <select name='rt_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    <option value='G'>일반RT</option>
-                                    <option value='R'>요청RT</option>
+                                    <option value='G'>매장요청RT</option>
+                                    <option value='R'>본사요청RT</option>
                                 </select>
                             </div>
                         </div>
@@ -347,9 +347,9 @@
                 return params.data.state < 40 && params.data.state > 0;
             },
         },
-        {field: "type", headerName: "구분", pinned: 'left', cellStyle: StyleRtType,
+        {field: "type", headerName: "RT구분", pinned: 'left', cellStyle: StyleRtType,
             cellRenderer: function(params) {
-                return params.value === 'R' ? '요청RT' : params.value === 'G' ? '일반RT' : '';
+                return params.value === 'R' ? '본사요청RT' : params.value === 'G' ? '매장요청RT' : '';
             }
         },
         {field: "state", headerName: "RT상태", pinned: 'left', cellStyle: StyleReleaseState,
