@@ -358,7 +358,7 @@
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
-        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}, 
+        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
                return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
@@ -450,10 +450,10 @@
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {

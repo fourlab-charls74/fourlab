@@ -283,7 +283,7 @@
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
-        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}, 
+        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
                return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
@@ -349,15 +349,24 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_nm", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-       
+		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
+		{field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+			cellRenderer: function(params) {
+				if(params.data.state >= 10) {
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.document_number}, ${params.data.idx})">출력</a>`;
+				} else{
+					return '-';
+				}
+			}
+		},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -495,5 +504,10 @@
         var url = '/shop/product/prd01/' + prd_no;
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
+
+	// 출고 거래명세서 출력
+	function printDocument(document_number, idx) {
+		location.href = '/shop/stock/stk10/download?document_number=' + document_number + '&idx=' + idx;
+	}
 </script>
 @stop

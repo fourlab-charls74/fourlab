@@ -846,6 +846,7 @@ CREATE TABLE `msg_group_store` (
 -- 원부자재 출고
 CREATE TABLE `sproduct_stock_release` (
 	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`document_number` INT(11) NOT NULL COMMENT '전표번호',
 	`type` VARCHAR(50) DEFAULT NULL COMMENT '분류 - code : REL_TYPE (요청분/일반 : R/G)',
 	`prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
 	`price` int(11) NOT NULL COMMENT '판매가',
