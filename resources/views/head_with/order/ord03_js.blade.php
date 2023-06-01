@@ -18,6 +18,9 @@
     out_order_errors["-500"] = "시스템오류";
     out_order_errors["110"] = "재고 부족";
 
+	// DB error code
+	out_order_errors["23000"] = "중복 등록";
+
     function validateFile(files) {
         if (files === null || files.length === 0) {
             alert("입력할 파일을 선택해주세요.");
@@ -309,8 +312,6 @@
                 cache: false,
                 data: {'sale_place':sale_place,'bank_code':bank_code,'ord_type':ord_type,'order':JSON.stringify($.extend({}, orders[index].data))},
                 success: function(res) {
-                    //console.log('rownode id : ' + rowid);
-                    //console.log(res);
                     var rownode = gx.getRowNode(rowid);
                     let result = "";
                     if(res.code == "200"){
@@ -323,8 +324,8 @@
                         }
                     }
                     rownode.setDataValue('code',result);
-                    rownode.setDataValue('ord_no',res.ord_no);
-                    //console.log(orders[i].data);
+                    rownode.setDataValue('ord_opt_no', res.ord_opt_no);
+                    rownode.setDataValue('ord_no', res.ord_no);
                 },
                 error: function(e) {
                     console.log('error');

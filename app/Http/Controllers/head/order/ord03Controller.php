@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conf;
 use App\Models\Jaego;
 use App\Models\Order;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -71,17 +72,34 @@ class ord03Controller extends Controller
 
     public function save(Request $request)
     {
-		$order = (array)json_decode($request->input('order'));
+		$order 		= (array)json_decode($request->input('order'));
         $sale_place = $request->input('sale_place');
-        $bank_code = $request->input('bank_code');
-        $ord_type = $request->input('ord_type',14);
+        $bank_code 	= $request->input('bank_code');
+        $ord_type 	= $request->input('ord_type',14);
+		
+		if(!isset($order["phone"]))         $order["phone"] = Lib::getValue($order,"r_phone","");
+		if(!isset($order["mobile"]))        $order["mobile"] = Lib::getValue($order,"r_mobile","");;
+		if(!isset($order["goods_opt"]))     $order["goods_opt"] = "none";
+		if(!isset($order["goods_opt"]))     $order["goods_opt"] = "none";
+		if(!isset($order["dlv_pay_type"]))  $order["dlv_pay_type"] = "P";
+		if(!isset($order["ord_state"]))     $order["ord_state"] = "10";
+		if(!isset($order["pay_type"]))      $order["pay_type"] = "1";
+		if(!isset($order["pay_stat"]))      $order["pay_stat"] = "1";
+		if(!isset($order["fee_rate"]))      $order["fee_rate"] = "0";
+		if(!isset($order["sales_com_fee"])) $order["sales_com_fee"] = "0";
+		if(!isset($order["ord_kind"]))      $order["ord_kind"] = "20";
+		if(!isset($order["dlv_amt"]))       $order["dlv_amt"] = "0";
+		if(!isset($order["dlv_add_amt"]))   $order["dlv_add_amt"] = "0";
+		if(!isset($order["user_id"]))       $order["user_id"] = "";
+		if(!isset($order["pay_date"]))      $order["pay_date"] = date("YmdHis");
+		if(!isset($order["dlv_comment"]) && isset($order["dlv_msg"])) $order["dlv_comment"] = $order["dlv_msg"];
 
-        $order["ord_type"] = $ord_type;
-        $order["sale_place"] = $sale_place;
-        $order["qty"] = str_replace(",","",trim($order["qty"]));
-        $order["ord_amt"] = str_replace(",","",trim($order["ord_amt"]));
-        $order["dlv_amt"] = str_replace(",","",$order["dlv_amt"]);			// 배송비
-        $order["dlv_add_amt"] = str_replace(",","",$order["dlv_add_amt"]);	// 추가배송비
+        $order["ord_type"] 		= $ord_type;
+        $order["sale_place"] 	= $sale_place;
+        $order["qty"] 			= str_replace(",","", trim($order["qty"]));
+        $order["ord_amt"] 		= str_replace(",","", trim($order["ord_amt"]));
+        $order["dlv_amt"] 		= str_replace(",","", $order["dlv_amt"]);			// 배송비
+        $order["dlv_add_amt"] 	= str_replace(",","", $order["dlv_add_amt"]);	// 추가배송비
 
         $order["r_addr1"] = $order["r_addr"];
         $order["r_addr2"] = "";
@@ -101,31 +119,13 @@ class ord03Controller extends Controller
         } else {
             $order["goods_sub"] = 0;
         }
-
-        if(!isset($order["phone"])) $order["phone"] = Lib::getValue($order,"r_phone","");
-        if(!isset($order["mobile"])) $order["mobile"] = Lib::getValue($order,"r_mobile","");;
-        if(!isset($order["goods_opt"])) $order["goods_opt"] = "none";
-        if(!isset($order["goods_opt"])) $order["goods_opt"] = "none";
-        if(!isset($order["dlv_pay_type"])) $order["dlv_pay_type"] = "P";
-        if(!isset($order["ord_state"])) $order["ord_state"] = "10";
-        if(!isset($order["pay_type"])) $order["pay_type"] = "1";
-        if(!isset($order["pay_stat"])) $order["pay_stat"] = "1";
-        if(!isset($order["fee_rate"])) $order["fee_rate"] = "0";
-        if(!isset($order["sales_com_fee"])) $order["sales_com_fee"] = "0";
-        if(!isset($order["ord_kind"])) $order["ord_kind"] = "20";
-        if(!isset($order["dlv_comment"]) && isset($order["dlv_msg"])) $order["dlv_comment"] = $order["dlv_msg"];
-
-        //print_r($order);
         $result = $this->save_order($order);
-
-        //echo $sale_place;
-        //echo "~~~~";
-        //echo $order["out_ord_no"];
 
         return response()->json([
             "code" => $result["code"],
             "msg" => Lib::getValue($result,"msg",""),
-            "ord_no" => isset($result["ord_no"])? $result["ord_no"]:""
+            "ord_no" => isset($result["ord_no"]) ? $result["ord_no"] : "",
+			"ord_opt_no" => isset($result["ord_opt_no"]) ? $result["ord_opt_no"] : "",
         ]);
 
     }
@@ -136,6 +136,7 @@ class ord03Controller extends Controller
         $admin_nm = Auth('head')->user()->name;
 
         $ord_no = "";
+		$ord_opt_no = "";
         $code = 0;
         $msg = "";
         $out_ord_no = $order["out_ord_no"];
@@ -162,7 +163,7 @@ class ord03Controller extends Controller
 
         if($code === 0){
             $stock = new Jaego();
-            if($stock->IsOption($order["goods_no"],0,$order["goods_opt"]) == false){
+            if(!$stock->IsOption($order["goods_no"],0, $order["goods_opt"])){
                 $code = "-220";
                 return ["code" => $code];
             }
@@ -249,7 +250,8 @@ class ord03Controller extends Controller
             $order["clm_state"] = ($is_stock == true) ? "0" : "0";	// 클레임 : 주문취소 상태
 
             try {
-
+				DB::beginTransaction();
+				
                 $orderClass = new Order([
                     "id" => $admin_id,
                     "name" => $admin_nm
@@ -277,7 +279,7 @@ class ord03Controller extends Controller
                         "r_zipcode" 	=> $order["r_zipcode"],
                         "r_addr1" 		=> $order["r_addr1"],
                         "r_addr2" 		=> $order["r_addr2"],
-                        "r_phone" 		=> $order["r_phone"],
+                        "r_phone" 		=> $order["r_phone"] ?? '',
                         "r_mobile" 		=> $order["r_mobile"],
                         "dlv_msg" 		=> $order["dlv_msg"],
                         "ord_state" 	=> $order["ord_state"],
@@ -414,7 +416,7 @@ class ord03Controller extends Controller
                     "r_zipcode" 	=> $order["r_zipcode"],
                     "r_addr1" 		=> $order["r_addr1"],
                     "r_addr2" 		=> $order["r_addr2"],
-                    "r_phone" 		=> $order["r_phone"],
+                    "r_phone" 		=> $order["r_phone"] ?? '',
                     "r_mobile" 		=> $order["r_mobile"],
                     "dlv_msg" 		=> $order["dlv_msg"],
 
@@ -431,9 +433,15 @@ class ord03Controller extends Controller
                 DB::table('outbound_order')->insert($out_order);
 
                 $code = ($is_stock)? 200:110;
-
+				if ($code === 110) throw new Exception("재고부족");
+				
+				DB::commit();
             } catch (Exception $e) {
-                $code = 500;
+				DB::rollback();
+
+				if ($code === 110) return ["code" => $code];
+				
+				$code = $e->getCode();
                 $msg = $e->getMessage();
             }
 
@@ -443,7 +451,8 @@ class ord03Controller extends Controller
         return [
             "code" => $code,
             "msg" => $msg,
-            "ord_no" => $ord_no
+            "ord_no" => $ord_no,
+            "ord_opt_no" => $ord_opt_no,
         ];
 
     }
@@ -603,7 +612,7 @@ class ord03Controller extends Controller
             }
 
             $jaego = new Jaego($conn,$this->user);
-            if($jaego->IsOption($data["goods_no"],$data["goods_sub"],$data["goods_opt"]) == false){
+            if (!$jaego->IsOption($data["goods_no"], $data["goods_sub"], $data["goods_opt"])) {
                 echo "-220";
                 return;
             }

@@ -596,7 +596,7 @@
             field:"ord_type",
             headerName:"주문구분",
             width:72,
-            cellStyle:StyleOrdKind
+            cellClass: 'hd-grid-code'
         },
         {
             field:"ord_kind",

@@ -13,10 +13,9 @@
     <form method="get" name="search">
         <div class="card mb-3">
             <div class="d-flex card-header justify-content-between">
-                <h4>검색</h4>
+                <h4>판매정보</h4>
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2 mx-1">저장</a>
-                    <a href="#" onclick="reset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
                     <a href="#" onclick="openImportPopup()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">판매처 데이터 변환</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -51,13 +50,13 @@
                             </div>--}}
 
                             <label for="name">파일</label>
-                            <div class="d-flex align-items-center flex-column flex-sm-row">
-                                <div class="custom-file w-100 mr-2">
+                            <div class="d-flex align-items-end align-items-sm-center flex-column flex-sm-row">
+                                <div class="custom-file w-100">
                                     <input type="file" class="custom-file-input" id="file" aria-describedby="inputGroupFileAddon03">
                                     <label id="file-label" class="custom-file-label" for="file"><i class="bx bx-images font-size-16 align-middle mr-1"></i>입력할 파일을 선택 해 주세요.</label>
                                 </div>
-                                <div class="" style="min-width: 180px;">
-                                    <button class="btn btn-outline-secondary" type="button" id="apply">적용</button>
+                                <div class="text-right" style="min-width: 130px;">
+{{--                                    <button class="btn btn-outline-secondary" type="button" id="apply">적용</button>--}}
                                     <a href="/sample/sample_sugi_2.xls" target="_blank" class="ml-2" style="text-decoration: underline !important;">수기판매 양식 다운로드</a>
                                 </div>
                             </div>
@@ -130,36 +129,37 @@
 <script>
 
     var columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {field: "code", headerName: "결과", width: 150,pinned: 'left'},
-        {field: "ord_no", headerName: "주문번호", width: 170, type: 'HeadOrderNoType', pinned: 'left'},
-        {field: "out_ord_no", headerName: "판매처 주문번호", width: 170, pinned: 'left'},
-        {field: "ord_date", headerName: "주문일"},
-        {field: "style_no", headerName: "스타일넘버",editable:true,cellClass:['hd-grid-edit']},
-        {field: "goods_no", headerName: "온라인코드",editable:true,cellClass:['hd-grid-edit']},
-        {field: "goods_opt", headerName: "옵션",editable:true,cellClass:['hd-grid-edit']},
-        {field: "goods_nm", headerName: "상품명",type:"HeadGoodsNameType"},
-        {field: "qty", headerName: "수량",type:"numberType"},
-        {field: "ord_amt", headerName: "금액",type:"numberType"},
-        {field: "dlv_pay_type", headerName: "배송비지불시점",editable:true,cellClass:['hd-grid-edit']},
-        {field: "dlv_amt", headerName: "배송비",type:"numberType",editable:true,cellClass:['hd-grid-edit']},
-        {field: "dlv_add_amt", headerName: "추가배송비",type:"numberType",editable:true,cellClass:['hd-grid-edit']},
-        {field: "pay_type", headerName: "결제방법"},
-        {field: "pay_date", headerName: "입금일"},
-        {field: "user_id", headerName: "회원아이디"},
-        {field: "user_nm", headerName: "주문자"},
-        {field: "phone", headerName: "주문자 연락처"},
-        {field: "mobile", headerName: "주문자 핸드폰번호"},
-        {field: "r_nm", headerName: "수령자"},
-        {field: "r_zipcode", headerName: "수령자 우편번호"},
-        {field: "r_addr", headerName: "수령자 주소"},
-        {field: "r_phone", headerName: "수령자 연락처"},
-        {field: "r_mobile", headerName: "수령자 핸드폰번호"},
-        {field: "dlv_msg", headerName: "배송정보"},
-        {field: "dlv_nm", headerName: "택배사"},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+        {field: "code", headerName: "결과", width: 150, pinned: 'left'},
+        {field: "ord_no", headerName: "주문번호", width: 150, type: 'HeadOrderNoType', cellClass: 'hd-grid-code', pinned: 'left'},
+        {field: "ord_opt_no", headerName: "주문일련번호", hide: true},
+        {field: "out_ord_no", headerName: "판매처 주문번호", width: 100, pinned: 'left', cellClass: 'hd-grid-code'},
+        {field: "ord_date", headerName: "주문일", width: 80, cellClass: 'hd-grid-code'},
+        {field: "style_no", headerName: "스타일넘버", editable: true, cellClass: ['hd-grid-edit', 'hd-grid-code']},
+        {field: "goods_no", headerName: "온라인코드", editable: true, cellClass: ['hd-grid-edit', 'hd-grid-code']},
+        {field: "goods_opt", headerName: "옵션", width: 100, editable: true, cellClass: ['hd-grid-edit']},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType"},
+        {field: "qty", headerName: "수량", type: "numberType"},
+        {field: "ord_amt", headerName: "금액", type: "numberType", width: 70},
+        {field: "dlv_pay_type", headerName: "배송비지불시점", editable: true, cellClass: ['hd-grid-edit', 'hd-grid-code']},
+        {field: "dlv_amt", headerName: "배송비", type: "numberType", editable: true, cellClass: ['hd-grid-edit', 'hd-grid-number']},
+        {field: "dlv_add_amt", headerName: "추가배송비", type: "numberType", editable: true,cellClass: ['hd-grid-edit', 'hd-grid-number']},
+        {field: "pay_type", headerName: "결제방법", width: 100, cellClass: 'hd-grid-code'},
+        {field: "pay_date", headerName: "입금일", width: 80, cellClass: 'hd-grid-code'},
+        {field: "user_id", headerName: "회원아이디", cellClass: 'hd-grid-code'},
+        {field: "user_nm", headerName: "주문자", cellClass: 'hd-grid-code'},
+        {field: "phone", headerName: "주문자 연락처", cellClass: 'hd-grid-code'},
+        {field: "mobile", headerName: "주문자 핸드폰번호", cellClass: 'hd-grid-code'},
+        {field: "r_nm", headerName: "수령자", cellClass: 'hd-grid-code'},
+        {field: "r_zipcode", headerName: "수령자 우편번호", cellClass: 'hd-grid-code'},
+        {field: "r_addr", headerName: "수령자 주소", width: 150},
+        {field: "r_phone", headerName: "수령자 연락처", cellClass: 'hd-grid-code'},
+        {field: "r_mobile", headerName: "수령자 핸드폰번호", cellClass: 'hd-grid-code'},
+        {field: "dlv_msg", headerName: "배송정보", width: 150},
+        {field: "dlv_nm", headerName: "택배사", width: 80, cellClass: 'hd-grid-code'},
         {field: "dlv_cd", headerName: "송장정보"},
-        {field: "dlv_msg", headerName: "출고메세지"},
-        {field: "fee_rate", headerName: "수수료율(%)"},
+        {field: "dlv_msg", headerName: "출고메세지", width: 150},
+        {field: "fee_rate", headerName: "수수료율(%)", type: "percentType"},
         {field: "nvl", headerName: " "},
     ];
 
@@ -177,11 +177,10 @@
 
     $(document).ready(function() {
 
-        $("#apply").click(function() {
-            // console.log('upload');
-            var file_data = $('#file').prop('files');
-            uploadFile(file_data);
-        });
+        // $("#apply").click(function() {
+        //     var file_data = $('#file').prop('files');
+        //     uploadFile(file_data);
+        // });
 
         $('#file').change(function(e){
             uploadFile(this.files);
