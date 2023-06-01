@@ -15,7 +15,7 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>판매정보</h4>
                 <div class="flax_box">
-                    <a href="#" id="search_sbtn" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2 mx-1">저장</a>
+                    <a href="#" id="search_sbtn" onclick="Save();" class="btn btn-sm btn-primary shadow-sm mx-1">저장</a>
                     <a href="#" onclick="openImportPopup()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">판매처 데이터 변환</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
@@ -102,7 +102,8 @@
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">
-
+	        <a href="#" id="search_sbtn" onclick="Save();" class="btn btn-sm btn-primary shadow-sm">저장</a>
+	        <a href="#" onclick="openImportPopup()" class="search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">판매처 데이터 변환</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </form>
