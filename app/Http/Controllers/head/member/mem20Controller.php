@@ -136,7 +136,7 @@ class mem20Controller extends Controller
             a.idx, ca.code_val as type,
             a.subject, a.user_nm, a.user_id, date_format(a.regi_date,'%Y.%m.%d %H:%i:%s') as regi_date, a.admin_open_yn,
             (case a.open_yn when 'Y' then '$public' when 'N' then '$private' else '-' end) as open_state,
-            (case a.admin_open_yn when 'Y' then '$public' when 'N' then '$private' else '-' end) as admin_open_state,
+            a.admin_open_yn as admin_open_state,
             (case a.ans_yn when 'Y' then '$ans_y' when 'C' then '$ans_c' else '$ans_s' end) as ans_state,
             a.ans_yn
         from qna a
@@ -368,7 +368,9 @@ class mem20Controller extends Controller
 
     return response()->json([
         "code" => 200,
-        "qa_code" => $qna_resuslt
+        "qa_code" => $qna_resuslt,
+        "ans_yn" => $c_ans_yn,
+        "a_open_yn" => $s_aopen_yn,
     ]);
   }
 

@@ -65,7 +65,7 @@
                                 <select name='ans_yn' class="form-control form-control-sm">
                                     <option value="">전체</option>
                                     @foreach ($admin_ans_items as $ans_item)
-                                        <option value="{{ $ans_item->code_id}}">{{ $ans_item->code_val }}</option>
+                                        <option value="{{ $ans_item->code_id}}" @if ($ans_item->code_id === 'N') selected @endif>{{ $ans_item->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -395,7 +395,11 @@
     const pApp = new App('', { gridId: "#div-gd", height: 260 });
     let gx;
     let ed;
-    const CELL_COLOR = { YELLOW: { 'background' : '#ffff99' } };
+	const CELL_COLOR = {
+		YELLOW: { 'background' : '#ffff99' },
+		RED: { 'background': '#ff9999' },
+		NONE: { 'background': 'none' },
+	};
 
     const columns = [
         { headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width: 28, cellStyle: { "background":"#F5F7F7" },
@@ -414,7 +418,7 @@
         { field: "user_nm", headerName: "작성자", width: 75, cellStyle: { 'text-align': 'center' } },
         { field: "regi_date", headerName: "작성일", width: 120, cellStyle: { 'text-align': 'center' } },
         { field: "admin_open_state", headerName: "출력", width: 60, cellStyle: { 'text-align': 'center' } },
-        { field: "open_state", headerName: "비밀글여부", width: 80, cellStyle: { 'text-align': 'center' } },
+        // { field: "open_state", headerName: "비밀글여부", width: 80, cellStyle: { 'text-align': 'center' } },
         { field: "ans_state", headerName: "상태",
             cellStyle: (params) => ({ 'text-align': 'center', 'color': (params.value === '대기' ? '#FF0000' : '#0000FF') }),
         },
@@ -432,7 +436,9 @@
         gx = new HDGrid(gridDiv, columns, {
             getRowStyle: (params) => {
                 if (params.data.ans_yn == "Y") return CELL_COLOR.YELLOW;
-            }
+				if (params.data.ans_yn == "CY") return CELL_COLOR.RED;
+				else return CELL_COLOR.NONE;
+			}
         });
 
         Search();
@@ -488,7 +494,7 @@
         $("#qa_content").html(qna.question);
         $("#ans_nm").val(qna.ans_nm);
         $("#ans_subject").val(ans_subject);
-        $("#c_ans_yn").val(qna.ans_yn);
+		$("#c_ans_yn").val('Y');
         $("#qa_state").html('');
         $("#ord_no").html('');
         $("#qa_goods_nm").html('');
@@ -701,7 +707,7 @@
             url: '/head/member/mem20/show/' + idx,
             data : form_data,
             success: function (data) {
-                cbSave(data);
+				cbSave(data, idx);
             },
             complete:function(){
                 _grid_loading = false;
@@ -772,13 +778,21 @@
 		}
 	}
 
-    function cbSave(res) {
+	function cbSave(res, idx){
         if (res.qa_code == "1") {
+
+			gx.gridOptions.api.forEachNode(function(node) {
+				if (node.data.idx == idx) {
+					node.setDataValue('ans_state', res.ans_yn === 'Y' ? "완료" : res.ans_yn === 'C' ? "불가" : "대기");
+					node.setDataValue('ans_yn', res.ans_yn === 'Y' ? "CY" : "N"); // CY: Current Y
+					node.setDataValue('admin_open_state', res.a_open_yn);
+				}
+			});
+			
             $("#btn_checkin").hide();
             $("#btn_save").attr("disabled", true);
 
             setQnaDetail($("[name='idx']").val(), res.qa_code);
-            Search();
         } else {
             alert("저장 중 오류가 발생하였습니다. 다시 처리하여 주십시요.");
         }

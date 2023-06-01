@@ -128,7 +128,7 @@
                             <div class="flax_box">
                                 <select name='answer_yn' class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    <option value="N">답변대기</option>
+                                    <option value="N" selected>답변대기</option>
                                     <option value="Y">답변완료</option>
                                 </select>
                             </div>
@@ -405,7 +405,8 @@
 <script language="javascript">
 
     const CELL_COLOR = {
-        YELLOW: { 'background' : '#ffff99' }
+        YELLOW: { 'background' : '#ffff99' },
+        RED: { 'background' : '#ff9999' },
     };
 
     var columns = [
@@ -516,6 +517,7 @@
     const options = {
         getRowStyle: (params) => {
             if (params.data.answer_yn == "Y") return CELL_COLOR.YELLOW;
+			if (params.data.answer_yn == "CY") return CELL_COLOR.RED;
         }
     };
     const gx = new HDGrid(gridDiv, columns, options);
@@ -628,7 +630,7 @@
             gx.gridOptions.api.forEachNode(function(node) {
                 if (node.data.no == qa_no) {
                     node.setDataValue('code_val', "답변완료");
-					node.setDataValue('answer_yn', "Y");
+					node.setDataValue('answer_yn', "CY");
                 }
             });
 
