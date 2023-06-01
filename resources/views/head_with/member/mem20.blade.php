@@ -468,7 +468,7 @@
     }
 
     // 좌측테이블에서 제목 클릭 시, 해당문의의 상세정보를 우측테이블에 출력
-    async function setQnaDetail(idx) {
+    async function setQnaDetail(idx, done_code) {
         const res = await axios({ method: 'get', url: '/head/member/mem20/show/' + idx });
         if (res.status !== 200 || res.data.code !== 200) {
             alert('조회 중 에러가 발생했습니다. 질문을 다시 한 번 선택해주세요.');
@@ -533,10 +533,22 @@
             }
             $("#qa_state").html(`<strong>${qna.check_nm}</strong> 접수중`);
         } else {
-            $("#btn_checkin").val("접수").show();
-            $("#btn_checkin").attr("disabled", false);
-            $("#btn_save").attr("disabled", true);
-            $("#btn_save").hide();
+			if (done_code > 0 && qna.ans_yn === 'Y') {
+				$("#btn_checkin").hide();
+				$("#btn_save").attr("disabled", true);
+				$("#btn_save").val("답변이 완료되었습니다.").show();
+			} else {
+				if (qna.ans_yn === 'Y') {
+					$("#btn_checkin").val("수정하시겠습니까?").show();
+					$("#btn_save").attr("disabled", true);
+					$("#btn_save").val("답변완료").show();
+				} else {
+					$("#btn_checkin").val("접수").show();
+					$("#btn_save").attr("disabled", true);
+					$("#btn_save").hide();
+				}
+				$("#btn_checkin").attr("disabled", false);
+			}
             if (qna.ans_yn === 'Y') $("#qa_state").html(`<strong class="mr-2">${qna.ans_nm}(${qna.ans_id}) 답변완료</strong>${qna.repl_date}`);
             else if (qna.ans_yn === 'C') $("#qa_state").html(`<strong class="mr-2">${qna.ans_nm}(${qna.ans_id}) 등록불가처리</strong>${qna.repl_date}`);
         }
@@ -606,9 +618,16 @@
     // 접수취소처리 완료
     function cbCheckOut(res) {
         if (res.qa_code == 1) {
-            $("#btn_checkin").val("접수");
-            $("#btn_save").attr("disabled", true);
-            $("#btn_save").hide();
+			$("#btn_save").attr("disabled", true);
+			
+			if (res.ans_yn === 'Y') {
+				$("#btn_save").val("답변완료").show();
+				$("#btn_checkin").val("수정하시겠습니까?").show();
+			} else {
+				$("#btn_save").hide();
+				$("#btn_checkin").val("접수").show();
+			}
+			
             $("#qa_state").html(
                 $("[name='prev_ans_yn']").val() === 'Y'
                     ? `<strong class="mr-2">${$("[name='prev_ans_nm']").val()}(${$("[name='prev_ans_id']").val()}) 답변완료</strong>${$("[name='qa_repl_date']").val()}`
@@ -758,7 +777,7 @@
             $("#btn_checkin").hide();
             $("#btn_save").attr("disabled", true);
 
-            setQnaDetail($("[name='idx']").val());
+            setQnaDetail($("[name='idx']").val(), res.qa_code);
             Search();
         } else {
             alert("저장 중 오류가 발생하였습니다. 다시 처리하여 주십시요.");

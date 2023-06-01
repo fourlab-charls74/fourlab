@@ -252,9 +252,13 @@ class mem20Controller extends Controller
 
     }
 
+	$sql = " select ans_yn from qna where idx = :idx ";
+	$ans_yn = DB::selectOne($sql, [ 'idx' => $idx ])->ans_yn ?? '';
+
     return response()->json([
         "code" => 200,
-        "qa_code" => $code
+        "qa_code" => $code,
+		"ans_yn" => $ans_yn,
     ]);
   }
 

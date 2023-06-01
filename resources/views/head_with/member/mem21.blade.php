@@ -628,6 +628,7 @@
             gx.gridOptions.api.forEachNode(function(node) {
                 if (node.data.no == qa_no) {
                     node.setDataValue('code_val', "답변완료");
+					node.setDataValue('answer_yn', "Y");
                 }
             });
 
