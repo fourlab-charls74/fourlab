@@ -490,8 +490,9 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::post('stk26/batch-getgoods', 'stk26Controller@get_goods');
         
          // 창고반품
-         Route::get('stk30','stk30Controller@index');
+		Route::get('stk30','stk30Controller@index');
         Route::get('stk30/search','stk30Controller@search');
+		Route::get('stk30/download','stk30Controller@download'); // 명세서출력
         Route::get('stk30/show/{sr_cd?}','stk30Controller@show');
         Route::get('stk30/view/{sr_cd?}','stk30Controller@view');
         Route::get('stk30/search-return-products','stk30Controller@search_return_products'); // 기존에 반품등록된 상품목록 조회

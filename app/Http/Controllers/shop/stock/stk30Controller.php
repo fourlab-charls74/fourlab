@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Exception;
-
 use App\Models\Conf;
+use App\Exports\ExcelViewExport;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 const PRODUCT_STOCK_TYPE_RETURN = 11; // 창고반품 (매장->창고)
 
@@ -950,4 +952,130 @@ class stk30Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
         */
+
+	// 창고반품 거래명세서 출력
+	public function download(Request $request)
+	{
+		$sr_cd = $request->input('sr_cd');
+
+		$sql = "
+            select srp.prd_cd
+				, g.goods_nm
+                , pc.color
+                , pc.size
+                 -- 확정수량? 예정수량? 논의 후 수정필요
+				, srp.return_qty * -1 as qty
+                , g.price
+                , (g.price * srp.return_qty * -1) as total_price
+			 	, round(g.price / 1.1) as return_price
+			 	, round(g.price / 1.1 * srp.return_qty * -1) as total_return_price
+				, s.store_nm
+				, s.addr1
+				, s.addr2
+				, s.phone
+				, s.fax
+				, s.biz_no
+				, s.biz_ceo
+				, s.biz_uptae
+				, s.biz_upjong
+				, (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = sr.storage_cd) as storage_addr
+				, (select concat(ifnull(ceo, ''), ' ', phone) from storage where storage_cd = sr.storage_cd) as storage_manager
+            from store_return_product srp
+                inner join product_code pc on pc.prd_cd = srp.prd_cd
+                inner join goods g on g.goods_no = pc.goods_no
+                inner join store_return sr on sr.sr_cd = srp.sr_cd
+				inner join store s on s.store_cd = sr.store_cd
+            where srp.sr_cd = :sr_cd
+        ";
+		$rows = DB::select($sql, ['sr_cd' => $sr_cd]);
+
+		$data = [
+			'one_sheet_count' => 36,
+			'document_number' => sprintf('%04d', $sr_cd),
+			'products' => $rows
+		];
+
+		if (count($rows) > 0) {
+			$data['receipt_date']		= date('Y-m-d'); // 반품요청일자? 반품처리일자? 반품완료일자? 논의 후 수정필요
+			$data['store_nm'] 			= $rows[0]->store_nm ?? '';
+			$data['store_addr'] 		= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);
+			$data['store_phone'] 		= $rows[0]->phone ?? '';
+			$data['store_fax'] 			= $rows[0]->fax ?? '';
+			$data['biz_no'] 			= $rows[0]->biz_no ?? '';
+			$data['biz_ceo'] 			= $rows[0]->biz_ceo ?? '';
+			$data['biz_uptae'] 			= $rows[0]->biz_uptae ?? '';
+			$data['biz_upjong'] 		= $rows[0]->biz_upjong ?? '';
+			$data['storage_addr'] 		= $rows[0]->storage_addr ?? '';
+			$data['storage_manager'] 	= $rows[0]->storage_manager ?? '';
+
+			$conf = new Conf();
+			$company = $conf->getConfig('shop');
+			$data['business_registration_number'] = $company['business_registration_number'];
+			$data['company_name'] = $company['company_name'];
+			$data['company_ceo_name'] = $company['company_ceo_name'];
+			$data['company_address'] = $company['company_address'];
+
+			/* 하단 정보는 값등록 후 수정이 필요합니다. */
+			$data['company_uptae'] = '도소매';
+			$data['company_upjong'] = '의류,신발,악세서리';
+			$data['company_office_phone'] = '02) 332-0018';
+			$data['company_fax'] = '';
+			$data['company_bank_number'] = '국민은행 / 730637-04-005212 / (주) 알펜인터내셔널';
+			/* 상단 정보는 값등록 후 수정이 필요합니다. */
+		}
+
+		$style = [
+			'A1:AH50' => [
+				'alignment' => [
+					'vertical' => Alignment::VERTICAL_CENTER,
+					'horizontal' => Alignment::HORIZONTAL_CENTER
+				],
+				'font' => [ 'size' => 45 ]
+			],
+			'A3:AH3' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'A4:AH50' => [
+				'borders' => [
+					'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
+					'outline' => [ 'borderStyle' => Border::BORDER_THICK ],
+				],
+			],
+			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AC47:AH50' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_THICK ] ] ],
+			'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'F10:F45' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'W10:AH46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
+			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
+			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
+			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
+			'B9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 10 ] ],
+			'F9' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 55 ] ],
+			'A46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 110 ] ],
+			'A47:A49' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 7 ] ],
+			'E6' => [ 'font' => [ 'size' => 32 ] ],
+			'M7' => [ 'font' => [ 'size' => 40 ] ],
+			'V5' => [ 'font' => [ 'size' => 35 ] ],
+			'V6' => [ 'font' => [ 'size' => 32 ] ],
+			'Q5' => [ 'font' => [ 'size' => 32 ] ],
+			'AH5' => [ 'font' => [ 'size' => 32 ] ],
+			'B10:Q45' => [ 'font' => [ 'size' => 32 ] ],
+			'Y10:Y45' => [ 'font' => [ 'size' => 32 ] ],
+			'AA10:AA46' => [ 'font' => [ 'size' => 40 ] ],
+			'AD10:AD45' => [ 'font' => [ 'size' => 32 ] ],
+			'AF10:AF46' => [ 'font' => [ 'size' => 40 ] ],
+			'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
+			'K1' => [ 'font' => [ 'size' => 80 ] ],
+		];
+
+		$view_url = Config::get('shop.store.view') . '/stock/stk30_document';
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 12, 'cell_height' => 70 ];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 220 ]];
+
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '반품거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 }
