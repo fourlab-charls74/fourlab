@@ -1,7 +1,7 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "창고반품등록";
-    if($cmd == "update") $title = "창고반품관리";
+    $title = "매장반품등록";
+    if($cmd == "update") $title = "매장반품수정";
 @endphp
 @section('title', $title)
 @section('content')
@@ -12,7 +12,7 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
-                <span>/ 창고반품</span>
+                <span>/ 매장반품관리</span>
             </div>
         </div>
         <div class="d-flex">
@@ -70,26 +70,7 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th class="required">반품창고</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <select name='storage_cd' class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
-                                                        @foreach (@$storages as $storage)
-                                                            <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
-                                                        @endforeach
-                                                        <input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <th>반품코드</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_cd }} @else {{ @$new_sr_cd }} @endif</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">매장</th>
+                                            <th class="required">보내는 매장</th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
                                                     @if(@$cmd == 'add')
@@ -106,6 +87,19 @@
                                                     @endif
                                                 </div>
                                             </td>
+                                            <th class="required">반품창고</th>
+                                            <td>
+                                                <div class="form-inline">
+                                                    <select name='storage_cd' class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
+                                                        @foreach (@$storages as $storage)
+                                                            <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+                                                        @endforeach
+                                                        <input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="required">반품사유</th>
                                             <td>
                                                 <div class="form-inline">
@@ -119,7 +113,13 @@
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2" @if(@$sr->sr_state == '10') readonly disabled style="background-color: #ccc" @endif>{{ @$sr->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="1" @if(@$sr->sr_state == '10') readonly disabled style="background-color: #ccc" @endif>{{ @$sr->comment }}</textarea>
+                                                </div>
+                                            </td>
+                                            <th>반품코드</th>
+                                            <td>
+                                                <div class="form-inline">
+                                                    <p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_cd }} @else {{ @$new_sr_cd }} @endif</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -195,16 +195,16 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType',
+        {field: "store_wqty", headerName: "가용재고", width: 90, type: 'currencyType',
             cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "red"} : {}
         },
-        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
+        {field: "qty", headerName: "반품요청수량", width: 85, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
         @if (@$sr_state == 30 || @$sr_state == 40)
-        {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType',
+        {field: "fixed_return_qty", headerName: "반품처리수량", width: 60, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
