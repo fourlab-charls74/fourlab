@@ -3018,14 +3018,15 @@ class prd01Controller extends Controller
 	}
 
 	// 유사 상품 등록
-	public function save_similar_goods(Request $request, $goods_no) {
+	public function save_similar_goods(Request $request, $no) {
 		$code = 200;
 		$msg = '';
 
 		$admin_id = Auth('head')->user()->id;
 		$admin_nm = Auth('head')->user()->name;
 		$goods_sub = $request->goods_sub;
-
+		$goods_no = $no;
+		
 		// 해당 상품 정보 조회
 		$sql = "
 			select ifnull(similar_no, 0) as similar_no, brand, com_id, opt_kind_cd, rep_cat_cd
@@ -3049,7 +3050,7 @@ class prd01Controller extends Controller
 				// 그룹이 없는 경우 -> 해당 상품번호를 그룹번호로 지정 후 유사 상품에 등록
 				$similar_no = $goods_no;
 
-				$sql = "
+				/*$sql = "
 					insert into goods_similar (
 						similar_no, goods_no, goods_sub, seq, admin_id, admin_nm, rt, ut
 					) values (
@@ -3057,7 +3058,8 @@ class prd01Controller extends Controller
 					)
 				";
 				DB::insert($sql);
-
+				*/
+				
 				$sql = "
 					update goods set
 						similar_no = '$similar_no'
@@ -3078,11 +3080,39 @@ class prd01Controller extends Controller
 			}
 
 			// 유사상품 등록
-			$add_goods = $request->add_goods;
-
+			$add_goods = $request->input('add_goods', []);
+			
 			foreach($add_goods as $goods) {
 				list($s_goods_no, $s_goods_sub) = explode("||", $goods);
 				if($goods_no !== $s_goods_no) {
+
+					$regist_prd_sql = "
+						select brand, com_id, opt_kind_cd, rep_cat_cd
+						from goods
+						where goods_no = :goods_no and goods_sub = :goods_sub
+					";
+
+					$regist_prd_info = DB::selectOne($regist_prd_sql, [
+						'goods_no' => $s_goods_no,
+						'goods_sub' => $s_goods_sub,
+					]);
+
+					if($regist_prd_info->brand !== $brand) {
+						throw new Exception("$s_goods_no 의 브랜드가 동일하지 않습니다.");
+					}
+
+					if($regist_prd_info->com_id !== $com_id) {
+						throw new Exception("$s_goods_no 의 업체가 동일하지 않습니다.");
+					}
+
+					if($regist_prd_info->opt_kind_cd !== $opt_kind_cd) {
+						throw new Exception("$s_goods_no 품목이 동일하지 않습니다.");
+					}
+
+					if($regist_prd_info->rep_cat_cd !== $rep_cat_cd) {
+						throw new Exception("$s_goods_no 대표카테고리가 동일하지 않습니다.");
+					}
+					
 					$sql = "
 						select goods_no, goods_sub
 						from goods

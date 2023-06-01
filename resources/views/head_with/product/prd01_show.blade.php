@@ -3476,7 +3476,7 @@
                 else alert(res.message);
             },
             error: function(error) {
-                console.log(error)
+				alert(error.responseJSON.message);
             }
         });
     }
