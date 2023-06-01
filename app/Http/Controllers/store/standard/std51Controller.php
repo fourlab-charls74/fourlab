@@ -217,6 +217,18 @@ class std51Controller extends Controller
 
                     if($cnt === 0){
                         DB::table('code')->insert($data_code);
+
+                        DB::table('sale_type')->insert([
+                            'sale_kind' => $data['code_id'],
+                            'sale_type_nm' => $data['code_val'],
+                            'sale_apply' => 'price',
+                            'amt_kind' => 'per',
+                            'sale_per' => 0,
+                            'use_yn' => $data['use_yn'],
+                            'reg_date' => now(),
+                            'mod_date' => now(),
+                            'admin_id' => $id
+                        ]);
                     }
                 }
             });
@@ -263,7 +275,12 @@ class std51Controller extends Controller
                     ->where('code_id', '=', $data['code_id'])
                     ->update($data_code);
 
-                   
+                    DB::table('sale_type')
+                        ->where('sale_kind','=',$data['code_id'])
+                        ->update([
+                            'sale_type_nm' => $data['code_val'],
+                            'mod_date' => now()
+                        ]);
                 }
             });
             $code = 200;
@@ -316,6 +333,52 @@ class std51Controller extends Controller
             $code = 500;
             $msg = $e->getMessage();
         }
+        return response()->json(['code' => $code,"msg" => $msg]);
+    }
+
+    //사용여부 변경
+    public function change_yn($code,Request $request) {
+
+        $data = $request->input('rows');
+
+        try {
+			DB::beginTransaction();
+
+            foreach ($data as $d) {
+                $code_id = $d['code_id'];
+                $use_yn = $d['use_yn'];
+                $change_yn = "";
+
+                if($use_yn == 'Y') {
+                    $change_yn = 'N';
+                } else {
+                    $change_yn = 'Y';
+                }
+
+                DB::table('code')
+                    ->where('code_kind_cd','=', $code)
+                    ->where('code_id', '=', $code_id)
+                    ->update([
+                        'use_yn' => $change_yn,
+                        'ut' => now()
+                    ]);
+
+                DB::table('sale_type')
+                    ->where('sale_kind', '=', $code_id)
+                    ->update([
+                        'use_yn' => $change_yn,
+                        'mod_date' => now()
+                    ]);
+            }
+	
+			$msg = "정상적으로 저장되었습니다.";
+            $code = 200;
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
         return response()->json(['code' => $code,"msg" => $msg]);
     }
 }

@@ -140,6 +140,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std05/show/{sale_type_cd?}', 'std05Controller@show');
         Route::get('std05/search-store/{sale_type_cd?}', 'std05Controller@search_store');
         Route::get('std05/search-brand/{sale_type_cd?}', 'std05Controller@search_brand');
+        Route::get('std05/check-code/{sale_type_cd?}', 'std05Controller@check_code');
 
         Route::post('std05/add', 'std05Controller@add_sale_type');
         Route::put('std05/update', 'std05Controller@update_sale_type');
@@ -205,6 +206,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('std51/{code?}/mod', 'std51Controller@data_mod');
         Route::post('std51/{code?}/del', 'std51Controller@data_del');
         Route::post('std51/{code?}/seq', 'std51Controller@data_seq');
+        Route::post('std51/{code?}/change-yn', 'std51Controller@change_yn');
 
     });
 

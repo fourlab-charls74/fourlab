@@ -1,6 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "매장실사등록";
+    $title = "실사개별등록";
     if($cmd == "update") $title = "매장실사관리";
 @endphp
 @section('title', $title)
@@ -109,7 +109,7 @@
                                             <th>메모</th>
                                             <td colspan="3">
                                                 <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="2">{{ @$sc->comment }}</textarea>
+                                                    <textarea name="comment" id="comment" class="w-100" rows="1">{{ @$sc->comment }}</textarea>
                                                 </div>
                                             </td>
                                         </tr>

@@ -70,7 +70,7 @@ class std05Controller extends Controller
 
 		if($sale_type_cd != '') {
 			$sql = "
-				select s.idx, s.sale_kind, c.code_val as sale_kind_nm, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn
+				select s.idx, s.sale_kind, c.code_val as sale_kind_nm, c.code_id as sale_type_cd, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn
 				from sale_type s
 					inner join code c
 						on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
@@ -169,6 +169,7 @@ class std05Controller extends Controller
 		$msg = "";
 
 		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
 		$r = $request->all();
 
 		try {
@@ -183,8 +184,26 @@ class std05Controller extends Controller
 				'sale_per' => $r['sale_per'] ?? null,
 				'use_yn' => $r['use_yn'],
 				'reg_date' => now(),
+				'mod_date' => now(),
 				'admin_id' => $admin_id,
 			]);
+
+			$cnt = DB::table('code')
+					->where('code_kind_cd', '=', 'SALE_KIND')
+					->count();
+
+			DB::table('code')
+				->insert([
+					'code_kind_cd' => 'SALE_KIND',
+					'code_id' => $r['sale_kind'],
+					'code_val' => $r['sale_type_nm'],
+					'use_yn' => $r['use_yn'],
+					'code_seq' => $cnt + 1,
+					'admin_id' => $admin_id,
+					'admin_nm' => $admin_nm,
+					'rt' => now(),
+					'ut' => now()
+				]);
 
 			foreach($r['store_datas'] as $s) {
 				DB::table('sale_type_store')->insert([
@@ -243,6 +262,15 @@ class std05Controller extends Controller
 					'use_yn' => $r['use_yn'],
 					'mod_date' => now(),
 					'admin_id' => $admin_id,
+				]);
+
+			DB::table('code')
+				->where('code_kind_cd','=', 'SALE_KIND')
+				->where('code_id', '=', $r['sale_kind'])
+				->update([
+					'code_val' => $r['sale_type_nm'],
+					'use_yn' => $r['use_yn'],
+					'ut' => now()
 				]);
 				
 			foreach($r['store_datas'] as $s) {
@@ -307,6 +335,24 @@ class std05Controller extends Controller
 
 		return response()->json(["code" => $code, "msg" => $msg, "data" => ["sale_type_cd" => $idx]]);
 
+	}
+
+	// 판매구분코드 중복체크
+	public function check_code($sale_type_cd = '') 
+	{
+		$code	= 200;
+		$msg	= "사용가능한 코드입니다.";
+
+		$sql	= " select count(code_id) as cnt from code where code_kind_cd = 'SALE_KIND' and code_id = :sale_type_cd ";
+
+		$cnt	= DB::selectOne($sql, ["sale_type_cd" => $sale_type_cd])->cnt;
+
+		if( $cnt > 0 ){
+			$code	= 409;
+			$msg	= "이미 사용중인 코드입니다.";
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }
 

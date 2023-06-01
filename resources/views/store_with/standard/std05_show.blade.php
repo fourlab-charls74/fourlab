@@ -47,23 +47,16 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">판매구분</th>
+                                            <th class="required">판매구분코드</th>
                                             <td>
                                                 <div class="d-flex">
+                                                    <input type="text" name="sale_type_cd" id="sale_type_cd" value="{{@$sale_type->sale_type_cd}}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="width:280px;" @if($cmd == "update") readonly @endif />
                                                     @if($cmd == "add")
-                                                    <select id="sale_kind" name="sale_kind" class="form-control form-control-sm w-100" onchange="autoWriteTypeName(this)">
-                                                        <option value="">전체</option>
-                                                        @foreach ($sale_kinds as $sale_kind)
-                                                        <option value="{{ $sale_kind->code_id }}" @if($sale_kind->use_yn == 1) disabled style="background-color: #DEDEDE" @endif>
-                                                            {{ $sale_kind->code_val }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                    @else
-                                                    <input type="hidden" id="sale_kind" name="sale_kind" value="{{ @$sale_type->sale_kind }}" />
-                                                    <p>{{ @$sale_type->sale_kind_nm }}</p>
+                                                        <button type="button" class="btn btn-primary" onclick="checkCode()">중복체크</button>
                                                     @endif
                                                 </div>
+                                                <p id="dupcheck" class="pt-1"></p>
+                                                <input type="hidden" name="sale_type_only" />
                                             </td>
                                             <th class="required">판매유형명</th>
                                             <td>
@@ -221,7 +214,7 @@
 
     $(document).ready(function() {
         // 매장정보
-        pApp.ResizeGrid(570);
+        pApp.ResizeGrid(425);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -298,6 +291,8 @@
         if(!window.confirm("판매유형 정보를 저장하시겠습니까?")) return;
         alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
 
+        console.log(type);
+
         let url = '/store/standard/std05/' + type;
         let method = type === 'add' ? 'post' : 'put';
 
@@ -327,11 +322,14 @@
     // 저장 시 입력값 확인
     const validation = (cmd) => {
         if(cmd === "add") {
-            // 판매구분 선택여부
-            if(f1.sale_kind.value === '') {
-                f1.sale_kind.focus();
-                return alert("판매구분을 선택해주세요.");
-            }
+            // 판매구분코드 선택여부
+            if(f1.sale_type_cd.value.trim() === '') {
+				f1.sale_type_cd.focus();
+				return alert("판매구분코드를 입력해주세요.");
+			}
+			
+			// 중복체크여부 검사
+			if($("[name='sale_type_only']").val() !== "true") return alert("판매구분코드 중복체크를 해주세요.");
         }
 
         if(f1.sale_type_nm.value === "") {
@@ -355,11 +353,11 @@
     // 저장데이터 반환
     const getFormData = (cmd) => {
         let sale_types = <?= json_encode(@$sale_kinds) ?> ;
-        let sale_type = sale_types.find(s => s.code_id === f1.sale_kind.value);
+        let sale_type = sale_types.find(s => s.code_id === f1.sale_type_cd.value);
         
         return {
             sale_kind_cd: cmd === 'update' ? "{{ @$sale_type->idx }}" : '',
-            sale_kind: f1.sale_kind.value,
+            sale_kind: f1.sale_type_cd.value,
             // sale_type_nm: sale_type ? sale_type['code_val'] : '',
             sale_type_nm: f1.sale_type_nm.value,
             sale_apply: f1.sale_apply.value,
@@ -389,7 +387,29 @@
 
     // 판매구분 선택 시 판매유형명 자동완성
     function autoWriteTypeName(obj) {
-        $("[name=sale_type_nm]").val(obj.options[obj.selectedIndex].text);
+
+        if(obj.options[obj.selectedIndex].value == 'new'){
+            $("[name=sale_type_nm]").val('');
+        } else {
+            $("[name=sale_type_nm]").val(obj.options[obj.selectedIndex].text);
+        }
+    }
+
+    function setDupCheckValue() {
+        $("[name=sale_type_only]").val("false");
+    }
+
+    async function checkCode() {
+        const sale_type_cd = $("[name=sale_type_cd]").val().trim();
+        if( sale_type_cd === '' )	return alert("판매구분코드를 입력해주세요.");
+        const response = await axios({ 
+            url: `/store/standard/std05/check-code/${sale_type_cd}`, 
+            method: 'get' 
+        });
+        const {data: {code, msg}} = response;
+        $("#dupcheck").text("* " + msg);
+        $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
+        $("[name=sale_type_only]").val(code === 200 ? "true" : "false");
     }
 </script>
 @stop

@@ -93,6 +93,7 @@
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataMod();"><span class="fs-12">코드수정</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">코드삭제</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeSeq();"><span class="fs-12">순서변경</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeYN();"><span class="fs-12">사용여부변경</span></a>
                                 </div>
                             </div>
                         </div>
@@ -414,6 +415,35 @@
                     dataType: 'json',
                     success: function (res) {
                         if(res.code == '200'){
+                            Search();
+                        } else {
+                            alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                            console.log(res.msg);
+                        }
+                    },
+                    error: function(e) {
+                        console.log(e.responseText)
+                    }
+                });
+            }
+            return true;
+        }
+
+        // 사용여부 변경
+        function ChangeYN(){
+            let rows = gx.getSelectedRows();
+
+            if(confirm('사용여부를 변경 하시겠습니까?')){
+                $.ajax({
+                    method: 'post',
+                    url: '/store/standard/std51/' + code + '/change-yn',
+                    data: {
+                        'rows' : rows
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        if(res.code == 200){
+                            alert('선택한 코드의 사용여부가 변경되었습니다.');
                             Search();
                         } else {
                             alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
