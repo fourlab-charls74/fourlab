@@ -8,7 +8,7 @@
                 <a href="javascript:;" class="arrow waves-effect"><i class="bx bx-package fs-18"></i><span>상품/재고</span></a>
                 <ul>
                     <li><a href="/partner/product/prd01">상품관리</a></li>
-{{--                    <li><a href="/partner/product/prd05">상품정보고시</a></li>--}}
+                    <li><a href="/partner/product/prd05">상품정보고시</a></li>
                     <li><a href="/partner/stock/stk01">재고관리</a></li>
                 </ul>
             </li>

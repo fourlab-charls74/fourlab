@@ -1163,7 +1163,7 @@
     function SearchFormReset() {
         var class_val = $("#class").val();
         document.search.reset();
-        $("#class").val(class_val);
+		$("#class").val(class_val).trigger('change');
     }
 
     function GridImageShow() {

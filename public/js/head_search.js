@@ -1360,6 +1360,8 @@ var initSearch = (select2 = [], form_name = "search") => { // 검색 초기화 �
     if ($('#cat_cd').length > 0) $('#cat_cd').val("").trigger('change'); // 카테고리 select2 박스 초기화
     if ($('#com_cd').length > 0) $('#com_cd').val("").trigger('change'); // 업체 select2 박스 초기화
     if ($("#goods_stat[name='goods_stat[]']").length > 0) $('#goods_stat').val([]).trigger('change'); // 전시상태 select2 박스 초기화
+	searchGoodsNos.Init();
+	
     /**
      * 동적 초기화
      */

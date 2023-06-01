@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers\partner\product;
 
-use App\Components\Lib;
-
 use App\Components\SLib;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-//use Illuminate\Database\Schema\Blueprint;
-//use Illuminate\Support\Facades\Schema;
+use Exception;
 
 class prd05Controller extends Controller
 {
@@ -18,15 +15,23 @@ class prd05Controller extends Controller
         $com_id = Auth('partner')->user()->com_id;
         $com_nm = Auth('partner')->user()->com_nm;
 
-        //echo 'com_id : '. $com_id;
-        $query = "
-        select '' as class, '미분류' as class_nm, (select count(*) as cnt from goods where com_id = '$com_id' and ifnull(class,'') = '') as cnt
-        union all
-        select a.class , a.class_nm, (select count(*) from goods where com_id='$com_id' and class=a.class) as cnt from code_class a group by class, class_nm";
-        $class_items = DB::select($query);
-        if(count($class_items) > 0){
-            $to_class_items = $class_items;
-        }
+		$query = "
+				select 
+                    '' as class
+                     , '미분류' as class_nm
+                     , (select count(*) as cnt from goods where com_id = '$com_id' and ifnull(class,'') = '') as cnt
+            union all
+                select 
+                    a.class
+                     , a.class_nm
+                     , (select count(*) from goods where com_id = '$com_id' and class = a.class) as cnt 
+                from code_class a 
+                group by class, class_nm
+        ";
+		$class_items = DB::select($query);
+		if (count($class_items) > 0) {
+			$to_class_items = $class_items;
+		}
 
         $query = "select item as id, item_nm as val from code_class where class = '001' order by item+0";
         $rows = DB::select($query);
@@ -57,20 +62,21 @@ class prd05Controller extends Controller
         $page = $request->input('page',1);
         if ($page < 1 or $page == "") $page = 1;
 
-        $class          = $request->input("class");         // 분류
-        $goods_type     = $request->input("goods_type");    // 상품구분
-        $goods_stat     = $request->input("goods_stat");    // 상품 상태
-        $style_no       = $request->input("style_no");      // 스타일 넘버
-        $goods_no       = $request->input("goods_no");      // 상품번호
-        $opt_kind_cd    = $request->input("opt_kind_cd");   // 품목
-        $brand_nm       = $request->input("brand_nm");      // 브랜드 이름
-        $brand_cd       = $request->input("brand_cd");      // 브랜드
-        $ad_desc        = $request->input("ad_desc");       // 상/하단 홍보문구
-        $goods_nm       = $request->input("goods_nm");      // 상품명
-        $limit          = $request->input("limit",100);         // 출력수
-        $ord_field      = $request->input("ord_field");     // 정렬필드
-        $ord            = $request->input("ord");           // 정렬
-        $goods          = $request->input("goods");
+		$class          = $request->input("class");         // 분류
+		$goods_type     = $request->input("goods_type");    // 상품구분
+		$goods_stat     = $request->input("goods_stat");    // 상품 상태
+		$style_no       = $request->input("style_no");      // 스타일 넘버
+		$goods_no       = $request->input("goods_no");      // 상품번호
+		$opt_kind_cd    = $request->input("item");          // 품목
+		$brand_nm       = $request->input("brand_nm");      // 브랜드 이름
+		$brand_cd       = $request->input("brand_cd");      // 브랜드
+		$ad_desc		= $request->input("head_desc");		// 상/하단 홍보문구
+		$goods_nm       = $request->input("goods_nm");      // 상품명
+		$limit          = $request->input("limit", 100);	// 출력수
+		$ord_field      = $request->input("ord_field");     // 정렬필드
+		$ord            = $request->input("ord");           // 정렬
+		$goods          = $request->input("goods");
+		$oms_col        = explode(",", $request->input("omission_column")); // 미등록항목 컬럼 ex) 001,003,009
 
         $where = "";
         $insql = "";
@@ -82,7 +88,7 @@ class prd05Controller extends Controller
 		if($style_no != "")	$where .= " and g.style_no like '$style_no%' ";
 		if($goods_no != ""){
 			// 상품코드 검색
-			$goods_nos = split(",",$goods_no);
+			$goods_nos = explode(",",$goods_no);
 			if(count($goods_nos) > 1){
 				if(count($goods_nos) > 50) array_splice($goods_nos,50);
 				$in_goods_nos = join(",",$goods_nos);
@@ -94,10 +100,10 @@ class prd05Controller extends Controller
 
 		if($goods != ""){
 			// 파일로 검색일 경우
-			$goods_arr = split(",",$goods);
+			$goods_arr = explode(",",$goods);
 			for($i=0;$i<count($goods_arr);$i++){
 				if(empty($goods_arr[$i])) continue;
-				list($no,$sub) = split("\|",$goods_arr[$i]);
+				list($no,$sub) = explode("\|",$goods_arr[$i]);
 				if($insql == ""){
 					$insql .= " select '$no' as no,'$sub' as sub ";
 				}else{
@@ -107,7 +113,7 @@ class prd05Controller extends Controller
 			$insql = " inner join ( $insql ) sg on g.goods_no = sg.no and g.goods_sub = sg.sub ";
         }
 
-		if($com_id != "")				$where .= " and g.com_id = '$com_id' ";
+		if($com_id != "")			$where .= " and g.com_id = '$com_id' ";
 		if($opt_kind_cd != "")		$where .= " and g.opt_kind_cd = '$opt_kind_cd' ";
 		if($brand_cd != "")			$where .= " and g.brand = '$brand_cd' ";
 		if($goods_nm != "")			$where .= " and g.goods_nm like '%$goods_nm%' ";
@@ -122,7 +128,11 @@ class prd05Controller extends Controller
 			$where .= " and g.class = '$class' ";
 		}
 
-
+		foreach($oms_col as $col) {
+			if($col !== '') {
+				$where .= " and (class.item_$col = '' or class.item_$col is null) ";
+			}
+		}
 
         /*
 		for($i=1; $i<=20;$i++){
@@ -163,7 +173,7 @@ class prd05Controller extends Controller
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
         if($limit == -1) $sql_limit = "";
-       else $sql_limit = " limit ".$limit;
+		else $sql_limit = " limit $startno, $page_size ";
 
         $total = 0;
         $page_cnt = 0;
@@ -326,7 +336,6 @@ class prd05Controller extends Controller
         $class = $request->input("class");         // 선택된 데이타
         $to_class = $request->input("to_class");
         $goods = $request->input("data");
-        $com_id = Auth('partner')->user()->com_id;
         $a_data = explode("^EOL", $data);
         $goods_arrs = json_decode($goods, true);
         $goods_cnt = count($goods_arrs);
@@ -339,23 +348,12 @@ class prd05Controller extends Controller
         $goods_color_del_result = 0;
         $goods_color_in_result = 500;
 
-        /*
-        print_r($goods_arrs);
-        echo "<br>";
+		// 기존 코드에 품목 변경시 데이터 초기화 추가 및 버그 수정
+		$class_changed = ($class == $to_class) ? false : true;
+		$class = $to_class ? $to_class : "";
 
-        echo 'class : '. $class;
-        echo "<br>";
-        */
-        if($to_class != ""){
-            $class = $to_class;
-        }
-        /*
-        echo "class : ". $class;
-        echo "<br>";
-        */
-        //$cnt = 0;
-        $cc_query = "select * from code_class where class='$class'";
-        $code_class_rows = DB::select($cc_query);
+		$cc_query = "select * from code_class where class='$class'";
+		$code_class_rows = DB::select($cc_query);
 
         //echo count($code_class_rows);
 
@@ -371,28 +369,28 @@ class prd05Controller extends Controller
             $insert = [];
             $update = [];
 
-            $goods_no = $goods_arr['goods_no'];
-            $goods_sub = $goods_arr['goods_sub'];
-            $item_001		= (isset($goods_arr['item_001'])) ? $goods_arr['item_001']:"";
-            $item_002		= (isset($goods_arr['item_002'])) ? $goods_arr['item_002']:"";
-            $item_003		= (isset($goods_arr['item_003'])) ? $goods_arr['item_003']:"";
-            $item_004		= (isset($goods_arr['item_004'])) ? $goods_arr['item_004']:"";
-            $item_005		= (isset($goods_arr['item_005'])) ? $goods_arr['item_005']:"";
-            $item_006		= (isset($goods_arr['item_006'])) ? $goods_arr['item_006']:"";
-            $item_007		= (isset($goods_arr['item_007'])) ? $goods_arr['item_007']:"";
-            $item_008		= (isset($goods_arr['item_008'])) ? $goods_arr['item_008']:"";
-            $item_009		= (isset($goods_arr['item_009'])) ? $goods_arr['item_009']:"";
-            $item_010		= (isset($goods_arr['item_010'])) ? $goods_arr['item_010']:"";
-            $item_011		= (isset($goods_arr['item_011'])) ? $goods_arr['item_011']:"";
-            $item_012		= (isset($goods_arr['item_012'])) ? $goods_arr['item_012']:"";
-            $item_013		= (isset($goods_arr['item_013'])) ? $goods_arr['item_013']:"";
-            $item_014		= (isset($goods_arr['item_014'])) ? $goods_arr['item_014']:"";
-            $item_015		= (isset($goods_arr['item_015'])) ? $goods_arr['item_015']:"";
-            $item_016		= (isset($goods_arr['item_016'])) ? $goods_arr['item_016']:"";
-            $item_017		= (isset($goods_arr['item_017'])) ? $goods_arr['item_017']:"";
-            $item_018		= (isset($goods_arr['item_018'])) ? $goods_arr['item_018']:"";
-            $item_019		= (isset($goods_arr['item_019'])) ? $goods_arr['item_019']:"";
-            $item_020		= (isset($goods_arr['item_020'])) ? $goods_arr['item_020']:"";
+			$goods_no 		= $goods_arr['goods_no'];
+			$goods_sub 		= $goods_arr['goods_sub'];
+			$item_001		= (isset($goods_arr['item_001']) && !$class_changed) ? $goods_arr['item_001']:"";
+			$item_002		= (isset($goods_arr['item_002']) && !$class_changed) ? $goods_arr['item_002']:"";
+			$item_003		= (isset($goods_arr['item_003']) && !$class_changed) ? $goods_arr['item_003']:"";
+			$item_004		= (isset($goods_arr['item_004']) && !$class_changed) ? $goods_arr['item_004']:"";
+			$item_005		= (isset($goods_arr['item_005']) && !$class_changed) ? $goods_arr['item_005']:"";
+			$item_006		= (isset($goods_arr['item_006']) && !$class_changed) ? $goods_arr['item_006']:"";
+			$item_007		= (isset($goods_arr['item_007']) && !$class_changed) ? $goods_arr['item_007']:"";
+			$item_008		= (isset($goods_arr['item_008']) && !$class_changed) ? $goods_arr['item_008']:"";
+			$item_009		= (isset($goods_arr['item_009']) && !$class_changed) ? $goods_arr['item_009']:"";
+			$item_010		= (isset($goods_arr['item_010']) && !$class_changed) ? $goods_arr['item_010']:"";
+			$item_011		= (isset($goods_arr['item_011']) && !$class_changed) ? $goods_arr['item_011']:"";
+			$item_012		= (isset($goods_arr['item_012']) && !$class_changed) ? $goods_arr['item_012']:"";
+			$item_013		= (isset($goods_arr['item_013']) && !$class_changed) ? $goods_arr['item_013']:"";
+			$item_014		= (isset($goods_arr['item_014']) && !$class_changed) ? $goods_arr['item_014']:"";
+			$item_015		= (isset($goods_arr['item_015']) && !$class_changed) ? $goods_arr['item_015']:"";
+			$item_016		= (isset($goods_arr['item_016']) && !$class_changed) ? $goods_arr['item_016']:"";
+			$item_017		= (isset($goods_arr['item_017']) && !$class_changed) ? $goods_arr['item_017']:"";
+			$item_018		= (isset($goods_arr['item_018']) && !$class_changed) ? $goods_arr['item_018']:"";
+			$item_019		= (isset($goods_arr['item_019']) && !$class_changed) ? $goods_arr['item_019']:"";
+			$item_020		= (isset($goods_arr['item_020']) && !$class_changed) ? $goods_arr['item_020']:"";
 
 
             $query = "select count(*) as cnt from goods_class where goods_no='$goods_no' and goods_sub='$goods_sub' ";
@@ -523,14 +521,9 @@ class prd05Controller extends Controller
 
                 if($item == $num && $field != ""){
                     if($field != "color" && $field != "as_info"){
-                        if($goods_opt_arr[$k] != ""){
+                        if(@$goods_opt_arr[$k] != ""){
                         $goods_class_sql = $goods_class_sql .", ". $field. " = '". $goods_opt_arr[$k] ."'";
                         }
-                        /*
-                        echo "goods_class_sql : ".$goods_class_sql;
-                        echo "<Br>";
-                        */
-                        //
                     }
                 }
                 $goods_fields[$item] = $field;
@@ -664,10 +657,7 @@ class prd05Controller extends Controller
             $query = "";
             $val = explode("@@@",$goods_class_rows[$i]);
             $sql_cols = "";
-                /*
-            echo $i. " val : ". count($val);
-            echo "<br>";
-            */
+
             $goods_no		= (isset($val[0])) ? $val[0]:"";
             $goods_sub		= (isset($val[1])) ? $val[1]:"";
             //$com_id		= (isset($val[2])) ? Rq($val[2]):"";
@@ -804,7 +794,7 @@ class prd05Controller extends Controller
 		if($style_no != "")	$where .= " and g.style_no like '$style_no%' ";
 		if($goods_no != ""){
 			// 상품코드 검색
-			$goods_nos = split(",",$goods_no);
+			$goods_nos = explode(",",$goods_no);
 			if(count($goods_nos) > 1){
 				if(count($goods_nos) > 50) array_splice($goods_nos,50);
 				$in_goods_nos = join(",",$goods_nos);
@@ -816,10 +806,10 @@ class prd05Controller extends Controller
 
 		if($goods != ""){
 			// 파일로 검색일 경우
-			$goods_arr = split(",",$goods);
+			$goods_arr = explode(",",$goods);
 			for($i=0;$i<count($goods_arr);$i++){
 				if(empty($goods_arr[$i])) continue;
-				list($no,$sub) = split("\|",$goods_arr[$i]);
+				list($no,$sub) = explode("\|",$goods_arr[$i]);
 				if($insql == ""){
 					$insql .= " select '$no' as no,'$sub' as sub ";
 				}else{
@@ -941,11 +931,12 @@ class prd05Controller extends Controller
 
 
 
-
-    public function show($goods_no){
-        return view( Config::get('shop.partner.view') . '/product/prd01_show',
-            ['goods_no' => $goods_no]
-        );
-    }
+	/*
+		public function show($goods_no){
+			return view( Config::get('shop.partner.view') . '/product/prd01_show',
+				['goods_no' => $goods_no]
+			);
+		}
+	*/
 
 }

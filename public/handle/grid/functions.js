@@ -233,6 +233,7 @@ function StyleGoodsType(params){
 function StyleGoodsTypeNM(params){
     var state = {
         "위탁판매":"#F90000",
+        "위탁":"#F90000",
         "매입":"#009999",
         "해외":"#0000FF",
     }
@@ -469,6 +470,41 @@ function currency(obj) {
 
     com(obj);
 };
+
+/* grid selected cell delete & backspace key 클릭 시 내용 삭제 기능 관련 */
+function getDeleteCellColumnObject() {
+	return {
+		suppressKeyboardEvent: params => {
+			if (!params.editing) {
+				let isBackspaceKey = params.event.keyCode === 8;
+				let isDeleteKey = params.event.keyCode === 46;
+
+				if(isDeleteKey || isBackspaceKey){
+					params.api.getCellRanges().forEach(r => {
+						const editable_obj = r.columns.reduce((a,c) => ({...a, [c.colId]: c.userProvidedColDef.editable}), {});
+						let colIds = r.columns.map(col => col.colId);
+						let startRowIndex = Math.min(r.startRow.rowIndex, r.endRow.rowIndex);
+						let endRowIndex = Math.max(r.startRow.rowIndex, r.endRow.rowIndex);
+
+						let itemsToUpdate = [];
+
+						for (let i = startRowIndex; i <= endRowIndex; i++) {
+							let data = params.api.rowModel.rowsToDisplay[i].data;
+							colIds.forEach(column => {
+								if(editable_obj[column]) {
+									data[column] = "";
+								}
+							});
+							itemsToUpdate.push(data);
+						}
+						params.api.applyTransaction({ update: itemsToUpdate });
+					});
+				}
+			}
+			return false;
+		},
+	}
+}
 
 //멀티 셀렉트 박스2
 $(document).ready(function() {
