@@ -442,7 +442,6 @@
             }
 
             $('#file').val('');
-            target_file = null;
         });
 
         // 이미지 적용
