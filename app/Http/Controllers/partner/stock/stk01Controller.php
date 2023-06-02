@@ -32,6 +32,9 @@ class stk01Controller extends Controller
         $page = $request->input('page',1);
         if ($page < 1 or $page == "") $page = 1;
         $limit = $request->input('limit',100);
+		
+		$ord_field = $request->input('ord_field', 'a.goods_no');
+		$ord = $request->input('ord', 'desc');
 
         $goods_stat	    = $request->input("goods_stat");
         $style_no		= $request->input("style_no");
@@ -131,7 +134,7 @@ class stk01Controller extends Controller
           inner join code cd on cd.code_kind_cd = 'G_GOODS_TYPE' and a.goods_type = cd.code_id
           inner join code cd2 on cd2.code_kind_cd = 'G_IS_UNLIMITED' and a.is_unlimited = cd2.code_id
           inner join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd3.code_id
-          order by a.goods_no desc,a.goods_opt
+          order by $ord_field $ord, a.goods_opt
         ";
 
         $result = DB::select($query,["com_id" => $com_id]);

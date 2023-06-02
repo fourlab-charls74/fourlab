@@ -7,6 +7,9 @@
         color: #aaa;
         text-align: right;
     }
+	.ag-row-level-0 {
+		background-color: #ededed !important;
+	}
 </style>
 
     <div class="page_tit">
@@ -119,7 +122,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="search-area-ext d-none row">
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_stat">품목</label>
@@ -142,6 +145,37 @@
                                 </div>
                             </div>
                         </div>
+	                    <div class="col-lg-4 inner-td">
+		                    <div class="form-group">
+			                    <label for="name">자료/정렬순서</label>
+			                    <div class="form-inline">
+				                    <div class="form-inline-inner input_box" style="width:24%;">
+					                    <select name="limit" class="form-control form-control-sm">
+						                    <option value="100">100</option>
+						                    <option value="500">500</option>
+						                    <option value="1000">1000</option>
+						                    <option value="2000">2000</option>
+						                    <option value="-1">모두</option>
+					                    </select>
+				                    </div>
+				                    <span class="text_line">/</span>
+				                    <div class="form-inline-inner input_box" style="width:45%;">
+					                    <select name="ord_field" class="form-control form-control-sm">
+						                    <option value="a.goods_no">상품코드</option>
+						                    <option value="a.style_no">스타일넘버</option>
+					                    </select>
+				                    </div>
+				                    <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+					                    <div class="btn-group" role="group">
+						                    <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+						                    <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+					                    </div>
+					                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+					                    <input type="radio" name="ord" id="sort_asc" value="asc">
+				                    </div>
+			                    </div>
+		                    </div>
+	                    </div>
                     </div>
                 </div>
             </div>
@@ -153,27 +187,30 @@
     </form>
     <!-- DataTales Example -->
     <form method="post" name="save" action="/parnter/stock/stk01">
-        <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
+        <div id="filter-area" class="card shadow-none ty2 last-card">
             <div class="card-body">
                 <div class="card-title mb-3">
                     <div class="filter_wrap">
                         <div class="fl_box">
                             <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
                         </div>
-                        <div class="fr_box">
-							<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-								<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);">
+                        <div class="fr_box d-flex flex-column flex-sm-row justify-content-end">
+							<div class="custom-control custom-checkbox form-check-box" style="display:inline-block;">
+								<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
 								<label class="custom-control-label font-weight-light" for="grid_expand">항목펼쳐보기</label>
 							</div>
-                            <span>재고조정</span>
-                            <select id='reason' name='reason' class="form-control form-control-sm"  style='width:160px;display:inline'>
-                                <option value=''>선택</option>
-                                @foreach ($alter_reasons as $alter_reason)
-                                    <option value='{{ $alter_reason->code_id }}'>{{ $alter_reason->code_val }}</option>
-                                @endforeach
-                            </select>
-                            <input type="hidden" name="data" id="data" value=""/>
-                            <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>저장</a>
+	                        <span class="d-none d-sm-inline-block mx-2 text-secondary">|</span>
+	                        <div>
+	                            <span class="mr-1">재고조정</span>
+	                            <select id='reason' name='reason' class="form-control form-control-sm"  style='width:160px;display:inline'>
+	                                <option value=''>선택</option>
+	                                @foreach ($alter_reasons as $alter_reason)
+	                                    <option value='{{ $alter_reason->code_id }}'>{{ $alter_reason->code_val }}</option>
+	                                @endforeach
+	                            </select>
+	                            <input type="hidden" name="data" id="data" value=""/>
+	                            <a href="#" onclick="Save();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>저장</a>
+	                        </div>
                         </div>
                     </div>
                 </div>
@@ -205,16 +242,16 @@
 
     <script language="javascript">
 
-        var columns= [
-            {field:"opt_kind_nm" ,headerName:"품목", pinned:'left', width: 120, aggFunc: "first"},
-            {field:"brand_nm" ,headerName:"브랜드", pinned:'left', aggFunc: "first"},
+        const columns= [
+            {field:"opt_kind_nm" ,headerName:"품목", pinned:'left', width: 80, cellClass: 'hd-grid-code', aggFunc: "first"},
+            {field:"brand_nm" ,headerName:"브랜드", pinned:'left', width: 80, cellClass: 'hd-grid-code', aggFunc: "first"},
             {field:"goods_no" ,headerName:"상품코드", width:80, pinned:'left', rowGroup: true, hide: true},
-            {field:"style_no" ,headerName:"스타일넘버" , pinned:'left', aggFunc: "first"},
-            {field:"goods_type_nm",headerName:"상품구분", width:100, cellStyle:StyleGoodsTypeNM, pinned:'left', aggFunc: "first"},
-            {field:"is_unlimited_nm",headerName:"재고구분", width:80, pinned:'left', aggFunc: "first"},
-            {field:"sale_stat_cl_nm" ,headerName:"상태", width:100, cellStyle:StyleGoodsState, pinned:'left', aggFunc: "first"},
-            {field:"wonga" ,headerName:"원가", type: 'currencyType', aggFunc: "first"},
-            {field:"goods_nm" ,headerName:"상품명", width:400, 
+            {field:"style_no" ,headerName:"스타일넘버" , width: 80, cellClass: 'hd-grid-code', pinned:'left', aggFunc: "first"},
+            {field:"goods_type_nm",headerName:"상품구분", width: 70, cellStyle:StyleGoodsTypeNM, pinned:'left', aggFunc: "first"},
+            {field:"is_unlimited_nm",headerName:"재고구분", width: 70, cellClass: 'hd-grid-code', pinned:'left', aggFunc: "first"},
+            {field:"sale_stat_cl_nm" ,headerName:"상태", width: 80, cellStyle:StyleGoodsState, pinned:'left', aggFunc: "first"},
+            {field:"wonga" ,headerName:"원가", width: 80, type: 'currencyType', aggFunc: "first"},
+            {field:"goods_nm" ,headerName:"상품명", width: 400, 
                 cellRenderer: function (params) {
                     if (params.data !== undefined) {
                         return '<a href="#" onclick="return openProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
@@ -223,7 +260,7 @@
                     }
                 }
             },
-            {field:"goods_opt" ,headerName:"옵션", width:210,
+            {field:"goods_opt" ,headerName:"옵션", width: 200,
                 checkboxSelection:function(params){ return (params.data !== undefined && params.data.is_unlimited != 'Y')? true:false; },
                 cellRenderer: function(params) {
                     if (params.data !== undefined) {
@@ -248,8 +285,7 @@
             {field:"goods_no_hd",headerName:"goods_no",hide:true},
             {field:"goods_sub_hd",headerName:"goods_sub",hide:true},
             {field:"is_unlimited",headerName:"is_unlimited",hide:true},
-            {field:"",headerName:"", width: "auto"}
-
+            {width: "auto"}
         ];
 
         function EditQty(params){
@@ -278,12 +314,10 @@
         }
     </script>
     <script type="text/javascript" charset="utf-8">
-        const pApp = new App('',{
-            gridId:"#div-gd",
-        });
+        const pApp = new App('', { gridId:"#div-gd" });
         let gx;
 
-        const basic_autoGroupColumnDef = (headerName, width = 150) => ({
+        const basic_autoGroupColumnDef = (headerName, width = 120) => ({
             headerName: headerName,
             headerClass: 'bizest',
             minWidth: width,
@@ -293,7 +327,7 @@
         });
         
         $(document).ready(function() {
-            pApp.ResizeGrid(310);
+            pApp.ResizeGrid(275);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, 
@@ -305,6 +339,9 @@
                     animateRows: true,
                     suppressDragLeaveHidesColumns: true,
                     suppressMakeColumnVisibleAfterUnGroup: true,
+					isRowSelectable: (params) => {
+						return !!params.data;
+					},
                 }
             );
 
@@ -313,7 +350,9 @@
 
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/partner/stock/stk01/search', data,1 );
+            gx.Request('/partner/stock/stk01/search', data, 1, function (e) {
+				setAllRowGroupExpanded($("#grid_expand").is(":checked"));	
+            });
         }
     </script>
     <script type="text/javascript" charset="utf-8">
