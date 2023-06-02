@@ -89,10 +89,15 @@
             return false;
         }
 
-        if (!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file[0].name)) {
+		if (!/(.*?)\.(jpg|jpeg|JPG|JPEG|)$/i.test(target_file[0].name)) {
+			alert("jpg 파일만 업로드 가능합니다.");
+			return false;
+		}
+		
+        /*if (!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(target_file[0].name)) {
             alert("이미지 형식이 아닙니다.");
             return false;
-        }
+        }*/
 
         if (target_file[0].size > 10*1024*1024) {
             alert("10M 이상 파일은 업로드 하실 수 없습니다.");
