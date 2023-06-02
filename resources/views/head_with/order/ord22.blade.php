@@ -253,10 +253,16 @@
 						</div>
 					</div>
 
-					<div class="resul_btn_wrap d-sm-none">
-						<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn mr-1" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-						<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn mr-1" onclick="exportBaesongList()">배송 목록 받기</a>
-						<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn" onclick="deliveryInvDnView()">송장 목록 받기</a>
+					<div class="resul_btn_wrap d-sm-none mt-3">
+						<div class="d-flex justify-content-center mb-2">
+							<a href="javascript:void(0);" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+							<a href="javascript:void(0);" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary">검색조건 초기화</a>
+						</div>
+						<div class="d-flex justify-content-center">
+							<button type="button" onclick="exportBaesongList()" class="btn btn-sm btn-outline-primary shadow-sm mr-1" value="">배송목록 받기</button>
+							<button type="button" onclick="deliveryInvDnView()" class="btn btn-sm btn-outline-primary shadow-sm mr-1" value="">택배송장 목록 받기</button>
+							<div class="search_mode_wrap btn-group mb-0 mb-sm-0"></div>
+						</div>
 					</div>
 				</div>
 			</div>

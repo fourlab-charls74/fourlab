@@ -16,6 +16,7 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+						<a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary">검색조건 초기화</a>
 						<button type="button" onclick="exportBaesongList()" class="btn btn-sm btn-outline-primary shadow-sm" value="">배송목록 받기</button>
 						<button type="button" onclick="deliveryInvDnView()" class="btn btn-sm btn-outline-primary shadow-sm" value="">택배송장 목록 받기</button>
 
@@ -226,42 +227,25 @@
 								</div>
 							</div>
 						</div>
-						<!-- 업체 -->
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="name">업체</label>
-
-								<div class="form-inline inline_select_box">
-									<div class="form-inline-inner input-box w-25 pr-1">
-										<select id="com_type" name="com_type" class="form-control form-control-sm w-100">
-											<option value="">전체</option>
-											@foreach ($com_types as $com_type)
-												<option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
-											@endforeach
-										</select>
-									</div>
-									<div class="form-inline-inner input-box w-75">
-										<div class="form-inline inline_btn_box">
-											<input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
 					</div>
 
-					<div class="resul_btn_wrap d-sm-none">
-						<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn mr-1" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-						<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn mr-1" onclick="exportBaesongList()">배송 목록 받기</a>
-						<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn" onclick="deliveryInvDnView()">송장 목록 받기</a>
+					<div class="resul_btn_wrap d-sm-none mt-3">
+						<div class="d-flex justify-content-center mb-2">
+							<a href="javascript:void(0);" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+							<a href="javascript:void(0);" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary">검색조건 초기화</a>
+						</div>
+						<div class="d-flex justify-content-center">
+							<button type="button" onclick="exportBaesongList()" class="btn btn-sm btn-outline-primary shadow-sm mr-1" value="">배송목록 받기</button>
+							<button type="button" onclick="deliveryInvDnView()" class="btn btn-sm btn-outline-primary shadow-sm mr-1" value="">택배송장 목록 받기</button>
+							<div class="search_mode_wrap btn-group mb-0 mb-sm-0"></div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</form>
 	<!-- DataTales Example -->
-	<div id="filter-area" class="card shadow-none mb-4 search_cum_form ty2 last-card">
+	<div id="filter-area" class="card shadow-none search_cum_form ty2 last-card">
 		<div class="card-body shadow">
 			<div class="card-title">
 				<div class="filter_wrap">
@@ -302,68 +286,69 @@
 			  headerCheckboxSelection: true,
 			  checkboxSelection: true,
 			  headerCheckboxSelectionFilteredOnly: true,
-			  width: 50,
+			  width: 28,
 			  pinned:'left'
 			},
 			{
 				headerName: '#',
-				width:50,
+				width: 40,
 				maxWidth: 100,
 				// it is important to have node.id here, so that when the id changes (which happens
 				// when the row is loaded) then the cell is refreshed.
 				valueGetter: 'node.id',
 				cellRenderer: 'loadingRenderer',
+				cellClass: 'hd-grid-code',
 				pinned:'left'
 			},
-			{field:"dlv_series_nm" , headerName:"출고차수", pinned:'left'},
-			{field:"dlv_no" , headerName:"송장번호", pinned:'left', editable: true, cellStyle: {'background' : '#ffff99'} },
-			{field:"ord_type_nm" , headerName:"주문구분",pinned:'left'},
-			{field:"ord_kind_nm" , headerName:"출고구분",cellStyle:StyleOrdKind, pinned:'left'  },
-			{field:"user_nm" , headerName:"주문자",pinned:'left'  },
-			{field:"r_nm" , headerName:"수령자",pinned:'left'  },
-			{field:"ord_no" , headerName:"주문번호", width:170, cellStyle:StyleOrdNo, type:'OrderNoType',pinned:'left'},
-			{field:"ord_opt_no" , headerName:"주문일련번호",sortable:"true",
+			{field:"dlv_series_nm", headerName: "출고차수", width: 130, cellClass: 'hd-grid-code', pinned:'left'},
+			{field:"dlv_no", headerName:"송장번호", width: 130, pinned:'left', editable: true, cellStyle: {'background' : '#ffff99'}},
+			{field:"ord_type_nm", headerName:"주문구분", width: 60, cellClass: 'hd-grid-code', pinned:'left'},
+			{field:"ord_kind_nm", headerName:"출고구분", width: 60, cellStyle: StyleOrdKind, pinned:'left'},
+			{field:"user_nm", headerName:"주문자", width: 100, cellClass: 'hd-grid-code', pinned: 'left'},
+			{field:"r_nm", headerName:"수령자", width: 60, cellClass: 'hd-grid-code', pinned: 'left'},
+			{field:"ord_no", headerName:"주문번호", width: 140, cellStyle: StyleOrdNo, cellClass: 'hd-grid-code', type: 'OrderNoType', pinned: 'left'},
+			{field:"ord_opt_no", headerName:"주문일련번호", sortable: "true", width: 80, cellClass: 'hd-grid-code',
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         return '<a href="#" onclick="return openOrder(\'' + params.data.ord_no + '\',\'' + params.value +'\');">' + params.value + '</a>';
                     }
-                },pinned:'left'},
-			{field:"ord_state_nm" , headerName:"주문상태",cellStyle:StyleOrdState  },
-			{field:"pay_stat_nm" , headerName:"입금상태"  },
-			{field:"dlv_type" , headerName:"배송방식"  },
-			{field:"clm_state_nm" , headerName:"클레임상태",cellStyle:StyleClmState  },
-			{field:"goods_type_nm" , headerName:"상품구분",cellStyle:StyleGoodsType  },
-			{field:"style_no" , headerName:"스타일넘버"  },
-			{field:"img" , headerName:"이미지", type:"GoodsImageType", hide: true},
-			{field:"goods_nm" , headerName:"상품명",type:"GoodsNameType"},
-			{field:"opt_val" , headerName:"옵션"  },
-			{field:"sale_qty" , headerName:"주문수량", type: 'currencyType' },
-			{field:"qty" , headerName:"온라인재고"  , type: 'currencyType'},
+               },pinned:'left'},
+			{field:"ord_state_nm", headerName:"주문상태",cellStyle:StyleOrdState},
+			{field:"pay_stat_nm", headerName:"입금상태", width: 60, cellClass: 'hd-grid-code'},
+			{field:"dlv_type", headerName:"배송방식", width: 60, cellClass: 'hd-grid-code'},
+			{field:"clm_state_nm", headerName:"클레임상태", cellStyle: StyleClmState},
+			{field:"goods_type_nm", headerName:"상품구분", cellStyle: StyleGoodsTypeNM},
+			{field:"style_no", headerName:"스타일넘버", width: 80, cellClass: 'hd-grid-code'},
+			{field:"img", headerName:"이미지", type:"GoodsImageType", hide: true},
+			{field:"goods_nm", headerName:"상품명",type:"GoodsNameType", width: 200},
+			{field:"opt_val", headerName:"옵션", width: 150},
+			{field:"sale_qty", headerName:"주문수량", type: 'currencyType', width: 70},
+			{field:"qty", headerName:"온라인재고" , type: 'currencyType', width: 70},
 			// 보유재고 확인요망
-			{field:"wqty" , headerName:"보유재고"  , type: 'currencyType'},
-			{field:"price" , headerName:"판매가", type: 'currencyType'  },
-			{field:"sale_amt" , headerName:"쿠폰할인", type: 'currencyType'  },
-			{field:"gift" , headerName:"사은품"  },
-			{field:"dlv_amt" , headerName:"배송비", type: 'currencyType'  },
-			{field:"pay_type" , headerName:"결제방법"   },
-			{field:"r_zipcode" , headerName:"우편번호"   },
-			{field:"r_addr" , headerName:"주소"   },
-			{field:"r_phone" , headerName:"전화번호"   },
-			{field:"r_mobile" , headerName:"핸드폰"   },
-			{field:"r_jumin" , headerName:"수령자 주민번호"   },
-			{field:"dlv_msg" , headerName:"특이사항"   },
-			{field:"dlv_comment" , headerName:"출고메시지"   },
-			{field:"proc_state" , headerName:"처리현황"   },
-			{field:"proc_memo" , headerName:"메모"   },
-			{field:"sale_place" , headerName:"판매처"   },
-			{field:"out_ord_no" , headerName:"판매처주문번호"   },
-			{field:"com_nm" , headerName:"업체"   },
-			{field:"baesong_kind" , headerName:"배송구분"  },
-			{field:"ord_date" , headerName:"주문일시"},
-			{field:"pay_date" , headerName:"입금일시"},
-			{field:"dlv_proc_date" , headerName:"출고요청일시"},
-			{field:"dlv_end_date" , headerName:"배송일시"},
-			{field:"last_up_date" , headerName:"클레임일시"}
+			{field:"wqty", headerName:"보유재고" , type: 'currencyType', width: 70},
+			{field:"price", headerName:"판매가", type: 'currencyType', width: 70},
+			{field:"sale_amt", headerName:"쿠폰할인", type: 'currencyType', width: 70},
+			{field:"gift", headerName:"사은품"},
+			{field:"dlv_amt", headerName:"배송비", type: 'currencyType', width: 70},
+			{field:"pay_type", headerName:"결제방법", width: 80, cellClass: 'hd-grid-code'},
+			{field:"r_zipcode", headerName:"우편번호", width: 60, cellClass: 'hd-grid-code'},
+			{field:"r_addr", headerName:"주소", width: 200},
+			{field:"r_phone", headerName:"전화번호", width: 100, cellClass: 'hd-grid-code'},
+			{field:"r_mobile", headerName:"핸드폰", width: 100, cellClass: 'hd-grid-code'},
+			{field:"r_jumin", headerName:"수령자 주민번호", hide: true},
+			{field:"dlv_msg", headerName:"특이사항", width: 150},
+			{field:"dlv_comment", headerName:"출고메시지", width: 150},
+			{field:"proc_state", headerName:"처리현황", cellClass: 'hd-grid-code'},
+			{field:"proc_memo", headerName:"메모", width: 150},
+			{field:"sale_place", headerName:"판매처", width: 80, cellClass: 'hd-grid-code'},
+			{field:"out_ord_no", headerName:"판매처주문번호", width: 100, cellClass: 'hd-grid-code'},
+			{field:"com_nm", headerName:"업체", width: 80, cellClass: 'hd-grid-code'},
+			{field:"baesong_kind", headerName:"배송구분", width: 80, cellClass: 'hd-grid-code'},
+			{field:"ord_date", headerName:"주문일시", type: 'DateTimeType'},
+			{field:"pay_date", headerName:"입금일시", type: 'DateTimeType'},
+			{field:"dlv_proc_date", headerName:"출고요청일시", type: 'DateTimeType'},
+			{field:"dlv_end_date", headerName:"배송일시", type: 'DateTimeType'},
+			{field:"last_up_date", headerName:"클레임일시", type: 'DateTimeType'}
 		];
 
 		function numberWithCommas(x) {
@@ -375,9 +360,7 @@
 	</script>
 	<script type="text/javascript" charset="utf-8">
 
-		const pApp = new App('', {
-			gridId: "#div-gd",
-		});
+		const pApp = new App('', { gridId: "#div-gd", height: 265 });
 		const gridDiv = document.querySelector(pApp.options.gridId);
 		let gx;
 		$(document).ready(function () {
@@ -386,7 +369,7 @@
                     return node.data.ord_state < '30';
                 }
             });
-			pApp.ResizeGrid(300);
+			pApp.ResizeGrid(265);
 			pApp.BindSearchEnter();
 			Search();
 

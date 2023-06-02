@@ -578,7 +578,7 @@ class ord22Controller extends Controller
             $rows[] = $row;
         }
 
-        $this->set_excel_download("delivery_%s.xls");
+        $this->set_excel_download("택배송장목록_%s.xls");
 
         return view( Config::get('shop.partner.view') . '/order/ord22_pop_excel',[
             'rows' => $rows,
@@ -591,9 +591,9 @@ class ord22Controller extends Controller
 
         header("Content-type: application/vnd.ms-excel;charset=UTF-8");
         header("Content-Disposition: attachment; filename=$filename");
-        Header("Content-Transfer-Encoding: binary");
-        Header("Pragma: no-cache");
-        Header("Expires: 0");
+		header("Content-Transfer-Encoding: binary");
+		header("Pragma: no-cache");
+		header("Expires: 0");
 
     }
 
@@ -672,9 +672,10 @@ class ord22Controller extends Controller
         return [$where, $orderby];
     }
 
-    public function out_complete(Request $req) {
+    public function out_complete(Request $request) {
 
-        $com_id = Auth('partner')->user()->com_id;
+		$code 	= 200;
+		$msg 	= "모든 항목이 정상적으로 출고완료 처리되었습니다.";
 
         // 설정 값 얻기
         $conf = new Conf();
@@ -684,34 +685,36 @@ class ord22Controller extends Controller
         $cfg_sms_yn			= $conf->getValue($cfg_sms,"sms_yn");
         $cfg_delivery_yn	= $conf->getValue($cfg_sms,"delivery_yn");
         $cfg_delivery_msg	= $conf->getValue($cfg_sms,"delivery_msg");
-        $shop_phone =       $conf->getConfigValue("shop","phone");
-
+        $shop_phone 		= $conf->getConfigValue("shop","phone");
+		
         $user = [
-            'id'	=> $com_id,
+            'id'	=> Auth('partner')->user()->com_id,
             'name'	=> Auth('partner')->user()->com_nm
         ];
-        $order_nos		= Request("order_nos", array());
-        $dlv_cd			=  Request("dlv_cd", '');
-        $send_sms_yn	=  Request("send_sms_yn", 'N');
+        $order_nos		= $request->input("order_nos", array());
+        $dlv_cd			= $request->input("dlv_cd", '');
+        $send_sms_yn	= $request->input("send_sms_yn", 'N');
 
-        try {
-            // Start transaction
-            DB::beginTransaction();
-            foreach($order_nos as $order_data)
-            {
-                list($ord_no, $ord_opt_no, $dlv_no)	= explode(",", $order_data);
-                $dlv_nm = SLib::getCodesValue('DELIVERY',$dlv_cd);
-                if($dlv_nm === "") $dlv_nm = $dlv_cd;
+		$failed = [];
 
-                $order	= new Order($user);
-                $order->SetOrdOptNo($ord_opt_no, $ord_no);
+		foreach ($order_nos as $order_data) {
+			list ($ord_no, $ord_opt_no, $dlv_no) = explode(",", $order_data);
+			
+			try {
+				DB::beginTransaction();
 
-                // 중복 방지 상태 점검
-                $check_state	= $order->CheckState("30");
+				$dlv_nm = SLib::getCodesValue('DELIVERY', $dlv_cd);
+				if ($dlv_nm === "") $dlv_nm = $dlv_cd;
 
-                if( !$check_state ) {
-                    throw new Exception("선택하신 주문 중 이미 출고된 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.");
-                }
+				$order = new Order($user);
+				$order->SetOrdOptNo($ord_opt_no, $ord_no);
+
+				// 중복 방지 상태 점검
+				$check_state = $order->CheckState("30");
+
+				if (!$check_state) {
+					throw new Exception("선택하신 주문 중 이미 출고된 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.");
+				}
 
                 /*******************************************************
                  * 주문상태 로그
@@ -733,54 +736,52 @@ class ord22Controller extends Controller
                 ################################################################
                 // 보유재고 차감 로직 추가
 
-                $sql	= /** @lang text */
-                    "
-					select qty, goods_no, goods_sub, goods_opt
+				$sql = "
+					select qty
+					     , goods_no
+					     , goods_sub
+					     , goods_opt
 					from order_opt
-					where ord_opt_no = '$ord_opt_no'
+					where ord_opt_no = :ord_opt_no
 				";
-                $opt	= DB::selectOne($sql);
-                $_qty	= $opt->qty;
-
-                $_goods_no	= $opt->goods_no;
-                $_goods_sub	= $opt->goods_sub;
-                $_goods_opt	= $opt->goods_opt;
+				$opt = DB::selectOne($sql, [ 'ord_opt_no' => $ord_opt_no ]);
+				
+				$_qty 		= $opt->qty;
+				$_goods_no	= $opt->goods_no;
+				$_goods_sub	= $opt->goods_sub;
+				$_goods_opt	= $opt->goods_opt;
 
                 $prd = new Product($user);
 
-                // 재고 차감 처리
-                $stocks = $ret = $prd->Minus( array(
-                    "type"			=> $type=2,
-                    "etc" 			=> $etc="",
-                    "qty" 			=> $_qty,
-                    "goods_no"		=> $_goods_no,
-                    "goods_sub"		=> $_goods_sub,
-                    "goods_opt"		=> $_goods_opt,
-                    "ord_no"		=> $ord_no,
-                    "ord_opt_no"	=> $ord_opt_no
-                ));
+				// 재고 차감 처리
+				$stocks = $ret = $prd->Minus([
+					"type"			=> $type = 2,
+					"etc" 			=> "배송출고처리",
+					"qty" 			=> $_qty,
+					"goods_no"		=> $_goods_no,
+					"goods_sub"		=> $_goods_sub,
+					"goods_opt"		=> $_goods_opt,
+					"ord_no"		=> $ord_no,
+					"ord_opt_no"	=> $ord_opt_no,
+				]);
 
-                if( count($stocks) > 0 )
-                {
-                    // 추가옵션에 대한 재고 차감
-                    $sql	= /** @lang text */
-                        "
+				if (count($stocks) > 0) {
+					// 추가옵션에 대한 재고 차감
+					$sql = "
 						select addopt_idx, addopt_qty
 						from order_opt_addopt
-						where ord_opt_no = '$ord_opt_no'
+						where ord_opt_no = :ord_opt_no
 					";
-                    $rows = DB::select($sql);
+					$rows = DB::select($sql, [ 'ord_opt_no' => $ord_opt_no ]);
 
-                    foreach($rows as $row)
-                    {
-                        $_addopt_idx	= $row->addopt_idx;
-                        $_addopt_qty	= $row->addopt_qty;
+					foreach ($rows as $row) {
+						$_addopt_idx = $row->addopt_idx;
+						$_addopt_qty = $row->addopt_qty;
 
-                        $sql2	= /** @lang text */
-                            "
-						update options set
-							wqty = wqty - $_addopt_qty
-						where no = '$_addopt_idx'
+						$sql2 = "
+							update` options set
+								wqty = wqty - $_addopt_qty
+							where `no = '$_addopt_idx'
 						";
                         DB::update($sql2);
                     }
@@ -789,141 +790,129 @@ class ord22Controller extends Controller
                     // 에스크로 결제 여부 검사
                     $is_escrow = $order->IsEscrowOrder();
 
-                    if( $is_escrow )
-                    {
-                        // 거래번호 얻기
-                        $sql	= "select tno from payment where ord_no = '$ord_no' ";
-                        $row	= DB::selectOne($sql);
-                        $tno	= $row->tno;
+					if ($is_escrow) {
+						// 거래번호 얻기
+						$sql = "select tno from payment where ord_no = :ord_no ";
+						$row = DB::selectOne($sql, [ 'ord_no' => $ord_no ]);
+						$tno = $row->tno;
 
-                        // Parameters
-                        $ip		= $_SERVER["REMOTE_ADDR"];
-                        $memo	= "배송 시작 요청";
-                        $a_param	= array( "deli_numb" => $dlv_no, "deli_corp" => $dlv_nm );
+						// Parameters
+						$ip			= $_SERVER["REMOTE_ADDR"];
+						$memo		= "배송 시작 요청";
+						$a_param	= [ "deli_numb" => $dlv_no, "deli_corp" => $dlv_nm ];
 
-                        // 배송요청 시작
-                        $pg	= new pay();
-                        list( $res_cd, $res_msg ) = $pg->mod_escrow("STE1", $tno, $ord_no, $ip, $memo, $a_param);
+						// 배송요청 시작
+						$pg	= new pay();
+						list ($res_cd, $res_msg) = $pg->mod_escrow("STE1", $tno, $ord_no, $ip, $memo, $a_param);
 
-                        // 클레임 메모 등록
-                        $param = array(
-                            "ord_state"	=> 30,
-                            "clm_state"	=> 30,
-                            "cs_form"	=> 10,
-                            "memo"		=> $msg = "[에스크로] 배송시작[ $dlv_nm ($dlv_no) ] - $res_msg [$res_cd]",
-                        );
-                        $claim	= new Claim($user);
-                        $claim->SetOrdOptNo( $ord_opt_no );
-                        $claim->SetClmNo("");
-                        $memo_no = $claim->InsertMessage( $param );
-                    }
+						// 클레임 메모 등록
+						$param = [
+							"ord_state"	=> 30,
+							"clm_state"	=> 30,
+							"cs_form"	=> 10,
+							"memo"		=> $msg = "[에스크로] 배송시작[ $dlv_nm ($dlv_no) ] - $res_msg [$res_cd]",
+						];
+						$claim = new Claim($user);
+						$claim->SetOrdOptNo($ord_opt_no);
+						$claim->SetClmNo("");
+						$memo_no = $claim->InsertMessage($param);
+					}
 
-                    /*******************************************************
-                     * 사은품 지급 :
-                     *******************************************************/
+					/*******************************************************
+					 * 사은품 지급 :
+					 *******************************************************/
 
-                    //Gift Class
-                    //$gift = new Gift($user);
-                    $gift = new Gift();
+					$gift = new Gift();
 
-                    $sql = "
+					$sql = "
 						select no
 						from order_gift
-						where ord_no = '$ord_no' and ord_opt_no = '$ord_opt_no'
+						where ord_no = :ord_no and ord_opt_no = :ord_opt_no
 					";
-                    $gifts = DB::select($sql);
+					$gifts = DB::select($sql, [ 'ord_no' => $ord_no, 'ord_opt_no' => $ord_opt_no ]);
 
-                    foreach( $gifts as $g_row )
-                    {
-                        $order_gift_no	= $g_row->no;
-                        if( $order_gift_no != "" )
-                        {
-                            $gift->GiveGift($order_gift_no);
-                        }
-                    }
+					foreach ($gifts as $g_row) {
+						$order_gift_no = $g_row->no;
+						if ($order_gift_no != "") {
+							$gift->GiveGift($order_gift_no);
+						}
+					}
 
-                    $msg_yn  = "N";
+					$msg_yn = "N";
 
-                    if( $send_sms_yn != "N" ){
-                        if( $cfg_sms_yn == "Y" && $cfg_delivery_yn == "Y" ){
-
-                            $sql = /** @lang text */
-                                "
-								select
-									b.user_nm, b.mobile, a.goods_nm,
-									( select count(*) from delivery_import where dlv_cd = a.dlv_cd and dlv_no = a.dlv_no and msg_yn = 'Y' ) as msg_cnt
+					if ($send_sms_yn != "N") {
+						if ($cfg_sms_yn == "Y" && $cfg_delivery_yn == "Y") {
+							$sql = "
+								select 
+								    b.user_nm
+								    , b.mobile
+								    , a.goods_nm
+									, (select count(*) from delivery_import where dlv_cd = a.dlv_cd and dlv_no = a.dlv_no and msg_yn = 'Y') as msg_cnt
 								from order_opt a
 									 inner join order_mst b on a.ord_no = b.ord_no
-								where ord_opt_no = '$ord_opt_no'
+								where ord_opt_no = :ord_opt_no
 								      and ( select count(*) from delivery_import where dlv_cd = a.dlv_cd and dlv_no = a.dlv_no and msg_yn = 'Y' ) = 0
 							";
-                            $opt = DB::selectone($sql);
-                            if ( !empty($opt->user_nm) )
-                            {
-                                $user_nm	= $opt->user_nm;
-                                $mobile		= $opt->mobile;
-                                $goods_nm	= mb_substr($opt->goods_nm, 0, 10);
+							$opt = DB::selectone($sql, [ 'ord_opt_no' => $ord_opt_no ]);
+							
+							if (!empty($opt->user_nm)) {
+								$user_nm	= $opt->user_nm;
+								$mobile		= $opt->mobile;
+								$goods_nm	= mb_substr($opt->goods_nm, 0, 10);
 
-                                $sms = new SMS( $user );
-                                $sms_msg = sprintf("[%s]%s..발송완료 %s(%s)",$cfg_shop_name, $goods_nm, $dlv_nm, $dlv_no);
+								$sms = new SMS($user);
+								$sms_msg = sprintf("[%s]%s..발송완료 %s(%s)", $cfg_shop_name, $goods_nm, $dlv_nm, $dlv_no);
 
-                                if($cfg_kakao_yn == "Y"){
-                                    $template_code = "OrderCode6";
-                                    $msgarr = array(
-                                        "SHOP_NAME" => $cfg_shop_name,
-                                        "GOODS_NAME" => $goods_nm,
-                                        "DELIVERY_NAME" => $dlv_nm,
-                                        "DELIVERY_NO" => $dlv_no,
-                                        "USER_NAME"	=> $user_nm,
-                                        "ORDER_NO"	=> $ord_no,
-                                        "SHOP_URL"	=> 'http://www.doortodoor.co.kr/jsp/cmn/Tracking.jsp?QueryType=3&pTdNo='.$dlv_no
-                                    );
-                                    $btnarr = array(
-                                        "BUTTON_TYPE" => '1',
-                                        "BUTTON_INFO" => '배송 조회하기^DS^http://www.doortodoor.co.kr/jsp/cmn/Tracking.jsp?QueryType=3&pTdNo='.$dlv_no
-                                    );
-                                    $sms->SendKakao( $template_code, $mobile, $user_nm, $sms_msg, $msgarr, '', $btnarr);
-                                } else {
-                                    if($mobile != ""){
-                                        $sms->Send( $sms_msg, $mobile, $user_nm,$shop_phone);
-                                        $msg_yn  = "Y";
-                                    }
-                                }
-                            }
-                        }
-                    }
+								if ($cfg_kakao_yn == "Y") {
+									// $template_code = "OrderCode6";
+									// $msgarr = array(
+									// 	"SHOP_NAME" => $cfg_shop_name,
+									// 	"GOODS_NAME" => $goods_nm,
+									// 	"DELIVERY_NAME" => $dlv_nm,
+									// 	"DELIVERY_NO" => $dlv_no,
+									// 	"USER_NAME"	=> $user_nm,
+									// 	"ORDER_NO"	=> $ord_no,
+									// 	"SHOP_URL"	=> 'http://www.doortodoor.co.kr/jsp/cmn/Tracking.jsp?QueryType=3&pTdNo='.$dlv_no
+									// );
+									// $btnarr = array(
+									// 	"BUTTON_TYPE" => '1',
+									// 	"BUTTON_INFO" => '배송 조회하기^DS^http://www.doortodoor.co.kr/jsp/cmn/Tracking.jsp?QueryType=3&pTdNo='.$dlv_no
+									// );
+									// $sms->SendKakao( $template_code, $mobile, $user_nm, $sms_msg, $msgarr, '', $btnarr);
+								} else {
+									if ($mobile != "") {
+										$sms->Send($sms_msg, $mobile, $user_nm, $shop_phone);
+										$msg_yn = "Y";
+									}
+								}
+							}
+						}
+					}
 
-                    DB::table("delivery_import")
-                        ->where("com_id",$com_id)
-                        ->where("admin_id",$user['id'])
-                        ->where("ord_opt_no",'$ord_opt_no')
-                        ->update([
-                            'dlv_yn' =>'Y',
-                            'msg_yn' => $msg_yn,
-                            'rt' => DB::raw("now()")
-                        ]);
-                }
-                else
-                {
-                    throw new Exception("선택하신 주문 중 이미 출고된 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.");
-                }
-            }
+					DB::table("delivery_import")
+						->where("com_id", $user['id'])
+						->where("admin_id", $user['id'])
+						->where("ord_opt_no", '$ord_opt_no')
+						->update([
+							'dlv_yn' => 'Y',
+							'msg_yn' => $msg_yn,
+							'rt' 	 => DB::raw("now()")
+						]);
+				} else {
+					throw new Exception("재고없음");
+					// throw new Exception("선택하신 주문 중 재고가 없는 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.[ord_no:" . $ord_no . ", ord_opt_no:" . $ord_opt_no . "]");
+				}
+				
+				DB::commit();
+			} catch (Exception $e) {
+				DB::rollBack();
+				$code = 206;
+				$msg = "선택하신 주문 중 재고가 없는 주문건이 있습니다. 처리 실패한 항목은 다시 처리해주세요.";
+				array_push($failed, $ord_opt_no);
+			}
+		}
 
-            // Finish transaction
-            DB::commit();
-
-            $code = "200";
-            $msg = "";
-
-        } catch(Exception $e) {
-            DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            "code" => $code,
-            "msg" => $msg
-        ]);
+		return response()->json([ 'code' => $code, 'msg' => $msg, 'body' => [ 'failed' => $failed ] ]);
     }
 
     private function get_is_not_use_date(Request $request) {

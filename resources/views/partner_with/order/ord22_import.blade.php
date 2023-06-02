@@ -76,7 +76,7 @@
 		</div>
 	</form>
 		<!-- DataTales Example -->
-		<div class="card shadow-none mb-4 ty2 last-card">
+		<div class="card shadow-none ty2 last-card">
 			<div class="card-body m-0 brtn">
 				<div class="card-title">
 					<div class="filter_wrap">
@@ -89,7 +89,7 @@
 					</div>
 				</div>
 				<div class="table-responsive">
-					<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+					<div id="div-gd" style="height:calc(100vh - 365px);width:100%;" class="ag-theme-balham"></div>
 				</div>
 			</div>
 		</div>
@@ -102,7 +102,7 @@
 					headerName: '',
 					headerCheckboxSelection: true,
 					headerCheckboxSelectionFilteredOnly: true,
-					width: 50,
+					width: 28,
 					checkboxSelection: function(params) {
 						return params.data.chk != 2;
 					},
@@ -113,23 +113,27 @@
 				},
 				{
 					headerName: '#',
-					width:50,
+					width:40,
 					maxWidth: 100,
 					valueGetter: 'node.id',
 					cellRenderer: 'loadingRenderer',
+					cellClass: 'hd-grid-code',
 				},
-				{field:"msg" , headerName:"내용"},
-				{field:"ord_opt_no" , headerName:"주문일련번호"},
-				{field:"dlv_cd_nm" , headerName:"택배사"  },
-				{field:"dlv_no" , headerName:"송장번호"  },
-				{field:"ord_no" , headerName:"주문번호"},
-				{field:"ord_state_nm" , headerName:"주문상태"  },
-				{field:"clm_state_nm" , headerName:"클레임상태"},
-				{field:"ord_kind_nm" , headerName:"출고구분"  },
-				{field:"dlv_series_nm" , headerName:"출고차수"  },
-				{field:"goods_nm" , headerName:"상품명"  },
-				{field:"goods_opt" , headerName:"옵션"  },
-				{field:"qty" , headerName:"수량"  }
+				{ field: "msg", headerName: "내용", width: 70, cellClass: 'hd-grid-code',
+					cellStyle: (params) => ({ 'color': params.value === '성공' ? '#66aa00' : params.value === '실패' ? '#ff4444' : 'inherit' }),
+				},
+				{ field: "ord_opt_no", headerName: "주문일련번호", width: 75, cellClass: 'hd-grid-code' },
+				{ field: "dlv_no", headerName: "송장번호", width: 130, cellClass: 'hd-grid-code' },
+				{ field: "dlv_cd_nm", headerName: "택배사", width: 70, cellClass: 'hd-grid-code' },
+				{ field: "ord_no", headerName: "주문번호", width: 140, cellClass: 'hd-grid-code' },
+				{ field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState },
+				{ field: "clm_state_nm", headerName: "클레임상태", width: 70, cellStyle: StyleClmState },
+				{ field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind },
+				{ field: "dlv_series_nm", headerName: "출고차수", width: 130, cellClass: 'hd-grid-code' },
+				{ field: "goods_nm", headerName: "상품명", width: 150 },
+				{ field: "goods_opt", headerName: "옵션", width: 100 },
+				{ field: "qty", headerName: "수량", width: 50, type: 'numberType' },
+				{ width: "auto" }
 		];
 
 </script>
@@ -147,7 +151,6 @@ $(document).ready(function () {
 		return params.data.chk != 2;
 	}
 
-	pApp.ResizeGrid();
 	Search();
 });
 
@@ -245,7 +248,7 @@ $(".out-complate-btn").click(function()
 		$.ajax({
 			async: true,
 			type: 'put',
-			url: '/partner/order/ord22/out-complate',
+			url: '/partner/order/ord22/out-complete',
 			data: {
 				"order_nos[]" : orderNos,
 				ord_state : 30,
@@ -253,8 +256,22 @@ $(".out-complate-btn").click(function()
 				send_sms_yn : $("[name=snd_sms_yn]:checked").val()
 			},
 			success: function (data) {
-				alert("출고완료 상태로 변경되었습니다.");
-				Search();
+				if(data.code === 200) {
+					gx.gridOptions.api.forEachNode(function(node) {
+						if(node.selected) {
+							node.setDataValue('msg', '성공');
+						}
+					});
+				} else if(data.code === 206) {
+					gx.gridOptions.api.forEachNode(function(node) {
+						if(node.selected) {
+							let result = data.body.failed.includes(node.data.ord_opt_no.toString()) ? '실패' : '성공';
+							node.setDataValue('msg', result);
+						}
+					});
+				}
+				alert(data.msg);
+				window.opener.Search();
 			},
 			error: function(request, status, error) {
 				const msg = request.responseJSON.msg;

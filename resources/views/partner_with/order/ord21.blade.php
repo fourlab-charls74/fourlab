@@ -226,7 +226,7 @@
         </div>
     </form>
     <!-- DataTales Example -->
-    <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
+    <div id="filter-area" class="card shadow-none ty2 last-card">
         <div class="card-body shadow">
             <div class="card-title">
                 <div class="filter_wrap">
@@ -271,37 +271,38 @@
               headerName: '',
               headerCheckboxSelection: true,
               checkboxSelection: true,
-              width:50
+              width: 28
             },
             {
                 headerName: '#',
-                width:50,
+                width: 40,
                 maxWidth: 100,
                 // it is important to have node.id here, so that when the id changes (which happens
                 // when the row is loaded) then the cell is refreshed.
                 valueGetter: 'node.id',
                 cellRenderer: 'loadingRenderer',
+	            cellClass: 'hd-grid-code',
             },
-            {field:"ord_type_nm" , headerName:"주문구분"  },
+            {field: "ord_type_nm", headerName: "주문구분", cellClass: 'hd-grid-code'},
             {
               field:"ord_kind_nm",
               headerName:"출고구분",
               cellStyle:StyleOrdKind
             },
-            {field:"ord_no" , headerName:"주문번호", width:170, cellStyle:StyleOrdNo, type:'OrderNoType'},
-            {field:"ord_opt_no" , headerName:"주문일련번호",sortable:"ture",
+            {field: "ord_no", headerName: "주문번호", width: 140, cellStyle: StyleOrdNo, type: 'OrderNoType', cellClass: 'hd-grid-code'},
+            {field: "ord_opt_no", headerName: "주문일련번호", sortable: "ture", width: 75, cellClass: 'hd-grid-code',
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         return '<a href="/partner/order/ord01/"' + params.data.ord_opt_no + '" rel="noopener">' + params.value + '</a>';
                     }
                 }
             },
-            {field:"ord_state_nm" , headerName:"주문상태",cellStyle:StyleOrdState  },
-            {field:"pay_stat_nm" , headerName:"입금상태"},
-            {field:"clm_state_nm" , headerName:"클레임상태",cellStyle:StyleClmState  },
-            {field:"goods_type_nm" , headerName:"상품구분",cellStyle:StyleGoodsType  },
-            {field:"style_no" , headerName:"스타일넘버"  },
-            {field:"goods_nm" , headerName:"상품명",type:"GoodsNameType"},
+            {field: "ord_state_nm", headerName: "주문상태", cellStyle: StyleOrdState},
+            {field: "pay_stat_nm", headerName: "입금상태", cellClass: 'hd-grid-code'},
+            {field: "clm_state_nm", headerName: "클레임상태", cellStyle: StyleClmState},
+            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsTypeNM},
+            {field: "style_no", headerName: "스타일넘버", width: 70, cellClass: 'hd-grid-code'},
+            {field: "goods_nm", headerName: "상품명", type: "GoodsNameType", width: 200},
             {
               field:"img" ,
               headerName:"이미지", width:80,
@@ -312,15 +313,15 @@
                   }
               }
             },
-            {field:"opt_val" , headerName:"옵션"  },
-            {field:"sale_qty" , headerName:"주문수량"  },
-            {field:"qty", headerName:"온라인재고",
+            {field: "opt_val", headerName: "옵션", width: 150},
+            {field: "sale_qty", headerName: "주문수량", type: "numberType", width: 60},
+            {field: "qty", headerName: "온라인재고", width: 70, type: "numberType",
                 cellRenderer: (params) => {
-				    return '<a href="#" onclick="return openStock(' + params.data.goods_no + ',\'' + params.data.opt_val +'\');">' + params.value + '</a>';
+				    return '<a href="#" onclick="return openStock(' + params.data.goods_no + ',\'' + params.data.opt_val +'\');">' + Comma(params.value) + '</a>';
 			    }
             },
-            {field:"user_nm" , headerName:"주문자(아이디)"  },
-            {field:"r_nm" , headerName:"수령자"  },
+            {field:"user_nm", headerName: "주문자(아이디)", cellClass: 'hd-grid-code'},
+            {field:"r_nm", headerName: "수령자", cellClass: 'hd-grid-code'},
             {field:"price" , headerName:"판매가", type: 'currencyType'  },
             {field:"sale_amt" , headerName:"쿠폰/할인", type: 'currencyType'  },
             {field:"gift" , headerName:"사은품"  },
@@ -350,10 +351,10 @@
             //출고요청이라 택배업체, 송장번호는 필요없다고 판단되었습니다.
             // {field:"dlv_nm" , headerName:"택배업체"  },
             // {field:"dlv_no" , headerName:"송장번호"  },
-            {field:"ord_date" , headerName:"주문일시"},
-            {field:"pay_date" , headerName:"입금일시"},
+            {field: "ord_date", headerName: "주문일시", type: 'DateTimeType'},
+            {field: "pay_date", headerName: "입금일시", type: 'DateTimeType'},
             // {field:"dlv_end_date" , headerName:"배송일시"},
-            {field:"last_up_date" , headerName:"클레임일시"},
+            {field: "last_up_date", headerName: "클레임일시", type: 'DateTimeType'},
             {field:"goods_no", headerName:"goods_no",hide:true },
             {field:"goods_sub", headerName:"goods_sub",hide:true },
             {field:"img", headerName:"goods_img",hide:true },
@@ -361,7 +362,7 @@
             {field:"level", headerName:"level",hide:true },
             {field:"sms_name", headerName:"order_name",hide:true  },
             {field:"sms_mobile", headerName:"order_mobile",hide:true  },
-            {headerName: "", field: "nvl"}
+            {width: "auto"}
         ];
 
 
@@ -376,9 +377,7 @@
     </script>
     <script type="text/javascript" charset="utf-8">
 
-        const pApp = new App('', {
-            gridId: "#div-gd",
-        });
+        const pApp = new App('', { gridId: "#div-gd", height: 265 });
         const gridDiv = document.querySelector(pApp.options.gridId);
         let gx;
         $(document).ready(function () {
@@ -387,7 +386,7 @@
                     return node.data.ord_state < '30';
                 }
             });
-            pApp.ResizeGrid(300);
+            pApp.ResizeGrid(265);
             Search();
 
             $('.search-all').keyup(function(){
