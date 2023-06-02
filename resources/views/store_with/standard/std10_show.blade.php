@@ -1,13 +1,13 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','코드 상세')
+@section('title','사이즈관리 상세')
 @section('content')
     <div class="show_layout py-3 px-sm-3">
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
-                <h3 class="d-inline-flex">코드</h3>
+                <h3 class="d-inline-flex">사이즈관리</h3>
                 <div class="d-inline-flex location">
                     <span class="home"></span>
-                    <span>/ 코드 - {{ $code }}</span>
+                    <span>/ 사이즈 - {{ $code }}</span>
                 </div>
             </div>
         </div>
@@ -16,7 +16,7 @@
             <div class="card_wrap aco_card_wrap">
                 <div class="card shadow">
                     <div class="card-header mb-0">
-                        <a href="#">코드상세</a>
+                        <a href="#">상세</a>
                     </div>
                     <div class="card-body mt-1">
                         <div class="row_wrap">
@@ -29,26 +29,18 @@
                                             </colgroup>
                                             <tbody>
                                             <tr>
-                                                <th>구분</th>
+                                                <th>사이즈구분</th>
                                                 <td>
                                                     <div class="input_box">
-                                                        <input type='text' class="form-control form-control-sm search-all" name='code_kind_cd' id='code_kind_cd' value='{{@$data_code_kind->code_kind_cd}}'>
+                                                        <input type='text' class="form-control form-control-sm search-all" name='size_kind_cd' id='size_kind_cd' value='{{@$data_size_kind->size_kind_cd}}'>
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>코드명</th>
+                                                <th>사이즈구분명</th>
                                                 <td>
                                                     <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='code_kind_nm' id="code_kind_nm" value='{{@$data_code_kind->code_kind_nm}}'>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>영문명</th>
-                                                <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='code_kind_nm_eng' id="code_kind_nm_eng" value='{{@$data_code_kind->code_kind_nm_eng}}'>
+                                                        <input type='text' class="form-control form-control-sm search-enter" name='size_kind_nm' id="size_kind_nm" value='{{@$data_size_kind->size_kind_nm}}'>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -57,11 +49,11 @@
                                                 <td>
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$data_code_kind->use_yn != 'N') checked @endif />
+                                                            <input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$data_size_kind->use_yn != 'N') checked @endif />
                                                             <label class="custom-control-label" for="use_y">사용</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="N" @if(@$data_code_kind->use_yn == 'N') checked @endif />
+                                                            <input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="N" @if(@$data_size_kind->use_yn == 'N') checked @endif />
                                                             <label class="custom-control-label" for="use_n">미사용</label>
                                                         </div>
                                                     </div>
@@ -78,7 +70,7 @@
                 @if ($code !== '')
                 <div class="card">
                     <div class="card-header mb-0">
-                        <a href="#">코드정보</a>
+                        <a href="#">사이즈정보</a>
                     </div>
                     <div class="card-body pt-2">
                         <div class="card-title">
@@ -88,10 +80,10 @@
                                 </div>
                                 <div class="fr_box">
                                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">코드추가</span></a>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">코드저장</span></a>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataMod();"><span class="fs-12">코드수정</span></a>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">코드삭제</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">사이즈추가</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">사이즈저장</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataMod();"><span class="fs-12">사이즈수정</span></a>
+                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">사이즈삭제</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeSeq();"><span class="fs-12">순서변경</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeYN();"><span class="fs-12">사용여부변경</span></a>
                                 </div>
@@ -122,21 +114,15 @@
          */
         function Save() {
 
-            if ($('#code_kind_cd').val() === '') {
-                $('#code_kind_cd').focus();
-                alert('구분을 선택해주세요.');
+            if ($('#size_kind_cd').val() === '') {
+                $('#size_kind_cd').focus();
+                alert('사이즈구분을 선택해주세요.');
                 return false;
             }
 
-            if ($('#code_kind_nm').val() === '') {
-                $('#code_kind_nm').focus();
-                alert('코드명을 입력해 주세요.');
-                return false;
-            }
-
-            if ($('#code_kind_nm_eng').val() === '') {
-                $('#code_kind_nm_eng').focus();
-                alert('영문명을 입력해 주세요.');
+            if ($('#size_kind_nm').val() === '') {
+                $('#size_kind_nm').focus();
+                alert('사이즈구분명을 입력해 주세요.');
                 return false;
             }
 
@@ -145,12 +131,11 @@
             }
 
             var frm = $('form');
-            //console.log(frm.serialize());
 
             if(code == ""){
                 $.ajax({
                     method: 'post',
-                    url: '/store/standard/std51',
+                    url: '/store/standard/std10/save',
                     data: frm.serialize(),
                     dataType: 'json',
                     success: function (res) {
@@ -170,11 +155,10 @@
             } else {
                 $.ajax({
                     method: 'put',
-                    url: '/store/standard/std51/' + code,
+                    url: '/store/standard/std10/' + code,
                     data: frm.serialize(),
                     dataType: 'json',
                     success: function (res) {
-                        // console.log(res);
                         if(res.code == '200'){
                             alert("정상적으로 변경 되었습니다.");
                             self.close();
@@ -197,7 +181,7 @@
             if(confirm('삭제 하시겠습니까?')){
                 $.ajax({
                     method: 'delete',
-                    url: '/store/standard/std51/' + code,
+                    url: '/store/standard/std10/' + code,
                     dataType: 'json',
                     success: function (res) {
                         // console.log(response);
@@ -219,34 +203,15 @@
     <script>
         const columns = [
             {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-            {field: "code_id", headerName: "아이디",rowDrag: true,
+            {field: "size_cd", headerName: "사이즈코드",rowDrag: true,
                 editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 width:100
             },
-            {field: "code_val", headerName: "코드값1",
+            {field: "size_nm", headerName: "사이즈명",
                 // editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 editable: true,
                 cellStyle: {'background' : '#ffff99'},
-                cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
-                width:120
-            },
-            {field: "code_val2", headerName: "코드값2",
-                editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
-                editable: true,
-                cellStyle: {'background' : '#ffff99'},
-                cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
-                width:120
-            },
-            {field: "code_val3", headerName: "코드값3",
-                editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
-                editable: true,
-                cellStyle: {'background' : '#ffff99'},
-                cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
-                width:120
-            },
-            {field: "code_val_eng", headerName: "영문코드값",
-                editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 width:120
             },
@@ -264,7 +229,7 @@
         let gx;
 
         $(document).ready(function() {
-            pApp.ResizeGrid(550);
+            pApp.ResizeGrid(490);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);
@@ -275,7 +240,7 @@
 
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/store/standard/std51/' + code + '/search', data);
+            gx.Request('/store/standard/std10/' + code + '/search', data);
         }
 
         /**
@@ -312,13 +277,13 @@
 			});
 
 			if(data_codes.length == 0 ){
-				alert('저장할 코드정보를 선택해 주십시오.');
+				alert('저장할 사이즈를 선택해 주십시오.');
 				return false;
 			}
 
 			$.ajax({
 				method: 'post',
-				url: '/store/standard/std51/' + code + '/save',
+				url: '/store/standard/std10/' + code + '/save',
 				data: {data:JSON.stringify(data_codes)},
 				dataType: 'json',
 				success: function (res) {
@@ -339,16 +304,14 @@
 
             let checkRows = gx.getSelectedRows();
 
-            console.log(checkRows);
-
             if(checkRows.length == 0 ){
-                alert('수정할 코드정보를 선택해 주십시오.');
+                alert('수정할 사이즈를 선택해 주십시오.');
                 return false;
             }
 
             $.ajax({
                 method: 'post',
-                url: '/store/standard/std51/' + code + '/mod',
+                url: '/store/standard/std10/' + code + '/mod',
                 data: {data:JSON.stringify(checkRows)},
                 dataType: 'json',
                 success: function (res) {
@@ -371,16 +334,16 @@
         function DataDel(){
             let code_ids = [];
             gx.getSelectedRows().forEach((selectedRow, index) => {
-                code_ids.push(selectedRow.code_id);
+                code_ids.push(selectedRow.size_cd);
             });
 
             if(code_ids.length === 0) {
-                alert('삭제할 상품을 선택 해 주십시오.');
+                alert('삭제할 사이즈를 선택 해 주십시오.');
             } else if(code_ids.length > 0 && confirm('삭제 하시겠습니까?')){
 
                 $.ajax({
                     method: 'post',
-                    url: '/store/standard/std51/' + code + '/del',
+                    url: '/store/standard/std10/' + code + '/del',
                     data: {'code_ids':code_ids},
                     dataType: 'json',
                     success: function (res) {
@@ -405,12 +368,12 @@
         function ChangeSeq(){
             let code_ids = [];
             gx.gridOptions.api.forEachNode(function(node) {
-                code_ids.push(node.data.code_id);
+                code_ids.push(node.data.size_cd);
             });
             if(confirm('순서를 변경 하시겠습니까?')){
                 $.ajax({
                     method: 'post',
-                    url: '/store/standard/std51/' + code + '/seq',
+                    url: '/store/standard/std10/' + code + '/seq',
                     data: {'code_ids':code_ids},
                     dataType: 'json',
                     success: function (res) {
@@ -433,19 +396,19 @@
         function ChangeYN(){
             let rows = gx.getSelectedRows();
 
-            if(rows.length === 0) return alert('사용여부를 변경할 코드를 선택해주세요.');
+            if(rows.length === 0) return alert('사용여부를 변경할 사이즈를 선택해주세요.');
 
             if(confirm('사용여부를 변경 하시겠습니까?')){
                 $.ajax({
                     method: 'post',
-                    url: '/store/standard/std51/' + code + '/change-yn',
+                    url: '/store/standard/std10/' + code + '/change-yn',
                     data: {
                         'rows' : rows
                     },
                     dataType: 'json',
                     success: function (res) {
                         if(res.code == 200){
-                            alert('선택한 코드의 사용여부가 변경되었습니다.');
+                            alert('선택한 사이즈의 사용여부가 변경되었습니다.');
                             Search();
                         } else {
                             alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');

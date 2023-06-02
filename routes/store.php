@@ -176,6 +176,22 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('std09/delete-channel', 'std09Controller@delete_channel');
         Route::get('std09/check-code/{code?}/{add_type?}', 'std09Controller@check_code');
 
+        //사이즈관리
+        Route::get('std10', 'std10Controller@index');
+        Route::post('std10/save', 'std10Controller@save');
+        Route::get('std10/search', 'std10Controller@search');
+        Route::get('std10/create', 'std10Controller@create');
+        Route::get('std10/{code?}', 'std10Controller@show');
+        Route::put('std10/{code?}', 'std10Controller@update');
+        Route::delete('std10/{code}', 'std10Controller@delete');
+
+        Route::get('std10/{code?}/search', 'std10Controller@size_search');
+        Route::post('std10/{code?}/save', 'std10Controller@size_add');
+        Route::post('std10/{code?}/mod', 'std10Controller@size_mod');
+        Route::post('std10/{code?}/del', 'std10Controller@size_del');
+        Route::post('std10/{code?}/seq', 'std10Controller@size_seq');
+        Route::post('std10/{code?}/change-yn', 'std10Controller@change_yn');
+
         // 수선관리
         Route::get('std11', 'std11Controller@index');
         Route::get('std11/search', 'std11Controller@search');

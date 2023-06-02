@@ -1157,6 +1157,33 @@ CREATE TABLE `store_channel` (
   PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 
+-- 사이즈관리
+CREATE TABLE `size` (
+  `no` int(11) NOT NULL AUTO_INCREMENT COMMENT '번호',
+  `size_kind_cd` varchar(20) DEFAULT NULL COMMENT '사이즈구분',
+  `size_cd` varchar(20) NOT NULL DEFAULT '' COMMENT '사이즈코드',
+  `size_nm` varchar(20) NOT NULL COMMENT '사이즈명',
+  `use_yn` char(1) DEFAULT 'Y' COMMENT '사용여부',
+  `size_seq` int(11) DEFAULT NULL COMMENT '순서',
+  `admin_id` varchar(20) NOT NULL COMMENT '관리자ID',
+  `admin_nm` varchar(20) NOT NULL COMMENT '관리자명',
+  `rt` datetime DEFAULT NULL COMMENT '등록일시',
+  `ut` datetime DEFAULT NULL COMMENT '수정일시',
+  PRIMARY KEY (`no`)
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `size_kind` (
+  `size_kind_cd` varchar(20) NOT NULL COMMENT '사이즈구분코드',
+  `size_kind_nm` varchar(20) NOT NULL COMMENT '사이즈구분명',
+  `use_yn` char(1) NOT NULL DEFAULT 'Y' COMMENT '사용여부',
+  `seq` int(11) DEFAULT NULL COMMENT '순서',
+  `admin_id` varchar(20) NOT NULL COMMENT '관리자ID',
+  `admin_nm` varchar(20) NOT NULL COMMENT '관리자명',
+  `rt` datetime DEFAULT NULL COMMENT '등록일시',
+  `ut` datetime DEFAULT NULL COMMENT '수정일시',
+  PRIMARY KEY (`size_kind_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --
