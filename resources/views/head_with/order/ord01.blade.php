@@ -351,6 +351,7 @@
                                 </div>
                                 <div class="form-inline-inner input-box w-75">
                                     <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_id" name="com_id">
                                         <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
@@ -558,19 +559,19 @@
             width:28,
             pinned: 'left',
         },
-        {field:"ord_no" , headerName:"주문번호", width:120, cellStyle:StyleOrdNo, type:'HeadOrderNoType', pinned: 'left'},
+        {field: "ord_no", headerName: "주문번호", width: 130, cellStyle: StyleOrdNo, type: 'HeadOrderNoType', pinned: 'left'},
         {field:"ord_opt_no" , headerName:"일련번호", width:58,sortable:"ture", pinned: 'left', type:'HeadOrderNoType'},
         {field:"ord_state_nm" , headerName:"주문상태", width:70,cellStyle:StyleOrdState, pinned: 'left'  },
         {field:"clm_state" , headerName:"클레임상태", width:70,cellStyle:StyleClmState, pinned: 'left'  },
         {field:"pay_stat" , headerName:"입금상태", width:58, cellStyle:{"text-align" : "center"} },
         {field:"goods_type_nm" , headerName:"상품구분", width:58, cellStyle:StyleGoodsType  },
         {field:"style_no" , headerName:"스타일넘버", width:70, cellStyle: {'text-align':'center'} },
-        {field:"goods_nm" , headerName:"상품명",type:"HeadGoodsNameType"},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 200},
         {field:"img" , headerName:"이미지", type:'GoodsImageType', width: 65, hide: true},
-        {field:"opt_val" , headerName:"옵션", width:82  },
+        {field: "opt_val", headerName: "옵션", width: 100},
         {field:"goods_addopt" , headerName:"추가옵션", width:72  },
         {field:"qty" , headerName:"수량", width:46, cellStyle:{"text-align" : "right"}},
-        {field:"user_nm" , headerName:"주문자(아이디)", width:96,
+        {field: "user_nm", headerName: "주문자(아이디)", width: 100,
             cellRenderer: function(params) {
                 let orderer = params.data.user_nm + '(' + params.data.user_id + ')';
                 if(params.data.user_nm == '비회원'){
@@ -582,13 +583,13 @@
                 }
             }
         },
-        {field:"r_nm" , headerName:"수령자", width:60  },
+        {field: "r_nm", headerName: "수령자", width: 60, cellClass: 'hd-grid-code'},
         {field:"price" , headerName:"판매가", width:60, type: 'currencyType'  },
         {field:"sale_amt" , headerName:"쿠폰/할인", width:72, type: 'currencyType'  },
         {field:"gift" , headerName:"사은품", width:60  },
         {field:"dlv_amt" , headerName:"배송비", width:60 , type: 'currencyType'  },
-        {field:"pay_fee" , headerName:"결제수수료", width:60, type: 'currencyType'  },
-        {field:"pay_type" , headerName:"결제방법", width:72   },
+        {field: "pay_fee", headerName: "결제수수료", width: 65, type: 'currencyType'  },
+        {field: "pay_type", headerName: "결제방법", width: 72, cellClass: 'hd-grid-code'},
         {field:"fintech" , headerName:"간편결제", width:72   },
         {field:"cash_apply_yn" , headerName:"현금영수증신청", width:72   },
         {field:"cash_yn" , headerName:"현금영수증발행", width:72   },
@@ -604,17 +605,17 @@
             width:72,
             cellStyle:StyleOrdKind
         },
-        {field:"sale_place" , headerName:"판매처" },
-        {field:"out_ord_no" , headerName:"판매처주문번호", width:125 },
-        {field:"com_nm" , headerName:"업체" },
-        {field:"baesong_kind" , headerName:"배송구분", width:72  },
+        {field: "sale_place", headerName: "판매처", width: 80},
+        {field: "out_ord_no", headerName: "판매처주문번호", width: 100},
+        {field: "com_nm", headerName: "업체", width: 100},
+        {field: "baesong_kind", headerName: "배송구분", width: 70, cellClass: 'hd-grid-code'},
         {field:"dlv_type" , headerName:"배송방식", width:72  },
         {field:"dlv_nm" , headerName:"택배업체", width:72  },
-        {field:"dlv_no" , headerName:"송장번호", width:72  },
+        {field: "dlv_no", headerName: "송장번호", width: 100},
         {field:"state" , headerName:"처리현황", editable: true, cellStyle: editCellStyle  },
         {field:"memo" , headerName:"메모", editable: true, cellStyle: editCellStyle  },
         {field:"coupon_nm" , headerName:"쿠폰"  },
-        {field:"mobile_yn" , headerName:"모바일여부", width:60, 
+        {field: "mobile_yn", headerName: "모바일여부", width: 65, 
             cellRenderer: function(params) {
                 if(params.value == 'Y') return "예"
                 else if(params.value == 'N') return "아니오"
@@ -623,13 +624,13 @@
         },
         {field:"app_yn" , headerName:"앱여부"  },
         {field:"browser" , headerName:"브라우저"  },
-        {field:"ord_date" , headerName:"주문일시", width:120 },
-        {field:"pay_date" , headerName:"입금일시", width:120 },
-        {field:"dlv_end_date" , headerName:"배송일시", width:120},
-        {field:"last_up_date" , headerName:"클레임일시", width:120},
+        {field: "ord_date", headerName: "주문일시", type: 'DateTimeType'},
+        {field: "pay_date", headerName: "입금일시", type: 'DateTimeType'},
+        {field: "dlv_end_date", headerName: "배송일시", type: 'DateTimeType'},
+        {field: "last_up_date", headerName: "클레임일시", type: 'DateTimeType'},
 		{field:"sms_name", headerName:"SMS_주문자명", hide:true},
 		{field:"sms_mobile", headerName:"SMS_주문자휴대폰", hide:true},
-        {headerName: "", field: "nvl"}
+        {width: "auto"}
     ];
 
 
