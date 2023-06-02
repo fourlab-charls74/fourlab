@@ -16,7 +16,7 @@
 
     @section('body')
     @show
-    <body class="sidebar-enable">
+    <body>
         <!-- header -->
         @include('store_with.layouts.top')
         @if(Cache::has('store_lnb'))

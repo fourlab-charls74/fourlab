@@ -86,17 +86,21 @@
                 if($("body").hasClass("sidebar-enable")){
                     $("body").removeClass("sidebar-enable");
                     $(this).removeClass("side_off");
+					sessionStorage.setItem("side-status", "open");
                 }else{
                     $("body").addClass("sidebar-enable");
                     $(this).addClass("side_off");
+					sessionStorage.setItem("side-status", "off");
                 }
             }else{
                 if($("body").hasClass("mobile-side")){
                     $("body").removeClass("mobile-side");
                     $("body").addClass("sidebar-enable");
+					sessionStorage.setItem("side-status", "open");
                 }else{
                     $("body").addClass("mobile-side");
                     $("body").removeClass("sidebar-enable");
+					sessionStorage.setItem("side-status", "off");
                 }
             }
             return false;
@@ -229,6 +233,13 @@ function init() {
     initFullScreen();
     initUtil();
     initSettings();
+
+	const side_status = sessionStorage.getItem("side-status");
+	if(side_status == "open") {
+		$("body").removeClass("sidebar-enable");
+	} else {
+		$("body").addClass("sidebar-enable");
+	}
 }
 
 init();

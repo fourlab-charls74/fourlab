@@ -1,7 +1,7 @@
 <nav>
     <div class="side_menu">
         <ul id="side_menu">
-            <li>
+            <li class="d-none">
                 <a href="/head"><i class="bx bx-home-circle fs-18"></i><span>대시보드</span></a>
             </li>
             <li data-menu-kind="M" data-menu-id="standard" class="d-none">
@@ -162,7 +162,7 @@
                 </ul>
             </li>
 
-            <li>
+            <li class="d-none">
                 <a href="javascript:;" class="arrow"><i class="bx bxs-group fs-18"></i><span>커뮤니티</span></a>
                 <ul>
                     <li><a href="/head/community/com01">커뮤니티</a></li>
@@ -260,7 +260,7 @@
                 </ul>
             </li> --}}
             @if ( auth('head')->user()->grade === 'S' )
-            <li>
+            <li class="d-none">
                 <a href="javascript:;" class="arrow"><i class="bx bx-desktop fs-18"></i><span>시스템</span></a>
                 <ul>
                     <li><a href="/head/system/sys01">사용자관리</a></li>

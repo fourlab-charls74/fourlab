@@ -15,7 +15,7 @@
 
     @section('body')
     @show
-    <body class="sidebar-enable">
+    <body>
         <!-- header -->
         @include('head_with.layouts.top')
         @include('head_with.layouts.lnb')
