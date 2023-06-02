@@ -211,7 +211,8 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::get('prd06', 'prd06Controller@index');
         Route::post('prd06', 'prd06Controller@store');
         Route::post('prd06/bundle', 'prd06Controller@store_bundle');
-
+		Route::post('prd06/enroll2', 'prd06Controller@enroll2');
+		
         Route::get('prd07', 'prd07Controller@index');
         Route::get('prd07/search', 'prd07Controller@search');
         Route::put('prd07/update', 'prd07Controller@update');
