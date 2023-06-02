@@ -5,24 +5,28 @@ namespace App\Http\Controllers\partner\product;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Models\Category;
+use App\Models\Option;
 use App\Models\Product;
 use App\Models\Jaego;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Components\SLib;
+use App\Models\Conf;
 
 class prd06Controller extends Controller
 {
     public function index() {
-
+		
+		$conf = new Conf();
         $com_id = Auth('partner')->user()->com_id;
 
 
         $opt_cd_list = $this->get_opt_cd_list();
         $com_info = $this->get_com_info($com_id);
         $point_info = $this->get_point_info();
-
+		$cfg_point_ratio = $conf->getConfigValue("point", "ratio", "0");
+		
         $values = [
             'com_id' => $com_id,
             'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
@@ -33,7 +37,7 @@ class prd06Controller extends Controller
             'opt_cd_list' => $opt_cd_list,
             'com_info' => $com_info,
             'point_info' => $point_info,
-
+			'order_point_ratio'	=> $cfg_point_ratio,
         ];
         return view( Config::get('shop.partner.view') . '/product/prd06',$values);
     }
@@ -536,6 +540,357 @@ class prd06Controller extends Controller
 
         return $result[0];
     }
+
+	public function checkInt($p_name, $default = 0)
+	{
+		$p_name = str_replace(",", "", $p_name);
+		return is_numeric($p_name) ? (int)$p_name : $default;
+	}
+	
+	public function enroll2(Request $request)
+	{
+		$row = $request->input('row');
+		$row["goods_sh"] = array_key_exists('goods_sh', $row) ? $this->checkInt(Lib::Rq($row["goods_sh"])) : null;
+		$row["price"] = array_key_exists('price', $row) ? $this->checkInt(Lib::Rq($row["price"])) : null;
+
+		// 데이터의 각각 키 이름들로 변수 할당
+		foreach ($row as $key => $value) {
+			$$key = is_string($value) ? Lib::Rq($value) : $value;
+		}
+
+		$sql = "
+			select 
+				com_type
+			from company 
+			where dp_yn = 'Y' and com_id = '$com_id'
+		";
+
+		$res = DB::selectOne($sql);
+		$com_type = $res->com_type;
+
+		// 상수 값 할당
+		$conf = new Conf();
+		$cfg_free_delivery_amt = $conf->getConfigValue("delivery", "free_delivery_amt");
+		$cfg_base_delivery_fee = $conf->getConfigValue("delivery", "base_delivery_fee");
+
+		$sale_stat_cl	= "5";
+		$goods_type		= ($com_type == "1") ? "S" : "P";
+		$special_yn		= "N";
+		$related_cfg	= "A";
+
+		// 쇼핑몰 정책에 의한 배송비
+		if ($dlv_fee_cfg == "S") {
+			$baesong_price = ($price < $cfg_free_delivery_amt) ? $cfg_base_delivery_fee : "0";
+		}
+
+		// 적립금 단위
+		$point_unit = ($point_unit == "%") ? "W" : "P";
+
+		// option varidation
+		$patten = "/[#\&%@=\\\:;'\"\^`\_|\!\?\*$#<>\{\}]/i";
+		$opt1 = preg_replace($patten, "", @$opt1);
+		$opt2 = preg_replace($patten, "", @$opt2);
+
+
+		// 상품 클래스
+		$user = [
+			'id' => Auth('head')->user()->id,
+			'name' => Auth('head')->user()->name
+		];
+		$goods = new Product($user);
+
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+
+		// 상품번호 생성
+		$goods_no = $goods->GetNextGoodsNo();
+		$goods_sub = 0;
+
+		// MD 이름, 아이디 얻기
+		$sql = "
+			select id from mgr_user where name = '" . @$md_nm . "'
+		";
+		$result = DB::selectOne($sql);
+		$md_id = isset($result->id) ? $result->id : "";
+
+
+
+		$today_his = date("Y-m-d H:i:s");
+		$param = @array(
+			"goods_no"		=> $goods_no,
+			"goods_sub"		=> $goods_sub,
+			"com_id"		=> $com_id,
+			"com_type"		=> $com_type,
+			"opt_kind_cd"	=> $opt_kind_cd,
+			"brand"			=> $brand,
+			"rep_cat_cd"	=> $rep_cat_cd,
+			"style_no"		=> $style_no,
+			"goods_nm"		=> $goods_nm,
+			"goods_nm_eng"	=> $goods_nm_eng,
+			"price"			=> $price,
+			"goods_sh"		=> $goods_sh,
+			"wonga"			=> $wonga,
+			"head_desc"		=> $head_desc,
+			"ad_desc"		=> $ad_desc,
+			"baesong_info"	=> $baesong_info,
+			"baesong_kind"	=> $baesong_kind,
+			"dlv_pay_type"	=> $dlv_pay_type,
+			"dlv_fee_cfg"	=> $dlv_fee_cfg,
+			"bae_yn"		=> $bae_yn,
+			"baesong_price"	=> $baesong_price,
+			"point_cfg"		=> $point_cfg,
+			"point_yn"		=> $point_yn,
+			"point_unit"	=> $point_unit,
+			"point"			=> $point,
+			"org_nm"		=> $org_nm,
+			"md_id"			=> $md_id,
+			"md_nm"			=> $md_nm,
+			"make"			=> $make,
+			"goods_cont"	=> $goods_cont,
+			"spec_desc"		=> $spec_desc,
+			"baesong_desc"	=> $baesong_desc,
+			"opinion"		=> $opinion,
+			"is_option_use"	=> $is_option_use,
+			"option_kind"	=> $option_kind,
+			"is_unlimited"	=> $is_unlimited,
+			"tax_yn"		=> $tax_yn,
+			"sale_stat_cl"	=> $sale_stat_cl,
+			"goods_type"	=> $goods_type,
+			"special_yn"	=> $special_yn,
+			"delv_area"		=> $delv_area,
+			"related_cfg"	=> $related_cfg,
+			"restock_yn"	=> $restock_yn,
+			"admin_id"		=> $admin_id,
+			"admin_nm"		=> $admin_nm,
+			"reg_dm"		=> $today_his,
+			"upd_dm"		=> $today_his,
+			"n_goods_yn"	=> "N",
+			"b_goods_yn"	=> "N",
+			"goods_location"=> $goods_location,
+		);
+
+		DB::beginTransaction();
+		try {
+			$goods->Add( $param ); // 상품 추가 클래스
+
+			// 전시카테고리 등록
+			if ($rep_cat_cd) {
+				$int = strlen($rep_cat_cd)/3;
+				for ($i = 1; $i <= $int; $i++)
+				{
+					$cd = substr($rep_cat_cd, 0, $i*3);
+					$category = new Category($user, "DISPLAY"); // 카테고리 클래스 호출
+					$category->SetCode( $cd ); //카테고리 번호 설정
+					$category->SetGoodsNoSub( $goods_no, $goods_sub ); //상품일련번호 설정
+					$category->AddGoods( "" ); //카테고리에 상품 등록
+				}
+			}
+
+			// 용도별 카테고리 등록
+			if ($u_cat_cd)
+			{
+				$cat_depth = strlen($u_cat_cd)/3;
+				for($j = 1; $j <= $cat_depth; $j++)
+				{
+					$cat = substr($u_cat_cd, 0, $j*3);
+					$category = new Category($user, "ITEM");
+					$category->SetCode( $cat );
+					$category->SetGoodsNoSub( $goods_no, $goods_sub );
+					$category->AddGoods( "" );
+				}
+			}
+
+			///////////////////////////////////////////////////////
+			//
+			//		옵션 등록 ( 매입 상품은 제외)
+			//
+			///////////////////////////////////////////////////////
+
+			// 멀티옵션 여부
+			$multi_pos = strpos($option_kind, "^");
+
+			// 옵션명 등록
+			$a_opt_name = explode("^", $option_kind);
+			$options = new Option($user, $goods_no, $goods_sub);
+			$options->setGoods($goods_no, $goods_sub);
+
+			for ( $i = 0; $i < count($a_opt_name); $i++ ) {
+				if($i > 2){
+					break;
+				}
+				$options->addOptionName(
+					array(
+						"type"			=> "basic",
+						"name"			=> trim(Lib::Rq($a_opt_name[$i])),
+						"required_yn"	=> "Y",
+						"use_yn"		=> "Y",
+						"option_no"		=> "",
+						"seq"			=> "0"
+					)
+				);
+			}
+
+			// 옵션 등록
+			$a_opt1 = ( $opt1 != "" ) ?  explode(",", $opt1) : array();
+			$a_opt2 = ( $opt2 != "" ) ?  explode(",", $opt2) : array();
+
+			// 옵션 수량
+			$a_opt_qty = ( @$opt_qty != "" ) ?  explode(",", $opt_qty) : array();
+
+			// 옵션 가격
+			$a_opt_price = ( @$opt_price != "" ) ?  explode(",", $opt_price) : array();
+
+			$jaego = new Jaego( $user );  //재고 클래스 호출
+
+			// 멀티옵션
+			if ( $multi_pos != false ) {
+
+				for( $i = 0; $i < count($a_opt1); $i++) {
+
+					$_opt1 = Lib::Rq($a_opt1[$i]);
+
+					// 수량 얻기
+					$_opt_qty = (isset($a_opt_qty[$i]) && trim($a_opt_qty[$i]) != "") ? trim($a_opt_qty[$i]) : 0;
+
+					for ( $j=0; $j < count($a_opt2); $j++ ) {
+
+						$_opt2 = Lib::Rq($a_opt2[$j]);
+						$goods_opt = sprintf("%s^%s", $_opt1, $_opt2);
+
+						// 옵션 재고 등록
+						$jaego->Plus( array(
+							"type" => 9,
+							"etc" => "재고수정",
+							"qty" => $_opt_qty,
+							"goods_no" => $goods_no,
+							"goods_sub" => $goods_sub,
+							"goods_opt" => $goods_opt,
+							"wonga" => $wonga,
+							"invoice_no" => date("Ymd"),
+							"opt_seq" => ($i+$j)
+						));
+
+						// 옵션가 등록
+						$_opt_price = isset($a_opt_price[$i]) ? trim($a_opt_price[$i]) : 0;
+						$options->modBasicOption(
+							array(
+								"opt1" => $_opt1,
+								"goods_opt" => $goods_opt,
+								"opt_price" => $_opt_price,
+								"opt_qty" => $_opt_qty,
+								"opt_seq" => ($i+$j)
+							)
+						);
+					}
+				}
+
+			} else {
+
+				// 단일옵션
+				for ( $i = 0; $i < count($a_opt1); $i++ ) {
+
+					$goods_opt = Lib::Rq($a_opt1[$i]);
+
+					// 옵션별 수량
+					$_opt_qty = (isset($a_opt_qty[$i]) && trim($a_opt_qty[$i]) != "") ? trim($a_opt_qty[$i]) : 0;
+
+					// 옵션 재고 등록
+					$jaego->Plus( array(
+						"type" => 9,
+						"etc" => "재고수정",
+						"qty" => $_opt_qty,
+						"goods_no" => $goods_no,
+						"goods_sub" => $goods_sub,
+						"goods_opt" => $goods_opt,
+						"wonga" => $wonga,
+						"invoice_no" => date("Ymd"),
+						"opt_seq" => $i
+					));
+
+					// 옵션가 등록
+					$_opt_price = isset($a_opt_price[$i]) ? trim($a_opt_price[$i]) : 0;
+					$options->modBasicOption(
+						array(
+							"opt1" => $goods_opt,
+							"goods_opt" => $goods_opt,
+							"opt_price" => $_opt_price,
+							"opt_qty" => $_opt_qty,
+							"opt_seq" => $i
+						)
+					);
+				}
+			}
+
+			///////////////////////////////////////////////////////
+			//
+			//		옵션등록 끝
+			//
+			///////////////////////////////////////////////////////
+
+			// 태그 등록
+			if ( @$tags != "" ) {
+
+				$a_tags = explode(",", $tags);
+
+				for ( $i = 0; $i < count($a_tags); $i++) {
+
+					$_tag = Lib::Rq(trim($a_tags[$i]));
+
+					if ( $_tag == "" ) continue;
+
+					// 태그 검색
+					$sql = "SELECT count(*) AS cnt
+						FROM goods_tags
+						WHERE goods_no = $goods_no AND goods_sub = $goods_sub AND tag = '$_tag'
+					";
+
+					$selectarr = array(
+						"goods_no" => $goods_no,
+						"goods_sub" => $goods_sub,
+						"tag"=> $_tag
+					);
+
+					$result = DB::selectOne($sql, $selectarr);
+					$cnt = $result->cnt;
+
+					if ($cnt == 0) {
+						$sql = "INSERT INTO goods_tags (
+								goods_no, goods_sub, tag, admin_id, admin_nm, rt
+							) VALUES (
+								$goods_no, $goods_sub, '$_tag', '$admin_id', '$admin_nm', NOW()
+							)
+						";
+						$inputarr = array(
+							"goods_no" => $goods_no,
+							"goods_sub" => $goods_sub,
+							"tag" => $_tag,
+							"id" => $admin_id,
+							"name" => $admin_nm
+						);
+						DB::insert($sql, $inputarr);
+					}
+
+				}
+			}
+
+			DB::commit();
+			return response()->json([
+				"result" => 1,
+				"msg" => $goods_no."-".$goods_sub,
+				"code" => 200
+			]);
+		} catch (Exception $e) {
+			DB::rollback();
+			return response()->json([
+				"result" => 0,
+				"msg" => "시스템에러",
+				"code" => 500
+
+				// "msg" => $e->getMessage()
+			]);
+		}
+
+	}
 
 
 }
