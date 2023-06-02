@@ -111,7 +111,7 @@
 											<th class="required">품목</th>
 											<td>
 												<div class="flax_box">
-													<select name='item' id='item' class="form-control form-control-sm prd_code">
+													<select name='item' id='item' class="form-control form-control-sm prd_code" onchange="change_gender();">
 														<option value=''>선택</option>
 														@foreach ($items as $item)
 														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
@@ -141,7 +141,7 @@
 											<th class="required">사이즈</th>
 											<td>
 												<div class="flax_box">
-													<select name='size' id='size' class="form-control form-control-sm">
+													<select name='size' id='size' class="form-control form-control-sm multi_select" multiple>
 														<option value=''>선택</option>
 													</select>
 												</div>
@@ -720,12 +720,14 @@
 	//성별에 따라 사이즈 값 다르게 출력
 	function change_gender() {
 		let gender = $('#gender option:selected').val();
+		let item = $('#item option:selected').val();
 		
 		$.ajax({
 			method: 'post',
-			url: '/store/product/prd03/change-gender',
+			url: '/store/product/prd02/change-gender',
 			data: {
-				gender : gender
+				gender : gender,
+				item : item
 			},
 			success: function (res) {
 				if(res.code == 200) {
@@ -735,7 +737,7 @@
 					let sel =''
 					for(let i = 0; i < res.result.length;i++) {
 						sel = "<option value=''>선택</option>"
-						option += '<option value='+ res.result[i].code_id +'>' + res.result[i].code_id + ' : ' + res.result[i].code_val+ '</option>';
+						option += '<option value='+ res.result[i].size_cd +'>' + res.result[i].size_cd + ' : ' + res.result[i].size_nm+ '</option>';
 					}
 					$('#size').append(sel);
 					$('#size').append(option);

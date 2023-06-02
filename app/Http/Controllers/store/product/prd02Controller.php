@@ -1480,32 +1480,40 @@ class prd02Controller extends Controller
 	public function change_gender(Request $request)
 	{
 		$gender = $request->input('gender');
-
-		$gen = '';
-		if($gender == 'M') {
-			$gen = 'MEN';
-		} else if ($gender == 'U') {
-			$gen = 'UNISEX';
-		} else if ($gender == 'W') {
-			$gen = 'WOMEN';
-		} else if ($gender == 'K') {
-			$gen = 'KIDS';
-		}
+		$item = $request->input('item');
 
 		try {
 			DB::beginTransaction();
 
-			$sql = "
-				select
-					code_id, code_val
-				from code
-				where code_kind_cd = 'PRD_CD_SIZE_$gen'
-				order by field(code_id, '10', '10.5', '99') desc,
-				field(code_id, 'XL', 'XS', 'L2', 'X2') asc,
-				code_id desc
-			";
+			if ($gender == 'M') {
+				$sql = "
+					select
+						size_kind_cd
+						, size_cd
+						, size_nm
+					from size
+					where size_kind_cd in ('TOP', 'BOTTOM', 'FREE', 'GLOVES', 'MEN_BOTTOM', 'MEN_BOTTOM_S', 'MEN_BOTTOM_R', 'SHOES', 'SOCKS', 'BELT')
+				";
 
-			$result = DB::select($sql);
+				$result = DB::select($sql);
+
+			} elseif ($gender == 'W') {
+				$sql = "
+					select
+						size_kind_cd
+						, size_cd
+						, size_nm
+					from size
+					where size_kind_cd in ('TOP', 'BOTTOM', 'FREE', 'GLOVES', 'WOMEN_BOTTOM', 'WOMEN_BOTTOM_S', 'WOMEN_BOTTOM_R', 'SHOES', 'SOCKS', 'BELT')
+				";
+
+				$result = DB::select($sql);
+
+			} elseif ($gender == 'U') {
+
+			} elseif ($gender == 'K')
+
+
 
             DB::commit();
             $code = 200;
