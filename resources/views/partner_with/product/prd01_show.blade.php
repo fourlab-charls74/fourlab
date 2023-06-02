@@ -1135,7 +1135,7 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <div id="goods-class-grid" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+                            <div id="goods-class-grid" style="height:95px;width:100%;" class="ag-theme-balham"></div>
                         </div>
                     </div>
                 </div>
