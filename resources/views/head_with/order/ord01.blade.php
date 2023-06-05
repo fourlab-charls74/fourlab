@@ -181,7 +181,7 @@
 
                 </div>
                 <!-- end row -->
-                <div class="row search-area-ext">
+                <div class="row">
                 <!-- <div class="row d-none search-area-ext"> -->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
@@ -544,7 +544,7 @@
         </div>
     </div>
 </div>
-<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:50px; margin: 0 auto; } </style>
+<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:20px; } </style>
 <script>
     const editCellStyle = {
         'background' : '#ffff99',

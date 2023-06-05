@@ -27,25 +27,25 @@ class ord01Controller extends Controller
             'sdate' => $sdate,
             'edate' => $edate,
             'style_no' => $style_no,
+            'ord_states' => SLib::getOrdStates(),
+            'ord_types' => SLib::getCodes('G_ORD_TYPE'),
+            'ord_kinds' => SLib::getCodes('G_ORD_KIND'),
+            'dlv_kinds' => SLib::getCodes('G_BAESONG_KIND'),
+			'dlv_types'     => SLib::getCodes('G_DLV_TYPE'),
+            'sale_places' => SLib::getSalePlaces(),
             'items' => SLib::getItems(),
             'goods_types' => SLib::getCodes('G_GOODS_TYPE'),
-            'sale_places' => SLib::getSalePlaces(),
-            'ord_states' => SLib::getOrdStates(),
             'clm_states' => SLib::getClmStates(),
-            'ord_kinds' => SLib::getCodes('G_ORD_KIND'),
-            'ord_types' => SLib::getCodes('G_ORD_TYPE'),
-            'dlv_kinds' => SLib::getCodes('G_BAESONG_KIND'),
+			'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE'),
         ];
         return view(Config::get('shop.partner.view') . '/order/ord01',$values);
     }
 
     public function search(Request $request){
-
         $com_id = Auth('partner')->user()->com_id;
 
         $page = $request->input('page',1);
         if ($page < 1 or $page == "") $page = 1;
-
         $limit = $request->input('limit',100);
 
         $sdate = $request->input('sdate',Carbon::now()->sub(7, 'day')->format('Ymd'));
@@ -53,40 +53,60 @@ class ord01Controller extends Controller
         $sdate = str_replace("-","",$sdate);
         $edate = str_replace("-","",$edate);
 
-        $ord_no = $request->input('ord_no');
-        $user_id = $request->input('user_id');
-        $user_nm = $request->input('user_nm');
-        $r_nm = $request->input('r_nm');
-        $cols = $request->input('cols');
-        $key = $request->input('key');
-        $style_no = $request->input('style_no');
-        $goods_no = $request->input('goods_no');
-        $item = $request->input('item');
-        $brand_cd = $request->input('brand_cd');
-        $goods_nm = $request->input('goods_nm');
-        $goods_type = $request->input('goods_type');
-        $dlv_kind = $request->input('dlv_kind');
-        $head_desc = $request->input('head_desc');
-        $ord_state = $request->input('ord_state');
-        $clm_state = $request->input('clm_state');
-        $limit = $request->input('limit',100);
-        $ord = $request->input('ord');
-        $ord_field = $request->input('ord_field');
-        $ord_type = $request->input('ord_type');
-        $ord_kind = $request->input('ord_kind');
-
+        $ord_no = $request->input('ord_no', '');
+        $user_id = $request->input('user_id', '');
+        $user_nm = $request->input('user_nm', '');
+        $r_nm = $request->input('r_nm', '');
+        $cols = $request->input('cols', '');
+        $key = $request->input('key', '');
+		$nud = $request->input("s_nud", 'Y');
+        $style_no = $request->input('style_no', '');
+        $goods_no = $request->input('goods_no', '');
+        $item = $request->input('item', '');
+        $brand_cd = $request->input('brand_cd', '');
+        $goods_nm = $request->input('goods_nm', '');
+        $goods_type = $request->input('goods_type', '');
+        $dlv_kind = $request->input('dlv_kind', '');
+        $head_desc = $request->input('head_desc', '');
+        $ord_state = $request->input('ord_state', '');
+        $clm_state = $request->input('clm_state', '');
+        $ord = $request->input('ord', 'desc');
+        $ord_field = $request->input('ord_field', 'a.ord_date');
+        $ord_type = $request->input('ord_type', '');
+        $ord_kind = $request->input('ord_kind', '');
+        $bank_inpnm = $request->input('bank_inpnm', '');
+        $pay_stat = $request->input('pay_stat', '');
+        $stat_pay_type = $request->input('stat_pay_type', '');
+        $not_complex = $request->input('not_complex', '');
+        $receipt = $request->input('receipt', 'N');
+        $dlv_type = $request->input('dlv_type', '');
+        $dlv_no = $request->input('dlv_no', '');
+        $sale_place = $request->input('sale_place', '');
+        $out_ord_no = $request->input('out_ord_no', '');
+        $goods_nm_eng = $request->input('goods_nm_eng', '');
 
         $where = "";
+		$insql = "";
         $is_not_use_date = false;
 
-        if($request->input('s_nud',"Y") === "Y"
-            && ($ord_no != "" || $user_id != "" || $user_nm != "" || $r_nm != ""
-                || ( ($cols == "b.mobile" || $cols == "b.phone" || $cols == "b.r_mobile") && $key != ""))){
-            $is_not_use_date = true;
-        }
+		if ($ord_no != "") {
+			$is_not_use_date = true;
+		} else if ($user_id != "") {
+			$is_not_use_date = true;
+		} else if ($user_nm != "") {
+			$is_not_use_date = true;
+		} else if (strlen($r_nm) >= 4) {
+			$is_not_use_date = true;
+		} else if ($cols == "b.mobile" && strlen($key) >= 8) {
+			$is_not_use_date = true;
+		} else if ($cols == "b.phone" && strlen($key) >= 8) {
+			$is_not_use_date = true;
+		} else if ($cols == "b.r_mobile" && strlen($key) >= 8) {
+			$is_not_use_date = true;
+		}
 
-        if($is_not_use_date == false){
-            $where .= " and a.ord_date >= '$sdate' ";
+        if ($is_not_use_date == false || $nud === 'Y') {
+            $where .= " and a.ord_date >= cast('$sdate' as date) ";
             $where .= " and a.ord_date < DATE_ADD('$edate', INTERVAL 1 DAY) ";
         }
 
@@ -95,6 +115,23 @@ class ord01Controller extends Controller
         if($r_nm != "")		$where .= " and b.r_nm = '" . Lib::quote($r_nm) . "' ";
         if($user_id != "")	$where .= " and b.user_id = '" . Lib::quote($user_id) . "' ";
 
+		if ($cols != "" && $key != "") {
+			if (in_array($cols, ["b.mobile", "b.phone", "b.r_phone", "b.r_mobile"])) {
+				$key = $this->replacetel($key);
+				if ($cols == "b.mobile" || $cols == "b.phone" || $cols == "b.r_mobile") {
+					$where .= " and $cols like '%$key' ";
+				} else {
+					$where .= " and $cols like '$key%' ";
+				}
+			} else {
+				if ($cols == "a.dlv_end_date") {
+					$where = " and date_format($cols, '%Y%m%d') = $key";
+				} else {
+					$where .= " and $cols like '" . Lib::quote($key) . "%' ";
+				}
+			}
+		}
+		
 		$style_no = preg_replace("/\s/",",",$style_no);
 		$style_no = preg_replace("/,,/",",",$style_no);
 		$style_no = preg_replace("/\t/",",",$style_no);
@@ -130,49 +167,57 @@ class ord01Controller extends Controller
 				$in_goods_nos = join(",",$goods_nos);
 				$where .= " and c.goods_no in ( $in_goods_nos ) ";
 			} else {
-				$where .= " and c.goods_no = '$goods_no' ";
+				if ($goods_no != "") $where .= " and c.goods_no = '" . Lib::quote($goods_no) . "' ";
 			}
 		}
 
-        if($item != "")	    $where .= " and opt_kind_cd = '" . Lib::quote($item) . "' ";
-        if($goods_nm != "")		$where .= " and c.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
-        if($goods_type != "")	$where .= " and c.goods_type = '" . Lib::quote($goods_type) . "' ";
-        if($dlv_kind != "")	    $where .= " and c.baesong_kind = '" . Lib::quote($dlv_kind) . "' ";
-        if($ord_kind != "")	$where .= " and a.ord_kind = '" . Lib::quote($ord_kind) . "' ";
-        if($ord_type != "")	$where .= " and a.ord_type = '" . Lib::quote($ord_type) . "' ";
+        if ($item != "")	    	$where .= " and opt_kind_cd = '" . Lib::quote($item) . "' ";
+        if ($goods_nm != "")		$where .= " and c.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
+        if ($goods_nm_eng != "")	$where .= " and c.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%'";
+        if ($goods_type != "")		$where .= " and c.goods_type = '" . Lib::quote($goods_type) . "' ";
+        if ($dlv_kind != "")		$where .= " and c.baesong_kind = '" . Lib::quote($dlv_kind) . "' ";
+        if ($ord_kind != "")		$where .= " and a.ord_kind = '" . Lib::quote($ord_kind) . "' ";
+        if ($ord_type != "")		$where .= " and a.ord_type = '" . Lib::quote($ord_type) . "' ";
+		if ($sale_place != "")		$where .= " and a.sale_place = '" . Lib::quote($sale_place) . "' ";
+		if ($bank_inpnm != "")		$where .= " and d.bank_inpnm = '" . Lib::quote($bank_inpnm) . "' ";
+        if ($head_desc != "")		$where .= " and c.head_desc = '" . Lib::quote($head_desc) . "' ";
+        if ($ord_state != "")		$where .= " and a.ord_state = '" . Lib::quote($ord_state) . "' ";
+        if ($brand_cd != "")    	$where .= " and c.brand = '" . Lib::quote($brand_cd) . "' ";
+		
+        if ($clm_state == "90")		$where .= " and a.clm_state = 0 ";
+		else if ($clm_state != "")	$where .= " and a.clm_state = '" . Lib::quote($clm_state) . "' ";
 
-        if($head_desc != "")	$where .= " and c.head_desc = '" . Lib::quote($head_desc) . "' ";
-        if($ord_state != "")	$where .= " and a.ord_state = '" . Lib::quote($ord_state) . "' ";
-        if($clm_state == "90")$where .= " and a.clm_state = 0 ";
-		else{
-			if($clm_state != ""){
-                $where .= " and a.clm_state = '" . Lib::quote($clm_state) . "' ";
+		// 결제조건
+		if ($stat_pay_type != "") {
+			if ($not_complex == "Y") {
+				$where .= " and a.pay_type = '" . Lib::quote($stat_pay_type) . "' ";
+			} else {
+				$where .= " and (( a.pay_type & " . Lib::quote($stat_pay_type) . " ) = " . Lib::quote($stat_pay_type) . ") ";
 			}
 		}
-        if($brand_cd != "")    $where .= " and c.brand = '" . Lib::quote($brand_cd) . "' ";
-        if($cols != "" && $key != ""){
-            if(in_array($cols,array("b.mobile","b.phone","b.r_phone","b.r_mobile"))){
-                $key = $this->replacetel($key);
-                if($cols == "b.mobile" || $cols == "b.phone" || $cols == "b.r_mobile"){
-                    $where .= " and $cols = '$key' ";
-                } else {
-                    $where .= " and $cols like '$key%' ";
-                }
-            } else {
-                $where .= " and $cols like '" . Lib::quote($key) . "%' ";
-            }
-        }
 
-        $str_order_by = $ord_field." ".$ord;
-        if($ord_field == "a.head_desc"){ // 상단 홍보글인경우, 상단홍보글, 상품명 순.
-			$str_order_by = $ord_field." ".$ord." ,a.goods_nm ".$ord;
+		if ($receipt == "R") {	// 신청
+			$where .= " and d.cash_apply_yn = 'Y' ";
+		} else if ($receipt == "Y") {	// 발행
+			$where .= " and d.cash_yn = 'Y' ";
 		}
 
-        $goods_img_url = '';
-        $cfg_img_size_real = "a_500";
-        $cfg_img_size_list = "s_50";
-        $insql = "";
-        $str_order_by = " a.ord_opt_no desc ";
+		if ($pay_stat != "")	$where .= " and d.pay_stat = '" . Lib::quote($pay_stat) . "' ";
+		if ($dlv_type != "")	$where .= " and b.dlv_type = '" . Lib::quote($dlv_type) . "' ";
+		if ($dlv_no != "")		$where .= " and a.dlv_no = '" . Lib::quote($dlv_no) . "' ";
+		if ($out_ord_no != "")	$where .= " and b.out_ord_no = '" . Lib::quote($out_ord_no) . "' ";
+
+		$str_order_by = $ord_field . " " . $ord;
+
+		if ($ord_field == "a.head_desc") { // 상단 홍보글인경우, 상단홍보글, 상품명 순.
+			$str_order_by = $ord_field . " " . $ord . " , a.goods_nm " . $ord;
+		}
+
+		$conf = new Conf();
+		$cfg_img_size_list		= SLib::getCodesValue('G_IMG_SIZE', 'list');
+		$cfg_img_size_real		= SLib::getCodesValue('G_IMG_SIZE', 'list');
+		$cfg_domain_img			= $conf->getConfigValue("shop", "domain_img");
+		$goods_img_url = '';
 
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
@@ -180,7 +225,7 @@ class ord01Controller extends Controller
         $total = 0;
         $page_cnt = 0;
 
-        if($page == 1){
+        if ($page == 1) {
             $query = /** @lang text */
                 "
 					select count(*) as total
@@ -194,17 +239,23 @@ class ord01Controller extends Controller
 						left outer join claim g on g.ord_opt_no = a.ord_opt_no
 						left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
 						left outer join order_track ot on a.ord_no = ot.ord_no
-					where 1=1 
-					and a.com_id = :com_id 
-					$where
+					where a.com_id = :com_id $where
 			";
-            $row = DB::select($query,["com_id" => $com_id]);
-            //$row = DB::select($query);
-            $total = $row[0]->total;
-            if($total > 0){
-                $page_cnt=(int)(($total-1)/$page_size) + 1;
+            $row = DB::selectOne($query, [ "com_id" => $com_id ]);
+            $total = $row->total;
+            if ($total > 0) {
+                $page_cnt = (int)(($total - 1) / $page_size) + 1;
+				$startno = ($page - 1) * $page_size;
             }
-        }
+        } else {
+			$startno = ($page - 1) * $page_size;
+		}
+
+		if ($limit == -1) {
+			$limit = "";
+		} else {
+			$limit = " limit $startno, $page_size ";
+		}
 
         $query = /** @lang text */
             "
@@ -229,7 +280,7 @@ class ord01Controller extends Controller
                 concat('$goods_img_url',replace(a.img,'$cfg_img_size_real','$cfg_img_size_list')) as img,
                 a.goods_type,
                 '2' as depth,
-                a.sms_name, a.sms_mobile
+                a.sms_name, a.sms_mobile, a.head_desc
             from (
                 select
                     b.ord_no, a.ord_opt_no, a.ord_state, d.pay_stat, c.goods_type, c.style_no, a.goods_nm,
@@ -250,7 +301,7 @@ class ord01Controller extends Controller
                     b.mobile_yn, '' as app_yn, ifnull(ot.browser, '') as browser,
                     if(d.cash_apply_yn = 'Y', '신청', '') as cash_apply_yn,
                     if(d.cash_yn = 'Y', '발행', '') as cash_yn,
-                    b.dlv_type,
+                    b.dlv_type, a.head_desc,
                     if(ifnull(a.goods_addopt,'') = '',
                         (select ifnull(group_concat(if(addopt_amt>0,concat(addopt,'(+',addopt_amt,')'),addopt)),'')
                         from order_opt_addopt where ord_opt_no = a.ord_opt_no),
@@ -285,9 +336,9 @@ class ord01Controller extends Controller
             left outer join code dlv_type on (a.dlv_type = dlv_type.code_id and dlv_type.code_kind_cd = 'G_DLV_TYPE')
         ";
 
-        $rows = DB::select($query,["com_id" => $com_id]);
-
         $depth_no = "";
+        $rows = DB::select($query, [ "com_id" => $com_id ]);
+
         foreach ($rows as $row) {
             $ord_no = $row->ord_no;
 
@@ -316,8 +367,6 @@ class ord01Controller extends Controller
             ),
             "body" => $rows
         ]);
-
-
     }
 
     public function show($ord_no,$ord_opt_no = ""){

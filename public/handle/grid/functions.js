@@ -328,6 +328,18 @@ function StyleOrdState(params) {
     };
 }
 
+function StylePayState(params) {
+	const state = {
+		"예정": "#ff2222",
+		"입금": "#222222",
+	}
+
+	return {
+		"color": state[params.value] || "inherit",
+		"text-align": "center",
+	};
+}
+
 function StyleClmState(params){
     if(params.value != ""){
         return {
