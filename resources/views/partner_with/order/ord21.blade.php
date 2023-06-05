@@ -70,65 +70,65 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="dlv_kind">주문상태/배송방식</label>
-                                <div class="form-inline">
-                                    <div class="form-inline-inner input_box">
-                                        <select name='ord_state' class="form-control form-control-sm">
-                                            <option value=''>전체</option>
-                                            @foreach ($ord_states as $ord_state)
-                                                <option
-                                                    value='{{ $ord_state->code_id }}'
-                                                    {{ ($ord_state->code_id == '10') ? 'selected' : '' }}
-                                                >
-                                                    {{ $ord_state->code_val }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <span class="text_line">/</span>
-                                    <div class="form-inline-inner input_box">
-                                        <select name='dlv_type' class="form-control form-control-sm">
-                                            <option value=''>전체</option>
-                                            @foreach ($dlv_types as $dlv_type)
-                                                <option value='{{ $dlv_type->code_id }}'>{{ $dlv_type->code_val }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                <label for="dlv_kind">주문상태</label>
+                                <div class="flax_box">
+                                    <select name='ord_state' class="form-control form-control-sm">
+                                        <option value=''>전체</option>
+                                        @foreach ($ord_states as $ord_state)
+                                            <option
+                                                value='{{ $ord_state->code_id }}'
+                                                {{ ($ord_state->code_id == '10') ? 'selected' : '' }}
+                                            >
+                                                {{ $ord_state->code_val }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-email-input">배송구분</label>
-                                <div class="flax_box">
-                                    <select name='dlv_kind' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
-                                        @foreach ($dlv_kinds as $dlv_kind)
-                                            <option value='{{ $dlv_kind->code_id }}'>{{ $dlv_kind->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <label for="formrow-email-input">배송구분/배송방식</label>
+	                            <div class="form-inline">
+		                            <div class="form-inline-inner input_box">
+			                            <select name='dlv_kind' class="form-control form-control-sm">
+				                            <option value=''>전체</option>
+				                            @foreach ($dlv_kinds as $dlv_kind)
+					                            <option value='{{ $dlv_kind->code_id }}'>{{ $dlv_kind->code_val }}</option>
+				                            @endforeach
+			                            </select>
+		                            </div>
+		                            <span class="text_line">/</span>
+		                            <div class="form-inline-inner input_box">
+			                            <select name='dlv_type' class="form-control form-control-sm">
+				                            <option value=''>전체</option>
+				                            @foreach ($dlv_types as $dlv_type)
+					                            <option value='{{ $dlv_type->code_id }}'>{{ $dlv_type->code_val }}</option>
+				                            @endforeach
+			                            </select>
+		                            </div>
+	                            </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-email-input">주문자/수령자</label>
+                                <label for="user_nm">주문자/수령자</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm search-all" name='user_nm' value=''>
+                                        <input type='text' class="form-control form-control-sm search-all search-enter" name='user_nm' id="user_nm" value=''>
                                     </div>
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm search-all" name='r_nm' value=''>
+                                        <input type='text' class="form-control form-control-sm search-all search-enter" name='r_nm' id="r_nm" value=''>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-inputState">스타일넘버</label>
+                                <label for="style_no">스타일넘버</label>
                                 <div class="flax_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
                                 </div>
@@ -136,25 +136,25 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-inputZip">재고</label>
+                                <label for="wqty_low">재고수량</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm search-all" name='wqty_low' value='' placeholder="이상">
+                                        <input type='text' class="form-control form-control-sm search-all search-enter" name='wqty_low' value='' placeholder="이상">
                                     </div>
                                     <span class="text_line">~</span>
                                     <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm search-all" name='wqty_high' value='' placeholder="이하">
+                                        <input type='text' class="form-control form-control-sm search-all search-enter" name='wqty_high' value='' placeholder="이하">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="search-area-ext d-none row align-items-center">
+                    <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="ord_no">주문번호</label>
                                 <div class="flax_box">
-                                    <input type="text" class="form-control form-control-sm search-all" name="ord_no" id="ord_no" value="">
+                                    <input type="text" class="form-control form-control-sm search-all search-enter" name="ord_no" id="ord_no" value="">
                                 </div>
                             </div>
                         </div>
@@ -185,7 +185,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="search-area-ext d-none row align-items-center">
+                    <div class="search-area-ext d-none row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="goods_type">품목</label>
@@ -212,7 +212,7 @@
                             <div class="form-group">
                                 <label for="formrow-email-input">상품명</label>
                                 <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm" name='goods_nm' value=''>
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
                                 </div>
                             </div>
                         </div>
@@ -256,7 +256,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <a href="#" onclick="updateKind()" class="btn btn-sm btn-primary shadow mr-1">출고상태 변경</a>
+                        <a href="#" onclick="updateKind()" class="btn btn-sm btn-primary shadow">출고상태 변경</a>
                     </div>
                 </div>
             </div>
@@ -267,40 +267,22 @@
     </div>
     <script language="javascript">
         var columns = [
-            {
-              headerName: '',
-              headerCheckboxSelection: true,
-              checkboxSelection: true,
-              width: 28
-            },
-            {
-                headerName: '#',
-                width: 40,
-                maxWidth: 100,
-                // it is important to have node.id here, so that when the id changes (which happens
-                // when the row is loaded) then the cell is refreshed.
-                valueGetter: 'node.id',
-                cellRenderer: 'loadingRenderer',
-	            cellClass: 'hd-grid-code',
-            },
-            {field: "ord_type_nm", headerName: "주문구분", cellClass: 'hd-grid-code'},
-            {
-              field:"ord_kind_nm",
-              headerName:"출고구분",
-              cellStyle:StyleOrdKind
-            },
-            {field: "ord_no", headerName: "주문번호", width: 140, cellStyle: StyleOrdNo, type: 'OrderNoType', cellClass: 'hd-grid-code'},
-            {field: "ord_opt_no", headerName: "주문일련번호", sortable: "ture", width: 75, cellClass: 'hd-grid-code',
+            {headerName: '#', width: 40, maxWidth: 100, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellClass: 'hd-grid-code', pinned: 'left'},
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left'},
+            {field: "ord_type_nm", headerName: "주문구분", width: 60, cellClass: 'hd-grid-code', pinned: 'left'},
+            {field: "ord_kind_nm", headerName: "출고구분", cellStyle: StyleOrdKind, width: 60, pinned: 'left'},
+            {field: "ord_no", headerName: "주문번호", width: 140, cellStyle: StyleOrdNo, type: 'OrderNoType', cellClass: 'hd-grid-code', pinned: 'left'},
+            {field: "ord_opt_no", headerName: "주문일련번호", sortable: "ture", width: 75, cellClass: 'hd-grid-code', pinned: 'left',
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         return '<a href="/partner/order/ord01/"' + params.data.ord_opt_no + '" rel="noopener">' + params.value + '</a>';
                     }
                 }
             },
-            {field: "ord_state_nm", headerName: "주문상태", cellStyle: StyleOrdState},
-            {field: "pay_stat_nm", headerName: "입금상태", cellClass: 'hd-grid-code'},
-            {field: "clm_state_nm", headerName: "클레임상태", cellStyle: StyleClmState},
-            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsTypeNM},
+            {field: "ord_state_nm", headerName: "주문상태", cellStyle: StyleOrdState, width: 60},
+            {field: "pay_stat_nm", headerName: "입금상태", cellClass: 'hd-grid-code', width: 60},
+            {field: "clm_state_nm", headerName: "클레임상태", cellStyle: StyleClmState, width: 70},
+            {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsTypeNM, width: 60},
             {field: "style_no", headerName: "스타일넘버", width: 70, cellClass: 'hd-grid-code'},
             {field: "goods_nm", headerName: "상품명", type: "GoodsNameType", width: 200},
             {
@@ -343,11 +325,11 @@
             {field:"dlv_comment", headerName: "출고 메시지"},
             {field:"proc_state", headerName: "처리현황"},
             {field:"proc_memo", headerName: "메모"},
-            {field:"sale_place", headerName: "판매처"},
+            {field: "sale_place", headerName: "판매처", width: 70, cellClass: 'hd-grid-code'},
             {field:"out_ord_no", headerName: "판매처주문번호"},
 
-            {field:"baesong_kind" , headerName:"배송구분"  },
-            {field:"dlv_type" , headerName:"배송방식"  },
+            {field: "baesong_kind", headerName:"배송구분", width: 70, cellClass: 'hd-grid-code'},
+            {field: "dlv_type", headerName:"배송방식", width: 60, cellClass: 'hd-grid-code'},
             //출고요청이라 택배업체, 송장번호는 필요없다고 판단되었습니다.
             // {field:"dlv_nm" , headerName:"택배업체"  },
             // {field:"dlv_no" , headerName:"송장번호"  },
@@ -387,6 +369,7 @@
                 }
             });
             pApp.ResizeGrid(265);
+			pApp.BindSearchEnter();
             Search();
 
             $('.search-all').keyup(function(){
@@ -397,7 +380,7 @@
 
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/partner/order/ord21/search', data, 1, searchCallback);
+            gx.Request('/partner/order/ord21/search', data, -1, searchCallback);
     }
 
     function searchCallback(data) {}

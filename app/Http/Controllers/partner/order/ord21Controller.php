@@ -17,7 +17,7 @@ class ord21Controller extends Controller
     public function index(Request $request)
     {
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(14, 'day')->format('Y-m-d');
+        $sdate = $mutable->sub(2, 'week')->format('Y-m-d');
         $style_no	= $request->input('style_no');
 
         $com_id = Auth('partner')->user()->com_id;
@@ -79,7 +79,7 @@ class ord21Controller extends Controller
         $item = $request->input('item');
 
         //브랜드
-        $brand = $request->input('brand');
+        $brand = $request->input('brand_cd');
 
         //상품명
         $goods_nm = $request->input('goods_nm');
@@ -165,40 +165,9 @@ class ord21Controller extends Controller
         $goods_img_url = '';
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
-        $insql = "";
         $str_order_by = " a.ord_opt_no desc ";
 
-        $page_size = $limit;
-        $startno = ($page-1) * $page_size;
-
         $total = 0;
-        $page_cnt = 0;
-
-        if($page == 1){
-            $query = /** @lang text */
-                "
-				select count(*) as total
-				from order_opt a
-                inner join order_mst b on a.ord_no = b.ord_no
-                inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub
-                inner join payment d on b.ord_no = d.ord_no
-                left join coupon g on g.coupon_no = a.coupon_no
-                inner join company f on a.sale_place = f.com_id and f.com_type='4'
-                inner join company e on a.com_id = e.com_id
-                left outer join claim i on a.ord_opt_no = i.ord_opt_no
-                left outer join order_opt_memo j on a.ord_opt_no = j.ord_opt_no
-                where 1=1
-                and ( a.clm_state = '0' or a.clm_state = '-30') $where
-                having 1 = 1 $having
-			";
-            //echo "<pre>$query $com_id</pre>";
-            $row = DB::select($query,["com_id" => $com_id]);
-            //$row = DB::select($query);
-            $total = $row[0]->total;
-            if($total > 0){
-                $page_cnt=(int)(($total-1)/$page_size) + 1;
-            }
-        }
 
         $query = "
             select
@@ -262,7 +231,6 @@ class ord21Controller extends Controller
               where 1=1
                 and ( a.clm_state = '0' or a.clm_state = '-30') $where
               having 1 = 1 $having
-              limit $startno, $page_size
             ) a
             left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
             left outer join code ord_kind on (a.ord_kind = ord_kind.code_id and ord_kind.code_kind_cd = 'G_ORD_KIND')
@@ -275,17 +243,16 @@ class ord21Controller extends Controller
             left outer join code dlv_type on (a.dlv_type = dlv_type.code_id and dlv_type.code_kind_cd = 'G_DLV_TYPE')
             order by a.ord_opt_no desc
         ";
-        //echo "<pre>$query</pre>";
 
         $rows = DB::select($query);
 
         return response()->json([
             "code" => 200,
             "head" => array(
-                "total" => $total,
-                "page" => $page,
-                "page_cnt" => $page_cnt,
-                "page_total" => count($rows)
+                "total" => count($rows),
+                "page" => 1,
+                "page_cnt" => 1,
+                "page_total" => 1,
             ),
             "body" => $rows
         ]);

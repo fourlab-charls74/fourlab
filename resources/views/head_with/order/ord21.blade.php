@@ -172,7 +172,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="row d-none search-area-ext">
+				<div class="row">
 					<!-- 상품구분 -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
@@ -340,6 +340,7 @@
 			valueGetter: 'node.id',
 			cellRenderer: 'loadingRenderer',
 			pinned: 'left',
+			cellClass: 'hd-grid-code'
 		},
 		{
 			headerName: '',
@@ -352,7 +353,8 @@
 			field: "ord_type_nm",
 			headerName: "주문구분",
 			width: 58,
-			pinned: 'left'
+			pinned: 'left',
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "ord_kind_nm",
@@ -386,17 +388,20 @@
 		{
 			field: "pay_stat_nm",
 			headerName: "입금상태",
-			width: 58
+			width: 58,
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "dlv_type",
 			headerName: "배송방식",
-			width: 58
+			width: 58,
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "clm_state_nm",
 			headerName: "클레임상태",
 			width: 70,
+			cellClass: 'hd-grid-code',
 			cellStyle: StyleClmState
 		},
 		{
@@ -407,7 +412,8 @@
 		},
 		{
 			field: "style_no",
-			headerName: "스타일넘버"
+			headerName: "스타일넘버",
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "img",
@@ -424,7 +430,7 @@
 		{
 			field: "opt_val",
 			headerName: "옵션",
-			width:82
+			width: 100
 		},
 		{
 			field: "sale_qty",
@@ -479,7 +485,8 @@
 		{
 			field: "pay_type",
 			headerName: "결제방법",
-			width:72
+			width: 80,
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "user_nm",
@@ -488,7 +495,8 @@
 		{
 			field: "r_nm",
 			headerName: "수령자",
-			width:60
+			width:60,
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "dlv_msg",
@@ -510,7 +518,9 @@
 		},
 		{
 			field: "sale_place",
-			headerName: "판매처"
+			headerName: "판매처",
+			width: 80,
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "out_ord_no",
@@ -518,7 +528,9 @@
 		},
 		{
 			field: "com_nm",
-			headerName: "업체"
+			headerName: "업체",
+			width: 80,
+			cellClass: 'hd-grid-code'
 		},
 		{
 			field: "baesong_kind",
@@ -528,24 +540,23 @@
 		{
 			field: "ord_date",
 			headerName: "주문일시",
-			width:110
+			type: 'DateTimeType'
 		},
 		{
 			field: "pay_date",
 			headerName: "입금일시",
-			width:110
+			type: 'DateTimeType'
 		},
 		{
 			field: "last_up_date",
 			headerName: "클레임일시",
-			width:110
-		}
+			type: 'DateTimeType'
+		},
+		{width: "auto"}
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', {
-		gridId: "#div-gd",
-	});
+	const pApp = new App('', { gridId: "#div-gd", height: 265 });
 	const gridDiv = document.querySelector(pApp.options.gridId);
 	let gx;
 	$(document).ready(function() {

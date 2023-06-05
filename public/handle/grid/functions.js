@@ -242,7 +242,6 @@ function StyleGoodsTypeNM(params){
             return {
                 color :state[params.value],
                 "text-align": "center",
-                "line-height": "30px"
             }
         }
     }
@@ -286,8 +285,7 @@ function StyleGoodsStateLH50(params){
 			var color = state[params.value];
 			return {
 				color: color,
-				'text-align': 'center',
-				'line-height': '30px'
+				'text-align': 'center'
 			}
 		}
 	}
