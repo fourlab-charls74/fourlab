@@ -234,12 +234,13 @@ function init() {
     initUtil();
     initSettings();
 
-	const side_status = sessionStorage.getItem("side-status");
-	if(side_status == "open") {
-		$("body").removeClass("sidebar-enable");
-	} else {
-		$("body").addClass("sidebar-enable");
-	}
+	/** 피엘라벤 적용해제 (김팀장님 요청) 2023-06-05 최유현 */
+	// const side_status = sessionStorage.getItem("side-status");
+	// if(side_status == "open") {
+	// 	$("body").removeClass("sidebar-enable");
+	// } else {
+	// 	$("body").addClass("sidebar-enable");
+	// }
 }
 
 init();
