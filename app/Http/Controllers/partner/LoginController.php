@@ -15,8 +15,10 @@ class LoginController extends Controller
 {
     //
     public function index() {
-        echo  Auth::guard('partner')->user();
-        return view( Config::get('shop.partner.view') . '/auth/login', [
+		$user = Auth::guard('partner')->user();
+		if ($user !== null) return redirect('/partner');
+
+		return view( Config::get('shop.partner.view') . '/auth/login', [
             "className" => "loginPage"
         ]);
     }

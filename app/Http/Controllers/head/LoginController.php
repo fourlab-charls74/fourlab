@@ -18,6 +18,9 @@ class LoginController extends Controller
 {
     //
     public function index() {
+		$user = Auth::guard('head')->user();
+		if ($user !== null) return redirect('/head');
+		
         return view( Config::get('shop.head.view') . '/auth/login', [
             "className" => "loginPage"
         ]);
