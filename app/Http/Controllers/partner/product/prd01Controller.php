@@ -115,14 +115,18 @@ class prd01Controller extends Controller
         $cat_cd = $request->input("cat_cd");
         $is_unlimited = $request->input("is_unlimited");
 
-		// $com_id = $request->input("com_cd");
+		$org_nm = $request->input("org_nm", "");
+		$make = $request->input("make", "");
+		$sdate = $request->input("sdate", "");
+		$edate = $request->input("edate", "");
+		$is_option_use = $request->input("is_option_use", "");
+		$goods_location = $request->input("goods_location", "");
 
 		$com_id = Auth('partner')->user()->com_id;
 
         $head_desc = $request->input("head_desc");
 		$ad_desc = $request->input("ad_desc");
 
-        $is_unlimited = $request->input("is_unlimited");
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
@@ -198,6 +202,13 @@ class prd01Controller extends Controller
 		if( $coupon_yn != "" )	$where .= " and gc.price > 0 ";
 		if( $sale_type != "" )	$where .= " and g.sale_type = '" . Lib::quote($sale_type) . "' ";
 		if( $except_trash == "Y") $where .= "and g.sale_stat_cl > -90";
+		
+		if ($org_nm != '') $where .= " and g.org_nm = '" . Lib::quote($org_nm) . "' ";
+		if ($make != '') $where .= " and g.make = '" . Lib::quote($make) . "' ";
+		if ($sdate != '') $where .= " and g.reg_dm >= '" . Lib::quote($sdate) . "' ";
+		if ($edate != '') $where .= " and g.reg_dm <= '" . Lib::quote($edate) . " 23:59:59' ";
+		if ($is_option_use != '') $where .= " and g.is_option_use = '" . Lib::quote($is_option_use) . "' ";
+		if ($goods_location != '') $where .= " and g.goods_location = '" . Lib::quote($goods_location) . "' ";
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;

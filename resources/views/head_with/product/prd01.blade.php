@@ -287,8 +287,12 @@
                         <div class="form-group">
                             <label for="item">재고구분</label>
                             <div class="form-inline form-radio-box">
+	                            <div class="custom-control custom-radio">
+		                            <input type="radio" name="is_unlimited" id="is_unlimited0" class="custom-control-input" value="" checked>
+		                            <label class="custom-control-label" for="is_unlimited0" value="">전체</label>
+	                            </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="is_unlimited" id="is_unlimited1" class="custom-control-input" checked="" value="N">
+                                    <input type="radio" name="is_unlimited" id="is_unlimited1" class="custom-control-input" value="N">
                                     <label class="custom-control-label" for="is_unlimited1" value="20">수량관리함</label>
                                 </div>
                                 <div class="custom-control custom-radio">

@@ -26,7 +26,7 @@
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
                     <a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                    <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+                    <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">검색조건 초기화</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -337,28 +337,27 @@
     });
 
     const columnDefs = [
-        {headerName: '#', pinned: 'left', type: 'NumType', cellStyle: style_obj},
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {field: "goods_no", headerName: "상품번호", width: 80, pinned: 'left', cellStyle: style_obj},
-        {field: "goods_type", headerName: "상품구분", width: 100, 
-            // cellStyle: { ...StyleGoodsTypeNM, "line-height": "40px" }, 
+        {headerName: '#', pinned: 'left', width: 40, type: 'NumType', cellClass: 'hd-grid-code', cellStyle: style_obj},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+        {field: "goods_no", headerName: "상품번호", width: 80, cellClass: 'hd-grid-code', pinned: 'left', cellStyle: style_obj},
+        {field: "goods_type", headerName: "상품구분", width: 60, pinned: 'left',
             cellStyle: (params) => 
                 { 
                     let obj = StyleGoodsTypeNM(params);
                     obj = { ...obj, ...style_obj, "text-align": "center"};
                     return obj;
-                },
-            pinned: 'left'},
-        {field: "com_nm", headerName: "업체", cellStyle: style_obj},
-        {field: "opt_kind_nm", headerName: "품목", cellStyle: style_obj, width: 110},
-        {field: "brand_nm", headerName: "브랜드", cellStyle: style_obj},
-        {field: "full_nm", headerName: "대표카테고리", cellStyle: style_obj, width: 200},
-        {field: "style_no", headerName: "스타일넘버", cellStyle: style_obj},
-        {field: "head_desc", headerName: "상단홍보글", cellStyle: style_obj, width: 150},
+                }
+		},
+        {field: "com_nm", headerName: "업체", cellStyle: style_obj, width: 80, cellClass: 'hd-grid-code'},
+        {field: "opt_kind_nm", headerName: "품목", cellStyle: style_obj, width: 100, cellClass: 'hd-grid-code'},
+        {field: "brand_nm", headerName: "브랜드", cellStyle: style_obj, width: 80, cellClass: 'hd-grid-code'},
+        {field: "full_nm", headerName: "대표카테고리", cellStyle: style_obj, width: 100},
+        {field: "style_no", headerName: "스타일넘버", cellStyle: style_obj, width: 80, cellClass: 'hd-grid-code'},
+        {field: "head_desc", headerName: "상단홍보글", cellStyle: style_obj, width: 100},
         {field: "img", headerName: "이미지", type: 'GoodsImageType', cellStyle: style_obj},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "goods_nm", headerName: "상품명", type: 'GoodsNameType', cellStyle: style_obj},
-        {field: "ad_desc", headerName: "하단홍보글", cellStyle: style_obj, width: 150},
+        {field: "ad_desc", headerName: "하단홍보글", cellStyle: style_obj, width: 100},
         {field: "sale_stat_cl", headerName: "상품상태", type: 'GoodsStateTypeLH50'},
         {field: "before_sale_price", headerName: "정상가", type: 'currencyType', hide: true},
         {field: "price", headerName: "판매가", type: 'currencyType', cellStyle: style_obj},
@@ -385,15 +384,15 @@
         {field: "margin_rate", headerName: "마진율", type: 'percentType', cellStyle: style_obj},
         {field: "margin_amt", headerName: "마진액", type: 'numberType', cellStyle: style_obj},
         {field: "md_nm", headerName: "MD", cellStyle: style_obj},
-        {field: "baesong_info", headerName: "배송지역", cellStyle: style_obj},
-        {field: "baesong_kind", headerName: "배송업체", cellStyle: style_obj},
-        {field: "dlv_pay_type", headerName: "배송비지불", cellStyle: style_obj},
+        {field: "baesong_info", headerName: "배송지역", cellStyle: style_obj, cellClass: 'hd-grid-code'},
+        {field: "baesong_kind", headerName: "배송업체", cellStyle: style_obj, cellClass: 'hd-grid-code'},
+        {field: "dlv_pay_type", headerName: "배송비지불", cellStyle: style_obj, cellClass: 'hd-grid-code'},
         {field: "baesong_price", headerName: "배송비", type: 'numberType', cellStyle: style_obj},
         {field: "point", headerName: "적립금", type: 'numberType', cellStyle: style_obj},
-        {field: "org_nm", headerName: "원산지", cellStyle: style_obj},
-        {field: "make", headerName: "제조업체", cellStyle: style_obj},
-        {field: "reg_dm", headerName: "등록일자", cellStyle: style_obj, width: 130},
-        {field: "upd_dm", headerName: "수정일자", cellStyle: style_obj, width: 130},
+        {field: "org_nm", headerName: "원산지", cellStyle: style_obj, cellClass: 'hd-grid-code'},
+        {field: "make", headerName: "제조업체", cellStyle: style_obj, cellClass: 'hd-grid-code'},
+        {field: "reg_dm", headerName: "등록일자", cellStyle: style_obj, type: "DateTimeType"},
+        {field: "upd_dm", headerName: "수정일자", cellStyle: style_obj, type: "DateTimeType"},
         {field: "goods_location", headerName: "위치", cellStyle: style_obj},
         {field: "sale_price", headerName: "sale_price", hide: true},
         {field: "goods_type_cd", headerName: "goods_type", hide: true},
