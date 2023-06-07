@@ -589,7 +589,7 @@
                                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                                             <tbody>
                                                 <tr>
-                                                    <th class="required">상품상태</th>
+                                                    <th class="required">전시상태</th>
                                                     <td>
                                                         <div class="txt_box flax_box">
                                                             <select name="sale_stat_cl" id="sale_stat_cl" class="form-control form-control-sm" style="width:61%; margin-right:7px">
