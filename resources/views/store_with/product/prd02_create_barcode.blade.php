@@ -98,7 +98,7 @@
 											<th class="required">성별</th>
 											<td>
 												<div class="flax_box">
-													<select name='gender' id='gender' class="form-control form-control-sm prd_code" onchange="change_gender();">
+													<select name='gender' id='gender' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($genders as $gender)
 														<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
@@ -111,7 +111,7 @@
 											<th class="required">품목</th>
 											<td>
 												<div class="flax_box">
-													<select name='item' id='item' class="form-control form-control-sm prd_code" onchange="change_gender();">
+													<select name='item' id='item' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($items as $item)
 														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
@@ -138,6 +138,19 @@
 													</select>
 												</div>
 											</td>
+											<th class="required">사이즈구분</th>
+											<td>
+												<div class="flax_box">
+													<select name="size_kind" id="size_kind" class="form-control form-control-sm" onchange="change_size();">
+														<option value=''> 선택 </option>
+													@foreach ($size_kind as $sk)
+														<option value='{{ $sk->size_kind_cd }}'>{{ $sk->size_kind_cd }} : {{ $sk->size_kind_nm }}</option>
+													@endforeach
+													</select>
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th class="required">사이즈</th>
 											<td>
 												<div class="flax_box">
@@ -146,8 +159,6 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">기획구분</th>
 											<td>
 												<div class="flax_box">
@@ -160,20 +171,22 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+                                        <tr>
 											<th class="required">상품명</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
-										</tr>
-                                        <tr>
 											<th class="required">상품명(영문)</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">공급업체</th>
 											<td>
 												<div class="flax_box">
@@ -185,30 +198,26 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">원가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>TAG가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>판매가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											<th></th>
-											<td></td>
 										</tr>
 										<tr>
 											<th>이미지</th>
@@ -277,6 +286,9 @@
 		{field: "prd_cd", headerName: "품번", width: 140},
 		{field: "color", headerName: "컬러", width: 80,
 			cellRenderer: (params) => params.data.color.split(':')[1]
+		},
+		{field: "size_kind", headerName: "사이즈구분", width: 80,
+			cellRenderer: (params) => params.data.size_kind.split(':')[1]
 		},
 		{field: "size", headerName: "사이즈", width: 80,
 			cellRenderer: (params) => params.data.size.split(':')[1]
@@ -366,8 +378,6 @@
 		const { code } = response.data;
 		if (code == 200) {
 
-			console.log(document.f1.style_no.id);
-
 			const idx = added_rows.length;
 			const brand = document.f1.brand.value;
 			let style_no_value = document.f1.style_no.value;
@@ -393,6 +403,7 @@
 				item: document.f1.item.value,
 				image: added_base64_image,
 				color: document.f1.color.value,
+				size_kind : document.f1.size_kind.value,
 				size: document.f1.size.value,
 				prd_nm: document.f1.prd_nm.value,
 				prd_nm_eng: document.f1.prd_nm_eng.value,
@@ -415,6 +426,7 @@
 				item: document.f1.item[document.f1.item.selectedIndex].text,
 				image: added_base64_image,
 				color: document.f1.color[document.f1.color.selectedIndex].text,
+				size_kind : document.f1.size_kind[document.f1.size_kind.selectedIndex].text,
 				size: document.f1.size[document.f1.size.selectedIndex].text,
 				prd_nm: document.f1.prd_nm.value,
 				prd_nm_eng: document.f1.prd_nm_eng.value,
@@ -476,6 +488,12 @@
 		if (f1.color.selectedIndex == 0) {
 			f1.color.focus();
 			return alert("컬러를 선택해주세요.");
+		}
+
+		// 사이즈 선택여부
+		if (f1.size_kind.selectedIndex == 0) {
+			f1.size_kind.focus();
+			return alert("사이즈구분을 선택해주세요.");
 		}
 
 		// 사이즈 선택여부
@@ -718,16 +736,14 @@
 	}
 
 	//성별에 따라 사이즈 값 다르게 출력
-	function change_gender() {
-		let gender = $('#gender option:selected').val();
-		let item = $('#item option:selected').val();
+	function change_size() {
+		let size_kind = $('#size_kind option:selected').val();
 		
 		$.ajax({
 			method: 'post',
-			url: '/store/product/prd02/change-gender',
+			url: '/store/product/prd02/change-size',
 			data: {
-				gender : gender,
-				item : item
+				size_kind : size_kind,
 			},
 			success: function (res) {
 				if(res.code == 200) {

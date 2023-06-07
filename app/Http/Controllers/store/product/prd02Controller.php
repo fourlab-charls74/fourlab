@@ -356,6 +356,8 @@ class prd02Controller extends Controller
 
 		$opt_sql	= " select code_id, code_val from code where code_kind_cd = 'prd_cd_opt' order by code_val asc";
 		$opts	= DB::select($opt_sql);
+
+		
 		
 		$values = [
 			'brands'	=> $brands,
@@ -364,6 +366,7 @@ class prd02Controller extends Controller
 			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
 			'items'		=> $items,
 			'opts'		=> $opts,
+			
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_create',$values);
@@ -1183,6 +1186,7 @@ class prd02Controller extends Controller
 				$gender		= $row['gender'];
 				$item 		= $row['item'];
 				$color 		= $row['color'];
+				$size_kind	= $row['size_kind'];
 				$size 		= $row['size'];
 				$prd_nm		= $row['prd_nm'];
 				$prd_nm_eng	= $row['prd_nm_eng']??'';
@@ -1200,6 +1204,7 @@ class prd02Controller extends Controller
 				$gender 	= explode(' : ', $gender);
 				$item 		= explode(' : ', $item);
 				$color 		= explode(' : ', $color);
+				$size_kind  = explode(' : ', $size_kind);
 				$size 		= explode(' : ', $size);
 				$sup_com 	= explode(' : ', $sup_com);
 				$plan_category 	= explode(' : ', $plan_category);
@@ -1257,6 +1262,7 @@ class prd02Controller extends Controller
 						'gender'	=> $gender[0],
 						'item'		=> $item[0],
 						'color'		=> $color[0],
+						'size_kind' => $size_kind[0],
 						'size'		=> $size[0],
 						'plan_category' => $plan_category[0],
 						'rt'		=> now(),
@@ -1477,43 +1483,26 @@ class prd02Controller extends Controller
 	}
 
 	//성별 변경 시 해당 성별의 사이즈 값 출력
-	public function change_gender(Request $request)
+	public function change_size(Request $request)
 	{
-		$gender = $request->input('gender');
-		$item = $request->input('item');
+		$size_kind = $request->input('size_kind');
 
 		try {
 			DB::beginTransaction();
 
-			if ($gender == 'M') {
-				$sql = "
-					select
-						size_kind_cd
-						, size_cd
-						, size_nm
-					from size
-					where size_kind_cd in ('TOP', 'BOTTOM', 'FREE', 'GLOVES', 'MEN_BOTTOM', 'MEN_BOTTOM_S', 'MEN_BOTTOM_R', 'SHOES', 'SOCKS', 'BELT')
-				";
+			$sql = "
+				select
+					size_kind_cd
+					, size_cd
+					, size_nm
+					, use_yn
+				from size
+				where size_kind_cd = '$size_kind'
+				and use_yn = 'Y'
+				order by size_seq asc
+			";
 
-				$result = DB::select($sql);
-
-			} elseif ($gender == 'W') {
-				$sql = "
-					select
-						size_kind_cd
-						, size_cd
-						, size_nm
-					from size
-					where size_kind_cd in ('TOP', 'BOTTOM', 'FREE', 'GLOVES', 'WOMEN_BOTTOM', 'WOMEN_BOTTOM_S', 'WOMEN_BOTTOM_R', 'SHOES', 'SOCKS', 'BELT')
-				";
-
-				$result = DB::select($sql);
-
-			} elseif ($gender == 'U') {
-
-			} elseif ($gender == 'K')
-
-
+			$result = DB::select($sql);
 
             DB::commit();
             $code = 200;
@@ -1748,6 +1737,8 @@ class prd02Controller extends Controller
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
 
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y'";
+		$size_kind = DB::select($size_kind_sql);
 
 		$values = [
 			'brands' 	=> $brands,
@@ -1761,6 +1752,7 @@ class prd02Controller extends Controller
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'sup_coms' 	=> $sup_coms,
 			'units' 	=> SLib::getCodes("PRD_CD_UNIT"),
+			'size_kind' => $size_kind,
 			'images' 	=> []
 		];
 

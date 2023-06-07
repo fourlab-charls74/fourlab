@@ -252,7 +252,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/show', 'prd02Controller@update');
 
         Route::get('prd02/product_upload', 'prd02Controller@product_upload');
-        Route::post('prd02/change-gender', 'prd02Controller@change_gender');
+        Route::post('prd02/change-size', 'prd02Controller@change_size');
         Route::post('prd02/get-seq', 'prd02Controller@getSeq');
         Route::post('prd02/save_product', 'prd02Controller@save_product');
         Route::post('prd02/update_product', 'prd02Controller@update_product');
