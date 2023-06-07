@@ -24,7 +24,7 @@
     </div>
 
     <style> 
-        .table th {min-width: 120px;}
+        .table th {min-width: 160px;}
         .table td {width: 25%;}
         
         @media (max-width: 740px) {
@@ -65,12 +65,12 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th class="required">이동구분/이동처명</th>
+                                            <th class="required">반품업체명</th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
                                                     @if(@$cmd == 'add')
                                                     <div class="d-flex w-100">
-                                                        <select name="target_type" id="target_type" class="form-control form-control-sm mr-1" style="min-width: 90px;">
+                                                        <select name="target_type" id="target_type" class="form-control form-control-sm mr-1" style="min-width: 90px;" hidden>
                                                             <option value="C">공급업체</option>
                                                             <option value="S">창고</option>
                                                         </select>
