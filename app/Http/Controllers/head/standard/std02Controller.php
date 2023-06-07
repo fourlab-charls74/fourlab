@@ -361,7 +361,7 @@ class std02Controller extends Controller
 		$pwd				= $request->input("pwd");
 		$change_pwd			= $request->input("change_pwd");
 		$com_nm				= $request->input("com_nm");
-		$use_yn				= $request->input("use_yn");
+		$use_yn				= strtoupper($request->input("use_yn", ""));
 		$com_type			= $request->input("com_type");
 		$md_nm				= $request->input("md_nm");
 		$settle_nm			= $request->input("settle_nm");
@@ -409,13 +409,13 @@ class std02Controller extends Controller
 		$cs_email			= $request->input("cs_email");
 		$cs_phone			= $request->input("cs_phone");
 		$cs_hp				= $request->input("cs_hp");
-		$cs_yn				= $request->input("cs_yn");
-		$price_yn			= $request->input("price_yn");
-		$api_yn				= $request->input("api_yn");
+		$cs_yn				= strtoupper($request->input("cs_yn", ""));
+		$price_yn			= strtoupper($request->input("price_yn", ""));
+		$api_yn				= strtoupper($request->input("api_yn", ""));
 		$api_key			= "";
 
 		$sell_type			= $request->input("sell_type", 0);
-		$dp_yn				= $request->input("dp_yn");
+		$dp_yn				= strtoupper($request->input("dp_yn", ""));
 		$store_type			= $request->input("store_type");
 		$store_nm			= $request->input("store_nm");
 		$store_branch		= $request->input("store_branch");
@@ -424,7 +424,7 @@ class std02Controller extends Controller
 		$com_site			= $request->input("com_site");
 		$sale_type			= $request->input("sale_type");
 		// $com_sale_type		= $request->input("com_sale_type");
-		$site_yn			= $request->input("site_yn", "N");
+		$site_yn			= strtoupper($request->input("site_yn", "N"));
 		$result_code		= 0;
 
 		if (!is_numeric($dlv_amt)) {

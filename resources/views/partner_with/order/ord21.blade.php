@@ -371,11 +371,6 @@
             pApp.ResizeGrid(265);
 			pApp.BindSearchEnter();
             Search();
-
-            $('.search-all').keyup(function(){
-                date_use_check();
-            });
-
         });
 
         function Search() {

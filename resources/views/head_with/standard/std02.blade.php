@@ -168,37 +168,34 @@
 
 
 <script language="javascript">
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
+	let columns = [
         {
             headerName: '#',
             width:35,
             pinned:'left',
             maxWidth: 100,
-            // it is important to have node.id here, so that when the id changes (which happens
-            // when the row is loaded) then the cell is refreshed.
             valueGetter: 'node.id',
             cellRenderer: 'loadingRenderer',
-            cellStyle: {"background":"#F5F7F7"}
+	        cellClass: 'hd-grid-code'
         },
         {field:"no",headerName:"no",hide:true},
-        {field:"com_type",headerName:"업체구분", pinned:'left', cellStyle:StyleGoodsTypeNM,editable: true},
-        {field:"com_id",headerName:"업체아이디", pinned:'left',
+        {field: "com_type", headerName: "업체구분", width: 70, cellClass: 'hd-grid-code', pinned: 'left', cellStyle: StyleGoodsTypeNM, editable: true},
+        {field: "com_id", headerName: "업체아이디", pinned: 'left', width: 120,
             cellRenderer: function(params) {
                 if (params.value !== undefined && params.data.no != "") {
                     return '<a href="#" onclick="ComDetail(\''+ params.value +'\');" >'+ params.value+'</a>';
                 }
             }
         },
-        {field:"com_nm",headerName:"업체명", pinned:'left', width: 'auto'},
-        {field:"baesong",headerName:"배송방식", width: 150},
-        {field:"dlv_policy",headerName:"배송비정책"},
-        {field:"baesong_price",headerName:"배송비", width: 200},
-        {field:"md_nm",headerName:"담당MD"},
-        {field:"settle_nm",headerName:"정산담당자"},
-        {field:"pay_fee",headerName:"판매수수료율"},
-        {field:"margin_type",headerName:"수수료적용방식", width: 100},
-        {field:"site_yn",headerName:"본사판매처", width: 75,
+        {field:"com_nm",headerName:"업체명", pinned:'left', width: 150},
+        {field: "baesong", headerName: "배송방식", width: 140, cellClass: 'hd-grid-code'},
+        {field: "dlv_policy", headerName: "배송비정책", width: 70, cellClass: 'hd-grid-code'},
+        {field: "baesong_price", headerName: "배송비", width: 210},
+        {field: "md_nm", headerName: "담당MD", width: 65, cellClass: 'hd-grid-code'},
+        {field: "settle_nm", headerName: "정산담당자", width: 65, cellClass: 'hd-grid-code'},
+        {field: "pay_fee", headerName: "판매수수료율", width: 75, type: 'percentType'},
+        {field: "margin_type", headerName: "수수료적용방식", width: 100, cellClass: 'hd-grid-code'},
+        {field: "site_yn", headerName: "본사판매처", width:  70,
             cellStyle: {'text-align':'center'},
             cellRenderer: function(params) {
 				if(params.value == 'Y') return "사용"
@@ -206,7 +203,7 @@ var columns = [
                 else return params.value
 			}
         },
-        {field:"api_yn",headerName:"API연동", width:75,
+        {field: "api_yn", headerName: "API연동", width: 70,
             cellStyle: {'text-align':'center'},
             cellRenderer: function(params) {
 				if(params.value == 'Y') return "사용"
@@ -214,7 +211,7 @@ var columns = [
                 else return params.value
 			}
         },
-        {field:"use_yn",headerName:"사용여부", width:75,
+        {field: "use_yn", headerName: "사용여부", width: 70,
             cellStyle: {'text-align':'center'},
             cellRenderer: function(params) {
 				if(params.value == 'Y') return "사용"
@@ -222,21 +219,21 @@ var columns = [
                 else return params.value
 			}
         },
-        {field:"biz_type",headerName:"CS사업자구분"},
-        {field:"cs_nm",headerName:"CS담당자"},
-        {field:"cs_email",headerName:"CS담당자 이메일"},
-        {field:"cs_phone",headerName:"CS담당자 연락처"},
-        {field:"cs_hp",headerName:"CS담당자 휴대전화"},
-        {field:"staff_nm1",headerName:"업체담당자"},
-        {field:"staff_email1",headerName:"업체담당자 이메일"},
-        {field:"staff_phone1",headerName:"업체담당자 연락처"},
-        {field:"staff_hp1",headerName:"업체담당자 휴대전화"},
-        {field:"staff_nm2",headerName:"정산담당자"},
-        {field:"staff_email2",headerName:"정산담당자 이메일"},
-        {field:"staff_phone2",headerName:"정산담당자 연락처"},
-        {field:"staff_hp2",headerName:"정산담당자 휴대전화"},
+        {field: "biz_type", headerName: "CS사업자구분", cellClass: 'hd-grid-code'},
+        {field: "cs_nm", headerName: "CS담당자", cellClass: 'hd-grid-code'},
+        {field: "cs_email", headerName: "CS담당자 이메일"},
+        {field: "cs_phone", headerName: "CS담당자 연락처", cellClass: 'hd-grid-code'},
+        {field: "cs_hp", headerName: "CS담당자 휴대전화", cellClass: 'hd-grid-code'},
+        {field: "staff_nm1", headerName: "업체담당자", cellClass: 'hd-grid-code'},
+        {field: "staff_email1", headerName: "업체담당자 이메일"},
+        {field: "staff_phone1", headerName: "업체담당자 연락처", cellClass: 'hd-grid-code'},
+        {field: "staff_hp1", headerName: "업체담당자 휴대전화", cellClass: 'hd-grid-code'},
+        {field: "staff_nm2", headerName: "정산담당자", cellClass: 'hd-grid-code'},
+        {field: "staff_email2", headerName: "정산담당자 이메일"},
+        {field: "staff_phone2", headerName: "정산담당자 연락처", cellClass: 'hd-grid-code'},
+        {field: "staff_hp2", headerName: "정산담당자 휴대전화", cellClass: 'hd-grid-code'},
         {width: "auto"}
-];
+	];
 
 </script>
 <script type="text/javascript" charset="utf-8">

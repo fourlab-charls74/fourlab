@@ -350,11 +350,11 @@
 												<td>
 													<div class="form-inline form-radio-box">
 														<div class="custom-control custom-radio">
-															<input type="radio" name="api_yn" id="api_yn1" class="custom-control-input" value="y" @if($company['api_yn']=='y' )checked="checked" @endif>
+															<input type="radio" name="api_yn" id="api_yn1" class="custom-control-input" value="Y" @if($company['api_yn']=='Y' )checked="checked" @endif>
 															<label class="custom-control-label" for="api_yn1">사용</label>
 														</div>
 														<div class="custom-control custom-radio">
-															<input type="radio" name="api_yn" id="api_yn2" class="custom-control-input" value="n" @if($company['api_yn']=='n' )checked="checked" @endif>
+															<input type="radio" name="api_yn" id="api_yn2" class="custom-control-input" value="N" @if($company['api_yn']=='N' )checked="checked" @endif>
 															<label class="custom-control-label" for="api_yn2">미사용</label>
 														</div>
 													</div>
