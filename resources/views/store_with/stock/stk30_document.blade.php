@@ -64,11 +64,11 @@
 		</tr>
 		<tr>
 			<td>No.</td>
-			<td colspan="4">품번</td>
-			<td colspan="12">품명</td>
-			<td colspan="2">색상</td>
+			<td colspan="4">품 번</td>
+			<td colspan="12">품 명</td>
+			<td colspan="2">색 상</td>
 			<td colspan="3">사이즈</td>
-			<td colspan="2">수량</td>
+			<td colspan="2">수 량</td>
 			<td colspan="2">판매가</td>
 			<td colspan="3">판매가합</td>
 			<td colspan="2">출고가</td>
