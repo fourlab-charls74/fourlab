@@ -1205,13 +1205,12 @@ class prd02Controller extends Controller
 				$item 		= explode(' : ', $item);
 				$color 		= explode(' : ', $color);
 				$size_kind  = explode(' : ', $size_kind);
-				$size 		= explode(' : ', $size);
 				$sup_com 	= explode(' : ', $sup_com);
 				$plan_category 	= explode(' : ', $plan_category);
 
 				$unit = "";
 
-				$prd_cd	= $row['prd_cd'].$color[0].$size[0];
+				$prd_cd	= $row['prd_cd'].$color[0].$size;
 				$goods_no = "";
 
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
@@ -1263,7 +1262,7 @@ class prd02Controller extends Controller
 						'item'		=> $item[0],
 						'color'		=> $color[0],
 						'size_kind' => $size_kind[0],
-						'size'		=> $size[0],
+						'size'		=> $size,
 						'plan_category' => $plan_category[0],
 						'rt'		=> now(),
 						'ut'		=> now(),
