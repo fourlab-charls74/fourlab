@@ -32,8 +32,8 @@ class std11Controller extends Controller
 			$dc_rate			= 0;
 			$dc_amt				= 0;
 			$dc_range			= "A";
-			$date_from			= " ";
-			$date_to			= " ";
+			$date_from			= "";
+			$date_to			= "";
 			$limit_margin_rate	= 0;
 			$limit_coupon_yn	= "Y";
 			$limit_point_yn		= "Y";
@@ -49,8 +49,8 @@ class std11Controller extends Controller
 				$dc_rate			= $row->dc_rate;
 				$dc_amt				= $row->dc_amt;
 				$dc_range			= $row->dc_range;
-				$date_from			= $row->date_from;
-				$date_to			= $row->date_to;
+				$date_from			= $row->date_from ? date_format(date_create($row->date_from), 'Y-m-d') : "";
+				$date_to			= $row->date_to ? date_format(date_create($row->date_to), 'Y-m-d') : "";
 				$limit_margin_rate	= $row->limit_margin_rate;
 				$limit_coupon_yn	= $row->limit_coupon_yn;
 				$limit_point_yn		= $row->limit_point_yn;
@@ -127,6 +127,7 @@ class std11Controller extends Controller
         if ($dc_range == 'A') {
             $sql = "
                 select *
+                     , date_format(date_from,'%Y-%m-%d') as date_from, date_format(date_to,'%Y-%m-%d') as date_to
                 from ad_dc a
                 where 1=1
                     $where
@@ -135,7 +136,8 @@ class std11Controller extends Controller
         } else {
             $sql = "
                 select
-                    a.name, a.use_yn, a.dc_range, dc_rate, dc_amt, date_from, date_to,
+                    a.name, a.use_yn, a.dc_range, dc_rate, dc_amt,
+                    date_format(date_from,'%Y-%m-%d') as date_from, date_format(date_to,'%Y-%m-%d') as date_to,
                     limit_margin_rate, limit_coupon_yn, limit_point_yn, add_point_yn, add_point_rate, add_point_amt, admin_nm, rt, ut,
                     a.no
                 from ad_dc a

@@ -95,7 +95,7 @@
                                                 <div class="form-inline">
                                                         <div class="docs-datepicker form-inline-inner input_box">
                                                             <div class="input-group">
-                                                                <input type="text" class="form-control form-control-sm docs-date" id="date_from" name="date_from" value="{{$date_from}}" autocomplete="off" disable>
+                                                                <input type="text" class="form-control form-control-sm docs-date" id="date_from" name="date_from" value="{{ $date_from }}" autocomplete="off">
                                                                 <div class="input-group-append">
                                                                     <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -123,7 +123,7 @@
 												<th>마진율제한</th>
 												<td colspan="5">
                                                     <div class="flax_box">
-                                                        마진율 : <div class="flax_box"><input type='text' class="form-control form-control-sm" name='limit_margin_rate' id='limit_margin_rate' value='{{$limit_margin_rate}}' style="width:calc(100% - 60px);margin-right:2px;"> %이하 제한</div>
+                                                        마진율 : <div class="flax_box mx-2"><input type='text' class="form-control form-control-sm text-right" name='limit_margin_rate' id='limit_margin_rate' value='{{$limit_margin_rate}}'></div> % 이하 제한
                                                     </div>
 												</td>
 											</tr>
@@ -359,6 +359,20 @@ $('.submit-btn').click((e) => {
                 $('#no_sale').show();
             }
         });
+
+		$(".docs-date").on("change", function (e) {
+			if (/[^0123456789-]/g.test(e.target.value)) {
+				alert("날짜형식으로 입력해주세요.");
+				e.target.value = '';
+			}
+		});
+		
+		$("#limit_margin_rate").on("change", function (e) {
+			if (/[^0123456789]/g.test(e.target.value)) {
+				alert("숫자형식으로 입력해주세요.(소수점 단위 불가능)");
+				e.target.value = 0;
+			}
+		});
     });
 </script>
 
