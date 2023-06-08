@@ -1120,7 +1120,7 @@
                                                                         <label class="custom-control-label" for="est_confirm_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="est_confirm_yn" id="est_confirm_yn" class="custom-control-input" value="N" @if ($est_confirm_yn == 'N') checked @endif/>
+                                                                        <input type="radio" name="est_confirm_yn" id="est_confirm_n" class="custom-control-input" value="N" @if ($est_confirm_yn == 'N') checked @endif/>
                                                                         <label class="custom-control-label" for="est_confirm_n">사용안함</label>
                                                                     </div>
                                                                 </div>
