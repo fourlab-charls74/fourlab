@@ -172,8 +172,10 @@ class prd05Controller extends Controller
         //echo 'page_size'. $page_size;
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
-        if($limit == -1) $sql_limit = "";
-		else $sql_limit = " limit $startno, $page_size ";
+        if($limit == -1) {
+			if ($page > 1) $sql_limit = "limit 0";
+			else $sql_limit = "";
+		} else $sql_limit = " limit $startno, $page_size ";
 
         $total = 0;
         $page_cnt = 0;

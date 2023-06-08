@@ -153,7 +153,8 @@ class stk05Controller extends Controller
         }
 
         if ($limit == -1) {
-            $limit = "";
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
         } else $limit = " limit $startno,$page_size ";
 
         $orderby = "";

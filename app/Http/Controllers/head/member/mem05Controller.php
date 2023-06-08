@@ -71,8 +71,10 @@ class mem05Controller extends Controller
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
 
-        if ($limit < 0) $limit = "";
-        else            $limit = " limit $startno, $page_size ";
+        if ($limit < 0) {
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
+		} else $limit = " limit $startno, $page_size ";
 
         $total = 0;
         $page_cnt = 0;

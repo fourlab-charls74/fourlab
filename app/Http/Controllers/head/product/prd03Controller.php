@@ -163,8 +163,10 @@ class prd03Controller extends Controller
             $startno = ($page - 1) * $page_size;
         }
 
-        if ($limit == -1) $limit = "";
-        else $limit = " limit $startno,$page_size ";
+        if ($limit == -1) {
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
+		} else $limit = " limit $startno,$page_size ";
 
         $sql = "
             select

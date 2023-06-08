@@ -122,7 +122,8 @@ class prd08Controller extends Controller
 		}
 
 		if ($limit == -1) {
-			$where_limit = "";
+			if ($page > 1) $where_limit = "limit 0";
+			else $where_limit = "";
 		} else {
 			$where_limit = " limit $startno, $page_size ";
 		}

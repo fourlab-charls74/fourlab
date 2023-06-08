@@ -89,11 +89,11 @@ var columns = [
         headerName:"회원수",
         type: 'currencyType',
         cellRenderer: function(params) {
-                return `<a href='#' onclick="openGroupUser('${params.data.group_no}')">${params.value}</a>`
+                return `<a href='#' onclick="openGroupUser('${params.data.group_no}')">${Comma(params.value)}</a>`
         }
     },
-    {field:"user_group_type" , headerName:"구분"},
-    {field:"dc_ratio" , headerName:"할인율(%)", width:80, cellStyle:{"text-align" : "right"}},
+    {field:"user_group_type" , headerName:"구분", cellClass: 'hd-grid-code'},
+    {field:"dc_ratio" , headerName:"할인율(%)", width:80, type: 'percentType'},
     {
         field:"dc_ext_goods" , 
         headerName:"할인율제외상품",
@@ -102,7 +102,7 @@ var columns = [
         }, 
         type: 'currencyType'
     },
-    {field:"point_ratio", headerName:"추가적립율(%)", width:100, cellStyle:{"text-align" : "right"}},
+    {field:"point_ratio", headerName:"추가적립율(%)", width:100, type: "percentType"},
     {field:"is_wholesale" , headerName:"도매여부", width:80, cellStyle:{"text-align" : "center"},
         cellRenderer: function(params) {
             if(params.value == 'Y') return "해당"
@@ -131,8 +131,8 @@ var columns = [
             else return params.value
         }
     },
-    {field:"rt" , headerName:"등록일시", width:135},
-    {field:"ut" , headerName:"수정일시", width:135},
+    {field:"rt" , headerName:"등록일시", type: 'DateTimeType'},
+    {field:"ut" , headerName:"수정일시", type: 'DateTimeType'},
     { width: "auto" }
 ];
 
@@ -144,7 +144,7 @@ pApp.ResizeGrid(275);
 
 function Search() {
     let data = $('form[name="search"]').serialize();
-    gx.Request('/head/member/mem03/search', data, 1);
+    gx.Request('/head/member/mem03/search', data, -1);
 }
 
 const openDetail = (type, no='') => {

@@ -173,7 +173,8 @@ class ord05Controller extends Controller
 		$arr_header = array("data_cnt"=>$total, "page_cnt"=>$page_cnt);
 
 		if($limit == -1){
-			$limit = "";
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
 		} else {
 			$limit = " limit $startno, $page_size ";
 		}

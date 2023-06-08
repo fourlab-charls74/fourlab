@@ -108,7 +108,8 @@ class ord51Controller extends Controller
 		}
 
 		if ($limit == -1) {
-			$sql_limit = "";
+			if ($page > 1) $sql_limit = "limit 0";
+			else $sql_limit = "";
 		} else {
 			$sql_limit = " limit $startno, $page_size ";
 		}

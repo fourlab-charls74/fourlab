@@ -114,7 +114,8 @@ class ord06Controller extends Controller
 		$arr_header = array("data_cnt"=>$total, "page_cnt"=>$page_cnt);
 
 		if($limit == -1){
-			$where_limit = "";
+			if ($page > 1) $where_limit = "limit 0";
+			else $where_limit = "";
 		} else {
 			$where_limit = " limit $startno, $page_size ";
 		}
