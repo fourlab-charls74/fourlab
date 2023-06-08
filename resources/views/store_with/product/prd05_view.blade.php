@@ -344,7 +344,8 @@
     }
 
     function Save() {
-        let change_date = document.getElementById('change_date').innerText;
+        let change_date_res = document.getElementById('change_date_res').innerText;
+        let change_date_now = document.getElementById('change_date_now').innerText;
         let change_price = parseInt($('#change_price').val());
         let change_kind = $('#change_kind').val();
         let rows = gx.getSelectedRows();
@@ -359,7 +360,8 @@
             method: 'put',
             data: {
                 data: rows,
-                change_date : change_date,
+                change_date_res : change_date_res,
+                change_date_now : change_date_now,
                 change_kind : change_kind,
                 change_price : change_price,
                 change_cnt : change_cnt,

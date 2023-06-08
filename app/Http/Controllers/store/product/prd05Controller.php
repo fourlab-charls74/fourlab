@@ -90,6 +90,8 @@ class prd05Controller extends Controller
 						, pp.apply_yn as apply_yn
 						, pp.change_kind as change_kind
 						, pp.change_val as change_val
+						, pp.change_type as change_type
+						, pp.price_kind as price_kind
 					from product_price_list ppl
 						inner join product p on p.prd_cd = ppl.prd_cd
 						left outer join product_code pc on pc.prd_cd = ppl.prd_cd
@@ -143,6 +145,7 @@ class prd05Controller extends Controller
 					, pp.apply_yn as apply_yn
 					, pp.change_kind as change_kind
 					, pp.change_val as change_val
+					, pp.change_type as change_type
 				from product_price_list ppl
 					inner join product p on p.prd_cd = ppl.prd_cd
 					left outer join product_code pc on pc.prd_cd = ppl.prd_cd
@@ -391,16 +394,40 @@ class prd05Controller extends Controller
 		]);
 	}
 	
-	//상품가격변경 예약
+	//상품가격변경
 	public function change_price (Request $request) {
 
 		$data = $request->input('data');
-		$change_date = $request->input('change_date');
+		$change_date_res = $request->input('change_date_res');
+		$change_date_now = $request->input('change_date_now');
 		$change_kind = $request->input('change_kind');
 		$change_price = $request->input('change_price');
 		$change_cnt = $request->input('change_cnt');
+		$type = $request->input('type');
 		$admin_id = Auth('head')->user()->id;
 		$del_product = $request->input('del_product', []);
+		$price_kind = $request->input('price_kind');
+
+		$change_date = '';
+		$change_type = '';
+		$apply_yn = '';
+
+
+		if ($type == 'reservation') {
+			$change_date = $change_date_res;
+			$change_type = 'R';
+			$apply_yn = 'N';
+		} else {
+			$change_date = $change_date_now;
+			$change_type = 'A';
+			$apply_yn = 'Y';
+		}
+
+		if ($price_kind == 'tag_price') {
+			$price_kind = 'T';
+		} else {
+			$price_kind = 'P';
+		}
 
 		try {
             DB::beginTransaction();
@@ -410,7 +437,10 @@ class prd05Controller extends Controller
 						'change_date' => $change_date,
 						'change_kind' => $change_kind,
 						'change_val' => $change_price,
+						'price_kind' => $price_kind,
+						'apply_yn' => $apply_yn,
 						'change_cnt' => $change_cnt,
+						'change_type' => $change_type,
 						'admin_id' => $admin_id,
 						'rt' => now(),
 						'ut' => now()
@@ -427,6 +457,18 @@ class prd05Controller extends Controller
 							'rt' => now(),
 							'ut' => now()
 						]);
+
+					if ($type == 'now') {
+						//goods 테이블 price 가격변경
+						DB::table('goods')
+						->where('goods_no', '=', $d['goods_no'])
+						->update(['price' => $d['change_val']]);
+	
+						//product 테이블 price 가격변경
+						DB::table('product')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->update(['price'=> $d['change_val']]);
+					}
 				}
 				
 			DB::commit();

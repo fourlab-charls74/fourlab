@@ -17,8 +17,8 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 예약 추가</a>
-                        <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a>
+                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
+                        <!-- <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a> -->
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -129,11 +129,7 @@
             {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code',
 				cellRenderer: function(params) {
 					if (params.value !== undefined && params.data.idx != "") {
-						if (params.data.change_type == 'A') {
-							return '<a href="#" onclick="cmd2(\''+ params.value +'\');" >'+ params.value+'</a>';
-						} else {
-							return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
-						}
+						return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
 					}
 				}
 			},
@@ -219,10 +215,10 @@
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
     };
 
-	function cmd2 (code) {
-		const url = '/store/product/prd05/view/' + code;
-		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-    };
+	// function cmd2 (code) {
+	// 	const url = '/store/product/prd05/view/' + code;
+	// 	window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+    // };
 
 	function del_product_price() {
 		let rows = gx.getSelectedRows();
