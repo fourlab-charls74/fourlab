@@ -496,14 +496,15 @@
 			return alert("컬러를 선택해주세요.");
 		}
 
-		// 사이즈 선택여부
+		// 사이즈구분 선택여부
 		if (f1.size_kind.selectedIndex == 0) {
 			f1.size_kind.focus();
 			return alert("사이즈구분을 선택해주세요.");
 		}
 
 		// 사이즈 선택여부
-		if (f1.size.selectedIndex == 0) {
+		let size = $('#size').val();
+		if (size.length == 0) {
 			f1.size.focus();
 			return alert("사이즈를 선택해주세요.");
 		}
