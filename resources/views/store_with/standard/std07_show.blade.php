@@ -1,6 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "매장마진관리 - " . @$store->store_nm;
+    $title = "판매처수수료관리 - " . @$store->store_nm;
 @endphp
 @section('title', $title)
 
