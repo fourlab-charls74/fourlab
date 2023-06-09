@@ -551,6 +551,8 @@
         form.target = target;
         form.goods_nos.value = goods_nos;
         form.submit();
+
+		form.goods_nos.value = '';
     };
 
     function AddProductImages() {

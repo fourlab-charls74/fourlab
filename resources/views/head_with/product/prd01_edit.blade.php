@@ -816,18 +816,17 @@
         };
 
         const saveRows = async () => {
-            if (confirm("변경하신 내용을 저장하시겠습니까?")) {
-                const selectedRows = gx.getSelectedRows();
-                if (selectedRows.length == 0)  {
-                    alert('저장할 항목을 선택하여 주십시오.');
-                    return false;
-                }
+            const selectedRows = gx.getSelectedRows();
+			if (selectedRows.length < 1) return alert("저장할 상품을 선택해주세요.");
+
+			if (confirm("변경하신 내용을 저장하시겠습니까?")) {
 
                 // 새로 저장시 저장후 메세지 초기화
                 selectedRows.map((row) => { initMsgInRow(row) });
 
                 // 검증 및 저장
                 if (validation() == true) selectedRows.map((row) => { saveRow(row);});
+				window.opener.Search();
             }
         };
 

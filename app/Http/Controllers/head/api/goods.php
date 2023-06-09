@@ -287,9 +287,10 @@ class goods extends Controller
             $query = /** @lang text */
                 "
                 select count(*) as total
-                from goods a
+                from goods a $insql $join
                 where 1=1 
                     $where
+                    $having
 			";
             $row = DB::select($query);
             $total = $row[0]->total;
