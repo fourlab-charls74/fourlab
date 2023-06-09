@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-firstname-input">일자</label>
+                                <label for="formrow-firstname-input">일시</label>
                                 <div class="form-inline">
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
@@ -77,21 +77,13 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="com_type">업체</label>
+                                <label for="com_type">공급업체</label>
                                 <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-25 pr-1">
-                                        <select id="com_type" name="com_type" class="form-control form-control-sm w-100">
-                                            <option value="">전체</option>
-                                            @foreach ($com_types as $com_type)
-                                                <option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-inline-inner input-box w-75">
+                                    <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
                                             <input type="hidden" id="com_cd" name="com_cd">
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%;">
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm w-100 bg-white sch-sup-company" readonly>
+                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -99,7 +91,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="style_no">스타일넘버/온라인코드</label>
+                                <label for="style_no">스타일넘버/상품코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input_box">
                                         <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
@@ -150,21 +142,53 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_stat">상품상태</label>
-                                <div class="flex_box">
-                                    <select id="goods_stat" name='goods_stat' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
-                                        @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+	                    <div class="col-lg-4 inner-td">
+		                    <div class="form-group">
+			                    <label for="name">자료/정렬순서</label>
+			                    <div class="form-inline">
+				                    <div class="form-inline-inner input_box" style="width:24%;">
+					                    <select name="limit" class="form-control form-control-sm">
+						                    <option value="100">100</option>
+						                    <option value="500">500</option>
+						                    <option value="1000">1000</option>
+						                    <option value="2000">2000</option>
+						                    <option value="-1">모두</option>
+					                    </select>
+				                    </div>
+				                    <span class="text_line">/</span>
+				                    <div class="form-inline-inner input_box" style="width:45%;">
+					                    <select name="ord_field" class="form-control form-control-sm">
+						                    <option value="a.history_no">입출고내역순</option>
+						                    <option value="a.goods_no" >상품번호</option>
+						                    <option value="a.style_no" >스타일넘버</option>
+					                    </select>
+				                    </div>
+				                    <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+					                    <div class="btn-group" role="group">
+						                    <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+						                    <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+					                    </div>
+					                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+					                    <input type="radio" name="ord" id="sort_asc" value="asc">
+				                    </div>
+			                    </div>
+		                    </div>
+	                    </div>
                     </div>
-                    <div class="row">
+                    <div class="row search-area-ext d-none">
+	                    <div class="col-lg-4 inner-td">
+		                    <div class="form-group">
+			                    <label for="goods_stat">상품상태</label>
+			                    <div class="flex_box">
+				                    <select id="goods_stat" name='goods_stat' class="form-control form-control-sm">
+					                    <option value=''>전체</option>
+					                    @foreach ($goods_stats as $goods_stat)
+						                    <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+					                    @endforeach
+				                    </select>
+			                    </div>
+		                    </div>
+	                    </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="loc">위치</label>
@@ -178,38 +202,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="name">자료/정렬순서</label>
-								<div class="form-inline">
-									<div class="form-inline-inner input_box" style="width:24%;">
-										<select name="limit" class="form-control form-control-sm">
-											<option value="100">100</option>
-											<option value="500">500</option>
-											<option value="1000">1000</option>
-											<option value="2000">2000</option>
-											<option value=-1>모두</option>
-										</select>
-									</div>
-									<span class="text_line">/</span>
-									<div class="form-inline-inner input_box" style="width:45%;">
-										<select name="ord_field" class="form-control form-control-sm">
-                                            <option value="a.history_no">입출고내역순</option>
-											<option value="a.goods_no" >상품번호</option>
-											<option value="a.style_no" >스타일넘버</option>
-										</select>
-									</div>
-									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-										<div class="btn-group" role="group">
-											<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
-											<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
-										</div>
-										<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-										<input type="radio" name="ord" id="sort_asc" value="asc">
-									</div>
-								</div>
-							</div>
-						</div>
                     </div>
                 </div>
             </div>
@@ -240,21 +232,21 @@
 
         // ag-grid
         var columns= [        
-            {field:"date", headerName:"일시", pinned:'left', width: 100},
-            {field:"kind", headerName:"구분", pinned:'left', cellStyle:{'text-align': 'center'}},
-            {field:"type", headerName:"사유", pinned:'left', width: 80},
-            {field:"com_nm", headerName:"공급업체", pinned:'left', width: 130},
-            {field:"opt_kind_nm", headerName:"품목", pinned:'left', width: 140},
-            {field:"brand_nm", headerName:"브랜드", width: 100},
+            {field:"date", headerName:"일시", type: "DayType", pinned:'left'},
+            {field:"kind", headerName:"구분", cellClass: 'hd-grid-code', pinned:'left', width: 60},
+            {field:"type", headerName:"사유", cellClass: 'hd-grid-code', pinned:'left', width: 60},
+            {field:"com_nm", headerName:"공급업체", pinned:'left', width: 100},
+            {field:"opt_kind_nm", headerName:"품목", cellClass: 'hd-grid-code', pinned:'left', width: 80},
+            {field:"brand_nm", headerName:"브랜드", cellClass: 'hd-grid-code', width: 80},
             {field:"style_no", headerName:"스타일넘버", width:80, cellStyle:{'text-align':'center'}},
-            {field:"goods_type", headerName:"상품구분", width:60},
-            {headerName:"온라인코드",
+            {field:"goods_type", headerName:"상품구분", type: "StyleGoodsTypeNM"},
+            {headerName:"상품코드",
                 children: [
-                    {headerName: "번호", field: "goods_no", width: 46, cellStyle:{'text-align': 'right'}},
-                    {headerName: "보조", field: "goods_sub", width: 34, cellStyle:{'text-align': 'right'}}
+                    {headerName: "번호", field: "goods_no", width: 60, cellClass: 'hd-grid-code'},
+                    {headerName: "보조", field: "goods_sub", width: 40, cellClass: 'hd-grid-code'},
                 ]
             },
-            {field:"goods_nm", headerName:"상품명", width: 320, type:'HeadGoodsNameType'},
+            {field:"goods_nm", headerName:"상품명", width: 250, type:'HeadGoodsNameType'},
             {field:"goods_opt", headerName:"옵션", width: 150},
             {field: "qty", headerName: "수량", width:46, type:'numberType',
                 cellRenderer: (params) => {
@@ -264,11 +256,12 @@
                 }
             },
             {field:"wonga", headerName: "원가", width:60, type: 'currencyType'},
-            {field:"loc", headerName:"위치"},
+			{field:"sale_stat_cl", headerName:"상품상태", type:'GoodsStateType'},
+            {field:"loc", headerName:"위치", cellClass: 'hd-grid-code'},
             {field:"invoice_no", headerName:"송장번호", width: 120},
             {field:"ord_no" , headerName:"주문번호", type:'HeadOrderNoType', width:135, cellStyle:{'text-align': 'center'}},
             {field:"etc", headerName:"메모", width: 130},
-            {field:"admin_nm", headerName:"처리자", width: 100},
+            {field:"admin_nm", headerName:"처리자", width: 80},
             {field:"ord_opt_no", headerName:"주문일련번호", hide: true},
             {field:"", headerName:"", width:"auto"}
         ];
