@@ -344,9 +344,31 @@ class ord22Controller extends Controller
 
             DB::insert($sql);
         }
-
-        $sql = "select cn as name, name as value from columns where type = '$type' order by seq";
+        $sql = "select cn as name, name as value, seq, use_seq from columns where type = '$type' order by seq";
         $columns = DB::select($sql);
+		
+		/** 사은품 항목 없을 시, DB에 저장 -> 실DB 적용 완료 시 코드삭제 */
+		$gift_column = array_reduce($columns, function ($a, $c) {
+			if ($c->name === 'gift') return $c;
+			return $a;
+		});
+		
+		if ($gift_column === null) {
+			DB::table('columns')->insert([
+				'type' => $type,
+				'cn' => 'gift',
+				'name' => '사은품',
+				'seq' => $columns[count($columns) - 1]->seq + 1,
+				'use_yn' => 'N',
+				'use_seq' => 0,
+				'rt' => now(),
+				'ut' => now(),
+			]);
+
+			$sql = "select cn as name, name as value from columns where type = '$type' order by seq";
+			$columns = DB::select($sql);
+		}
+		/** //end 사은품 항목 없을 시, DB에 저장 -> 실DB 적용 완료 시 코드삭제 */
 
         $sql = "select cn as name, name as value from columns where type = '$type' and use_yn = 'Y' order by use_seq";
         $fields = DB::select($sql);
@@ -376,8 +398,31 @@ class ord22Controller extends Controller
             DB::insert($sql);
         }
 
-        $sql = "select cn as name, name as value from columns where type = '$type' order by use_seq";
+		$sql = "select cn as name, name as value, seq from columns where type = '$type' order by seq";
         $columns = DB::select($sql);
+
+		/** 사은품 항목 없을 시, DB에 저장 -> 실DB 적용 완료 시 코드삭제 */
+		$gift_column = array_reduce($columns, function ($a, $c) {
+			if ($c->name === 'gift') return $c;
+			return $a;
+		});
+
+		if ($gift_column === null) {
+			DB::table('columns')->insert([
+				'type' => $type,
+				'cn' => 'gift',
+				'name' => '사은품',
+				'seq' => $columns[count($columns) - 1]->seq + 1,
+				'use_yn' => 'Y',
+				'use_seq' => 0,
+				'rt' => now(),
+				'ut' => now(),
+			]);
+
+			$sql = "select cn as name, name as value from columns where type = '$type' order by seq";
+			$columns = DB::select($sql);
+		}
+		/** //end 사은품 항목 없을 시, DB에 저장 -> 실DB 적용 완료 시 코드삭제 */
 
         $sql	= "select col as name, col_nm as value from delivery_column where sale_place = '$s_sale_place' order by seq";
         $fields	= DB::select($sql);
