@@ -524,7 +524,7 @@ class ord22Controller extends Controller
 			a.goods_location,
 			a.sale_qty, a.qty, a.price, a.recv_amt, a.sale_amt, a.dlv_amt,
 			pay_type.code_val as pay_type, a.user_nm, a.r_nm, a.r_jumin, a.r_zipcode, a.r_addr, a.r_phone, a.r_mobile,
-			a.dlv_msg, a.dlv_comment, a.free_gift as gift, a.sale_place, a.out_ord_no,
+			a.dlv_msg, a.dlv_comment, a.gift, a.sale_place, a.out_ord_no,
 			a.com_nm, baesong_kind.code_val baesong_kind,
 			date_format(a.ord_date,'%Y-%m-%d %H:%i:%s') as ord_date,
 			ifnull(date_format(a.pay_date,'%Y-%m-%d %H:%i:%s'),' ') as pay_date,
@@ -548,14 +548,21 @@ class ord22Controller extends Controller
 				select sum(good_qty) from goods_summary
 				where goods_no = a.goods_no and goods_sub = a.goods_sub
 				), 0) as qty,
-				a.price, (a.price - a.coupon_amt) as recv_amt, (a.coupon_amt+a.dc_amt) as sale_amt, a.dlv_amt,
+				a.price, (a.price - a.coupon_amt) as recv_amt, (a.coupon_amt+a.dc_amt) as sale_amt,
+				(
+					select group_concat(gf.name)
+					from order_gift og
+						inner join gift gf on og.gift_no = gf.no
+					where og.ord_no = a.ord_no and og.ord_opt_no = a.ord_opt_no
+				) as gift,
+				a.dlv_amt,
 				case d.pay_type
 				when '0' then d.card_name
 				when '1' then d.bank_code
 				when '4' then '-'
 				else d.bank_code end bank_code,
 				b.r_zipcode, concat(ifnull(b.r_addr1, ''),' ',ifnull(b.r_addr2, '')) as r_addr, b.r_phone, b.r_mobile,
-				b.dlv_msg, a.dlv_comment, '' as free_gift,
+				b.dlv_msg, a.dlv_comment,
 				concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm, b.r_nm, b.r_jumin, f.com_nm as sale_place,
 				b.out_ord_no,e.com_nm,
 				c.baesong_kind, b.ord_date,d.pay_date,
@@ -673,6 +680,12 @@ class ord22Controller extends Controller
 						when '4' then '-'
 					 else d.bank_code end bank_code,
 					b.r_zipcode, concat(ifnull(b.r_addr1, ''),ifnull(b.r_addr2, '')) as r_addr, b.r_phone, b.r_mobile, b.dlv_msg, '' as free_gift,
+					(
+						select group_concat(gf.name)
+						from order_gift og
+							inner join gift gf on og.gift_no = gf.no
+						where og.ord_no = a.ord_no and og.ord_opt_no = a.ord_opt_no
+					) as gift,
 					concat(ifnull(b.user_nm, ''),'(',ifnull(b.user_id, ''),')') as user_nm, b.r_nm, b.r_jumin,
 					f.com_nm as sale_place, concat('[', ifnull(f.zip_code, ''),']', ifnull(f.addr1, ''), ' ', ifnull(f.addr2, '')) as sale_place_addr,
                     f.cs_phone as sale_place_phone, b.out_ord_no, c.com_nm, c.baesong_kind, b.ord_date,
@@ -718,6 +731,7 @@ class ord22Controller extends Controller
             'r_addr' => 40,
             'r_phone' => 15,
             'r_mobile' => 15,
+            'head_desc' => 30,
         ];
         return Excel::download(new ExcelExport($sql, $headers, $sizes), $filename, \Maatwebsite\Excel\Excel::XLSX);
     }
@@ -1174,6 +1188,8 @@ class ord22Controller extends Controller
                 $field .= ", a.memo";
             } else if($val->name == "head_desc"){
                 $field .= ", a.head_desc";
+			} else if($val->name == "gift"){
+				$field .= ", a.gift";
             }
         }
 
