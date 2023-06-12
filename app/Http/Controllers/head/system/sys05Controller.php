@@ -33,8 +33,8 @@ class sys05Controller extends Controller
         $sql_admin_domain = "select * from conf where type = 'shop' and name = 'domain_bizest'";
         $a_domain = DB::selectOne($sql_admin_domain);
        
-        $sql_admin_new_domain = "select * from conf where type = 'shop' and name = 'domain_bizest_new'";
-        $a_new_domain = DB::selectOne($sql_admin_new_domain);
+        $sql_admin_domain_handle = "select * from conf where type = 'shop' and name = 'domain_handle'";
+        $a_domain_handle = DB::selectOne($sql_admin_domain_handle);
 
         $sql_email = "select * from conf where type = 'shop' and name = 'email'";
         $email = DB::selectOne($sql_email);
@@ -387,7 +387,7 @@ class sys05Controller extends Controller
             'phone' => $phone->value ?? '',
             's_domain' => $s_domain->value ?? '',
             'a_domain' => $a_domain->value ?? '',
-            'a_new_domain' => $a_new_domain->value ?? '',
+            'a_domain_handle' => $a_domain_handle->value ?? '',
             'email' => $email->value ?? '',
             'title' => $title->value ?? '',
             'title_main' => $title_main->value ?? '',
@@ -526,7 +526,7 @@ class sys05Controller extends Controller
         $phone = $request->input('phone');
         $domain = $request->input('domain');
         $domain_bizest = $request->input('domain_bizest');
-		$domain_bizest_new = $request->input('domain_bizest_new');
+		$domain_handle = $request->input('domain_handle');
         $email = $request->input('email');
         $title = $request->input('title');
         $title_main = $request->input('title_main');
@@ -677,8 +677,8 @@ class sys05Controller extends Controller
                 $sql_domain_bizest = "update conf set value='$domain_bizest', ut = '$ut' where type='shop' and name='domain_bizest'";
                 DB::update($sql_domain_bizest);
 
-				$sql_domain_bizest_new = "update conf set value='$domain_bizest_new', ut = '$ut' where type='shop' and name='domain_bizest_new'";
-				DB::update($sql_domain_bizest_new);
+				$sql_domain_handle = "update conf set value='$domain_handle', ut = '$ut' where type='shop' and name='domain_handle'";
+				DB::update($sql_domain_handle);
 
                 $sql_email = "update conf set value='$email', ut = '$ut' where type='shop' and name='email'";
                 DB::update($sql_email);
