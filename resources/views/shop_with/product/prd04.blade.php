@@ -24,7 +24,6 @@
 				</div>
 			</div>
 			<div class="card-body">
-
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
@@ -62,7 +61,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>상품코드</label>
+							<label>바코드</label>
 							<div class="flex_box">
 								<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 								<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -81,7 +80,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품옵션 범위검색</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">
@@ -93,55 +92,6 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="style_no">스타일넘버/상품번호</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input-box" style="width:47%">
-									<div class="form-inline-inner inline_btn_box">
-										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-						<label for="formrow-email-input">매칭여부</label>
-							<div class="form-inline form-radio-box">
-								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="A" id="match_all1" class="custom-control-input" checked>
-									<label class="custom-control-label" for="match_all1">전체</label>
-								</div>
-								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="Y" id="match_y1" class="custom-control-input">
-									<label class="custom-control-label" for="match_y1">Y</label>
-								</div>
-								<div class="custom-control custom-radio">
-									<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
-									<label class="custom-control-label" for="match_n1">N</label>
-								</div>
-							</div>
-						</div>
-					</div>
-					{{-- <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>창고명</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="storage_nm" name="storage_nm">
-                                <select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select"  multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div> --}}
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">자료수/정렬</label>
@@ -171,6 +121,54 @@
 									</div>
 									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
 									<input type="radio" name="ord" id="sort_asc" value="asc">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row search-area-ext d-none">
+					<!-- <div class="col-lg-4 inner-td">
+						<div class="form-group">
+						<label for="formrow-email-input">매칭여부</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="A" id="match_all1" class="custom-control-input" checked>
+									<label class="custom-control-label" for="match_all1">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="Y" id="match_y1" class="custom-control-input">
+									<label class="custom-control-label" for="match_y1">Y</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
+									<label class="custom-control-label" for="match_n1">N</label>
+								</div>
+							</div>
+						</div>
+					</div> -->
+					{{-- <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>창고명</label>
+                            <div class="form-inline inline_btn_box">
+                                <input type='hidden' id="storage_nm" name="storage_nm">
+                                <select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select"  multiple></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+                    </div> --}}
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="style_no">스타일넘버/온라인코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input-box" style="width:47%">
+									<div class="form-inline-inner inline_btn_box">
+										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -227,7 +225,7 @@
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
 		},
-		{field: "prd_cd", headerName: "상품코드", pinned: 'left', width:120, cellStyle: StyleLineHeight,
+		{field: "prd_cd", headerName: "바코드", pinned: 'left', width:120, cellStyle: StyleLineHeight,
 			cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') return "합계";
 				if (params.value !== undefined) {
@@ -235,7 +233,7 @@
 				}
 			}
 		},
-		{field: "goods_no", headerName: "상품번호", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}",

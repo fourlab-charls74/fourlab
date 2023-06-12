@@ -1,14 +1,14 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','월별동종업계매출관리')
+@section('title','동종업계매출등록')
 @section('content')
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">월별동종업계매출관리 추가</h3>
+        <h3 class="d-inline-flex">동종업계매출등록</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 매장관리</span>
-            <span>/ 월별동종업계매출관리</span>
+            <span>/ 동종업계매출등록</span>
         </div>
     </div>
     <form method="get" name="search">

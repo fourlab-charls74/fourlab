@@ -59,7 +59,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
+                        <!-- <div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="good_types">판매채널/매장구분</label>
 								<div class="d-flex align-items-center">
@@ -82,7 +82,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="store_no">매장명</label>
@@ -93,21 +93,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        {{-- <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="good_types">동종업계</label>
-                                <div class="flax_box">
-                                    <select name='competitor_type' class="form-control form-control-sm search-enter">
-                                        <option value=''>전체</option>
-                                    @foreach ($competitors as $competitor)
-                                        <option value='{{ $competitor->code_id }}'>{{ $competitor->code_val }}</option>
-                                    @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="">자료수/정렬</label>
@@ -137,6 +122,22 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        {{-- <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="good_types">동종업계</label>
+                                <div class="flax_box">
+                                    <select name='competitor_type' class="form-control form-control-sm search-enter">
+                                        <option value=''>전체</option>
+                                    @foreach ($competitors as $competitor)
+                                        <option value='{{ $competitor->code_id }}'>{{ $competitor->code_val }}</option>
+                                    @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div> --}}
+                        
                     </div>
                 </div>
             </div>

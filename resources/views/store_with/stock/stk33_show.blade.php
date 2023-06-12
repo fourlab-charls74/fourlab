@@ -8,6 +8,7 @@
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 매장관리</span>
+            <span>/ 동종업계매출등록</span>
         </div>
     </div>
     <form method="get" name="search">
