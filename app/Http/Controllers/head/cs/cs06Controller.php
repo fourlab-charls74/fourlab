@@ -8,6 +8,10 @@ use App\Components\Lib;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Pay;
+use App\Models\Claim;
+use App\Models\Point;
+use App\Models\Gift;
 
 use App\Models\Conf;
 
@@ -544,7 +548,7 @@ class cs06Controller extends Controller
 		$sql = "
 			select count(*) as cnt
 			from claim c inner join order_opt o on c.ord_opt_no = o.ord_opt_no
-			where o.ord_no = '$ORD_NO' and c.refund_no = '$ORD_OPT_NO' and o.clm_state <> 51
+			where o.ord_no = '$ord_no' and c.refund_no = '$ord_opt_no' and o.clm_state <> 51
 		";
 
 		$rowRefund = DB::selectOne($sql);
@@ -555,7 +559,7 @@ class cs06Controller extends Controller
 		}else{
 			// 중복사용제한
 			$sql = "
-				select count(*) as cnt from locked where type = 'refund' and idx = '$ORD_OPT_NO'
+				select count(*) as cnt from locked where type = 'refund' and idx = '$ord_opt_no'
 			";
 
 			$row = DB::selectOne($sql);
@@ -567,7 +571,7 @@ class cs06Controller extends Controller
 			}else{
 			
 				$sql = "
-					insert into locked ( type,idx, id, ut ) values ( 'refund', '$ORD_OPT_NO', '$id', now())
+					insert into locked ( type,idx, id, ut ) values ( 'refund', '$ord_opt_no', '$id', now())
 				";
 				$ret = DB::insert($sql);
 				/*
@@ -591,7 +595,7 @@ class cs06Controller extends Controller
 						from order_opt o
 							inner join payment p on o.ord_no = p.ord_no
 							inner join claim c on o.ord_opt_no = c.ord_opt_no
-						where o.ord_opt_no = '$ORD_OPT_NO' and c.clm_state = 51 and c.refund_yn = 'y' and o.ord_state >= 10
+						where o.ord_opt_no = '$ord_opt_no' and c.clm_state = 51 and c.refund_yn = 'y' and o.ord_state >= 10
 					";
 					$row = DB::selectOne($sql);
 
