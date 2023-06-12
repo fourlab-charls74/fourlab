@@ -90,6 +90,8 @@ class prd05Controller extends Controller
 						, pp.apply_yn as apply_yn
 						, pp.change_kind as change_kind
 						, pp.change_val as change_val
+						, pp.change_type as change_type
+						, pp.price_kind as price_kind
 					from product_price_list ppl
 						inner join product p on p.prd_cd = ppl.prd_cd
 						left outer join product_code pc on pc.prd_cd = ppl.prd_cd
@@ -143,6 +145,7 @@ class prd05Controller extends Controller
 					, pp.apply_yn as apply_yn
 					, pp.change_kind as change_kind
 					, pp.change_val as change_val
+					, pp.change_type as change_type
 				from product_price_list ppl
 					inner join product p on p.prd_cd = ppl.prd_cd
 					left outer join product_code pc on pc.prd_cd = ppl.prd_cd
@@ -172,14 +175,16 @@ class prd05Controller extends Controller
 		$sdate = $request->input('sdate');
 		$edate = $request->input('edate');
 		$change_kind = $request->input('change_kind');
+		$prd_cd = $request->input('prd_cd');
 		$nud = $request->input("s_nud", "N");
 
+
 		$where = "";
-		if( $change_kind != "" ) $where .= " and change_kind = '" . $change_kind . "' ";
-		if($nud == 'Y') $where .= " and ( change_date >= '$sdate' and change_date < date_add('$edate',interval 1 day)) ";
+		if( $prd_cd != "" ) $where .= " and pc.prd_cd like '$prd_cd%'";
+		if($nud == 'Y') $where .= " and ( pp.change_date >= '$sdate' and pp.change_date < date_add('$edate',interval 1 day)) ";
 
 		// ordreby
-        $ord_field  = $request->input("ord_field", "change_date");
+        $ord_field  = $request->input("ord_field", "pp.change_date");
         $ord        = $request->input("ord", "desc");
         $orderby    = sprintf("order by %s %s", $ord_field, $ord);
         
@@ -192,17 +197,35 @@ class prd05Controller extends Controller
 
 		$sql = "
 			select
-				idx
-				, change_date
-				, change_kind
-				, change_val
-				, apply_yn
-				, change_cnt
-				, change_type
-				, rt
-				, ut
-			from product_price
-			where 1=1 
+				pp.idx
+				, pp.change_date
+				, pp.change_kind
+				, pp.change_val
+				, pp.apply_yn
+				, pp.change_cnt
+				, pp.change_type
+				, pp.rt
+				, pp.ut
+				, pc.prd_cd
+				, opt.opt_kind_nm as opt_kind_nm
+				, ifnull(pc.goods_no,0) as goods_no
+				, ifnull(p.style_no, 0) as style_no
+				, b.brand_nm as brand
+				, g.goods_nm
+				, g.goods_nm_eng
+				, c.code_val as color
+				, pc.size
+				, g.price
+				, g.goods_sh
+			from product_code pc
+				left outer join product p on p.prd_cd = pc.prd_cd
+				left outer join product_price_list ppl on ppl.prd_cd = pc.prd_cd
+				left outer join product_price pp on pp.idx = ppl.product_price_cd
+				left outer join goods g on g.goods_no = pc.goods_no
+				left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
+				left outer join brand b on b.br_cd = pc.brand
+				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+			where 1=1 and pp.idx != ''
 			$where
 			$orderby
 			$limit
@@ -215,11 +238,18 @@ class prd05Controller extends Controller
 		$page_cnt = 0;
 		if($page == 1) {
 			$sql = "
-			select
-				count(*) as total
-			from product_price
-			where 1=1
-			$where
+				select
+					count(*) as total
+				from product_code pc
+					left outer join product p on p.prd_cd = pc.prd_cd
+					left outer join product_price_list ppl on ppl.prd_cd = pc.prd_cd
+					left outer join product_price pp on pp.idx = ppl.product_price_cd
+					left outer join goods g on g.goods_no = pc.goods_no
+					left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
+					left outer join brand b on b.br_cd = pc.brand
+					left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+				where 1=1 and pp.idx != ''
+				$where
 			";
 
 			$row = DB::selectOne($sql, ['sdate' => $sdate,'edate' => $edate]);
@@ -316,91 +346,41 @@ class prd05Controller extends Controller
 		]);
 	}
 
-	//상품 가격 변경 즉시
-	public function view_search(Request $request) {
-
-		$product_price_cd = $request->input('product_price_cd');
-
-		 // pagination
-		 $page       = $request->input("page", 1);
-		 $page_size  = $request->input("limit", 100);
-		 if ($page < 1 or $page == "") $page = 1;
-		 $startno    = ($page - 1) * $page_size;
-
-		$sql = "
-			select
-				ppl.prd_cd as prd_cd
-				, g.goods_no as goods_no
-				, opt.opt_kind_nm as opt_kind_nm
-				, b.brand_nm as brand
-				, g.style_no as style_no
-				, g.goods_nm as goods_nm
-				, g.goods_nm_eng as goods_nm_eng
-				, pc.prd_cd_p as prd_cd_p
-				, pc.color as color
-				, pc.size as size
-				, pc.goods_opt as goods_opt
-				, p.tag_price as goods_sh
-				, p.price as price
-				, ppl.change_price as change_val
-				, ppl.product_price_cd as product_price_cd
-			from product_price_list ppl
-				inner join product p on p.prd_cd = ppl.prd_cd
-				left outer join product_code pc on pc.prd_cd = ppl.prd_cd
-				inner join goods g on g.goods_no = pc.goods_no
-				left outer join brand b on b.br_cd = pc.brand
-				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-			where 1=1 and ppl.product_price_cd = '$product_price_cd'
-		";
-
-		$result = DB::select($sql);
-
-
-		// pagination
-		$total = 0;
-		$page_cnt = 0;
-		if($page == 1) {
-			$sql = "
-				select
-					count(*) as total
-				from product_price_list ppl
-					inner join product p on p.prd_cd = ppl.prd_cd
-					left outer join product_code pc on pc.prd_cd = ppl.prd_cd
-					inner join goods g on g.goods_no = pc.goods_no
-					left outer join brand b on b.br_cd = pc.brand
-					left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-				where 1=1 and ppl.product_price_cd = '$product_price_cd'
-			";
-
-			$row = DB::selectOne($sql);
-			$total = $row->total;
-			$page_cnt = (int)(($total - 1) / $page_size) + 1;
-		}
 	
-		
-
-		return response()->json([
-			"code"	=> 200,
-			"head"	=> array(
-				"total" => $total,
-				"page" => $page,
-				"page_cnt" => $page_cnt,
-				"page_total"=> count($result)
-			),
-			"body"	=> $result
-		]);
-	}
-	
-	//상품가격변경 예약
+	//상품가격변경
 	public function change_price (Request $request) {
 
 		$data = $request->input('data');
-		$change_date = $request->input('change_date');
+		$change_date_res = $request->input('change_date_res');
+		$change_date_now = $request->input('change_date_now');
 		$change_kind = $request->input('change_kind');
 		$change_price = $request->input('change_price');
 		$change_cnt = $request->input('change_cnt');
+		$type = $request->input('type');
 		$admin_id = Auth('head')->user()->id;
 		$del_product = $request->input('del_product', []);
+		$price_kind = $request->input('price_kind');
+
+		$change_date = '';
+		$change_type = '';
+		$apply_yn = '';
+
+
+		if ($type == 'reservation') {
+			$change_date = $change_date_res;
+			$change_type = 'R';
+			$apply_yn = 'N';
+		} else {
+			$change_date = $change_date_now;
+			$change_type = 'A';
+			$apply_yn = 'Y';
+		}
+
+		if ($price_kind == 'tag_price') {
+			$price_kind = 'T';
+		} else {
+			$price_kind = 'P';
+		}
 
 		try {
             DB::beginTransaction();
@@ -410,7 +390,10 @@ class prd05Controller extends Controller
 						'change_date' => $change_date,
 						'change_kind' => $change_kind,
 						'change_val' => $change_price,
+						'price_kind' => $price_kind,
+						'apply_yn' => $apply_yn,
 						'change_cnt' => $change_cnt,
+						'change_type' => $change_type,
 						'admin_id' => $admin_id,
 						'rt' => now(),
 						'ut' => now()
@@ -427,6 +410,18 @@ class prd05Controller extends Controller
 							'rt' => now(),
 							'ut' => now()
 						]);
+
+					if ($type == 'now') {
+						//goods 테이블 price 가격변경
+						DB::table('goods')
+						->where('goods_no', '=', $d['goods_no'])
+						->update(['price' => $d['change_val']]);
+	
+						//product 테이블 price 가격변경
+						DB::table('product')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->update(['price'=> $d['change_val']]);
+					}
 				}
 				
 			DB::commit();

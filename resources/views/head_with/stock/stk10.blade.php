@@ -274,7 +274,7 @@
             {field:"org_nm" ,headerName:"원산지",pinned:'left',width:84},
             {headerName:"온라인코드",
                 children: [
-                    {headerName: "번호", field: "goods_no", width: 46, pinned:'left', cellStyle:{'text-align': 'right'}},
+                    {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}},
                     {headerName: "보조", field: "goods_sub", width: 34, pinned:'left', cellStyle:{'text-align': 'center'}}
                 ]
             },

@@ -131,7 +131,6 @@ class stk05Controller extends Controller
 
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
-        $limit = " limit $startno, $page_size ";
 
         $total = 0;
         $page_cnt = 0;
@@ -152,8 +151,9 @@ class stk05Controller extends Controller
             $page_cnt=(int)(($total-1)/$page_size) + 1;
         }
 
-        if ($limit == -1) {
-            $limit = "";
+        if ($limit < 0) {
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
         } else $limit = " limit $startno,$page_size ";
 
         $orderby = "";
@@ -170,8 +170,8 @@ class stk05Controller extends Controller
 				g.goods_no, g.goods_sub, g.goods_nm,
 				replace(a.goods_opt, '^', '  :  ') as goods_opt,
 				a.qty, a.wonga,
-				if(a.loc = '','기본',cd6.code_val) as loc, a.invoice_no,a.ord_no,
-				etc, a.admin_nm, a.ord_opt_no
+				if(a.loc = '', '', cd6.code_val) as loc, a.invoice_no,a.ord_no,
+				etc, a.admin_nm, a.ord_opt_no, cd7.code_val as sale_stat_cl
 			from goods_history a
 				inner join goods g on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub
 				inner join company c on g.com_id = c.com_id
@@ -184,6 +184,7 @@ class stk05Controller extends Controller
 				left outer join code cd4 on cd4.code_kind_cd = 'G_CLM_STATE' and cd4.code_id = oo.clm_state
 				left outer join code cd5 on g.goods_type = cd5.code_id and cd5.code_kind_cd = 'G_GOODS_TYPE'
 				left outer join code cd6 on a.loc = cd6.code_id and cd6.code_kind_cd = 'G_STOCK_LOC'
+			    left outer join code cd7 on cd7.code_kind_cd = 'G_GOODS_STAT' and cd7.code_id = g.sale_stat_cl
 			where 1=1 $where
             $orderby
 			$limit

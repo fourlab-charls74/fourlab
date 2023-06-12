@@ -226,7 +226,7 @@ class std07Controller extends Controller
 						'reg_date' => now(),
 						'admin_id' => $admin_id,
 					]);
-				} else if($d['use_yn'] == 'Y') {
+				} else if($d['use_yn'] == 'Y' || $d['use_yn'] == 'N') {
 					$edate = $d['edate'] ?? '9999-12-31';
 					if($new_data != '') {
 						$edate = date('Y-m-d', strtotime($new_data['sdate'] . '-1 day'));

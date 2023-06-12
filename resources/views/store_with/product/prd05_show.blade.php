@@ -1,8 +1,8 @@
 @extends('store_with.layouts.layout-nav')
 
 @php
-    $title = "상품가격 변경 예약";
-    if($cmd == "update") $title = "상품가격 변경 예약 상세";
+    $title = "상품가격 변경";
+    if($cmd == "update") $title = "상품가격 변경 상세";
 @endphp
 
 @section('title', $title)
@@ -30,7 +30,7 @@
     </div>
 
     <style> 
-        .table th {min-width: 120px;}
+        .table th {min-width: 130px;}
         .table td {width: 50%;}
         
         @media (max-width: 740px) {
@@ -51,12 +51,38 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
+                                            <th class="required">상품가격변경 구분</th>
+                                            <td>
+                                                <div class="form-inline form-radio-box">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="product_price_type" value="reservation" id="reservation" class="custom-control-input" 
+                                                        @if ($cmd == 'update')
+                                                            @if ($res->change_type == 'R')
+                                                                checked
+                                                            @endif
+                                                        @else
+                                                            checked
+                                                        @endif
+                                                        >
+                                                        <label class="custom-control-label" for="reservation">예약</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" name="product_price_type" value="now" id="now" class="custom-control-input"  
+                                                        @if ($cmd == 'update')
+                                                            @if ($res->change_type != 'R')
+                                                                checked
+                                                            @endif
+                                                        @endif>
+                                                        <label class="custom-control-label" for="now">즉시</label>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <th class="required">변경일자</th>
                                             <td>
-                                                <div class="form-inline">
+                                                <div class="form-inline" id="sel_date">
                                                     <div class="docs-datepicker form-inline-inner input_box w-100">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date" id="change_date" value="@if($cmd == 'update') {{$res->change_date}} @else {{$edate}} @endif" autocomplete="off">
+                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date_res" id="change_date_res" value="@if($cmd == 'update') {{$res->change_date}} @else {{$edate}} @endif" autocomplete="off">
                                                             <div class="input-group-append">
                                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -66,12 +92,12 @@
                                                         <div class="docs-datepicker-container"></div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <th>@if ($cmd == 'update') 가격변경 코드 @endif</th>
-                                            <td>
-                                                <div class="form-inline inline_select_box">
-                                                    <div class="d-flex w-100">
-                                                        <span id="product_price_cd">@if ($cmd == 'update') {{@$code}} @endif </span>
+                                                <div class="form-inline" id="cur_date">
+                                                    <div class="docs-datepicker form-inline-inner input_box w-100">
+                                                        <div>
+                                                            <span id="change_date_now">{{$edate}}</span>
+                                                        </div>
+                                                        <div class="docs-datepicker-container"></div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -92,28 +118,28 @@
                         @if ($cmd == 'update' && $res->apply_yn == 'N')
                         <select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>
                             <option value="">선택</option>
-                            <option value="tag_price">Tag가</option>
-                            <option value="price">판매가</option>
+                            <option value="tag_price" @if($res->price_kind == 'T') selected @endif>정상가</option>
+                            <option value="price" @if($res->price_kind == 'P') selected @endif>현재가</option>
                         </select>
-                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;" value="{{@$res->change_val}}">
-                        <select id='change_kind' name='change_kind' class="form-control form-control-sm ml-1"  style='width:70px;display:inline;'>
+                        <select id='change_kind' name='change_kind' class="form-control form-control-sm mr-1"  style='width:70px;display:inline;'>
                                 <option value=''>선택</option>
                                 <option value='P' @if($res->change_kind == 'P') selected @endif>%</option>
-                                <option value='W' @if($res->change_kind == 'W') selected @endif>원</option>
+                                <option value='W' @if($res->change_kind == 'W') selected @endif>금액</option>
                         </select>
+                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;" value="{{@$res->change_val}}">
                         <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
                         @elseif ($cmd == 'add')
                         <select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>
                             <option value="">선택</option>
-                            <option value="tag_price">Tag가</option>
-                            <option value="price">판매가</option>
+                            <option value="tag_price">정상가</option>
+                            <option value="price">현재가</option>
                         </select>
-                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;">
-                        <select id='change_kind' name='change_kind' class="form-control form-control-sm ml-1"  style='width:70px;display:inline;'>
+                        <select id='change_kind' name='change_kind' class="form-control form-control-sm mr-1"  style='width:70px;display:inline;'>
                                 <option value=''>선택</option>
                                 <option value='P'>%</option>
-                                <option value='W'>원</option>
+                                <option value='W'>금액</option>
                         </select>
+                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;">
                         <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
                         @endif
                     </div>
@@ -156,8 +182,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 153},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 65},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 65},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 65},
         {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 80 @if ($cmd == 'update' && $res->apply_yn == 'N') ,editable:true, cellStyle: {'background' : '#ffff99'} @elseif($cmd == 'add') ,editable:true, cellStyle: {'background' : '#ffff99'} @endif},
     ];
 </script>
@@ -173,6 +199,7 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         if('{{ @$cmd }}' === 'update') GetProducts();
+        $('#cur_date').hide();
     });
     
 
@@ -256,17 +283,17 @@
         }
 
         if ($('#price_kind').val() === '') {
-            alert('Tag가 또는 판매가 기준으로 변경할 것인지 선택해주세요.');
-            return false;
-        }
-
-        if ($('#change_price').val() === '') {
-            alert('변경금액(율)을 입력해주세요.');
+            alert('정상가 또는 현재가 기준으로 변경할 것인지 선택해주세요.');
             return false;
         }
 
         if ($('#change_kind').val() === '') {
             alert('변경종류를 선택해주세요.');
+            return false;
+        }
+
+        if ($('#change_price').val() === '') {
+            alert('변경금액(율)을 입력해주세요.');
             return false;
         }
 
@@ -378,11 +405,14 @@
     }
 
     function Save() {
-        let change_date = $('#change_date').val();
+        let change_date_res = $('#change_date_res').val();
+        let change_date_now = document.getElementById('change_date_now').innerText;
         let change_price = parseInt($('#change_price').val());
         let change_kind = $('#change_kind').val();
+        let type = $("input[name='product_price_type']:checked").val();
         let rows = gx.getSelectedRows();
         let change_cnt = rows.length;
+        let price_kind = $('#price_kind').val();
 
         if(rows.length < 1) return alert('저장할 상품을 선택해주세요.');
 
@@ -393,10 +423,13 @@
             method: 'put',
             data: {
                 data: rows,
-                change_date : change_date,
+                change_date_res : change_date_res,
+                change_date_now : change_date_now,
                 change_kind : change_kind,
                 change_price : change_price,
                 change_cnt : change_cnt,
+                type : type,
+                price_kind : price_kind
                 
             },
         }).then(function (res) {
@@ -453,6 +486,21 @@
             console.log(err);
         });
     }
+
+    @if ($cmd == 'add')
+    $("input[name='product_price_type']").change(function(){
+        let type = $("input[name='product_price_type']:checked").val();
+
+        if (type == 'reservation') {
+            $('#sel_date').show();
+            $('#cur_date').hide();
+
+        } else {
+            $('#sel_date').hide();
+            $('#cur_date').show();
+        }
+    });
+    @endif
 
 
 </script>

@@ -334,6 +334,7 @@
                     const row = params.data;
                     row.buy_cost = parseFloat(row.qty) * row.buy_unit_cost;
                     gx.gridOptions.api.applyTransaction({ update: [row] });
+					params.node.setSelected(true);
                 };
             }
         };
@@ -351,45 +352,41 @@
         };
 
         const add = () => {
-            let arr;
+            let arr = gx.getSelectedRows();
+            if (Array.isArray(arr) && !(arr.length > 0)) {
+				alert('항목을 선택해 주십시오.')
+				return false;
+			}
             if (confirm('저장하시겠습니까?')) {
-                arr = gx.getSelectedRows();
-                if (Array.isArray(arr) && !(arr.length > 0)) {
-                    alert('항목을 선택 해 주십시오.')
-                    return false;
-                } else {
-                    let data_string = "";
-                    const apply_avg_wonga = document.querySelector('#apply_avg_wonga');
-                    let apply_avg_wonga_checked = ( apply_avg_wonga && apply_avg_wonga.checked ) ? true : false;
-                    arr.map((obj) => {
-                        const goods_no = obj.hasOwnProperty('goods_no') ? obj.goods_no : "";
-                        const goods_sub = obj.hasOwnProperty('goods_sub') ? obj.goods_sub : "";
-                        const goods_opt = obj.hasOwnProperty('goods_opt') ? obj.goods_opt : "";
-                        const qty = obj.hasOwnProperty('qty') ? obj.qty : "";
-                        const opt_kind_nm = obj.hasOwnProperty('opt_kind_nm') ? obj.opt_kind_nm : "";
+                let data_string = "";
+                const apply_avg_wonga = document.querySelector('#apply_avg_wonga');
+                let apply_avg_wonga_checked = ( apply_avg_wonga && apply_avg_wonga.checked ) ? true : false;
+                arr.map((obj) => {
+                    const goods_no = obj.hasOwnProperty('goods_no') ? obj.goods_no : "";
+                    const goods_sub = obj.hasOwnProperty('goods_sub') ? obj.goods_sub : "";
+                    const goods_opt = obj.hasOwnProperty('goods_opt') ? obj.goods_opt : "";
+                    const qty = obj.hasOwnProperty('qty') ? obj.qty : "";
+                    const opt_kind_nm = obj.hasOwnProperty('opt_kind_nm') ? obj.opt_kind_nm : "";
 
-                        // console.log(opt_kind_nm);
-                        let buy_unit_cost = obj.hasOwnProperty('buy_unit_cost') ? obj.buy_unit_cost : "";
-                        obj.hasOwnProperty('avg_wonga') && apply_avg_wonga_checked
-                            ? buy_unit_cost = obj.avg_wonga
-                            : null;
-                        
-                        data_string += goods_no + "\t" +  goods_sub + "\t" + goods_opt + "\t" + qty + "\t" + buy_unit_cost + "\t" + opt_kind_nm +"\n";
-                    });
-                    axios({
-                        url: '/head/stock/stk10/buy/add',
-                        method: 'post',
-                        data: { data : data_string }
-                    }).then((response) => {
-                        console.log(response);
-                        if (response.status == 201) {
-                            window.opener.Search();
-                            window.close();
-                        }
-                    }).catch((error) => {
-                        console.log(error);
-                    });
-                };
+                    let buy_unit_cost = obj.hasOwnProperty('buy_unit_cost') ? obj.buy_unit_cost : "";
+                    // obj.hasOwnProperty('avg_wonga') && apply_avg_wonga_checked
+                    //     ? buy_unit_cost = obj.avg_wonga
+                    //     : null;
+                    
+                    data_string += goods_no + "\t" +  goods_sub + "\t" + goods_opt + "\t" + qty + "\t" + buy_unit_cost + "\t" + opt_kind_nm +"\n";
+                });
+                axios({
+                    url: '/head/stock/stk10/buy/add',
+                    method: 'post',
+                    data: { data : data_string }
+                }).then((response) => {
+                    if (response.status == 201) {
+                        window.opener.Search();
+                        window.close();
+                    }
+                }).catch((error) => {
+                    console.log(error);
+                });
             };
         };
 

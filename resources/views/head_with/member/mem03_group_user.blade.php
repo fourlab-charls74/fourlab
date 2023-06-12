@@ -22,7 +22,7 @@
                     <h4>검색</h4>
                     <div class="flax_box">
                         <a href="#" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="SearchFormReset()">
+                        <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm mr-1" onclick="SearchFormReset()">
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
@@ -283,7 +283,7 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
+                <div id="div-gd" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
@@ -299,7 +299,7 @@ var columns = [
         width:28,
         pinned:'left'
     },
-    {field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType"  },
+    {field:"user_id" , headerName:"아이디", pinned:'left', type:"HeadUserType", width: 80},
     {field:"name" , headerName:"이름"},
     {field:"sex" , headerName:"성별"},
     {field:"jumin1" , headerName:"주민번호"},
@@ -317,11 +317,11 @@ var columns = [
     { width: "auto" }
 ];
 
-const pApp = new App('', {gridId: "#div-gd"});
+const pApp = new App('', {gridId: "#div-gd", height: 205});
 const gridDiv = document.querySelector(pApp.options.gridId);
 const gx = new HDGrid(gridDiv, columns);
 
-pApp.ResizeGrid();
+pApp.ResizeGrid(205);
 
 function Search() {
     let data = $('form[name="search"]').serialize();

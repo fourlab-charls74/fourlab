@@ -16,6 +16,7 @@
                     <div>
                         <a href="#" id="search_sbtn" onclick="Search()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                         <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+	                    <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -113,6 +114,7 @@
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                 <a href="#" onclick="add();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 추가</a>
+	            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
         </div>
         <div id="filter-area" class="card shadow-none mb-0 ty2 last-card">

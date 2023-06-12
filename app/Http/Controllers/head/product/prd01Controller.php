@@ -223,7 +223,6 @@ class prd01Controller extends Controller
 					left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 					left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
                 where 1=1
-                    -- g.com_id = :com_id
                     $where
 			";
             //$row = DB::select($query,['com_id' => $com_id]);
@@ -648,7 +647,8 @@ class prd01Controller extends Controller
 				"limited_min_qty"	=> $limited_min_qty,
 				"limited_max_qty"	=> $limited_max_qty,
 				"limited_total_qty_yn"	=> $limited_total_qty_yn,
-				"member_buy_yn"		=> $member_buy_yn
+				"member_buy_yn"		=> $member_buy_yn,
+				"upd_dm"		    => now(),
 			);
 
 			try {

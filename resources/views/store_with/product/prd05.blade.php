@@ -17,8 +17,8 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 예약 추가</a>
-                        <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a>
+                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
+                        <!-- <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a> -->
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -57,6 +57,15 @@
 											<label class="" for="s_nud" data-on-label="ON" data-off-label="OFF"></label>
 										</div>
 									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="prd_cd">바코드</label>
+								<div class="flex_box">
+									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 								</div>
 							</div>
 						</div>
@@ -126,18 +135,33 @@
 					}
 				}
 			},
-            {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code',
+            {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code', hide:true,
 				cellRenderer: function(params) {
 					if (params.value !== undefined && params.data.idx != "") {
-						if (params.data.change_type == 'A') {
-							return '<a href="#" onclick="cmd2(\''+ params.value +'\');" >'+ params.value+'</a>';
-						} else {
-							return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
-						}
+						return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
 					}
 				}
 			},
             {field: "change_date", headerName: "변경일자", width: 100, cellClass: 'hd-grid-code'},
+            {field: "prd_cd", headerName: "바코드", width: 120, cellClass: 'hd-grid-code'},
+            {field: "style_no", headerName: "스타일넘버", width: 80, cellClass: 'hd-grid-code'},
+            {field: "goods_no", headerName: "온라인코드", width: 80, cellClass: 'hd-grid-code'},
+            {field: "brand", headerName: "브랜드", width: 80, cellClass: 'hd-grid-code'},
+            {field: "opt_kind_nm", headerName: "품목", width: 70, cellClass: 'hd-grid-code'},
+            {field: "goods_nm", headerName: "상품명", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType"},
+            {field: "goods_nm_eng", headerName: "상품명(영문)", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType"},
+            {field: "color", headerName: "컬러", width: 100, cellClass: 'hd-grid-code'},
+            {field: "size", headerName: "사이즈", width: 60, cellClass: 'hd-grid-code'},
+            {field: "goods_sh", headerName: "정상가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+				cellRenderer:function(params) {
+					return Comma(params.data.goods_sh) + '원';
+				}
+			},
+            {field: "price", headerName: "현재가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+				cellRenderer:function(params) {
+					return Comma(params.data.price) + '원';
+				}
+			},
             {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
 				cellRenderer:function(params) {
 					if (params.data.change_kind == 'P'){
@@ -204,7 +228,7 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/product/prd05/search', data);
+        gx.Request('/store/product/prd05/search', data,1);
     }
 
     function Add (cmd) {
@@ -219,10 +243,10 @@
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
     };
 
-	function cmd2 (code) {
-		const url = '/store/product/prd05/view/' + code;
-		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-    };
+	// function cmd2 (code) {
+	// 	const url = '/store/product/prd05/view/' + code;
+	// 	window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+    // };
 
 	function del_product_price() {
 		let rows = gx.getSelectedRows();

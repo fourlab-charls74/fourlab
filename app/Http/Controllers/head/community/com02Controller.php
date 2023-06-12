@@ -98,7 +98,8 @@ class com02Controller extends Controller
 		$arr_header = array("data_cnt" => $data_cnt, "page_cnt" => $page_cnt);
 		
 		if($limit == -1){
-            $limits = "";
+			if ($page > 1) $limits = "limit 0";
+			else $limits = "";
         } else {
             $limits = " limit $startno, $page_size ";
         }

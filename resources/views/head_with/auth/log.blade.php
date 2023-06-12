@@ -60,7 +60,7 @@
             </div>
         </div>
     </form>
-    <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
+    <div id="filter-area" class="card shadow-none ty2 last-card">
         <div class="card-body shadow">
             <div class="card-title">
                 <div class="filter_wrap">
@@ -72,7 +72,7 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="width:100%;min-height:600px;" class="ag-theme-balham"></div>
+                <div id="div-gd" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
@@ -90,18 +90,19 @@
             {headerName: "메뉴명", field: "menu_nm",width:200},
             {headerName: "URI", field: "cmd", width:250},
             {headerName: "이름", field: "name"},
-            {headerName: "IP", field: "ip",width:100}
+            {headerName: "IP", field: "ip",width:100},
+			{width: "auto"}
         ];
     </script>
     <script type="text/javascript" charset="utf-8">
         let chart_data = null;
 
         const pApp = new App('',{
-            gridId:"#div-gd",
+            gridId:"#div-gd", height: 265
         });
         let gx;
         $(document).ready(function() {
-            pApp.ResizeGrid(300);
+            pApp.ResizeGrid(265);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns);

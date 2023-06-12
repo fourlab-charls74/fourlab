@@ -141,7 +141,7 @@
 							<div class="row">
 								<div class="col-12">
 									<div class="table-responsive">
-										<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+										<div id="div-gd" class="ag-theme-balham"></div>
 									</div>
 								</div>
 							</div>
@@ -149,7 +149,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-6">
+			<div class="col-lg-6 pl-1">
 				<div class="card_wrap">
 					<div class="card shadow">
 						<div class="row_wrap">
@@ -461,7 +461,8 @@
 			// when the row is loaded) then the cell is refreshed.
 			valueGetter: 'node.id',
 			cellRenderer: 'loadingRenderer',
-			cellStyle: {"background":"#F5F7F7"}
+			cellStyle: {"background":"#F5F7F7"},
+			cellClass: 'hd-grid-code',
 		},
 		{
 			field: "chk", 
@@ -469,14 +470,14 @@
 			cellClass: 'hd-grid-code', 
 			headerCheckboxSelection: true, 
 			checkboxSelection: true, 
-			width: 40,
+			width: 28,
 		},
 		{
 			field: "brand_type",
 			headerName: "구분",
 			width: 50,
 			cellStyle: StyleGoodsTypeNM,
-			//editable: true,
+			cellClass: 'hd-grid-code',
 			cellRenderer: function(params) {
 				if(params.value === 'S') return "시스템"
 				else if(params.value === 'U') return "유저"
@@ -486,7 +487,6 @@
 			field: "brand",
 			headerName: "브랜드",
 			width: 100,
-			editable: true,
 			cellRenderer: function(params) {
 				return '<a href="javascript:;" data-code="' + params.value + '" onClick="GetBrand(this)">' + params.value + '</a>'
 			}
@@ -495,21 +495,18 @@
 			field: "brand_nm",
 			headerName: "브랜드명",
 			width: 100,
-			//editable: true,
 		},
 		{
 			field: "goods_cnt",
 			headerName: "상품수",
 			width: 50,
-			//editable: true,
-			cellStyle: {'text-align':'right'},
+			type: 'numberType'
 		},
 		{
 			field: "use_yn",
 			headerName: "사용여부",
 			width: 60,
-			//editable: true,
-			cellStyle: {'text-align':'center'},
+			cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
 				if(params.value == 'Y') return "사용"
 				else if(params.value == 'N') return "미사용"
@@ -519,24 +516,20 @@
 		{
 			field: "regi_date",
 			headerName: "등록일시",
-			width: 130,
-			//editable: true,
+			type: 'DateTimeType'
 		},
 		{
 			field: "ut",
 			headerName: "수정일시",
-			width: 130,
-			//editable: true,
+			type: 'DateTimeType'
 		},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('', {
-		gridId: "#div-gd",
-	});
+	const pApp = new App('', { gridId: "#div-gd", height: 265 });
 	let gx;
 	$(document).ready(function() {
-		pApp.ResizeGrid();
+		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);

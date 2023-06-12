@@ -179,9 +179,12 @@ class std03Controller extends Controller
 				"brand_contents"=> $brand_contents,
 				"admin_id"		=> $id,
 				"admin_nm"		=> $name,
-				"brand_logo"	=> $logo_img_url,
 				"ut"			=> now()
 			];
+			
+			if ($logo_img_url !== '') {
+				$update_items['brand_logo'] = $logo_img_url;
+			}
 
 			try {
 				DB::table('brand')

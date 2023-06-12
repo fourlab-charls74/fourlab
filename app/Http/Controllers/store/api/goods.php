@@ -88,13 +88,16 @@ class goods extends Controller
         
         $com_id = $request->input("com_cd");
 
-        $sql = "
-            select
-                com_type
-            from company
-            where com_id = '$com_id'
-        ";
-        $com_type = DB::selectOne($sql);
+        if ($com_id != null) {
+            $sql = "
+                select
+                    com_type
+                from company
+                where com_id = '$com_id'
+            ";
+            $com_type = DB::selectOne($sql);
+        }
+       
 
         // $goods_stat = $request->input("goods_stat");
         // $head_desc = $request->input("head_desc");
@@ -183,7 +186,7 @@ class goods extends Controller
             else $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having, ['com_id' => $com_id]);
         }
         else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $orderby, $limit, ['com_id' => $com_id]);
-        else if ($com_type->com_type == 6) $sqls = $this->_wonboo_sql($where, $orderby, $limit, ['com_id' => $com_id]);
+        else if ($com_type->com_type??'' == 6) $sqls = $this->_wonboo_sql($where, $orderby, $limit, ['com_id' => $com_id]);
         else $sqls = $this->_normal_sql($where, $orderby, $limit, ['com_id' => $com_id]);
 
         $total = 0;

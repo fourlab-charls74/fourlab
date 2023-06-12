@@ -250,7 +250,7 @@ class stk10Controller extends Controller
 				d.buy_ord_prd_no
 			from (
 				select
-					p.buy_ord_prd_no,p.buy_ord_date,p.buy_ord_no,p.state,g.goods_no, g.goods_sub, a.goods_opt,
+					p.buy_ord_prd_no,p.buy_ord_date,p.buy_ord_no,p.state,g.goods_no, g.goods_sub, p.opt as goods_opt,
 					g.brand,c.com_nm, g.opt_kind_cd,g.style_no,g.org_nm,
 					g.goods_nm as goods_nm,img,
 					g.sale_stat_cl,

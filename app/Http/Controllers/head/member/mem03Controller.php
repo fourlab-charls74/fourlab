@@ -330,11 +330,16 @@ class mem03Controller extends Controller
             );
 		} else {
 			$startno = ($page-1) * $page_size;
-			$arr_header = null;
+			$arr_header = array(
+				"total" => 0,
+				"page" => $page,
+				"page_cnt" => 0
+			);
         }
 
 		if($limit == -1){
-			$limit = "";
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
 		} else {
 			$limit = " limit $startno, $page_size ";
 		}
@@ -361,6 +366,7 @@ class mem03Controller extends Controller
         ";
 
         $result = DB::select($sql);
+		$arr_header['page_total'] = count($result);
 
         return response()->json([
             "code" => 200,
@@ -468,7 +474,8 @@ class mem03Controller extends Controller
 			$arr_header = null;
 		}
 		if($limit == -1){
-			$limit = "";
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
 		} else {
 			$limit = " limit $startno, $page_size ";
 		}

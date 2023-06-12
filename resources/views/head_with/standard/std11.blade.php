@@ -26,7 +26,7 @@
                         <div class="form-group">
                             <label for="sale_name">할인명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='name' id="sale_name" value='' />
+                                <input type='text' class="form-control form-control-sm search-all search-enter" name='name' id="sale_name" value='' />
                             </div>
                         </div>
                     </div>
@@ -49,7 +49,6 @@
                                 <select name="dc_range" id="dc_range" class="form-control form-control-sm">
                                     <option value="A">전체</option>
                                     <option value="G">상품</option>
-                                    <!-- <option value="">상품</option> -->
                                 </select>
                             </div>
                         </div>
@@ -124,35 +123,31 @@
 
 <script>
     const columnDefs = [
-        {headerName: '#', pinned: 'left', type: 'NumType'},
-        {
-            field: "name", 
-            headerName: "할인명",
+        {headerName: '#', width: 35, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellClass: 'hd-grid-code', pinned: 'left'},
+        {field: "name", headerName: "할인명", width: 100,
             cellRenderer: function(params) {
                 return `<a href="#" onClick="openDetailPopup('${params.data.no}')">${params.value}</a>`;
             }
         },
-        {field: "use_yn", headerName: "사용", width:45,
-            cellStyle: {'text-align':'center'},
+        {field: "use_yn", headerName: "사용", width: 45, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
 				if(params.value === 'Y') return "사용"
 				else if(params.value === 'N') return "미사용"
                 else return params.value
 			}
         },
-        {field: "dc_range", headerName: "범위", width:45,
-            cellStyle: {'text-align':'center'},
+        {field: "dc_range", headerName: "범위", width: 45, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
 				if(params.value === 'A') return "전체"
 				else if(params.value === 'G') return "상품"
                 else return params.value
 			}
         },
-        {field: "dc_rate", headerName: "할인율(%)", type:'currencyType', width: 70},
+        {field: "dc_rate", headerName: "할인율(%)", type:'percentType', width: 70},
         {field: "dc_amt", headerName: "할인금액(원)", type:'currencyType', width: 80},
-        {field: "date_from", headerName: "할인기간 시작", width:90, cellStyle:{'text-align':'right'}},
-        {field: "date_to", headerName: "할인기간 종료", width:90, cellStyle:{'text-align':'right'}},
-        {field: "limit_margin_rate", headerName: "마진율제한(%)", type:'currencyType', width: 90},
+        {field: "date_from", headerName: "할인기간 시작", width: 90, cellClass: 'hd-grid-code'},
+        {field: "date_to", headerName: "할인기간 종료", width: 90, cellClass: 'hd-grid-code'},
+        {field: "limit_margin_rate", headerName: "마진율제한(%)", type:'percentType', width: 90},
         {field: "limit_coupon_yn", headerName: "쿠폰제한", width:58,
             cellStyle: {'text-align':'center'},
             cellRenderer: function(params) {
@@ -177,23 +172,25 @@
                 else return params.value
 			}
         },
-        {field: "add_point_rate", headerName: "추가적립율(%)", type:'currencyType', width: 90},
+        {field: "add_point_rate", headerName: "추가적립율(%)", type:'percentType', width: 90},
         {field: "add_point_amt", headerName: "추가적립금액(원)", type:'currencyType', width: 105},
-        {field: "admin_nm", headerName: "관리자명"},
-        {field: "rt", headerName: "등록일시", width: 130},
-        {field: "ut", headerName: "수정일시", width: 130},
+        {field: "admin_nm", headerName: "관리자명", cellClass: 'hd-grid-code'},
+        {field: "rt", headerName: "등록일시", type: 'DateTimeType'},
+        {field: "ut", headerName: "수정일시", type: 'DateTimeType'},
         {field: "", headerName: "", width: "auto"}
     ];
 
     const pApp = new App('', { gridId: "#div-gd" });
-    const gridDiv = document.querySelector(pApp.options.gridId);
-    const gx = new HDGrid(gridDiv, columnDefs);
+	let gx;
 
-    gx.gridOptions.getRowNodeId = function(data) {
-        return data.id;
-    }
+	$(function() {
+		pApp.ResizeGrid(275);
+		pApp.BindSearchEnter();
+		const gridDiv = document.querySelector(pApp.options.gridId);
+		gx = new HDGrid(gridDiv, columnDefs);
 
-    pApp.ResizeGrid(275);
+		Search();
+	});
 
     function Search(){
         let data = $('form[name="search"]').serialize();
@@ -202,22 +199,12 @@
 
     function openDetailPopup(no) {
         const url='/head/standard/std11/show/dc/' + no;
-        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=1000");
+        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
     }
     
     function openAddDCPopup() {
         const url='/head/standard/std11/show/dc/';
-        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=600");
+        const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=710");
     }
-    Search();
-
-    $(function() {
-        $("[name=name]").on("keypress", function(e) {
-            if(e.which == 13) {
-                e.preventDefault();
-                Search();
-            }
-        });
-    });
 </script>
 @stop

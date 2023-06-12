@@ -93,10 +93,19 @@ class stk01Controller extends Controller
         if($page == 1){
             $query = /** @lang text */
                 "
-                select count(*) as total
-                from goods g 
-                    inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
-                where 1=1 and g.com_id = :com_id $where
+				select count(a.goods_no) as total
+				from (
+					select g.goods_no, g.brand, g.goods_type, g.is_unlimited, g.sale_stat_cl, g.opt_kind_cd
+					from goods g 
+						inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
+						inner join company c on c.com_id = g.com_id
+					where g.com_id = :com_id $where
+				) a
+				left outer join brand b on a.brand = b.brand
+				inner join opt o on a.opt_kind_cd = o.opt_kind_cd and o.opt_id = 'K'
+				inner join code cd on cd.code_kind_cd = 'G_GOODS_TYPE' and a.goods_type = cd.code_id
+				inner join code cd2 on cd2.code_kind_cd = 'G_IS_UNLIMITED' and a.is_unlimited = cd2.code_id
+				inner join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd3.code_id
 			";
             $row = DB::select($query,["com_id" => $com_id]);
             $total = $row[0]->total;
@@ -126,8 +135,7 @@ class stk01Controller extends Controller
                 s.goods_opt,s.good_qty,s.wqty
                 from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
                 inner join company c on c.com_id = g.com_id
-                where 1=1 and g.com_id = :com_id $where
-                $limit
+                where g.com_id = :com_id $where
           ) a
           left outer join brand b on a.brand = b.brand
           inner join opt o on a.opt_kind_cd = o.opt_kind_cd and o.opt_id = 'K'
@@ -135,6 +143,7 @@ class stk01Controller extends Controller
           inner join code cd2 on cd2.code_kind_cd = 'G_IS_UNLIMITED' and a.is_unlimited = cd2.code_id
           inner join code cd3 on cd3.code_kind_cd = 'G_GOODS_STAT' and a.sale_stat_cl = cd3.code_id
           order by $ord_field $ord, a.goods_opt
+		  $limit
         ";
 
         $result = DB::select($query,["com_id" => $com_id]);

@@ -34,7 +34,8 @@ class ExcelViewExport implements WithMultipleSheets
 	public function sheets(): array
 	{
 		$sheets = [];
-		$sheets_count = floor(count($this->data[$this->keys['list_key'] ?? 'list'] ?? []) / ($this->keys['one_sheet_count'] ?? 25));
+		$sheets_count = floor(count($this->data[$this->keys['list_key'] ?? 'list'] ?? []) / ($this->keys['one_sheet_count'] ?? 25)) - 1;
+		if ($sheets_count < 0) $sheets_count = 0;
 
 		foreach (range(0, $sheets_count) as $i) {
 			$sheets[] = new ExcelOneSheetExport($this->view_url, $this->data, $this->style, $this->images, $this->keys, $i);
@@ -71,10 +72,12 @@ class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings
 		
 		$sheet->getPageMargins()->setTop(0.5);
 		$sheet->getPageMargins()->setBottom(0.5);
-		$sheet->getPageMargins()->setLeft(0.25);
-		$sheet->getPageMargins()->setRight(0.25);
+		$sheet->getPageMargins()->setLeft(0);
+		$sheet->getPageMargins()->setRight(0);
 		$sheet->getPageSetup()->setHorizontalCentered(true);
+		$sheet->getPageSetup()->setVerticalCentered(true);
 		$sheet->getPageSetup()->setFitToPage(true);
+		$sheet->getPageSetup()->setPaperSize(9);
 		
 		return $this->style;
 	}
