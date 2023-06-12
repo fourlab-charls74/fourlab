@@ -547,7 +547,6 @@
                                             <th><input type="checkbox" id="goods-all"></th>
                                             <th>상태</th>
                                             <th>출고형태/<br />출고구분</th>
-                                            <th>출고형태/<br />출고구분</th>
                                             <th>스타일넘버<br />(업체)</th>
                                             <th colspan="2" style="width:25%; overflow:hidden;">상품명/옵션/배송정보</th>
                                             <th>처리현황/<br />메모</th>
