@@ -629,13 +629,13 @@ class cs06Controller extends Controller
 
 						$ip = $_SERVER["REMOTE_ADDR"];
 						$memo = sprintf("%s (%s%s)","환불완료", $pay_type_nm, ($refund_type == "CL")? "취소":"부분취소");
-						/*
+
 						$pg = new pay();
 						list($res_cd, $res_msg ) = $pg->mod($refund_type,$tno,$ord_no,$ip,$memo,$refund_amt,$bal_amt);
-						*/
 
-						// 테스트 코드
-						$res_cd = "0000";
+						
+						// 테스트 코드 ( 2023-06-12 일주일후 삭제 예정 )
+						//$res_cd = "0000";
 						//printf("%s %s",$res_cd,$res_msg);
 
 						//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -739,21 +739,23 @@ class cs06Controller extends Controller
 
 
 										$sms_msg = $sms->MsgReplace($msg, $msgarr);
-										/*
+										/* 2023-06-12 주석해제 완료 1주일 후 삭제 예정 */
 										if($cfg_kakao_yn == "Y" && $template_code != ""){
-											$sms->SendKakao($template_code, $user_mobile, $user_name, $sms_msg, $msgarr, '', $btnarr);
+											//$sms->SendKakao($template_code, $user_mobile, $user_name, $sms_msg, $msgarr, '', $btnarr);
 										} else {
-											$sms->Send($sms_msg, $user_mobile, $user_name);
+											//$sms->Send($sms_msg, $user_mobile, $user_name);
 										}
-										*/
+
+										$sms->SendAligoSMS( $user_mobile, $sms_msg, $user_name );
+										/**/
 
 										/******************************************************
 										* 테스트 위해 아래로 휴대폰 번호 임시 지정
 										******************************************************/
-										$user_mobile = "010-9877-2675";
-										$user_name = "테스트";
+										//$user_mobile = "010-9877-2675";
+										//$user_name = "테스트";
 
-										$sms->Send($sms_msg, $user_mobile, $user_name);
+										//$sms->Send($sms_msg, $user_mobile, $user_name);
 
 									}
 									////////// 환불완료시 문자보내기 끝 //////////
