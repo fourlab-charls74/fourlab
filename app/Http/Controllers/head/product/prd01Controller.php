@@ -271,6 +271,7 @@ class prd01Controller extends Controller
 				  ) as wqty
 				, g.wonga
 				, g.goods_sh
+				, round(((g.goods_sh - g.price) / g.goods_sh) * 100 ,2) as sale_amt
 				, (100/(g.price/(g.price-g.wonga))) as margin_rate
 				, (g.price-g.wonga) as margin_amt
 				, g.md_nm

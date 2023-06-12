@@ -141,6 +141,7 @@
                         </select>
                         <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;">
                         <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
+                        <button type="button" onclick="change_return(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_return"> 정상가로 환원하기</button>
                         @endif
                     </div>
                     @if ($cmd == 'update' && $res->apply_yn == 'N')
@@ -502,6 +503,20 @@
     });
     @endif
 
+    // 정상가로 환원하기
+    function change_return(is_zero = false) {
+        let rows = gx.getSelectedRows();
+        change_return_price = gx.getSelectedRows().map(row => ({
+            ...row, 
+            change_val : row.goods_sh 
+        }));
+        // gx.gridOptions.api.applyTransaction({ update : change_return });
+        for (let i = 0; i < rows.length; i++) {
+            gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+        }
+        gx.gridOptions.api.applyTransaction({ add : change_return_price });
+        gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+    }
 
 </script>
 @stop

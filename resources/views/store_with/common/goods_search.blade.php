@@ -1,6 +1,7 @@
 @php
     $title = isset($store) ? '매장별 상품검색' : (isset($storage) ? '창고별 상품검색' : '상품검색');
     $subTitle = isset($store) ? '- ' . $store->store_nm : (isset($storage) ? '- ' . $storage->storage_nm : '');
+    $subTitle2 = isset($store) ?  $store->store_nm : (isset($storage) ? $storage->storage_nm : '');
 @endphp
 
 @extends('store_with.layouts.layout-nav')
@@ -277,6 +278,8 @@
         }
     };
 
+    let title = '{{ $subTitle2 }}';
+
     const columns = [
         // {headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight},
         // {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
@@ -316,7 +319,7 @@
                 aggFunc: sum_values, cellRenderer: stock_render,
             },  
             {
-                headerName: "매장재고",
+                headerName: title??'매장재고',
                 children: [
                     {
                         field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}, 

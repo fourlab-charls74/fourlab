@@ -86,11 +86,11 @@
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sc_state_Y" name="sc_state" value="Y" />
-                                    <label class="custom-control-label" for="sc_state_Y">등록</label>
+                                    <label class="custom-control-label" for="sc_state_Y">처리완료</label>
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sc_state_N" name="sc_state" value="N" />
-                                    <label class="custom-control-label" for="sc_state_N">미등록</label>
+                                    <label class="custom-control-label" for="sc_state_N">미처리</label>
                                 </div>
                             </div>
                         </div>
@@ -146,7 +146,7 @@
         {field: "loss_price", headerName: "LOSS 총금액", width: 80, type: "currencyType"},
         {field: "sc_state", headerName: "LOSS처리여부", width: 90, 
             cellStyle: (params) => ({"text-align": "center", "color": params.value == "N" ? "red" : params.value == "Y" ? "green" : "none"}),
-            cellRenderer: (params) => params.value === "Y" ? "등록" : "미등록",
+            cellRenderer: (params) => params.value === "Y" ? "처리완료" : "미처리",
         },
         {field: "md_id", hide: true},
         {field: "md_nm", headerName: "담당자", width: 80, cellStyle: {"text-align": "center"}},

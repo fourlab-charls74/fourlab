@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','상품반품')
+@section('title','창고간상품이동')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">상품반품</h3>
+	<h3 class="d-inline-flex">창고간상품이동</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 생산입고관리</span>
-		<span>/ 상품반품</span>
+		<span>/ 창고간상품이동</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -230,18 +230,18 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/cs/cs02/search', data, 1);
+		gx.Request('/store/cs/cs04/search', data, 1);
 	}
 
     // 거래처반품 상품관리 팝업 오픈
     const openDetailPopup = (sgr_cd = '') => {
-        const url = '/store/cs/cs02/show/' + sgr_cd;
+        const url = '/store/cs/cs04/show/' + sgr_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     };
     
     // 거래처반품 일괄등록 팝업 오픈
     const openBatchPopup = () => {
-        const url = '/store/cs/cs02/batch';
+        const url = '/store/cs/cs04/batch';
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     }
 
@@ -256,7 +256,7 @@
         if(!confirm("선택한 항목을 반품완료처리 하시겠습니까?")) return;
 
         axios({
-            url: '/store/cs/cs02/update-return-state',
+            url: '/store/cs/cs04/update-return-state',
             method: 'put',
             data: {data: rows},
         }).then(function (res) {
@@ -283,7 +283,7 @@
         if(!confirm("삭제한 거래처반품정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
 
         axios({
-            url: '/store/cs/cs02/del-return',
+            url: '/store/cs/cs04/del-return',
             method: 'delete',
             data: {
                 sgr_cds: rows.map(r => r.sgr_cd),

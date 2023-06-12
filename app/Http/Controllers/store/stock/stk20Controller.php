@@ -20,10 +20,10 @@ const PRODUCT_STOCK_TYPE_STORE_RT = 15;
 class stk20Controller extends Controller
 {
     private $rt_states = [
-        '10' => '요청',
-        '20' => '접수',
-        '30' => '처리',
-        '40' => '완료',
+        '10' => 'RT요청',
+        '20' => 'RT접수',
+        '30' => 'RT처리중',
+        '40' => 'RT완료',
         '-10' => '거부',
     ];
 

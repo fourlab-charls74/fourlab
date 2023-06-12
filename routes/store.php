@@ -361,6 +361,19 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
             Route::post('/save', 'cs03Controller@save');
             Route::post('/changeInput', 'cs03Controller@changeInput');
         });
+
+        // 창고간상품이동
+        Route::get('cs04', 'cs04Controller@index');
+        Route::get('cs04/search', 'cs04Controller@search');
+        Route::get('cs04/show/{sgr_cd?}','cs04Controller@show');
+        Route::put('cs04/update-return-state','cs04Controller@update_return_state');
+        Route::delete('cs04/del-return','cs04Controller@del_return');
+        Route::get('cs04/search-return-products','cs04Controller@search_return_products');
+        Route::put('cs04/add-storage-return','cs04Controller@add_storage_return');
+        Route::put('cs04/update-storage-return','cs04Controller@update_storage_return');
+        Route::get('cs04/batch','cs04Controller@batch_show');
+        Route::post('cs04/batch-import','cs04Controller@import_excel');
+        Route::post('cs04/batch-getgoods','cs04Controller@get_goods');
         
     });
 

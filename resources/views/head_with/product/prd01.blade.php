@@ -387,6 +387,7 @@
         {field: "normal_price", headerName: "정상가", type: 'currencyType', hide:true},
         {field: "goods_sh", headerName: "정상가", type: 'currencyType'},
         {field: "price", headerName: "판매가", editable: true, type: 'currencyType', width:60, cellStyle: {'background' : '#ffff99'}},
+        {field: "sale_amt", headerName: "할인율", cellStyle:{'text-align' : 'right'}},
         {field: "coupon_price", headerName: "쿠폰가", type: 'currencyType', width:60},
         {field: "sale_rate", headerName: "세일율(,%)", type: 'percentType', hide: true},
         {field: "sale_s_dt", headerName: "세일기간", hide: true},

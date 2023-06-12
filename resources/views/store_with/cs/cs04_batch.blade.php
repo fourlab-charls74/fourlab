@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품반품 일괄등록')
+@section('title', '창고간상품이동 일괄등록')
 @section('content')
 
 <!-- import excel lib -->
@@ -8,11 +8,11 @@
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">상품반품 일괄등록</h3>
+            <h3 class="d-inline-flex">창고간상품이동 일괄등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 생산입고관리</span>
-                <span>/ 상품반품</span>
+                <span>/ 창고간상품이동</span>
             </div>
         </div>
         <div class="d-flex">
@@ -53,7 +53,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_cs02.xlsx" class="ml-2" style="text-decoration: underline !important;">상품반품 등록양식 다운로드</a>
+                                                    <a href="/sample/sample_cs04.xlsx" class="ml-2" style="text-decoration: underline !important;">창고간상품이동 등록양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -341,7 +341,7 @@
         
         axios({
             method: 'post',
-            url: '/store/cs/cs02/batch-import',
+            url: '/store/cs/cs04/batch-import',
             data: form_data,
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -364,7 +364,7 @@
     const getGood = async (rows, firstIndex) => {
 
         axios({
-            url: '/store/cs/cs02/batch-getgoods',
+            url: '/store/cs/cs04/batch-getgoods',
             method: 'post',
             data: { data: rows },
         }).then(async (res) => {
@@ -408,7 +408,7 @@
         if(!confirm("일괄등록하시겠습니까?")) return;
 
         axios({
-            url: '/store/cs/cs02/add-storage-return',
+            url: '/store/cs/cs04/add-storage-return',
             method: 'put',
             data: {
                 sgr_type: 'B',
