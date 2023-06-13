@@ -12,6 +12,7 @@ use App\Models\Pay;
 use App\Models\Claim;
 use App\Models\Point;
 use App\Models\Gift;
+use App\Models\SMS;
 
 use App\Models\Conf;
 
@@ -291,13 +292,12 @@ class cs06Controller extends Controller
 					left outer join claim c on a.ord_opt_no = c.ord_opt_no
 				where a.ord_no = '$ord_no'
 			";
-			$rs = $conn->Execute($sql);
-			$row = $rs->fields;
+			$row = DB::selectOne($sql);
 
 			$group_dlv = array();
 			$group_dlv["1"]["cnt"] = $ord_cnt;
 			$group_dlv["1"]["dlv_amt"] = $pay_baesong;
-			$group_dlv["1"]["dlv_add_amt"] = $rs->dlv_add_amt;
+			$group_dlv["1"]["dlv_add_amt"] = $row->dlv_add_amt;
 
 		}
 
