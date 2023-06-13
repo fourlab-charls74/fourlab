@@ -85,8 +85,8 @@ class SmsController extends Controller
 
         if($mobile != ""){
             //$sms->Send($sms_msg, $mobile, $name, $shop_tel);
-			//$sms->SendAligoSMS( $mobile, $sms_msg, $name );
-			$sms->Send( $sms_msg, $mobile, $name,$shop_tel);
+			$sms->SendAligoSMS( $mobile, $sms_msg, $name );
+			//$sms->Send( $sms_msg, $mobile, $name,$shop_tel);
         }
         return response()->json([
             "code" => "200"
