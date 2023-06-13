@@ -59,6 +59,11 @@ class SMS
 	 */
 	function Send( $msg, $phone, $name, $callback = "" ) {
 
+		// 알리고로 리다이렉트
+		// 2023-06-13
+		$this->SendAligoSMS( $phone, $msg, $name,$callback = '1566-8911' );
+		exit;
+
 		$tr_phone = str_replace("-","",$phone);
 
         $conf = new Conf();
@@ -80,8 +85,8 @@ class SMS
             ";
 
             DB::insert($sql);
-		}
-		else if( $cfg_sms_sender == "youiwe" ) {
+			
+		}else if( $cfg_sms_sender == "youiwe" ) {
             // 수행시간 확인
             $time_start = microtime(true);
 
@@ -108,7 +113,7 @@ class SMS
             // 즉시 전송으로 구성하실경우
             $result = $sms->SendSMS($sms_id, $sms_pwd, $snd_number, $rcv_number, $sms_content);// 5개의 인자로 함수를 호출합니다.
 
-            dd($result);
+            //dd($result);
 
             // 수행시간 확인
             $time_end = microtime(true);
