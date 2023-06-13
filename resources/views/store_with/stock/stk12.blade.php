@@ -245,7 +245,7 @@
                         <div class="d-flex">
                             <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
                                 @foreach ($rel_order_res as $rel_order)
-                                    <option value='{{ $rel_order->code_val3 }}'>{{ $rel_order->code_val }}</option>
+                                    <option value='{{ $rel_order->code_val}}'>{{ $rel_order->code_val}}</option>
                                 @endforeach
                             </select>
                             <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>

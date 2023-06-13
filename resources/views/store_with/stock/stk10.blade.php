@@ -305,7 +305,7 @@
                         <div class="d-flex">
                             <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
                                 @foreach ($rel_order_res as $rel_order)
-                                    <option value='{{ $rel_order->code_val3 }}'>{{ $rel_order->code_val }}</option>
+                                    <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -363,12 +363,13 @@
                return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
         },
+        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
+        {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 60,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "매장", pinned: 'left', width: 140, cellStyle: {"text-align": "center"}},
         {field: "storage_cd",	headerName: "창고코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
@@ -404,7 +405,6 @@
                 return params.data.dlv_day;
            }
         },
-		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"}},
         {field: "last_release_date", headerName: "최근출고일", width: 90,
             cellRenderer: function(params){
                 let last_release_date = params.data.last_release_date;

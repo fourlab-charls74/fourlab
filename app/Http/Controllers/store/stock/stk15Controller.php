@@ -289,7 +289,7 @@ class stk15Controller extends Controller
                         'storage_cd' => $storage_cd,
                         'state' => $state,
                         'exp_dlv_day' => $exp_dlv_day_data,
-                        'rel_order' =>  $exp_dlv_day_data . '-' . $rel_order,
+                        'rel_order' => $rel_order,
                         'req_id' => $admin_id,
                         'req_rt' => now(),
                         'rec_id' => $admin_id,

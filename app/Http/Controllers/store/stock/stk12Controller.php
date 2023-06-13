@@ -289,7 +289,7 @@ class stk12Controller extends Controller
 
             $sql = "
                 select 
-                    code_val3 
+                    code_val
                 from code 
                 where code_kind_cd = 'REL_ORDER' and code_val = '$rel_order'
             ";
@@ -326,7 +326,7 @@ class stk12Controller extends Controller
                             'storage_cd' => $storage_cd,
                             'state' => $state,
                             'exp_dlv_day' => $exp_dlv_day_data,
-                            'rel_order' =>  $exp_dlv_day_data . '-' . $rel_order,
+                            'rel_order' => $rel_order->code_val,
                             'req_id' => $admin_id,
                             'req_rt' => now(),
                             'rec_id' => $admin_id,
@@ -593,7 +593,7 @@ class stk12Controller extends Controller
                             'storage_cd' => $storage_cd,
                             'state' => $state,
                             'exp_dlv_day' => $exp_dlv_day_data,
-                            'rel_order' =>  $exp_dlv_day_data . '-' . $rel_order,
+                            'rel_order' => $rel_order,
                             'req_id' => $admin_id,
                             'req_rt' => now(),
                             'rec_id' => $admin_id,

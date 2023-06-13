@@ -318,7 +318,7 @@ class stk10Controller extends Controller
                     ->update([
                         'qty' => $d['qty'] ?? 0,
                         'exp_dlv_day' => $exp_dlv_day_data,
-                        'rel_order' => $exp_dlv_day_data . '-' . $rel_order,
+                        'rel_order' => $rel_order,
                         'state' => $new_state,
                         'comment' => $d['comment'],
                         'req_comment' => $d['req_comment'],
