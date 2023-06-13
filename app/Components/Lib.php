@@ -354,5 +354,46 @@ class Lib
         echo "<pre>" . $sql. "</pre>";
         exit;
     }
-
+	
+	/**
+		Function: calcDate
+		   0M : 해당달의 20050601, 1M : 이전달 20050501
+		Parameters:
+		   Date - 일자
+		   Peroid - 주기
+		Returns:
+		   일자
+	*/
+   public static function calcDate($Date,$Peroid){
+	   $ptype = substr($Peroid,strlen($Peroid)-1,strlen($Peroid));
+	   if($ptype == "M"){
+		   $mopp = substr($Peroid,0,strlen($Peroid)-1);
+		   if($mopp == 0){
+			   $d = mktime (0,0,0,substr($Date,4,2),substr($Date,6,2),substr($Date,0,4));
+			   return date("Ymd",mktime (0,0,0,date("m",$d)-$mopp,1,date("Y",$d)));
+		   } else {
+			   $d = mktime (0,0,0,substr($Date,4,2),substr($Date,6,2),substr($Date,0,4));
+			   return date("Ymd",mktime (0,0,0,date("m",$d)-$mopp,date("d",$d),date("Y",$d)));
+		   }
+	   } elseif($ptype == "R"){
+		   $mopp           = substr($Peroid,0,strlen($Peroid)-1);
+		   $d              = mktime (0,0,0,substr($Date,4,2),substr($Date,6,2),substr($Date,0,4));
+		   return date("Ymd",mktime (0,0,0,date("m",$d)-$mopp,1,date("Y",$d)));
+	   } elseif($ptype == "Y"){
+		   $mopp           = substr($Peroid,0,strlen($Peroid)-1);
+		   $d              = mktime (0,0,0,substr($Date,4,2),substr($Date,6,2),substr($Date,0,4));
+		   return date("Ymd",mktime (0,0,0,1,1,date("Y",$d)-$mopp));
+	   } elseif($ptype == "W"){
+		   $wopp           = substr($Peroid,0,strlen($Peroid)-1);
+		   $d              = mktime (0,0,0,substr($Date,4,2),substr($Date,6,2),substr($Date,0,4));
+		   $w              = date("w",$d)+7*$wopp-1;
+		   return  date("Ymd",mktime (0,0,0,date("m",$d),date("d",$d)-$w,date("Y",$d)));
+	   } elseif($ptype == "D") {
+		   $dopp           = substr($Peroid,0,strlen($Peroid)-1);
+		   $d              = mktime (0,0,0,substr($Date,4,2),substr($Date,6,2),substr($Date,0,4));
+		   return date("Ymd", mktime (0,0,0,date("m",$d),date("d",$d)-$dopp,date("Y",$d)));
+	   } else {
+	   }
+   }
+	
 }

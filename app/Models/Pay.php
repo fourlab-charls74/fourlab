@@ -122,7 +122,7 @@ class Pay
 
 
 			$now = date("Ymd");
-			$pmonth = calcDate($now,"1M");
+			$pmonth = Lib::calcDate($now,"1M");
 
 			// 한달 이전 승인자료 이면 취소 불가
 			if($appdate <= $pmonth) return -1;
