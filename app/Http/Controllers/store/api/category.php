@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\head\api;
+namespace App\Http\Controllers\store\api;
 
 use App\Components\SLib;
 use App\Components\Lib;
@@ -42,7 +42,7 @@ class category extends Controller
 
 		];
 
-        return view( Config::get('shop.head.view') . "/common/category", $values);
+        return view( Config::get('shop.store.view') . "/common/category", $values);
     }
 
 

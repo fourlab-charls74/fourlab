@@ -12,6 +12,11 @@ function openHeadProduct(prd_no){
     var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
 
+function openStoreProduct(prd_no){
+    var url = '/store/product/prd01/' + prd_no;
+    var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+}
+
 function openOrder(ord_no,ord_opt_no = ''){
     if(ord_opt_no !== ''){
         var url = '/partner/order/ord01/' + ord_no + '/' + ord_opt_no;

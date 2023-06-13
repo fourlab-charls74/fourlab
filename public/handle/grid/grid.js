@@ -169,6 +169,15 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                     }
                 }
             },
+            StoreGoodsNameType:{
+                width:200,
+                cellRenderer: function (params) {
+                    if (params.value !== undefined) {
+                        if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+                        return '<a href="#" onclick="return openStoreProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+                    }
+                }
+            },
             HeadCouponType:{
                 width:200,
                 cellRenderer: function (params) {

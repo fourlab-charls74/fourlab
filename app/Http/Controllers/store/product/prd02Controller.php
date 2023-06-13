@@ -1764,4 +1764,57 @@ class prd02Controller extends Controller
 
 
 	}
+
+	/*
+	***
+	상품슬라이더
+	***
+	*/
+
+	public function index_slider(Request $request) {
+
+        $where = '';
+        foreach(explode(",", $request->goods_nos) as $goods_no) {
+            $where .= " or goods_no = $goods_no";
+        }
+
+		$sql = "
+            select goods_no, goods_sub, goods_nm, date_format(reg_dm,'%Y%m%d') as reg_dm, img, goods_cont
+            from goods
+            where 1!=1 $where
+		";
+        $goods_list = DB::select($sql);
+
+        foreach($goods_list as $goods) {
+            $reg_dm = $goods->reg_dm;
+            $dir = sprintf("/images/goods_img/%s/%s", $reg_dm, $goods->goods_no);
+            $file_list = Storage::disk('public')->files($dir);
+
+            $files = [];
+            $sortArr = [];
+
+            foreach ($file_list as $file) {
+                $names = explode('/', $file);
+                $name = array_pop($names);
+                $file_size = floor(Storage::disk('public')->size($file) / 1000);
+                $img_size = explode('.', explode('_', $name)[2])[0];
+        
+                $files[] = [
+                    'src' => "/" . $file,
+                    'filesize' => $file_size,
+                    'size' => $img_size
+                ];
+        
+                $sortArr[] = $img_size;
+            }
+            array_multisort($sortArr, SORT_ASC, $files);
+            $goods->files = $files;
+        }
+        // error_log(var_export($goods_list, 1));
+
+		$values = [
+			'goods_list' => $goods_list,
+		];
+		return view( Config::get('shop.store.view') . '/product/prd02_slider', $values);
+	}
 }

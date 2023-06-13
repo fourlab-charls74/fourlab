@@ -50,14 +50,14 @@
                             </div>
 						</div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+                    <!-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
 							<label>실사코드</label>
                             <div class="flex_box">
                                 <input type='text' class="form-control form-control-sm search-enter" name='sc_cd' value='{{ @$sc_cd }}'>
                             </div>
 						</div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
 							<label>매장</label>
@@ -68,8 +68,6 @@
                             </div>
 						</div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>LOSS처리여부</label>
@@ -89,6 +87,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    
                 </div>
             </div>
         </div>
@@ -118,9 +119,15 @@
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
         {field: "sc_date", headerName: "실사일자", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "sc_cd", headerName: "실사코드", width: 100, cellStyle: {"text-align": "center"},
+        {field: "sc_cd", headerName: "실사코드", width: 120, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
+                let sc_date = params.data.sc_date;
+                let date = sc_date.replace('-','');
+                let stock_check_date = date.replace('-','');
+                let sc_cd = params.data.sc_cd.toString();
+                let sc_code = sc_cd.padStart(3, '0');
+
+                return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.data.store_cd}_${stock_check_date}_${sc_code}</a>`;
             }
         },
         {field: "store_cd", headerName: "매장코드", width: 100, cellStyle: {"text-align": "center"}},

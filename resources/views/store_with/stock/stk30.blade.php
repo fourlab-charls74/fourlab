@@ -230,12 +230,18 @@
             //     return params.data.sr_state < 40;
             // },
         },
-        {field: "sr_cd", headerName: "반품코드", width: 80, cellStyle: {"text-align": "center"},
+        {field: "sr_cd", headerName: "반품코드", width: 120, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
+                let sr_date = params.data.sr_date;
+                let date = sr_date.replace('-','');
+                let return_date = date.replace('-','');
+                let sr_cd = params.data.sr_cd.toString();
+                let return_code = sr_cd.padStart(3, '0');
+
                 if (params.data.sr_state == '10'){
-                    return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
+                    return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.data.store_cd}_${return_date}_${return_code}</a>`;
                 } else {
-                    return `<a href="javascript:void(0);" onclick="openDetailPopup2(${params.value})">${params.value}</a>`;
+                    return `<a href="javascript:void(0);" onclick="openDetailPopup2(${params.value})">${params.data.store_cd}_${return_date}_${return_code}</a>`;
                 }
             }
         },

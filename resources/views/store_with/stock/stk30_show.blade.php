@@ -116,12 +116,14 @@
                                                     <textarea name="comment" id="comment" class="w-100" rows="1" @if(@$sr->sr_state == '10') readonly disabled style="background-color: #ccc" @endif>{{ @$sr->comment }}</textarea>
                                                 </div>
                                             </td>
-                                            <th>반품코드</th>
-                                            <td>
+                                            <th style="display:none">반품코드</th>
+                                            <td style="display:none">
                                                 <div class="form-inline">
                                                     <p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_cd }} @else {{ @$new_sr_cd }} @endif</p>
                                                 </div>
                                             </td>
+                                            <th></th>
+                                            <td></td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -52,6 +52,12 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 관리자 (담당자MD) 조회
         Route::get('mds/search', 'AdminController@search');
 
+        //category 리스트
+        Route::get('category/{cat_type}', 'category@index');
+        Route::get('category/get_category_list/{cat_type}', 'category@get_category_list');
+        Route::get('category/getlist/{cat_type}', 'category@getlist');
+        Route::get('category/get_category_by_goods_no/{cat_type}/{goods_no}/{goods_sub}', 'category@get_category_by_goods_no');
+
         // 매장명 조회
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');
@@ -228,6 +234,68 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
     // 상품관리
     Route::prefix("product")->namespace('product')->group(function () {
+        Route::get('prd01', 'prd01Controller@index');
+        Route::get('prd01/choice', 'prd01Controller@index_choice');
+        Route::get('prd01/search', 'prd01Controller@search');
+        Route::get('prd01/create', 'prd01Controller@create');
+        Route::post('prd01/cleanup-trash', 'prd01Controller@cleanup_trash');
+
+        // 상품관리 - 일괄수정
+        Route::match(['get', 'post'], 'prd01/edit', 'prd01Controller@edit_index');
+        Route::post('prd01/edit/search', 'prd01Controller@edit_search');
+        Route::post('prd01/edit/save', 'prd01Controller@edit_save');
+
+        Route::get('prd01/{no}', 'prd01Controller@show');
+        Route::get('prd01/{no}/get', 'prd01Controller@get');
+        Route::get('prd01/{no}/get-addinfo', 'prd01Controller@get_addinfo');
+        Route::get('prd01/{no}/in-qty', 'prd01Controller@show_in_qty');
+        Route::get('prd01/{no}/options', 'prd01Controller@options');
+        Route::get('prd01/{no}/goods-class', 'prd01Controller@goods_class');
+        Route::get("prd01/{no}/get-similar-goods", "prd01Controller@get_similar_goods");
+        Route::post("prd01/{no}/similar-goods-add", "prd01Controller@save_similar_goods");
+        Route::delete("prd01/{no}/similar-goods-del", "prd01Controller@delete_similar_goods");
+
+        Route::get("prd01/{no}/goods-cont", "prd01Controller@index_cont");
+        Route::get("prd01/{no}/search/sale-place-cont", "prd01Controller@search_sale_place_cont");
+
+        Route::post('prd01', 'prd01Controller@create_goods');
+
+        Route::put('prd01', 'prd01Controller@update');
+        Route::put('prd01/{no}/in-qty', 'prd01Controller@update_in_qty');
+        Route::put('prd01/update/state', 'prd01Controller@update_state');
+        Route::put('prd01/update/qty', 'prd01Controller@update_qty');
+
+        Route::put('prd01/goods-class-opt-update', 'prd01Controller@goods_class_opt_update');
+        Route::put('prd01/goods-class-update', 'prd01Controller@goods_class_update');
+        Route::put('prd01/goods-class-delete', 'prd01Controller@goods_class_delete');
+        Route::put('prd01/{no}/save/sale-place-cont', 'prd01Controller@save_sale_place_cont');
+
+        Route::post("prd01/{no}/planing-delete", 'prd01Controller@delete_planing');
+        Route::post("prd01/{no}/coupon-delete", 'prd01Controller@delete_coupon');
+
+        Route::post("prd01/update", 'prd01Controller@update_selected');
+
+        // 옵션 관리
+        Route::get('prd01/{no}/get-option-name', 'prd01Controller@get_option_name');
+        Route::post('prd01/get-option-stock', 'prd01Controller@get_option_stock');
+        Route::post("prd01/{no}/option-kind-add", "prd01Controller@add_option_kind");
+        Route::post("prd01/{no}/option-kind-del", "prd01Controller@del_option_kind");
+
+        Route::get("prd01/{no}/get-basic-options", "prd01Controller@getBasicOptions");
+        Route::get("prd01/{no}/get-basic-opts-matrix", "prd01Controller@getBasicOptsMatrix");
+        Route::post("prd01/{no}/save-basic-options", "prd01Controller@saveBasicOptions");
+        Route::post("prd01/{no}/delete-basic-options", "prd01Controller@deleteBasicOptions");
+
+        Route::post("prd01/get-extra-options", "prd01Controller@getExtraOptions");
+        Route::post("prd01/{no}/update-basic-opts-data", "prd01Controller@updateBasicOptsData");
+        Route::post("prd01/update-extra-opts-data", "prd01Controller@updateExtraOptsData");
+        Route::get('prd01/{no}/stock', 'prd01Controller@stock');
+        Route::post('prd01/stock-in', 'prd01Controller@stockIn');
+
+        // 관련 상품
+        Route::post('prd01/add-related-goods', 'prd01Controller@addRelatedGoods');
+        Route::post('prd01/del-related-good', 'prd01Controller@delRelatedGood');
+
         Route::get('prd02','prd02Controller@index');
         Route::get('prd02/search','prd02Controller@search');
         Route::get('prd02/create', 'prd02Controller@create');
@@ -264,6 +332,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('prd02/create_barcode', 'prd02Controller@create_barcode');
         Route::post('prd02/dup-style-no', 'prd02Controller@dup_style_no');
+
+        // 이미지 관리
+        Route::post('prd02/{idx}/upload', 'prd02Controller@upload');
+        Route::get('prd02/{no}/image', 'prd02Controller@index');
+        Route::get("prd02/slider", "prd02Controller@index_slider");
 
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');
@@ -323,6 +396,25 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd06/prd_delete', 'prd06Controller@prd_delete');
         Route::get('prd06/prd_add', 'prd06Controller@add_show');
         Route::post('prd06/prd_add', 'prd06Controller@add_save');
+
+        // 상품관리 - 일괄등록
+        Route::get('prd07', 'prd07Controller@index');
+        Route::post('prd07/enroll', 'prd07Controller@enroll');
+        Route::post('prd07/enroll2', 'prd07Controller@enroll2');
+        Route::get('prd07/batch', 'prd07Controller@batch_show');
+        Route::post('prd07/batch-import', 'prd07Controller@import_excel');
+        Route::post('prd07/batch-getproducts','prd07Controller@get_products');
+        Route::post('prd07/batch-products','prd07Controller@batch_products');
+
+        // 이미지 관리
+        Route::post('prd08/{idx}/upload', 'prd08Controller@upload');
+        Route::get('prd08/{no}/image', 'prd08Controller@index');
+
+        // 상품이미지 일괄등록
+        Route::get('prd23', 'prd23Controller@index');
+        Route::get('prd23/goods-info/goods-no', 'prd23Controller@get_goods_info_by_goodsno');
+        Route::get('prd23/goods-info/style-no', 'prd23Controller@get_goods_info_by_styleno');
+        Route::put('prd23/upload', 'prd23Controller@upload_images');
     });
 
     // 생산입고관리

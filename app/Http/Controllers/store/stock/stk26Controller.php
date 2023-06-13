@@ -67,7 +67,7 @@ class stk26Controller extends Controller
         ";
 
         $result = DB::select($sql);
-        
+
 		return response()->json([
 			'code' => 200,
 			'head' => [
@@ -88,6 +88,7 @@ class stk26Controller extends Controller
             $sql = "
                 select
                     s.sc_date,
+                    concat(s.store_cd, '_', REPLACE(s.sc_date, '-', '') , '_' , LPAD(s.sc_cd, 3, '0')) as sc_code,
                     s.sc_type,
                     s.sc_cd,
                     s.store_cd,

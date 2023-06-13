@@ -184,6 +184,7 @@ class sal20Controller extends Controller
                 select
                     s.sc_date,
                     s.sc_type,
+                    concat(s.store_cd, '_', REPLACE(s.sc_date, '-', '') , '_' , LPAD(s.sc_cd, 3, '0')) as sc_code,
                     s.sc_cd,
                     s.store_cd,
                     store.store_nm,
