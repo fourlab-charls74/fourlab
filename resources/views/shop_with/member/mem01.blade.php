@@ -248,7 +248,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">구매수</label>
+							<label for="">구매수량</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<div class="form-group">
@@ -439,7 +439,7 @@
 		{field:"visit_cnt", headerName:"로그인횟수", type:'currencyType', width:80},
 		{field:"auth_yn", headerName:"인증여부", width:70, cellStyle:{"text-align": "center"}},
 		{field:"ord_date", headerName:"최근주문일", width:125, cellStyle:{"text-align": "center"}},
-		{field:"ord_cnt", headerName:"구매수", type:'currencyType', width:60},
+		{field:"ord_cnt", headerName:"구매수량", type:'currencyType', width:60},
 		{field:"ord_amt", headerName:"구입금액", type:'currencyType', width:70},
 		{field:"email_chk", headerName:"메일수신", width:70, cellStyle:{"text-align": "center"}},
 		{field:"mobile_chk", headerName:"SMS수신", width:70, cellStyle:{"text-align": "center"}},

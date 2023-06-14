@@ -1,8 +1,8 @@
 @extends('store_with.layouts.layout')
-@section('title','온라인 배송처리')
+@section('title','온라인출고등록')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">온라인 배송처리</h3>
+	<h3 class="d-inline-flex">온라인출고등록</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
@@ -12,7 +12,6 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -400,7 +399,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm">출고완료처리</a>
+                    <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm">온라인출고완료</a>
                     <span class="ml-2 mr-2 text-secondary">|</span>
                     <div class="d-flex">
                         <span class="mr-2">출고구분 :</span>

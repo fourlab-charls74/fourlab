@@ -1,8 +1,8 @@
 @extends('store_with.layouts.layout')
-@section('title','온라인 주문접수')
+@section('title','온라인출고요청')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">온라인 주문접수</h3>
+	<h3 class="d-inline-flex">온라인출고요청</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
@@ -319,16 +319,7 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
                 <div class="fr_box d-flex">
-                    <div class="d-flex">
-                        <span class="mr-2">출고차수 :</span>
-                        <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
-                            @foreach (@$rel_orders as $rel_order)
-                                <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <a href="javascript:void(0);" onclick="return receiptOrder();" class="btn btn-sm btn-primary shadow-sm">온라인주문접수</a>
-                    <span class="ml-2 mr-2 text-secondary">|</span>
+                   
                     <div class="d-flex">
                         <span class="mr-2">출고구분 :</span>
                         <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2"  style='width:120px;'>
@@ -338,6 +329,16 @@
                         </select>
                     </div>
                     <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm">출고구분변경</a>
+                    <span class="ml-2 mr-2 text-secondary">|</span>
+                    <div class="d-flex">
+                        <span class="mr-2">출고차수 :</span>
+                        <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:90px;'>
+                            @foreach (@$rel_orders as $rel_order)
+                                <option value='{{ $rel_order }}'>{{ $rel_order }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <a href="javascript:void(0);" onclick="return receiptOrder();" class="btn btn-sm btn-primary shadow-sm">온라인주문접수</a>
                 </div>
 			</div>
 		</div>

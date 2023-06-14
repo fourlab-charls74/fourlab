@@ -115,9 +115,8 @@ class std10Controller extends Controller
 
     public function update($code, Request $request){
 
-        $code_kind_cd = $request->input('code_kind_cd');
-        $code_kind_nm = $request->input('code_kind_nm');
-        $code_kind_nm_eng = $request->input('code_kind_nm_eng');
+        $size_kind_cd = $request->input('size_kind_cd');
+        $size_kind_nm = $request->input('size_kind_nm');
         $use_yn = $request->input('use_yn','Y');
         //$admin_nm = $request->input('admin_nm');
 
@@ -125,9 +124,8 @@ class std10Controller extends Controller
         $name = Auth::guard('head')->user()->name;
 
         $data_code_kind = [
-            'code_kind_cd' => $code_kind_cd,
-            'code_kind_nm' => $code_kind_nm,
-            'code_kind_nm_eng' => $code_kind_nm_eng,
+            'size_kind_cd' => $size_kind_cd,
+            'size_kind_nm' => $size_kind_nm,
             'use_yn' => $use_yn,
             'seq' => 0,
             'admin_nm' => $id,
@@ -138,8 +136,8 @@ class std10Controller extends Controller
 
         try {
             DB::transaction(function () use (&$result, $code,$data_code_kind) {
-                DB::table('code_kind')
-                    ->where('code_kind_cd','=',$code)
+                DB::table('size_kind')
+                    ->where('size_kind_cd','=',$code)
                     ->update($data_code_kind);
             });
             $code = 200;
