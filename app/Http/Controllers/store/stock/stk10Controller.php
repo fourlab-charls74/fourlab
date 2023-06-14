@@ -22,7 +22,7 @@ class stk10Controller extends Controller
 {
     private $rel_states = [
         '10' => '출고요청',
-        '20' => '출고접수',
+        '20' => '출고처리중',
         '30' => '출고완료',
         '40' => '매장입고',
         '-10' => '출고거부',

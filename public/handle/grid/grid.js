@@ -348,6 +348,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         rowBuffer:0,
         //onBodyScroll:onscroll,
         suppressColumnVirtualisation:true,
+        suppressLastEmptyLineOnPaste: true, // fix: copy and paste error from excel
 
         // 첫글자 영문입력 막기 - 엔터키로 edit하도록 유도 // 임시주석처리 (2022-11-23 최유현)
         // suppressKeyboardEvent: (params) => {

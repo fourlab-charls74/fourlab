@@ -276,7 +276,7 @@
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
                     {field: "storage_qty", headerName: "재고", type: 'currencyType', width: 100},
-                    // {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
                 ]
             },
         ];
@@ -342,9 +342,18 @@
                             alert("숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
-                            // let store_cd = e.column.colId.split("_")[0];
-                            // if(e.data[store_cd] === null) e.data[store_cd] = {};
-                            // e.data[store_cd][e.column.colId] = parseInt(e.newValue);
+                            if (e.oldValue != undefined) {
+                                let oldValue = e.oldValue * 1;
+                                let newValue = e.newValue * 1;
+                                let qty = (e.data.storage_wqty + oldValue) - newValue;
+                                e.data.storage_wqty = qty;
+                                gx.gridOptions.api.updateRowData({update: [e.data]});
+                            } else if (e.oldValue == undefined) {
+                                let newValue = e.newValue * 1;
+                                let qty = e.data.storage_wqty - newValue;
+                                e.data.storage_wqty = qty;
+                                gx.gridOptions.api.updateRowData({update: [e.data]});
+                            }
                         }
                     }
                 }

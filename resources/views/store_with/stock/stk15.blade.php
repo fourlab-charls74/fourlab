@@ -215,8 +215,8 @@
                     </div>
                     <span class="d-none d-lg-block mr-2 tex-secondary">|</span>
                     <div class="d-flex mb-1 mb-lg-0">
-                        <span class="mr-1">창고</span>
-                        <select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;display:inline'>
+                        <span class="mr-1" style="display:none">창고</span>
+                        <select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;display:none'>
                             <option value=''>선택</option>
                             @foreach ($storages as $storage)
                                 @if ($storage->default_yn == "Y")
@@ -226,18 +226,14 @@
                         </select>
                     </div>
                     <div class="d-flex align-items-center mb-1 mb-lg-0">
-                        <i class="fas fa-arrow-right fa-sm ml-2 mr-2" aria-hidden="true"></i>
-                        <span class="mr-1">판매채널</span>
-                        <div class="flex_box" style="width:100px">
-                            <select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
-                                <option value=''>전체</option>
-                            @foreach ($store_channel as $sc)
-                                <option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
-                            @endforeach
-                            </select>
+                        <span class="mr-1">보내는매장</span>
+                        <div class="form-inline inline_btn_box" style="width:250px;">
+                            <input type='hidden' id="store_nm" name="store_nm">
+                            <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center mb-1 mb-lg-0">
+                    <!-- <div class="d-flex align-items-center mb-1 mb-lg-0">
                         <i class="fas fa-arrow-right fa-sm ml-2 mr-2" aria-hidden="true"></i>
                         <span class="mr-1">매장구분</span>
                         <div class="flex_box" style="width:100px">
@@ -255,7 +251,7 @@
                         <select id='store' name='store' class="form-control form-control-sm"  style='width:160px;display:inline' disabled>
                             <option value=''>선택</option>
                         </select>
-                    </div>
+                    </div> -->
                     <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                     <div class="d-flex mr-1 mb-1 mb-lg-0">
                         <span class="mr-1">출고예정일</span>
@@ -358,14 +354,9 @@
         let storage_cd = $('[name=storage]').val();
         if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
         
-        let store_channel = $('[name=store_channel]').val();
-        if(store_channel === '') return alert("상품을 출고할 판매채널을 선택해주세요.");
-        
-        let store_channel_kind = $('[name=store_channel_kind]').val();
-        if(store_channel_kind === '') return alert("상품을 출고할 매장구분을 선택해주세요.");
-
-        let store_cd =$('[name=store]').val();
-        if(store_cd === '') return alert("상품을 보낼 매장을 선택해주세요.");
+        let store_cd =$('[name=store_no]').val();
+        console.log(store_cd);
+        if(store_cd === null) return alert("상품을 보낼 매장을 선택해주세요.");
 
         let over_qty_rows = rows.filter(row => {
             let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);

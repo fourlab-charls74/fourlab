@@ -303,14 +303,18 @@
                             </div>
                         </div>
                         <div class="d-flex">
-                            <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
+                            <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-1"  style='width:70px;display:inline'>
                                 @foreach ($rel_order_res as $rel_order)
                                     <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
                                 @endforeach
                             </select>
+                        <select id='change_state_type' name='change_state_type' class="form-control form-control-sm mr-1"  style='width:100px;display:inline'>
+                                <option value='20'>출고처리중</option>
+                                <option value='-10'>거부</option>
+                        </select>
                         </div>
-                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
-                        <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm ml-1">거부</a>
+                        <a href="javascript:void(0);" onclick="changeState()" class="btn btn-sm btn-primary shadow-sm">상태변경</a>
+                        <!-- <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm ml-1">거부</a> -->
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         @endif
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
@@ -365,7 +369,7 @@
         },
         {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 60,
+        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 70,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
@@ -484,6 +488,63 @@
         const node = gx.getRowNode(rowIndex);
         node.data[fieldName] = e.value;
         node.setDataValue(fieldName, e.value);
+    }
+
+    function changeState() {
+        let state = $('#change_state_type').val();
+        let rows = gx.getSelectedRows();
+
+        if(state == '20') {
+            if(rows.length < 1) return alert("출고처리중으로 변경할 항목을 선택해주세요.");
+            if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리중으로 변경 가능합니다.");
+            if(!confirm("선택한 항목을 출고처리중으로 변경하시겠습니까?")) return;
+
+            axios({
+                url: '/store/stock/stk10/receipt',
+                method: 'post',
+                data: {
+                    data: rows, 
+                    exp_dlv_day: $("[name=exp_dlv_day]").val(), 
+                    rel_order: $("[name=exp_rel_order]").val(),
+                },
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    alert(res.data.msg);
+                    Search();
+                } else {
+                    console.log(res.data);
+                    alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
+            if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
+            if(rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
+            if(!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
+
+            axios({
+                url: '/store/stock/stk10/reject',
+                method: 'post',
+                data: {data: rows},
+            }).then(function (res) {
+                if(res.data.code === 200) {
+                    alert(res.data.msg);
+                    Search();
+                } else {
+                    console.log(res.data);
+                    alert("거부처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }
+
+
+
+
+
     }
 
     // 접수 (10 -> 20)
