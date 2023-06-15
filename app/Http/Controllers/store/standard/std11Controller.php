@@ -24,12 +24,14 @@ class std11Controller extends Controller
 		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
 		$as_states = SLib::getCodes("AS_STATE");
+		$as_types = SLib::getCodes("AS_TYPE");
 		$values = [
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
 			'items' => $items,
 		    'com_types' => $com_types,
-		    'as_states' => $as_states
+		    'as_states' => $as_states,
+			'as_types' => $as_types
         ];
 		return view(Config::get('shop.store.view') . '/standard/std11', $values);
 	}
@@ -71,12 +73,14 @@ class std11Controller extends Controller
 		$where2 = $request->input('where2');
 		$store_cd = $request->input('store_no');
 		$as_type = $request->input('as_type');
+		$as_state = $request->input('as_state');
 
 		$where = "";
 		if ($date_type != '') $where .= "and $date_type >= '$sdate' and $date_type <= '$edate'";
 		if ($where1 != '') $where .= "and $where1 like '%" . $where2 . "%'";
 		if ($store_cd != '') $where .= "and a.store_cd = '$store_cd'";
 		if ($as_type != '') $where .= "and a.as_type = '$as_type'";
+		if ($as_state != '') $where .= "and a.as_state = '$as_state'";
 		
 
 		$query = /** @lang text */

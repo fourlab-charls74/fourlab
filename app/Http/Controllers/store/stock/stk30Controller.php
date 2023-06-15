@@ -310,6 +310,7 @@ class stk30Controller extends Controller
                 srp.return_price, 
                 ifnull(pss.wqty, 0) as store_wqty, 
                 srp.return_qty as qty,
+                srp.return_p_qty as return_p_qty,
                 (srp.return_qty * srp.return_price) as total_return_price,
                 true as isEditable,
                 srp.fixed_return_price as fixed_return_price,
@@ -382,7 +383,8 @@ class stk30Controller extends Controller
                         'prd_cd' => $product['prd_cd'],
                         'price' => $product['price'], // 판매가
                         'return_price' => $product['return_price'], // 반품단가
-                        'return_qty' => $product['return_qty'], // 반품수량
+                        'return_qty' => $product['return_qty'], // 반품요청수량
+                        'return_p_qty' => 0,
                         'fixed_return_qty' => 0,
                         'fixed_return_price' => 0,
                         'rt' => now(),
@@ -410,7 +412,7 @@ class stk30Controller extends Controller
         $sr_reason = $request->input("sr_reason", "");
         $comment = $request->input("comment", "");
         $products = $request->input("products", []);
-       
+
         try {
             DB::beginTransaction();
 
@@ -428,7 +430,8 @@ class stk30Controller extends Controller
                     ->where('sr_prd_cd', '=', $product['sr_prd_cd'])
                     ->update([
                         'return_price' => $product['return_price'], // 반품단가
-                        'return_qty' => $product['return_qty'], // 반품수량
+                        'return_qty' => $product['return_qty'], // 반품요청수량
+                        'return_p_qty' => $product['return_p_qty'], //반품처리수량
                         'fixed_return_price' => $product['fixed_return_price'],
                         'fixed_return_qty' => $product['fixed_return_qty'],
                         'fixed_comment' => $product['fixed_comment']??'',
@@ -460,6 +463,7 @@ class stk30Controller extends Controller
         $storage_cd = $request->input('storage_cd');
         $sr_cd = $request->input('sr_cd');
 
+
         try {
             DB::beginTransaction();
 
@@ -477,7 +481,8 @@ class stk30Controller extends Controller
                         ->where('sr_prd_cd', '=', $d['sr_prd_cd'])
                    ->update([
                             'return_price' => $d['return_price'], // 반품단가
-                            'return_qty' => $d['qty'], // 반품수량
+                            'return_qty' => $d['qty'], // 반품요청수량
+                            'return_p_qty' => $d['return_p_qty'], //반품처리수량
                             'fixed_return_price' => $d['fixed_return_price'],
                             'fixed_return_qty' => $d['fixed_return_qty'],
                             'fixed_comment' => $d['fixed_comment']??'',
@@ -492,6 +497,7 @@ class stk30Controller extends Controller
                             sr.sr_prd_cd,
                             sr.prd_cd,
                             sr.return_qty,
+                            sr.return_p_qty,
                             sr.fixed_return_qty,
                             pc.goods_opt,
                             g.goods_no,
@@ -511,8 +517,8 @@ class stk30Controller extends Controller
                         ->where('prd_cd', '=', $row->prd_cd)
                         ->where('store_cd', '=', $store_cd) 
                         ->update([
-                            'qty' => DB::raw('qty - ' . ($row->return_qty ?? 0)),
-                            'wqty' => DB::raw('wqty - ' . ($row->return_qty ?? 0)),
+                            'qty' => DB::raw('qty - ' . ($row->return_p_qty ?? 0)),
+                            'wqty' => DB::raw('wqty - ' . ($row->return_p_qty ?? 0)),
                             'ut' => now(),
                         ]);
 
@@ -527,7 +533,7 @@ class stk30Controller extends Controller
                             'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
                             'price' => $row->price,
                             'wonga' => $row->wonga,
-                            'qty' => ($row->return_qty ?? 0) * -1,
+                            'qty' => ($row->return_p_qty ?? 0) * -1,
                             'stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
                             'comment' => '창고반품',
@@ -541,7 +547,7 @@ class stk30Controller extends Controller
                         ->where('prd_cd', '=', $row->prd_cd)
                         ->where('storage_cd', '=', $storage_cd) 
                         ->update([
-                            'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
+                            'wqty' => DB::raw('wqty + ' . ($row->return_p_qty ?? 0)),
                             'ut' => now(),
                         ]);
                     
@@ -556,7 +562,7 @@ class stk30Controller extends Controller
                             'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
                             'price' => $row->price,
                             'wonga' => $row->wonga,
-                            'qty' => $row->return_qty ?? 0,
+                            'qty' => $row->return_p_qty ?? 0,
                             'stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
                             'comment' => '매장반품',
@@ -569,7 +575,7 @@ class stk30Controller extends Controller
                     DB::table('product_stock')
                         ->where('prd_cd', '=', $row->prd_cd)
                         ->update([
-                            'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
+                            'wqty' => DB::raw('wqty + ' . ($row->return_p_qty ?? 0)),
                             'ut' => now(),
                         ]);
                 }

@@ -149,7 +149,7 @@
                 "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
             }),
         },
-		{ field: "closed_day", headerName: "마감대상기간", pinned: 'left', width: 140, cellStyle: {...CENTER, "text-decoration": "underline"},
+		{ field: "closed_day", headerName: "정산기간", pinned: 'left', width: 140, cellStyle: {...CENTER, "text-decoration": "underline"},
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : `<a href="javascript:void(0);" onclick="return openDetailPopup('${params.data.idx}');">${params.data.sday} ~ ${params.data.eday}</a>`,
 		},
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 55, cellStyle: CENTER },

@@ -99,12 +99,22 @@
                             <div class="flex_box">
                                 <select class="form-control form-control-sm" name="as_type" id="as_type">
                                     <option value="">전체</option>
-                                    <option value="1">매장접수(A/S)</option>
-                                    <option value="2">매장접수(불량)</option>
-                                    <option value="3">매장접수(심의)</option>
-                                    <option value="4">본사A/S접수/진행</option>
-                                    <option value="5">본사A/S완료</option>
-                                    <option value="6">본사불량</option>
+                                @foreach($as_types as $at)
+                                    <option value="{{ $at->code_id }}">{{ $at->code_val }}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="as_state">수선상태</label>
+                            <div class="flex_box">
+                                <select class="form-control form-control-sm" name="as_state" id="as_state">
+                                    <option value="">전체</option>
+                                @foreach($as_states as $as)
+                                    <option value="{{ $as->code_id }}">{{ $as->code_val }}</option>
+                                @endforeach
                                 </select>
                             </div>
                         </div>

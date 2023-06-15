@@ -165,7 +165,7 @@
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : params.value,
 		},
         { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
-        { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
+        { field: "store_nm", headerName: "매장명", pinned: 'left', width: 150 },
         { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 55, cellStyle: CENTER },
         { field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 65, cellStyle: CENTER },
         { headerName: "매출",
@@ -185,21 +185,21 @@
         },
         { headerName: "중간관리자 수수료",
             children: [
-                { headerName: "정상1",
+                { headerName: "기본수수료",
                     children: [
                         { headerName: "매출액(-VAT)", field: "ord_JS1_amt_except_vat", type: 'currencyType', width: 90, aggregation: true, },
                         { headerName: "수수료율", field: "fee1", type: 'percentType', width: 60 },
                         { headerName: "수수료", field: "fee_amt_JS1", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
-                { headerName: "정상2",
+                { headerName: "초과수수료1",
                     children: [
 						{ headerName: "매출액(-VAT)", field: "ord_JS2_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee2", type: 'percentType', width: 60 },
                         { headerName: "수수료", field: "fee_amt_JS2", type: 'currencyType', width: 90, aggregation: true },
                     ]
                 },
-                { headerName: "정상3",
+                { headerName: "초과수수료2",
                     children: [
 						{ headerName: "매출액(-VAT)", field: "ord_JS3_amt_except_vat", type: 'currencyType', width: 90, aggregation: true },
                         { headerName: "수수료율", field: "fee3", type: 'percentType', width: 60 },
@@ -232,12 +232,12 @@
 				{ headerName: "수수료 합계", field: "fee_amt", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell" },
             ]
         },
-		{ headerName: "기타재반자료",
+		{ headerName: "기타제반자료",
 			children: [
 				{ field: "extra_P_amt", headerName: "인건비", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
 				{ field: "extra_S_amt", headerName: "매장부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
 				{ field: "extra_C_amt", headerName: "본사부담금", type: 'currencyType', width: 70, aggregation: true, headerClass: "merged-cell" },
-				{ field: "extra_amt", headerName: "기타재반 합계", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell",
+				{ field: "extra_amt", headerName: "기타제반 합계", type: 'currencyType', width: 90, aggregation: true, headerClass: "merged-cell",
 					cellRenderer: (params) => params.node.rowPinned === 'top' ? params.valueFormatted : '<a href="javascript:void(0);" onClick="openExtraAmtPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>'
 				},
 			]
@@ -283,7 +283,7 @@
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
 
-	// 기타재반자료 상세
+	// 기타제반자료 상세
 	function openExtraAmtPopup(store_cd) {
 		const sdate = $('input[name="sdate"]').val();
 		const url = '/store/account/acc05/show?date=' + sdate.replaceAll('-', '') + '&store_cd=' + store_cd;

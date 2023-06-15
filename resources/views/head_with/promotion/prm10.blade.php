@@ -17,7 +17,7 @@
                 <h4>검색</h4>
                 <div class="flax_box">
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2 add-btn"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm mr-1 pl-2 add-btn"><i class="bx bx-plus fs-16"></i> 등록</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -160,7 +160,7 @@
         },
         {field:"coupon_type_nm" , headerName:"구분", cellStyle: CENTER},
         {
-            headerName:"지급기간",
+            headerName:"발행일자",
             children : [
                 {headerName:"시작", field:"pub_fr_date", width:80, cellStyle: CENTER},
                 {headerName:"종료", field:"pub_to_date", width:80, cellStyle: CENTER}

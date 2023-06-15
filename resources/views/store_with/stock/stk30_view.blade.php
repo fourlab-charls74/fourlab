@@ -188,7 +188,7 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "가용재고", width: 90, type: 'currencyType',
+        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType',
             cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "red"} : {}
         },
         {field: "qty", headerName: "반품요청수량", width: 85, type: 'currencyType', 
@@ -197,7 +197,7 @@
         },
         {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
         
-        {field: "fixed_return_qty", headerName: "반품처리수량", width: 85, type: 'currencyType',
+        {field: "return_p_qty", headerName: "반품처리수량", width: 85, type: 'currencyType',
             editable: (params) => checkIsEditable2(params),
             cellStyle: (params) => checkIsEditable2(params) ? {"background-color": "#ffff99"} : {}
         },

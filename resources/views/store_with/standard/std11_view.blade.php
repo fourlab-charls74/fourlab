@@ -73,7 +73,7 @@
                                                 <div class="flex_box">
                                                     <select id="as_type" name="as_type" class="form-control form-control-sm">
                                                         <option value="">선택</option>
-                                                        <option value="1">매장접수(A/S)</option>
+                                                        <option value="1" selected>매장접수(A/S)</option>
                                                         <option value="2">매장접수(불량)</option>
                                                         <option value="3">매장접수(심의)</option>
                                                     </select>
@@ -219,6 +219,9 @@
         const { name } = row;
         const { user_id } = row;
         const { phone } = row;
+        const { zip } = row;
+        const { addr } = row;
+        const { addr2 } = row;
 
         let num = phone.split('-');
 
@@ -228,6 +231,9 @@
         $('#phone1').val(num[0]);
         $('#phone2').val(num[1]);
         $('#phone3').val(num[2]);
+        $('#zipcode').val(zip);
+        $('#addr1').val(addr);
+        $('#addr2').val(addr2);
     };
 
     const getMember = () => {

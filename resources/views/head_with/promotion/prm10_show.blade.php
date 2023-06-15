@@ -108,7 +108,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="required">지급기간</th>
+                                                <th class="required">발행일자</th>
                                                 <td>
                                                     <div class="form-inline">
                                                         <div class="docs-datepicker form-inline-inner input_box">
@@ -282,7 +282,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="required">발행금액</th>
+                                                <th class="required">쿠폰율/액</th>
                                                 <td>
                                                     <div class="form-inline" style="max-width:200px;">
                                                         <input type="hidden" name="coupon_amt" id="coupon_amt">

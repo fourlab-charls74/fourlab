@@ -254,7 +254,7 @@
             ]
         },
         {
-            headerName: "이동입고",
+            headerName: "RT입고",
             children: [
                 {field: "rt_in_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "rt_in_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
@@ -263,7 +263,7 @@
             ]
         },
         {
-            headerName: "이동출고",
+            headerName: "RT출고",
             children: [
                 {field: "rt_out_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "rt_out_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
@@ -290,7 +290,7 @@
             ]
         },
         {
-            headerName: "기간재고",
+            headerName: "기말재고",
             children: [
                 {field: "term_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "term_sh", headerName: "TAG금액", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
