@@ -206,9 +206,9 @@ class std10Controller extends Controller
                         'ut' => DB::raw('now()')
                     ];
 
-                    $cnt = DB::table('code')
-                        ->where('code_kind_cd','=',$code)
-                        ->where('code_id','=',$data_size["size_cd"])
+                    $cnt = DB::table('size')
+                        ->where('size_kind_cd','=',$code)
+                        ->where('size_cd','=',$data_size["size_cd"])
                         ->count();
 
                     if($cnt === 0){
