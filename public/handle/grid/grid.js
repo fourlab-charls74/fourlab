@@ -366,17 +366,33 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         // 셀 입력중, 키보드 아래방향키로 셀 이동
         suppressKeyboardEvent: function(e) {
             let key = e.event.key;
-            
-            if (e.column.isCellEditable(e.node)) {
-                if (key == 'ArrowDown') {
-                    if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
-                        e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
-                    } else {
-                        e.api.stopEditing();
-                        e.api.setFocusedCell(e.node.rowIndex, e.column);
-                    }
-                }
-            }
+
+			if (e.column.isCellEditable(e.node)) {
+				if (key == 'ArrowDown') {
+					if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
+						e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
+					} else {
+						e.api.stopEditing();
+						e.api.setFocusedCell(e.node.rowIndex, e.column);
+					}
+				} else if (key == 'ArrowUp') {
+					if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
+						e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
+					} else {
+						e.api.stopEditing();
+						e.api.setFocusedCell(e.node.rowIndex, e.column);
+					}
+				} else if (key == 'ArrowLeft') {
+					if (e.event.target.selectionStart < 1) {
+						e.api.stopEditing();
+					}
+
+				} else if (key == 'ArrowRight') {
+					if (e.event.target.selectionStart >= e.event.target.value.length) {
+						e.api.stopEditing();
+					}
+				}
+			}
         },
 
         onColumnVisible: function (params) {

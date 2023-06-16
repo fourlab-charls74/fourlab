@@ -31,7 +31,7 @@
         <link href="{{ URL::asset('/with/css/app.css')}}" id="app-light" rel="stylesheet" type="text/css" />
         <link href="{{ URL::asset('/with/css/app_dark.css')}}" id="app-dark" rel="stylesheet" type="text/css" disabled />
         <script src="/handle/grid/grid.js?v=2020102717"></script>
-        <script src="/handle/grid/head_functions.js?v=2020102717"></script>
+        <script src="/handle/grid/head_functions.js?v=2023061615"></script>
         <script src="/handle/libs.js"></script>
         <script src="/js/init.js"></script>
         <link rel="stylesheet" href="/handle/grid/style.css" type="text/css">

@@ -31,7 +31,7 @@
         @endif
         <script src="/handle/grid/grid.js?v=20220707"></script>
         <script src="/handle/grid/grid_auto_complete.js?v=20230413"></script>
-        <script src="/handle/grid/functions.js?v=20220707"></script>
+        <script src="/handle/grid/functions.js?v=2023061615"></script>
         <script src="/handle/libs.js"></script>
         <script src="/js/init.js"></script>
         <link rel="stylesheet" href="/handle/grid/style.css" type="text/css">

@@ -486,7 +486,7 @@ function currency(obj) {
     com(obj);
 };
 
-/* grid selected cell delete & backspace key 클릭 시 내용 삭제 기능 관련 */
+/* grid selected cell delete & backspace key 클릭 시 내용 삭제 기능 관련 + 방향키 셀 이동기능 */
 function getDeleteCellColumnObject() {
 	return {
 		suppressKeyboardEvent: params => {
@@ -514,6 +514,34 @@ function getDeleteCellColumnObject() {
 						}
 						params.api.applyTransaction({ update: itemsToUpdate });
 					});
+				}
+			} else {
+				let key = params.event.key;
+				if (params.column.isCellEditable(params.node)) {
+					if (key == 'ArrowDown') {
+						if (params.api.getDisplayedRowCount() > params.node.rowIndex + 1) {
+							params.api.setFocusedCell(params.node.rowIndex + 1, params.column);
+						} else {
+							params.api.stopEditing();
+							params.api.setFocusedCell(params.node.rowIndex, params.column);
+						}
+					} else if (key == 'ArrowUp') {
+						if (params.api.getDisplayedRowCount() > params.node.rowIndex + 1) {
+							params.api.setFocusedCell(params.node.rowIndex + 1, params.column);
+						} else {
+							params.api.stopEditing();
+							params.api.setFocusedCell(params.node.rowIndex, params.column);
+						}
+					} else if (key == 'ArrowLeft') {
+						if (params.event.target.selectionStart < 1) {
+							params.api.stopEditing();
+						}
+
+					} else if (key == 'ArrowRight') {
+						if (params.event.target.selectionStart >= params.event.target.value.length) {
+							params.api.stopEditing();
+						}
+					}
 				}
 			}
 			return false;
