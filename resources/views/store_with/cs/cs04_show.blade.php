@@ -45,7 +45,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">반품일자</th>
+                                            <th class="required">이동일자</th>
                                             <td>
                                                 <div class="form-inline">
                                                     @if(@$cmd == 'add')
@@ -65,7 +65,7 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th class="required">반품업체명</th>
+                                            <th class="required">이동창고명</th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
                                                     @if(@$cmd == 'add')
@@ -75,9 +75,10 @@
                                                             <option value="S">창고</option>
                                                         </select>
                                                         <select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
-                                                            @foreach (@$companies as $com)
-                                                               <option value="{{ $com->com_id }}">{{ $com->com_nm }}</option> 
-                                                            @endforeach
+															<option value="">선택</option>
+														@foreach (@$storages as $storage)
+															<option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->target_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+														@endforeach
                                                         </select>
                                                     </div>
                                                     @else
@@ -85,7 +86,7 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th>반품코드</th>
+                                            <th>이동코드</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>

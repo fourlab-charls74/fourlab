@@ -20,8 +20,8 @@
                     <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()" hidden>검색조건 초기화</a> -->
                     @if(Auth('head')->user()->logistics_group_yn == 'N')
-                    <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 등록</a>
-                    <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 일괄등록</a>
+                    <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 이동 등록</a>
+                    <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 이동 일괄등록</a>
                     @endif
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -75,21 +75,22 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             {{-- 반품이동처 --}}
-                            <label for="">반품업체</label>
+                            <label for="">이동창고</label>
                             <div class="flex_box">
+								<!--
                                 <select name='target_com_cd' class="form-control form-control-sm" style="width: 100%;">
                                     <option value="">전체</option>
                                     @foreach (@$sup_coms as $sup_com)
                                         <option value='{{ $sup_com->com_id }}'>{{ $sup_com->com_nm }}</option>
                                     @endforeach
                                 </select>
-                                <!-- <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='target_storage_cd' class="form-control form-control-sm" style="width: 47%;">
+                                <span class="text_line" style="width: 6%; text-align: center;">/</span>//-->
+                                <select name='target_storage_cd' class="form-control form-control-sm" style="width: 100%;">
                                     <option value="">창고 전체</option>
                                     @foreach (@$storages as $storage)
                                         <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
                                     @endforeach
-                                </select> -->
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -97,7 +98,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="sgr_type">반품구분</label>
+                            <label for="sgr_type">이동구분</label>
                             <div class="d-flex">
                                 <select name="sgr_type" id="sgr_type" class="form-control form-control-sm">
                                     <option value="">전체</option>
@@ -109,7 +110,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="sgr_state">반품상태</label>
+                            <label for="sgr_state">이동상태</label>
                             <div class="d-flex">
                                 <select name="sgr_state" id="sgr_state" class="form-control form-control-sm">
                                     <option value="">전체</option>
@@ -134,8 +135,8 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="sgr_cd">반품코드</option>
-                                        <option value="sgr_date">반품일자</option>
+                                        <option value="sgr_cd">이동코드</option>
+                                        <option value="sgr_date">이동일자</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -158,8 +159,8 @@
             <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
             <!-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> -->
             @if(Auth('head')->user()->logistics_group_yn == 'N')
-            <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 등록</a>
-            <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 반품 일괄등록</a>
+            <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 이동 등록</a>
+            <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 이동 일괄등록</a>
             @endif
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
@@ -174,7 +175,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <a href="javascript:void(0);" onclick="ChangeState()" class="btn btn-sm btn-primary mr-1"><i class="fas fa-check fa-sm text-white-50 mr-1"></i> 반품완료처리</a>
+                        <a href="javascript:void(0);" onclick="ChangeState()" class="btn btn-sm btn-primary mr-1"><i class="fas fa-check fa-sm text-white-50 mr-1"></i> 이동완료처리</a>
                         <a href="javascript:void(0);" onclick="DelReturn()" class="btn btn-sm btn-outline-primary"><i class="fas fa-trash-alt fa-sm"></i> 삭제</a>
                     </div>
 				</div>
@@ -198,9 +199,9 @@
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
             }
         },        
-        {field: "sgr_date", headerName: "반품일자", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "sgr_date", headerName: "이동일자", width: 80, cellStyle: {"text-align": "center"}},
         {field: "sgr_type", hide: true},
-        {field: "sgr_type_nm", headerName: "반품구분", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "#2aa876" : "none"})},
+        {field: "sgr_type_nm", headerName: "이동구분", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "#2aa876" : "none"})},
         {field: "sgr_state", hide: true},
         {field: "sgr_state_nm", headerName: "반품상태", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_state == "30" ? "#2aa876" : "#0000ff"})},
         {field: "storage_cd", headerName: "창고코드", width: 70, cellStyle: {"text-align": "center"}},
@@ -210,8 +211,8 @@
         {field: "target_nm", headerName: "공급/창고", width: 120,
             cellRenderer: (params) => (params.data.target_type == "C" ? "[공급] " : params.data.target_type == "S" ? "[창고] " : "") + params.value,
         }, // 반품이동처
-        {field: "sgr_qty", headerName: "반품수량", type: "currencyType", width: 60},
-        {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 60},
+        {field: "sgr_qty", headerName: "이동수량", type: "currencyType", width: 60},
+        {field: "sgr_price", headerName: "이동금액", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 300},
         {width: "auto"}
 	];
