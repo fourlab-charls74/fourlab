@@ -306,9 +306,11 @@
             let data = [];
             if (IS_SINGLE == "true") {
                 rows.map((row) => {
-                    const opt = row.opt1_nm;
-                    const qty = row.qty;
-                    data.push({ opt: opt, qty: qty });
+					if (row.is_changed === true) {
+						const opt = row.opt1_nm;
+						const qty = row.qty;
+						data.push({opt: opt, qty: qty});
+					}
                 });
             } else if (IS_SINGLE == "false") {
                 rows.map((row) => {
@@ -338,7 +340,7 @@
                         data: {
                             'goods_no': document.stock.goods_no.value,
                             'invoice_no': document.stock.invoice_no.value,
-                            'wonga': document.stock.wonga.value,
+							'wonga': unComma(document.stock.wonga.value),
                             'loc': document.stock.loc.value,
                             'data': refinedData()
                         }
