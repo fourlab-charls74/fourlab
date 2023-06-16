@@ -164,6 +164,18 @@
             </div>
         </div>
     </div>
+    @if ($code !== '')
+    <div class="card shadow">
+        <div class="card-header mb-0">
+            <a href="#">메뉴 순서 변경</a>
+        </div>
+        <div class="card-body pt-2">
+            <div class="table-responsive">
+                <div id="div-gd-change-seq" style="height:250px;width:100%;" class="ag-theme-balham"></div>
+            </div>
+        </div>
+    </div>
+    @endif
     <script>
         const columns = [{
                 field: "group_no",
@@ -195,11 +207,18 @@
                 hide: true
             },
         ];
+
+        const columns2 = [
+            {field: "pid", headerName: "프로그램 ID", width: 100, cellClass: 'hd-grid-code',rowDrag: true,},
+            {field: "kor_nm", headerName: "메뉴명", width: 150},
+            {field: "eng_nm", headerName: "영문명", width: 150}
+        ];
     </script>
 </div>
 <div class="resul_btn_wrap mt-3 d-block">
     <a href="javascript:Save();" class="btn btn-sm btn-primary submit-btn">저장</a>
     @if ($code !== '')
+    <a href="javascript:Change_seq();" class="btn btn-sm btn-primary submit-btn">메뉴 순서 변경</a>
     <a href="javascript:Delete();;" class="btn btn-sm btn-secondary delete-btn">삭제</a>
     @endif
     <a href="javascript:;" class="btn btn-sm btn-secondary" onclick="window.close()">취소</a>
@@ -264,7 +283,6 @@
                     roles[node.data.group_no] = node.data.role;
                 }
             });
-            console.log(JSON.stringify(roles));
 
             $.ajax({
                 method: 'put',
@@ -287,6 +305,37 @@
             });
         }
         return true;
+    }
+
+    function Change_seq() {
+
+        let seq = [];
+            gx2.gridOptions.api.forEachNode(function(node) {
+                seq.push(node.data.pid);
+            });
+
+            $.ajax({
+                method: 'post',
+                url: '/shop/system/sys02/' + code + '/change-seq',
+                data: {
+                    seq : seq
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code == 200) {
+                        alert('메뉴순서가 변경 되었습니다.');
+                        opener.Search();
+                        Search2();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(e) {
+                    console.log(e.responseText)
+                }
+            });
+
+
     }
 
     function Delete() {
@@ -326,9 +375,29 @@
         Search();
     });
 
+    const pApp2 = new App('', {
+        gridId: "#div-gd-change-seq",
+    });
+    let gx2;
+
+    $(document).ready(function() {
+        pApp2.BindSearchEnter();
+        let gridDiv2 = document.querySelector(pApp2.options.gridId);
+        gx2 = new HDGrid(gridDiv2, columns2);
+        gx2.gridOptions.rowDragManaged = true;
+        gx2.gridOptions.animateRows = true;
+        Search2();
+    });
+
+
     function Search() {
         let data = '';
         gx.Request('/shop/system/sys02/' + code + '/search', data);
+    }
+
+    function Search2() {
+        let data = '';
+        gx2.Request('/shop/system/sys02/' + code + '/search-seq');
     }
     
     $(document).keydown(function(e) {

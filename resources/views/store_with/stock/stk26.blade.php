@@ -202,7 +202,8 @@
         params += "&sc_cd=" + $("[name=sc_cd]").val();
         params += "&store_cd=" + $("[name=store_no]").val();
         params += "&sc_state=" + $("[name=sc_state]:checked").val();
-        window.open(url + params, "_blank");
+        // window.open(url + params, "_blank");
+        location.replace(url + params);
     }
 
     function DeleteStockCheck() {

@@ -106,7 +106,15 @@
                 }
             },
         },
-        {field: "state", headerName: "상태", cellClass: 'hd-grid-code'},
+        {field: "state", headerName: "상태", cellClass: 'hd-grid-code',
+        cellRenderer: function(params) {
+				if(params.value == '0') return "사용중"
+				else if(params.value == '2') return "개발중"
+				else if(params.value == '4') return "테스트중"
+				else if(params.value == '-1') return "미사용"
+                else return params.value
+			}
+        },
         {
             field: "kor_nm",
             headerName: "메뉴명",
@@ -171,7 +179,7 @@
     }
 
     function Edit(a) {
-        let url = '/store/system/sys02/' + $(a).attr('data-code');
+        let url = '/shop/system/sys02/' + $(a).attr('data-code');
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1000");
     }
 </script>

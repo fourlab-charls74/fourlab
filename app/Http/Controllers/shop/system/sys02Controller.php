@@ -439,4 +439,56 @@ class sys02Controller extends Controller
             "body" => $rows
         ]);
     }
+
+    public function search_seq($code)
+    {
+
+        $sql = "
+            select
+                lev, entry
+            from shop_controller
+            where menu_no = :code
+        ";
+        $lev = DB::selectOne($sql, array("code" => $code));
+
+        $sql = "
+            select
+                pid, kor_nm, eng_nm
+            from shop_controller
+            where lev = '$lev->lev' and entry = '$lev->entry'
+            order by seq
+        ";
+
+        $rows = DB::select($sql, array("code" => $code));
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($rows)
+            ),
+            "body" => $rows
+        ]);
+    }
+
+    public function change_seq($code,Request $request) {
+
+        $seq = $request->input('seq');
+
+        try {
+            DB::transaction(function () use (&$result, $code, $seq) {
+                for($i=0;$i<count($seq);$i++){
+                    DB::table('shop_controller')
+                        ->where('pid', '=', $seq[$i])
+                        ->update(['seq' => $i+1]);
+                }
+            });
+            $code = 200;
+            $msg = "";
+        } catch (Exception $e) {
+            $code = 500;
+            $msg = $e->getMessage();
+        }
+
+        return response()->json(['code' => $code,"msg" => $msg]);
+    }
 }

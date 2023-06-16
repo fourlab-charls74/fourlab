@@ -16,6 +16,7 @@
                 <h4>검색</h4>
                 <div>
                     <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <a href="javascript:void(0);" onclick="location.href='/store/stock/stk26'" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fa fa-arrow-right fa-sm mr-1"></i> 매장실사</a>
                 </div>
             </div>
             <div class="card-body">
