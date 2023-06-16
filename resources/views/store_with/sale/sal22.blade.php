@@ -202,7 +202,7 @@
             ]
         },
         {
-            headerName: "생산입고",
+            headerName: "상품입고",
             children: [
                 {field: "storage_in_qty", headerName: "수량", width: 50, type: "currencyType"},
                 {field: "storage_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
@@ -211,30 +211,12 @@
             ]
         },
         {
-            headerName: "생산반품",
+            headerName: "상품반품",
             children: [
                 {field: "storage_return_qty", headerName: "수량", width: 50, type: "currencyType"},
                 {field: "storage_return_sh", headerName: "Tag가", width: 80, type: "currencyType"},
                 {field: "storage_return_price", headerName: "판매가", width: 80, type: "currencyType"},
                 {field: "storage_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
-            ]
-        },
-        {
-            headerName: "이동입고",
-            children: [
-                {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "rt_in_price", headerName: "판매가", width: 80, type: "currencyType"},
-                {field: "rt_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
-            ]
-        },
-        {
-            headerName: "이동출고",
-            children: [
-                {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_out_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "rt_out_price", headerName: "판매가", width: 80, type: "currencyType"},
-                {field: "rt_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
         {
@@ -256,6 +238,24 @@
             ]
         },
         {
+            headerName: "이동입고",
+            children: [
+                {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "rt_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "rt_in_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "rt_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
+            ]
+        },
+        {
+            headerName: "이동출고",
+            children: [
+                {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType"},
+                {field: "rt_out_sh", headerName: "Tag가", width: 80, type: "currencyType"},
+                {field: "rt_out_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "rt_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
+            ]
+        },
+        {
             headerName: "LOSS",
             children: [
                 {field: "loss_qty", headerName: "수량", width: 50, type: "currencyType"},
@@ -265,7 +265,7 @@
             ]
         },
         {
-            headerName: "기간재고",
+            headerName: "기말재고",
             children: [
                 {field: "term_qty", headerName: "수량", width: 50, type: "currencyType"},
                 {field: "term_sh", headerName: "Tag가", width: 80, type: "currencyType"},
