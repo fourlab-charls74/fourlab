@@ -45,6 +45,12 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
+                                            <th>반품코드</th>
+                                            <td>
+                                                <div class="form-inline">
+                                                    <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
+                                                </div>
+                                            </td>
                                             <th class="required">반품일자</th>
                                             <td>
                                                 <div class="form-inline">
@@ -65,6 +71,18 @@
                                                     @endif
                                                 </div>
                                             </td>
+                                            <th class="required">출고창고</th>
+                                            <td>
+                                                <div class="form-inline">
+                                                    <select name='storage_cd' id="storage_cd" class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
+                                                        @foreach (@$storages as $storage)
+                                                            <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="required">반품업체명</th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
@@ -85,26 +103,12 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th>반품코드</th>
+                                            <th>반품 주소</th>
                                             <td>
-                                                <div class="form-inline">
-                                                    <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="required">출고창고</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <select name='storage_cd' id="storage_cd" class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
-                                                        @foreach (@$storages as $storage)
-                                                            <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
+                                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='return_addr' id="return_addr" value="@if($cmd == 'add'){{ @$com_addr->addr1 }} {{@$com_addr->addr2}} @else {{ @$sgr->return_addr }} @endif">
                                             </td>
                                             <th>메모</th>
-                                            <td colspan="3">
+                                            <td>
                                                 <div class="form-inline">
                                                     <textarea name="comment" id="comment" class="w-100" rows="1">{{ @$sgr->comment }}</textarea>
                                                 </div>
@@ -135,7 +139,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>p
 
 <script language="javascript">
     const cmd = '{{ @$cmd }}';
@@ -263,6 +267,7 @@
         if(!cmd) return;
 
         let comment = document.f1.comment.value;
+        let return_addr = document.f1.return_addr.value;
         let rows = gx.getRows();
 
         if(cmd === 'add') {
@@ -270,6 +275,7 @@
             let storage_cd = document.f1.storage_cd.value;
             let target_type = document.f1.target_type.value;
             let target_cd = document.f1.target_cd.value;
+            
 
             if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
 
@@ -289,6 +295,7 @@
                     storage_cd,
                     target_type,
                     target_cd,
+                    return_addr,
                     comment,
                     products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
                 },
@@ -317,6 +324,7 @@
                 data: {
                     sgr_cd,
                     comment,
+                    return_addr,
                     products: rows.map(r => ({ sgr_prd_cd: r.sgr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
                 },
             }).then(function (res) {

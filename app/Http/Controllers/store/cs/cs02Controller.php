@@ -306,8 +306,11 @@ class cs02Controller extends Controller
     {
         $sgr = '';
         $new_sgr_cd = '';
+        $com_addr = '';
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
         $companies = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
+
+       
 
         if($sgr_cd != '') {
             $sql = "
@@ -319,6 +322,7 @@ class cs02Controller extends Controller
                     sgr.storage_cd,
                     sgr.target_type,
                     sgr.target_cd,
+                    sgr.return_addr,
                     if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
                     sgr.comment
                 from storage_return sgr
@@ -335,6 +339,17 @@ class cs02Controller extends Controller
             $row = DB::selectOne($sql);
             if($row == null) $new_sgr_cd = 1;
             else $new_sgr_cd = $row->sgr_cd + 1;
+
+            $sql = "
+                select
+                    addr1
+                    , addr2
+                    , zip_code
+                from company
+                where use_yn = 'Y' and com_type = '1'
+            ";
+
+            $com_addr = DB::selectOne($sql);
         }
 
         $values = [
@@ -344,6 +359,7 @@ class cs02Controller extends Controller
             'companies'     => $companies,
             'sgr'           => $sgr,
             'new_sgr_cd'    => $new_sgr_cd,
+            'com_addr'      => $com_addr
         ];
         return view(Config::get('shop.store.view') . '/cs/cs02_show', $values);
     }
@@ -419,6 +435,7 @@ class cs02Controller extends Controller
         $storage_cd = $request->input("storage_cd", "");
         $target_type = $request->input("target_type", "");
         $target_cd = $request->input("target_cd", "");
+        $return_addr = $request->input("return_addr","");
         $comment = $request->input("comment", "");
         $products = $request->input("products", []);
 
@@ -437,6 +454,7 @@ class cs02Controller extends Controller
                     'sgr_date' => $sgr_date,
                     'sgr_type' => $sgr_type,
                     'sgr_state' => $sgr_state,
+                    'return_addr' => $return_addr,
                     'comment' => $comment,
                     'rt' => now(),
                     'admin_id' => $admin_id,
@@ -581,6 +599,7 @@ class cs02Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $sgr_cd = $request->input("sgr_cd", "");
         $comment = $request->input("comment", "");
+        $return_addr = $request->input("return_addr", "");
         $products = $request->input("products", []);
 
         try {
@@ -589,6 +608,7 @@ class cs02Controller extends Controller
             DB::table('storage_return')
                 ->where('sgr_cd', '=', $sgr_cd)
                 ->update([
+                    'return_addr' => $return_addr,
                     'comment' => $comment,
                     'ut' => now(),
                     'admin_id' => $admin_id,
