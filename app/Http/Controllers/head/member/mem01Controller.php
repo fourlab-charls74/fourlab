@@ -211,7 +211,7 @@ class mem01Controller extends Controller
          */
         $cond = $this->get_condition($req);
 
-        $sql = $this->get_user_sql($cond[0], $cond[1], $cond[2], 0, 100, true);
+        $sql = $this->get_user_sql($cond[0], $cond[1], $cond[2], 0, 200000, true);
 
         $fields = [];
         $_fields = explode(',',Request('fields', ''));
