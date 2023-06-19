@@ -67,7 +67,7 @@
             <div class="card-header mb-0 pt-1 pb-1 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0">판매채널</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreChannel()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>삭제</button>
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreChannel()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button>
                 </div>
             </div>
             <div class="card-body shadow pt-2">
@@ -82,7 +82,7 @@
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>매장구분</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreType()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>삭제</button>
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreType()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button>
                 </div>
             </div>
             <div class="card-body shadow pt-2">

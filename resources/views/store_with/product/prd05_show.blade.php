@@ -338,18 +338,18 @@
              * 할인율  = 판매가 - (판매가 * 할인율)
              */
             let change_rate = [];
-            if (change_price == 100) {
+            if (change_price >= 100) {
                 let sale = change_price/100;
             
                 if(price_kind == 'tag_price') {
                     change_rate = gx.getSelectedRows().map(row => ({
                         ...row, 
-                        change_val : row.goods_sh 
+                        change_val : 0 
                     }));
                 } else {
                     change_rate = gx.getSelectedRows().map(row => ({
                         ...row, 
-                        change_val : row.price
+                        change_val : 0
                     }));
                 }
 
@@ -359,38 +359,18 @@
                 gx.gridOptions.api.applyTransaction({ add : change_rate });
                 gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
                 
-            } else if (change_price > 100){
-                let sale = change_price/100;
-
-                if(price_kind == 'tag_price') {
-                    change_rate = gx.getSelectedRows().map(row => ({
-                        ...row, 
-                        change_val : row.goods_sh * sale 
-                    }));
-                } else {
-                    change_rate = gx.getSelectedRows().map(row => ({
-                        ...row, 
-                        change_val : row.price * sale 
-                    }));
-                }
-
-                for (let i = 0; i < rows.length; i++) {
-                    gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
-                }
-                gx.gridOptions.api.applyTransaction({ add : change_rate });
-                gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
             } else if (change_price < 100) {
                 let sale = change_price/100;
 
                 if(price_kind == 'tag_price') {
                     change_rate = gx.getSelectedRows().map(row => ({
                         ...row, 
-                        change_val : row.goods_sh * sale 
+                        change_val : row.goods_sh - (row.goods_sh * sale)
                     }));
                 } else {
                     change_rate = gx.getSelectedRows().map(row => ({
                         ...row, 
-                        change_val : row.price * sale 
+                        change_val : row.price - (row.price * sale)
                     }));
                 }
 
