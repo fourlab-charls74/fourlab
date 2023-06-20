@@ -168,7 +168,7 @@
 <script language="javascript">
     const cmd = '{{ @$cmd }}';
     const now_state = '{{ @$sr->sr_state }}';
-    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 , fixed_return_qty: 0, fixed_return_price : 0, return_p_qty: 0}];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 , fixed_return_qty: 0, fixed_return_price : 0}];
 
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
@@ -204,21 +204,25 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        @if (@$sr_state == 10)
-        {field: "return_p_qty", headerName: "반품처리수량", width: 85, type: 'currencyType',
+        {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
+        @if (@$sr_state == 30 || @$sr_state == 40)
+        {field: "fixed_return_qty", headerName: "반품처리수량", width: 60, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
+        {field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType'},
+        {field: "fixed_comment", headerName: "확정메모", width: 300, 
+            editable: (params) => checkIsEditable(params),
+            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+        
+        }
         @endif
-      
     ];
 </script>
 
 <script type="text/javascript" charset="utf-8">
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
-    const sr_state = '{{ @$sr->sr_state }}';
 
     $(document).ready(function() {
         pApp.ResizeGrid(275, 470);
@@ -231,7 +235,7 @@
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: (e) => {
-                if (e.column.colId === "return_price" || e.column.colId === "qty" || e.column.colId === "fixed_return_qty" || e.column.colId === "return_p_qty") {
+                if (e.column.colId === "return_price" || e.column.colId === "qty" || e.column.colId === "fixed_return_qty") {
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -244,11 +248,8 @@
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
                             e.node.setSelected(true);
-                            if(sr_state == 10) {
-                                e.data.total_return_price = parseInt(e.data.return_p_qty) * parseInt(e.data.return_price);
-                            } else {
-                                e.data.total_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
-                            }
+                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
+                            // e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
                             gx.gridOptions.api.updateRowData({update: [e.data]});
                             updatePinnedRow();
                         }
@@ -258,15 +259,6 @@
                         } else {
                             e.node.setSelected(true);
                             e.data.fixed_return_price = parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price);
-                            gx.gridOptions.api.updateRowData({update: [e.data]});
-                            updatePinnedRow();
-                        }
-                        if (e.column.colId === "return_p_qty" && e.data.store_wqty < parseInt(e.data.return_p_qty)) {
-                            alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
-                            gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                        } else {
-                            e.node.setSelected(true);
-                            e.data.fixed_return_price = parseInt(e.data.return_p_qty) * parseInt(e.data.return_price);
                             gx.gridOptions.api.updateRowData({update: [e.data]});
                             updatePinnedRow();
                         }
@@ -345,7 +337,6 @@
             let sr_cd = '{{ @$sr->sr_cd }}';
 
             if('{{ @$sr->sr_state }}' != 10) return alert("창고반품이 '요청'상태일떄만 수정가능합니다.");
-            if(rows.length < 1) return alert("저장할 상품을 선택해주세요.");
             if(!confirm("수정하시겠습니까?")) return;
 
             axios({
@@ -355,7 +346,7 @@
                     sr_cd,
                     sr_reason,
                     comment,
-                    products: rows.map(r => ({ sr_prd_cd: r.sr_prd_cd, return_price: r.return_price, return_qty: r.qty, fixed_return_price:r.fixed_return_price, fixed_return_qty:r.fixed_return_qty, fixed_comment:r.fixed_comment, return_p_qty:r.return_p_qty})),
+                    products: rows.map(r => ({ sr_prd_cd: r.sr_prd_cd, return_price: r.return_price, return_qty: r.qty, fixed_return_price:r.fixed_return_price, fixed_return_qty:r.fixed_return_qty, fixed_comment:r.fixed_comment})),
                 },
             }).then(function (res) {
                 if(res.data.code === 200) {
@@ -433,7 +424,6 @@
             total_return_price: 0,
             fixed_return_qty : 0,
             fixed_return_price: 0,
-            return_p_qty: 0,
             isEditable: true,
             count: count + 1,
         };
@@ -447,7 +437,7 @@
     }
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ qty, total_return_price, fixed_return_qty, fixed_return_price, return_p_qty ] = [ 0, 0, 0, 0, 0 ];
+        let [ qty, total_return_price, fixed_return_qty, fixed_return_price ] = [ 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
@@ -455,13 +445,12 @@
                 total_return_price += parseFloat(row.total_return_price);
                 fixed_return_qty += parseFloat(row.fixed_return_qty);
                 fixed_return_price += parseFloat(row.fixed_return_price);
-                return_p_qty += parseFloat(row.return_p_qty);
             });
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price, fixed_return_price, fixed_return_qty, return_p_qty:return_p_qty}
+            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price, fixed_return_price, fixed_return_qty}
         ]);
     };
 
@@ -493,10 +482,7 @@
 
         for (let row of rows) {
             if(row.qty == 0){
-               return alert("반품요청수량을 입력해주세요.");
-            }
-            if(row.return_p_qty == 0){
-               return alert("반품처리수량을 입력해주세요.");
+               return alert("반품수량을 입력해주세요.");
             }
         }
         let sr_cd = '{{ @$sr->sr_cd }}';

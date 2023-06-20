@@ -256,9 +256,7 @@
         {field: "store_type_nm", headerName: "매장구분", width: 80, cellClass: 'hd-grid-code'},
         {field: "store_nm", headerName: "매장명", width: 200, cellClass: 'hd-grid-code'},
         
-        {field: "sr_qty", headerName: "반품요청수량", type: "currencyType", width: 100},
-        {field: "return_p_qty", headerName: "반품처리수량", type: "currencyType", width: 100},
-        {field: "fixed_return_qty", headerName: "반품확정수량", type: "currencyType", width: 100},
+        {field: "sr_qty", headerName: "반품수량", type: "currencyType", width: 80},
         {field: "sr_price", headerName: "반품금액", type: "currencyType", width: 80},
         
         {field: "sr_reason", hide: true},
