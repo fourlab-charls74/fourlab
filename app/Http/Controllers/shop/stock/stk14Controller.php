@@ -215,7 +215,9 @@ class stk14Controller extends Controller
             DB::beginTransaction();
 
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_release order by document_number desc limit 1";
-			$document_number = DB::selectOne($sql)->document_number;
+			$document_number = DB::selectOne($sql);
+			if ($document_number === null) $document_number = 1;
+			else $document_number = $document_number->document_number;
 
 			foreach($data as $d) {
                 DB::table('product_stock_release')

@@ -343,7 +343,9 @@ class stk13Controller extends Controller
 			$storage_cd = $storage_cd[0]->storage_cd;
 
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_release order by document_number desc limit 1";
-			$document_number = DB::selectOne($sql)->document_number;
+			$document_number = DB::selectOne($sql);
+			if ($document_number === null) $document_number = 1;
+			else $document_number = $document_number->document_number;
 
 			foreach($data as $d) {
 				$rel_qty2 = $d['rel_qty2'] ?? 0;
