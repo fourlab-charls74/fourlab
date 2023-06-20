@@ -248,8 +248,6 @@ class prd04Controller extends Controller
 				) a
 			";
 
-			// dd($query);
-
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
 			$total_row = $row[0];
@@ -282,6 +280,7 @@ class prd04Controller extends Controller
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+				, round(((g.goods_sh - g.price) / g.goods_sh) * 100, 2) as sale_rate
 				, p.match_yn
 				, ps.qty as hqty
 				, ps.wqty as hwqty

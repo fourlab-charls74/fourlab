@@ -77,13 +77,40 @@
             </div>
         </div>
     </div>
-    {{-- 검색 --}}
+    {{-- 창고/매장 재고현황 --}}
+    <div class="show_layout">
+        <div class="card shadow">
+            <div class="card-header mb-0">
+                <div class="filter_wrap">
+                    <div class="fl_box">
+                        <a href="#" class="m-0 font-weight-bold">현재 재고 현황</a>
+                    </div>
+                    <div class="fr_box">
+                        <div class="font-weight-light">
+                            <span class="mr-2">* 실재고 / 보유재고</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-3">
+                <h6 class="fs-16">[ 창고 현재 재고 ]</h6>
+                <div class="table-responsive mb-1">
+                    <div id="div-gd-storage-stock" class="ag-theme-balham"></div>
+                </div>
+                <h6 class="fs-16 mt-3">[ 매장 현재 재고 ]</h6>
+                <div class="table-responsive mb-1">
+                    <div id="div-gd-store-stock" class="ag-theme-balham"></div>
+                </div>
+                <p class="mt-1" style="color:red;">* 매장에 입고된 적이 없는 상품의 경우 재고가 표시되지 않습니다.</p>
+            </div>
+        </div>
+    </div>
     <div id="search-area" class="search_cum_form mb-4">
         <form name="search" method="get">
             <input type="hidden" name="prd_cd" value="{{ @$prd->prd_cd }}">
             <div class="card">
                 <div class="d-flex card-header justify-content-between">
-                    <h4>검색</h4>
+                    <h4>매장기간재고 검색</h4>
                     <div class="flax_box">
                         <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     </div>
@@ -161,41 +188,14 @@
                             </div>
                         </div>
                     </div>
+                    <h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영, 보유재고 기준</span></h6>
+                    <div class="table-responsive">
+                        <div id="div-gd-store-stock-detail" class="ag-theme-balham"></div>
+                    </div>
+                    <p class="mt-1" style="color:red;">* 매장에 입고된 적이 없는 상품의 경우 재고가 표시되지 않습니다.</p>
                 </div>
             </div>
         </form>
-    </div>
-    {{-- 창고/매장 재고현황 --}}
-    <div class="show_layout">
-        <div class="card shadow">
-            <div class="card-header mb-0">
-                <div class="filter_wrap">
-                    <div class="fl_box">
-                        <a href="#" class="m-0 font-weight-bold">창고/매장 재고 현황</a>
-                    </div>
-                    <div class="fr_box">
-                        <div class="font-weight-light">
-                            <span class="mr-2">* 실재고 / 보유재고</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body pt-3">
-                <h6 class="fs-16">[ 창고 현재 재고 ]</h6>
-                <div class="table-responsive mb-1">
-                    <div id="div-gd-storage-stock" class="ag-theme-balham"></div>
-                </div>
-                <h6 class="fs-16 mt-3">[ 매장 현재 재고 ]</h6>
-                <div class="table-responsive mb-1">
-                    <div id="div-gd-store-stock" class="ag-theme-balham"></div>
-                </div>
-                <h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영, 보유재고 기준</span></h6>
-                <div class="table-responsive">
-                    <div id="div-gd-store-stock-detail" class="ag-theme-balham"></div>
-                </div>
-                <p class="mt-1" style="color:red;">* 매장에 입고된 적이 없는 상품의 경우 재고가 표시되지 않습니다.</p>
-            </div>
-        </div>
     </div>
     @endif
 </div>

@@ -321,7 +321,7 @@
         function setColumn(store) {
             if(!store) return;
 
-            columns[12].headerName = store.store_nm;
+            columns[13].headerName = store.store_nm;
             gx.gridOptions.api.setColumnDefs(columns);
 
             gx.gridOptions.columnApi.applyColumnState({

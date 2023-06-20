@@ -303,8 +303,9 @@
 		{field: "size", headerName: "사이즈", width: 50, cellStyle: StyleLineHeight},
 		{field: "goods_opt", headerName: "옵션", width: 190},
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
-		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width: 100, aggFunc: 'first'},
+		{field: "goods_sh", headerName: "정상가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "price", headerName: "판매가", type: 'currencyType', width: 100, aggFunc: 'first'},
+		{field: "sale_rate", headerName: "할인율", width: 70, cellStyle:{'text-align':'right'}},
 		@if(true) // 슈퍼관리자 권한설정 필요 (추후)
 			{field: "wonga", headerName: "원가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		@endif
