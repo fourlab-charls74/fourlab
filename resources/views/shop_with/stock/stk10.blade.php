@@ -284,16 +284,17 @@
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
         {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
-            cellRenderer: function(params) {
-               return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
-            }
-        },
+        cellRenderer: function(params) {
+            return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
+        }
+    },
+    {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
+    {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
         {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 60,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "storage_cd",	headerName: "창고코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
         {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
         {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
@@ -338,7 +339,6 @@
                 return params.data.dlv_day;
            }
         },
-		{field: "rel_order", headerName: "출고차수", width: 100, cellStyle: {"text-align": "center"}},
         {field: "req_comment", headerName: "매장메모", width: 300},
         {field: "comment", headerName: "본사메모", width: 300},
         {field: "req_nm", headerName: "요청자", cellStyle: {"text-align": "center"}},
