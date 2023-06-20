@@ -5,11 +5,11 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">원부자재상품추가</h3>
+			<h3 class="d-inline-flex">원부자재상품등록</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
-				<span>/ 원부자재상품관리</span>
-				<span>/ 추가</span>
+				<span>/ 원부자재관리</span>
+				<span>/ 원부자재상품등록</span>
 			</div>
 		</div>
 		<div class="d-flex">

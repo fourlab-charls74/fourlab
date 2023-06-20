@@ -1,12 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','매장목표')
+@section('title','매장별목표매출관리')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장목표</h3>
+	<h3 class="d-inline-flex">매장별목표매출관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장목표</span>
-		<span>/ 경영관리</span>
+		<span>/ 영업관리</span>
+		<span>/ 매장별목표매출관리</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -16,7 +16,7 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 					<!-- <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a> -->
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -91,7 +91,7 @@
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 			<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 			<!-- <input type="reset" id="search_reset" value="검색조건 초기화" class="btn btn-sm btn-outline-primary shadow-sm" onclick="formReset()"> -->
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>

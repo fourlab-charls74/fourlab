@@ -1,12 +1,13 @@
 @extends('store_with.layouts.layout')
-@section('title','창고관리')
+@section('title','창고정보관리')
 
 @section('content')
 <div class="page_tit">
-    <h3 class="d-inline-flex">창고관리</h3>
+    <h3 class="d-inline-flex">창고정보관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
-        <span>/ 코드관리</span>
+        <span>/ 기준정보관리</span>
+        <span>/ 창고정보관리</span>
     </div>
 </div>
 

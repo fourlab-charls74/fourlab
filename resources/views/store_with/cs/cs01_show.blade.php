@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','입고')
+@section('title','상품입고관리')
 @section('content')
 
 <style>
@@ -10,10 +10,11 @@
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">입고 {{ @$invoice_no ? (" - " . $invoice_no) : "" }}</h3>
+        <h3 class="d-inline-flex">상품입고 {{ @$invoice_no ? (" - " . $invoice_no) : "" }}</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 생산입고관리</span>
+            <span>/ 상품관리</span>
+            <span>/ 상품입고관리</span>
         </div>
     </div>
     <div id="search-area" class="search_cum_form">

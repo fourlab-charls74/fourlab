@@ -5,8 +5,8 @@
 	<h3 class="d-inline-flex">매장상품별판매분석</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
 		<span>/ 경영관리</span>
+		<span>/ 매장상품별판매분석</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -16,7 +16,7 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 					<!-- <a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a> -->
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -31,9 +31,9 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disabled>
 										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disabled>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>

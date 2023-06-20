@@ -6,7 +6,7 @@
     <h3 class="d-inline-flex">사이즈관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
-        <span>/ 코드관리</span>
+        <span>/ 기준정보관리</span>
         <span>/ 사이즈관리</span>
     </div>
 </div>

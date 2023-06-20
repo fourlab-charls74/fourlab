@@ -1,13 +1,13 @@
 @extends('store_with.layouts.layout')
-@section('title','월별동종업계매출관리')
+@section('title','동종업계월별매출관리')
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">월별동종업계매출관리</h3>
+    <h3 class="d-inline-flex">동종업계월별매출관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 매장관리</span>
-        <span>/ 월별동종업계매출관리</span>
+        <span>/ 동종업계월별매출관리</span>
     </div>
 </div>
 
@@ -20,7 +20,7 @@
                     <a href="javascript:void(0);" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- <a href="javascript:void(0);" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
-                    <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
+                    <a href="javascript:void(0);" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 등록</a>
                     <a href="javascript:void(0);" class="export-excel btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>

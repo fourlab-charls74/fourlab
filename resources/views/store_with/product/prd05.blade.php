@@ -7,6 +7,7 @@
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>/ 상품관리</span>
+			<span>/ 상품가격 관리</span>
 		</div>
 	</div>
 	<form method="get" name="search" id="search">

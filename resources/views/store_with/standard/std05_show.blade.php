@@ -12,7 +12,8 @@
             <h3 class="d-inline-flex">{{ $title }}</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 코드관리</span>
+                <span>/ 기준정보관리</span>
+                <span>/ 판매유형관리</span>
             </div>
         </div>
         <div class="d-flex">

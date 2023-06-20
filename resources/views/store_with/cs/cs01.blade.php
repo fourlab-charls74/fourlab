@@ -1,11 +1,12 @@
 @extends('store_with.layouts.layout')
-@section('title','입고')
+@section('title','상품입고관리')
 @section('content')
     <div class="page_tit">
-        <h3 class="d-inline-flex">입고</h3>
+        <h3 class="d-inline-flex">상품입고관리</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 생산입고관리</span>
+            <span>/ 상품관리</span>
+            <span>/ 상품입고관리</span>
         </div>
     </div>
     <form method="get" name="search">

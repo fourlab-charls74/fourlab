@@ -1,10 +1,10 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','코드 상세')
+@section('title','공통코드관리 상세')
 @section('content')
     <div class="show_layout py-3 px-sm-3">
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
-                <h3 class="d-inline-flex">코드</h3>
+                <h3 class="d-inline-flex">공통코드관리 상세</h3>
                 <div class="d-inline-flex location">
                     <span class="home"></span>
                     <span>/ 코드 - {{ $code }}</span>

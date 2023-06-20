@@ -1,6 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "기타재반자료 추가";
+    $title = "기타재반자료 등록";
     if($cmd == "update") $title = "기타재반자료 상세내역";
 @endphp
 @section('title', $title)
@@ -15,9 +15,9 @@
             <h3 class="d-inline-flex">{{ $title }}</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>매장관리</span>
-                <span>/ 정산/마감관리</span>
+                <span>/ 정산관리</span>
                 <span>/ 기타재반자료</span>
+                <span>/ 기타재반자료 상세</span>
             </div>
         </div>
         <div class="d-flex">

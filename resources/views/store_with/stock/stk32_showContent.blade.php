@@ -7,6 +7,8 @@
                 <h3 class="d-inline-flex">알림</h3>
                 <div class="d-inline-flex location">
                     <span class="home"></span>
+                    <span>/ 게시판/알리미</span>
+                    <span>/ 매장알림</span>
                     <span>/ 알림 보기</span>
                 </div>
             </div>

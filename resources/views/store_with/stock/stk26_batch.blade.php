@@ -12,7 +12,8 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
-                <span>/ 실사</span>
+                <span>/ 매장실사/LOSS관리</span>
+                <span>/ 매장실사일괄등록</span>
             </div>
         </div>
         <div class="d-flex">

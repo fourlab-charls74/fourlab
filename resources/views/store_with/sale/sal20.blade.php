@@ -5,7 +5,8 @@
 	<h3 class="d-inline-flex">매장LOSS관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-        <span>/ 영업관리</span>
+        <span>/ 매장관리</span>
+		<span>/ 매장실사/LOSS관리</span>
 		<span>/ 매장LOSS관리</span>
 	</div>
 </div>

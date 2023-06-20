@@ -5,8 +5,8 @@
 	<h3 class="d-inline-flex">온라인출고요청</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 주문/배송관리</span>
+		<span>판매관리</span>
+		<span>/ 온라인출고요청</span>
 	</div>
 </div>
 <form method="get" name="search">

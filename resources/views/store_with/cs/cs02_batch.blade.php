@@ -11,8 +11,9 @@
             <h3 class="d-inline-flex">상품반품 일괄등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 생산입고관리</span>
-                <span>/ 상품반품</span>
+                <span>/ 상품관리</span>
+                <span>/ 상품반품관리</span>
+                <span>/ 상품반품 일괄등록</span>
             </div>
         </div>
         <div class="d-flex">

@@ -2,10 +2,11 @@
 @section('title','원부자재상품관리')
 @section('content')
 	<div class="page_tit">
-		<h3 class="d-inline-flex">원부자재상품관리</h3>
+		<h3 class="d-inline-flex">원부자재관리</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
-			<span>/ 원부자재상품관리</span>
+			<span>/ 원부자재관리</span>
+			<span>/ 원부자재관리</span>
 		</div>
 	</div>
 	<style>

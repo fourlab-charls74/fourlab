@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','상품')
+@section('title','상품정보관리')
 @section('content')
 
 <style>
@@ -89,9 +89,9 @@
         <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
             <div>
                 @if( $type == '')
-                <h3 class="d-inline-flex">상품수정</h3>
+                <h3 class="d-inline-flex">상품정보수정</h3>
                 @elseif ( $type == "create")
-                <h3 class="d-inline-flex">상품등록</h3>
+                <h3 class="d-inline-flex">상품정보등록</h3>
                 @endif
                 <div class="d-inline-flex location">
                     <span class="home"></span>

@@ -2,11 +2,11 @@
 @section('title','매장RT')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장RT</h3>
+	<h3 class="d-inline-flex">매장RT관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 매장RT</span>
+		<span>/ 매장관리</span>
+		<span>/ 매장RT관리</span>
 	</div>
 </div>
 <form method="get" name="search">

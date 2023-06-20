@@ -14,9 +14,9 @@
     <div class="d-inline-flex location">
         <span class="home"></span>
         @if (@$type === "create")
-        <span>/ 고객 / 수선관리 / 등록</span>
+        <span>/ A/S관리 / 수선관리 / 등록</span>
         @elseif (@$type =="detail")
-        <span>/ 고객 / 수선관리 / 상세 {{ @$idx ? '- 접수번호: ' . $idx : '' }}</span>
+        <span>/ A/S관리 / 수선관리 / 상세 {{ @$idx ? '- 접수번호: ' . $idx : '' }}</span>
         @endif
     </div>
 </div>

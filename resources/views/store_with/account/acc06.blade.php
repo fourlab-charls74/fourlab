@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','매장중간관리자정산')
+@section('title','매장별중간관리정산')
 @section('content')
 
 <style>
@@ -19,11 +19,11 @@
 	}
 </style>
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장중간관리자정산</h3>
+	<h3 class="d-inline-flex">매장별중간관리정산</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 정산/마감관리</span>
+		<span>정산관리</span>
+		<span>/ 매장별중간관리정산</span>
 	</div>
 </div>
 <form method="get" name="search">

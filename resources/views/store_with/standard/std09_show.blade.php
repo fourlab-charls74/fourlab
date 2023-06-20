@@ -12,7 +12,7 @@ else $title = '판매채널관리 수정';
                 <h3 class="d-inline-flex">{{@$title}}</h3>
                 <div class="d-inline-flex location">
                     <span class="home"></span>
-                    <span>/코드관리</span>
+                    <span>/기준정보관리</span>
                     <span>/판매채널관리</span>
                     <span></span>
                 </div>

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title','상품관리 - 일괄등록')
+@section('title','상품정보관리 - 일괄등록')
 @section('content')
 <style>
     .wrap { overflow-y: 'hidden' }
@@ -46,9 +46,10 @@
 </style>
 <div class="py-3 px-sm-3 wrap">
     <div class="page_tit">
-        <h3 class="d-inline-flex">상품관리 - 일괄등록</h3>
+        <h3 class="d-inline-flex">상품정보관리 - 일괄등록</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
+            <span>/ 상품정보관리</span>
             <span>/ 일괄등록 {{$goods_nos}} </span>
         </div>
         <div class="d-inline" style="float: right;">

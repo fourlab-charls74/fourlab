@@ -5,8 +5,8 @@
 	<h3 class="d-inline-flex">일반RT</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 매장RT</span>
+		<span>/ 매장관리</span>
+		<span>/ 매장RT관리</span>
 		<span>/ 일반RT</span>
 	</div>
 </div>

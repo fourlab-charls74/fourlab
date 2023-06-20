@@ -7,8 +7,8 @@
             <h3 class="d-inline-flex">수기 일괄판매</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 매장관리</span>
-                <span>/ 매장주문</span>
+                <span>/ 판매관리</span>
+                <span>/ 주문내역조회</span>
                 <span>/ 수기 일괄판매</span>
             </div>
         </div>

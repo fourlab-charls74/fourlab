@@ -1,7 +1,7 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "창고등록";
-    if($cmd == "update") $title = "창고관리 - " . @$storage->storage_nm;
+    $title = "창고정보등록";
+    if($cmd == "update") $title = "창고정보관리 - " . @$storage->storage_nm;
 @endphp
 @section('title', $title)
 
@@ -12,7 +12,8 @@
             <h3 class="d-inline-flex">{{ $title }}</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 코드관리</span>
+                <span>/ 기준정보관리</span>
+                <span>/ 창고정보관리</span>
             </div>
         </div>
         <div class="d-flex">
