@@ -346,6 +346,7 @@
 					</div>
 				</div>
 				<div class="row">
+					{{--
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">인증방식</label>
@@ -359,6 +360,7 @@
 							</div>
 						</div>
 					</div>
+					--}}
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬</label>

@@ -98,6 +98,41 @@
                     </div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
+							<label for="item">자료수/정렬</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:24%;">
+									<select name="limit" class="form-control form-control-sm">
+										<option value="100" >100</option>
+										<option value="500" >500</option>
+										<option value="1000" >1000</option>
+										<option value="2000" >2000</option>
+									</select>
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input_box" style="width:45%;">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value="a.user_id" selected>아이디</option>
+										<option value="a.name" >이름</option>
+										<option value="a.regdate" selected >가입일</option>
+										<option value="a.lastdate" >최근로그인</option>
+										<option value="e.ord_date" >최근주문일</option>
+										<option value="e.ord_amt" >구매금액</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+									<div class="btn-group" role="group">
+										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+									</div>
+									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+									<input type="radio" name="ord" id="sort_asc" value="asc">
+								</div>
+							</div>
+						</div>
+					</div>
+					{{--
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
 							<label for="">인증방식</label>
 							<div class="flax_box">
 								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
@@ -109,6 +144,7 @@
 							</div>
 						</div>
 					</div>
+					--}}
 				</div>
 				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
@@ -342,42 +378,6 @@
 											@endforeach
 										</select>
 									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="item">자료수/정렬</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width:24%;">
-									<select name="limit" class="form-control form-control-sm">
-										<option value="100" >100</option>
-										<option value="500" >500</option>
-										<option value="1000" >1000</option>
-										<option value="2000" >2000</option>
-									</select>
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input_box" style="width:45%;">
-									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.user_id" selected>아이디</option>
-										<option value="a.name" >이름</option>
-										<option value="a.regdate" selected >가입일</option>
-										<option value="a.lastdate" >최근로그인</option>
-										<option value="e.ord_date" >최근주문일</option>
-										<option value="e.ord_amt" >구매금액</option>
-									</select>
-								</div>
-								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-									<div class="btn-group" role="group">
-										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
-										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
-									</div>
-									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-									<input type="radio" name="ord" id="sort_asc" value="asc">
 								</div>
 							</div>
 						</div>
