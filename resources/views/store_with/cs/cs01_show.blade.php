@@ -118,11 +118,12 @@
                             <div class="form-group">
                                 <label for="loc">위치</label>
                                 <div class="flex_box">
-                                    <select name="loc" id="loc" class="form-control form-control-sm w-100">
+                                    <select name="loc" id="loc" class="form-control form-control-sm w-100" hidden>
                                         @foreach ($locs as $item)
                                             <option value="{{ $item->code_id }}" {{ $item->code_id == $loc ? 'selected' : '' }}>{{ $item->code_val }}</option>
                                         @endforeach
                                     </select>
+                                    <input type="text" class="form-control form-control-sm" name="loc" value="기본" readonly>
                                 </div>
                             </div>
                         </div>

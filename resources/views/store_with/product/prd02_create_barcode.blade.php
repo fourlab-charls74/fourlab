@@ -221,6 +221,16 @@
 											</td>
 										</tr>
 										<tr>
+											<th>원산지</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='origin' id="origin" value=''>
+												</div>
+											</td>
+											<th></th>
+											<td></td>
+										</tr>
+										<tr>
 											<th>이미지</th>
 											<td colspan="3">
 												<div style="text-align:center;" id="multi_img">
@@ -304,6 +314,7 @@
 		{field: "season", headerName: "시즌",width: 80},
 		{field: "gender", headerName: "성별", width: 80},
 		{field: "sup_com", headerName: "공급업체", width: 120},
+		{field: "origin", headerName: "원산지", width: 100},
 		{field: "plan_category", headerName: "기획구분", width: 120},
 	];
 </script>
@@ -365,8 +376,6 @@
 	const add = async() => {
 		let size = $('#size').val();
 
-		console.log(size);
-		
 		if (!validation()) return;
 		const response = await axios({ url: `/store/product/prd02/get-seq`, method: 'post',
 			data: {
@@ -419,6 +428,7 @@
 					price: document.f1.price.value,
 					wonga: document.f1.wonga.value,
 					tag_price: document.f1.tag_price.value,
+					origin: document.f1.origin.value,
 					plan_category : document.f1.plan_category.value
 				});
 			}
@@ -444,6 +454,7 @@
 					price: document.f1.price.value,
 					wonga: document.f1.wonga.value,
 					tag_price: document.f1.tag_price.value,
+					origin: document.f1.origin.value,
 					plan_category: document.f1.plan_category[document.f1.plan_category.selectedIndex].text,
 
 				};

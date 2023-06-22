@@ -185,6 +185,18 @@
                             <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
                             <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
                         </div>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="prd_cd_p_grid_expand" id="prd_cd_p_grid_expand" onchange="return RowExpand('prd_cd_sm', this.checked);" checked>
+                            <label class="custom-control-label font-weight-normal" for="prd_cd_p_grid_expand">품번별 접기</label>
+                        </div>
+                        <!-- <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="store_grid_expand" id="store_grid_expand" onchange="return setAllRowGroupExpanded3(this.checked);" checked>
+                            <label class="custom-control-label font-weight-normal" for="store_grid_expand">매장별 접기</label>
+                        </div>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="store_type_grid_expand" id="store_type_grid_expand" onchange="return setAllRowGroupExpanded4(this.checked);" checked>
+                            <label class="custom-control-label font-weight-normal" for="store_type_grid_expand">매장구분 접기</label>
+                        </div> -->
                     </div>
 				</div>
 			</div>
@@ -198,6 +210,7 @@
 <style>
 	.ag-row-level-1 {background-color: #f2f2f2 !important;}
 	.ag-row-level-2 {background-color: #e2e2e2 !important;}
+	.ag-row-level-3 {background-color: #edf4fd !important;}
 </style>
 
 <script language="javascript">
@@ -214,12 +227,13 @@
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
 		},
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
+		{headerName: '품번', showRowGroup: 'prd_cd_sm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
         {field: "prd_cd", headerName: "바코드", width: 130, cellStyle: AlignCenter, pinned: 'left'},
         {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: AlignCenter, pinned: 'left'},
         {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter},
         {field: "goods_nm", headerName: "상품명", width: 200, type: "HeadGoodsNameType"},
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_sm", headerName: "품번", width: 100, cellStyle: AlignCenter},
+        {field: "prd_cd_sm", headerName: "품번", width: 100, cellStyle: AlignCenter, rowGroup: true, hide: true},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
         {field: "goods_opt", headerName: "옵션", width: 150},
@@ -338,6 +352,29 @@
             });
         });
     });
+
+    // function RowExpand(e, a) {
+    //     console.log(e, a);
+    //     var RowNode = gx.gridOptions.api.getRowNode('1');
+
+    //     console.log(RowNode);
+    //     RowNode.setExpanded(a);
+        
+    // }
+
+    function RowExpand(rowClass, expand) {
+        var rowElements = document.getElementsByClassName(rowClass);
+
+        console.log(rowElements);
+        for (var i = 0; i < rowElements.length; i++) {
+            if (expand) {
+            rowElements[i].style.display = "none";
+            } else {
+            rowElements[i].style.display = "";
+            }
+        }
+        return true;
+    }
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
