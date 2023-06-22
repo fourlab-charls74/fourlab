@@ -177,12 +177,14 @@
     }
 
     /** 상품검색 */
-    function Search() {
+    function Search(callback = null) {
         let type = $("[name=search_prd_type]").val();
         let keyword = $("[name=search_prd_keyword]").val();
 
         let data = "search_type=" + type + "&search_keyword=" + keyword;
-        gx2.Request("/shop/pos/search/goods", data, 1);
+        gx2.Request("/shop/pos/search/goods", data, 1, function (e) {
+			if (callback !== null) callback(e);
+        });
     }
 
     /** 상품리스트에 상품 추가 */
@@ -221,11 +223,14 @@
             $("#cur_goods_color").text('');
             $("#cur_goods_size").text('');
             $("#cur_prd_cd").text('');
-            $("#cur_qty").val('');
-            $("#cur_price").text('-');
+			$("#cur_img").attr('src', '');
+			$("#cur_img").attr('alt', '');
             $("#cur_goods_sh").text('-');
-            $("#cur_img").attr('src', '');
-            $("#cur_img").attr('alt', '');
+            $("#cur_wqty").text('-');
+            $("#cur_ori_price").text('-');
+            $("#cur_qty").text('');
+            $("#cur_dc_rate").text('-');
+            $("#cur_price").text('-');
             $("#sale_type").find("option").remove();
             $('#pr_code').val('JS').prop("selected", true);
             $('#coupon_no').val('').prop("selected", true);
@@ -239,11 +244,14 @@
         $("#cur_goods_color").text(goods.color);
         $("#cur_goods_size").text(goods.size);
         $("#cur_prd_cd").text(goods.prd_cd);
-        $("#cur_qty").val(goods.qty);
-        $("#cur_price").text(Comma(goods.price));
-        $("#cur_goods_sh").text(Comma(goods.goods_sh));
         $("#cur_img").attr('src', "{{config('shop.image_svr')}}" + "/" + goods.img);
         $("#cur_img").attr('alt', goods.goods_nm);
+        $("#cur_goods_sh").text(Comma(goods.goods_sh));
+		$("#cur_wqty").text(Comma(goods.wqty));
+		$("#cur_ori_price").text(Comma(goods.ori_price));
+		$("#cur_qty").text(goods.qty);
+		$("#cur_dc_rate").text(goods.dc_rate + ' %');
+		$("#cur_price").text(Comma(goods.price));
 
         let isJsGoods = goods.ori_price == goods.goods_sh;
 
@@ -284,8 +292,6 @@
             $(opt).prop("disabled", !usable_coupon_nos.includes(opt.value));
             if (opt.value === goods.coupon_no) $(opt).prop("selected", true);
         });
-
-        $("#cur_qty").trigger('focus');
     }
 
     /** 상품리스트에서 상품 삭제 */
@@ -318,7 +324,9 @@
             if(curRow.length > 0) {
                 let rowData = curRow[0].data;
                 if(key === 'cur_qty') {
-                    $("#cur_qty").val(value);
+					let prd_cd = event;
+					if (value < 1 || rowData.prd_cd !== prd_cd) return false;
+                    $("#cur_qty").text(value);
                     curRow[0].setData({...rowData, qty: value, total: (rowData.price * value) - (rowData.coupon_discount_amt || 0)});
                 // 단가변경 기능 사용안함 - 20230314
                 // } else if(key === 'cur_price') {
@@ -330,11 +338,13 @@
                     let discount_amt = st.sale_amt || 0;
                     if(st.amt_kind === 'per') discount_amt = std_price * (unComma(st.sale_per || 0) / 100);
 
+                    $("#cur_dc_rate").text(Comma(100 - Math.round((std_price - discount_amt) / rowData.goods_sh * 100)) + ' %');
                     $("#cur_price").text(Comma(std_price - discount_amt));
                     curRow[0].setData({
                         ...rowData,
                         sale_type: value,
                         price: std_price - discount_amt,
+	                    dc_rate: 100 - Math.round((std_price - discount_amt) / rowData.goods_sh * 100),
                         total: rowData.qty * (std_price - discount_amt) - (rowData.coupon_discount_amt || 0)
                     });
                 } else if(key === 'pr_code') {
@@ -347,9 +357,12 @@
                     curRow[0].setData({
                         ...rowData,
                         coupon_no: value,
+                        c_no: cp.c_no,
                         coupon_discount_amt: discount_amt,
                         total: rowData.price * rowData.qty - discount_amt
-                    });
+                    })
+	                
+	                $("#cur_price").text();
                 }
             }
         }
@@ -555,7 +568,7 @@
 
         if(memb.user_id) {
             $("#user_nm").text(memb.user_nm);
-            $("#user_info").text(`(${memb.gender}, ${memb.yyyy ? `${memb.yyyy}.${memb.mm}.${memb.dd}` : '-'})`);
+            $("#user_info").text(`(${memb.gender || '-'}, ${memb.yyyy ? `${memb.yyyy}.${memb.mm}.${memb.dd}` : '-'})`);
             $("#user_id_txt").text(memb.user_id);
             $("#user_phone").text(memb.mobile);
             $("#user_email").text(memb.email || "-");
@@ -591,6 +604,7 @@
         if (status === 200) {
             html += body.reduce((a,c) => a + `
                 <option value='${c.coupon_no}'
+                    data-c_no='${c.c_no}'
                     data-coupon_nm='${c.coupon_nm}'
                     data-apply='${c.coupon_apply}'
                     data-goods_nos='${c.goods_nos}'
@@ -639,12 +653,15 @@
         let form = $("form[name=add_member]");
         if(!validateMember(getForm2JSON(form), true)) return;
 
-        let { data: cnt, status } = await axios({ url: '/shop/pos/check-phone?' + form.serialize(), method: 'get'});
+        let { data, status } = await axios({ url: '/shop/pos/check-phone?' + form.serialize(), method: 'get'});
         if(status != 200) return alert("중복확인 중 오류가 발생했습니다.\n다시 시도해주세요.");
 
-        if(cnt > 0) {
+        if (data.mobile_cnt > 0) {
+			$("#user_mobile_check").val("N");
+			alert("해당 휴대폰을 사용하는 고객정보가 이미 존재합니다.");
+		} else if (data.user_cnt > 0) {
             $("#user_mobile_check").val("N");
-            alert("해당 휴대폰을 사용하는 고객정보가 이미 존재합니다.");
+            alert("해당 휴대폰이 아이디로 등록된 고객정보가 이미 존재합니다.");
         } else {
             $("#user_mobile_check").val("Y");
             alert("사용가능한 휴대폰정보입니다.");
@@ -697,8 +714,6 @@
     /** 고객등록 시 null check */
     function validateMember(data, only_phone = false) {
         if (!only_phone) {
-            if(data.user_id.trim().length < 1) return alert("아이디를 입력해주세요.");
-            if(data.user_id_check !== 'Y') return alert("아이디 중복확인을 진행해주세요.");
             if(data.name.trim().length < 1) return alert("이름을 입력해주세요.");
         }
 
@@ -710,6 +725,11 @@
             if(data.user_mobile_check !== 'Y') return alert("휴대폰 중복확인을 진행해주세요.");
         }
 
+		if (!only_phone) {
+			if(data.id_mobile_same_yn !== 'Y' && data.user_id.trim().length < 1) return alert("아이디를 입력해주세요.");
+			if(data.id_mobile_same_yn !== 'Y' && data.user_id_check !== 'Y') return alert("아이디 중복확인을 진행해주세요.");
+		}
+		
         return true;
     }
 
@@ -927,10 +947,14 @@
 
     /** 오프라인 쿠폰 등록 */
     function addCoupon() {
-        const user_id = $("#cp_user_id").val().trim();
-        const serial_num = $("#cp_serial_num").val().trim();
+        const user_id = $("#user_id_txt").text().trim();
+		const serial_num = $("#cp_serial_num").val().trim();
 
-        if (user_id === '') return alert("고객정보를 선택해주세요.");
+        if (user_id === '') {
+			alert("고객정보를 선택해주세요.");
+			$('#searchMemberModal').modal('show');
+			return false;
+        }
         if (serial_num === '') return alert("쿠폰의 시리얼넘버를 입력해주세요.");
 
         axios({
@@ -939,8 +963,9 @@
             data: { user_id, serial_num },
         }).then(function (res) {
             if(res.data.code == 200) {
-                alert("오프라인쿠폰이 정상적으로 등록되었습니다.");
-                $('#addCouponModal').modal('hide');
+				alert("쿠폰이 정상적으로 등록되었습니다.");
+				getUserCouponList(user_id);
+				$("#cp_serial_num").val('');
             } else {
                 alert(res.data.msg);
                 console.log(res);

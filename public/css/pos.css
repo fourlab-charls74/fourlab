@@ -8,6 +8,7 @@
 .flex-3 {flex: 3;}
 .flex-4 {flex: 4;}
 .flex-5 {flex: 5;}
+.flex-6 {flex: 6;}
 
 /* padding */
 .p-5 {padding: 2.2rem !important;}
@@ -108,7 +109,7 @@ textarea::placeholder {color: #999;font-size: inherit;}
 .curson-pointer {cursor: pointer;}
 
 /* component */
-.ag-row {font-size: 16px !important;}
+.ag-row {font-size: 12px !important;}
 .ag-cell-focus, .ag-cell {
     border: none !important;
     background-color: unset !important;
@@ -131,10 +132,8 @@ textarea::placeholder {color: #999;font-size: inherit;}
         'f f g g e e e e'
 }
 table.prd_info_table tr:not(:last-child) {border-bottom: 1px solid #bbb;}
-table.prd_info_table th {padding: 1.23rem;width: 100px;text-align: center;background-color: #e2e2e2;}
-table.prd_info_table td {text-align: right;font-weight: bold;}
-table.prd_info_table td .inp_num {width: 100%;text-align: right;border: none;font-size: 20px;font-weight: inherit;}
-table.prd_info_table td .inp_num:focus {outline: none;}
+table.prd_info_table th {padding: 0.95rem;width: 15%;text-align: center;background-color: #e2e2e2;}
+table.prd_info_table td {width: 30%;text-align: right;font-weight: bold;}
 .calculator-grid {
     display: grid;
     border: 1px solid #bbb;

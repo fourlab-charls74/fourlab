@@ -18,7 +18,7 @@ use Exception;
 
 class PosController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $store_cd = Auth::guard('head')->user()->store_cd;
         $today = date('Y-m-d');
@@ -59,6 +59,9 @@ class PosController extends Controller
             'clm_reasons' => SLib::getCodes("G_CLM_REASON"),
         ];
 
+		if ($request->input('is_back', 'false') === 'true') {
+			return view(Config::get('shop.shop.view') . '/pos/pos_back', $values);
+		}
         return view(Config::get('shop.shop.view') . '/pos/pos', $values);
     }
 
@@ -175,6 +178,7 @@ class PosController extends Controller
             select pc.prd_cd, pc.prd_cd_p as prd_cd_sm
                 , pc.goods_no, g.goods_sub, g.goods_nm, g.goods_nm_eng, pc.goods_opt, g.style_no
                 , g.goods_type as goods_type_cd, g.brand, g.price, g.price as ori_price, g.goods_sh
+                , (100 - round(g.price / g.goods_sh * 100)) as dc_rate
                 , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
                     select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                     from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -347,6 +351,9 @@ class PosController extends Controller
         $enc_pwd = Lib::get_enc_hash($default_pw, $encrypt_mode, $encrypt_key);
 
         $user_id = object_get($data, 'user_id', '');
+		if (object_get($data, 'id_mobile_same_yn', '') === 'Y') {
+			$user_id = object_get($data, 'mobile1', '') . object_get($data, 'mobile2', '') . object_get($data, 'mobile3', '');
+		}
 
         try {
             DB::beginTransaction();
@@ -414,8 +421,12 @@ class PosController extends Controller
         $mobile2 = $request->input('mobile2', '');
         $mobile3 = $request->input('mobile3', '');
         $mobile = $mobile1 . '-' . $mobile2 . '-' . $mobile3;
-
-		return DB::table('member')->where('mobile', $mobile)->count();
+		$mobile_cnt = DB::table('member')->where('mobile', $mobile)->count();
+		
+		$user_id = $mobile1 . $mobile2 . $mobile3;
+		$user_cnt = DB::table('member')->where('user_id', $user_id)->count();
+		
+		return response()->json([ 'mobile_cnt' => $mobile_cnt, 'user_cnt' => $user_cnt ]);
     }
 
     /** 주문등록 (판매 / 대기) */
@@ -518,7 +529,7 @@ class PosController extends Controller
                 $qty = $item['qty'] ?? 0; // 판매수량
                 $sale_kind = $item['sale_type'] ?? ''; // 판매유형
                 $pr_code = $item['pr_code'] ?? ''; // 행사명
-                $coupon_no = $item['coupon_no'] ?? ''; // 쿠폰아이디
+                $coupon_no = $item['c_no'] ?? ''; // 쿠폰아이디
 
                 $opt_ord_type = 15; // order_opt의 ord_type (정상:15 / 예약:4)
 
@@ -798,14 +809,15 @@ class PosController extends Controller
                 }
 
                 ######################### 사용한 쿠폰 처리 ############################
-                $coupon_no = $cart[$i]['coupon_no'] ?? ''; // 쿠폰아이디
+                $coupon_no = $cart[$i]['c_no'] ?? '';
+                $c_idx = $cart[$i]['coupon_no'] ?? '';
                 if ($coupon_no !== '') {
                     DB::table('coupon')->where('coupon_no', $coupon_no)->update([
                         'coupon_use_cnt' => DB::raw('coupon_use_cnt + 1'),
                         'coupon_order_cnt' => DB::raw('coupon_order_cnt + 1'),
                     ]);
 
-                    DB::table('coupon_member')->where('user_id', $member_id)->where('coupon_no', $coupon_no)->update([
+                    DB::table('coupon_member')->where('idx', $c_idx)->update([
                         'ord_opt_no' => $ord_opt_no,
                         'use_date' => now(),
                         'use_yn' => 'Y',
@@ -1128,7 +1140,7 @@ class PosController extends Controller
         $sql = "
             select a.*
             from (
-                select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.coupon_no, c.coupon_nm, c.coupon_type
+                select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.idx as coupon_no, cm.coupon_no as c_no, c.coupon_nm, c.coupon_type
                     , if(c.use_date_type = 'S', c.use_fr_date, date_format(cm.down_date, '%Y%m%d')) as use_fr_date
                     , if(c.use_date_type = 'S', c.use_to_date, date_format(date_add(cm.down_date, interval c.use_date DAY), '%Y%m%d')) as use_to_date
                     , if(c.coupon_apply = 'AG', ifnull(cg.goods_no, ''), '') as goods_nos
