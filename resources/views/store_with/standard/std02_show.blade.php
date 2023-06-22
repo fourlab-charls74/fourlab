@@ -13,6 +13,7 @@
                 <span class="home"></span>
                 <span>/ 기준정보관리</span>
                 <span>/ 매장정보관리</span>
+                <span>/ {{ $title }}</span>
             </div>
         </div>
         <div class="d-flex">
@@ -92,14 +93,14 @@
 																@endforeach
 															@else 
 																@foreach ($store_channel as $sc)
-																	<option value='{{ $sc->store_channel_cd }}' selected> {{ $sc->store_channel }} </option>
+																	<option value='{{ $sc->store_channel_cd }}' @if($sc->store_channel_cd == $store->store_channel ) selected @endif> {{ $sc->store_channel }} </option>
 																@endforeach
 															@endif
 														</select>
 													</div>
 													<span class="mr-2 ml-2">/</span>
 													<div class="flex_box w-100">
-														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == '') disabled @endif onchange="createStoreCd()">
+														<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" @if($cmd == '') disabled @endif @if($cmd == '') onchange="createStoreCd()" @endif>
 															<option value=''>전체</option>
 															@if($cmd == 'update')
 																@foreach ($sel_store_kind as $sk)
