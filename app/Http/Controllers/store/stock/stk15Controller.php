@@ -51,7 +51,7 @@ class stk15Controller extends Controller
 		$rel_order_res = DB::select($sql);
 
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
             'today'         => date("Y-m-d"),
