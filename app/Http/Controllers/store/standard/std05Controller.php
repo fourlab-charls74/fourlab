@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Exception;
 
 use App\Models\Conf;
+use Illuminate\Support\Facades\Date;
 
 class std05Controller extends Controller
 {
@@ -30,6 +31,8 @@ class std05Controller extends Controller
 		$sale_apply = $request->input("sale_apply");
 		$use_yn = $request->input("use_yn");
 
+		$date = Carbon::now()->timezone('Asia/Seoul')->format('Y-m-d');
+
 		$code = 200;
 		$where = "";
 
@@ -43,7 +46,15 @@ class std05Controller extends Controller
 			$where .= " and s.use_yn = '$use_yn'";
 
 		$sql = "
-			select s.sale_kind, c.code_val as sale_kind_nm, s.idx as sale_type_cd, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn, (select count(ss.idx) from sale_type_store ss where ss.sale_type_cd = s.idx and ss.use_yn = 'Y') as store_cnt
+			select 
+				s.sale_kind
+				, c.code_val as sale_kind_nm
+				, s.idx as sale_type_cd
+				, s.sale_type_nm
+				, s.sale_apply
+				, s.amt_kind, s.sale_amt
+				, s.sale_per, s.use_yn
+				, (select count(ss.idx) from sale_type_store ss where ss.sale_type_cd = s.idx and ss.use_yn = 'Y' and ss.sdate >= '$date') as store_cnt
 			from sale_type s
 				inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
 			where 1=1 $where

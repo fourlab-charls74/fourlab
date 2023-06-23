@@ -279,7 +279,7 @@ class prd02Controller extends Controller
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 						  )) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
-				, g.goods_nm_eng
+				, if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
 				, pc.goods_opt
 				, c.code_val as color_nm
 				, case
@@ -299,6 +299,7 @@ class prd02Controller extends Controller
 				, g.reg_dm
 				, g.upd_dm
 				, p.match_yn
+				, p.origin as org_nm
 			from product_code pc
 				inner join product_stock ps on ps.prd_cd = pc.prd_cd
 				inner join product p on p.prd_cd = pc.prd_cd
@@ -1195,6 +1196,7 @@ class prd02Controller extends Controller
 				$price 		= $row['price'];
 				$wonga 		= $row['wonga'];
 				$tag_price 	= $row['tag_price'];
+				$origin 	= $row['origin'];
 				$plan_category 	= $row['plan_category'];
 
 
@@ -1231,6 +1233,7 @@ class prd02Controller extends Controller
 						'wonga' => $wonga,
 						'tag_price' => $tag_price,
 						'com_id' => $sup_com[0],
+						'origin' => $origin,
 						'unit' => $unit,
 						'rt' => now(),
 						'ut' => now(),

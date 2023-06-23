@@ -233,6 +233,16 @@ class cs01Controller extends Controller {
 			$col_opts = array();
 		};
 
+		$sql = "
+			select
+				code_id
+				, code_val
+			from code
+			where code_kind_cd = 'G_STOCK_LOC'
+		";
+
+		$locs = DB::select($sql);
+
         $values = [
 			'stock_no' => $stock_no,
 			'invoice_no' => $invoice_no,
@@ -256,7 +266,7 @@ class cs01Controller extends Controller {
 			'opts' => $opts,
 			'opt_cnt' => count($col_opts),
 			"col_opts" => $col_opts,
-			"locs" => Slib::getCodes('G_STOCK_LOC'),
+			"locs" => $locs,
 			"loc" => $loc,
 			"super_admin" => ($admin_id === SUPER_ADMIN_ID ? 'true' : 'false')
         ];
@@ -325,6 +335,8 @@ class cs01Controller extends Controller {
 		// Form
 		$invoice_no				= $request->input("invoice_no");			//송장번호
 		$bl_no					= $request->input("bl_no", "");				//통관번호 (B/L No.)
+
+		dd($bl_no);
 		$stock_date				= str_replace('-','',$request->input("stock_date"));	//입고일자
 		$stock_type				= "A";										//입고구분 (일괄/발주)
 		$com_id					= $request->input("com_id");				//공급처
