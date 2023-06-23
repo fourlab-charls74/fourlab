@@ -76,7 +76,7 @@
 		</div>
 	</form>
 		<!-- DataTales Example -->
-		<div class="card shadow-none mb-4 ty2 last-card">
+		<div class="card shadow-none ty2 last-card">
 			<div class="card-body m-0 brtn">
 				<div class="card-title">
 					<div class="filter_wrap">
@@ -84,7 +84,7 @@
 							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
 						</div>
 						<div class="fr_box">
-							<a href="#" class="btn btn-sm btn-primary shadow-sm out-complate-btn">출고완료</a>
+							<a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm out-complate-btn">출고완료</a>
 						</div>
 					</div>
 				</div>
@@ -102,7 +102,7 @@
 					headerName: '',
 					headerCheckboxSelection: true,
 					headerCheckboxSelectionFilteredOnly: true,
-					width: 40,
+					width: 28,
 					checkboxSelection: function(params) {
 						return params.data.chk != 2;
 					},
@@ -122,17 +122,18 @@
 					cellRenderer: (p) => p.value === "S" ? "성공" : p.value === "F" ? "실패" : "", 
 					cellStyle: (p) => ({"text-align": "center", "color": p.value === "S" ? "blue" : p.value === "F" ? "red" : "black"}),
 				},
-				{field:"ord_opt_no" , headerName:"주문일련번호"},
+				{field:"ord_opt_no" , headerName:"주문일련번호", width: 80, cellClass: 'hd-grid-code'},
 				{field:"dlv_cd_nm" , headerName:"택배사"  },
 				{field:"dlv_no" , headerName:"송장번호"  },
-				{field:"ord_no" , headerName:"주문번호"},
-				{field:"ord_state_nm" , headerName:"주문상태"  },
-				{field:"clm_state_nm" , headerName:"클레임상태"},
-				{field:"ord_kind_nm" , headerName:"출고구분"  },
+				{field:"ord_no" , headerName:"주문번호", width: 130},
+				{field:"ord_state_nm" , headerName:"주문상태", cellStyle: StyleOrdState, width: 60},
+				{field:"clm_state_nm" , headerName:"클레임상태", cellStyle: StyleClmState, width: 65},
+				{field:"ord_kind_nm" , headerName:"출고구분", cellStyle: StyleOrdKind, cellClass: 'hd-grid-code', width: 60},
 				{field:"dlv_series_nm" , headerName:"출고차수"  },
-				{field:"goods_nm" , headerName:"상품명"  },
+				{field:"goods_nm" , headerName:"상품명", width: 90},
 				{field:"goods_opt" , headerName:"옵션"  },
-				{field:"qty" , headerName:"수량"  }
+				{field:"qty" , headerName:"수량", type: "currencyType"},
+				{width: "auto"}
 		];
 
 </script>
@@ -150,7 +151,7 @@ $(document).ready(function () {
 		return params.data.chk != 2;
 	}
 
-	pApp.ResizeGrid();
+	pApp.ResizeGrid(365);
 	Search();
 });
 
@@ -250,40 +251,43 @@ $(".out-complate-btn").click(function()
 			return [row.ord_no, row.ord_opt_no, row.dlv_no];
 		});
 
-		$.ajax({
-			async: false,
-			type: 'put',
-			url: '/head/order/ord22/out-complete',
-			data: {
-				"order_nos[]" : orderNos,
-				ord_state : 30,
-				dlv_cd : $("#dlv_cd").val(),
-				send_sms_yn : $("[name=snd_sms_yn]:checked").val()
-			},
-			success: function (data) {
-				if(data.code === 200) {
-					gx.gridOptions.api.forEachNode(function(node) {
-						if(node.selected) {
-							node.setDataValue('msg', 'S');
+		for (let i = 0; i < orderNos.length; i++) {
+			let order = orderNos[i];
+			
+			$.ajax({
+				type: 'put',
+				url: '/head/order/ord22/out-complete',
+				data: {
+					"order_nos[]": [order],
+					ord_state: 30,
+					dlv_cd: $("#dlv_cd").val(),
+					send_sms_yn: $("[name=snd_sms_yn]:checked").val()
+				},
+				success: function (data) {
+					console.log(data);
+					
+					gx.gridOptions.api.forEachNode(node => {
+						if (node.data.ord_opt_no === order[1]) {
+							node.data.msg = data.code == "200" ? 'S' : 'F';
+							node.data.chk = data.code == "200" ? 2 : node.data.chk;
+							node.setSelected(false);
+							node.setRowSelectable(!data.code == "200");
+							gx.gridOptions.api.redrawRows({ rowNodes: [node] });
+							gx.gridOptions.api.ensureIndexVisible(node.rowIndex, 'bottom');
 						}
 					});
-				} else if(data.code === 206) {
-					gx.gridOptions.api.forEachNode(function(node) {
-						if(node.selected) {
-							let result = data.body.failed.includes(node.data.ord_opt_no.toString()) ? 'F' : 'S';
-							node.setDataValue('msg', result);
-						}
-					});
+					if (i >= orderNos.length - 1) {
+						alert('택배송장 일괄입력이 완료되었습니다. "내용" 항목에서 성공여부를 확인해주세요.');
+						window.opener.Search();
+					}
+				},
+				error: function (request, status, error) {
+					const msg = request.responseJSON.msg;
+					const code = request.status;
+					alert(`${msg} (Code : ${code})`);
 				}
-				alert(data.msg);
-				window.opener.Search();
-			},
-			error: function(request, status, error) {
-				const msg = request.responseJSON.msg;
-				const code = request.status;
-				alert(`${msg} (Code : ${code})`);
-			}
-		});
+			});
+		}
 	}
 });
 </script>

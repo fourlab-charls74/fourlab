@@ -1058,15 +1058,14 @@ class ord22Controller extends Controller
                             'rt' => DB::raw("now()")
                         ]);
                 } else {
-                    throw new Exception("재고없음");
-                    // throw new Exception("선택하신 주문 중 재고가 없는 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.[ord_no:" . $ord_no . ", ord_opt_no:" . $ord_opt_no . "]");
+                    throw new Exception("선택하신 주문 중 이미 출고된 주문건이 있습니다. 검색 후 다시 처리하여 주십시오.[ord_no:" . $ord_no . "]");
                 }
 
                 DB::commit();
             } catch (Exception $e) {
                 DB::rollBack();
                 $code = 206;
-                $msg = "선택하신 주문 중 재고가 없는 주문건이 있습니다. 처리 실패한 항목은 다시 처리해주세요.";
+				$msg = $e->getMessage();
                 array_push($failed, $ord_opt_no);
             }
         }
