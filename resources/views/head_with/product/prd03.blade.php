@@ -265,6 +265,7 @@
         { field: "price", headerName: "판매가", type: 'numberType', width: 58 },
         { field: "wonga", headerName: "원가", type: 'numberType', width: 58, cellRenderer: (params) => `<a href="#" onclick="openWongaPopup(event, ${params.data.goods_no}, ${params.data.goods_sub})">${Comma(params.value)}</a>` },
         { field: "margin", headerName: "원가대비 마진율", type: 'numberType', width: 100 },
+		{ field: "is_changed", hide: true }
     ];
 
     function styleOfMarginRatio(params) {
@@ -298,15 +299,14 @@
 
         if(wonga > 0) margin_ratio = (100 - Math.round((wonga / wholesale_price) * 100));
         else margin_ratio = 0;
-        e.data[group_name + "_ratio"] = margin_ratio;
+        e.node.setDataValue(group_name + "_ratio", margin_ratio);
 
         if(price > 0) {
             dc_ratio = Math.round(((price - wholesale_price) / price) * 100);
-            e.data[group_name + "_dc_ratio"] = dc_ratio;
+            e.node.setDataValue(group_name + "_dc_ratio", dc_ratio);
         }
 
-        e.data['is_changed'] = true;
-        e.api.updateRowData({ update: [e.data] });
+        e.node.setDataValue('is_changed', true);
         e.node.setSelected(true);        
     }
 
