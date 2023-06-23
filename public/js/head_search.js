@@ -614,6 +614,14 @@ $( document ).ready(function() {
         searchBrand.Open();
     });
 
+	$('#SearchBrandModal').on('shown.bs.modal', function () {
+		$('#SearchBrandModal [name=brand]').focus();
+	});
+
+	$('#SearchBrandModal').on('hide.bs.modal', function () {
+		searchBrand.InitValue();
+	});
+
     $( ".sch-category" ).click(function() {
         let cat_type = $('#cat_type').val();
         if(cat_type !== "ITEM"){
@@ -633,6 +641,14 @@ $( document ).ready(function() {
     $( ".sch-sup-company" ).on("click", () => {
         searchCompany.Open(null, '1');
     });
+
+	$('#SearchCompanyModal').on('shown.bs.modal', function () {
+		$('#SearchCompanyModal [name=com_nm]').focus();
+	});
+
+	$('#SearchCompanyModal').on('hide.bs.modal', function () {
+		searchCompany.InitValue();
+	});
 
     $( ".sch-goods_nos" ).click(function() {
         if($(this).attr("data-name") !== null){
@@ -787,6 +803,12 @@ SearchBrand.prototype.Choice = function(code,name){
     }
     $('#SearchBrandModal').modal('toggle');
 };
+
+SearchBrand.prototype.InitValue = () => {
+	document.querySelector("#SearchBrandModal form[name=search_brand]").reset();
+	searchBrand.grid.setRows([]);
+};
+
 let searchBrand = new SearchBrand();
 
 
@@ -1039,6 +1061,11 @@ SearchCompany.prototype.Choice = function(code,name, com_type, baesong_kind, bae
 		}
 	}
 	$('#SearchCompanyModal').modal('toggle');
+};
+
+SearchCompany.prototype.InitValue = () => {
+	$('#SearchCompanyModal input[name="com_nm"]').val('');
+	searchCompany.grid.setRows([]);
 };
 
 let searchCompany = new SearchCompany();
