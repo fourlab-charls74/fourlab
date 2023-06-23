@@ -878,6 +878,16 @@ class PosController extends Controller
         $edate = $request->input('edate', date("Y-m-d"));
         $where .= " and o.ord_date >= '$sdate 00:00:00' ";
         $where .= " and o.ord_date <= '$edate 23:59:59' ";
+		
+		$keyword = $request->input('keyword', '');
+
+		if ($keyword != '') {
+			if (is_numeric($keyword)) {
+				$where .= "and o.mobile like '%" . Lib::quote($keyword) . "' ";
+			} else {
+				$where .= " and o.user_nm = '" . Lib::quote($keyword) . "' ";
+			}
+		}
 
         $ord_field = "o.ord_date";
         $ord = $request->input('ord', 'desc');

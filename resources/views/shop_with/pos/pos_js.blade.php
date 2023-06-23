@@ -13,10 +13,11 @@
         $("#" + idx).addClass("d-flex");
 
         if(idx === "pos_order") {
-            // $("#home_btn").css("display", "none");
+            $("#back_btn").addClass('d-none');
             $("#search_prd_keyword_out").trigger("focus");
+			document.search_order_history.reset();
         } else {
-            // $("#home_btn").css("display", "inline-block");
+            $("#back_btn").removeClass('d-none');
             $("#search_prd_keyword_out").val('');
         }
     }
@@ -136,13 +137,14 @@
             $("[name=cash_amt]").val(0);
             $("[name=point_amt]").val(0);
 
+            $("#total_goods_sh_amt").text(0);
+            $("#total_dc_amt").text(0);
             $("#total_order_amt").text(0);
             $("#total_order_amt2").text(0);
             $("#payed_amt").text(0);
             $("#change_amt").text(0);
             $("#due_amt").text(0);
             $("#total_order_qty").text(0);
-            $("#total_coupon_discount_qty").text(0);
 
             $("#card_amt").text(0);
             $("#cash_amt").text(0);
@@ -369,21 +371,23 @@
 
         let list = gx.getRows();
 
+        let goods_sh = list.reduce((a, c) => a + (c.goods_sh * c.qty), 0);
+		let dc_amt = list.reduce((a, c) => a + ((c.ori_price - c.price) * c.qty) + (c.coupon_discount_amt || 0), 0);
         let order_price = list.reduce((a, c) => a + c.total, 0);
         let order_qty = list.reduce((a, c) => a + c.qty, 0);
-        let coupon_discount_amt = list.reduce((a, c) => a + (c.coupon_discount_amt || 0), 0);
         let card_amt = $("[name=card_amt]").val() * 1;
         let cash_amt = $("[name=cash_amt]").val() * 1;
         let point_amt = $("[name=point_amt]").val() * 1;
         let payed_amt = card_amt + cash_amt + point_amt;
 
+		$("#total_goods_sh_amt").text(Comma(goods_sh));
+		$("#total_dc_amt").text(Comma(dc_amt));
         $("#total_order_amt").text(Comma(order_price));
         $("#total_order_amt2").text(Comma(order_price));
         $("#payed_amt").text(Comma(payed_amt));
         $("#change_amt").text(Comma(payed_amt - order_price > 0 ? payed_amt - order_price : 0));
         $("#due_amt").text(Comma(order_price - payed_amt > 0 ? order_price - payed_amt : 0));
         $("#total_order_qty").text(Comma(order_qty));
-        $("#total_coupon_discount_qty").text(Comma(coupon_discount_amt));
 
         $("#card_amt").text(Comma(card_amt));
         $("#cash_amt").text(Comma(cash_amt));
@@ -747,10 +751,11 @@
     function SearchOrder(ord_no = '') {
         let sdate = $("[name=ord_sdate]").val();
         let edate = $("[name=ord_edate]").val();
+		let keyword = $("[name=order_search_keyword]").val();
         let ord = $("#ord_field").val();
         let limit = $("#limit").val();
 
-        let data = "sdate=" + sdate + "&edate=" + edate + "&ord=" + ord + "&limit=" + limit;
+        let data = "sdate=" + sdate + "&edate=" + edate + "&keyword=" + keyword + "&ord=" + ord + "&limit=" + limit;
 
         if(ord_no != '') data += "&ord_no=" + ord_no;
         gx4.Request("/shop/pos/search/order", data, 1);
@@ -761,18 +766,21 @@
         if(ord_no === '') return;
 
         let res = await axios({ method: "get", url: "/shop/pos/search/order-detail?ord_no=" + ord_no });
+		console.log(res);
         if(res.status === 200) {
             let data = res.data.data;
             let ord = data[0];
 
             $("#od_ord_no").text(ord.ord_no);
             $("#od_ord_date").text(ord.ord_date);
-            $("#od_ord_amt").text(Comma(data.reduce((a,c) => (c.price * c.qty) + a, 0)));
+            $("#od_ord_amt").text(Comma(data.reduce((a,c) => (c.goods_sh * c.qty) + a, 0)));
 
+            $("#od_total_dc_amt").text(Comma((ord.total_dc_amt * -1) + (ord.total_coupon_amt * -1)));
             $("#od_dc_amt").text(Comma(ord.total_dc_amt * -1));
             $("#od_coupon_amt").text(Comma(ord.total_coupon_amt * -1));
             $("#od_point_amt").text(Comma(ord.total_point_amt * -1));
             $("#od_recv_amt").text(Comma(ord.total_recv_amt));
+            $("#od_ord_qty").text(Comma(data.reduce((a,c) =>c.qty + a, 0)));
 
             $("#od_pay_type").text(ord.pay_type_nm.replaceAll("무통장", "현금"));
             $("#od_user_info").text(ord.user_nm + (ord.user_id ? ` (${ord.user_id})` : ''));

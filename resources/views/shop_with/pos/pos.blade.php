@@ -2,7 +2,7 @@
 @section('title','POS')
 @section('content')
 
-<link href="{{ URL::asset('css/pos.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('css/pos.css')}}?v=20230623" rel="stylesheet" type="text/css" />
 
 <div id="pos" class="d-flex flex-column w-100 m-0" style="min-height: 100vh;max-width: 100vw;">
     {{-- 포스 헤더 --}}
@@ -11,7 +11,8 @@
         <div class="d-flex align-items-center">
             <p class="fw-b mr-5">[{{ @$store->store_cd }}] {{ @$store->store_nm }}</p>
             <p id="clock" class="fw-sb mr-4" style="width: 230px;"></p>
-            <button type="button" onclick="return window.close();" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-times" aria-hidden="true"></i></button>
+	        <button type="button" id="back_btn" onclick="return setScreen('pos_order');" class="butt butt-close bg-trans d-none" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+	        <button type="button" onclick="return window.close();" class="butt butt-close bg-trans" style="width:55px;height:50px;border-left:1px solid #999"><i class="fa fa-times" aria-hidden="true"></i></button>
         </div>
     </div>
 
@@ -46,8 +47,8 @@
 	            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb my-4">
 	                <p>주문번호</p>
 		            <div class="d-flex">
-	                    <p id="ord_no" class="fc-red mr-2"></p>
-			            <button type="button" class="butt fc-white fs-10 br-05 bg-navy px-3 py-1" onclick="return setScreen('pos_today');"><i class="fa fa-search fs-09 mr-1" aria-hidden="true"></i>영수증조회</button>
+	                    <p id="ord_no" class="fc-red mr-3"></p>
+			            <button type="button" class="butt fc-white fs-09 br-05 bg-navy px-2 py-1" style="height:33px;" onclick="return setScreen('pos_today');"><i class="fa fa-search fs-08 mr-1" aria-hidden="true"></i>영수증조회</button>
 		            </div>
 	            </div>
 	            <div class="d-flex align-items-center mb-3">
@@ -169,12 +170,23 @@
 		    <div class="flex-6 p-0 pr-3">
 			    <div class="d-flex flex-column">
                     <div class="d-flex mb-4">
-
-                        <div class="flex-1 mr-4">
-                            <div class="d-flex justify-content-between align-items-center fs-15 fw-b mb-3">
+                        <div class="flex-1 mr-3 mb-3">
+	                        <div class="d-flex justify-content-between align-items-center fs-14 fw-b mt-2 mb-4">
+		                        <p>총 판매금액</p>
+		                        <p><strong id="total_goods_sh_amt" class="fs-20 fw-b mr-1">0</strong>원</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
+		                        <p>총 할인금액</p>
+		                        <p><strong id="total_dc_amt" class="fw-b mr-1">0</strong>원</p>
+	                        </div>
+                            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
                                 <p>총 주문금액</p>
-                                <p><strong id="total_order_amt" class="fc-red fs-20 fw-b mr-1">0</strong>원</p>
+                                <p><strong id="total_order_amt" class="fc-red fw-b mr-1">0</strong>원</p>
                             </div>
+	                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-4">
+		                        <p>총 주문수량</p>
+		                        <p><strong id="total_order_qty" class="fw-b mr-1">0</strong>개</p>
+	                        </div>
                             <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
                                 <p>결제한 금액</p>
                                 <p><strong id="payed_amt" class="fw-b mr-1">0</strong>원</p>
@@ -182,14 +194,6 @@
                             <div class="d-flex justify-content-between align-items-center fs-12 fw-sb">
                                 <p>거스름돈</p>
                                 <p><strong id="change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mt-3 mb-2">
-                                <p>총 주문수량</p>
-                                <p><strong id="total_order_qty" class="fw-b mr-1">0</strong>개</p>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb">
-                                <p>쿠폰할인금액</p>
-                                <p><strong id="total_coupon_discount_qty" class="fw-b mr-1">0</strong>원</p>
                             </div>
                         </div>
                         <div class="flex-2 d-flex">
@@ -210,7 +214,7 @@
                                     <span class="d-block fs-14 fw-sb mt-1">적립금</span>
                                 </button>
                             </div>
-                            <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-mint p-2" onclick="return sale();">판매</button>
+                            <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-mint p-2" onclick="return sale();">판 매</button>
                         </div>
                     </div>
 
@@ -233,53 +237,56 @@
             <div class="flex-3">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="m-0 fs-12 fw-b">총 <span id="gd-order-total" class="text-primary">0</span> 건</h6>
-                    <div class="d-flex fs-08">
-                        <div class="d-flex align-items-center date-select-inbox mr-2">
-                            <div class="docs-datepicker form-inline-inner input_box" style="width: 130px;">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date" name="ord_sdate" value="{{ @$today }}" autocomplete="off" disable>
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </div>
-                            <span class="text_line ml-2 mr-2">~</span>
-                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date" name="ord_edate" value="{{ @$today }}" autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </div>
-                        </div>
-                        <select name="ord_field" id="ord_field" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;min-height:30px;">
-                            <option value="desc">최신순</option>
-                            <option value="asc">오래된순</option>
-                        </select>
-                        <select name="limit" id="limit" class="sel b-1-gray br-05 pl-2 mr-2" style="width:130px;min-height:30px;">
-                            <option value="100">100개씩 보기</option>
-                            <option value="200">200개씩 보기</option>
-                            <option value="500">500개씩 보기</option>
-                        </select>
-                        <button type="button" class="butt fc-white fs-10 br-05 bg-navy" style="width:80px;" onclick="return SearchOrder();">검색</button>
-                    </div>
+	                <form name="search_order_history">
+	                    <div class="d-flex fs-08">
+	                        <div class="d-flex align-items-center date-select-inbox mr-2">
+	                            <div class="docs-datepicker form-inline-inner input_box" style="width: 130px;">
+	                                <div class="input-group">
+	                                    <input type="text" class="form-control form-control-sm docs-date" name="ord_sdate" value="{{ @$today }}" autocomplete="off" disable>
+	                                    <div class="input-group-append">
+	                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+	                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+	                                        </button>
+	                                    </div>
+	                                </div>
+	                                <div class="docs-datepicker-container"></div>
+	                            </div>
+	                            <span class="text_line ml-2 mr-2">~</span>
+	                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;">
+	                                <div class="input-group">
+	                                    <input type="text" class="form-control form-control-sm docs-date" name="ord_edate" value="{{ @$today }}" autocomplete="off">
+	                                    <div class="input-group-append">
+	                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+	                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+	                                        </button>
+	                                    </div>
+	                                </div>
+	                                <div class="docs-datepicker-container"></div>
+	                            </div>
+	                        </div>
+		                    <select name="ord_field" id="ord_field" class="sel b-1-gray br-05 pl-2 mr-2" style="width:80px;min-height:30px;">
+			                    <option value="desc">최신순</option>
+			                    <option value="asc">오래된순</option>
+		                    </select>
+		                    <select name="limit" id="limit" class="sel b-1-gray br-05 pl-2 mr-2" style="width:110px;min-height:30px;">
+			                    <option value="100">100개씩 보기</option>
+			                    <option value="200">200개씩 보기</option>
+			                    <option value="500">500개씩 보기</option>
+		                    </select>
+		                    <input type="text" id="order_search_keyword" name="order_search_keyword" class="inp b-1-gray br-05 px-2 mr-2" style="width: 150px;" placeholder="휴대폰뒷자리 or 고객명">
+	                        <button type="button" class="butt fc-white fs-10 br-05 bg-navy" style="width:80px;" onclick="return SearchOrder();">검색</button>
+	                    </div>
+	                </form>
                 </div>
                 <div class="flex-1 table-responsive">
-                    <div id="div-gd-order" class="ag-theme-balham" style="font-size: 18px;"></div>
+                    <div id="div-gd-order" class="ag-theme-balham fc-16" style="font-size: 16px;"></div>
                 </div>
             </div>
             <div class="flex-2 d-flex justify-content-center">
                 <div class="d-flex flex-column justify-content-between w-100 h-100 p-5" style="min-width:300px;max-width:650px;max-height:890px;border:7px solid #222;overflow:auto;">
                     <div class="d-flex flex-column align-items-center">
                         <div class="mb-5"><img src="/theme/{{config('shop.theme')}}/images/pc_logo_white.png" alt="" class="w-100"></div>
-                        <div class="d-flex flex-column w-100 fs-12 mb-4">
+                        <div class="d-flex flex-column w-100 fs-10 mb-4">
                             <div class="d-flex justify-content-between">
                                 <p>주문번호</p>
                                 <p id="od_ord_no" class="fw-sb">-</p>
@@ -310,29 +317,37 @@
                             </thead>
                             <tbody id="od_prd_list"></tbody>
                         </table>
-                        <div class="d-flex flex-column w-100 fs-12 b-1-gray pb-2 mb-4" style="border-width: 0 0 1px;">
-                            <div class="d-flex justify-content-between mb-1">
-                                <p>주문합계</p>
-                                <p id="od_ord_amt" class="fw-sb">-</p>
-                            </div>
-                            <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
-                                <p>&#8722; 판매할인금액</p>
-                                <p id="od_dc_amt">-</p>
-                            </div>
-                            <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
-                                <p>&#8722; 쿠폰할인금액</p>
-                                <p id="od_coupon_amt">-</p>
-                            </div>
-                            <div class="d-flex justify-content-between fs-10 pl-2 mb-2">
-                                <p>&#8722; 적립금사용금액</p>
-                                <p id="od_point_amt">-</p>
-                            </div>
-                            <div class="d-flex justify-content-between fs-16 fw-b">
-                                <p>Total</p>
-                                <p id="od_recv_amt">-</p>
-                            </div>
+                        <div class="d-flex flex-column w-100 fs-10 b-1-gray pb-2 mt-1 mb-4" style="border-width: 0 0 1px;">
+	                        <div class="d-flex justify-content-between mb-1">
+		                        <p>총 판매금액</p>
+		                        <p id="od_ord_amt" class="fw-sb">-</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between mb-1">
+		                        <p>총 할인금액</p>
+		                        <p id="od_total_dc_amt" class="fw-sb">-</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between fs-09 pl-2 mb-2">
+		                        <p>&#8722; 판매할인금액</p>
+		                        <p id="od_dc_amt">-</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between fs-09 pl-2 mb-2">
+		                        <p>&#8722; 쿠폰할인금액</p>
+		                        <p id="od_coupon_amt">-</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between mb-1">
+		                        <p>적립금 사용금액</p>
+		                        <p id="od_point_amt">-</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between mb-1">
+		                        <p>총 주문금액</p>
+		                        <p id="od_recv_amt" class="fw-sb">-</p>
+	                        </div>
+	                        <div class="d-flex justify-content-between mb-1">
+		                        <p>총 주문수량</p>
+		                        <p id="od_ord_qty" class="fw-sb">-</p>
+	                        </div>
                         </div>
-                        <div class="d-flex flex-column w-100 fs-12">
+                        <div class="d-flex flex-column w-100 fs-09">
                             <div class="d-flex justify-content-between mb-1">
                                 <p>[ 결제수단 ]</p>
                                 <p id="od_pay_type">-</p>
@@ -414,7 +429,7 @@
                             </div>
                             <div class="d-flex">
                                 <div class="table-responsive">
-                                    <div id="div-gd-product" class="ag-theme-balham" style="font-size: 18px;"></div>
+                                    <div id="div-gd-product" class="ag-theme-balham fc-16" style="font-size: 16px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -467,7 +482,7 @@
 					                                </div>
 				                                </div>
 				                                <input type="hidden" name="user_mobile_check" id="user_mobile_check" value="N">
-				                                <a href="#" onclick="return checkUserPhone();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray p-1" style="min-width:70px;">중복확인</a>
+				                                <a href="#" onclick="return checkUserPhone();" class="butt d-flex justify-content-center align-items-center fc-white fw-sb br-05 bg-gray p-1" style="min-width:70px;">중복확인</a>
 			                                </div>
 		                                </td>
 	                                </tr>
@@ -476,9 +491,9 @@
                                         <td>
 	                                        <div class="d-flex flex-column">
 	                                            <div class="flax_box inline_btn_box" style="padding-right:75px;">
-	                                                <input type="text" name="user_id" id="user_id" class="form-control form-control-sm">
+	                                                <input type="text" name="user_id" id="user_id" class="form-control form-control-sm" readonly>
 	                                                <input type="hidden" name="user_id_check" id="user_id_check" value="N">
-	                                                <a href="#" onclick="return checkUserId();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray" style="width:70px;">중복확인</a>
+	                                                <a href="#" onclick="return checkUserId();" class="butt d-flex justify-content-center align-items-center fc-white fw-sb br-05 bg-gray" style="width:70px;">중복확인</a>
 	                                            </div>
 		                                        <div class="d-flex align-items-center">
 			                                        <input type="checkbox" name="id_mobile_same_yn" id="id_mobile_same_yn" value="Y" class="inp" checked>
@@ -533,7 +548,7 @@
                                                 <div class="d-flex w-100 mb-2">
                                                     <input type="text" id="zipcode" name="zipcode" class="flex-1 form-control form-control-sm mr-2" readonly="readonly">
                                                     <a href="javascript:;" onclick="openFindAddress('zipcode', 'addr1')" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-navy" style="width:70px;">
-                                                        <i class="fas fa-search fa-sm text-white-50 mr-1"></i>
+                                                        <i class="fas fa-search fa-sm text-white-50 mr-2"></i>
                                                         검색
                                                     </a>
                                                 </div>
@@ -623,7 +638,7 @@
                             <p class="d-flex mb-2">* <span class="d-block ml-2 mr-1" style="width: 50px;height: 15px;background-color:#c9f9f9;"></span> : 본 매장 고객</p>
                             <div class="d-flex">
                                 <div class="table-responsive">
-                                    <div id="div-gd-member" class="ag-theme-balham" style="font-size: 18px;"></div>
+                                    <div id="div-gd-member" class="ag-theme-balham fc-16" style="font-size: 16px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -845,62 +860,11 @@
             </div>
         </div>
     </div>
-    {{-- 쿠폰등록 모달 --}}
-{{--    <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel" aria-hidden="true">--}}
-{{--        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 600px;">--}}
-{{--            <div class="modal-content">--}}
-{{--                <div class="modal-body">--}}
-{{--                    <div class="card">--}}
-{{--                        <div class="card-header">--}}
-{{--                            <button type="button" class="fs-20 close" data-dismiss="modal" aria-label="Close">--}}
-{{--                                <span aria-hidden="true">&times;</span>--}}
-{{--                            </button>--}}
-{{--                            <h5 class="mt-1 fs-14 fw-b">쿠폰 등록</h5>--}}
-{{--                        </div>--}}
-{{--                        <div class="card-body b-none mt-4">--}}
-{{--                            <form name="add_coupon">--}}
-{{--                                <table class="table incont table-bordered mt-2" width="100%" cellspacing="0">--}}
-{{--                                    <tr>--}}
-{{--                                        <th>휴대폰뒷자리 검색</th>--}}
-{{--                                        <td colspan="3">--}}
-{{--                                            <div class="flax_box inline_btn_box" style="padding-right:75px;">--}}
-{{--                                                <input type="text" name="cp_user_phone" id="cp_user_phone" class="form-control form-control-sm">--}}
-{{--                                                <a href="javascript:void(0);" onclick="return searchUserInCouponModal();" class="butt d-flex justify-content-center align-items-center fc-white fs-08 fw-sb br-05 bg-gray" style="width:70px;"><i class="fas fa-search fa-sm mr-1"></i> 검색</a>--}}
-{{--                                            </div>--}}
-{{--                                        </td>--}}
-{{--                                    </tr>--}}
-{{--                                    <tr>--}}
-{{--                                        <th class="required">고객 선택</th>--}}
-{{--                                        <td>--}}
-{{--                                            <select name="cp_user_id" id="cp_user_id" class="form-control form-control-sm mr-1">--}}
-{{--                                                <option value="">---</option>--}}
-{{--                                            </select>--}}
-{{--                                        </td>--}}
-{{--                                    </tr>--}}
-{{--                                    <tr>--}}
-{{--                                        <th class="required">쿠폰 시리얼넘버</th>--}}
-{{--                                        <td colspan="3">--}}
-{{--                                            <div class="flax_box inline_btn_box p-0">--}}
-{{--                                                <input type="text" name="cp_serial_num" id="cp_serial_num" class="form-control form-control-sm">--}}
-{{--                                            </div>--}}
-{{--                                        </td>--}}
-{{--                                    </tr>--}}
-{{--                                </table>--}}
-{{--                            </form>--}}
-{{--                            <div class="text-center w-100">--}}
-{{--                                <button type="button" onclick="return addCoupon();" class="butt fc-white fs-12 fw-sb br-1 bg-blue w-100 p-3">등록</button>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
 </div>
 
 <script type="text/javascript" charset="utf-8">
     let AlignCenter = {"text-align": "center"};
-    let LineHeight50 = {"line-height": "50px"}; // 삭제예정
+    let LineHeight50 = {"line-height": "50px"};
     let LineHeight40 = {"height": "40px", "line-height": 1, "display": "flex", "align-items": "center"};
     let LineHeight40Center = {"height": "40px", "line-height": 1, "display": "flex", "align-items": "center", "justify-content": 'center'};
     let LineHeight40Right = {"height": "40px", "line-height": 1, "display": "flex", "align-items": "center", "justify-content": 'flex-end'};
@@ -1226,8 +1190,16 @@
             initAddMemberModal();
         });
 		
+		$("#id_mobile_same_yn").on("change", function (e) {
+			$("#user_id").attr('readonly', this.checked);
+		});
+		
 		$("#cp_serial_num").on('keypress', function (e) {
 			if (e.keyCode === 13) addCoupon();
+		});
+		
+		$("#order_search_keyword").on('keypress', function (e) {
+			if (e.keyCode === 13) SearchOrder();
 		});
 
         /** 쿠폰등록모달 관련 */
