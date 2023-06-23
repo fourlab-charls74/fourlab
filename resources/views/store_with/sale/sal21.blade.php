@@ -353,27 +353,10 @@
         });
     });
 
-    // function RowExpand(e, a) {
-    //     console.log(e, a);
-    //     var RowNode = gx.gridOptions.api.getRowNode('1');
-
-    //     console.log(RowNode);
-    //     RowNode.setExpanded(a);
+    function RowExpand(e, a) {
+        var RowNode = gx.gridOptions.api.getRowNode('1');
+        RowNode.setExpanded(a);
         
-    // }
-
-    function RowExpand(rowClass, expand) {
-        var rowElements = document.getElementsByClassName(rowClass);
-
-        console.log(rowElements);
-        for (var i = 0; i < rowElements.length; i++) {
-            if (expand) {
-            rowElements[i].style.display = "none";
-            } else {
-            rowElements[i].style.display = "";
-            }
-        }
-        return true;
     }
 
 	function Search() {
