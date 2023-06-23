@@ -138,9 +138,19 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-                    <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                        <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
-                        <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                    <div class="d-flex">
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+                            <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+                        </div>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="storage_grid_expand" id="storage_grid_expand" onchange="return RowExpand('storage',this.checked);">
+                            <label class="custom-control-label font-weight-normal" for="storage_grid_expand">창고별 접기</label>
+                        </div>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="prd_cd_p_grid_expand" id="prd_cd_p_grid_expand" onchange="return RowExpand('prd_cd_p',this.checked);">
+                            <label class="custom-control-label font-weight-normal" for="prd_cd_p_grid_expand">품번별 접기</label>
+                        </div>
                     </div>
 				</div>
 			</div>
@@ -330,6 +340,27 @@
 
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
+
+    function RowExpand(e, ischeck) {
+        let check;
+        if(ischeck == true) {
+            check = false;
+        } else {
+            check = true;
+        }
+        gx.gridOptions.api.forEachNode(node => {
+            if(e == 'prd_cd_p') {
+                if (node.group && node.level == 2) {
+                    node.setExpanded(check);
+                }
+            } else if (e == 'storage') {
+                if (node.group && node.level == 0) {
+                    node.setExpanded(check);
+                }
+            }
+        });
+        
     }
 </script>
 @stop

@@ -186,17 +186,17 @@
                             <label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
                         </div>
                         <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                            <input type="checkbox" class="custom-control-input" name="prd_cd_p_grid_expand" id="prd_cd_p_grid_expand" onchange="return RowExpand('prd_cd_sm', this.checked);" checked>
+                            <input type="checkbox" class="custom-control-input" name="prd_cd_p_grid_expand" id="prd_cd_p_grid_expand" onchange="return RowExpand('prd_cd_p',this.checked);">
                             <label class="custom-control-label font-weight-normal" for="prd_cd_p_grid_expand">품번별 접기</label>
                         </div>
-                        <!-- <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                            <input type="checkbox" class="custom-control-input" name="store_grid_expand" id="store_grid_expand" onchange="return setAllRowGroupExpanded3(this.checked);" checked>
+                        <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+                            <input type="checkbox" class="custom-control-input" name="store_grid_expand" id="store_grid_expand" onchange="return RowExpand('store', this.checked);">
                             <label class="custom-control-label font-weight-normal" for="store_grid_expand">매장별 접기</label>
                         </div>
                         <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                            <input type="checkbox" class="custom-control-input" name="store_type_grid_expand" id="store_type_grid_expand" onchange="return setAllRowGroupExpanded4(this.checked);" checked>
-                            <label class="custom-control-label font-weight-normal" for="store_type_grid_expand">매장구분 접기</label>
-                        </div> -->
+                            <input type="checkbox" class="custom-control-input" name="store_type_grid_expand" id="store_type_grid_expand" onchange="return RowExpand('store_type', this.checked);">
+                            <label class="custom-control-label font-weight-normal" for="store_type_grid_expand">매장구분별 접기</label>
+                        </div>
                     </div>
 				</div>
 			</div>
@@ -352,10 +352,31 @@
             });
         });
     });
+    
 
-    function RowExpand(e, a) {
-        var RowNode = gx.gridOptions.api.getRowNode('1');
-        RowNode.setExpanded(a);
+    // 품번별 접기, 매장별접기, 매장구분별 접기 기능
+    function RowExpand(e, ischeck) {
+        let check;
+        if(ischeck == true) {
+            check = false;
+        } else {
+            check = true;
+        }
+        gx.gridOptions.api.forEachNode(node => {
+            if(e == 'prd_cd_p') {
+                if (node.group && node.level == 2) {
+                    node.setExpanded(check);
+                }
+            } else if (e == 'store') {
+                if (node.group && node.level == 1) {
+                    node.setExpanded(check);
+                }
+            } else if (e == 'store_type') {
+                if (node.group && node.level == 0) {
+                    node.setExpanded(check);
+                }
+            }
+        });
         
     }
 
