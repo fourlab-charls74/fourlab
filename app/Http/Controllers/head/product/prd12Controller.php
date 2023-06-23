@@ -411,6 +411,32 @@ class prd12Controller extends Controller
         return response()->json(['code' => $code]);
     }
 
+	public function update_show_yn($code, Request $request)
+	{
+		$result_code = 200;
+		$is_show = '';
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('planning')->where('no', $code)
+				->update([
+					'is_show' => DB::raw('if(is_show = 0, 1, 0)'),
+					'upd_date' => now(),
+				]);
+
+			$is_show = DB::table('planning')->where('no', $code)->value('is_show');
+			$is_show = $is_show == '0' ? 'N' : 'Y';
+
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollBack();
+			$result_code = 500;
+		}
+
+		return response()->json([ 'code' => $result_code, 'is_show' => $is_show ]);
+	}
+
     public function delete($code, Request $req) {
         try {
             DB::transaction(function () use (&$result,$code) {

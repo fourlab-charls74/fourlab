@@ -413,6 +413,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('prd12/create', 'prd12Controller@create');
         Route::get('prd12/{code?}', 'prd12Controller@show');
         Route::put('prd12/{code?}', 'prd12Controller@update');
+		Route::put('prd12/{code?}/edit_show', 'prd12Controller@update_show_yn');
         Route::delete('prd12/{code}', 'prd12Controller@delete');
 
         Route::get('prd12/{code?}/search', 'prd12Controller@goods_search');
