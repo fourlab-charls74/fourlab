@@ -18,7 +18,7 @@ use Exception;
 
 class PosController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $store_cd = Auth::guard('head')->user()->store_cd;
         $today = date('Y-m-d');
@@ -59,9 +59,6 @@ class PosController extends Controller
             'clm_reasons' => SLib::getCodes("G_CLM_REASON"),
         ];
 
-		if ($request->input('is_back', 'false') === 'true') {
-			return view(Config::get('shop.shop.view') . '/pos/pos_back', $values);
-		}
         return view(Config::get('shop.shop.view') . '/pos/pos', $values);
     }
 

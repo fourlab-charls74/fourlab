@@ -329,7 +329,13 @@
 					let prd_cd = event;
 					if (value < 1 || rowData.prd_cd !== prd_cd) return false;
                     $("#cur_qty").text(value);
-                    curRow[0].setData({...rowData, qty: value, total: (rowData.price * value) - (rowData.coupon_discount_amt || 0)});
+					$("#cur_dc_rate").text(Comma(100 - Math.round(((rowData.price * value) - (rowData.coupon_discount_amt || 0)) / value / rowData.goods_sh * 100)) + ' %');
+                    curRow[0].setData({
+	                    ...rowData, 
+	                    qty: value,
+						dc_rate: 100 - Math.round(((rowData.price * value) - (rowData.coupon_discount_amt || 0)) / value / rowData.goods_sh * 100),
+	                    total: (rowData.price * value) - (rowData.coupon_discount_amt || 0)
+					});
                 // 단가변경 기능 사용안함 - 20230314
                 // } else if(key === 'cur_price') {
                     // $("#cur_price").text(Comma(value));
@@ -356,11 +362,13 @@
                     const discount_amt = cp.amt_kind === 'P'
                         ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100)
                         : ((cp.amt || 0) * 1);
+					$("#cur_dc_rate").text(Comma(100 - Math.round(((rowData.price * rowData.qty) - discount_amt) / rowData.qty / rowData.goods_sh * 100)) + ' %');
                     curRow[0].setData({
                         ...rowData,
                         coupon_no: value,
                         c_no: cp.c_no,
                         coupon_discount_amt: discount_amt,
+						dc_rate: 100 - Math.round(((rowData.price * rowData.qty) - discount_amt) / rowData.qty / rowData.goods_sh * 100),
                         total: rowData.price * rowData.qty - discount_amt
                     })
 	                
@@ -766,7 +774,6 @@
         if(ord_no === '') return;
 
         let res = await axios({ method: "get", url: "/shop/pos/search/order-detail?ord_no=" + ord_no });
-		console.log(res);
         if(res.status === 200) {
             let data = res.data.data;
             let ord = data[0];

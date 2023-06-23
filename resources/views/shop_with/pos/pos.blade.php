@@ -126,7 +126,10 @@
 			                    </td>
 			                    <th>쿠폰등록</th>
 			                    <td class="px-3">
-				                    <input id="cp_serial_num" class="inp fs-10 fw-sb b-1-gray px-2 w-100">
+				                    <div class="d-flex w-100">
+				                        <input id="cp_serial_num" class="inp fs-10 fw-sb b-1-gray px-2 mr-1 w-75">
+				                        <button type="button" class="butt fc-white fs-09 br-05 bg-navy px-2 py-1 w-25" onclick="return addCoupon();">등록</button>
+				                    </div>
 			                    </td>
 		                    </tr>
 	                    </table>
@@ -162,7 +165,7 @@
 					    </div>
 				    </div>
 				    <div class="d-flex" style="position:absolute;bottom:12px;right:12px;">
-					    <button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-gray pb-2 pt-2 pl-3 pr-3 mr-2" data-toggle="modal" data-target="#searchMemberModal">고객검색</button>
+					    <button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-gray pb-2 pt-2 pl-3 pr-3 mr-2" data-toggle="modal" data-target="#searchMemberModal">고객조회</button>
 					    <button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-blue pb-2 pt-2 pl-3 pr-3" data-toggle="modal" data-target="#addMemberModal">고객등록</button>
 				    </div>
 			    </div>
