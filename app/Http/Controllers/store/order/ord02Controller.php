@@ -288,12 +288,16 @@ class ord02Controller extends Controller
 			if (!isset($c->prd_cd)) {
 				$sql = "
 						select
-							pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group, 'N' as prd_match
+							pc.prd_cd, if(pc.prd_cd_p = '', concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt), pc.prd_cd_p) as prd_cd_p
+							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group, pc.match_yn as prd_match
 							$qty_sql
 						from order_opt o
 							inner join order_mst om on om.ord_no = o.ord_no
-							left outer join product_code pc on pc.goods_no = o.goods_no
+							left outer join (
+							    select pc.prd_cd, pc.prd_cd_p, pc.goods_no, pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt, pc.color, pc.size, p.match_yn
+							    from product_code pc
+							    	inner join product p on p.prd_cd = pc.prd_cd
+							) pc on pc.goods_no = o.goods_no
 						where o.ord_opt_no = " . $c->ord_opt_no . "
 							and o.goods_no = " . $c->goods_no
 				;
