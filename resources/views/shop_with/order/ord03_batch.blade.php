@@ -11,9 +11,9 @@
             <h3 class="d-inline-flex">택배송장 일괄등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 매장관리</span>
-                <span>/ 주문/배송관리</span>
-                <span>/ 온라인 배송처리</span>
+                <span>/ 주문/배송처리</span>
+                <span>/ 온라인출고등록</span>
+                <span>/ 택배송장 일괄등록</span>
             </div>
         </div>
         <div class="d-flex">

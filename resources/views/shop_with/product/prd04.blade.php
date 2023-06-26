@@ -1,12 +1,12 @@
 @extends('shop_with.layouts.layout')
-@section('title','상품')
+@section('title','상품재고조회')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">상품재고관리</h3>
+	<h3 class="d-inline-flex">상품재고조회</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 상품관리</span>
-		<span>/ 상품재고관리</span>
+		<span>/ 매장관리</span>
+		<span>/ 상품재고조회</span>
 	</div>
 </div>
 

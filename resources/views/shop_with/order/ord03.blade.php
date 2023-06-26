@@ -1,12 +1,12 @@
 @extends('shop_with.layouts.layout')
-@section('title','온라인출고요청')
+@section('title','온라인출고등록')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">온라인출고요청</h3>
+	<h3 class="d-inline-flex">온라인출고등록</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 주문/배송관리</span>
+		<span>/ 주문/배송처리</span>
+		<span>/ 온라인출고등록</span>
 	</div>
 </div>
 <form method="get" name="search">

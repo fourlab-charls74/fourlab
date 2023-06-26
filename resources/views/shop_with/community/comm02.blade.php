@@ -7,7 +7,7 @@
     <h3 class="d-inline-flex">{{ @$cmd == 'send' ? '보낸' : '받은' }} 알림 보관함</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
-        <span>/ 매장관리</span>
+        <span>/ 게시판</span>
         <span>/ 알림</span>
     </div>
 </div>

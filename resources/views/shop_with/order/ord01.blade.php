@@ -1,12 +1,12 @@
 @extends('shop_with.layouts.layout')
-@section('title','매장주문')
+@section('title','주문내역조회')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장주문</h3>
+	<h3 class="d-inline-flex">주문내역조회</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 매장주문</span>
+		<span>주문/배송처리</span>
+		<span>/ 주문내역조회</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -16,7 +16,7 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch(['#store_no'])">검색조건 초기화</a> -->
                     <a href="javascript:void(0);" onclick="Add()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 등록</a>
@@ -348,7 +348,7 @@
             </div>
 		</div>
         <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 	</div>

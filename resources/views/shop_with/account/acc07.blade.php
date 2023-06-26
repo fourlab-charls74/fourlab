@@ -6,8 +6,8 @@
 	<h3 class="d-inline-flex">매장중간관리자마감정산</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
-		<span>/ 정산/마감관리</span>
+		<span>/ 정산관리</span>
+		<span>/ 매장중간관리자마감정산</span>
 	</div>
 </div>
 

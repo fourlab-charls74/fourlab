@@ -146,10 +146,26 @@
             field: "summary", headerName: "합계",
             children: [
                 {field: "proj_amt", headerName: "목표", type: 'currencyType', width:75, aggregation: true },
-                {field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
                 {field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true },
                 {field: "progress_proj_amt", headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
                     cellRenderer: params => goalProgress(params.data)
+                },
+                {field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
+				{field: "growth_rate", headerName: "성장율(%)", aggregation: true,
+					cellRenderer : function(params) {
+						let recv_amt = toInt(params.data.recv_amt);
+						let last_recv_amt = toInt(params.data.last_recv_amt);
+
+						console.log("금액 : " + recv_amt);
+						console.log("전년 : " + last_recv_amt);
+
+						if(recv_amt != 0 && last_recv_amt != 0) {
+							return ((recv_amt / last_recv_amt)*100).toFixed(0);
+						} else {
+							return "0";
+						}
+
+					}
                 },
             ]
         },
@@ -167,9 +183,8 @@
                         }
                     }
                 },
-                { field: 'prev_recv_amt_{{$month["val"]}}', headerName: "전월", type: 'currencyMinusColorType', width:75, aggregation: true },
-                { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
                 { field: 'recv_amt_{{$month["val"]}}', headerName: "금액", type: 'currencyMinusColorType', width:75, aggregation: true},
+                // { field: 'prev_recv_amt_{{$month["val"]}}', headerName: "전월", type: 'currencyMinusColorType', width:75, aggregation: true },
                 { field: 'progress_proj_amt_{{$month["val"]}}', headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
                     cellRenderer: function(params) {
 						let progress = 0;
@@ -186,7 +201,25 @@
 
 						return progress;
 					}
-                }
+                },
+                { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:75, aggregation: true },
+				{ field: 'growth_rate_{{$month["val"]}}', headerName: "성장율(%)", aggregation: true,
+                    cellRenderer: function(params) {
+						let progress = 0;
+						let recv_amt = toInt(params.data.recv_amt_{{$month['val']}});
+						let last_recv_amt = toInt(params.data.last_recv_amt_{{$month['val']}});
+
+						if (recv_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+						if (last_recv_amt == 0) return progress = 0;
+
+						if(recv_amt != null && last_recv_amt != null) {
+							progress = Comma(Math.round(( recv_amt / last_recv_amt) * 100));
+						}
+						if (progress == -Infinity) progress = 0;
+
+						return progress;
+					}
+                },
             ]
         },
         @endforeach

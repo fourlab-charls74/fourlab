@@ -7,8 +7,9 @@
             <h3 class="d-inline-flex">수선관리 : 접수번호 - {{@$row->idx}}</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 고객/수선관리</span>
+                <span>/ A/S 관리</span>
                 <span>/ 수선관리</span>
+                <span>/ 수선관리 상세</span>
             </div>
         </div>
         <div class="d-flex">

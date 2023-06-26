@@ -7,14 +7,14 @@
         <h3 class="d-inline-flex">매장 공지사항</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 매장관리</span>
+            <span>/ 게시판</span>
             <span>/ 매장 공지사항</span>
         </div>
     @else 
         <h3 class="d-inline-flex">VMD 게시판</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 매장관리</span>
+            <span>/ 게시판</span>
             <span>/ VMD 게시판</span>
         </div>
     @endif

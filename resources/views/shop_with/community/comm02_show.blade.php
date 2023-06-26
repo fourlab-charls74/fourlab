@@ -7,7 +7,9 @@
         <h3 class="d-inline-flex">알림전송</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
+            <span>/ 게시판</span>
             <span>/ 알림</span>
+            <span>/ 알림 전송</span>
         </div>
     </div>
     <form method="get" name="search">

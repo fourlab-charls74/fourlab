@@ -5,8 +5,8 @@
 	<h3 class="d-inline-flex">매장상품별판매분석</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>매장관리</span>
 		<span>/ 경영관리</span>
+		<span>/ 매장상품별판매분석</span>
 	</div>
 </div>
 <form method="get" name="search">

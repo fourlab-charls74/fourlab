@@ -5,7 +5,8 @@
 	<h3 class="d-inline-flex">회원관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 고객/수선관리</span>
+		<span>/ 고객관리</span>
+		<span>/ 회원관리</span>
 	</div>
 </div>
 

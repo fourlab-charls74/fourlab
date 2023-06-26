@@ -6,7 +6,7 @@
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>매장관리</span>
-        <span>/ 매장RT</span>
+        <span>/ 매장RT관리</span>
         <span>/ 일반RT</span>
     </div>
 </div>
