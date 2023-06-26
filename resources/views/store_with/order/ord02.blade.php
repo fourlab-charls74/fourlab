@@ -345,8 +345,8 @@
 		<div class="table-responsive">
 			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
-        <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고cell을 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
-        <p class="mt-1 fs-14 text-secondary">* <span class="text-danger">빨간색상의 바코드</span>는 옵션이 매칭되지 않은 상품입니다.</p>
+        <p class="mt-2 fs-14 text-secondary">* 창고/매장의 재고를 더블클릭하면 해당 창고/매장이 배송처로 적용됩니다. ( <span class="text-primary font-weight-bold">창고</span> / <span class="text-danger font-weight-bold">매장</span> )</p>
+        <p class="mt-1 fs-14 text-secondary">* <span class="text-danger font-weight-bold">적색의 바코드</span>는 옵션이 매칭되지 않은 상품입니다. / 옵션이 매칭되었지만 컬러나 사이즈명이 주문내용과 일치하지 않는 경우에는 해당되는 상품목록이 <span class="text-secondary font-weight-bold">회색으로</span> 아래에 나열됩니다. </p>
 	</div>
 </div>
 

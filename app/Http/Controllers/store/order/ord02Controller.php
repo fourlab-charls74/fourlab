@@ -237,7 +237,7 @@ class ord02Controller extends Controller
 				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
 				select
-					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, pc.goods_opt
+					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
 					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
@@ -260,11 +260,16 @@ class ord02Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join (
-						select prd_cd, goods_no, goods_opt, brand, year, season, gender, item, seq, opt, color, size, c.code_val as color_nm, cs.code_val as size_nm
-						from product_code
-							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = color
-							inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
-					) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+						select p.prd_cd, p.goods_no, p.goods_opt, p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt, p.color, p.size, c.code_val as color_nm
+							, (
+								select s.size_nm from size s 
+								where size_kind_cd = if(p.size_kind != '', p.size_kind, if(p.gender = 'M', 'PRD_CD_SIZE_MEN', if(p.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+								  	and s.size_cd = p.size
+									and use_yn = 'Y'
+							) as size_nm
+						from product_code p
+							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
+					) pc on pc.goods_no = o.goods_no and lower(pc.color_nm) = lower(substring_index(o.goods_opt, '^', 1)) and lower(replace(pc.size_nm, ' ', '')) = lower(replace(substring_index(o.goods_opt, '^', -1), ' ', ''))
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 					and o.clm_state in (-30,1,90,0)
 					$where
@@ -298,10 +303,10 @@ class ord02Controller extends Controller
 							    from product_code pc
 							    	inner join product p on p.prd_cd = pc.prd_cd
 							) pc on pc.goods_no = o.goods_no
-						where o.ord_opt_no = " . $c->ord_opt_no . "
-							and o.goods_no = " . $c->goods_no
-				;
-				$rows = DB::select($sql);
+						where o.ord_opt_no = :ord_opt_no
+							and o.goods_no = :goods_no
+				";
+				$rows = DB::select($sql, [ 'ord_opt_no' => $c->ord_opt_no, 'goods_no' => $c->goods_no ]);
 				$rows = array_map(function($row) use ($c) { return array_merge((array) $c, (array) $row); }, $rows);
 				return array_merge($a, $rows);
 			}
