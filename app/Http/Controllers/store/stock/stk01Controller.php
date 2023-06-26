@@ -284,7 +284,7 @@ class stk01Controller extends Controller
 		}
 
 		$storages = DB::table("storage")
-			->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')
+			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
 			->where('use_yn', '=', 'Y')
 			->orderByDesc('default_yn')
 			->get();

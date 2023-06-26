@@ -307,7 +307,7 @@ class cs02Controller extends Controller
         $sgr = '';
         $new_sgr_cd = '';
         $com_addr = '';
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
         $companies = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
 
        
