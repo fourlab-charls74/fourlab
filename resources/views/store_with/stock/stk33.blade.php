@@ -169,7 +169,7 @@
 </div>
 <script language="javascript">
 
-const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , 
+const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0,
 
     @foreach($competitors as $com)
          amt_{{$com->code_id}} : 0,
@@ -187,6 +187,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 ,
         {headerName: "매장코드", field: "store_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
         {headerName: "동종업계코드", field: "competitor_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
         {headerName: "매장구분", field: "store_type",  pinned:'left', width: 70, cellClass: 'hd-grid-code', hide:true},
+        {headerName: "매장매출액", field: "store_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
         {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
         {field: "competitors",	headerName: "동종업계 매장",
             children: [

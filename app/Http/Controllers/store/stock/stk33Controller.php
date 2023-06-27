@@ -109,6 +109,12 @@ class stk33Controller extends Controller
                 s.store_nm
                 , cs.sale_date
                 , sum(cs.sale_amt) as total_amt
+                , (
+                    select 
+                        if(ord_state = 60 or ord_state = 61, sum(recv_amt * -1) , sum(recv_amt)) as store_amt 
+                    from order_opt_wonga
+                    where ord_state in(30, 60, 61) and store_cd = cs.store_cd and ord_state_date = replace(cs.sale_date, '-','')
+                    ) as store_amt
                 , cs.store_cd
                 , cs.competitor_cd
                 , s.store_type
@@ -133,14 +139,21 @@ class stk33Controller extends Controller
             $query =
                 "
                 select
-                    count(a.store_nm) as total,
-                    sum(a.total_amt) as total_amt
+                    count(a.store_nm) as total
+                    , sum(a.total_amt) as total_amt
+                    , sum(a.store_amt) as store_amt
                     $t_amt
                 from (
                     select 
                         s.store_nm
                         , cs.sale_date
                         , sum(cs.sale_amt) as total_amt
+                        , (
+                            select 
+                                if(ord_state = 60 or ord_state = 61, sum(recv_amt * -1) , sum(recv_amt)) as store_amt 
+                            from order_opt_wonga
+                            where ord_state in(30, 60, 61) and store_cd = cs.store_cd and ord_state_date = replace(cs.sale_date, '-','')
+                            ) as store_amt
                         , cs.store_cd
                         , cs.competitor_cd
                         , s.store_type
