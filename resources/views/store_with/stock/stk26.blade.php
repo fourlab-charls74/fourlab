@@ -158,7 +158,7 @@
         {field: "md_id", hide: true},
         {field: "md_nm", headerName: "담당자", width: 80, cellStyle: {"text-align": "center"}},
         {field: "comment", headerName: "메모", width: 300},
-        {width: 'auto'}
+        {width: 0}
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

@@ -174,7 +174,7 @@
             }
         },
         {headerName: "글번호", field: "ns_cd", hide:true },
-        {width: 'auto'}
+        {width: 0}
     ];
 
     const pApp = new App('', { gridId:"#div-gd" });
@@ -208,7 +208,7 @@
             cellStyle: (params) => ({color: params.data.check_yn == 'Y' ? 'green' : 'none'})
         },
         {headerName: "알림 번호", field: "msg_cd", hide: true},
-        {width: 'auto'}
+        {width: 0}
     ];
 
     const pApp2 = new App('', { gridId:"#div-gd-alarm" });

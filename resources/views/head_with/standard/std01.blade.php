@@ -102,7 +102,7 @@
         },
         { field: "regi_date", headerName: "등록일시", width: 130, cellStyle: { "text-align": "center" } },
         { field: "upd_date", headerName: "수정일시", width: 130, cellStyle: { "text-align": "center" } },
-        { width: 'auto' },
+        { width: 0 },
     ];
 
     const pApp = new App('', { gridId: "#div-gd", height: 270 });

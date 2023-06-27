@@ -25,6 +25,38 @@ function formatNumber(params) {
     }
 }
 
+// 셀 입력중, 키보드방향키로 셀 이동 (suppressKeyboardEvent)
+function setArrowKeyboardEvent(e) {
+	let key = e.event.key;
+
+	if (e.column.isCellEditable(e.node)) {
+		if (key == 'ArrowDown') {
+			if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
+				e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
+			} else {
+				e.api.stopEditing();
+				e.api.setFocusedCell(e.node.rowIndex, e.column);
+			}
+		} else if (key == 'ArrowUp') {
+			if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
+				e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
+			} else {
+				e.api.stopEditing();
+				e.api.setFocusedCell(e.node.rowIndex, e.column);
+			}
+		} else if (key == 'ArrowLeft') {
+			if (e.event.target.selectionStart < 1) {
+				e.api.stopEditing();
+			}
+
+		} else if (key == 'ArrowRight') {
+			if (e.event.target.selectionStart >= e.event.target.value.length) {
+				e.api.stopEditing();
+			}
+		}
+	}
+};
+
 function HDGrid(gridDiv , columns, optionMixin = {}){
     this.id = gridDiv.id.replace("div-", "");
     this.gridDiv = gridDiv;
@@ -59,6 +91,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
             //suppressSizeToFit: true,
             sortable:true,
             //minWidth:70,
+			suppressKeyboardEvent: setArrowKeyboardEvent,
         },
         enableRangeSelection:true,
         columnTypes:{
@@ -363,38 +396,6 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         //     }
         // },
 
-        // 셀 입력중, 키보드 아래방향키로 셀 이동
-        suppressKeyboardEvent: function(e) {
-            let key = e.event.key;
-
-			if (e.column.isCellEditable(e.node)) {
-				if (key == 'ArrowDown') {
-					if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
-						e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
-					} else {
-						e.api.stopEditing();
-						e.api.setFocusedCell(e.node.rowIndex, e.column);
-					}
-				} else if (key == 'ArrowUp') {
-					if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
-						e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
-					} else {
-						e.api.stopEditing();
-						e.api.setFocusedCell(e.node.rowIndex, e.column);
-					}
-				} else if (key == 'ArrowLeft') {
-					if (e.event.target.selectionStart < 1) {
-						e.api.stopEditing();
-					}
-
-				} else if (key == 'ArrowRight') {
-					if (e.event.target.selectionStart >= e.event.target.value.length) {
-						e.api.stopEditing();
-					}
-				}
-			}
-        },
-
         onColumnVisible: function (params) {
             params.api.resetRowHeights();
         },
@@ -460,7 +461,11 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
     };
 
     Object.keys(optionMixin).forEach((key) => {
-        this.gridOptions[key] = optionMixin[key];
+		if (key === "defaultColDef") {
+			this.gridOptions[key] = { suppressKeyboardEvent: this.gridOptions[key].suppressKeyboardEvent, ...optionMixin[key] };
+		} else {
+        	this.gridOptions[key] = optionMixin[key];
+		}
     });
 
     let grid = new agGrid.Grid(gridDiv , this.gridOptions);

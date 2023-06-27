@@ -213,7 +213,7 @@
 		@endforeach
 		{ field: "S_total", headerName: "매장부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 공제금
 		{ field: "C_total", headerName: "본사부담금 합계", type: 'currencyType', width: 100, cellStyle: { "font-weight": "700" } }, // 추가지급금
-        { width: "auto" }
+        { width: 0 }
     ];
 </script>
 
@@ -233,6 +233,11 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+			defaultColDef: {
+				suppressMenu: true,
+				resizable: false,
+				sortable: true,
+			},
             pinnedTopRowData: [{ store_cd: "합계" }],
             getRowStyle: (params) => { // 고정된 row styling
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee'};
@@ -271,11 +276,6 @@
 				}
 			}
 		});
-		gx.gridOptions.defaultColDef = {
-			suppressMenu: true,
-			resizable: false,
-			sortable: true,
-		};
 
         if (CMD === 'update') Search();
         updatePinnedRow();
