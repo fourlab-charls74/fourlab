@@ -107,8 +107,14 @@ class sal21Controller extends Controller
 
         // having
         $having = "";
-        if ($ext_term_qty === 'true') $having .= " having (p.wqty - sum(ifnull(_next.qty, 0)) > 0)";
-
+        if ($ext_term_qty === 'true') $having .= " having 
+        (sum(ifnull(store_in.qty, 0)) != 0) 
+        or (sum(ifnull(store_return.qty, 0)) * -1 != 0) 
+        or (sum(ifnull(rt_in.qty, 0)) != 0)
+        or (sum(ifnull(rt_out.qty, 0)) * -1 != 0)
+        or (sum(ifnull(sale.qty, 0)) * -1 != 0)
+        ";
+        
         // ordreby
         $ord = $request->input('ord', 'desc');
         $ord_field = $request->input('ord_field', 'p.store_cd');

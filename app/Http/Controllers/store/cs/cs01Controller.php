@@ -335,8 +335,6 @@ class cs01Controller extends Controller {
 		// Form
 		$invoice_no				= $request->input("invoice_no");			//송장번호
 		$bl_no					= $request->input("bl_no", "");				//통관번호 (B/L No.)
-
-		dd($bl_no);
 		$stock_date				= str_replace('-','',$request->input("stock_date"));	//입고일자
 		$stock_type				= "A";										//입고구분 (일괄/발주)
 		$com_id					= $request->input("com_id");				//공급처

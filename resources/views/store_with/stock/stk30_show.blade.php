@@ -197,7 +197,7 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType',
+        {field: "store_wqty", headerName: "가용재고", width: 90, type: 'currencyType',
             cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "red"} : {}
         },
         {field: "qty", headerName: "반품요청수량", width: 85, type: 'currencyType', 
