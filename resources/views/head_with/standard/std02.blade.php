@@ -232,7 +232,7 @@
         {field: "staff_email2", headerName: "정산담당자 이메일"},
         {field: "staff_phone2", headerName: "정산담당자 연락처", cellClass: 'hd-grid-code'},
         {field: "staff_hp2", headerName: "정산담당자 휴대전화", cellClass: 'hd-grid-code'},
-        {width: "auto"}
+        {width: 0}
 	];
 
 </script>

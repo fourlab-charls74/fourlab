@@ -249,7 +249,7 @@ var columns = [
 			}
         },
         {field:"qna_no", headerName:"qna_no", hide:true,},
-        {field:"", headerName:"", width:"auto"}
+        {field:"", headerName:"", width:0}
 ];
 
 </script>

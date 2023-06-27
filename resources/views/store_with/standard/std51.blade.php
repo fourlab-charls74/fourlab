@@ -130,7 +130,7 @@
         {
             field: "",
             headerName: "",
-            width: "auto"
+            width: 0
         },
     ];
 </script>

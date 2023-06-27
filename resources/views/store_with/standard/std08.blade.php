@@ -142,7 +142,7 @@
             ]
         },
         { field: "bigo", headerName: "비고", width: 200, editable: true, cellStyle: YELLOW },
-        { width: "auto" },
+        { width: 0 },
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

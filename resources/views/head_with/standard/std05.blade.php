@@ -173,7 +173,7 @@
                 else return params.value
 			}
         },
-        { field: "", headerName: "", width: "auto" }
+        { field: "", headerName: "", width: 0 }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

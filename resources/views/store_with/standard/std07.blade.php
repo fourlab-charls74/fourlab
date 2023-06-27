@@ -145,7 +145,7 @@
             }
         },
         {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}, width: 60},
-        {width: "auto"},
+        {width: 0},
     ];
 
     let fee_columns = [
@@ -172,7 +172,7 @@
         // },
         // {field: "manager_fee", headerName: "중간관리수수료(%)", width: 120, type: "percentType"},
         {field: "comment", headerName: "메모", width: 300},
-        {width: "auto"},
+        {width: 0},
     ];
 </script>
 

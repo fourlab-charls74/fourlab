@@ -202,7 +202,7 @@
 		// },
 		{headerName:"판매수수료율",	field:"sale_fee",		width:84, cellStyle:{"text-align":"right"}},
 		{headerName:"사용여부",		field:"use_yn",			width:60, cellStyle:{"text-align":"center"}},
-		{headerName:"",				field:"",				width:"auto"}
+		{headerName:"",				field:"",				width:0}
 	];
 
 	function Add()

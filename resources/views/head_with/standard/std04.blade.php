@@ -288,7 +288,7 @@
             hide: true
         },
 		{ field:"p_d_cat_cd", headerName:"p_d_cat_cd", hide: true },
-        { field: "", headerName: "", width: "auto" }
+        { field: "", headerName: "", width: 0 }
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

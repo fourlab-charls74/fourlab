@@ -272,7 +272,7 @@
                 {field:"goods_sh",headerName:"시중가격", width:60, type:'currencyType'},
                 {field:"price" , headerName:"판매가", width:60, type: 'currencyType'},
                 {field:"restock_ut" ,headerName:"최근요청일시", width:110},
-                {field:"", headerName:"", width:"auto"}
+                {field:"", headerName:"", width:0}
             ];
     
         const pApp = new App('',{

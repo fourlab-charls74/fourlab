@@ -158,14 +158,14 @@
         {
             field: "rt",
             headerName: "등록일시",
-            width: 110
+	        type: "DateTimeType"
         },
         {
             field: "ut",
             headerName: "수정일시",
-            width: 110
+	        type: "DateTimeType"
         },
-        { field: "", headerName: "", width: "auto" }
+        { field: "", headerName: "", width: 0 }
     ];
 
     const pApp = new App('', {
@@ -173,10 +173,6 @@
     });
     const gridDiv = document.querySelector(pApp.options.gridId);
     const gx = new HDGrid(gridDiv, columnDefs);
-
-    gx.gridOptions.getRowNodeId = function(data) {
-        return data.id;
-    }
 
     pApp.ResizeGrid(275);
     pApp.BindSearchEnter();

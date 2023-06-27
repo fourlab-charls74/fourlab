@@ -259,7 +259,7 @@
                 {field:"goods_no_hd",headerName:"goods_no",hide:true},
                 {field:"goods_sub_hd",headerName:"goods_sub",hide:true},
                 {field:"is_unlimited",headerName:"is_unlimited",hide:true},
-                {field:"nvl",headerName:" ",width:'auto'}
+                {field:"nvl",headerName:" ",width:0}
 
             ];
 

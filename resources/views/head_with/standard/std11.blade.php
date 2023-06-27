@@ -177,7 +177,7 @@
         {field: "admin_nm", headerName: "관리자명", cellClass: 'hd-grid-code'},
         {field: "rt", headerName: "등록일시", type: 'DateTimeType'},
         {field: "ut", headerName: "수정일시", type: 'DateTimeType'},
-        {field: "", headerName: "", width: "auto"}
+        {field: "", headerName: "", width: 0}
     ];
 
     const pApp = new App('', { gridId: "#div-gd" });

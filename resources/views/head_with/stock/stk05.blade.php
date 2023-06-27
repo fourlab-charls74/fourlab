@@ -263,7 +263,7 @@
             {field:"etc", headerName:"메모", width: 130},
             {field:"admin_nm", headerName:"처리자", width: 80},
             {field:"ord_opt_no", headerName:"주문일련번호", hide: true},
-            {field:"", headerName:"", width:"auto"}
+            {field:"", headerName:"", width:0}
         ];
 
         const pApp = new App('',{

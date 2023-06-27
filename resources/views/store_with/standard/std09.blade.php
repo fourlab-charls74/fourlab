@@ -96,8 +96,8 @@
 
 <script>
     const columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
+        {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
         // {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
         //     cellRenderer: function(params) {
         //         if (params.value === 'C') {
@@ -116,13 +116,13 @@
             }
         },
         {field: "use_yn", headerName: "사용여부", cellStyle:{'text-align' : 'center'},},
-        {width: 'auto'}
+        {width: 0}
         
     ]
 
     const store_type_columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
+        {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
         // {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
         //     cellRenderer: function(params) {
         //         if (params.value === 'T') {
@@ -140,7 +140,7 @@
         {field: "store_kind", headerName: "매장구분", width: 100, cellStyle:{'text-align' : 'center'},},
         // {field: "seq", headerName: "순서", cellStyle:{'text-align' : 'center'},},
         {field: "use_yn", headerName: "사용여부", cellStyle:{'text-align' : 'center'},},
-        {width: 'auto'}
+        {width: 0}
     ]
 
 </script>
@@ -152,7 +152,7 @@
 
     $(document).ready(function() {
         // 매장목록
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(284);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);

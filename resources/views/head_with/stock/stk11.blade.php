@@ -156,7 +156,7 @@
             { field: "buy_order_qty", headerName: "발주 후 입고수", width: 120, type:'numberType', },
             { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
             { field: "rt", headerName: "최종수정일", width: 150, cellStyle:{ 'text-align': 'center' } },
-            { field: "", headerName:"", width: "auto" },
+            { field: "", headerName:"", width: 0 },
         ];
 
         const pApp = new App('', {
