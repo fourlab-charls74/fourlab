@@ -3552,7 +3552,7 @@
     */
 
     const ori_price = '{{  @$goods_info->price }}';
-    const ori_sale_rate = '{{  @$goods_info->sale_rate }}';
+	const ori_sale_rate = '{{  @$goods_info->sale_rate }}';
     const ori_sale_price = '{{  @$goods_info->sale_price }}';
     const ori_sale_margin = '{{  @$goods_info->sale_margin }}';
     const ori_normal_wonga = '{{  @$goods_info->normal_wonga }}';
@@ -3593,6 +3593,11 @@
         $(".sale_e_dt_btn").attr("disabled", !is_use);
         $("select[name='sale_s_dt_tm']").attr("disabled", !is_use);
         $("select[name='sale_e_dt_tm']").attr("disabled", !is_use);
+		if(is_use === true) {
+			$("[name='price']").val(Comma(ori_price));
+		} else {
+			$("[name='price']").val(Comma($("[name='sale_price']").val()));
+		}
     }
 
     function setSaleAmount(is_reset, is_sale_rate) {
