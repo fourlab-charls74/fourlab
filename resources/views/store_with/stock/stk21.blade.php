@@ -305,22 +305,9 @@
     let stock_columns = [
         {field: "prd_cd", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 30},
-        {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-        {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
-        {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 140, cellStyle: {"background-color": "#ffff99"},
-            editable: true,
-            cellEditor: GridAutoCompleteEditor,
-            cellEditorParams: {
-                cellEditor: GridAutoCompleteEditor,
-                rowData: stores,
-                width: "138px",
-            },
-            cellEditorPopup: true,
-        },
-        {field: "store_cd", hide: true},
-        {headerName: "매장재고",
+        {field: "dep_store_cd",	headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "dep_store_nm",	headerName: "보내는 매장", width: 140},
+        {headerName: "보내는 매장재고",
             children: [
                 {field: "qty", headerName: "재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
@@ -338,6 +325,24 @@
                 },
             ]
         },
+		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
+		{field: "store_nm",	headerName: "받는 매장", width: 140, cellStyle: {"background-color": "#ffff99"},
+			editable: true,
+			cellEditor: GridAutoCompleteEditor,
+			cellEditorParams: {
+				cellEditor: GridAutoCompleteEditor,
+				rowData: stores,
+				width: "138px",
+			},
+			cellEditorPopup: true,
+		},
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 30},
+		{headerName: "받는 매장재고",
+			children: [
+				{field: "send_qty", headerName: "재고", type: "currencyType", width: 65},
+				{field: "send_wqty", headerName: "보유재고", type: "currencyType", width: 65},
+			]
+		},
         {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65, editable: true, cellStyle: {"background-color": "#ffFF99"}},
         {field: "comment", headerName: "메모", width: "auto", editable: true, cellStyle: {"background-color": "#ffFF99"}},
     ];
@@ -418,8 +423,24 @@
                 if (e.column.colId == "store_nm") {
                     let arr = stores.filter(s => s.store_nm === e.newValue);
                     e.data.store_cd = arr.length > 0 ? arr[0].store_cd : null;
-                    e.api.redrawRows({rowNodes:[e.node]});
-                    gx2.setFocusedWorkingCell();
+					if (!e.data.store_cd) {
+						e.api.redrawRows({rowNodes:[e.node]});
+						gx2.setFocusedWorkingCell();
+					} else {
+						$.ajax({
+							method: 'get',
+							url: '/store/stock/stk21/search-stock-for-store?prd_cd=' + selected_prd?.prd_cd + '&store_cd=' + e.data.store_cd,
+							success: function (res) {
+								e.data.send_qty = res.stock?.qty || 0;
+								e.data.send_wqty = res.stock?.wqty || 0;
+								e.api.redrawRows({rowNodes:[e.node]});
+								gx2.setFocusedWorkingCell();
+							},
+							error: function(e) {
+								console.log(e.responseText);
+							}
+						});
+					}
                 }
             }
         });

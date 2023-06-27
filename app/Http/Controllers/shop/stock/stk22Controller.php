@@ -195,7 +195,9 @@ class stk22Controller extends Controller
                 ifnull(pss.qty, 0) as storage_qty,
                 ifnull(pss.wqty, 0) as storage_wqty,
                 '$user_store' as store_cd,
-                '$user_store_nm' as store_nm
+                '$user_store_nm' as store_nm,
+				ifnull((select qty from product_stock_store where store_cd = '$user_store' and prd_cd = '$prd_cd'), 0) as send_qty,
+				ifnull((select wqty from product_stock_store where store_cd = '$user_store' and prd_cd = '$prd_cd'), 0) as send_wqty
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'

@@ -580,6 +580,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk21','stk21Controller@index');
         Route::get('stk21/search-goods','stk21Controller@search_goods');
         Route::get('stk21/search-stock','stk21Controller@search_stock');
+        Route::get('stk21/search-stock-for-store','stk21Controller@search_stock_for_store');
         Route::post('stk21/request-rt','stk21Controller@request_rt');
 
         // 일반RT

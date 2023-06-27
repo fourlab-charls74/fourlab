@@ -176,16 +176,17 @@
     <div class="col-lg-7">
         <div class="card shadow mb-0 pt-2 pt-sm-0">
             <div class="card-title">
-                <div class="filter_wrap mt-2 pt-2">
+                <div class="filter_wrap d-flex flex-column mt-2 pt-2">
                     <div class="d-flex justify-content-between">
-                        <h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14 text-danger font-weight-normal"></strong></h6>
+                        <h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건</h6>
                         <div class="d-flex justify-content-between mt-1">
                             <div class="d-flex">
-                                <p class="mr-2">(대표)창고재고 <span id="storage_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개</p>
+                                <p class="mr-2">(대표)창고재고 <span id="storage_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개 / 우리매장재고 <span id="store_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개</p>
                                 <a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm" style="min-width:130px;">RT리스트에 등록</a>
                             </div>
                         </div>
                     </div>
+	                <div>ㄴ 선택 상품 :<strong id="selected_prd_nm" class="ml-2 fs-14 text-danger font-weight-normal"></strong></div>
                 </div>
             </div>
             <div class="table-responsive">
@@ -331,7 +332,7 @@
     let selected_prd = {};
 
     $(document).ready(function() {
-        pApp.ResizeGrid(450, 403);
+        pApp.ResizeGrid(450, 435);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, product_columns, {
@@ -403,6 +404,7 @@
         gx2.Request('/shop/stock/stk22/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
             $("#storage_stock").html(d.body[0]?.storage_qty + ' / ' + d.body[0]?.storage_wqty);
+            $("#store_stock").html(d.body[0]?.send_qty + ' / ' + d.body[0]?.send_wqty);
         });
     }
 
@@ -476,7 +478,7 @@
         });
     }
 
-    function OpenStoreStockPopup(prd_cd, date) {
+    function OpenStoreStockPopup(prd_cd, date = '') {
         var url = `/shop/stock/stk01/${prd_cd}?date=${date}`;
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
     }

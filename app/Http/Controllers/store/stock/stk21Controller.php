@@ -244,6 +244,17 @@ class stk21Controller extends Controller
 			"body" => $result
 		]);
     }
+	
+	// 매장의 특정상품재고 조회
+	public function search_stock_for_store(Request $request)
+	{
+		$prd_cd = $request->input('prd_cd', '');
+		$store_cd = $request->input('store_cd', '');
+		
+		$stock = DB::table('product_stock_store')->where('store_cd', $store_cd)->where('prd_cd', $prd_cd)->select('qty', 'wqty')->first();
+		
+		return response()->json([ 'code' => 200, 'stock' => $stock ], 200);
+	}
 
     // 요청RT 등록
     public function request_rt(Request $request)

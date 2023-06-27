@@ -361,7 +361,7 @@
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 150},
         {field: "store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "store_nm",	headerName: "받는 매장", pinned: 'left', width: 150},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
         {field: "goods_no",	headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
         {field: "goods_nm",	headerName: "상품명", width: 150,
@@ -388,10 +388,10 @@
                     }
             }
         },
-        {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "fin_rt", headerName: "완료일시", width: 120, cellStyle: {"text-align": "center"}},
+        {field: "req_rt", headerName: "요청일시", type: "DateTimeType"},
+        {field: "rec_rt", headerName: "접수일시", type: "DateTimeType"},
+        {field: "prc_rt", headerName: "처리일시", type: "DateTimeType"},
+        {field: "fin_rt", headerName: "완료일시", type: "DateTimeType"},
         {field: "req_comment", headerName: "요청메모", width: 300},
         {field: "rec_comment", headerName: "접수메모", width: 300,
             editable: function(params) {return params.data.state === 10;},
