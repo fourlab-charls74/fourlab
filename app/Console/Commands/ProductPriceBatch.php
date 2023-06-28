@@ -53,7 +53,7 @@ class ProductPriceBatch extends Command
 			";
 			$rows = DB::select($sql,['change_date' => $chk_date]);
 			foreach ($rows as $row) {
-				$product_price_cd	= $row['idx'];
+				$product_price_cd	= $row->idx;
 				
 				$sql_list = "
 					select
@@ -65,8 +65,8 @@ class ProductPriceBatch extends Command
 				$rows_list	= DB::select($sql_list,['product_price_cd' => $product_price_cd]);
 				foreach ($rows_list as $row_list) {
 
-					$goods_no		= $row_list['goods_no'];
-					$change_price	= $row_list['change_price'];
+					$goods_no		= $row_list->goods_no;
+					$change_price	= $row_list->change_price;
 
 					//goods 테이블 price 가격변경
 					DB::table('goods')
