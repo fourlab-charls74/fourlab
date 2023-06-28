@@ -24,6 +24,7 @@ class stk26Controller extends Controller
 		$values = [
 			'sdate' => $sdate,
 			'edate' => $edate,
+			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk26', $values);
 	}
@@ -35,6 +36,7 @@ class stk26Controller extends Controller
         $sc_cd = $request->input('sc_cd', '');
         $store_cd = $request->input('store_no', '');
         $sc_state = $request->input('sc_state', '');
+		$loss_reason = $request->input('loss_reason', '');
 
         // where
         $where = "";
@@ -43,6 +45,7 @@ class stk26Controller extends Controller
         if($sc_cd != '') $where .= " and s.sc_cd = '$sc_cd' ";
         if($store_cd != '') $where .= " and s.store_cd = '$store_cd' ";
         if($sc_state != '') $where .= " and s.sc_state = '$sc_state' ";
+        if($loss_reason != '') $where .= " and sp.loss_reason = '$loss_reason' ";
 
         $sql = "
             select
@@ -51,6 +54,8 @@ class stk26Controller extends Controller
                 s.sc_cd,
                 s.store_cd,
                 store.store_nm,
+                sum(sp.store_qty) as store_qty,
+                sum(sp.qty) as qty,
                 sum(sp.loss_rec_qty) as loss_qty,
                 sum(sp.loss_price) as loss_price,
                 s.sc_state,
@@ -80,9 +85,7 @@ class stk26Controller extends Controller
 
     public function show($sc_cd = '', Request $request)
     {
-        $editable = $request->input("editable", 'Y'); // 매장LOSS등록에서 실사상세팝업에 접근할 경우, 정보를 수정할 수 없습니다.
         $sc = '';
-        $new_sc_cd = '';
 
         if($sc_cd != '') {
             $sql = "
@@ -90,6 +93,7 @@ class stk26Controller extends Controller
                     s.sc_date,
                     concat(s.store_cd, '_', REPLACE(s.sc_date, '-', '') , '_' , LPAD(s.sc_cd, 3, '0')) as sc_code,
                     s.sc_type,
+                    if(s.sc_type = 'G', '일반등록', if(s.sc_type = 'B', '일괄등록', if(s.sc_type = 'C', '바코드등록', '-'))) as sc_type_nm,
                     s.sc_cd,
                     s.store_cd,
                     store.store_nm,
@@ -103,25 +107,13 @@ class stk26Controller extends Controller
                 where sc_cd = :sc_cd
             ";
             $sc = DB::selectOne($sql, ['sc_cd' => $sc_cd]);
-        } else {
-            $sql = "
-                select 
-                    sc_cd
-                from stock_check
-                order by sc_cd desc
-                limit 1
-            ";
-            $row = DB::selectOne($sql);
-            if($row == null) $new_sc_cd = 1;
-            else $new_sc_cd = $row->sc_cd + 1;
         }
-        if($editable == 'N') $sc->sc_state = 'Y';
 
         $values = [
             "cmd"           => $sc == '' ? "add" : "update",
             'sdate'         => $sc == '' ? date("Y-m-d") : $sc->sc_date,
             'sc'            => $sc,
-            'new_sc_cd'     => $new_sc_cd,
+			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk26_show', $values);
     }
@@ -144,25 +136,28 @@ class stk26Controller extends Controller
                 if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm,
                 if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng,
                 pc.goods_opt,
-                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                if(pc.prd_cd_p <> '', pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p,
                 pc.color,
                 pc.size,
                 if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh,
                 s.price,
                 s.qty,
                 s.store_qty as store_wqty, 
-                (s.store_qty - s.qty) as loss_qty,
-                (s.store_qty - s.qty) as loss_rec_qty,
-                (s.price * (s.store_qty - s.qty)) as loss_price,
-                if(g.goods_no <> '0', g.goods_sh * (s.store_qty - s.qty), p.tag_price * (s.store_qty - s.qty)) as loss_tag_price,
-                (s.price * (s.store_qty - s.qty)) as loss_price2,
-                true as isEditable
+                s.loss_qty,
+                s.loss_rec_qty,
+                s.loss_price,
+                s.loss_price2,
+                s.loss_tag_price,
+                s.loss_reason,
+                r.code_val as loss_reason_val,
+                s.comment
             from stock_check_product s
                 inner join product_code pc on pc.prd_cd = s.prd_cd
                 inner join product p on p.prd_cd = s.prd_cd
                 left outer join goods g on g.goods_no = pc.goods_no
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+               	left outer join code r on r.code_kind_cd = 'LOSS_REASON' and r.code_id = s.loss_reason
                 , (select @rownum :=0) as r
             where s.sc_cd = :sc_cd
         ";
@@ -210,9 +205,16 @@ class stk26Controller extends Controller
                     ->insert([
                         'sc_cd' => $sc_cd,
                         'prd_cd' => $product['prd_cd'],
-                        'price' => $product['price'], // 판매가
-                        'qty' => $product['qty'], // 실사수량
-                        'store_qty' => $product['store_qty'], // 매장수량
+                        'price' => $product['price'],
+                        'qty' => $product['qty'],
+                        'store_qty' => $product['store_qty'],
+                        'loss_qty' => $product['store_qty'] - $product['qty'],
+                        'loss_rec_qty' => $product['store_qty'] - $product['qty'],
+                        'loss_price' => $product['price'] * ($product['store_qty'] - $product['qty']),
+                        'loss_price2' => $product['price'] * $product['store_qty'],
+                        'loss_tag_price' => $product['goods_sh'] * $product['store_qty'],
+						'loss_reason' => $product['loss_reason'] ?? null,
+						'comment' => $product['comment'] ?? null,
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -253,7 +255,12 @@ class stk26Controller extends Controller
                 DB::table('stock_check_product')
                     ->where('sc_prd_cd', '=', $product['sc_prd_cd'])
                     ->update([
-                        'qty' => $product['qty'], // 실사수량
+                        'qty' => $product['qty'],
+						'loss_qty' => DB::raw("store_qty - qty"),
+						'loss_rec_qty' => $product['loss_rec_qty'],
+						'loss_price' => DB::raw("loss_rec_qty * price"),
+						'loss_reason' => $product['loss_reason'] ?? null,
+						'comment' => $product['comment'] ?? null,
                         'ut' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -302,6 +309,102 @@ class stk26Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+
+	// LOSS 등록
+	public function save_loss(Request $request)
+	{
+		$code 		= 200;
+		$msg		= "";
+		$sc_cd 		= $request->input('sc_cd');
+		$store_cd   = $request->input('store_cd');
+		$comment    = $request->input('comment');
+		$products 	= $request->input("products", []);
+		$admin_id   = Auth('head')->user()->id;
+		$admin_nm   = Auth('head')->user()->name;
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('stock_check')
+				->where('sc_cd', '=', $sc_cd)
+				->update([
+					'sc_state' => 'Y',
+					'comment' => $comment,
+					'ut' => now(),
+					'admin_id' => $admin_id,
+				]);
+
+			foreach ($products as $product) {
+				
+				DB::table('stock_check_product')
+					->where('sc_prd_cd', '=', $product['sc_prd_cd'])
+					->update([
+						'loss_rec_qty' => $product['loss_rec_qty'],
+						'qty' => DB::raw("store_qty - loss_rec_qty"),
+						'loss_qty' => DB::raw("store_qty - " . $product['qty']),
+						'loss_price' => DB::raw("loss_rec_qty * price"),
+						'loss_reason' => $product['loss_reason'] ?? null,
+						'comment' => $product['comment'] ?? null,
+						'ut' => now(),
+						'admin_id' => $admin_id,
+					]);
+				
+				$qty = DB::table('stock_check_product')->where('sc_prd_cd', $product['sc_prd_cd'])->value('qty');
+
+				$original_wqty = DB::table('product_stock_store')->where('store_cd', $store_cd)->where('prd_cd', $product['prd_cd'])->value('wqty');
+				$minus_qty = ($original_wqty ?? 0) - ($qty ?? 0);
+
+				DB::table('product_stock_store')
+					->where('store_cd', $store_cd)
+					->where('prd_cd', $product['prd_cd'])
+					->update([
+						'qty' => $qty,
+						'wqty' => $qty,
+						'ut' => now(),
+					]);
+
+				DB::table('product_stock')
+					->where('prd_cd', $product['prd_cd'])
+					->update([
+						'qty_wonga'	=> DB::raw('qty_wonga - (' . $minus_qty . ' * wonga)'),
+						'out_qty' => DB::raw('out_qty + ' . $minus_qty),
+						'qty' => DB::raw('qty - ' . $minus_qty),
+						'ut' => now(),
+					]);
+				
+				$wonga = DB::table('product_stock')->where('prd_cd', $product['prd_cd'])->value('wonga');
+
+				// 재고이력 등록
+				DB::table('product_stock_hst')
+					->insert([
+						'goods_no' => $product['goods_no'],
+						'prd_cd' => $product['prd_cd'],
+						'goods_opt' => $product['goods_opt'],
+						'location_cd' => $store_cd,
+						'location_type' => 'STORE',
+						'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
+						'price' => $product['price'],
+						'wonga' => $wonga ?? 0,
+						'qty' => $product['loss_rec_qty'] * -1,
+						'stock_state_date' => date('Ymd'),
+						'ord_opt_no' => '',
+						'comment' => 'LOSS등록',
+						'rt' => now(),
+						'admin_id' => $admin_id,
+						'admin_nm' => $admin_nm,
+					]);
+			}
+
+			DB::commit();
+			$msg = "LOSS등록이 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json([ "code" => $code, "msg" => $msg ], $code);
+	}
 
     /** 실사일괄등록 팝업오픈 */
     public function show_batch()

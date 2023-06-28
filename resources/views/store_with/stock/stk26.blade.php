@@ -15,13 +15,13 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div>
-                    <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50 mr-1"></i> 조회</a>
 					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2" onclick="initSearch(['#store_no'])">검색조건 초기화</a> -->
-                    <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm text-white-50 mr-1"></i> 실사개별등록</a>
-                    <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm text-white-50 mr-1"></i> 실사일괄등록</a>
-                    <a href="javascript:void(0);" onclick="openBarCodePopup()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm text-white-50 mr-1"></i> 실사바코드등록</a>
-                    <a href="javascript:void(0);" onclick="moveToSal20()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fa fa-arrow-right fa-sm mr-1"></i> LOSS등록</a>
+                    <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm mr-1"></i> 실사개별등록</a>
+                    <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm mr-1"></i> 실사일괄등록</a>
+                    <a href="javascript:void(0);" onclick="openBarCodePopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm mr-1"></i> 실사바코드등록</a>
+{{--                    <a href="javascript:void(0);" onclick="moveToSal20()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fa fa-arrow-right fa-sm mr-1"></i> LOSS등록</a>--}}
                 </div>
             </div>
             <div class="card-body">
@@ -95,7 +95,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label>LOSS사유</label>
+			                <div class="flex_box">
+				                <select name='loss_reason' id="loss_reason" class="form-control form-control-sm">
+					                <option value=''>전체</option>
+				                @foreach ($loss_reasons as $reason)
+					                <option value='{{ $reason->code_id }}'>{{ $reason->code_val }}</option>
+				                @endforeach
+				                </select>
+			                </div>
+		                </div>
+	                </div>
                 </div>
             </div>
         </div>
@@ -133,7 +145,7 @@
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "sc_date", headerName: "실사일자", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "sc_cd", headerName: "실사코드", width: 120, cellStyle: {"text-align": "center"},
+        {field: "sc_cd", headerName: "실사코드", width: 140, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 let sc_date = params.data.sc_date;
                 let date = sc_date.replace('-','');
@@ -148,25 +160,26 @@
             cellRenderer: (params) => params.value === 'G' ? '일반' : params.value === 'B' ? '일괄' : params.value === 'C' ? '바코드' : '-',
         },
         {field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "store_nm", headerName: "매장명", width: 170},
+        {field: "store_nm", headerName: "매장명", width: 150},
+        {field: "store_qty", headerName: "매장보유재고", width: 80, type: "currencyType"},
+        {field: "qty", headerName: "실사재고", width: 80, type: "currencyType"},
         {field: "loss_qty", headerName: "LOSS 총수량", width: 80, type: "currencyType"},
-        {field: "loss_price", headerName: "LOSS 총금액", width: 80, type: "currencyType"},
-        {field: "sc_state", headerName: "LOSS처리여부", width: 90, 
+        {field: "loss_price", headerName: "LOSS 금액", width: 80, type: "currencyType"},
+        {field: "sc_state", headerName: "LOSS 처리여부", width: 90, 
             cellStyle: (params) => ({"text-align": "center", "color": params.value == "N" ? "red" : params.value == "Y" ? "green" : "none"}),
             cellRenderer: (params) => params.value === "Y" ? "처리완료" : "미처리",
         },
         {field: "md_id", hide: true},
         {field: "md_nm", headerName: "담당자", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "comment", headerName: "메모", width: 300},
-        {width: 0}
+        {field: "comment", headerName: "메모", width: 0},
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);

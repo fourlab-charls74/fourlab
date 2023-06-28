@@ -16,7 +16,11 @@
                 <span>/ 실사개별등록</span>
             </div>
         </div>
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
+	        @if(@$cmd != 'add' and @$sc->sc_state == 'N')
+		        <a href="javascript:void(0)" onclick="LossSave('{{ @$sc->sc_cd }}')" class="btn btn-danger">LOSS 등록</a>
+				<span class="mx-2">|</span>
+	        @endif
             @if(@$cmd == 'add' or @$sc->sc_state == 'N')
             <a href="javascript:void(0)" onclick="Save('{{ @$cmd }}')" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
             @endif
@@ -88,7 +92,7 @@
                                             <th>실사코드</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p id="sc_cd" class="fs-14">@if(@$sc != null) {{ @$sc->sc_code }} ({{ @$sc->sc_type == 'G' ? '일반등록' : (@$sc->sc_type == 'B' ? '일괄등록' : @$sc->sc_type == 'C' ? '바코드 등록' : '-') }}) @endif</p>
+                                                    <p id="sc_cd" class="fs-14">@if(@$sc != null) {{ @$sc->sc_code }} ({{ @$sc->sc_type_nm }}) @endif</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -145,9 +149,12 @@
     const cmd = '{{ @$cmd }}';
     const now_state = '{{ @$sc->sc_state }}';
     const pinnedRowData = [{ prd_cd: '합계', store_wqty: 0, qty: 0, loss_qty: 0, loss_price: 0 }];
+	
+	const loss_reasons = <?= json_encode(@$loss_reasons) ?>;
+	loss_reasons.unshift({ code_id: "", code_val: "-" });
 
     let columns = [
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellClass: 'hd-grid-code',
             cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
             sortingOrder: ['desc', 'asc', 'null'],
             comparator: (valueA, valueB, nodeA, nodeB, isInverted) => {
@@ -156,11 +163,11 @@
             },
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellClass: 'hd-grid-code'},
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellClass: 'hd-grid-code'},
+        {field: "opt_kind_nm", headerName: "품목", width: 80, cellClass: 'hd-grid-code'},
+        {field: "brand", headerName: "브랜드", width: 80, cellClass: 'hd-grid-code'},
+        {field: "style_no",	headerName: "스타일넘버", width: 70, cellClass: 'hd-grid-code'},
         {field: "goods_nm",	headerName: "상품명", width: 200,
             cellRenderer: (params) => {
                 if (params.data.goods_no === undefined) return '';
@@ -171,20 +178,49 @@
                 }
             }   
         },
-        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "goods_opt", headerName: "옵션", width: 130},
+        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 150},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellClass: 'hd-grid-code'},
+        {field: "color", headerName: "컬러", width: 50, cellClass: 'hd-grid-code'},
+        {field: "size", headerName: "사이즈", width: 50, cellClass: 'hd-grid-code'},
+        {field: "goods_opt", headerName: "옵션", width: 100},
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
         {field: "price", headerName: "판매가", type: "currencyType", width: 70},
-        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType'},
+        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType'},
         {field: "qty", headerName: "실사재고", width: 60, type: 'currencyType', 
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+            editable: (params)=> params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N'),
+			cellClass: (params) => (['hd-grid-number', params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N') ? 'hd-grid-edit' : '']),
         },
-        {field: "loss_qty", headerName: "LOSS수량", width: 80, type: 'currencyType'},
-        {field: "loss_price", headerName: "LOSS금액", width: 80, type: 'currencyType'}
+        {field: "loss_qty", headerName: "LOSS수량", width: 80, type: 'currencyType',
+            cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N') && (params.value > 0 || params.value < 0) ? '#ff9999' : 'inherit' }),
+        },
+		{field: "loss_rec_qty", headerName: "LOSS인정수량", width: 90, type: 'currencyType', hide: true,
+			editable: (params)=> params.node.rowPinned !== 'top' && now_state === 'N',
+			cellClass: (params) => (['hd-grid-number', params.node.rowPinned !== 'top' && now_state === 'N' ? 'hd-grid-edit' : '']),
+			cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && now_state == 'Y' && (params.value > 0 || params.value < 0) ? '#ff9999' : 'none' }),
+		},
+        {field: "loss_price", headerName: "LOSS금액", width: 80, type: 'currencyType',
+            cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && (params.value > 0 || params.value < 0) ? '#ff9999' : 'inherit' }),
+        },
+		{field: "loss_tag_price", headerName: "TAG가 금액", width: 80, type: 'currencyType', hide: true},
+		{field: "loss_price2", headerName: "현재가 금액", width: 80, type: 'currencyType', hide: true},
+        {field: "loss_reason", hide: true},
+        {field: "loss_reason_val", headerName: "LOSS사유", width: 90, 
+	        editable: (params)=> params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N'),
+	        cellClass: (params) => (['hd-grid-code', params.node.rowPinned === 'top' && (cmd == 'add' || now_state == 'N') ? '' : 'hd-grid-edit']),
+			cellEditor: 'agRichSelectCellEditor',
+			cellEditorPopup: true,
+			cellEditorParams: {
+				values: loss_reasons.map(rs => rs.code_val),
+				formatValue: (value) => {
+					let code_id = loss_reasons.find(rs => rs.code_val === value)?.code_id;
+					return `${code_id ? '[' + code_id + ']' : ''}${value}`;
+				},
+			},
+        },
+        {field: "comment", headerName: "메모", width: 200,
+	        editable: (params)=> params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N'), 
+	        cellClass: (params) => params.node.rowPinned === 'top' && (cmd == 'add' || now_state == 'N') ? '' : 'hd-grid-edit'
+        },
     ];
 </script>
 
@@ -193,9 +229,14 @@
     const pApp = new App('', { gridId: "#div-gd" });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 470);
+        pApp.ResizeGrid(385);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
+		
+		if (cmd === 'update') {
+			columns = columns.map(col => ['loss_rec_qty', 'loss_price2', 'loss_tag_price'].includes(col.field) ? { ...col, hide: false } : col);
+		}
+		
         gx = new HDGrid(gridDiv, columns, {
             pinnedTopRowData: pinnedRowData,
             getRowStyle: (params) => { // 고정된 row styling
@@ -203,19 +244,25 @@
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: (e) => {
-                if (e.column.colId === "qty") {
-                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                if (e.column.colId === "qty" || e.column.colId === "loss_rec_qty") {
+                    if (isNaN(e.newValue) || e.newValue === "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    } else if(e.newValue < 0) {
+                    } else if(e.newValue < 0 && e.column.colId === "qty") {
                         alert("음수는 입력할 수 없습니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     } else {
-                        e.data.loss_qty = parseInt(e.data.store_wqty) - parseInt(e.data.qty);
-                        e.data.loss_price = parseInt(e.data.price) * parseInt(e.data.loss_qty);
-                        gx.gridOptions.api.updateRowData({update: [e.data]});
-                        updatePinnedRow();
+						e.node.setDataValue('loss_qty', parseInt(e.data.store_wqty) - parseInt(e.data.qty));
+						if (cmd === 'update') {
+							if (e.column?.colId === 'qty') e.node.setDataValue('loss_rec_qty', e.data.loss_qty);
+							e.node.setDataValue('loss_price', parseInt(e.data.price) * parseInt(e.data.loss_rec_qty));
+						} else {
+							e.node.setDataValue('loss_price', parseInt(e.data.price) * parseInt(e.data.loss_qty));
+						}
+						updatePinnedRow();
                     }
+                } else if (e.column.colId === "loss_reason_val") {
+					e.node.setDataValue('loss_reason', loss_reasons.find(rs => rs.code_val === e.value)?.code_id || '');
                 }
             }
         });
@@ -254,6 +301,9 @@
             if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
             if($("[name=md_id]").val() === '') return alert("담당자를 선택해주세요.");
 
+			let not_reason_rows = rows.filter(row => row.store_wqty != row.qty && !row.loss_reason);
+			if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
+
             if(!confirm("등록하시겠습니까?")) return;
 
             axios({
@@ -265,7 +315,15 @@
                     store_cd,
                     md_id,
                     comment,
-                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, qty: r.qty, store_qty: r.store_wqty })),
+                    products: rows.map(r => ({ 
+	                    prd_cd: r.prd_cd, 
+	                    price: r.price,
+	                    goods_sh: r.goods_sh,
+	                    qty: r.qty, 
+	                    store_qty: r.store_wqty, 
+	                    loss_reason: r.loss_reason, 
+	                    comment: r.comment 
+					})),
                 },
             }).then(function (res) {
                 if(res.data.code === '200') {
@@ -284,6 +342,10 @@
             let sc_cd = '{{ @$sc->sc_cd }}';
 
             if(sc_state != 'N') return alert("매장LOSS등록 이전에만 수정가능합니다.");
+
+			let not_reason_rows = rows.filter(row => (row.loss_rec_qty > 0 || row.loss_rec_qty < 0) && !row.loss_reason);
+			if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
+			
             if(!confirm("수정하시겠습니까?")) return;
 
             axios({
@@ -292,8 +354,14 @@
                 data: {
                     sc_cd,
                     comment,
-                    products: rows.map(r => ({ sc_prd_cd: r.sc_prd_cd, qty: r.qty })),
-                },
+                    products: rows.map(r => ({ 
+	                    sc_prd_cd: r.sc_prd_cd, 
+	                    qty: r.qty, 
+	                    loss_rec_qty: r.loss_rec_qty, 
+	                    loss_reason: r.loss_reason, 
+	                    comment: r.comment 
+					})),
+				},
             }).then(function (res) {
                 if(res.data.code === '200') {
                     alert("실사정보 수정이 성공적으로 완료되었습니다.");
@@ -309,10 +377,6 @@
         }
     }
 
-    const checkIsEditable = (params) => {
-        return (cmd == 'add' || now_state == 'N') && params.data.hasOwnProperty('isEditable') && params.data.isEditable ? true : false;
-    };
-
     // 상품 삭제
     const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
 
@@ -321,7 +385,7 @@
         const rows = gx.getSelectedRows();
         if (Array.isArray(rows) && !(rows.length > 0)) return alert("삭제할 상품을 선택해주세요.");
 
-        rows.filter((row, idx) => row.isEditable).map((row) => { deleteRow(row); });
+        rows.forEach((row) => { deleteRow(row); });
         updatePinnedRow();
     };
 
@@ -367,7 +431,6 @@
             qty: 0, 
             loss_qty: (row.store_wqty * 1),
             loss_price: (row.store_wqty * 1) * row.price,
-            isEditable: true,
             count: count + 1,
         };
         callbaackRows.push(row);
@@ -380,7 +443,7 @@
     }
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ store_wqty, qty, loss_qty, loss_price ] = [ 0, 0, 0, 0 ];
+        let [ store_wqty, qty, loss_qty, loss_price, loss_rec_qty, loss_price2, loss_tag_price ] = [ 0, 0, 0, 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
@@ -388,12 +451,15 @@
                 qty += parseInt(row.qty || 0);
                 loss_qty += parseInt(row.loss_qty || 0);
                 loss_price += parseInt(row.loss_price || 0);
+				loss_rec_qty += parseInt(row.loss_rec_qty || 0);
+                loss_price2 += parseInt(row.loss_price2 || 0);
+                loss_tag_price += parseInt(row.loss_tag_price || 0);
             });
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, store_wqty: store_wqty, qty: qty, loss_qty: loss_qty, loss_price: loss_price }
+            { ...pinnedRow.data, store_wqty, qty, loss_qty, loss_price, loss_rec_qty, loss_price2, loss_tag_price }
         ]);
     };
 
@@ -418,5 +484,43 @@
             console.log(err);
         });
     }
+
+	// LOSS 등록
+	const LossSave = (sc_cd) => {
+		if(!cmd) return;
+
+		let comment = document.f1.comment.value;
+		let rows = gx.getRows();
+		let sc_state = '{{ @$sc->sc_state }}';
+		if(sc_state != 'N') return alert("이미 LOSS 등록된 내역입니다.");
+
+		let not_reason_rows = rows.filter(row => (row.loss_rec_qty > 0 || row.loss_rec_qty < 0) && !row.loss_reason);
+		if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
+
+		if(!confirm("LOSS 등록 이후에는 수정/삭제가 불가능합니다.\nLOSS 등록하시겠습니까?")) return;
+
+		axios({
+			url: '/store/stock/stk26/save-loss',
+			method: 'post',
+			data: {
+				sc_cd: sc_cd,
+				store_cd: "{{ @$sc->store_cd }}",
+				comment: comment,
+				products: rows,
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert("LOSS 등록이 성공적으로 완료되었습니다.");
+				opener.Search();
+				window.close();
+			} else {
+				console.log(res.data);
+				alert("등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+
+	}
 </script>
 @stop
