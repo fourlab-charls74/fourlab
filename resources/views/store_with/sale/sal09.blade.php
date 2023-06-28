@@ -26,22 +26,36 @@
 
 			<div class="card-body">
 				<div class="row">
-					<div class="col-lg-4">
-						<div class="form-group">
-							<label for="good_types">판매기간(판매연월)</label>
-							<div class="docs-datepicker flex_box">
-								<div class="input-group">
-								<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
-									<div class="input-group-append">
-										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-											<i class="fa fa-calendar" aria-hidden="true"></i>
-										</button>
-									</div>
-								</div>
-								<div class="docs-datepicker-container"></div>
-							</div>
-						</div>
-					</div>
+					<div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="formrow-firstname-input">매출일자</label>
+                            <div class="form-inline">
+                                <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                                <span class="text_line">~</span>
+                                <div class="docs-datepicker form-inline-inner input_box">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="docs-datepicker-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="good_types">판매채널/매장구분</label>
@@ -185,11 +199,6 @@
 </style>
 <script type="text/javascript" charset="utf-8">
 
-	const yoil = {
-		codes: [],
-		format: ["일", "월", "화", "수", "목", "금", "토"],
-	};
-
 	var columns = [
 		{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", aggAvg:"평균", cellStyle: { 'text-align': "center" },
 			cellRenderer: function (params) {
@@ -241,45 +250,40 @@
 				// { headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
 				{ headerName: "판매금액", field: "recv_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' }
 			]
-		}
+		},
 	];
 
 	var mutable_cols = [];
 
-	const toInt = (value) => {
-		if (value == "" || value == NaN || value == null || value == undefined) return 0;
-		return parseInt(value);
-	};
-
-	const setMutableColumns = (max_day) => {
+	const setMutableColumns = (month) => {
 		gx.gridOptions.api.setColumnDefs([]);
 		mutable_cols = [];
 		columns.map(col => {
 			mutable_cols.push(col);
 		});
-		mutable_cols.push(dayColumns(max_day));
+		mutable_cols.push(monthColumns(month));
 		mutable_cols.push({ headerName: "", field: "nvl", width: "auto" });
 		gx.gridOptions.api.setColumnDefs(mutable_cols);
 		autoSizeColumns(gx, ["nvl"]);
 		gx.CalAggregation();
 	};
 
-	const dayColumns = (max_day) => {
-		let obj = { fields: "day", headerName: "기간", children: [] };
-		for ( var i=0; i < max_day; i++ ) {
-			const day = i + 1;
-			const code = yoil.codes[i];
-			const day_of_week = yoil.format[code];
-			const f_day = day + ` (${day_of_week})`;
-			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType', aggregation:true, type: 'currencyMinusColorType' };
-			if ( code == 0 ) {
-				col.headerClass = 'hd-grid-red'; // 일요일 표시
-			} else if ( code == 6 ) {
-				col.headerClass = 'hd-grid-blue'; // 토요일 표시
-			}
-			obj.children.push(col);
+	const monthColumns = (month) => {
+		
+		let obj = { fields: "month", headerName: "기간", children: [] };
+		for(let i=0;i<month.length;i++) {
+			let str = String(month[i]);
+			let col_nm = str.substring(0,4) + '-' + str.substring(4);
+			let month_data = { field: 'recv_amt_'+ month[i], headerName: col_nm, type: 'currencyMinusColorType', width:75, aggregation: true};
+			obj.children.push(month_data);
 		}
 		return obj;
+		
+	};
+
+	const toInt = (value) => {
+		if (value == "" || value == NaN || value == null || value == undefined) return 0;
+		return parseInt(value);
 	};
 
 	const pApp = new App('', {
@@ -311,9 +315,8 @@
 	};
 
 	const formatDay = async (e) => {
-		yoil.codes = e.head.yoil_codes
-		const max_day = yoil.codes.length;
-		setMutableColumns(max_day);
+		const month = e.head.col_keys;
+		setMutableColumns(month);
 	};
 
 	function Search() {
@@ -325,6 +328,10 @@
 	const formReset = () => {
 		document.search.reset();
 	};
+	
+	const startEditingCell = (row_index, col_key) => {
+        gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
+    };
 
 	// 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
 	$(document).ready(function() {

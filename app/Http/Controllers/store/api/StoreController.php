@@ -28,16 +28,16 @@ class StoreController extends Controller {
     {
         $store_nm = $request->input('store_nm');
         $store_cd = $request->input('store_cd');
-        $store_channel = $request->input('store_channel');
-        $store_channel_kind = $request->input('store_channel_kind');
+        $store_channel = $request->input('store_channel','');
+        $store_channel_kind = $request->input('store_channel_kind','');
         $where = "";
 
         if($store_channel != '') {
-            $where .= " and store_channel = $store_channel";
+            $where .= " and store_channel = '$store_channel'";
         }
 
         if($store_channel_kind != '') {
-            $where .= " and store_channel_kind = $store_channel_kind";
+            $where .= " and store_channel_kind = '$store_channel_kind'";
         }
 
         $sql = "

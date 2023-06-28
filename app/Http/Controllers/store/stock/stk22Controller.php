@@ -207,8 +207,8 @@ class stk22Controller extends Controller
         $now_date = date('Ymd');
         $where = "";
 
-        if($store_channel != '') $where .= " and s.store_channel = $store_channel";
-        if($store_channel_kind != '') $where .= " and s.store_channel_kind = $store_channel_kind";
+        if($store_channel != '') $where .= " and s.store_channel = '$store_channel'";
+        if($store_channel_kind != '') $where .= " and s.store_channel_kind = '$store_channel_kind'";
 
 		$sql = "
             select
