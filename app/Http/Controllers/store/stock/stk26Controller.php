@@ -409,7 +409,11 @@ class stk26Controller extends Controller
     /** 실사일괄등록 팝업오픈 */
     public function show_batch()
     {
-        return view(Config::get('shop.store.view') . '/stock/stk26_batch');
+		$values = [ 
+			'sdate' => date("Y-m-d"),
+			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
+		];
+        return view(Config::get('shop.store.view') . '/stock/stk26_batch', $values);
     }
 
     /** 일괄등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
@@ -441,24 +445,15 @@ class stk26Controller extends Controller
 
     /** 일괄등록 상품 개별 조회 */
     public function get_goods(Request $request) {
-        $sc_date = $request->input('sc_date', '');
         $store_cd = $request->input('store_cd', '');
-        $md_id = $request->input('md_id', '');
-        $comment = $request->input('comment', '');
-        
         $data = $request->input('data', []);
         $result = [];
-        
-        $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
-        $md = DB::table('mgr_user')->where('id', $md_id)->select('id', 'name')->first();
-        if ($store == null || $md == null || $sc_date == null) {
-            return response()->json(['code' => 404, 'msg' => '실사 기본정보가 올바르지 않습니다. 실사일자/매장코드/담당자아이디 항목을 확인해주세요.']);
-        }
 
         foreach ($data as $key => $d) {
             $prd_cd = $d['prd_cd'];
             $qty = $d['qty'] ?? 0;
             $count = $d['count'] ?? '';
+			$loss_reason_val = $d['loss_reason_val'] ?? '';
 
             $sql = "
                 select
@@ -481,6 +476,8 @@ class stk26Controller extends Controller
                     , (ifnull(pss.wqty, 0) - ifnull('$qty', 0)) * g.price as loss_price
                     , true as isEditable
                     , '$count' as count
+                	, ifnull((select code_val from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason_val
+                	, ifnull((select code_id from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
                     left outer join goods g on g.goods_no = pc.goods_no
@@ -494,16 +491,6 @@ class stk26Controller extends Controller
             array_push($result, $row);
         }
 
-        $new_sc_cd = 1;
-        $sql = "
-            select sc_cd
-            from stock_check
-            order by sc_cd desc
-            limit 1
-        ";
-        $row = DB::selectOne($sql);
-        if($row != null) $new_sc_cd = $row->sc_cd + 1;
-
         return response()->json([
             "code" => 200,
             "head" => [
@@ -511,11 +498,6 @@ class stk26Controller extends Controller
                 "page" => 1,
                 "page_cnt" => 1,
                 "page_total" => 1,
-                "new_sc_cd" => $new_sc_cd,
-                "sc_date" => $sc_date,
-                "store" => $store,
-                "md" => $md,
-                "comment" => $comment,
             ],
             "body" => $result
         ]);

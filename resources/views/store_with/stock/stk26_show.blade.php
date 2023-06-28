@@ -298,8 +298,8 @@
                 $(".sch-store").click();
                 return alert("매장을 선택해주세요.");
             }
-            if(rows.length < 1) return alert("실사등록할 상품을 선택해주세요.");
-            if($("[name=md_id]").val() === '') return alert("담당자를 선택해주세요.");
+            if(rows.length < 1) return alert("실사등록할 상품을 추가해주세요.");
+            if(md_id === '') return alert("담당자를 선택해주세요.");
 
 			let not_reason_rows = rows.filter(row => row.store_wqty != row.qty && !row.loss_reason);
 			if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
