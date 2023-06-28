@@ -57,8 +57,9 @@ class ProductPriceBatch extends Command
 				
 				$sql_list = "
 					select
-						ppl.goods_no, ppl.change_price
+						pc.goods_no, ppl.change_price
 					from product_price_list ppl
+					inner join product_code pc on pc.prd_cd = ppl.prd_cd
 					where
 					    ppl.product_price_cd = :product_price_cd
 				";
@@ -69,9 +70,11 @@ class ProductPriceBatch extends Command
 					$change_price	= $row_list->change_price;
 
 					//goods 테이블 price 가격변경
-					DB::table('goods')
-						->where('goods_no', '=', $goods_no)
-						->update(['price' => $change_price]);
+					if( $goods_no != 0 ){
+						DB::table('goods')
+							->where('goods_no', '=', $goods_no)
+							->update(['price' => $change_price]);
+					}
 
 					//product 테이블 price 가격변경
 					DB::table('product')
