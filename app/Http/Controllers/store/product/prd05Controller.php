@@ -209,7 +209,7 @@ class prd05Controller extends Controller
 				, pc.prd_cd
 				, opt.opt_kind_nm as opt_kind_nm
 				, ifnull(pc.goods_no,0) as goods_no
-				, ifnull(p.style_no, 0) as style_no
+				, pc.style_no
 				, b.brand_nm as brand
 				, g.goods_nm
 				, g.goods_nm_eng
@@ -217,15 +217,14 @@ class prd05Controller extends Controller
 				, pc.size
 				, g.price
 				, g.goods_sh
-			from product_code pc
-				left outer join product p on p.prd_cd = pc.prd_cd
-				left outer join product_price_list ppl on ppl.prd_cd = pc.prd_cd
-				left outer join product_price pp on pp.idx = ppl.product_price_cd
-				left outer join goods g on g.goods_no = pc.goods_no
-				left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
-				left outer join brand b on b.br_cd = pc.brand
-				left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-			where 1=1 and pp.idx != ''
+			from product_price_list ppl
+			inner join product_price pp on pp.idx = ppl.product_price_cd
+			inner join product_code pc on ppl.prd_cd = pc.prd_cd
+			left outer join goods g on g.goods_no = pc.goods_no
+			left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
+			left outer join brand b on b.br_cd = pc.brand
+			left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+			where 1=1 
 			$where
 			$orderby
 			$limit
@@ -240,15 +239,10 @@ class prd05Controller extends Controller
 			$sql = "
 				select
 					count(*) as total
-				from product_code pc
-					left outer join product p on p.prd_cd = pc.prd_cd
-					left outer join product_price_list ppl on ppl.prd_cd = pc.prd_cd
-					left outer join product_price pp on pp.idx = ppl.product_price_cd
-					left outer join goods g on g.goods_no = pc.goods_no
-					left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
-					left outer join brand b on b.br_cd = pc.brand
-					left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-				where 1=1 and pp.idx != ''
+				from product_price_list ppl
+				inner join product_price pp on pp.idx = ppl.product_price_cd
+				inner join product_code pc on ppl.prd_cd = pc.prd_cd
+				where 1=1
 				$where
 			";
 
@@ -438,6 +432,7 @@ class prd05Controller extends Controller
 	}
 
 	//상품가격변경 즉시
+	// 현재 사용하지 않음 (추후 사용하지 않을시 삭제예정 )
 	public function change_price_now (Request $request) {
 
 		$data = $request->input('data');

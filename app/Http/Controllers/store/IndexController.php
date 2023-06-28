@@ -484,7 +484,7 @@ class IndexController extends Controller
                 group by a.ord_state_date
                 ) p on a.sale_date = p.ord_state_date
         ";
-
+		
         $rows = DB::select($sql);
 
         $result = collect($rows)->map(function ($row) {
