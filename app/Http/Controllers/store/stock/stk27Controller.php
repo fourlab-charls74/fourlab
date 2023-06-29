@@ -139,8 +139,8 @@ class stk27Controller extends Controller
                 s.loss_price,
                 (s.storage_qty * s.price) as loss_price2,
                 (s.storage_qty * s.tag_price) as loss_tag_price,
-                s.loss_reason,
-                r.code_val as loss_reason_val,
+                if(r.code_val is null, '', s.loss_reason) as loss_reason,
+                ifnull(r.code_val, s.loss_reason) as loss_reason_val,
                 s.comment
             from storage_stock_check_product s
                 inner join product_code pc on pc.prd_cd = s.prd_cd

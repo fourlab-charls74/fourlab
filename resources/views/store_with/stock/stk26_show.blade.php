@@ -206,7 +206,7 @@
         {field: "loss_reason", hide: true},
         {field: "loss_reason_val", headerName: "LOSS사유", width: 90, 
 	        editable: (params)=> params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N'),
-	        cellClass: (params) => (['hd-grid-code', params.node.rowPinned === 'top' && (cmd == 'add' || now_state == 'N') ? '' : 'hd-grid-edit']),
+	        cellClass: (params) => (['hd-grid-code', params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N') ? 'hd-grid-edit' : '']),
 			cellEditor: 'agRichSelectCellEditor',
 			cellEditorPopup: true,
 			cellEditorParams: {
@@ -219,7 +219,7 @@
         },
         {field: "comment", headerName: "메모", width: 200,
 	        editable: (params)=> params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N'), 
-	        cellClass: (params) => params.node.rowPinned === 'top' && (cmd == 'add' || now_state == 'N') ? '' : 'hd-grid-edit'
+	        cellClass: (params) => params.node.rowPinned !== 'top' && (cmd == 'add' || now_state == 'N') ? 'hd-grid-edit' : '',
         },
     ];
 </script>

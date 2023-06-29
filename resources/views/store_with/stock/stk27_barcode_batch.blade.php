@@ -440,7 +440,7 @@
         return merged;
     }
 
-    // 실사 등록
+    // 재고조 등록
     function Save() {
         let rows = gx.getRows();
 
@@ -474,7 +474,7 @@
             },
         }).then(function (res) {
             if(res.data.code === '200') {
-                alert("실사 바코드 등록이 성공적으로 완료되었습니다.");
+                alert("창고재고조정 바코드등록이 성공적으로 완료되었습니다.");
                 opener.Search();
                 window.close();
             } else {

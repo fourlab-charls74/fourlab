@@ -326,7 +326,7 @@
 				}
 			});
             
-            row.qty = row.qty || 0; // 실사재고 미입력 시 0 처리
+            row.qty = row.qty || 0; // 조정재고 미입력 시 0 처리
             row = { ...row, count: ++count };
             rows.push(row);
             rowIndex++;
@@ -406,7 +406,7 @@
         });
     };
 
-    // 실사 등록
+    // 재고조정 등록
     function Save() {
         let rows = gx.getRows();
 
@@ -440,7 +440,7 @@
             },
         }).then(function (res) {
             if(res.data.code === '200') {
-                alert("실사등록이 성공적으로 완료되었습니다.");
+                alert("창고재고조정이 성공적으로 완료되었습니다.");
                 opener.Search();
                 window.close();
             } else {

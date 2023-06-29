@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\store\stock;
 
 use App\Http\Controllers\Controller;
-use App\Components\Lib;
 use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Exception;
 
 const PRODUCT_STOCK_TYPE_LOSS = 14;		// 재고분류 : LOSS
+
 class stk26Controller extends Controller
 {
 	public function index()
@@ -148,10 +147,11 @@ class stk26Controller extends Controller
                 s.loss_price,
                 s.loss_price2,
                 s.loss_tag_price,
-                s.loss_reason,
-                r.code_val as loss_reason_val,
+                if(r.code_val is null, '', s.loss_reason) as loss_reason,
+                ifnull(r.code_val, if(sc.sc_state = 'Y', s.loss_reason, null)) as loss_reason_val,
                 s.comment
             from stock_check_product s
+                inner join stock_check sc on sc.sc_cd = s.sc_cd
                 inner join product_code pc on pc.prd_cd = s.prd_cd
                 inner join product p on p.prd_cd = s.prd_cd
                 left outer join goods g on g.goods_no = pc.goods_no
@@ -358,7 +358,7 @@ class stk26Controller extends Controller
 					->where('store_cd', $store_cd)
 					->where('prd_cd', $product['prd_cd'])
 					->update([
-						'qty' => $qty,
+						'qty' => DB::raw("qty - " . $minus_qty),
 						'wqty' => $qty,
 						'ut' => now(),
 					]);
