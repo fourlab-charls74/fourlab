@@ -17,7 +17,6 @@
                 <h4>검색</h4>
                 <div>
                     <a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="openAddPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 등록</a>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -67,7 +66,8 @@
             <div class="card-header mb-0 pt-1 pb-1 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0">판매채널</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreChannel()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="openAddPopup()" ><i class="bx bx-plus fs-16"></i> 판매채널 등록</a>
+                    <!-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreChannel()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button> -->
                 </div>
             </div>
             <div class="card-body shadow pt-2">
@@ -82,7 +82,8 @@
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>매장구분</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreType()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="openAddTypePopup()" ><i class="bx bx-plus fs-16"></i> 매장구분 등록</a>
+                    <!-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreType()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button> -->
                 </div>
             </div>
             <div class="card-body shadow pt-2">
@@ -98,13 +99,7 @@
     const columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
         {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        // {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
-        //     cellRenderer: function(params) {
-        //         if (params.value === 'C') {
-        //             return '판매채널';
-        //         }
-        //     }
-        // },
+        
         {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_channel_cd}", "${params.data.store_type}" , "${params.data.idx}")'>${params.value}</a>`;
@@ -123,22 +118,12 @@
     const store_type_columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
         {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        // {field: "store_type", headerName: "구분", width: 80, cellStyle:{'text-align' : 'center'},
-        //     cellRenderer: function(params) {
-        //         if (params.value === 'T') {
-        //             return '매장구분';
-        //         }
-        //     }
-        // },
-        // {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},},
-        // {field: "store_channel", headerName: "판매채널", width: 100, cellStyle:{'text-align' : 'center'}},
         {field: "store_kind_cd", headerName: "매장구분코드", width: 100, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_kind_cd}", "${params.data.store_type}", "${params.data.idx}")'>${params.value}</a>`;
             }
         },
         {field: "store_kind", headerName: "매장구분", width: 100, cellStyle:{'text-align' : 'center'},},
-        // {field: "seq", headerName: "순서", cellStyle:{'text-align' : 'center'},},
         {field: "use_yn", headerName: "사용여부", cellStyle:{'text-align' : 'center'},},
         {width: 0}
     ]
@@ -195,71 +180,78 @@
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
     }
 
+    function openAddTypePopup () {
+        const url = '/store/standard/std09/add';
+        const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=480");
+    }
+
     function openEditPopup(code, type, idx) {
         const url = '/store/standard/std09/show/' + code + '/' + type + '/' + idx;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
     }
 
-    //매장구분 삭제
-    function deleteStoreType() {
-        let rows = gx2.getSelectedRows();
 
-        if (rows.length == 0) {
-            alert('삭제할 매장구분을 선택해주세요');
-            return false;
-        }
+    // 판매채널, 매장구분 삭제 일단 주석처리 추후 필요할 수 있음
+    // //매장구분 삭제
+    // function deleteStoreType() {
+    //     let rows = gx2.getSelectedRows();
 
-        if (confirm('선택한 매장구분을 삭제하시겠습니까?') === false) return;
+    //     if (rows.length == 0) {
+    //         alert('삭제할 매장구분을 선택해주세요');
+    //         return false;
+    //     }
 
-        axios({
-            url: '/store/standard/std09/delete',
-            method: 'post',
-            data: { 
-                data: rows.map(r => ({ store_channel_cd : r.store_channel_cd, store_kind_cd : r.store_kind_cd })),
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                console.log(res);
-                alert("매장구분이 삭제되었습니다.");
-                SearchDetail(res.data.store_channel_cd, res.data.store_channel);
-            } else {
-                console.log(res.data);
-                alert("매장구분 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
+    //     if (confirm('선택한 매장구분을 삭제하시겠습니까?') === false) return;
 
-    //판매채널 삭제
-    function deleteStoreChannel() {
-        let rows = gx.getSelectedRows();
+    //     axios({
+    //         url: '/store/standard/std09/delete',
+    //         method: 'post',
+    //         data: { 
+    //             data: rows.map(r => ({ store_channel_cd : r.store_channel_cd, store_kind_cd : r.store_kind_cd })),
+    //         },
+    //     }).then(function (res) {
+    //         if(res.data.code === 200) {
+    //             console.log(res);
+    //             alert("매장구분이 삭제되었습니다.");
+    //             SearchDetail(res.data.store_channel_cd, res.data.store_channel);
+    //         } else {
+    //             console.log(res.data);
+    //             alert("매장구분 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+    //         }
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
 
-        if (rows.length == 0) {
-            alert('삭제할 판매채널을 선택해주세요');
-            return false;
-        }
+    // //판매채널 삭제
+    // function deleteStoreChannel() {
+    //     let rows = gx.getSelectedRows();
 
-        if (confirm('선택한 판매채널의 매장구분도 삭제됩니다. 삭제하시겠습니까?') === false) return;
+    //     if (rows.length == 0) {
+    //         alert('삭제할 판매채널을 선택해주세요');
+    //         return false;
+    //     }
 
-        axios({
-            url: '/store/standard/std09/delete-channel',
-            method: 'post',
-            data: { 
-                data: rows.map(r => ({ store_channel_cd : r.store_channel_cd})),
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                alert("판매채널이 삭제되었습니다.");
-                Search();
-                SearchDetail();
-            } else {
-                console.log(res.data);
-                alert("판매채널 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
-    }
+    //     if (confirm('선택한 판매채널의 매장구분도 삭제됩니다. 삭제하시겠습니까?') === false) return;
+
+    //     axios({
+    //         url: '/store/standard/std09/delete-channel',
+    //         method: 'post',
+    //         data: { 
+    //             data: rows.map(r => ({ store_channel_cd : r.store_channel_cd})),
+    //         },
+    //     }).then(function (res) {
+    //         if(res.data.code === 200) {
+    //             alert("판매채널이 삭제되었습니다.");
+    //             Search();
+    //             SearchDetail();
+    //         } else {
+    //             console.log(res.data);
+    //             alert("판매채널 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+    //         }
+    //     }).catch(function (err) {
+    //         console.log(err);
+    //     });
+    // }
 </script>
 @stop

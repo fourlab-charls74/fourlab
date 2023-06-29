@@ -1,5 +1,5 @@
 @php
-if ($code == '') $title = '판매채널관리 추가';
+if ($code == '') $title = '매장구분 추가';
 else $title = '판매채널관리 수정';
 @endphp
 
@@ -39,35 +39,10 @@ else $title = '판매채널관리 수정';
                                                 <th>구분</th>
                                                 <td>
                                                     <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio" style="@if($type == 'T') display:none @endif">
-                                                            <input type="radio" name="add_type" id="add_c" class="custom-control-input" value="C" @if($type == 'C' || $code == '') checked @endif/>
-                                                            <label class="custom-control-label" for="add_c">판매채널</label>
+                                                        <div class="custom-control custom-radio" style="@if($type == 'C') display:none @endif" >
+                                                            <input type="radio" name="add_type" id="add_t" class="custom-control-input" value="T" @if($type == 'T' || $code == '') checked @endif/>
+                                                            <label class="custom-control-label" for="add_t">매장구분</label>
                                                         </div>
-                                                        @if ($code != '')
-                                                            <div class="custom-control custom-radio" style="@if($type == 'C') display:none @endif" >
-                                                                <input type="radio" name="add_type" id="add_t" class="custom-control-input" value="T" @if($type == 'T') checked @endif/>
-                                                                <label class="custom-control-label" for="add_t">매장구분</label>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr id="channel1">
-                                                <th>판매채널코드</th>
-                                                <td>
-                                                    <div class="d-flex">
-                                                            <input type='text' class="form-control form-control-sm search-enter" name='store_channel_cd' id="store_channel_cd" onkeydown="setDupCheckValue()" value='{{@$store_channel->store_channel_cd}}' style="width:60%" maxlength="2">
-                                                            <button type="button" class="btn btn-primary ml-2" onclick="checkCode()">중복체크</button>
-                                                            &nbsp;&nbsp;&nbsp; <span id="dupcheck" class="pt-1"></span>
-                                                            <input type="hidden" name="check_dup" />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr id="channel2">
-                                                <th>판매채널명</th>
-                                                <td>
-                                                    <div class="flax_box">
-                                                        <input type='text' class="form-control form-control-sm search-enter" name='store_channel' id="store_channel" value='{{@$store_channel->store_channel}}'>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -156,87 +131,27 @@ else $title = '판매채널관리 수정';
     </div>
     <script>
 
-        $(document).ready(function() {
-            let type = "{{@$type}}";
-            let code = "{{@$code}}";
-
-            if (type == 'C' || code == '') {
-                $('#type1').hide();
-                $('#type2').hide();
-                $('#type3').hide();
-
-            } else {
-                $('#channel1').hide();
-                $('#channel2').hide();
-                $('#type1').show();
-                $('#type2').show();
-                $('#type3').show();
-                window.resizeTo(800,550);
-            }
-
-
-            $('input[type=radio][name="add_type"]').change(function() {
-                if ($("input[name='add_type']:checked").val() === 'C') {
-                    $('#channel1').show();
-                    $('#channel2').show();
-                    $('#type1').hide();
-                    $('#type2').hide();
-                    $('#type3').hide();
-                    window.resizeTo(800,490);
-
-                } else {
-                    $('#channel1').hide();
-                    $('#channel2').hide();
-                    $('#type1').show();
-                    $('#type2').show();
-                    $('#type3').show();
-                    window.resizeTo(800,550);
-                }
-            });
-        });
 
         function Save() {
 
-            if ($("input[name='add_type']:checked").val() === 'C') {
-                
-                if ($('#store_channel_cd').val() === '') {
-                    $('#store_channel_cd').focus();
-                    alert('판매채널코드를 입력해주세요');
-                    return false;
-                }
-                
-                if ($('#store_channel').val() === '') {
-                    $('#store_channel').focus();
-                    alert('판매채널명을 입력해주세요');
-                    return false;
-                }
-
-                if($("[name='check_dup']").val() !== "true") return alert("판매채널코드 중복체크를 해주세요.");
-
+            if ($('#sel_channel').val() === '') {
+                alert('판매채널을 선택해주세요');
+                return false;
+            }
+            
+            if ($('#store_kind_cd').val() === '') {
+                $('#store_kind_cd').focus();
+                alert('매장구분코드를 입력해주세요');
+                return false;
             }
 
-            if ($("input[name='add_type']:checked").val() === 'T') {
-                
-                if ($('#sel_channel').val() === '') {
-                    alert('판매채널을 선택해주세요');
-                    return false;
-                }
-                
-                if ($('#store_kind_cd').val() === '') {
-                    $('#store_kind_cd').focus();
-                    alert('매장구분코드를 입력해주세요');
-                    return false;
-                }
-
-                if ($('#store_kind').val() === '') {
-                    $('#store_kind').focus();
-                    alert('매장구분명을 입력해주세요');
-                    return false;
-                }
-
-                if($("[name='check_dup2']").val() !== "true") return alert("매장구분코드 중복체크를 해주세요.");
-
+            if ($('#store_kind').val() === '') {
+                $('#store_kind').focus();
+                alert('매장구분명을 입력해주세요');
+                return false;
             }
+
+            if($("[name='check_dup2']").val() !== "true") return alert("매장구분코드 중복체크를 해주세요.");
 
             if(!confirm('저장하시겠습니까?')){
                 return false;
@@ -246,7 +161,7 @@ else $title = '판매채널관리 수정';
 
             $.ajax({
                 method: 'post',
-                url: '/store/standard/std09/save',
+                url: '/store/standard/std09/store-type-save',
                 data: frm,
                 dataType: 'json',
                 success: function (res) {
@@ -266,79 +181,10 @@ else $title = '판매채널관리 수정';
 
         }
 
-        function Edit() {
-
-            if ($("input[name='add_type']:checked").val() === 'C') {
-                
-                if ($('#store_channel_cd').val() === '') {
-                    $('#store_channel_cd').focus();
-                    alert('판매채널코드를 입력해주세요');
-                    return false;
-                }
-                
-                if ($('#store_channel').val() === '') {
-                    $('#store_channel').focus();
-                    alert('판매채널명을 입력해주세요');
-                    return false;
-                }
-
-            }
-
-            if ($("input[name='add_type']:checked").val() === 'T') {
-                
-                if ($('#sel_channel').val() === '') {
-                    alert('판매채널을 선택해주세요');
-                    return false;
-                }
-                
-                if ($('#store_kind_cd').val() === '') {
-                    $('#store_kind_cd').focus();
-                    alert('매장구분코드를 입력해주세요');
-                    return false;
-                }
-
-                if ($('#store_kind').val() === '') {
-                    $('#store_kind').focus();
-                    alert('매장구분명을 입력해주세요');
-                    return false;
-                }
-
-            }
-
-            if(!confirm('수정하시겠습니까?')){
-                return false;
-            }
-            let idx = '{{@$idx}}'
-            let code = "{{@$store_channel_cd}}";
-            var frm = $('form[name=detail]').serialize();
-            frm += '&idx='+idx;
-            frm += '&code=' + code;
-
-            $.ajax({
-                method: 'post',
-                url: '/store/standard/std09/edit',
-                data: frm,
-                dataType: 'json',
-                success: function (res) {
-                    if(res.code == '200'){
-                        alert("정상적으로 수정 되었습니다.");
-                        self.close();
-                        opener.Search(1);
-                    } else {
-                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-                        console.log(res.msg);
-                    }
-                },
-                error: function(e) {
-                    console.log(e.responseText)
-                }
-            });
-
-        }
+       
 
         // 판매채널코드 중복체크
         async function checkCode() {
-            const store_channel_cd = $("[name=store_channel_cd]").val().trim();
             const store_kind_cd = $("[name=store_kind_cd").val().trim();
             const add_type = $("input[name='add_type']:checked").val();
             

@@ -102,7 +102,7 @@
 </form>
 
 <div class="row show_layout">
-    <div class="col-lg-3 pr-1">
+    <div class="col-lg-4 pr-1">
         <div class="card shadow-none mb-0">
             <div class="card-header mb-0 pt-1 pb-1">
                 <h5 class="m-0">매장목록</h5>
@@ -114,7 +114,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-9">
+    <div class="col-lg-8">
         <div class="card shadow-none mb-0">
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>동종업계 세부정보</h5>
@@ -141,7 +141,8 @@
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.value}", "${params.data.store_nm}")'>${params.value}</a>`;
             }
         },
-        {field: "store_type", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_channel", headerName: "판매채널", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_channel_kind", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 140, 
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.data.store_cd}", "${params.value}")'>${params.value}</a>`;
@@ -159,10 +160,12 @@
         }},
         {field: "competitor_cd", headerName: "동종업계코드", width: 100, cellStyle: {"text-align": "center"}},
         {field: "competitor_nm", headerName: "동종업계명", width: 200},
-        {field: "item", headerName: "아이템", width: 200, cellStyle: {"background-color": "#ffff99"}, editable: true},
-        {field: "manager", headerName: "매니저", cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
-        {field: "sdate", headerName: "등록일", width: 80, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
-        {field: "edate", headerName: "폐점일", width: 80, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true},
+
+        //본사에서 삭제요청 일단 히든처리
+        {field: "item", headerName: "아이템", width: 200, cellStyle: {"background-color": "#ffff99"}, editable: true, hide:true},
+        {field: "manager", headerName: "매니저", cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true, hide:true},
+        {field: "sdate", headerName: "등록일", width: 80, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true, hide:true},
+        {field: "edate", headerName: "폐점일", width: 80, cellStyle: {"text-align": "center", "background-color": "#ffff99"}, editable: true, hide:true},
         {width: "auto"},
     ];
 </script>

@@ -174,8 +174,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //판매채널관리
         Route::get('std09', 'std09Controller@index');
         Route::get('std09/show/{code?}/{type?}/{idx?}', 'std09Controller@show');
+        Route::get('std09/add/', 'std09Controller@add');
         Route::get('std09/search', 'std09Controller@search');
         Route::post('std09/save', 'std09Controller@save');
+        Route::post('std09/store-type-save', 'std09Controller@store_type_save');
         Route::post('std09/edit', 'std09Controller@edit');
         Route::get('std09/search-store-type/{store_channel_cd?}', 'std09Controller@search_store_type');
         Route::post('std09/delete', 'std09Controller@delete');
