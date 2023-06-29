@@ -616,9 +616,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::get('stk27/show/{sc_cd?}','stk27Controller@show');
 		Route::get('stk27/search-check-products','stk27Controller@search_check_products');
 		Route::put('stk27/save', 'stk27Controller@save');
-		Route::put('stk27/update', 'stk27Controller@update');
-		Route::post('stk27/save-loss', 'stk27Controller@save_loss');
-		Route::delete('stk27','stk27Controller@delete');
+
 		Route::get('stk27/batch', 'stk27Controller@show_batch');
 		Route::get('stk27/barcode-batch', 'stk27Controller@barcode_batch');
 		Route::post('stk27/batch-import', 'stk27Controller@import_excel');

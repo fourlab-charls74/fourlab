@@ -203,7 +203,7 @@
 				values: loss_reasons.map(rs => rs.code_val),
 				formatValue: (value) => {
 					let code_id = loss_reasons.find(rs => rs.code_val === value)?.code_id;
-					return `${code_id ? '[' + code_id + ']' : ''}${value}`;
+					return `${code_id ? '[' + code_id + '] ' : ''}${value}`;
 				},
 			},
 		},

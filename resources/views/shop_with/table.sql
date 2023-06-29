@@ -619,6 +619,39 @@ CREATE TABLE `stock_check_product` (
 	PRIMARY KEY (`sc_prd_cd`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- 창고재고조정
+CREATE TABLE `storage_stock_check` (
+	`ssc_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify (재고조정코드)',
+	`storage_cd` varchar(30) NOT NULL COMMENT '창고코드 - storage : storage_cd',
+	`md_id` varchar(30) DEFAULT NULL COMMENT '담당자',
+	`ssc_date` char(10) NOT NULL COMMENT '재고조정일자',
+	`ssc_type` char(1) NOT NULL COMMENT '재고조정구분 - 일반(G)/일괄(B)/바코드(C)',
+	`comment` varchar(255) DEFAULT NULL COMMENT '메모',
+	`rt` datetime DEFAULT NULL COMMENT '등록일자',
+	`ut` datetime DEFAULT NULL COMMENT '수정일자',
+	`admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+	PRIMARY KEY (`ssc_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 창고재고조정 상품리스트
+CREATE TABLE `storage_stock_check_product` (
+	`ssc_prd_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT 'identify (재고조정상품코드)',
+	`ssc_cd` int(11) NOT NULL COMMENT '재고조정코드',
+	`prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+	`price` int(11) NOT NULL COMMENT '(재고조정당시) 판매가',
+	`tag_price` int(11) NOT NULL COMMENT '(재고조정당시) TAG가',
+	`qty` int(11) NOT NULL COMMENT '재고조정수량',
+	`storage_qty` int(11) NOT NULL COMMENT '(재고조정당시) 창고수량',
+	`loss_qty` int(11) COMMENT 'LOSS 수량',
+	`loss_price` int(11) COMMENT 'LOSS 금액',
+	`loss_reason` varchar(10) DEFAULT NULL COMMENT 'LOSS 사유 - code : STORAGE_LOSS_REASON',
+	`comment` varchar(255) DEFAULT NULL COMMENT 'LOSS 상품별 메모',
+	`rt` datetime DEFAULT NULL COMMENT '등록일자',
+	`ut` datetime DEFAULT NULL COMMENT '수정일자',
+	`admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',
+	PRIMARY KEY (`ssc_prd_cd`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 -- 매장마감
 CREATE TABLE `store_account_closed` (
 	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '정산번호',

@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\store\stock;
 
 use App\Http\Controllers\Controller;
-use App\Components\Lib;
 use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Exception;
 
-const PRODUCT_STOCK_TYPE_LOSS = 14;		// 재고분류 : LOSS
+const PRODUCT_STOCK_TYPE_LOSS = 14; // 재고분류 : LOSS
+
 class stk27Controller extends Controller
 {
 	public function index()
@@ -24,7 +23,7 @@ class stk27Controller extends Controller
 		$values = [
 			'sdate' => $sdate,
 			'edate' => $edate,
-			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
+			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk27', $values);
 	}
@@ -33,44 +32,38 @@ class stk27Controller extends Controller
     {
         $sdate = $request->input('sdate', now()->sub(1, 'week')->format('Y-m-d'));
         $edate = $request->input('edate', date('Y-m-d'));
-        $sc_cd = $request->input('sc_cd', '');
-        $store_cd = $request->input('store_no', '');
-        $sc_state = $request->input('sc_state', '');
+        $storage_cd = $request->input('storage_cd', '');
 		$loss_reason = $request->input('loss_reason', '');
 
         // where
         $where = "";
-        $where .= " and s.sc_date >= '$sdate' ";
-        $where .= " and s.sc_date <= '$edate' ";
-        if($sc_cd != '') $where .= " and s.sc_cd = '$sc_cd' ";
-        if($store_cd != '') $where .= " and s.store_cd = '$store_cd' ";
-        if($sc_state != '') $where .= " and s.sc_state = '$sc_state' ";
+        $where .= " and s.ssc_date >= '$sdate' ";
+        $where .= " and s.ssc_date <= '$edate' ";
+        if($storage_cd != '') $where .= " and s.storage_cd = '$storage_cd' ";
         if($loss_reason != '') $where .= " and sp.loss_reason = '$loss_reason' ";
 
         $sql = "
             select
-                s.sc_date,
-                s.sc_type,
-                s.sc_cd,
-                s.store_cd,
-                store.store_nm,
-                sum(sp.store_qty) as store_qty,
+                s.ssc_date,
+                s.ssc_type,
+                s.ssc_cd,
+                s.storage_cd,
+                storage.storage_nm,
+                sum(sp.storage_qty) as storage_qty,
                 sum(sp.qty) as qty,
-                sum(sp.loss_rec_qty) as loss_qty,
+                sum(sp.loss_qty) as loss_qty,
                 sum(sp.loss_price) as loss_price,
-                s.sc_state,
                 s.md_id,
                 m.name as md_nm,
                 s.comment
-            from stock_check s
-                inner join store on store.store_cd = s.store_cd
+            from storage_stock_check s
+                inner join storage on storage.storage_cd = s.storage_cd
                 inner join mgr_user m on m.id = s.md_id
-                inner join stock_check_product sp on sp.sc_cd = s.sc_cd
+                inner join storage_stock_check_product sp on sp.ssc_cd = s.ssc_cd
             where 1=1 $where
-            group by s.sc_cd
-            order by s.sc_cd desc
+            group by s.ssc_cd
+            order by s.ssc_cd desc
         ";
-
         $result = DB::select($sql);
 
 		return response()->json([
@@ -83,50 +76,49 @@ class stk27Controller extends Controller
 		]);
     }
 
-    public function show($sc_cd = '', Request $request)
+    public function show($ssc_cd = '', Request $request)
     {
-        $sc = '';
+        $ssc = '';
 
-        if($sc_cd != '') {
+        if($ssc_cd != '') {
             $sql = "
                 select
-                    s.sc_date,
-                    concat(s.store_cd, '_', REPLACE(s.sc_date, '-', '') , '_' , LPAD(s.sc_cd, 3, '0')) as sc_code,
-                    s.sc_type,
-                    if(s.sc_type = 'G', '일반등록', if(s.sc_type = 'B', '일괄등록', if(s.sc_type = 'C', '바코드등록', '-'))) as sc_type_nm,
-                    s.sc_cd,
-                    s.store_cd,
-                    store.store_nm,
-                    s.sc_state,
+                    s.ssc_date,
+                    concat(s.storage_cd, '_', REPLACE(s.ssc_date, '-', '') , '_' , LPAD(s.ssc_cd, 3, '0')) as ssc_code,
+                    s.ssc_type,
+                    if(s.ssc_type = 'G', '일반등록', if(s.ssc_type = 'B', '일괄등록', if(s.ssc_type = 'C', '바코드등록', '-'))) as ssc_type_nm,
+                    s.ssc_cd,
+                    s.storage_cd,
+                    storage.storage_nm,
                     s.md_id,
                     m.name as md_nm,
                     s.comment
-                from stock_check s
-                    inner join store on store.store_cd = s.store_cd
+                from storage_stock_check s
+                    inner join storage on storage.storage_cd = s.storage_cd
                     inner join mgr_user m on m.id = s.md_id
-                where sc_cd = :sc_cd
+                where s.ssc_cd = :ssc_cd
             ";
-            $sc = DB::selectOne($sql, ['sc_cd' => $sc_cd]);
+            $ssc = DB::selectOne($sql, [ 'ssc_cd' => $ssc_cd ]);
         }
 
         $values = [
-            "cmd"           => $sc == '' ? "add" : "update",
-            'sdate'         => $sc == '' ? date("Y-m-d") : $sc->sc_date,
-            'sc'            => $sc,
-			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
+            "cmd"           => $ssc == '' ? "add" : "get",
+            'sdate'         => $ssc == '' ? date("Y-m-d") : $ssc->ssc_date,
+            'ssc'           => $ssc,
+			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk27_show', $values);
     }
 
-    // 기존 실사등록상품정보 불러오기
+    // 기존 재고조정등록상품정보 불러오기
     public function search_check_products(Request $request)
     {
-        $sc_cd = $request->input('sc_cd', '');
+        $ssc_cd = $request->input('ssc_cd', '');
         $sql = "
             select 
                 @rownum := @rownum + 1 as count,
-                s.sc_prd_cd, 
-                s.sc_cd, 
+                s.ssc_prd_cd, 
+                s.ssc_cd, 
                 s.prd_cd,
                 pc.goods_no,
                 g.goods_type,
@@ -139,29 +131,28 @@ class stk27Controller extends Controller
                 if(pc.prd_cd_p <> '', pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p,
                 pc.color,
                 pc.size,
-                if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh,
+                s.tag_price as goods_sh,
                 s.price,
                 s.qty,
-                s.store_qty as store_wqty, 
+                s.storage_qty as storage_wqty, 
                 s.loss_qty,
-                s.loss_rec_qty,
                 s.loss_price,
-                s.loss_price2,
-                s.loss_tag_price,
+                (s.storage_qty * s.price) as loss_price2,
+                (s.storage_qty * s.tag_price) as loss_tag_price,
                 s.loss_reason,
                 r.code_val as loss_reason_val,
                 s.comment
-            from stock_check_product s
+            from storage_stock_check_product s
                 inner join product_code pc on pc.prd_cd = s.prd_cd
                 inner join product p on p.prd_cd = s.prd_cd
                 left outer join goods g on g.goods_no = pc.goods_no
                 left outer join brand b on b.br_cd = pc.brand
                 left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-               	left outer join code r on r.code_kind_cd = 'LOSS_REASON' and r.code_id = s.loss_reason
+               	left outer join code r on r.code_kind_cd = 'STORAGE_LOSS_REASON' and r.code_id = s.loss_reason
                 , (select @rownum :=0) as r
-            where s.sc_cd = :sc_cd
+            where s.ssc_cd = :ssc_cd
         ";
-        $products = DB::select($sql, ['sc_cd' => $sc_cd]);
+        $products = DB::select($sql, ['ssc_cd' => $ssc_cd]);
 
 		return response()->json([
 			"code" => 200,
@@ -175,54 +166,100 @@ class stk27Controller extends Controller
 		]);
     }
 
-    // 실사등록
+    // 재고조정 등록
     public function save(Request $request)
     {
-        $sc_type = $request->input("sc_type", "G"); // 일반(G)/일괄(B)
-        $sc_date = $request->input("sc_date", date("Y-m-d"));
-        $store_cd = $request->input("store_cd", "");
+		$code = '200';
+		$msg = '';
+        $ssc_type = $request->input("ssc_type", "G"); // 일반(G)/일괄(B)/바코드(C)
+        $ssc_date = $request->input("ssc_date", date("Y-m-d"));
+        $storage_cd = $request->input("storage_cd", "");
         $md_id = $request->input("md_id", "");
         $comment = $request->input("comment", "");
         $products = $request->input("products", []);
         $admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
 
         try {
             DB::beginTransaction();
 
-            $sc_cd = DB::table('stock_check')
+			// 재고조정 마스터 등록
+            $ssc_cd = DB::table('storage_stock_check')
                 ->insertGetId([
-                    'store_cd' => $store_cd,
+                    'storage_cd' => $storage_cd,
                     'md_id' => $md_id,
-                    'sc_date' => $sc_date,
-                    'sc_type' => $sc_type,
+                    'ssc_date' => $ssc_date,
+                    'ssc_type' => $ssc_type,
                     'comment' => $comment,
                     'rt' => now(),
                     'admin_id' => $admin_id,
                 ]);
 
             foreach($products as $product) {
-                DB::table('stock_check_product')
+				$loss_qty = $product['storage_qty'] - $product['qty'];
+				
+				// 재고조정 상품 상세내역 등록
+                DB::table('storage_stock_check_product')
                     ->insert([
-                        'sc_cd' => $sc_cd,
+                        'ssc_cd' => $ssc_cd,
                         'prd_cd' => $product['prd_cd'],
                         'price' => $product['price'],
+                        'tag_price' => $product['goods_sh'],
                         'qty' => $product['qty'],
-                        'store_qty' => $product['store_qty'],
-                        'loss_qty' => $product['store_qty'] - $product['qty'],
-                        'loss_rec_qty' => $product['store_qty'] - $product['qty'],
-                        'loss_price' => $product['price'] * ($product['store_qty'] - $product['qty']),
-                        'loss_price2' => $product['price'] * $product['store_qty'],
-                        'loss_tag_price' => $product['goods_sh'] * $product['store_qty'],
+                        'storage_qty' => $product['storage_qty'],
+                        'loss_qty' => $loss_qty,
+                        'loss_price' => $product['price'] * $loss_qty,
 						'loss_reason' => $product['loss_reason'] ?? null,
 						'comment' => $product['comment'] ?? null,
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
+
+				// 창고재고처리
+				DB::table('product_stock_storage')
+					->where('storage_cd', $storage_cd)
+					->where('prd_cd', $product['prd_cd'])
+					->update([
+						'qty' => DB::raw("qty - " . $loss_qty),
+						'wqty' => $product['qty'],
+						'ut' => now(),
+					]);
+
+				// 전체재고처리
+				DB::table('product_stock')
+					->where('prd_cd', $product['prd_cd'])
+					->update([
+						'qty_wonga'	=> DB::raw('qty_wonga - (' . $loss_qty . ' * wonga)'),
+						'out_qty' => DB::raw('out_qty + ' . $loss_qty),
+						'qty' => DB::raw('qty - ' . $loss_qty),
+						'ut' => now(),
+					]);
+
+				$wonga = DB::table('product_stock')->where('prd_cd', $product['prd_cd'])->value('wonga');
+
+				// 재고이력 등록
+				DB::table('product_stock_hst')
+					->insert([
+						'goods_no' => $product['goods_no'],
+						'prd_cd' => $product['prd_cd'],
+						'goods_opt' => $product['goods_opt'],
+						'location_cd' => $storage_cd,
+						'location_type' => 'STORAGE',
+						'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
+						'price' => $product['price'],
+						'wonga' => $wonga ?? 0,
+						'wqty' => $loss_qty * -1,
+						'stock_state_date' => date('Ymd'),
+						'ord_opt_no' => '',
+						'comment' => 'LOSS등록',
+						'rt' => now(),
+						'admin_id' => $admin_id,
+						'admin_nm' => $admin_nm,
+					]);
             }
 
 			DB::commit();
-            $code = '200';
-            $msg = '';
+            $msg = '창고재고조정이 정상적으로 완료되었습니다.';
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = '500';
@@ -309,102 +346,6 @@ class stk27Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
-
-	// LOSS 등록
-	public function save_loss(Request $request)
-	{
-		$code 		= 200;
-		$msg		= "";
-		$sc_cd 		= $request->input('sc_cd');
-		$store_cd   = $request->input('store_cd');
-		$comment    = $request->input('comment');
-		$products 	= $request->input("products", []);
-		$admin_id   = Auth('head')->user()->id;
-		$admin_nm   = Auth('head')->user()->name;
-
-		try {
-			DB::beginTransaction();
-
-			DB::table('stock_check')
-				->where('sc_cd', '=', $sc_cd)
-				->update([
-					'sc_state' => 'Y',
-					'comment' => $comment,
-					'ut' => now(),
-					'admin_id' => $admin_id,
-				]);
-
-			foreach ($products as $product) {
-				
-				DB::table('stock_check_product')
-					->where('sc_prd_cd', '=', $product['sc_prd_cd'])
-					->update([
-						'loss_rec_qty' => $product['loss_rec_qty'],
-						'qty' => DB::raw("store_qty - loss_rec_qty"),
-						'loss_qty' => DB::raw("store_qty - " . $product['qty']),
-						'loss_price' => DB::raw("loss_rec_qty * price"),
-						'loss_reason' => $product['loss_reason'] ?? null,
-						'comment' => $product['comment'] ?? null,
-						'ut' => now(),
-						'admin_id' => $admin_id,
-					]);
-				
-				$qty = DB::table('stock_check_product')->where('sc_prd_cd', $product['sc_prd_cd'])->value('qty');
-
-				$original_wqty = DB::table('product_stock_store')->where('store_cd', $store_cd)->where('prd_cd', $product['prd_cd'])->value('wqty');
-				$minus_qty = ($original_wqty ?? 0) - ($qty ?? 0);
-
-				DB::table('product_stock_store')
-					->where('store_cd', $store_cd)
-					->where('prd_cd', $product['prd_cd'])
-					->update([
-						'qty' => $qty,
-						'wqty' => $qty,
-						'ut' => now(),
-					]);
-
-				DB::table('product_stock')
-					->where('prd_cd', $product['prd_cd'])
-					->update([
-						'qty_wonga'	=> DB::raw('qty_wonga - (' . $minus_qty . ' * wonga)'),
-						'out_qty' => DB::raw('out_qty + ' . $minus_qty),
-						'qty' => DB::raw('qty - ' . $minus_qty),
-						'ut' => now(),
-					]);
-				
-				$wonga = DB::table('product_stock')->where('prd_cd', $product['prd_cd'])->value('wonga');
-
-				// 재고이력 등록
-				DB::table('product_stock_hst')
-					->insert([
-						'goods_no' => $product['goods_no'],
-						'prd_cd' => $product['prd_cd'],
-						'goods_opt' => $product['goods_opt'],
-						'location_cd' => $store_cd,
-						'location_type' => 'STORE',
-						'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
-						'price' => $product['price'],
-						'wonga' => $wonga ?? 0,
-						'qty' => $product['loss_rec_qty'] * -1,
-						'stock_state_date' => date('Ymd'),
-						'ord_opt_no' => '',
-						'comment' => 'LOSS등록',
-						'rt' => now(),
-						'admin_id' => $admin_id,
-						'admin_nm' => $admin_nm,
-					]);
-			}
-
-			DB::commit();
-			$msg = "LOSS등록이 정상적으로 완료되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
-
-		return response()->json([ "code" => $code, "msg" => $msg ], $code);
-	}
 
     /** 실사일괄등록 팝업오픈 */
     public function show_batch()
