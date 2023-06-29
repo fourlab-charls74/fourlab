@@ -156,7 +156,7 @@
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.data.store_cd}_${stock_check_date}_${sc_code}</a>`;
             }
         },
-        {field: "sc_type", headerName: "실사구분", width: 70, cellStyle: (params) => ({"text-align": "center", "color": params.value === 'B' ? '#2aa876' : 'none'}),
+        {field: "sc_type", headerName: "실사구분", width: 70, cellStyle: (params) => ({"text-align": "center", "color": params.value === 'B' ? '#2aa876' : params.value === 'C' ? '#ff7f00' : 'none'}),
             cellRenderer: (params) => params.value === 'G' ? '일반' : params.value === 'B' ? '일괄' : params.value === 'C' ? '바코드' : '-',
         },
         {field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},

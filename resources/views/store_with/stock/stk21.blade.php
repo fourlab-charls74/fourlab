@@ -509,6 +509,9 @@
         if(rows.filter(r => !r.store_cd).length > 0)
             return alert("선택한 항목의 받는 매장을 선택해주세요.");
 
+		let same_store_rows = rows.filter(row => row.dep_store_cd === row.store_cd);
+		if(same_store_rows.length > 0) return alert(`보내는 매장과 받는 매장을 같은 매장으로 요청하실 수 없습니다.\n보내는 매장명 : ${same_store_rows.map(o => o.dep_store_nm).join(", ")}`);
+
         let over_qty_rows = rows.filter(row => {
             if(row.wqty !== null) {
                 if(row.wqty < parseInt(row.rt_qty)) return true;
