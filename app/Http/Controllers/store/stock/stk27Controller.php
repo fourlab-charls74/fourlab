@@ -229,33 +229,36 @@ class stk27Controller extends Controller
 				DB::table('product_stock')
 					->where('prd_cd', $product['prd_cd'])
 					->update([
-						'qty_wonga'	=> DB::raw('qty_wonga - (' . $loss_qty . ' * wonga)'),
 						'out_qty' => DB::raw('out_qty + ' . $loss_qty),
+						'qty' => DB::raw('qty - ' . $loss_qty),
 						'wqty' => DB::raw('wqty - ' . $loss_qty),
+						'qty_wonga'	=> DB::raw('qty * wonga'),
 						'ut' => now(),
 					]);
 
 				$wonga = DB::table('product_stock')->where('prd_cd', $product['prd_cd'])->value('wonga');
 
-				// 재고이력 등록
-				DB::table('product_stock_hst')
-					->insert([
-						'goods_no' => $product['goods_no'],
-						'prd_cd' => $product['prd_cd'],
-						'goods_opt' => $product['goods_opt'],
-						'location_cd' => $storage_cd,
-						'location_type' => 'STORAGE',
-						'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
-						'price' => $product['price'],
-						'wonga' => $wonga ?? 0,
-						'qty' => $loss_qty * -1,
-						'stock_state_date' => date('Ymd'),
-						'ord_opt_no' => '',
-						'comment' => 'LOSS등록',
-						'rt' => now(),
-						'admin_id' => $admin_id,
-						'admin_nm' => $admin_nm,
-					]);
+				if ($loss_qty > 0 || $loss_qty < 0) {
+					// 재고이력 등록
+					DB::table('product_stock_hst')
+						->insert([
+							'goods_no' => $product['goods_no'],
+							'prd_cd' => $product['prd_cd'],
+							'goods_opt' => $product['goods_opt'],
+							'location_cd' => $storage_cd,
+							'location_type' => 'STORAGE',
+							'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
+							'price' => $product['price'],
+							'wonga' => $wonga ?? 0,
+							'qty' => $loss_qty * -1,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => '',
+							'comment' => 'LOSS등록',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						]);
+				}
             }
 
 			DB::commit();
@@ -310,7 +313,7 @@ class stk27Controller extends Controller
     public function get_goods(Request $request) {
         $storage_cd = $request->input('storage_cd', '');
         $data = $request->input('data', []);
-		$ssc_type = $request->input('ssc_type', 'G');
+		$ssc_type = $request->input('ssc_type', 'B');
         $result = [];
 
         foreach ($data as $key => $d) {

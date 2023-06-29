@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '창고재고조정일괄등록')
+@section('title', '창고재고조정 일괄등록')
 @section('content')
 
 <!-- import excel lib -->

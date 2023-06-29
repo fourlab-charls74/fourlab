@@ -366,33 +366,35 @@ class stk26Controller extends Controller
 				DB::table('product_stock')
 					->where('prd_cd', $product['prd_cd'])
 					->update([
-						'qty_wonga'	=> DB::raw('qty_wonga - (' . $minus_qty . ' * wonga)'),
 						'out_qty' => DB::raw('out_qty + ' . $minus_qty),
 						'qty' => DB::raw('qty - ' . $minus_qty),
+						'qty_wonga'	=> DB::raw('qty * wonga'),
 						'ut' => now(),
 					]);
 				
 				$wonga = DB::table('product_stock')->where('prd_cd', $product['prd_cd'])->value('wonga');
 
-				// 재고이력 등록
-				DB::table('product_stock_hst')
-					->insert([
-						'goods_no' => $product['goods_no'],
-						'prd_cd' => $product['prd_cd'],
-						'goods_opt' => $product['goods_opt'],
-						'location_cd' => $store_cd,
-						'location_type' => 'STORE',
-						'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
-						'price' => $product['price'],
-						'wonga' => $wonga ?? 0,
-						'qty' => $product['loss_rec_qty'] * -1,
-						'stock_state_date' => date('Ymd'),
-						'ord_opt_no' => '',
-						'comment' => 'LOSS등록',
-						'rt' => now(),
-						'admin_id' => $admin_id,
-						'admin_nm' => $admin_nm,
-					]);
+				if ($product['loss_rec_qty'] > 0 || $product['loss_rec_qty'] < 0) {
+					// 재고이력 등록
+					DB::table('product_stock_hst')
+						->insert([
+							'goods_no' => $product['goods_no'],
+							'prd_cd' => $product['prd_cd'],
+							'goods_opt' => $product['goods_opt'],
+							'location_cd' => $store_cd,
+							'location_type' => 'STORE',
+							'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
+							'price' => $product['price'],
+							'wonga' => $wonga ?? 0,
+							'qty' => $product['loss_rec_qty'] * -1,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => '',
+							'comment' => 'LOSS등록',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						]);
+				}
 			}
 
 			DB::commit();

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '창고재고조정바코드등록')
+@section('title', '창고재고조정 바코드등록')
 @section('content')
 
 <!-- import excel lib -->
@@ -340,7 +340,7 @@
 		}
         if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
         rows = rows.filter(r => r.prd_cd);
-        let values = { data: rows, storage_cd: document.f1.storage_no.value };
+        let values = { data: rows, storage_cd: document.f1.storage_no.value, ssc_type: 'C' };
         await getGood(values, firstRowIndex);
 	};
 
@@ -403,7 +403,7 @@
         axios({
             url: '/store/stock/stk27/batch-getgoods',
             method: 'post',
-            data: { ...values, ssc_type: 'C' },
+            data: values,
         }).then(async (res) => {
             if (res.data.code != 200) return alert(res.data.msg);
 

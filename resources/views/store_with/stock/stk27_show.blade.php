@@ -1,6 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "창고재고조정개별등록";
+    $title = "창고재고조정 개별등록";
     if($cmd == "get") $title = "창고재고조정내역";
 @endphp
 @section('title', $title)
