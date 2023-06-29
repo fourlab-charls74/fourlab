@@ -474,7 +474,6 @@ class stk26Controller extends Controller
                     , '$qty' as qty
                     , (ifnull(pss.wqty, 0) - ifnull('$qty', 0)) as loss_qty
                     , (ifnull(pss.wqty, 0) - ifnull('$qty', 0)) * g.price as loss_price
-                    , true as isEditable
                     , '$count' as count
                 	, ifnull((select code_val from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason_val
                 	, ifnull((select code_id from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason
@@ -509,12 +508,16 @@ class stk26Controller extends Controller
        * 
        */
 
-      public function barcode_batch()
-      {
-          return view(Config::get('shop.store.view') . '/stock/stk26_barcode_batch');
-      }
+	public function barcode_batch()
+	{
+		$values = [
+			'sdate' => date("Y-m-d"),
+			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
+		];
+		return view(Config::get('shop.store.view') . '/stock/stk26_barcode_batch', $values);
+	}
 
-      /** 바코드 등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
+	/** 바코드 등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
 	public function import_excel2(Request $request) {
 		if (count($_FILES) > 0) {
 			if ( 0 < $_FILES['file']['error'] ) {
@@ -543,19 +546,9 @@ class stk26Controller extends Controller
 
     /** 바코드 등록 상품 개별 조회 */
     public function get_goods2(Request $request) {
-        $sc_date = $request->input('sc_date', '');
         $store_cd = $request->input('store_cd', '');
-        $md_id = $request->input('md_id', '');
-        $comment = $request->input('comment', '');
-        
         $data = $request->input('data', []);
         $result = [];
-        
-        $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
-        $md = DB::table('mgr_user')->where('id', $md_id)->select('id', 'name')->first();
-        if ($store == null || $md == null || $sc_date == null) {
-            return response()->json(['code' => 404, 'msg' => '실사 기본정보가 올바르지 않습니다. 실사일자/매장코드/담당자아이디 항목을 확인해주세요.']);
-        }
 
         foreach ($data as $key => $d) {
             $prd_cd = $d['prd_cd'];
@@ -581,7 +574,6 @@ class stk26Controller extends Controller
                     , $qty as qty
                     , (ifnull(pss.wqty, 0) - ifnull($qty, 0)) as loss_qty
                     , (ifnull(pss.wqty, 0) - ifnull($qty, 0)) * g.price as loss_price
-                    , true as isEditable
                     , '$count' as count
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
@@ -596,18 +588,6 @@ class stk26Controller extends Controller
             array_push($result, $row);
         }
 
-        
-
-        $new_sc_cd = 1;
-        $sql = "
-            select sc_cd
-            from stock_check
-            order by sc_cd desc
-            limit 1
-        ";
-        $row = DB::selectOne($sql);
-        if($row != null) $new_sc_cd = $row->sc_cd + 1;
-
         return response()->json([
             "code" => 200,
             "head" => [
@@ -615,16 +595,8 @@ class stk26Controller extends Controller
                 "page" => 1,
                 "page_cnt" => 1,
                 "page_total" => 1,
-                "new_sc_cd" => $new_sc_cd,
-                "sc_date" => $sc_date,
-                "store" => $store,
-                "md" => $md,
-                "comment" => $comment,
             ],
             "body" => $result
         ]);
     }
-
-
-
 }
