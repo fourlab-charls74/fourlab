@@ -34,20 +34,14 @@ class IndexController extends Controller
             date_format(a.sale_date,'%d') as day,
             date_format(a.sale_date,'%a') as yoil_nm,
             DAYOFWEEK(a.sale_date) as yoil,
-            t.*,
             (qty_30 + qty_60 + qty_61) as sum_qty,
             (t.recv_amt_30 + t.recv_amt_60 + t.recv_amt_61) as sum_recv_amt,
-            (t.wonga_30 + t.wonga_60 + t.wonga_61) as sum_wonga,
             (t.point_amt_30 + t.point_amt_60 + t.point_amt_61) as sum_point_amt,
-            (t.coupon_amt_30 + t.coupon_amt_60 + t.coupon_amt_61) as sum_coupon_amt,
-            (t.fee_amt_30 + t.fee_amt_60 + t.fee_amt_61 ) as sum_fee_amt,
-            (t.dc_amt_30 + t.dc_amt_60 + t.dc_amt_61) as sum_dc_amt,
-            (t.taxation_amt_30 + t.taxation_amt_60 + t.taxation_amt_61) as sum_taxation_amt,
-            (t.tax_amt_30 + t.tax_amt_60 + t.tax_amt_61) as sum_tax_amt,
-            ifnull(p.pg_fee,0) as exp_pg_fee
+            (t.fee_amt_30 + t.fee_amt_60 + t.fee_amt_61 ) as sum_fee_amt
         from (
         select d as sale_date from mdate where d >='$startdate' and d <= '$enddate' order by sale_date desc
-        ) a left outer join (
+        ) a 
+        left outer join (
             select
                 b.sale_date
                 , sum(if(ord_state = '10', ifnull(b.qty, 0), 0)) as qty_30
@@ -80,33 +74,35 @@ class IndexController extends Controller
                 , sum(if(ord_state = 61, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_61
                 , sum(if(ord_state = 61, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_61
             from (
-            select
-                w.ord_state_date as sale_date, w.ord_state
-                , sum(w.qty)as qty
-                , sum(w.recv_amt) as recv_amt
-                , sum(w.point_apply_amt) as point_amt
-                , sum(w.wonga * w.qty) as wonga
-                , sum(w.coupon_apply_amt) as coupon_amt
-                , sum(w.sales_com_fee) as fee_amt
-                , sum(w.dc_apply_amt) as dc_amt
-                , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
-                , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11), 0)) as tax_amt
-                , o.store_cd
-                , o.sale_kind
-                , o.pr_code
-                , g.brand
-            from order_opt o
-                inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
-                inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
-                left outer join company c on o.sale_place = c.com_id
-            where
-                w.ord_state_date >= '$startdate' and w.ord_state_date <= '$enddate'
-                and w.ord_state in ('10',60,61)
-                and o.ord_state >= '10'
-                and (  o.ord_type = '5'  or  o.ord_type = '4'  or  o.ord_type = '3'  or  o.ord_type = '13'  or  o.ord_type = '12'  or  o.ord_type = '17'  or  o.ord_type = '14'  or  o.ord_type = '15'  or o.ord_type = '0'  or  o.ord_type = '16'  )  
-                    group by w.ord_state_date, w.ord_state
-                ) b group by b.sale_date
-            ) t on a.sale_date = t.sale_date left outer join (
+                select
+                    w.ord_state_date as sale_date, w.ord_state
+                    , sum(w.qty)as qty
+                    , sum(w.recv_amt) as recv_amt
+                    , sum(w.point_apply_amt) as point_amt
+                    , sum(w.wonga * w.qty) as wonga
+                    , sum(w.coupon_apply_amt) as coupon_amt
+                    , sum(w.sales_com_fee) as fee_amt
+                    , sum(w.dc_apply_amt) as dc_amt
+                    , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
+                    , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11), 0)) as tax_amt
+                    , o.store_cd
+                    , o.sale_kind
+                    , o.pr_code
+                    , g.brand
+                from order_opt o
+                    inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+                    inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+                    left outer join company c on o.sale_place = c.com_id
+                where
+                    w.ord_state_date >= '$startdate' and w.ord_state_date <= '$enddate'
+                    and o.store_cd = '$user_store'
+                    and w.ord_state in ('10',60,61)
+                    and o.ord_state >= '10'
+                    and (  o.ord_type = '5'  or  o.ord_type = '4'  or  o.ord_type = '3'  or  o.ord_type = '13'  or  o.ord_type = '12'  or  o.ord_type = '17'  or  o.ord_type = '14'  or  o.ord_type = '15'  or o.ord_type = '0'  or  o.ord_type = '16'  )  
+                        group by w.ord_state_date, w.ord_state
+                    ) b group by b.sale_date
+            ) t on a.sale_date = t.sale_date 
+            left outer join (
                 select
                     ord_state_date,
                     sum(cal_pg_fee(a.ord_state,a.ord_state_date,p.pay_type,p.pay_amt,p.pay_date,a.refund_amt)) as pg_fee
@@ -138,11 +134,9 @@ class IndexController extends Controller
         $result = collect($rows)->map(function ($row) {
 
 			$sale_date		= $row->date;
-
 			$sum_point		= $row->sum_point_amt;	//포인트 합계
 			$sum_fee		= $row->sum_fee_amt;		//수수료 합계
 			$sum_recv		= $row->sum_recv_amt;		//무통장 또는 카드 합계
-			$sum_wonga		= (int)$row->sum_wonga;		//원가 합계
 			$sum_amt		= $sum_recv + $sum_point - $sum_fee;
 
 
@@ -150,12 +144,7 @@ class IndexController extends Controller
 				"date"			=> $sale_date,
 				"month"			=> $row->month,
 				"day"			=> $row->day,
-
-				"sum_point"		=> ($sum_point) ? $sum_point:0,
-				"sum_fee"	=> ($sum_fee) ? $sum_fee:0,
-				"sum_recv"		=> ($sum_recv) ? $sum_recv:0,
 				"sum_amt"		=> ($sum_amt) ? $sum_amt:0,
-				"sum_wonga"		=> ($sum_wonga) ? $sum_wonga:0,
 			);
 
 			return $array;
