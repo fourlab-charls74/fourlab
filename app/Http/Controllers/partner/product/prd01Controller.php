@@ -2522,10 +2522,20 @@ class prd01Controller extends Controller
 
 			$opt_kinds = DB::select($sql, ['goods_no' => $goods_no]);
 
+			// goods_summary.opt_name이 없을경우 
+			foreach($opt_kinds as $value) {
+				$a_name[] = $value->name;
+			}
+			if(isset($a_name) && is_array($a_name)){
+				$option_kind = implode("^", $a_name);
+			} else {
+				$option_kind = "";
+			}
+
 			if ($is_single) { // 기본 싱글 옵션인 경우
 
 				$sql = "
-					select goods_opt, opt_name, goods_no
+					select goods_opt, ifnull('$option_kind', opt_name) as opt_name, goods_no
 					from goods_summary
 					where goods_no = :goods_no and use_yn = 'Y'
 					order by seq

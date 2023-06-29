@@ -1275,17 +1275,11 @@ ControlOption.prototype.SetGrid = function(divId) {
 
         $("#opt_kind").html("");
         $("#opt_kind").append(`<option value=0>= 옵션구분 =</option>`);
-        
-        // 옵션이 NONE인 경우 반영 x
-        if (opt_kinds[0]?.name == 'NONE') {
-            return;
-        } else {
-            opt_kinds.map(item => {
-                $("#opt_kind").append(`<option value='${JSON.stringify(item.name)}'>${item.name}</option>`);
-            });
-            $("#gd-option-total").text(e.head.total);
-        }
-
+		
+		opt_kinds.map(item => {
+			$("#opt_kind").append(`<option value='${JSON.stringify(item.name)}'>${item.name}</option>`);
+		});
+		$("#gd-option-total").text(e.head.total);
     });
 };
 
