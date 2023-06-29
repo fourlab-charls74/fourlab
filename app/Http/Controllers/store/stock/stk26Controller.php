@@ -454,6 +454,7 @@ class stk26Controller extends Controller
             $qty = $d['qty'] ?? 0;
             $count = $d['count'] ?? '';
 			$loss_reason_val = $d['loss_reason_val'] ?? '';
+			$comment = $d['comment'] ?? '';
 
             $sql = "
                 select
@@ -477,6 +478,7 @@ class stk26Controller extends Controller
                     , '$count' as count
                 	, ifnull((select code_val from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason_val
                 	, ifnull((select code_id from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason
+					, '$comment' as comment
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
                     left outer join goods g on g.goods_no = pc.goods_no

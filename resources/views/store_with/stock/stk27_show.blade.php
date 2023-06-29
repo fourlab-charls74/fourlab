@@ -1,6 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "재고조정개별등록";
+    $title = "창고재고조정개별등록";
     if($cmd == "get") $title = "창고재고조정내역";
 @endphp
 @section('title', $title)
@@ -100,7 +100,7 @@
                                                         <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-md"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                     </div>
                                                     @else
-                                                    <p class="fs-14">{{ $ssc->md_nm }}</p>
+                                                    <p class="fs-14 py-2">{{ $ssc->md_nm }}</p>
                                                     @endif
                                                 </div>
                                             </td>
@@ -110,7 +110,7 @@
 	                                                @if(@$cmd == 'add')
 		                                                <textarea name="comment" id="comment" class="form-control w-100" rows="1">{{ @$ssc->comment }}</textarea>
 	                                                @else
-		                                                <p class="fs-14 py-3">{{ $ssc->comment }}</p>
+		                                                <p class="fs-14">{{ $ssc->comment }}</p>
 	                                                @endif
                                                 </div>
                                             </td>

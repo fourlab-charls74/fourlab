@@ -616,13 +616,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::get('stk27/show/{sc_cd?}','stk27Controller@show');
 		Route::get('stk27/search-check-products','stk27Controller@search_check_products');
 		Route::put('stk27/save', 'stk27Controller@save');
-
 		Route::get('stk27/batch', 'stk27Controller@show_batch');
 		Route::get('stk27/barcode-batch', 'stk27Controller@barcode_batch');
 		Route::post('stk27/batch-import', 'stk27Controller@import_excel');
 		Route::post('stk27/batch-getgoods', 'stk27Controller@get_goods');
-		Route::post('stk27/batch-import2', 'stk27Controller@import_excel2');
-		Route::post('stk27/batch-getgoods2', 'stk27Controller@get_goods2');
         
         // 창고반품
         Route::get('stk30','stk30Controller@index');

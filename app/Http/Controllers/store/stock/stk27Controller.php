@@ -32,7 +32,7 @@ class stk27Controller extends Controller
     {
         $sdate = $request->input('sdate', now()->sub(1, 'week')->format('Y-m-d'));
         $edate = $request->input('edate', date('Y-m-d'));
-        $storage_cd = $request->input('storage_cd', '');
+        $storage_cd = $request->input('storage_no', '');
 		$loss_reason = $request->input('loss_reason', '');
 
         // where
@@ -166,7 +166,7 @@ class stk27Controller extends Controller
 		]);
     }
 
-    // 재고조정 등록
+    /** 재고조정 등록 */
     public function save(Request $request)
     {
 		$code = '200';
@@ -231,7 +231,7 @@ class stk27Controller extends Controller
 					->update([
 						'qty_wonga'	=> DB::raw('qty_wonga - (' . $loss_qty . ' * wonga)'),
 						'out_qty' => DB::raw('out_qty + ' . $loss_qty),
-						'qty' => DB::raw('qty - ' . $loss_qty),
+						'wqty' => DB::raw('wqty - ' . $loss_qty),
 						'ut' => now(),
 					]);
 
@@ -248,7 +248,7 @@ class stk27Controller extends Controller
 						'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
 						'price' => $product['price'],
 						'wonga' => $wonga ?? 0,
-						'wqty' => $loss_qty * -1,
+						'qty' => $loss_qty * -1,
 						'stock_state_date' => date('Ymd'),
 						'ord_opt_no' => '',
 						'comment' => 'LOSS등록',
@@ -269,90 +269,12 @@ class stk27Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
-    // 실사정보 수정
-    public function update(Request $request)
-    {
-        $sc_cd = $request->input("sc_cd", "");
-        $comment = $request->input("comment", "");
-        $products = $request->input("products", []);
-        $admin_id = Auth('head')->user()->id;
-
-        try {
-            DB::beginTransaction();
-
-            DB::table('stock_check')
-                ->where('sc_cd', '=', $sc_cd)
-                ->update([
-                    'comment' => $comment,
-                    'ut' => now(),
-                    'admin_id' => $admin_id,
-                ]);
-
-			foreach($products as $product) {
-                DB::table('stock_check_product')
-                    ->where('sc_prd_cd', '=', $product['sc_prd_cd'])
-                    ->update([
-                        'qty' => $product['qty'],
-						'loss_qty' => DB::raw("store_qty - qty"),
-						'loss_rec_qty' => $product['loss_rec_qty'],
-						'loss_price' => DB::raw("loss_rec_qty * price"),
-						'loss_reason' => $product['loss_reason'] ?? null,
-						'comment' => $product['comment'] ?? null,
-                        'ut' => now(),
-                        'admin_id' => $admin_id,
-                    ]);
-            }
-
-			DB::commit();
-            $code = '200';
-            $msg = '';
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = '500';
-			$msg = $e->getMessage();
-		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
-    }
-
-    // 실사정보 삭제 (LOSS미등록시에만)
-    public function delete(Request $request)
-    {
-        $code = '';
-        $msg = '';
-        $sc_cds = $request->input('sc_cds', []);
-        
-        try {
-            DB::beginTransaction();
-
-            foreach ($sc_cds as $sc_cd) {
-                if ($sc_cd == '') throw new Exception("삭제할 실사정보가 존재하지 않는 항목이 있습니다.");
-    
-                $sc_state = DB::table('stock_check')->where('sc_cd', $sc_cd)->value('sc_state');
-                if ($sc_state != 'N') throw new Exception("LOSS등록된 실사정보는 삭제할 수 없습니다.");
-    
-                // 삭제
-                DB::table('stock_check')->where('sc_cd', $sc_cd)->delete();
-                DB::table('stock_check_product')->where('sc_cd', $sc_cd)->delete();
-            }
-
-			DB::commit();
-            $code = '200';
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = '500';
-			$msg = $e->getMessage();
-		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
-    }
-
-    /** 실사일괄등록 팝업오픈 */
+    /** 재고조정일괄등록 팝업오픈 */
     public function show_batch()
     {
 		$values = [ 
 			'sdate' => date("Y-m-d"),
-			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
+			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk27_batch', $values);
     }
@@ -386,8 +308,9 @@ class stk27Controller extends Controller
 
     /** 일괄등록 상품 개별 조회 */
     public function get_goods(Request $request) {
-        $store_cd = $request->input('store_cd', '');
+        $storage_cd = $request->input('storage_cd', '');
         $data = $request->input('data', []);
+		$ssc_type = $request->input('ssc_type', 'G');
         $result = [];
 
         foreach ($data as $key => $d) {
@@ -395,6 +318,16 @@ class stk27Controller extends Controller
             $qty = $d['qty'] ?? 0;
             $count = $d['count'] ?? '';
 			$loss_reason_val = $d['loss_reason_val'] ?? '';
+			$comment = $d['comment'] ?? '';
+			
+			$batch_sql = "";
+			if ($ssc_type !== 'C') {
+				$batch_sql = "
+					, ifnull((select code_val from code where code_kind_cd = 'STORAGE_LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason_val
+                	, ifnull((select code_id from code where code_kind_cd = 'STORAGE_LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason
+                	, '$comment' as comment
+				";
+			}
 
             $sql = "
                 select
@@ -411,17 +344,16 @@ class stk27Controller extends Controller
                     , pc.goods_opt
                     , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
                     , if(g.goods_no <> '0', g.price, p.price) as price
-                    , ifnull(pss.wqty, 0) as store_wqty
+                    , ifnull(pss.wqty, 0) as storage_wqty
                     , '$qty' as qty
                     , (ifnull(pss.wqty, 0) - ifnull('$qty', 0)) as loss_qty
                     , (ifnull(pss.wqty, 0) - ifnull('$qty', 0)) * g.price as loss_price
                     , '$count' as count
-                	, ifnull((select code_val from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason_val
-                	, ifnull((select code_id from code where code_kind_cd = 'LOSS_REASON' and code_val = '$loss_reason_val'), '') as loss_reason
+                	$batch_sql
                 from product_code pc
                     inner join product p on p.prd_cd = pc.prd_cd
                     left outer join goods g on g.goods_no = pc.goods_no
-                    left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
+                    left outer join product_stock_storage pss on pss.prd_cd = pc.prd_cd and pss.storage_cd = '$storage_cd'
                     left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                     left outer join brand b on b.br_cd = pc.brand
                 where pc.prd_cd = '$prd_cd'
@@ -443,101 +375,13 @@ class stk27Controller extends Controller
         ]);
     }
 
-      /**
-       * 
-       * 매장 실사 바코드 등록 부분
-       * 
-       */
-
+	/** 창고재고조정 바코드등록 팝업오픈 */
 	public function barcode_batch()
 	{
 		$values = [
 			'sdate' => date("Y-m-d"),
-			'loss_reasons'	=> SLib::getCodes('LOSS_REASON'),
+			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
 		];
 		return view(Config::get('shop.store.view') . '/stock/stk27_barcode_batch', $values);
 	}
-
-	/** 바코드 등록 시 Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
-	public function import_excel2(Request $request) {
-		if (count($_FILES) > 0) {
-			if ( 0 < $_FILES['file']['error'] ) {
-				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
-			}
-			else {
-				$file = $request->file('file');
-				$now = date('YmdHis');
-				$user_id = Auth::guard('head')->user()->id;
-				$extension = $file->extension();
-	
-				$save_path = "data/store/stk27/";
-				$file_name = "${now}_${user_id}.${extension}";
-				
-				if (!Storage::disk('public')->exists($save_path)) {
-					Storage::disk('public')->makeDirectory($save_path);
-				}
-	
-				$file = sprintf("${save_path}%s", $file_name);
-				move_uploaded_file($_FILES['file']['tmp_name'], $file);
-	
-				return response()->json(['code' => 1, 'file' => $file], 200);
-			}
-		}
-	}
-
-    /** 바코드 등록 상품 개별 조회 */
-    public function get_goods2(Request $request) {
-        $store_cd = $request->input('store_cd', '');
-        $data = $request->input('data', []);
-        $result = [];
-
-        foreach ($data as $key => $d) {
-            $prd_cd = $d['prd_cd'];
-            $qty = $d['qty'] ?? 0;
-            $count = $d['count'] ?? '';
-
-            $sql = "
-                select
-                    pc.prd_cd
-                    , pc.goods_no
-                    , opt.opt_kind_nm
-                    , b.brand_nm as brand
-                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
-                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
-                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
-                    , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-                    , pc.color
-                    , pc.size
-                    , pc.goods_opt
-                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
-                    , if(g.goods_no <> '0', g.price, p.price) as price
-                    , ifnull(pss.wqty, 0) as store_wqty
-                    , $qty as qty
-                    , (ifnull(pss.wqty, 0) - ifnull($qty, 0)) as loss_qty
-                    , (ifnull(pss.wqty, 0) - ifnull($qty, 0)) * g.price as loss_price
-                    , '$count' as count
-                from product_code pc
-                    inner join product p on p.prd_cd = pc.prd_cd
-                    left outer join goods g on g.goods_no = pc.goods_no
-                    left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
-                    left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                    left outer join brand b on b.br_cd = pc.brand
-                where pc.prd_cd = '$prd_cd'
-                limit 1
-            ";
-            $row = DB::selectOne($sql);
-            array_push($result, $row);
-        }
-
-        return response()->json([
-            "code" => 200,
-            "head" => [
-                "total" => count($result),
-                "page" => 1,
-                "page_cnt" => 1,
-                "page_total" => 1,
-            ],
-            "body" => $result
-        ]);
-    }
 }
