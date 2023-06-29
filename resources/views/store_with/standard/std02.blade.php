@@ -98,6 +98,10 @@
 							<label for="item">사용유무</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
+									<input type="radio" name="use_yn" id="use_yn" class="custom-control-input" value="">
+									<label class="custom-control-label" for="use_yn" value="">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
 									<input type="radio" name="use_yn" id="use_yn1" class="custom-control-input" value="Y" checked>
 									<label class="custom-control-label" for="use_yn1" value="">Y</label>
 								</div>
@@ -175,18 +179,18 @@
 		{headerName:"판매채널",		field:"store_channel",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장구분",		field:"store_channel_kind",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType'},
-		{headerName:"매니저수수료등급",		field:"grade_nm",	width:110, cellStyle:{"text-align":"center"}},
+		{headerName:"지역",			field:"store_area_nm",	width:72, cellStyle:{"text-align":"center"}},
+		{headerName:"주소",			field:"addr1",			width:240},
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},
-		{headerName:"지역",			field:"store_area_nm",	width:72, cellStyle:{"text-align":"center"}},
-		{headerName:"주소",			field:"addr1",			width:240},
 		{headerName:"개장일",		field:"sdate",			width:60},
 		{headerName:"폐점일",		field:"edate",			width:60},
 		{headerName:"매니저",		children:[
 			{headerName:"매니저명",	field:"manager_nm",		width:100},
 			{headerName:"연락처",	field:"manager_mobile",	width:100},
 		]},
+		{headerName:"매니저수수료등급",		field:"grade_nm",	width:110, cellStyle:{"text-align":"center"}},
 		{headerName:"보증금",		children:[
 			{headerName:"매장",		field:"deposit_cash",	width:72, type: 'currencyType'},
 			{headerName:"담보",		field:"deposit_coll",	width:72, type: 'currencyType'},
