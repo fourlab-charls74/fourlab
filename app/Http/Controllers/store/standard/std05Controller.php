@@ -54,7 +54,7 @@ class std05Controller extends Controller
 				, s.sale_apply
 				, s.amt_kind, s.sale_amt
 				, s.sale_per, s.use_yn
-				, (select count(ss.idx) from sale_type_store ss where ss.sale_type_cd = s.idx and ss.use_yn = 'Y' and ss.sdate >= '$date') as store_cnt
+				, (select count(ss.idx) from sale_type_store ss where ss.sale_type_cd = s.idx and ss.use_yn = 'Y' and ss.sdate <= '$date' and ss.edate >= '$date') as store_cnt
 			from sale_type s
 				inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
 			where 1=1 $where
@@ -77,6 +77,29 @@ class std05Controller extends Controller
 
 	public function show($sale_type_cd = '') 
 	{
+
+		$sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+		";
+
+		$store_channel = DB::select($sql);
+
+		$sql = "
+			select
+				store_kind
+				, store_kind_cd
+				, use_yn
+			from store_channel
+			where dep = 2 and use_yn = 'Y'
+		";
+
+		$store_kind = DB::select($sql);
+
 		$sale_type = "";
 
 		if($sale_type_cd != '') {
@@ -108,6 +131,8 @@ class std05Controller extends Controller
 			"sale_type" => $sale_type,
 			"sale_kinds" => $sale_kinds,
 			"store_types" => SLib::getCodes("STORE_TYPE"),
+			'store_channel'	=> $store_channel,
+			'store_kind'	=> $store_kind
 		];
 
 		return view(Config::get('shop.store.view') . '/standard/std05_show', $values);
@@ -116,11 +141,14 @@ class std05Controller extends Controller
 	// 판매유형별 매장정보 조회
 	public function search_store(Request $request, $sale_type_cd = '')
 	{
-		$store_type_cd = $request->input("store_type_cd");
+		$store_channel	= $request->input("store_channel","");
+		$store_channel_kind	= $request->input("store_channel_kind","");
 		$code = 200;
 
 		$where = "";
-		if($store_type_cd != '') $where .= " and store.store_type = '$store_type_cd'";
+		// if($store_type_cd != '') $where .= " and store.store_type = '$store_type_cd'";
+		if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "' and store.use_yn = 'Y'";
+		if ($store_channel_kind != "") $where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "' and store.use_yn = 'Y'";
 		
 		$sql = "
 			select store.store_cd, store.store_nm, s.use_yn, s.sdate, s.edate
