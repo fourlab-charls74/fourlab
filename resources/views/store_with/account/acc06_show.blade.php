@@ -185,7 +185,7 @@
 			cellStyle: (params) => ({"background-color": params.node.rowPinned === 'top' ? "none" : "#E9EFFF"})
 		},
 		{field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: CENTER},
-		{field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: CENTER},
+		{field: "pr_code_nm", headerName: "판매처수수료", width: 85, cellStyle: CENTER},
 		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: CENTER},
 		{field: "store_nm",	headerName: "매장명", width: 100},
 		{field: "user_nm", headerName: "주문자", width: 60, cellStyle: CENTER},
