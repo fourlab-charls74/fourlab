@@ -48,7 +48,7 @@
 	                <p>주문번호</p>
 		            <div class="d-flex">
 	                    <p id="ord_no" class="fc-red mr-3"></p>
-			            <button type="button" class="butt fc-white fs-09 br-05 bg-navy px-2 py-1" style="height:33px;" onclick="return setScreen('pos_today');"><i class="fa fa-search fs-08 mr-1" aria-hidden="true"></i>영수증조회</button>
+			            <button type="button" class="butt fc-white fs-09 br-05 bg-navy px-3 py-1" style="height:33px;" onclick="return setScreen('pos_today');"><i class="fa fa-search fs-08 mr-1" aria-hidden="true"></i>영수증조회</button>
 		            </div>
 	            </div>
 	            <div class="d-flex align-items-center mb-3">
@@ -170,35 +170,40 @@
 				    </div>
 			    </div>
 		    </div>	    
-		    <div class="flex-6 p-0 pr-3">
+		    <div class="flex-3 p-0">
+			    <div class="flex-1 pr-3 mt-2 mb-4">
+				    <div class="d-flex justify-content-between align-items-center fs-14 fw-b mb-3">
+					    <p>총 판매금액</p>
+					    <p><strong id="total_goods_sh_amt" class="fs-20 fw-b mr-1">0</strong>원</p>
+				    </div>
+				    <div class="d-flex justify-content-between align-items-center fs-14 fw-sb mb-3">
+					    <p>총 할인금액</p>
+					    <p><strong id="total_dc_amt" class="fw-b mr-1">0</strong>원</p>
+				    </div>
+				    <div class="d-flex justify-content-between align-items-center fs-14 fw-sb mb-3">
+					    <p>총 주문금액</p>
+					    <p><strong id="total_order_amt" class="fc-red fw-b mr-1">0</strong>원</p>
+				    </div>
+				    <div class="d-flex justify-content-between align-items-center fs-14 fw-sb mb-3">
+					    <p>총 주문수량</p>
+					    <p><strong id="total_order_qty" class="fw-b mr-1">0</strong>개</p>
+				    </div>
+				    <div class="d-flex justify-content-between align-items-center fs-14 fw-sb mb-3">
+					    <p>결제한 금액</p>
+					    <p><strong id="payed_amt" class="fw-b mr-1">0</strong>원</p>
+				    </div>
+				    <div class="d-flex justify-content-between align-items-center fs-14 fw-sb">
+					    <p>거스름돈</p>
+					    <p><strong id="change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
+				    </div>
+			    </div>
+			    <div class="flex-1 d-flex pr-2">
+				    <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-3" onclick="return cancelOrder();">주문 초기화</button>
+			    </div>
+		    </div>
+		    <div class="flex-3 p-0 pr-3 mt-2">
 			    <div class="d-flex flex-column">
                     <div class="d-flex mb-4">
-                        <div class="flex-1 mr-3 mb-3">
-	                        <div class="d-flex justify-content-between align-items-center fs-14 fw-b mt-2 mb-4">
-		                        <p>총 판매금액</p>
-		                        <p><strong id="total_goods_sh_amt" class="fs-20 fw-b mr-1">0</strong>원</p>
-	                        </div>
-	                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
-		                        <p>총 할인금액</p>
-		                        <p><strong id="total_dc_amt" class="fw-b mr-1">0</strong>원</p>
-	                        </div>
-                            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
-                                <p>총 주문금액</p>
-                                <p><strong id="total_order_amt" class="fc-red fw-b mr-1">0</strong>원</p>
-                            </div>
-	                        <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-4">
-		                        <p>총 주문수량</p>
-		                        <p><strong id="total_order_qty" class="fw-b mr-1">0</strong>개</p>
-	                        </div>
-                            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb mb-2">
-                                <p>결제한 금액</p>
-                                <p><strong id="payed_amt" class="fw-b mr-1">0</strong>원</p>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center fs-12 fw-sb">
-                                <p>거스름돈</p>
-                                <p><strong id="change_amt" class="fc-red fw-b mr-1">0</strong>원</p>
-                            </div>
-                        </div>
                         <div class="flex-2 d-flex">
                             <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-blue p-2 mr-3" data-toggle="modal" data-target="#payModal" data-title="신용카드 결제" data-pay-type="card_amt">
                                 <span id="card_amt">0</span>
@@ -206,12 +211,12 @@
                                 <span class="d-block fs-14 fw-sb mt-1">신용카드</span>
                             </button>
                             <div class="flex-3 d-flex flex-column mr-3">
-                                <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-2 mb-3" data-toggle="modal" data-target="#payModal" data-title="현금 결제" data-pay-type="cash_amt">
+                                <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-blue p-4 mb-4" data-toggle="modal" data-target="#payModal" data-title="현금 결제" data-pay-type="cash_amt">
                                     <span id="cash_amt">0</span>
                                     <input type="hidden" name="cash_amt" value="0">
                                     <span class="d-block fs-14 fw-sb mt-1">현금</span>
                                 </button>
-                                <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-2" data-toggle="modal" data-target="#payModal" data-title="적립금 사용" data-pay-type="point_amt">
+                                <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-4" data-toggle="modal" data-target="#payModal" data-title="적립금 사용" data-pay-type="point_amt">
                                     <span id="point_amt">0</span>
                                     <input type="hidden" name="point_amt" value="0">
                                     <span class="d-block fs-14 fw-sb mt-1">적립금</span>
@@ -220,14 +225,8 @@
                             <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-mint p-2" onclick="return sale();">판 매</button>
                         </div>
                     </div>
-
                     <div class="d-flex">
-                        <div class="flex-1 d-flex mr-4">
-                            <button type="button" class="butt flex-1 fc-white fs-16 fw-sb br-1 bg-red p-4" onclick="return cancelOrder();">주문 초기화</button>
-                        </div>
-                        <div class="flex-2">
-                            <textarea name="memo" id="memo" rows="2" class="w-100 h-100 fs-12 p-2 mr-2 noresize" placeholder="특이사항"></textarea>
-                        </div>
+                        <textarea name="memo" id="memo" rows="2" class="form-control w-100 h-100 fs-12 p-2 noresize" placeholder="특이사항"></textarea>
                     </div>
 			    </div>
 		    </div>
