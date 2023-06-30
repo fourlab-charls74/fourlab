@@ -2,7 +2,7 @@
 @section('title','매장실사/LOSS관리')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">매장실사관리</h3>
+	<h3 class="d-inline-flex">매장실사/LOSS관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>매장관리</span>
@@ -21,7 +21,7 @@
                     <a href="javascript:void(0);" onclick="openDetailPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm mr-1"></i> 실사개별등록</a>
                     <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm mr-1"></i> 실사일괄등록</a>
                     <a href="javascript:void(0);" onclick="openBarCodePopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fas fa-plus fa-sm mr-1"></i> 실사바코드등록</a>
-{{--                    <a href="javascript:void(0);" onclick="moveToSal20()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fa fa-arrow-right fa-sm mr-1"></i> LOSS등록</a>--}}
+	                <!-- <a href="javascript:void(0);" onclick="moveToSal20()" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="fa fa-arrow-right fa-sm mr-1"></i> LOSS등록</a> -->
                 </div>
             </div>
             <div class="card-body">
@@ -161,11 +161,11 @@
         },
         {field: "store_cd", headerName: "매장코드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 150},
-        {field: "store_qty", headerName: "매장보유재고", width: 80, type: "currencyType"},
+        {field: "store_qty", headerName: "매장보유재고", width: 90, type: "currencyType"},
         {field: "qty", headerName: "실사재고", width: 80, type: "currencyType"},
-        {field: "loss_qty", headerName: "LOSS 총수량", width: 80, type: "currencyType"},
-        {field: "loss_price", headerName: "LOSS 금액", width: 80, type: "currencyType"},
-        {field: "sc_state", headerName: "LOSS 처리여부", width: 90, 
+        {field: "loss_qty", headerName: "LOSS 총수량", width: 90, type: "currencyType"},
+        {field: "loss_price", headerName: "LOSS 금액", width: 90, type: "currencyType"},
+        {field: "sc_state", headerName: "LOSS 처리여부", width: 100, 
             cellStyle: (params) => ({"text-align": "center", "color": params.value == "N" ? "red" : params.value == "Y" ? "green" : "none"}),
             cellRenderer: (params) => params.value === "Y" ? "처리완료" : "미처리",
         },

@@ -1,7 +1,7 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "실사개별등록";
-    if($cmd == "update") $title = "매장실사관리";
+    $title = "매장실사 개별등록";
+    if($cmd == "update") $title = "매장실사내역";
 @endphp
 @section('title', $title)
 @section('content')
@@ -13,7 +13,7 @@
                 <span class="home"></span>
                 <span>/ 매장관리</span>
                 <span>/ 매장실사/LOSS관리</span>
-                <span>/ 실사개별등록</span>
+                <span>/ {{ $title }}</span>
             </div>
         </div>
         <div class="d-flex align-items-center">
@@ -301,9 +301,6 @@
             if(rows.length < 1) return alert("실사등록할 상품을 추가해주세요.");
             if(md_id === '') return alert("담당자를 선택해주세요.");
 
-			let not_reason_rows = rows.filter(row => row.store_wqty != row.qty && !row.loss_reason);
-			if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
-
             if(!confirm("등록하시겠습니까?")) return;
 
             axios({
@@ -342,9 +339,6 @@
             let sc_cd = '{{ @$sc->sc_cd }}';
 
             if(sc_state != 'N') return alert("매장LOSS등록 이전에만 수정가능합니다.");
-
-			let not_reason_rows = rows.filter(row => (row.loss_rec_qty > 0 || row.loss_rec_qty < 0) && !row.loss_reason);
-			if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
 			
             if(!confirm("수정하시겠습니까?")) return;
 

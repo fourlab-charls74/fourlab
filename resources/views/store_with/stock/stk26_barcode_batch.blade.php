@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '매장실사바코드등록')
+@section('title', '매장실사 바코드등록')
 @section('content')
 
 <!-- import excel lib -->
@@ -8,12 +8,12 @@
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">매장실사 바코드 등록</h3>
+            <h3 class="d-inline-flex">매장실사 바코드등록</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
                 <span>/ 매장실사/LOSS관리</span>
-                <span>/ 매장실사 바코드 등록</span>
+                <span>/ 매장실사 바코드등록</span>
             </div>
         </div>
         <div class="d-flex">
@@ -457,9 +457,6 @@
 		}
 		if(rows.length < 1) return alert("실사등록할 상품을 추가해주세요.");
 		if(md_id === '') return alert("담당자를 선택해주세요.");
-
-		let not_reason_rows = rows.filter(row => row.store_wqty != row.qty && !row.loss_reason);
-		if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
 
 		if(!confirm("등록하시겠습니까?")) return;
 
