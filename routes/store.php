@@ -559,6 +559,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk16/release','stk16Controller@release'); // 출고
         Route::post('stk16/receive','stk16Controller@receive'); // 매장입고
         Route::post('stk16/reject','stk16Controller@reject'); // 거부
+        Route::post('stk16/del-release','stk16Controller@del_release'); // 삭제
 
         // 원부자재 - 요청분출고
         Route::get('stk17','stk17Controller@index');

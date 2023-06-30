@@ -15,6 +15,8 @@ use App\Models\Conf;
 
 const PRODUCT_STOCK_TYPE_STORE_IN = 1; // (매장)입고
 const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
+const PRODUCT_STOCK_TYPE_STORE_OUT = 11;
+const PRODUCT_STOCK_TYPE_STORAGE_IN = 11;
 
 class stk16Controller extends Controller
 {
@@ -290,23 +292,23 @@ class stk16Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // 재고이력 등록
-                // DB::table('product_stock_hst')
-                //     ->insert([
-                //         'prd_cd' => $prd_cd,
-                //         'location_cd' => $row['storage_cd'],
-                //         'location_type' => 'STORAGE',
-                //         'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
-                //         'price' => $price,
-                //         'wonga' => $wonga,
-                //         'qty' => ($row['qty'] ?? 0) * -1,
-                //         'stock_state_date' => date('Ymd'),
-                //         'ord_opt_no' => '',
-                //         'comment' => '창고출고',
-                //         'rt' => now(),
-                //         'admin_id' => $admin_id,
-                //         'admin_nm' => $admin_nm,
-                //     ]);
+                //재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'prd_cd' => $prd_cd,
+                        'location_cd' => $row['storage_cd'],
+                        'location_type' => 'STORAGE',
+                        'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
+                        'price' => $price,
+                        'wonga' => $wonga,
+                        'qty' => ($row['qty'] ?? 0) * -1,
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => '창고출고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
 
                 // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
                 $store_stock_cnt =
@@ -336,23 +338,23 @@ class stk16Controller extends Controller
                         ]);
                 }
 
-                // // 재고이력 등록
-                // DB::table('product_stock_hst')
-                //     ->insert([
-                //         'prd_cd' => $prd_cd,
-                //         'location_cd' => $row['store_cd'],
-                //         'location_type' => 'STORE',
-                //         'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
-                //         'price' => $price,
-                //         'wonga' => $wonga,
-                //         'qty' => $row['qty'] ?? 0,
-                //         'stock_state_date' => date('Ymd'),
-                //         'ord_opt_no' => '',
-                //         'comment' => '매장입고',
-                //         'rt' => now(),
-                //         'admin_id' => $admin_id,
-                //         'admin_nm' => $admin_nm,
-                //     ]);
+                // 재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'prd_cd' => $prd_cd,
+                        'location_cd' => $row['store_cd'],
+                        'location_type' => 'STORE',
+                        'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
+                        'price' => $price,
+                        'wonga' => $wonga,
+                        'qty' => $row['qty'] ?? 0,
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => '매장입고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
 
             }
             $code = 200;
@@ -502,5 +504,100 @@ class stk16Controller extends Controller
             // $msg = $e->getMessage();
         }
         return response()->json(["code" => $code]);
+    }
+
+    //삭제
+    public function del_release(Request $request) 
+    {
+        $admin_id = Auth('head')->user()->id;
+        $admin_nm = Auth('head')->user()->name;
+        $data = $request->input("data", []);
+
+        try {
+            DB::beginTransaction();
+
+			foreach ($data as $row) {
+
+                $prd_cd = $row['prd_cd'];
+                $price = $row['price'];
+                $wonga = $row['wonga'];
+
+                DB::table('sproduct_stock_release')
+                    ->where('idx', '=', $row['idx'])
+                    ->delete();
+
+                // product_stock 보유재고 플러스
+                DB::table('product_stock')
+                    ->where('prd_cd', '=', $prd_cd)
+                    ->update([
+                        'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // product_stock_storage -> 보유재고 플러스
+                DB::table('product_stock_storage')
+                    ->where('prd_cd', '=', $prd_cd)
+                    ->where('storage_cd', '=', $row['storage_cd'])
+                    ->update([
+                        'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // 재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'prd_cd' => $prd_cd,
+                        'location_cd' => $row['storage_cd'],
+                        'location_type' => 'STORAGE',
+                        'type' => PRODUCT_STOCK_TYPE_STORAGE_IN, 
+                        'price' => $price,
+                        'wonga' => $wonga,
+                        'qty' => ($row['qty'] ?? 0),
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => '창고입고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
+
+                // 매장재고 원복
+                DB::table('product_stock_store')
+                    ->where('prd_cd', '=', $prd_cd)
+                    ->where('store_cd', '=', $row['store_cd'])
+                    ->update([
+                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
+                        'ut' => now(),
+                    ]);
+
+                // // 재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'prd_cd' => $prd_cd,
+                        'location_cd' => $row['store_cd'],
+                        'location_type' => 'STORE',
+                        'type' => PRODUCT_STOCK_TYPE_STORE_OUT,
+                        'price' => $price,
+                        'wonga' => $wonga,
+                        'qty' => ($row['qty'] ?? 0) * -1,
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => '매장출고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
+            }
+
+			DB::commit();
+            $code = 200;
+            $msg = "삭제가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
     }
 }

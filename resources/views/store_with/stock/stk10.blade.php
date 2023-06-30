@@ -673,9 +673,6 @@
         }).catch(function (err) {
             console.log(err);
         });
-
-
-
     }
 
     // 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
