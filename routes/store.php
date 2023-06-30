@@ -632,17 +632,16 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk30/search','stk30Controller@search');
 		Route::get('stk30/download','stk30Controller@download'); // 명세서출력
         Route::get('stk30/show/{sr_cd?}','stk30Controller@show');
-        Route::get('stk30/view/{sr_cd?}','stk30Controller@view');
+        // Route::get('stk30/view/{sr_cd?}','stk30Controller@view');
         Route::get('stk30/search-return-products','stk30Controller@search_return_products'); // 기존에 반품등록된 상품목록 조회
-        Route::put('stk30/add-store-return','stk30Controller@add_store_return'); // 창고반품등록
-        Route::put('stk30/update-store-return','stk30Controller@update_store_return'); // 창고반품수정
-        Route::put('stk30/update-return-state','stk30Controller@update_return_state'); // 창고반품 상태변경
-        Route::put('stk30/update-state','stk30Controller@update_state');
-        Route::delete('stk30/del-return','stk30Controller@del_return'); // 창고반품 삭제
+        Route::put('stk30/save','stk30Controller@save'); // 반품요청
+        Route::put('stk30/update','stk30Controller@update'); // 반품수정
+        // Route::put('stk30/update-return-state','stk30Controller@update_return_state'); // 창고반품 상태변경
+        // Route::put('stk30/update-state','stk30Controller@update_state');
+        Route::delete('stk30/del-return','stk30Controller@del_return'); // 반품 삭제
         Route::get('stk30/batch', 'stk30Controller@show_batch');
         Route::post('stk30/batch-import', 'stk30Controller@import_excel');
         Route::post('stk30/batch-getgoods', 'stk30Controller@get_goods');
-        Route::put('stk30/save', 'stk30Controller@save');
 
         // 매장 및 vmd 공지사항
         Route::get('stk31/{notice_id}','stk31Controller@index');
