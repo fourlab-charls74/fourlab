@@ -335,6 +335,11 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+				defaultColDef: {
+					suppressMenu: true,
+					resizable: false,
+					sortable: true,
+				},
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId.includes('rel_qty')) {
@@ -358,11 +363,6 @@
                     }
                 }
             });
-            gx.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
 
             // 매장검색
             $( ".sch-store" ).on("click", function() {

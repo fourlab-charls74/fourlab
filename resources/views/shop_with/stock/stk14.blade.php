@@ -371,6 +371,11 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+				defaultColDef: {
+					suppressMenu: true,
+					resizable: false,
+					sortable: true,
+				},
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId == "rel_qty") {
@@ -390,11 +395,6 @@
                 onSelectionChanged: setRowGroupExpanded,
                 groupSelectsChildren: true,
             });
-            gx.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
 
             @if($user_store != '')
                 $("#store_no").select2({data:['{{ @$user_store }}']??'', tags: true});

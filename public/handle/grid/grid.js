@@ -29,7 +29,7 @@ function formatNumber(params) {
 function setArrowKeyboardEvent(e) {
 	let key = e.event.key;
 
-	if (e.column.isCellEditable(e.node)) {
+	if (e.editing) {
 		if (key == 'ArrowDown') {
 			if (e.api.getDisplayedRowCount() > e.node.rowIndex + 1) {
 				e.api.setFocusedCell(e.node.rowIndex + 1, e.column);
@@ -48,7 +48,6 @@ function setArrowKeyboardEvent(e) {
 			if (e.event.target.selectionStart < 1) {
 				e.api.stopEditing();
 			}
-
 		} else if (key == 'ArrowRight') {
 			if (e.event.target.selectionStart >= e.event.target.value.length) {
 				e.api.stopEditing();

@@ -514,7 +514,7 @@ function getDeleteCellColumnObject() {
                 }
             } else {
 				let key = params.event.key;
-				if (params.column.isCellEditable(params.node)) {
+				if (params.editing) {
 					if (key == 'ArrowDown') {
 						if (params.api.getDisplayedRowCount() > params.node.rowIndex + 1) {
 							params.api.setFocusedCell(params.node.rowIndex + 1, params.column);
@@ -533,7 +533,6 @@ function getDeleteCellColumnObject() {
 						if (params.event.target.selectionStart < 1) {
 							params.api.stopEditing();
 						}
-
 					} else if (key == 'ArrowRight') {
 						if (params.event.target.selectionStart >= params.event.target.value.length) {
 							params.api.stopEditing();

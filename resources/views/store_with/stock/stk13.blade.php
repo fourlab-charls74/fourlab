@@ -391,6 +391,11 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+				defaultColDef: {
+					suppressMenu: true,
+					resizable: false,
+					sortable: true,
+				},
                 rollup: true,
                 autoGroupColumnDef: basic_autoGroupColumnDef('매장', 180, 180),
                 groupDefaultExpanded: 1,
@@ -422,16 +427,12 @@
                                 });
                                 e.api.redrawRows();
                                 e.node.setSelected(e.newValue * 1 > 0);
+								gx.setFocusedWorkingCell();
                             }
                         }
                     }
                 }
             });
-            gx.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
 
             Search();
 

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout')
-@section('title','상품')
+@section('title','바코드관리')
 @section('content')
 <style>
 .ag-row-level-1 {

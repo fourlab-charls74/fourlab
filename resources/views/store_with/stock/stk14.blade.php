@@ -310,11 +310,16 @@
                         width: 80,
                         editable: true,
                         cellStyle: {'background-color': '#ffff99'},
+						editable: params => params.node.level != 0,
+						cellStyle: params => ({'background-color': params.node.level != 0 ? '#ffff99' : 'inherit'}),
                         valueFormatter: formatNumber
                     },
                 ],
             },
-            {field: "req_comment", headerName: "매장메모", width: 300, editable: true,cellStyle: {'background-color': '#ffff99'}},
+            {field: "req_comment", headerName: "매장메모", width: 300,
+				editable: params => params.node.level != 0,
+				cellStyle: params => ({'background-color': params.node.level != 0 ? '#ffff99' : 'inherit'}),
+            },
             {width: 'auto'}
         ];
 
@@ -352,6 +357,11 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+				defaultColDef: {
+					suppressMenu: true,
+					resizable: false,
+					sortable: true,
+				},
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId == "rel_qty") {
@@ -371,11 +381,6 @@
                 onSelectionChanged: setRowGroupExpanded,
                 groupSelectsChildren: true,
             });
-            gx.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
         });
 
         async function Search() {
