@@ -321,6 +321,8 @@
                         @if(Auth('head')->user()->logistics_group_yn == 'N')
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a>
                         @endif
+                        <span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span>
+                        <a href="javascript:void(0);" onclick="delRelease()" class="btn btn-sm btn-primary shadow-sm mr-1">삭제</a>
                     </div>
 				</div>
 			</div>
@@ -647,6 +649,33 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
+
+    // 삭제 (출고처리중 단계에서만)
+    function delRelease() {
+        let rows = gx.getSelectedRows();
+        if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
+        if(rows.filter(r => r.state !== 20).length > 0) return alert("'출고처리중'상태의 항목만 삭제 가능합니다.");
+        if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
+
+        axios({
+            url: '/store/stock/stk10/del-release',
+            method: 'post',
+            data: {data: rows},
+        }).then(function (res) {
+            if(res.data.code === 200) {
+                alert(res.data.msg);
+                Search();
+            } else {
+                console.log(res.data);
+                alert("삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+            }
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+
+
     }
 
     // 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리

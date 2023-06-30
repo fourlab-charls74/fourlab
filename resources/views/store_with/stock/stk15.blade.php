@@ -226,7 +226,7 @@
                         </select>
                     </div>
                     <div class="d-flex align-items-center mb-1 mb-lg-0">
-                        <span class="mr-1">보내는매장</span>
+                        <span class="mr-1">매장명</span>
                         <div class="form-inline inline_btn_box" style="width:250px;">
                             <input type='hidden' id="store_nm" name="store_nm">
                             <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
@@ -287,7 +287,7 @@
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 60, cellStyle: {"text-align": "center"}},
         {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", width:80, cellStyle: {"text-align": "center"}},
