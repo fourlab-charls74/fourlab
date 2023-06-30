@@ -183,6 +183,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('std09/delete', 'std09Controller@delete');
         Route::post('std09/delete-channel', 'std09Controller@delete_channel');
         Route::get('std09/check-code/{code?}/{add_type?}', 'std09Controller@check_code');
+        Route::post('std09/change-seq-store-channel', 'std09Controller@change_seq_store_channel');
+        Route::post('std09/change-seq-store-type', 'std09Controller@change_seq_store_type');
 
         //사이즈관리
         Route::get('std10', 'std10Controller@index');

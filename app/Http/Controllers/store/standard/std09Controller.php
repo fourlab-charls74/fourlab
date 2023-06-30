@@ -187,6 +187,7 @@ class std09Controller extends Controller
                  , use_yn
             from store_channel
             where 1=1 and store_type = 'C' and dep = 1 $where
+            order by seq asc
         ";
 
         $rows = DB::select($sql);
@@ -236,6 +237,7 @@ class std09Controller extends Controller
                 , use_yn
             from store_channel
             where 1=1 and store_type = 'T' and dep = 2 and store_channel_cd = '$store_channel_cd'
+            order by seq asc
 
 		";
 
@@ -541,4 +543,65 @@ class std09Controller extends Controller
 
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
+
+    //판매채널 순서변경
+    public function change_seq_store_channel(Request $request) {
+
+        $store_channel_cds = $request->input('store_channel_cds');
+
+        try {
+			DB::beginTransaction();
+                for($i=0;$i<count($store_channel_cds);$i++) {
+                    DB::table('store_channel')
+                        ->where('store_channel_cd','=',$store_channel_cds[$i])
+                        ->where('dep','=', 1)
+                        ->update(['seq' => $i+1]);
+                }
+	
+			$msg = "판매채널의 순서가 변경되었습니다.";
+            $code = 200;
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+        return response()->json(['code' => $code,"msg" => $msg]);
+    }
+
+    //매장구분 순서변경
+    public function change_seq_store_type(Request $request) {
+
+        $store_types = $request->input('store_types');
+
+        $sql = "
+            select
+                store_channel_cd
+                , store_channel
+            from store_channel
+            where store_kind_cd = '$store_types[0]'
+        ";
+
+        $store_channel = DB::selectOne($sql);
+
+        try {
+			DB::beginTransaction();
+                for($i=0;$i<count($store_types);$i++) {
+                    DB::table('store_channel')
+                        ->where('store_kind_cd','=',$store_types[$i])
+                        ->where('dep','=', 2)
+                        ->update(['seq' => $i+1]);
+                }
+	
+			$msg = "판매채널의 순서가 변경되었습니다.";
+            $code = 200;
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+        return response()->json(['code' => $code,"msg" => $msg, "store_channel" => $store_channel->store_channel, "store_channel_cd" => $store_channel-> store_channel_cd]);
+    }
+   
 }

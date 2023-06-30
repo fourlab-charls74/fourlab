@@ -66,7 +66,8 @@
             <div class="card-header mb-0 pt-1 pb-1 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0">판매채널</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="openAddPopup()" ><i class="bx bx-plus fs-16"></i> 판매채널 등록</a>
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeqStoreChannel()" > 판매채널 순서변경</a>
+                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 ml-1" onclick="openAddPopup()" ><i class="bx bx-plus fs-16"></i> 판매채널 등록</a>
                     <!-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreChannel()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button> -->
                 </div>
             </div>
@@ -82,7 +83,8 @@
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>매장구분</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="openAddTypePopup()" ><i class="bx bx-plus fs-16"></i> 매장구분 등록</a>
+                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeqStoreType()" > 매장구분 순서변경</a>
+                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 ml-1" onclick="openAddTypePopup()" ><i class="bx bx-plus fs-16"></i> 매장구분 등록</a>
                     <!-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreType()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button> -->
                 </div>
             </div>
@@ -98,7 +100,7 @@
 <script>
     const columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-        {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+        {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 60, cellStyle: {"text-align": "center"}, rowDrag: true},
         
         {field: "store_channel_cd", headerName: "판매채널코드", width: 110, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
@@ -117,7 +119,7 @@
 
     const store_type_columns = [
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-        {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+        {headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 60, cellStyle: {"text-align": "center"}, rowDrag: true},
         {field: "store_kind_cd", headerName: "매장구분코드", width: 100, cellStyle:{'text-align' : 'center'},
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openEditPopup("${params.data.store_kind_cd}", "${params.data.store_type}", "${params.data.idx}")'>${params.value}</a>`;
@@ -141,12 +143,16 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
+        gx.gridOptions.rowDragManaged = true;
+        gx.gridOptions.animateRows = true;
 
         // 동종업계 세부정보
         pApp2.ResizeGrid(275);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, store_type_columns);
+        gx2.gridOptions.rowDragManaged = true;
+        gx2.gridOptions.animateRows = true;
 
         // 최초검색
         Search();
@@ -188,6 +194,62 @@
     function openEditPopup(code, type, idx) {
         const url = '/store/standard/std09/show/' + code + '/' + type + '/' + idx;
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
+    }
+
+    function changeSeqStoreChannel(){
+        let store_channel_cds = [];
+        gx.gridOptions.api.forEachNode(function(node) {
+            store_channel_cds.push(node.data.store_channel_cd);
+        });
+
+        if(confirm('판매채널 순서를 변경 하시겠습니까?')){
+            $.ajax({
+                method: 'post',
+                url: '/store/standard/std09/change-seq-store-channel',
+                data: {'store_channel_cds': store_channel_cds},
+                dataType: 'json',
+                success: function (res) {
+                    if(res.code == '200'){
+                        alert(res.msg);
+                        Search();
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(e) {
+                    console.log(e.responseText)
+                }
+            });
+        }
+        return true;
+    }
+
+    function changeSeqStoreType(){
+        let store_types = [];
+        gx2.gridOptions.api.forEachNode(function(node) {
+            store_types.push(node.data.store_kind_cd);
+        });
+
+        if(confirm('매장구분 순서를 변경 하시겠습니까?')){
+            $.ajax({
+                method: 'post',
+                url: '/store/standard/std09/change-seq-store-type',
+                data: {'store_types': store_types},
+                dataType: 'json',
+                success: function (res) {
+                    if(res.code == '200'){
+                        alert(res.msg);
+                        SearchDetail(res.store_channel_cd, res.store_channel);
+                    } else {
+                        alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                    }
+                },
+                error: function(e) {
+                    console.log(e.responseText)
+                }
+            });
+        }
+        return true;
     }
 
 
