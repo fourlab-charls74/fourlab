@@ -489,7 +489,7 @@
 		if(sc_state != 'N') return alert("이미 LOSS 등록된 내역입니다.");
 
 		let not_reason_rows = rows.filter(row => (row.loss_rec_qty > 0 || row.loss_rec_qty < 0) && !row.loss_reason);
-		if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
+		if (not_reason_rows.length > 0) return alert("LOSS인정수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
 
 		if(!confirm("LOSS 등록 이후에는 수정/삭제가 불가능합니다.\nLOSS 등록하시겠습니까?")) return;
 
