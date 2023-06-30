@@ -139,15 +139,15 @@ class prd02Controller extends Controller
 			}
 		}
 
-		if($style_no != "")		$where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
+		if($style_no != "")		$where .= " and if(pc.goods_no = 0, p.style_no , g.style_no) like '" . Lib::quote($style_no) . "%' ";
 		if($item != "")			$where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if($brand_cd != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
 		} else if ($brand_cd == "" && $brand_nm != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
 		}
-		if($goods_nm != "")		$where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+		if($goods_nm != "")		$where .= " and if(pc.goods_no = 0, p.prd_nm, g.goods_nm) like '%" . Lib::quote($goods_nm) . "%' ";
+		if($goods_nm_eng != "")	$where .= " and if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) like '%" . Lib::quote($goods_nm_eng) . "%' ";
 		if($is_unlimited != "")	$where .= " and g.is_unlimited = '" . Lib::quote($is_unlimited) . "' ";
 
 		if($com_id != "")		$where .= " and g.com_id = '" . Lib::quote($com_id) . "'";

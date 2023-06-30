@@ -12,7 +12,7 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 상품관리</span>
-                <span>/ 바코드관리</span>
+                <span>/ 상품코드관리</span>
                 <span>/ 바코드 등록</span>
                 <span>/ 바코드 일괄등록</span>
             </div>

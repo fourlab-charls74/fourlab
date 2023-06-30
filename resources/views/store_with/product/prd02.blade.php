@@ -1,5 +1,9 @@
 @extends('store_with.layouts.layout')
+<<<<<<< Updated upstream
 @section('title','바코드관리')
+=======
+@section('title','상품코드관리')
+>>>>>>> Stashed changes
 @section('content')
 <style>
 .ag-row-level-1 {
@@ -9,11 +13,11 @@
 </style>
 
 	<div class="page_tit">
-		<h3 class="d-inline-flex">바코드관리</h3>
+		<h3 class="d-inline-flex">상품코드관리</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>/ 상품관리</span>
-			<span>/ 바코드관리</span>
+			<span>/ 상품코드관리</span>
 		</div>
 	</div>
 	<style>
@@ -94,15 +98,11 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="style_no">스타일넘버/온라인코드</label>
+								<label for="style_no">스타일넘버</label>
 								<div class="form-inline">
-									<div class="form-inline-inner input_box">
-										<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
-									</div>
-									<span class="text_line">/</span>
-									<div class="form-inline-inner input-box" style="width:47%">
-										<div class="form-inline-inner inline_btn_box">
-											<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='text' class="form-control form-control-sm ac-style-no w-100 search-enter" name='style_no' id='style_no' value=''>
 											<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
