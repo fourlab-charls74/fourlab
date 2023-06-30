@@ -83,7 +83,7 @@
         //         return params.data.use_yn === "A";
         //     }
         // },
-        {field: "comment", headerName: "메모", width: 235, 
+        {field: "comment", headerName: "메모", width: 0, 
             cellStyle: function(params) {
                 return {"background-color": params.data.use_yn === "A" ? "#ffff99" : ""};
             }, 

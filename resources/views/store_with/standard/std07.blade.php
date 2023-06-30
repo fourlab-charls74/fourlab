@@ -195,7 +195,12 @@
         pApp2.ResizeGrid(275);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
-        gx2 = new HDGrid(gridDiv2, fee_columns);
+        gx2 = new HDGrid(gridDiv2, fee_columns, {
+			isRowSelectable: (params) => false,
+			getRowStyle: (params) => {
+				if (params.data.use_yn === 'Y')  return { 'background': '#b7e4ff' };
+			},
+        });
 
         // 최초검색
         Search();
@@ -231,9 +236,6 @@
         cur_store_nm = store_nm;
         gx2.Request("/store/standard/std07/search-store-fee/" + store_cd, "", -1, function(d) {
             $("#select_store_nm").text(` - ${store_nm}`);
-            gx2.gridOptions.api.forEachNode(function(node) {
-                if(node.data.use_yn === 'Y') node.setSelected(true);
-            });
         })
     }
 
