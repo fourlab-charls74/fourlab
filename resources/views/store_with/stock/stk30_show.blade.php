@@ -356,13 +356,15 @@
                     store_cd,
                     sr_reason,
                     comment,
-                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
+                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty, store_wqty: r.store_wqty })),
                 },
             }).then(function (res) {
                 if(res.data.code === 200) {
                     alert(res.data.msg);
                     opener.Search();
                     window.close();
+                } else if (res.data.code !== 500) {
+					alert(res.data.msg);
                 } else {
                     console.log(res.data);
                     alert("반품요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '창고일괄반품')
+@section('title', '매장일괄반품')
 @section('content')
 
 <!-- import excel lib -->
@@ -8,16 +8,16 @@
 <div class="show_layout py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">창고일괄반품</h3>
+            <h3 class="d-inline-flex">매장일괄반품</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
-                <span>/ 창고반품</span>
-                <span>/ 창고일괄반품</span>
+                <span>/ 매장반품관리</span>
+                <span>/ 매장일괄반품</span>
             </div>
         </div>
         <div class="d-flex">
-            <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+            <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 반품요청</a>
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
     </div>
@@ -34,40 +34,6 @@
     <div class="card_wrap aco_card_wrap">
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
-                <a href="#">파일 업로드</a>
-            </div>
-            <div class="card-body">
-                <form name="f1">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-box-ty2 mobile">
-                                <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                    <tbody>
-                                        <tr>
-                                            <th>파일</th>
-                                            <td class="w-100">
-                                                <div class="flex_box">
-                                                    <div class="custom-file w-50">
-                                                        <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
-                                                        <label class="custom-file-label" for="file"></label>
-                                                    </div>
-                                                    <div class="btn-group ml-2">
-                                                        <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
-                                                    </div>
-                                                    <a href="/sample/sample_stk30.xlsx" class="ml-2" style="text-decoration: underline !important;">창고일괄반품양식 다운로드</a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="card shadow mt-3 d-none" id="basic_info_form">
-            <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">기본정보</a>
             </div>
             <div class="card-body">
@@ -81,41 +47,81 @@
                                             <th class="required">반품일자</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14" id="sr_date"></p>
+	                                                <div class="docs-datepicker form-inline-inner input_box w-100">
+		                                                <div class="input-group">
+			                                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off">
+			                                                <div class="input-group-append">
+				                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+					                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+				                                                </button>
+			                                                </div>
+		                                                </div>
+		                                                <div class="docs-datepicker-container"></div>
+	                                                </div>
                                                 </div>
                                             </td>
-                                            <th class="required">반품매장</th>
+                                            <th class="required">보내는 매장</th>
                                             <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="store_nm"></p>
+                                                <div class="form-inline inline_select_box">
+	                                                <div class="form-inline-inner input-box w-100">
+		                                                <div class="form-inline inline_btn_box">
+			                                                <input type='hidden' id="store_nm" name="store_nm">
+			                                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+			                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+		                                                </div>
+	                                                </div>
                                                 </div>
                                             </td>
-                                            <th>반품코드</th>
+                                            <th class="required">반품창고</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14" id="new_sr_cd"></p>
+	                                                <select name='storage_cd' class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>
+		                                                @foreach (@$storages as $storage)
+			                                                <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+		                                                @endforeach
+		                                                <input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
+	                                                </select>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">반품창고</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="storage_nm"></p>
-                                                </div>
-                                            </td>
-                                            <th class="required">반품사유</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="sr_reason"></p>
-                                                </div>
-                                            </td>
+	                                        <th class="required">반품사유</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <select name='sr_reason' id="sr_reason" class="form-control form-control-sm w-100">
+				                                        @foreach ($sr_reasons as $sr_reason)
+					                                        <option value='{{ $sr_reason->code_id }}'>{{ $sr_reason->code_val }}</option>
+				                                        @endforeach
+			                                        </select>
+		                                        </div>
+	                                        </td>
                                             <th>메모</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <p class="fs-14" id="comment"></p>
+	                                                <textarea name="comment" id="comment" class="form-control w-100" rows="1"></textarea>
                                                 </div>
                                             </td>
+	                                        <th>반품코드</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <p id="sr_cd" class="fs-14"></p>
+		                                        </div>
+	                                        </td>
+                                        </tr>
+                                        <tr>
+	                                        <th>파일</th>
+	                                        <td colspan="5">
+		                                        <div class="flex_box">
+			                                        <div class="custom-file w-50">
+				                                        <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
+				                                        <label class="custom-file-label" for="file"></label>
+			                                        </div>
+			                                        <div class="btn-group ml-2">
+				                                        <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
+			                                        </div>
+			                                        <a href="/sample/sample_stk30.xlsx" download="매장일괄반품_샘플" class="ml-2" style="text-decoration: underline !important;">매장일괄반품 양식다운로드</a>
+		                                        </div>
+	                                        </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -129,7 +135,7 @@
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">상품정보</a>
                 <div class="d-flex">
-                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
+                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                 </div>
             </div>
             <div class="card-body">
@@ -142,7 +148,7 @@
 </div>
 
 <script language="javascript">
-    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0, return_amt: 0 }];
 
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"},
@@ -154,29 +160,32 @@
             },
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 180},
-        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 180},
-        {field: "prd_cd_p",	headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
+        {field: "prd_cd_p",	headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size",	headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "goods_opt", headerName: "옵션", width: 130},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 65},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 65},
+        {field: "goods_opt", headerName: "옵션", width: 100},
+        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
+        {field: "price", headerName: "판매가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 90, type: 'currencyType'},
-        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
+        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType',
+			cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "#ff4444"} : {}
+        },
+        {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "total_return_price", headerName: "반품금액", width: 80, type: 'currencyType'},
+        {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
+		{width: 0}
     ];
 </script>
 
@@ -184,10 +193,8 @@
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
 
-    let basic_info = {};
-
     $(document).ready(function() {
-        pApp.ResizeGrid(275, 470);
+        pApp.ResizeGrid(435);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -209,27 +216,13 @@
                             alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
-                            e.node.setSelected(true);
-                            e.data.total_return_price = parseInt(e.data.qty) * parseInt(e.data.return_price);
-                            gx.gridOptions.api.updateRowData({update: [e.data]});
+							e.node.setDataValue('return_amt', parseInt(e.data.qty) * parseInt(e.data.return_price));
                             updatePinnedRow();
                         }
                     }
                 }
             }
         });
-
-        //반품금액 업데이트
-        async function onCellValueChanged(params) {
-            if (params.oldValue == params.newValue) return;
-            let row = params.data;
-
-            if (row.retrun_price != null && row.qty != null ) row.total_return_price = (row.return_price * row.qty);
-
-            await gx.gridOptions.api.applyTransaction({ 
-                update: [{...row}] 
-            });
-        }
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -238,6 +231,11 @@
             }
             $('.custom-file-label').html(this.files[0].name);
         });
+
+		$("#store_no").on("change", function(e) {
+			gx.gridOptions.api.setRowData([]);
+			updatePinnedRow();
+		});
     });
 
     /**
@@ -296,25 +294,17 @@
 		let firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
 		let worksheet = workbook.Sheets[firstSheetName];
 
-        let sr_date = worksheet['C7']?.w;  //반품일자
-        let storage_cd = worksheet['C8']?.w;    //반품창고코드
-        let store_cd = worksheet['C9']?.w;  //매장코드
-        let sr_reason = worksheet['C10']?.w; //반품사유
-        let comment = worksheet['C11']?.w;  //메모
-
-        basic_info = {sr_date, storage_cd, store_cd, sr_reason, comment};
-
 		let excel_columns = {
-			'B': 'prd_cd',
-			'C': 'qty',
+			'A': 'prd_cd',
+			'B': 'qty',
         };
 
-        let firstRowIndex = 15; // 엑셀 10행부터 시작 (샘플데이터 참고)
+        let firstRowIndex = 2; // 엑셀 2행부터 시작 (샘플데이터 참고)
 		let rowIndex = firstRowIndex; 
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
-		while (worksheet['B' + rowIndex]) {
+		while (worksheet['A' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
@@ -332,7 +322,7 @@
 		}
         if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
         rows = rows.filter(r => r.prd_cd);
-        let values = { data: rows, sr_date, storage_cd, store_cd, sr_reason, comment };
+        let values = { data: rows, storage_cd: document.f1.storage_cd.value, store_cd: document.f1.store_no.value };
         await getGood(values, firstRowIndex);
 	};
 
@@ -352,7 +342,14 @@
 	};
 
     const upload = () => {
-        
+		const store_cd = document.f1.store_no.value;
+		if (store_cd === '') {
+			$(".sch-store").click();
+			return alert("매장을 선택해주세요.");
+		}
+
+		if (gx.getRows().length > 0 && !confirm("새로 적용하시는 경우 기존정보는 저장되지 않습니다.\n적용하시겠습니까?")) return;
+
 		const file_data = $('#excel_file').prop('files')[0];
         if(!file_data) return alert("적용할 파일을 선택해주세요.");
 
@@ -390,46 +387,32 @@
             method: 'post',
             data: values,
         }).then(async (res) => {
-            if (res.data.code != 200) return alert(res.data.msg);
-
-            setBasicInfo(res.data.data);
-            await gx.gridOptions.api.applyTransaction({add : res.data.body});
-            updatePinnedRow();
+            if (res.data.code == 200) {
+	            await gx.gridOptions.api.applyTransaction({add : res.data.body});
+	            updatePinnedRow();
+            } else {
+				alert("상품정보조회 중 오류가 발생했습니다.\n다시 시도해주세요.");
+            }
         }).catch((error) => {
             console.log(error);
         });
     };
 
-     function setBasicInfo(obj) {
-
-        let new_sr_cd = {{ @$new_sr_cd }};
-        let sr_date = basic_info.sr_date;
-        let store_cd = obj.store_nm
-        let storage_cd = obj.storage_nm;
-        let sr_reason = obj.sr_reason;
-        let comment = basic_info.comment;
-
-        $("#new_sr_cd").text(new_sr_cd);
-        $("#sr_date").text(sr_date);
-        $("#store_nm").text(store_cd);
-        $("#storage_nm").text(storage_cd);
-        $("#sr_reason").text(sr_reason);
-        $("#comment").text(comment);
-
-        $("#basic_info_form").removeClass("d-none");
-        pApp.ResizeGrid(275, 340);
-    }
-
-
-    // 창고일괄반품 저장
+    // 매장일괄반품 저장
     function Save() {
-        let rows = gx.getRows();
+        let sr_date = document.f1.sdate.value;
+        let store_cd = document.f1.store_no.value;
+        let storage_cd = document.f1.storage_cd.value;
+        let sr_reason = document.f1.sr_reason.value;
+        let comment = document.f1.comment.value;
 
-        let sr_date = basic_info.sr_date;
-        let store_cd = basic_info.store_cd;
-        let storage_cd = basic_info.storage_cd;
-        let sr_reason = basic_info.sr_reason;
-        let comment = basic_info.comment;
+		if(store_cd === '') {
+			$(".sch-store").click();
+			return alert("매장을 선택해주세요.");
+		}
+
+		let rows = gx.getRows();
+		if(rows.length < 1) return alert("일괄등록할 상품을 추가해주세요.");
 
         if(!confirm("등록하시겠습니까?")) return;
 
@@ -437,17 +420,23 @@
             url: '/store/stock/stk30/save',
             method: 'put',
             data: {
-                sr_kind: "B",
+                sr_kind: "B", // 일괄등록
                 sr_date,
                 store_cd,
                 storage_cd,
                 sr_reason,
                 comment,
-                products: rows.map(r => ({ sr_cd : r.sr_cd, prd_cd : r.prd_cd, price : r.price, return_price : r.return_price, return_qty: r.qty, store_wqty : r.store_wqty })),
+                products: rows.map(r => ({
+	                prd_cd : r.prd_cd, 
+	                price : r.price, 
+	                return_price : r.return_price, 
+	                return_qty: r.qty, 
+	                store_wqty : r.store_wqty 
+				})),
             },
         }).then(function (res) {
             if(res.data.code === 200) {
-                alert("창고일괄반품이 성공적으로 완료되었습니다.");
+                alert("매장반품요청이 성공적으로 완료되었습니다.");
                 opener.Search();
                 window.close();
             } else if (res.data.code === 501) {
@@ -469,7 +458,6 @@
     const deleteRow = (row) => { gx.gridOptions.api.applyTransaction({remove : [row]}); };
 
     const delGoods = () => {
-        const ff = document.f1;
         const rows = gx.getSelectedRows();
         if (Array.isArray(rows) && !(rows.length > 0)) return alert("삭제할 상품을 선택해주세요.");
 
@@ -478,18 +466,18 @@
     };
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ qty, total_return_price ] = [ 0, 0 ];
+        let [ qty, return_amt ] = [ 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
                 qty += parseFloat(row.qty);
-                total_return_price += parseFloat(row.total_return_price);
+                return_amt += parseFloat(row.return_amt);
             });
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
+            { ...pinnedRow.data, qty: qty, return_amt: return_amt }
         ]);
     };
 </script>

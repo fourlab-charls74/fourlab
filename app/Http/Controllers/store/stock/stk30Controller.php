@@ -323,8 +323,11 @@ class stk30Controller extends Controller
     // 매장반품 등록
     public function save(Request $request)
     {
+		$code = 200;
+		$msg = "";
+
         $admin_id = Auth('head')->user()->id;
-        $sr_kind = "S"; // 관리자(S)
+        $sr_kind = $request->input("sr_kind", "S"); // 관리자(S) / 일반(G) / 일괄(B)
         $sr_state = 10; // 반품등록 시 요청 상태로 등록
         $sr_date = $request->input("sr_date", date("Y-m-d"));
         $storage_cd = $request->input("storage_cd", "");
@@ -354,6 +357,11 @@ class stk30Controller extends Controller
                 ]);
 
 			foreach($products as $product) {
+				if ($product['store_wqty'] < $product['return_qty']) {
+					$code = 501;
+					throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
+				}
+
                 DB::table('store_return_product')
                     ->insert([
                         'sr_cd' => $sr_cd,
@@ -367,11 +375,10 @@ class stk30Controller extends Controller
             }
 
 			DB::commit();
-            $code = 200;
             $msg = "매장반품이 정상적으로 요청되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
-			$code = 500;
+			$code = $code === 200 ? 500 : $code;
 			$msg = $e->getMessage();
 		}
 
@@ -381,6 +388,9 @@ class stk30Controller extends Controller
     // 창고반품 수정 (+상태변경)
     public function update(Request $request)
     {
+		$code = 200;
+		$msg = "";
+
         $admin_id = Auth('head')->user()->id;
 		$admin_nm = Auth('head')->user()->name;
         $sr_cd = $request->input("sr_cd", "");
@@ -408,6 +418,11 @@ class stk30Controller extends Controller
                 ->update($sr_update);
 
 			foreach($products as $product) {
+				if ($product['store_wqty'] < $product['return_qty']) {
+					$code = 501;
+					throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
+				}
+
                 DB::table('store_return_product')
                     ->where('sr_prd_cd', '=', $product['sr_prd_cd'])
                     ->update([
@@ -430,11 +445,10 @@ class stk30Controller extends Controller
             }
 
 			DB::commit();
-            $code = 200;
             $msg = "매장반품내역이 정상적으로 저장되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
-			$code = 500;
+			$code = $code === 200 ? 500 : $code;
 			$msg = $e->getMessage();
 		}
 
@@ -931,21 +945,15 @@ class stk30Controller extends Controller
 
     public function show_batch()
     {
-        $sql = "
-            select 
-                sr_cd
-            from store_return
-            order by sr_cd desc
-            limit 1
-        ";
-        $row = DB::selectOne($sql);
-        if($row == null) $new_sr_cd = 1;
-        else $new_sr_cd = $row->sr_cd + 1;
+		$storages = DB::table("storage")->where('use_yn', '=', 'Y')
+			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
+			->orderByDesc('default_yn')->get();
 
-        $values = [
-            'new_sr_cd' => $new_sr_cd
-        ];
-
+		$values = [
+			'sdate'         => date("Y-m-d"),
+			'storages'      => $storages,
+			'sr_reasons'    => SLib::getCodes("SR_REASON"),
+		];
         return view(Config::get('shop.store.view') . '/stock/stk30_batch', $values);
     }
 
@@ -978,11 +986,8 @@ class stk30Controller extends Controller
 
     /** 일괄등록 상품 개별 조회 */
     public function get_goods(Request $request) {
-        $sr_date = $request->input('sr_date', '');
         $storage_cd = $request->input('storage_cd', '');
         $store_cd = $request->input('store_cd', '');
-        $sr_reason = $request->input('sr_reason', '');
-        $comment = $request->input('comment', '');
 
         $data = $request->input('data', []);
         $result = [];
@@ -990,8 +995,8 @@ class stk30Controller extends Controller
         $store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
         $storage = DB::table('storage')->where('storage_cd', $storage_cd)->select('storage_cd', 'storage_nm')->first();
 
-        if ($store == null || $storage== null || $sr_reason == null || $sr_date == null) {
-            return response()->json(['code' => 404, 'msg' => '창고반품 기본정보가 올바르지 않습니다. 반품일자/반품창고코드/매장코드/반품사유 항목을 확인해주세요.']);
+        if ($store == null || $storage== null) {
+            return response()->json(['code' => 404, 'msg' => '매장반품 기본정보가 올바르지 않습니다. 반품창고와 보내는매장 항목을 확인해주세요.']);
         }
 
         foreach ($data as $key => $d) {
@@ -1017,7 +1022,7 @@ class stk30Controller extends Controller
                     , p.price as return_price
                     , pss.wqty as store_wqty
                     , '$qty' as qty
-                    , (if(g.goods_no <> '0', g.price, p.price) * $qty) as total_return_price
+                    , (if(g.goods_no <> '0', g.price, p.price) * $qty) as return_amt
                     , true as isEditable
                     , '$count' as count
                 from product_code pc
@@ -1034,34 +1039,6 @@ class stk30Controller extends Controller
             array_push($result, $row);
         }
 
-
-        $sql = "
-            select 
-                store_nm
-            from store
-            where store_cd = :store_cd
-        ";
-
-        $store_nm = DB::selectOne($sql,['store_cd' => $store_cd]);
-
-        $sql = "
-            select 
-                storage_nm
-            from storage
-            where storage_cd = :storage_cd
-        ";
-
-        $storage_nm = DB::selectOne($sql,['storage_cd' => $storage_cd]);
-        
-        $sql = "
-            select 
-                code_val
-            from code
-            where code_kind_cd = 'SR_REASON' and code_id = :sr_reason
-        ";
-
-        $sr_reason = DB::selectOne($sql,['sr_reason' => $sr_reason]);
-
         return response()->json([
             "code" => 200,
             "head" => [
@@ -1071,11 +1048,6 @@ class stk30Controller extends Controller
                 "page_total" => 1,
             ],
             "body" => $result,
-            "data" => [
-                'store_nm' => $store_nm->store_nm,
-                'storage_nm' => $storage_nm->storage_nm,
-                'sr_reason' => $sr_reason->code_val
-            ]
         ]);
     }
 
