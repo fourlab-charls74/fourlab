@@ -35,7 +35,7 @@
     <script src="{{ URL::asset('/with/libs/bootstrap/bootstrap.min.js')}}"></script>
     <script src="{{ URL::asset('/skin/libs/select2/select2.min.js')}}"></script>
     <script src="{{ URL::asset('/skin/libs/datepicker/datepicker.min.js')}}"></script>
-    <script src="{{ URL::asset('/js/shop_search.js?20230306')}}"></script>
+    <script src="{{ URL::asset('/js/shop_search.js?2023070314')}}"></script>
     <script src="/handle/http/axios.js"></script>
     <script src="/with/js/app.js"></script>
     <script language="javascript">

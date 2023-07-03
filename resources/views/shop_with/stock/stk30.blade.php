@@ -25,7 +25,7 @@
 
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">반품일자</label>
                             <div class="form-inline date-select-inbox">
@@ -55,7 +55,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">반품상태</label>
                             <div class="d-flex">
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">반품사유</label>
                             <div class="d-flex">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">반품창고</label>
                             <div class="d-flex">
@@ -181,35 +181,36 @@
     }
 
 	let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28,
-            // checkboxSelection: function(params) {
-            //     return params.data.sr_state < 40;
-            // },
-        },
-        {field: "sr_cd", headerName: "반품코드", width: 80, cellClass: 'hd-grid-code',
-            cellRenderer: function(params) {
-                if (params.data.sr_state == '10'){
-                    return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
-                } else {
-                    return `<a href="javascript:void(0);" onclick="openDetailPopup2(${params.value})">${params.value}</a>`;
-                }
-            }
-        },
-        {field: "sr_date", headerName: "반품일자", width: 100, cellClass: 'hd-grid-code'},
+		{headerName: "No", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellClass: 'hd-grid-code', pinned: 'left'},
+		{field: "sr_cd", headerName: "반품코드", width: 140, cellClass: 'hd-grid-code', pinned: 'left',
+			cellRenderer: function(params) {
+				let sr_date = params.data.sr_date;
+				let return_date = sr_date.replaceAll('-','');
+				let sr_cd = params.data.sr_cd.toString();
+				let return_code = sr_cd.padStart(3, '0');
+
+				return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.data.store_cd}_${return_date}_${return_code}</a>`;
+			}
+		},
+        {field: "sr_date", headerName: "반품일자", width: 90, cellClass: 'hd-grid-code'},
         {field: "sr_state", hide: true},
-        {field: "sr_state_nm", headerName: "반품상태", width: 60, cellStyle: StyleReturnState},
+        {field: "sr_state_nm", headerName: "반품상태", width: 65, cellStyle: StyleReturnState},
         {field: "sr_kind", hide: true},
         {field: "storage_cd", hide: true},
-        {field: "storage_nm", headerName: "반품창고", width: 100, cellClass: 'hd-grid-code'},
-        {field: "store_type", hide: true},
+        {field: "storage_nm", headerName: "반품창고", width: 120},
         {field: "store_cd", headerName: "매장코드", width: 70, cellClass: 'hd-grid-code'},
-        {field: "store_nm", headerName: "매장명", width: 200, cellClass: 'hd-grid-code'},
-        {field: "sr_qty", headerName: "반품수량", type: "currencyType", width: 80},
-        {field: "sr_price", headerName: "반품금액", type: "currencyType", width: 80},
+        {field: "store_nm", headerName: "매장명", width: 150},
+		{field: "store_qty", headerName: "매장보유재고", type: "currencyType", width: 90},
+		{field: "sr_qty", headerName: "요청수량", type: "currencyType", width: 60},
+		{field: "sr_price", headerName: "요청금액", type: "currencyType", width: 80},
+		{field: "return_p_qty", headerName: "처리수량", type: "currencyType", width: 60},
+		{field: "return_p_price", headerName: "처리금액", type: "currencyType", width: 80},
+		{field: "fixed_return_qty", headerName: "확정수량", type: "currencyType", width: 60},
+		{field: "fixed_return_price", headerName: "확정금액", type: "currencyType", width: 80},
         {field: "sr_reason", hide: true},
-        {field: "sr_reason_nm", headerName: "반품사유", width: 120, cellClass: 'hd-grid-code'},
-        {field: "comment", headerName: "메모", width: 300},
-		{field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+        {field: "sr_reason_nm", headerName: "반품사유", width: 80, cellClass: 'hd-grid-code'},
+        {field: "comment", headerName: "메모", width: 200},
+		{field: "print", headerName: "명세서 출력", width: 100, cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
 			cellRenderer: function(params) {
 				if(params.data.sr_state >= 10) {
 					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.sr_cd})">출력</a>`;
@@ -218,15 +219,15 @@
 				}
 			}
 		},
-        {width: "auto"},
+		{width: 0},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
@@ -238,45 +239,10 @@
 		gx.Request('/shop/stock/stk30/search', data, 1);
 	}
 
-    // 창고반품관리 팝업 오픈
+    // 매장반품내역 팝업 오픈
     function openDetailPopup(sr_cd) {
         const url = '/shop/stock/stk30/show/' + sr_cd;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
-    }
-    // 창고반품관리 팝업 오픈
-    function openDetailPopup2(sr_cd) {
-        const url = '/shop/stock/stk30/view/' + sr_cd;
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
-    }
-
-    // 반품상태변경
-    function ChangeState() {
-        let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("상태변경할 항목을 선택해주세요.");
-
-        let wrong_list = rows.filter(r => r.sr_state != 10);
-        if(wrong_list.length > 0) return alert("'요청'상태의 항목만 반품 처리할 수 있습니다.");
-
-        if(!confirm("선택한 항목의 반품상태를 '이동'으로 변경하시겠습니까?")) return;
-
-        axios({
-            url: '/shop/stock/stk30/update-return-state',
-            method: 'put',
-            data: {
-                data: rows,
-                new_state: chg_state
-            },
-        }).then(function (res) {
-            if(res.data.code === 200) {
-                alert(res.data.msg);
-                Search();
-            } else {
-                console.log(res.data);
-                alert("상태변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-            }
-        }).catch(function (err) {
-            console.log(err);
-        });
     }
     
 	// 창고반품 거래명세서 출력

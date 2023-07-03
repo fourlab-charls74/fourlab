@@ -1743,6 +1743,11 @@ $( document ).ready(function() {
             searchGoodsNo.Open($(this).attr("data-name"));
         }
     });
+
+	$(".sort_toggle_btn label").on("click", function(){
+		$(".sort_toggle_btn label").attr("class","btn btn-secondary");
+		$(this).attr("class","btn btn-primary");
+	});
 });
 
 /**
