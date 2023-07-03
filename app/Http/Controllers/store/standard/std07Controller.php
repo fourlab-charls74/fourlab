@@ -24,6 +24,7 @@ class std07Controller extends Controller
 				, use_yn
 			from store_channel
 			where dep = 1 and use_yn = 'Y'
+			order by seq
 		";
 
 		$store_channel = DB::select($sql);
@@ -72,10 +73,17 @@ class std07Controller extends Controller
 		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		$sql = "
-			select s.store_cd, s.store_nm as store_nm, s.use_yn, c.code_val as store_type
+			select 
+				s.store_cd
+				, s.store_nm as store_nm
+				, s.use_yn
+				, sc.store_channel as store_channel
+				, sc2.store_kind as store_channel_kind
 			from store s
-				inner join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
-			where 1=1 $where
+				left outer join store_channel sc on sc.store_channel_cd = s.store_channel
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind
+			where 1=1 and s.use_yn = 'Y' $where
+			group by store_cd
 			order by store_cd
 		";
 

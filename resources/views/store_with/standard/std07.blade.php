@@ -138,7 +138,8 @@
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
         {field: "store_cd", headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "store_type", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_channel", headerName: "판매채널", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "store_channel_kind", headerName: "매장구분", width: 80, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 140, 
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.data.store_cd}", "${params.value}")'>${params.value}</a>`;

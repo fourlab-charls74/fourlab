@@ -125,14 +125,10 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="goods_stat">전시상태</label>
-								<div class="flex_box">
-									<select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-										<option value=''>전체</option>
-										@foreach ($goods_stats as $goods_stat)
-											<option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-										@endforeach
-									</select>
+								<label for="brand_cd">브랜드</label>
+								<div class="form-inline inline_btn_box">
+									<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+									<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 								</div>
 							</div>
 						</div>
@@ -140,34 +136,20 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="good_types">판매채널/매장구분</label>
-								<div class="d-flex align-items-center">
-									<div class="flex_box w-100">
-										<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
-											<option value=''>전체</option>
-										@foreach ($store_channel as $sc)
-											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
-										@endforeach
-										</select>
+							<label for="formrow-email-input">매칭여부</label>
+								<div class="form-inline form-radio-box">
+									<div class="custom-control custom-radio">
+										<input type="radio" name="match_yn1" value="A" id="match_all1" class="custom-control-input" checked>
+										<label class="custom-control-label" for="match_all1">전체</label>
 									</div>
-									<span class="mr-2 ml-2">/</span>
-									<div class="flex_box w-100">
-										<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
-											<option value=''>전체</option>
-										@foreach ($store_kind as $sk)
-											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
-										@endforeach
-										</select>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="match_yn1" value="Y" id="match_y1" class="custom-control-input">
+										<label class="custom-control-label" for="match_y1">Y</label>
 									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label for="brand_cd">브랜드</label>
-								<div class="form-inline inline_btn_box">
-									<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-									<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
+										<label class="custom-control-label" for="match_n1">N</label>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -201,37 +183,6 @@
 										</div>
 										<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
 										<input type="radio" name="ord" id="sort_asc" value="asc">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row search-area-ext d-none">
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-								<label>매장명</label>
-								<div class="form-inline inline_btn_box">
-									<input type='hidden' id="store_nm" name="store_nm">
-									<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
-									<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
-							<label for="formrow-email-input">매칭여부</label>
-								<div class="form-inline form-radio-box">
-									<div class="custom-control custom-radio">
-										<input type="radio" name="match_yn1" value="A" id="match_all1" class="custom-control-input" checked>
-										<label class="custom-control-label" for="match_all1">전체</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="match_yn1" value="Y" id="match_y1" class="custom-control-input">
-										<label class="custom-control-label" for="match_y1">Y</label>
-									</div>
-									<div class="custom-control custom-radio">
-										<input type="radio" name="match_yn1" value="N" id="match_n1" class="custom-control-input">
-										<label class="custom-control-label" for="match_n1">N</label>
 									</div>
 								</div>
 							</div>
@@ -309,9 +260,8 @@
 					}
 				}
 			},
-			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first", hide:true},
 			{field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
-
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}",
 				aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			},
@@ -381,7 +331,13 @@
 			{field: "price", headerName: "판매가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "wonga", headerName: "원가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "margin_amt", headerName: "마진액", type: 'numberType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
-			{field: "margin_rate", headerName: "마진율", type: 'percentType', width:80, cellStyle: {"line-height": "30px"}},
+			{field: "margin_rate", headerName: "마진율", type: 'percentType', width:80, cellStyle: {"line-height": "30px"},
+				cellRenderer:function(params) {
+					let margin_rate = parseFloat(params.data.margin_rate);
+					let marginRate = margin_rate.toFixed(2);
+					return marginRate + '%';
+				}
+			},
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
 			{{--
@@ -555,53 +511,6 @@
 			var url = `/store/product/prd04/stock?prd_cd_p=${prd_cd_p}&date=${date}&color=${color}&size=${size}`;
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1000,height=900");
 		}
-
-	// 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
-	$(document).ready(function() {
-		const store_channel = document.getElementById("store_channel");
-		const store_channel_kind = document.getElementById("store_channel_kind");
-
-		store_channel.addEventListener("change", () => {
-			if (store_channel.value) {
-				store_channel_kind.disabled = false;
-			} else {
-				store_channel_kind.disabled = true;
-			}
-		});
-	});
-
-	// 판매채널이 변경되면 해당 판매채널의 매장구분을 가져오는 부분
-	function chg_store_channel() {
-
-		const sel_channel = document.getElementById("store_channel").value;
-
-		$.ajax({
-			method: 'post',
-			url: '/store/standard/std02/show/chg-store-channel',
-			data: {
-				'store_channel' : sel_channel
-				},
-			dataType: 'json',
-			success: function (res) {
-				if(res.code == 200){
-					$('#store_channel_kind').empty();
-					let select =  $("<option value=''>전체</option>");
-					$('#store_channel_kind').append(select);
-
-					for(let i = 0; i < res.store_kind.length; i++) {
-						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
-						$('#store_channel_kind').append(option);
-					}
-
-				} else {
-					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-				}
-			},
-			error: function(e) {
-				console.log(e.responseText)
-			}
-		});
-	}	
 
 	</script>
 @stop
