@@ -161,6 +161,42 @@ class IndexController extends Controller
 
 		})->all();
 
+        // $sql = "
+        //     select
+        //         sum(recv_amt) as sum_amt
+        //     from order_opt_wonga
+        //     where ord_state in (30, 60, 61) and ord_state_date >= '$startdate' and ord_state_date <= '$enddate'
+        // ";
+
+        // $result = DB::select($sql);
+
+        // $sql = "
+        //     select
+        //         w.ord_state_date as sale_date
+        //         , w.ord_state
+        //         , sum(w.qty)as qty
+        //         , ifnull(sum(w.recv_amt),0) as recv_amt
+        //         , sum(w.point_apply_amt) as point_amt
+        //         , ifnull(sum(w.wonga * w.qty),0) as wonga
+        //         , sum(w.coupon_apply_amt) as coupon_amt
+        //         , sum(w.sales_com_fee) as fee_amt
+        //         , sum(w.dc_apply_amt) as dc_amt
+        //         , o.store_cd
+        //     from order_opt o
+        //         inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+        //         inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+        //         left outer join company c on o.sale_place = c.com_id
+        //     where
+        //         w.ord_state_date >= '$startdate' and w.ord_state_date <= '$enddate'
+        //         and w.ord_state in ('10',60,61)
+        //         and o.ord_state >= '10'
+        //         and (  o.ord_type = '5'  or  o.ord_type = '4'  or  o.ord_type = '3'  or  o.ord_type = '13'  or  o.ord_type = '12'  or  o.ord_type = '17'  or  o.ord_type = '14'  or  o.ord_type = '15'  or o.ord_type = '0'  or  o.ord_type = '16'  )  
+        //             group by w.ord_state_date, w.ord_state
+        // ";
+
+        // $result = DB::select($sql);
+
+
 
         $sql = "
         select
