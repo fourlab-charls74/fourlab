@@ -27,6 +27,7 @@ class prd02Controller extends Controller
 				, use_yn
 			from store_channel
 			where dep = 1 and use_yn = 'Y'
+			order by seq 
 		";
 
 		$store_channel = DB::select($sql);
@@ -36,6 +37,7 @@ class prd02Controller extends Controller
 				store_kind
 				, store_kind_cd
 				, use_yn
+				, seq
 			from store_channel
 			where dep = 2 and use_yn = 'Y'
 		";

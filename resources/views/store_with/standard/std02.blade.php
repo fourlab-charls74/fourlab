@@ -184,8 +184,8 @@
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},
-		{headerName:"개장일",		field:"sdate",			width:60},
-		{headerName:"폐점일",		field:"edate",			width:60},
+		{headerName:"개장일",		field:"sdate",			width:65},
+		{headerName:"폐점일",		field:"edate",			width:65},
 		{headerName:"매니저",		children:[
 			{headerName:"매니저명",	field:"manager_nm",		width:100},
 			{headerName:"연락처",	field:"manager_mobile",	width:100},

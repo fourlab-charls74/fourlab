@@ -1,9 +1,5 @@
 @extends('store_with.layouts.layout')
-<<<<<<< Updated upstream
-@section('title','바코드관리')
-=======
 @section('title','상품코드관리')
->>>>>>> Stashed changes
 @section('content')
 <style>
 .ag-row-level-1 {

@@ -22,6 +22,7 @@ class sal03Controller extends Controller
 				, use_yn
 			from store_channel
 			where dep = 1 and use_yn = 'Y'
+			order by seq
 		";
 
 		$store_channel = DB::select($sql);

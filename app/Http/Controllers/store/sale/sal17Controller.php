@@ -22,6 +22,7 @@ class sal17Controller extends Controller
 				, use_yn
 			from store_channel
 			where dep = 1 and use_yn = 'Y'
+			order by seq
 		";
 
 		$store_channel = DB::select($sql);
@@ -105,9 +106,7 @@ class sal17Controller extends Controller
 		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$where = "";
-		if ($store_cd != "") {
-			$where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
-		}
+		if ($store_cd != "") $where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
@@ -180,7 +179,7 @@ class sal17Controller extends Controller
 
 		$sql = /** @lang text */
             "
-			select s.store_cd as scd,s.store_nm,c.code_val as store_type_nm,a.*,b.*,p.*
+			select s.store_cd as scd,s.store_nm, sc.store_channel as store_channel, sc2.store_kind as store_channel_kind,a.*,b.*,p.*
 				from store s 
 				left outer join
 				( 
@@ -211,7 +210,9 @@ class sal17Controller extends Controller
 					where ym >= '${ym_s}' and ym <= '${ym_e}'
 					group by ssp.store_cd
 				) p on s.`store_cd` = p.`store_cd` 
-				left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+				-- left outer join `code` c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and sc.dep = '1'
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind
 			where 1=1 ${where}
 			order by scd
 		";

@@ -613,7 +613,8 @@ class std02Controller extends Controller
 						store_kind_cd
 						, store_kind
 					from store_channel
-					where store_channel_cd = '$store_channel' and dep = 2 and use_yn = 'Y'
+					where store_channel_cd = '$store_channel' and dep = 2 and use_yn = 'Y' 
+					order by seq asc
                 ";
             $store_kind = DB::select($sql);
 
