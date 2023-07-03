@@ -131,12 +131,13 @@
                 }
             }
         },
-        { field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" },
+        { field: "store_channel", headerName: "판매채널", pinned:'left', width:90, cellStyle: { 'text-align': "center" }},
+        { field: "store_channel_kind", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" },
 			cellRenderer: function (params) {
 					if (params.node.rowPinned === 'top') {
 						return "합계";
 					} else {
-						return params.data.store_type_nm
+						return params.data.store_channel_kind
 					}
 				},
 		},

@@ -180,13 +180,35 @@
 											<th>오픈일</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" />
+													<!-- <input type="text" name="sdate" id="sdate" value="{{ @$store->sdate }}" class="form-control form-control-sm w-100" /> -->
+													<div class="docs-datepicker form-inline-inner input_box w-100">
+														<div class="input-group">
+															<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$store->sdate }}" autocomplete="off">
+															<div class="input-group-append">
+																<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
+																	<i class="fa fa-calendar" aria-hidden="true"></i>
+																</button>
+															</div>
+														</div>
+														<div class="docs-datepicker-container"></div>
+													</div>
 												</div>
 											</td>
 											<th>종료일</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" />
+													<!-- <input type="text" name="edate" id="edate" value="{{ @$store->edate }}" class="form-control form-control-sm w-100" /> -->
+													<div class="docs-datepicker form-inline-inner input_box w-100">
+														<div class="input-group">
+															<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ @$store->edate }}" autocomplete="off">
+															<div class="input-group-append">
+																<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
+																	<i class="fa fa-calendar" aria-hidden="true"></i>
+																</button>
+															</div>
+														</div>
+														<div class="docs-datepicker-container"></div>
+													</div>
 												</div>
 											</td>
 										</tr>

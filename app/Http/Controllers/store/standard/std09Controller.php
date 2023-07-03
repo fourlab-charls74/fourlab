@@ -593,7 +593,7 @@ class std09Controller extends Controller
                         ->update(['seq' => $i+1]);
                 }
 	
-			$msg = "판매채널의 순서가 변경되었습니다.";
+			$msg = "매장구분의 순서가 변경되었습니다.";
             $code = 200;
 			DB::commit();
 		} catch (Exception $e) {
