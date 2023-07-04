@@ -163,15 +163,15 @@
 			{field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType'},
 			{field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
 		]},
-        {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType'},
         {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
+        {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType'},
+		{field: "return_p_amt", headerName: "처리금액", width: 80, type: 'currencyType'},
 		{field: "return_p_qty", headerName: "처리수량", width: 60, type: 'currencyType',
 			editable: (params) => checkIsEditable(params),
 			cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
 		},
-		{field: "return_p_amt", headerName: "처리금액", width: 80, type: 'currencyType'},
-        {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType', hide: true},
         {field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType', hide: true},
+        {field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType', hide: true},
 		{field: "reject_reason", hide: true},
 		{field: "reject_reason_val", headerName: "반품거부사유", width: 90,
 			editable: (params) => checkIsEditable(params),
@@ -320,8 +320,8 @@
 	function UpgradeState() {
 		let rows = gx.getRows();
 		
-		let reject_reason_empty_list = rows.filter(row => row.qty != row.return_p_qty && !row.reject_reason);
-		if (reject_reason_empty_list.length > 0) return alert("요청수량과 처리수량을 다르게 입력할 경우, 해당 항목의 반품거부사유를 반드시 선택해주세요.");
+		let reject_reason_empty_list = rows.filter(row => (row.qty < 1 ? row.store_wqty != row.return_p_qty : row.qty != row.return_p_qty) && !row.reject_reason);
+		if (reject_reason_empty_list.length > 0) return alert("바코드 \"" + reject_reason_empty_list[0].prd_cd + "\" 상품의 반품거부사유를 반드시 선택해주세요.");
 
 		if(!confirm("반품처리중 상태로 변경하시겠습니까?")) return;
 

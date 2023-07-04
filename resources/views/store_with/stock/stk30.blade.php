@@ -216,7 +216,7 @@
 
 	let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
-        {field: "sr_cd", headerName: "반품코드", width: 140, cellStyle: {"text-align": "center"},
+        {field: "sr_cd", headerName: "반품코드", width: 140, cellStyle: {"text-align": "center"}, pinned: 'left',
             cellRenderer: function(params) {
                 let sr_date = params.data.sr_date;
                 let date = sr_date.replace('-','');
@@ -238,12 +238,12 @@
         {field: "store_type_nm", headerName: "매장구분", width: 80, cellClass: 'hd-grid-code'},
         {field: "store_nm", headerName: "매장명", width: 200},
         {field: "store_qty", headerName: "매장보유재고", type: "currencyType", width: 90},
-        {field: "sr_qty", headerName: "요청수량", type: "currencyType", width: 60},
         {field: "sr_price", headerName: "요청금액", type: "currencyType", width: 80},
-        {field: "return_p_qty", headerName: "처리수량", type: "currencyType", width: 60},
+        {field: "sr_qty", headerName: "요청수량", type: "currencyType", width: 60},
         {field: "return_p_price", headerName: "처리금액", type: "currencyType", width: 80},
-        {field: "fixed_return_qty", headerName: "확정수량", type: "currencyType", width: 60},
+        {field: "return_p_qty", headerName: "처리수량", type: "currencyType", width: 60},
         {field: "fixed_return_price", headerName: "확정금액", type: "currencyType", width: 80},
+        {field: "fixed_return_qty", headerName: "확정수량", type: "currencyType", width: 60},
         {field: "sr_reason", hide: true},
         {field: "sr_reason_nm", headerName: "반품사유", width: 80, cellClass: 'hd-grid-code'},
         {field: "comment", headerName: "메모", width: 300},

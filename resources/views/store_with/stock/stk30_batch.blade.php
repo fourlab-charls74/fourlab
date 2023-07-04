@@ -181,11 +181,11 @@
 			{field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType'},
 			{field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
 		]},
+        {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
         {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
 		{width: 0}
     ];
 </script>

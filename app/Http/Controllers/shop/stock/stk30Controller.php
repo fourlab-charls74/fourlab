@@ -410,8 +410,7 @@ class stk30Controller extends Controller
 				, g.goods_nm
                 , pc.color
                 , pc.size
-                 -- 확정수량? 예정수량? 논의 후 수정필요
-				, srp.return_qty * -1 as qty
+                , if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1 as qty
                 , g.price
                 , (g.price * srp.return_qty * -1) as total_price
 			 	, round(g.price / 1.1) as return_price
