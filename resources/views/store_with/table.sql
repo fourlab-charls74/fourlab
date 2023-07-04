@@ -448,7 +448,7 @@ CREATE TABLE `sale_type` (
 	`sale_apply` varchar(10) DEFAULT 'price' COMMENT '기준금액 : 판매가(price)/TAG가(tag)',
 	`amt_kind` varchar(10) DEFAULT 'per' COMMENT '적용구분 : 할인율(per)/할인액(amt)',
 	`sale_amt` int(11) DEFAULT NULL COMMENT '할인액',
-	`sale_per` decimal(10,2) DEFAULT NULL COMMENT '할인율',
+	`sale_per` int(11) DEFAULT NULL COMMENT '할인율',
 	`use_yn` char(1) DEFAULT 'Y' COMMENT '사용여부',
 	`reg_date` datetime DEFAULT NULL COMMENT '등록일자',
 	`mod_date` datetime DEFAULT NULL COMMENT '수정일자',

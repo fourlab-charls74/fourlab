@@ -134,7 +134,7 @@
         }},
         {field: "sale_amt", headerName: "할인율/액", width: 100, cellStyle: {"text-align": "right"},
             cellRenderer: function(params) {
-                return params.data.amt_kind === 'per' ? Number.parseFloat(params.data.sale_per).toFixed(2) : Comma(params.value);
+                return params.data.amt_kind === 'per' ? Number.parseFloat(params.data.sale_per) + '%' : Comma(params.value);
         }},
         {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}},
         {field: "store_cnt", headerName: "적용매장수", type: "numberType", cellStyle: {"text-align": "center"}},
