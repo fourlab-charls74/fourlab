@@ -171,7 +171,7 @@
 											<option value="prd_cd1">등록일(품번별)</option>
 											<option value="pc.rt">등록일</option>
 											<option value="pc.ut">수정일</option>
-											<option value="g.goods_no">온라인코드</option>
+											<!-- <option value="g.goods_no">온라인코드</option> -->
 											<option value="g.goods_nm">상품명</option>
 											<option value="pc.prd_cd">바코드</option>
 										</select>
@@ -251,8 +251,8 @@
 		// const pinnedRowData = [{ goods_nm: '' , goods_sh: 0, price: 0, wonga: 0 , margin_amt : 0, wqty : 0, sqty : 0}];
 
 		const columns = [
-			{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight},
-			
+			// {headerName: '#', type: 'NumType', width:40, cellStyle: StyleLineHeight, pinned: 'left'},
+			{headerName: '#', width:40, pinned: 'left', valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: StyleLineHeight},
 			{field: "prd_cd", headerName: "바코드", width:120, pinned: 'left', cellStyle: StyleLineHeight,
 				cellRenderer: function(params) {
 					if (params.value !== undefined) {
@@ -260,9 +260,8 @@
 					}
 				}
 			},
-			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
-			// {field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
-
+			// {field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			{field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}",
 				aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			},
@@ -295,7 +294,6 @@
 			// {field: "goods_opt", headerName: "옵션", width:190},
 			// {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"},aggFunc: "first"},
-			
 			{{--
 			// {field: "wqty", headerName: "창고재고", width:70,type: 'currencyType', cellStyle: {"line-height": "30px"},
 			// 	aggFunc: (params) => {
@@ -327,16 +325,11 @@
 			// 		}
 			// },
 			--}}
-
 			{field: "goods_sh", headerName: "정상가", type: 'currencyType', cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "price", headerName: "판매가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "wonga", headerName: "원가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "margin_amt", headerName: "마진액", type: 'numberType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
-			{field: "margin_rate", headerName: "마진율", type: 'numberType', width:80, cellStyle: {"line-height": "30px"},
-				// cellRenderer:function(params) {
-				// 	return params.data.margin_rate;
-				// }
-			},
+			{field: "margin_rate", headerName: "마진율(%)", type: 'percentType', width:80, cellStyle: {"line-height": "30px"}},
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
 			{{--
@@ -418,7 +411,7 @@
 		if(ord_field === "prd_cd1") {
 			let prd_columns = columns.map(c => c.field === "prd_cd1" 
 				? ({...c, rowGroup: true, hide: true, pinned: "left"}) 
-				: c.type === "NumType" ? ({...c, hide: true})
+				: c.type === "NumType" || c.headerName === "#" ? ({...c, hide: true})
 				: c.field === "goods_no" ? ({...c, cellStyle: StyleLineHeight}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		} else {

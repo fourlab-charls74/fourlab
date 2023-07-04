@@ -184,7 +184,7 @@
                 },
             },
             {headerName: "보낸 날짜", field: "rt", width:120},
-            //{headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
+            {headerName: "확인여부", field: "check_yn", width: 150, cellClass: 'hd-grid-code'},
             {headerName: "알림 번호", field: "msg_cd", hide: true},    
             {width: 'auto'}
         ];                              

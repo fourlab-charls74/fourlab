@@ -66,6 +66,7 @@ class prd02Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 		$ext_storage_qty = $request->input('ext_storage_qty');
+		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 
 		$prd_cd		= $request->input("prd_cd", "");
@@ -238,7 +239,7 @@ class prd02Controller extends Controller
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-				, round((100/(g.price/(g.price-g.wonga))),0) as margin_rate
+				, (100/(g.price/(g.price-g.wonga))) as margin_rate
 				, (g.price-g.wonga) as margin_amt
 				, g.org_nm
 				, com.com_nm
@@ -1670,8 +1671,11 @@ class prd02Controller extends Controller
 
 	public function create_barcode(Request $request)
 	{
-		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
-			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
+		// $sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->where('com_type', '=', '10')
+		// 	->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
+
+		$sql = "select com_id, com_nm from company where use_yn = 'Y' and com_type in ('1','10')";
+		$sup_coms = DB::select($sql);
 
 		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' order by field(brand_nm, '헤스트라', '프리머스', '한바그', '피엘라벤') desc, brand_nm asc";
 		$brands	= DB::select($sql);
