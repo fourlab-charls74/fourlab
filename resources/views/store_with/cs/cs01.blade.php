@@ -94,7 +94,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 mb-2 mb-lg-0">
+                        <!-- <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
                                 <label for="item">품목</label>
                                 <div class="flex_box">
@@ -106,7 +106,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="user_name">입고자</label>

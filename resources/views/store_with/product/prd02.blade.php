@@ -260,8 +260,9 @@
 					}
 				}
 			},
-			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first", hide:true},
-			{field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
+			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			// {field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
+
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}",
 				aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			},
@@ -331,12 +332,10 @@
 			{field: "price", headerName: "판매가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "wonga", headerName: "원가", type: 'currencyType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "margin_amt", headerName: "마진액", type: 'numberType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
-			{field: "margin_rate", headerName: "마진율", type: 'percentType', width:80, cellStyle: {"line-height": "30px"},
-				cellRenderer:function(params) {
-					let margin_rate = parseFloat(params.data.margin_rate);
-					let marginRate = margin_rate.toFixed(2);
-					return marginRate + '%';
-				}
+			{field: "margin_rate", headerName: "마진율", type: 'numberType', width:80, cellStyle: {"line-height": "30px"},
+				// cellRenderer:function(params) {
+				// 	return params.data.margin_rate;
+				// }
 			},
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},

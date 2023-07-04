@@ -66,7 +66,6 @@ class prd02Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 		$ext_storage_qty = $request->input('ext_storage_qty');
-		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 
 		$prd_cd		= $request->input("prd_cd", "");
@@ -239,7 +238,7 @@ class prd02Controller extends Controller
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-				, (100/(g.price/(g.price-g.wonga))) as margin_rate
+				, round((100/(g.price/(g.price-g.wonga))),0) as margin_rate
 				, (g.price-g.wonga) as margin_amt
 				, g.org_nm
 				, com.com_nm

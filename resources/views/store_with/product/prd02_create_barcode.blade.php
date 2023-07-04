@@ -305,24 +305,17 @@
 			cellRenderer: (params) => params.data.size
 		},
 		{field: "plan_category", headerName: "기획구분", width: 120},
-		
 		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
 		},
-		{field: "prd_cd", headerName: "품번", width: 140},
-		
-		
-		
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
-		
-		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
-		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
-		
 		{field: "sup_com", headerName: "공급업체", width: 120},
+		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
+		{field: "price", headerName: "정상가", type: 'currencyType', width: 80},
+		{field: "tag_price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "origin", headerName: "원산지", width: 100},
-		
+		{field: "prd_cd", headerName: "품번", width: 140},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
