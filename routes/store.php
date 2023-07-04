@@ -627,7 +627,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::post('stk27/batch-import', 'stk27Controller@import_excel');
 		Route::post('stk27/batch-getgoods', 'stk27Controller@get_goods');
         
-        // 창고반품
+        // 매장반품
         Route::get('stk30','stk30Controller@index');
         Route::get('stk30/search','stk30Controller@search');
 		Route::get('stk30/download','stk30Controller@download'); // 명세서출력

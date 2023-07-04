@@ -177,9 +177,10 @@
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType',
-			cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "#ff4444"} : {}
-        },
+		{headerName: "매장재고", children: [
+			{field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType'},
+			{field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
+		]},
         {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}

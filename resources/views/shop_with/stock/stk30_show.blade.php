@@ -16,7 +16,7 @@
         @if (@$sr_state == 10)
 	        <a href="javascript:void(0)" onclick="return UpgradeState();" class="btn btn-danger"><i class="fas fa-check fa-sm text-white-50 mr-1"></i> 반품처리중</a>
 	        <span class="mx-2">|</span>
-	        <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+	        <a href="javascript:void(0)" onclick="Save()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 임시저장</a>
 		@elseif (@$sr_state == 30)
 			<u class="fs-14 text-primary font-weight-bold mr-2">반품처리중</u>
 		@elseif (@$sr_state == 40)
@@ -108,8 +108,8 @@
                 <a href="#">상품정보</a>
                 <div class="d-flex align-items-center">
                     @if($sr->sr_state == 10)
-		                <button type="button" onclick="return setReturnQty('qty', 'return_p_qty');" class="btn btn-sm btn-outline-primary shadow-sm mr-1">요청수량 <i class="bx bx-right-arrow-alt"></i> 처리수량</button>
-                        <button type="button" onclick="return setReturnQty('', 'return_p_qty');" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn">처리수량 초기화</button>
+		                <button type="button" onclick="return setReturnQty('qty', 'return_p_qty');" class="btn btn-sm btn-outline-primary shadow-sm mr-1">전체반품처리</button>
+                        <button type="button" onclick="return setReturnQty('', 'return_p_qty');" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn">처리수량초기화</button>
                     @endif
                 </div>
             </div>
@@ -159,9 +159,10 @@
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
         {field: "price", headerName: "판매가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType'},
-        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType',
-            cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "red"} : {}
-        },
+		{headerName: "매장재고", children: [
+			{field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType'},
+			{field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
+		]},
         {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType'},
         {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
 		{field: "return_p_qty", headerName: "처리수량", width: 60, type: 'currencyType',
@@ -259,7 +260,7 @@
         let sr_cd = '{{ @$sr->sr_cd }}';
 
 		if(now_state >= 30) return alert("반품처리중 이후의 내역은 수정할 수 없습니다.");
-		if(!confirm("저장하시겠습니까?")) return;
+		if(!confirm("임시저장하시겠습니까?")) return;
 
         axios({
             url: '/shop/stock/stk30/update',
@@ -275,7 +276,7 @@
                 window.close();
             } else {
                 console.log(res.data);
-                alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("임시저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);
@@ -287,10 +288,11 @@
     };
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-		let [ store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price ] = [ 0, 0, 0, 0, 0, 0, 0 ];
+		let [ store_qty, store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price ] = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
+				store_qty += parseFloat(row.store_qty);
 				store_wqty += parseFloat(row.store_wqty);
                 qty += parseFloat(row.qty);
 				return_amt += parseFloat(row.return_amt);
@@ -303,7 +305,7 @@
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price }
+            { ...pinnedRow.data, store_qty, store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price }
         ]);
     };
 

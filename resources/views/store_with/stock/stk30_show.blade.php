@@ -145,8 +145,8 @@
                 <div class="d-flex align-items-center">
                 @if(@$cmd == 'add')
                     <div class="d-flex">
-                        <button type="button" onclick="return setAllQty(false);" class="btn btn-sm btn-outline-primary shadow-sm mr-1">전체재고반품요청</button>
-                        <button type="button" onclick="return setAllQty(true);" class="btn btn-sm btn-outline-primary shadow-sm">요청수량초기화</button>
+                        <button type="button" onclick="return setReturnQty('store_wqty', 'qty');" class="btn btn-sm btn-outline-primary shadow-sm mr-1">전체재고반품요청</button>
+                        <button type="button" onclick="return setReturnQty('', 'qty');" class="btn btn-sm btn-outline-primary shadow-sm">요청수량초기화</button>
                     </div>
 	                <span class="mx-2">|</span>
 	                <div class="d-flex">
@@ -203,20 +203,21 @@
         {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
         {field: "price", headerName: "판매가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+            editable: (params) => checkIsEditable(params) && now_state < 30,
+            cellStyle: (params) => checkIsEditable(params) && now_state < 30 ? {"background-color": "#ffff99"} : {}
         },
-        {field: "store_wqty", headerName: "매장보유재고", width: 100, type: 'currencyType',
-            cellStyle: (params) => params.data.store_wqty != 0 ? {"color" : "#ff4444"} : {}
-        },
-        {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType', 
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+		{headerName: "매장재고", children: [
+			{field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType'},
+	        {field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
+		]},
+        {field: "qty", headerName: "요청수량", width: 60, type: 'currencyType',
+            editable: (params) => checkIsEditable(params) && now_state < 30,
+            cellStyle: (params) => checkIsEditable(params) && now_state < 30 ? {"background-color": "#ffff99"} : {}
         },
         {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
         {field: "return_p_qty", headerName: "처리수량", width: 60, type: 'currencyType', hide: true,
-            editable: (params) => checkIsEditable(params),
-            cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+            editable: (params) => checkIsEditable(params) && now_state < 30,
+            cellStyle: (params) => checkIsEditable(params) && now_state < 30 ? {"background-color": "#ffff99"} : {}
         },
 		{field: "return_p_amt", headerName: "처리금액", width: 80, type: 'currencyType', hide: true},
 		{field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType', hide: true,
@@ -226,21 +227,21 @@
 		{field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType', hide: true},
 		{field: "reject_reason", hide: true},
 		{field: "reject_reason_val", headerName: "반품거부사유", width: 90, hide: true,
-			editable: (params) => checkIsEditable(params),
-			cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {},
-			cellEditor: 'agRichSelectCellEditor',
-			cellEditorPopup: true,
-			cellEditorParams: {
-				values: reject_reasons.map(rs => rs.code_val),
-				formatValue: (value) => {
-					let code_id = reject_reasons.find(rs => rs.code_val === value)?.code_id;
-					return `${code_id ? '[' + code_id + '] ' : ''}${value}`;
-				},
-			},
+			// editable: (params) => checkIsEditable(params),
+			// cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {},
+			// cellEditor: 'agRichSelectCellEditor',
+			// cellEditorPopup: true,
+			// cellEditorParams: {
+			// 	values: reject_reasons.map(rs => rs.code_val),
+			// 	formatValue: (value) => {
+			// 		let code_id = reject_reasons.find(rs => rs.code_val === value)?.code_id;
+			// 		return `${code_id ? '[' + code_id + '] ' : ''}${value}`;
+			// 	},
+			// },
 		},
 		{field: "reject_comment", headerName: "반품거부메모", width: 200, hide: true,
-			editable: (params) => checkIsEditable(params),
-			cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {},
+			// editable: (params) => checkIsEditable(params),
+			// cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {},
 		},
         {field: "fixed_comment", headerName: "확정메모", width: 200, hide: true, 
             editable: (params) => checkIsEditable(params),
@@ -284,7 +285,8 @@
                     } else if(
 						(e.column.colId === "qty" && e.data.store_wqty < parseInt(e.data.qty))
 						|| (e.column.colId === "return_p_qty" && e.data.store_wqty < parseInt(e.data.return_p_qty))
-						|| (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty))
+	                    // 아래코드 주석처리 (확정수량은 처리 이후 현재의 보유재고보다 많을 수 있습니다.)
+						// || (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty))
                     ) {
 						alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -497,10 +499,11 @@
     }
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price ] = [ 0, 0, 0, 0, 0, 0, 0 ];
+        let [ store_qty, store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price ] = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
+				store_qty += parseFloat(row.store_qty);
 				store_wqty += parseFloat(row.store_wqty);
                 qty += parseFloat(row.qty);
                 return_amt += parseFloat(row.return_amt);
@@ -513,27 +516,16 @@
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price }
+            { ...pinnedRow.data, store_qty, store_wqty, qty, return_amt, return_p_qty, return_p_amt, fixed_return_qty, fixed_return_price }
         ]);
     };
 	
 	const setReturnQty = (copy_col = '', paste_col = '') => {
-		if (copy_col === '' || paste_col === '') return;
+		if (paste_col === '') return;
 		gx.gridOptions.api.forEachNode(node => {
 			node.setDataValue(paste_col, node.data[copy_col] || 0);
 		});
 	}
-
-    const setAllQty = (is_zero = false) => {
-        const rows = gx.getRows().map(row => ({
-            ...row, 
-            qty: is_zero ? 0 : row.store_wqty, 
-            return_amt: is_zero ? 0 : parseInt(row.return_price) * parseInt(row.store_wqty),
-        }));
-        gx.gridOptions.api.applyTransaction({ update : rows });
-        gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
-        updatePinnedRow();
-    }
 	
 	// 반품상태 변경
     function UpgradeState(new_state) {
@@ -543,7 +535,7 @@
 		let rows = gx.getRows();
 		
 		if (new_state == 40) {
-			let wrong_list = rows.filter(row => row.return_qty != row.fixed_return_qty);
+			let wrong_list = rows.filter(row => row.qty != row.fixed_return_qty);
 			if (wrong_list.length > 0 && !confirm("요청수량과 확정수량이 일치하지 않는 항목이 존재합니다.\n그래도 변경하시겠습니까?")) return;
 		}
 		
