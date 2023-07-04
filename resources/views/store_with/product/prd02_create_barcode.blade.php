@@ -290,11 +290,11 @@
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null},
 		{field: "brand", headerName: "브랜드", width: 70},
 		{field: "image_url", headerName: "이미지 경로", hide: true},
+		{field: "year", headerName: "년도", width: 80},
+		{field: "season", headerName: "시즌",width: 80},
+		{field: "gender", headerName: "성별", width: 80},
 		{field: "item", headerName: "품목", width: 80},
-		{field: "image", headerName: "이미지",
-			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
-		},
-		{field: "prd_cd", headerName: "품번", width: 140},
+		{field: "style_no", headerName: "스타일넘버", width: 100},
 		{field: "color", headerName: "컬러", width: 80,
 			cellRenderer: (params) => params.data.color.split(':')[1]
 		},
@@ -304,18 +304,25 @@
 		{field: "size", headerName: "사이즈", width: 80,
 			cellRenderer: (params) => params.data.size
 		},
+		{field: "plan_category", headerName: "기획구분", width: 120},
+		
+		{field: "image", headerName: "이미지",
+			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
+		},
+		{field: "prd_cd", headerName: "품번", width: 140},
+		
+		
+		
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
-		{field: "style_no", headerName: "스타일넘버", width: 100},
+		
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
-		{field: "year", headerName: "년도", width: 80},
-		{field: "season", headerName: "시즌",width: 80},
-		{field: "gender", headerName: "성별", width: 80},
+		
 		{field: "sup_com", headerName: "공급업체", width: 120},
 		{field: "origin", headerName: "원산지", width: 100},
-		{field: "plan_category", headerName: "기획구분", width: 120},
+		
 	];
 </script>
 <script type="text/javascript" charset="utf-8">

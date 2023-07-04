@@ -218,17 +218,17 @@ class std51Controller extends Controller
                     if($cnt === 0){
                         DB::table('code')->insert($data_code);
 
-                        DB::table('sale_type')->insert([
-                            'sale_kind' => $data['code_id'],
-                            'sale_type_nm' => $data['code_val'],
-                            'sale_apply' => 'price',
-                            'amt_kind' => 'per',
-                            'sale_per' => 0,
-                            'use_yn' => $data['use_yn'],
-                            'reg_date' => now(),
-                            'mod_date' => now(),
-                            'admin_id' => $id
-                        ]);
+                        // DB::table('sale_type')->insert([
+                        //     'sale_kind' => $data['code_id'],
+                        //     'sale_type_nm' => $data['code_val'],
+                        //     'sale_apply' => 'price',
+                        //     'amt_kind' => 'per',
+                        //     'sale_per' => 0,
+                        //     'use_yn' => $data['use_yn'],
+                        //     'reg_date' => now(),
+                        //     'mod_date' => now(),
+                        //     'admin_id' => $id
+                        // ]);
                     }
                 }
             });
