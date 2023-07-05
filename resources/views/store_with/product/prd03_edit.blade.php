@@ -15,7 +15,7 @@
 		@if($method == 'edit')
 		<div class="d-flex">
 			<a href="javascript:void(0);" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>수정</a>
-			<a href="javascript:void(0);" onclick="del();" class="btn btn-outline-primary mr-1"><i class="far fa-trash-alt fs-12"></i> 삭제</a>
+			<a href="javascript:void(0);" onclick="del(`${PRD_CD}`);" class="btn btn-outline-primary mr-1"><i class="far fa-trash-alt fs-12"></i> 삭제</a>
 			<a href="javascript:void(0);" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 		@endif
@@ -244,18 +244,27 @@
 		});
 	}
 
-	async function del() {
-		if (!confirm("삭제 하시겠습니까?")) {
-			return false;
-		}
-		const response = await axios({ url: `/store/product/prd03/delete/${PRD_CD}`, method: 'get' });
-		const { code } = response.data;
-		if (code == 200) {
-			alert("삭제가 완료되었습니다.");
-			window.opener.Search();
-			window.close();
-		} else if (code == 500) {
-			alert("수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+	function del(prd_cd) {
+		if (confirm("원부자재상품을 삭제하시겠습니까?")) {
+			$.ajax({
+				method: 'get',
+				url: '/store/product/prd03/delSproduct',
+				data: {
+					prd_cd: prd_cd,
+				},
+				success: function(data) {
+					if (data.code == 200) {
+						alert('원부자재상품이 삭제되었습니다.');
+						opener.Search();
+						window.close();
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function(res, status, error) {
+					console.log(error);
+				}
+			});
 		}
 	}
 

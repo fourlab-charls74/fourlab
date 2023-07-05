@@ -112,7 +112,7 @@ class prd02Controller extends Controller
 			}
 		}
 
-
+		// 스타일넘버 다중검색
 		$style_nos = explode(',', $style_no);
 		if ( $style_no != "" ) {
 			$where	.= " and (1!=1";
