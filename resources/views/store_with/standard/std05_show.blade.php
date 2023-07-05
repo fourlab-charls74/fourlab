@@ -127,7 +127,7 @@
 			</div>
 		</div>
         <!-- 2023.02.08 김나영 추후 작업 -->
-        <div class="card_wrap aco_card_wrap" hidden>
+        <div class="card_wrap aco_card_wrap" >
 			<div class="card shadow">
 				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
 					<a href="#">브랜드 정보</a>
@@ -136,7 +136,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
-                                <div id="div-gd-brand" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                                <div id="div-gd-brand" style="width:100%;" class="ag-theme-balham"></div>
                             </div>
                         </div>
                     </div>
@@ -238,7 +238,7 @@
         });
 
         // 브랜드정보
-        pApp2.ResizeGrid(570);
+        pApp2.ResizeGrid(770);
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, brand_columns, {
@@ -303,8 +303,6 @@
         if(!validation(type)) return;
         if(!window.confirm("판매유형 정보를 저장하시겠습니까?")) return;
         alert("다소 시간이 소요될 수 있습니다. 잠시만 기다려주세요.");
-
-        console.log(type);
 
         let url = '/store/standard/std05/' + type;
         let method = type === 'add' ? 'post' : 'put';
