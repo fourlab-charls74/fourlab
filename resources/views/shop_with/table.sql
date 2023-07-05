@@ -1088,6 +1088,23 @@ CREATE TABLE member_black_list (
   PRIMARY KEY (`seq`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='블랙리스트 관리 테이블';
 
+-- 매장관리 환경설정
+CREATE TABLE `store_conf` (
+	`type` VARCHAR(50) NOT NULL COMMENT '구분',
+	`name` VARCHAR(50) NOT NULL COMMENT '이름',
+	`idx` VARCHAR(50) NOT NULL COMMENT '배열이름',
+	`value` VARCHAR(100) NOT NULL COMMENT '값',
+	`mvalue` VARCHAR(100) DEFAULT NULL COMMENT '모바일값',
+	`content` MEDIUMTEXT DEFAULT NULL COMMENT '내용',
+	`desc` VARCHAR(255) DEFAULT NULL COMMENT '설명',
+	`admin_id` VARCHAR(20) NOT NULL COMMENT '관리자ID',
+	`admin_nm` VARCHAR(20) NOT NULL COMMENT '관리자명',
+	`rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+	`ut` DATETIME DEFAULT NULL COMMENT '수정일시',
+	PRIMARY KEY (`type`, `name`, `idx`),
+	KEY `idx_type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='매장관리 환경설정';
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --

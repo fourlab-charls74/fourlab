@@ -898,7 +898,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sys04', 'sys04Controller@index');
         Route::get('sys04/search', 'sys04Controller@search');
 
-        
+        // 환경관리
+		Route::get('sys05', 'sys05Controller@index');
+		Route::get('sys05/search', 'sys05Controller@search');
+		Route::get('sys05/show', 'sys05Controller@show');
+		Route::post('sys05', 'sys05Controller@save');
+		Route::put('sys05', 'sys05Controller@update');
+		Route::delete('sys05', 'sys05Controller@remove');
 
     });
 
