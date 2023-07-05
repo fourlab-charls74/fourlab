@@ -112,7 +112,16 @@ class prd02Controller extends Controller
 			}
 		}
 
-		if($style_no != "")		$where .= " and if(pc.goods_no = 0, p.style_no , g.style_no) like '" . Lib::quote($style_no) . "%' ";
+
+		$style_nos = explode(',', $style_no);
+		if ( $style_no != "" ) {
+			$where	.= " and (1!=1";
+			foreach($style_nos as $styleno) {
+				$where .= " or if(pc.goods_no = 0, p.style_no, g.style_no) = '$styleno' ";
+
+			}
+			$where	.= ")";
+		}
 		if($item != "")			$where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if($brand_cd != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
