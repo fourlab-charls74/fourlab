@@ -163,6 +163,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std07/search-store-fee-history', 'std07Controller@search_store_fee_history');
         Route::put('std07/update-store-fee', 'std07Controller@update_store_fee');
         Route::delete('std07/remove-store-fee/{fee_idx?}', 'std07Controller@remove_store_fee');
+        Route::get('std07/changeUseYn','std07Controller@change_use_yn');
 
         // 매장등급관리
         Route::get('std08', 'std08Controller@index');

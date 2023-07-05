@@ -129,7 +129,7 @@
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
         {field: "prd_cd", headerName: "바코드", width: 120, pinned: 'left', cellStyle: StyleCenter},
-        {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: StyleCenter},
+        // {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: StyleCenter},
         {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 150,
             cellRenderer: (params) => {
                 if (params.data.goods_no === undefined) return '';

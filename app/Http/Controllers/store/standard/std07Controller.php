@@ -289,5 +289,54 @@ class std07Controller extends Controller
 
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
+
+	// public function change_use_yn(Request $request) 
+	// {
+	// 	$charge_yn = $request->input('charge_yn');
+
+	// 	$code = 200;
+
+	// 	$sql = "
+	// 		select 
+	// 			sf.idx, 
+	// 			cd.code_id as pr_code_cd, 
+	// 			cd.code_val as pr_code_nm, 
+	// 			s.store_cd, 
+	// 			sf.store_fee,
+	// 			s.grade_cd,
+	// 			sg.idx as grade_idx,
+	// 			sg.name as grade_nm,
+	// 			sf.sdate, 
+	// 			sf.edate, 
+	// 			sf.comment, 
+	// 			sf.use_yn
+	// 		from code cd
+	// 			inner join store s on s.store_cd = '$store_cd'
+	// 			left outer join store_fee sf
+	// 				on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code) and sf.use_yn = 'Y'
+	// 			left outer join store_grade sg 
+	// 				on sg.grade_cd = s.grade_cd 
+	// 				and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+	// 				and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
+	// 		where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
+	// 		order by cd.code_seq
+	// 	";
+
+	// 	$rows = DB::select($sql);
+
+	// 	return response()->json([
+	// 		"code" => $code,
+	// 		"head" => [
+	// 			"total" => count($rows),
+	// 			"page" => 1,
+	// 			"page_cnt" => 1,
+	// 			"page_total" => 1
+	// 		],
+	// 		"body" => $rows
+	// 	]);
+
+		
+
+	// }
 }
 
