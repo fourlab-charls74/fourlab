@@ -419,6 +419,8 @@ class ord03Controller extends Controller
 					$order->DlvEnd($dlv_cd, $dlv_no, $ord_state, $row['dlv_location_type'], $row['dlv_location_cd']);
 					$order->DlvLog($ord_state);
 
+					$this->update_sale_store($ord_opt_no);
+
 					// 온라인주문접수 업데이트정보 변경
 					DB::table('order_receipt')
 						->where('or_cd', $row['or_cd'])
@@ -592,6 +594,18 @@ class ord03Controller extends Controller
 				'admin_id' => $user['id'],
 				'admin_nm' => $user['name'],
 			]);
+	}
+
+	/** 주문접수 시 판매매장정보 등록 */
+	private function update_sale_store($ord_opt_no)
+	{
+		$ord = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->select('sale_place', 'store_cd')->first();
+		if ($ord->sale_place != '' && $ord->store_cd == '') {
+			$store = DB::table('store')->where('sale_place_match_yn', 'Y')->where('com_id', $ord->sale_place)->select('store_cd')->first();
+			if ($store !== null) {
+				DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'store_cd' => $store->store_cd ]);
+			}
+		}
 	}
 
 	/** 
