@@ -34,14 +34,13 @@ class PosController extends Controller
         $sale_types = DB::select($sql);
 
         $sql = "
-            select
-                code_id as pr_code,
-                code_val as pr_code_nm
-            from code
-            where code_kind_cd = 'PR_CODE' and use_yn = 'Y'
-            order by code_seq
+			select sf.pr_code, c.code_val as pr_code_nm
+			from store_fee sf
+				inner join code c on c.code_kind_cd = 'PR_CODE' and c.use_yn = 'Y' and c.code_id = sf.pr_code
+			where sf.store_cd = :store_cd and sf.use_yn = 'Y'
+			order by c.code_seq
         ";
-        $pr_codes = DB::select($sql);
+        $pr_codes = DB::select($sql, [ 'store_cd' => $store_cd ]);
 
         $sql = "
             select store_cd, store_nm
