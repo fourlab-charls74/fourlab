@@ -198,11 +198,10 @@
 
         let same_goods = gx.getRows().find(g => g.prd_cd === prd_cd);
         if(same_goods === undefined) {
-            gx.gridOptions.api.applyTransaction({ add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_types[0].sale_kind, pr_code: pr_codes[0].pr_code}] });
+            gx.gridOptions.api.applyTransaction({ add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: '', pr_code: pr_codes[0].pr_code}] });
             gx.gridOptions.api.forEachNode((node) => {
                 if(node.data.prd_cd === prd_cd) {
                     node.setSelected(true);
-                    updateOrderValue('sale_type', sale_types[0].sale_kind);
                 }
             });
 
@@ -261,11 +260,16 @@
         $(sale_type).find("option").remove();
         sale_types.forEach((type, key) => {
             if(isJsGoods || (!isJsGoods && ((type.amt_kind == 'per' && type.sale_per <= 0) || (type.amt_kind == 'amt' && type.sale_amt <= 0)))) {
-                sale_type[sale_type.options.length] = new Option(type.sale_type_nm, type.sale_kind);
+				if (type.brands === null || (type.brands?.split(',') || []).includes(goods.brand)) {
+                    sale_type[sale_type.options.length] = new Option(type.sale_type_nm, type.sale_kind);
+				}
             }
         });
         if(goods.sale_type != "") {
             $(sale_type).val(goods.sale_type).prop("selected", true);
+        } else {
+            $(sale_type).prop("selectedIndex", 0);
+			updateOrderValue('sale_type', $(sale_type).val());
         }
 
         if(goods.pr_code != "") {
@@ -344,8 +348,7 @@
                     let st = sale_types.find(s => s.sale_kind == value);
                     let std_price = st.sale_apply === 'tag' ? rowData.goods_sh : rowData.ori_price;
                     let discount_amt = st.sale_amt || 0;
-                    if(st.amt_kind === 'per') discount_amt = std_price * (unComma(st.sale_per || 0) / 100);
-
+                    if(st.amt_kind === 'per') discount_amt = std_price * ((st.sale_per || 0) / 100);
                     $("#cur_dc_rate").text(Comma(100 - Math.round((std_price - discount_amt) / rowData.goods_sh * 100)) + ' %');
                     $("#cur_price").text(Comma(std_price - discount_amt));
                     curRow[0].setData({

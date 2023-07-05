@@ -25,7 +25,8 @@ class PosController extends Controller
         $sql = "
             select
                 s.idx as sale_type, s.sale_kind, s.sale_type_nm,
-                s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per
+                s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per,
+                (select group_concat(brand) from sale_type_brand b where b.sale_type_cd = s.idx and use_yn = 'Y') as brands
             from sale_type_store ss
                 inner join sale_type s on s.idx = ss.sale_type_cd
             where ss.store_cd = '$store_cd' and ss.use_yn = 'Y' and ss.sdate <= '$today 00:00:00' and ss.edate >= '$today 23:59:59'
