@@ -1507,6 +1507,27 @@ $( document ).ready(function() {
     
 });
 
+/**
+ * 
+ * 판매채널 부분
+ * 
+ */
+
+// 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
+function load_store_channel() {
+		const store_channel = document.getElementById("store_channel");
+		const store_channel_kind = document.getElementById("store_channel_kind");
+
+		store_channel.addEventListener("change", () => {
+			if (store_channel.value) {
+				store_channel_kind.disabled = false;
+			} else {
+				store_channel_kind.disabled = true;
+			}
+		});
+}
+
+// 판매채널 검색
 function chg_store_channel() {
 
     const sel_channel = document.getElementById("store_channel").value;

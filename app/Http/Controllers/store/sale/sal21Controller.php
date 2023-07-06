@@ -15,34 +15,12 @@ class sal21Controller extends Controller
 {
 	public function index()
 	{
-        $sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
         $values = [
             'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
             'edate' => date('Y-m-d'),
             'store_types' => SLib::getStoreTypes(),
-            'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+            'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
         return view(Config::get('shop.store.view') . '/sale/sal21', $values);
 	}

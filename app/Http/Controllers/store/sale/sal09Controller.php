@@ -12,31 +12,8 @@ use Carbon\Carbon;
 
 class sal09Controller extends Controller
 {
-	public function index(Request $request) {
-
-		$sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-			order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
+	public function index(Request $request)
+	{
 		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
 		// $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
@@ -85,8 +62,8 @@ class sal09Controller extends Controller
 			'store_types'	=> $store_types,
 			'event_cds'		=> $event_cds,
 			'sell_types'	=> $sell_types,
-			'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
         return view( Config::get('shop.store.view') . '/sale/sal09',$values);
 	}

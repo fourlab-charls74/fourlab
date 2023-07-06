@@ -30,29 +30,6 @@ class stk16Controller extends Controller
 
     public function index()
     {
-        $sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-            order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
         $values = [
             'sdate' => now()->sub(1, 'week')->format('Y-m-d'),
             'edate' => date("Y-m-d"),
@@ -62,8 +39,8 @@ class stk16Controller extends Controller
             'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
             'types' => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
             'opts' => SLib::getCodes("PRD_MATERIAL_OPT"), // 원부자재 품목
-            'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+            'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
         ];
 
         return view(Config::get('shop.store.view') . '/stock/stk16', $values);

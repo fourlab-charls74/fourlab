@@ -19,34 +19,11 @@ class std02Controller extends Controller
 {
 	public function index() 
 	{
-		$sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
 		$values = [
 			'store_types'	=> SLib::getCodes("STORE_TYPE"),	// 매장구분
-			'store_kinds'	=> SLib::getCodes("STORE_KIND"),	// 매장종류
 			'store_areas'	=> SLib::getCodes("STORE_AREA"),	// 매장지역
-			'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
 		return view( Config::get('shop.store.view') . '/standard/std02',$values);
@@ -224,6 +201,7 @@ class std02Controller extends Controller
 				, use_yn
 			from store_channel
 			where dep = 1 and use_yn = 'Y'
+			order by seq
 		";
 
 		$store_channel = DB::select($sql);

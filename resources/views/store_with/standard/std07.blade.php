@@ -174,7 +174,7 @@
         },
         {field: "sdate", headerName: "시작일", width: 90, cellStyle: {"text-align": "center"}},
         {field: "edate", headerName: "종료일", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "store_fee", headerName: "매장수수료(%)", width: 120, type: "percentType"},
+        {field: "store_fee", headerName: "판매처수수료(%)", width: 120, type: "percentType"},
         {field: "grade_cd", hide: true},
         // {field: "grade_nm", headerName: "매장등급", width: 80, cellStyle: {"text-align": "center"},
         //     cellRenderer: (params) => {
@@ -222,6 +222,9 @@
                 pApp2.ResizeGrid(275);
             }
         });
+
+        //판매채널 선택전 매장구분 disable처리
+        load_store_channel()
     });
 
     // 매장목록 조회
@@ -264,53 +267,6 @@
         const url = "/store/standard/std08/choice?grade_nm=" + grade_nm;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1200,height=710");
     }
-
-    // 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
-	$(document).ready(function() {
-		const store_channel = document.getElementById("store_channel");
-		const store_channel_kind = document.getElementById("store_channel_kind");
-
-		store_channel.addEventListener("change", () => {
-			if (store_channel.value) {
-				store_channel_kind.disabled = false;
-			} else {
-				store_channel_kind.disabled = true;
-			}
-		});
-	});
-
-	// 판매채널이 변경되면 해당 판매채널의 매장구분을 가져오는 부분
-	function chg_store_channel() {
-
-		const sel_channel = document.getElementById("store_channel").value;
-
-		$.ajax({
-			method: 'post',
-			url: '/store/standard/std02/show/chg-store-channel',
-			data: {
-				'store_channel' : sel_channel
-				},
-			dataType: 'json',
-			success: function (res) {
-				if(res.code == 200){
-					$('#store_channel_kind').empty();
-					let select =  $("<option value=''>전체</option>");
-					$('#store_channel_kind').append(select);
-
-					for(let i = 0; i < res.store_kind.length; i++) {
-						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
-						$('#store_channel_kind').append(option);
-					}
-
-				} else {
-					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-				}
-			},
-			error: function(e) {
-				console.log(e.responseText)
-			}
-		});
-	}
 
     // 사용여부가 선택될때 바로 검색 후 리스트에 출력하는 부분
     function changeUseYn() {
