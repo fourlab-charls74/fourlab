@@ -205,13 +205,13 @@
 											</td>
 										</tr>
 										<tr>
-											<th>TAG가</th>
+											<th>정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											<th>판매가</th>
+											<th>현재가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
@@ -294,7 +294,7 @@
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
 		{field: "style_no", headerName: "스타일넘버", width: 100},
 		{field: "seq", headerName: "순서", width: 50},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
+		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
 		{field: "year", headerName: "년도", width: 80},

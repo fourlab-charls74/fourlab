@@ -72,7 +72,7 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">년도</th>
+											<th class="required">연도</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<select name='year' id='year' class="form-control form-control-sm prd_code">
@@ -160,7 +160,7 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">기획구분</th>
+											<th class="required">상품운영구분</th>
 											<td>
 												<div class="flax_box">
 													<select name='plan_category' id="plan_category" class="form-control form-control-sm">
@@ -188,7 +188,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th class="required">공급업체</th>
+											<th class="required">업체명</th>
 											<td>
 												<div class="flax_box">
 													<select name='sup_com' id="sup_com" class="form-control form-control-sm">
@@ -207,13 +207,13 @@
 											</td>
 										</tr>
 										<tr>
-											<th>TAG가</th>
+											<th>정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											<th>판매가</th>
+											<th>현재가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
@@ -290,7 +290,7 @@
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null},
 		{field: "brand", headerName: "브랜드", width: 70},
 		{field: "image_url", headerName: "이미지 경로", hide: true},
-		{field: "year", headerName: "년도", width: 80},
+		{field: "year", headerName: "연도", width: 80},
 		{field: "season", headerName: "시즌",width: 80},
 		{field: "gender", headerName: "성별", width: 80},
 		{field: "item", headerName: "품목", width: 80},
@@ -304,13 +304,13 @@
 		{field: "size", headerName: "사이즈", width: 80,
 			cellRenderer: (params) => params.data.size
 		},
-		{field: "plan_category", headerName: "기획구분", width: 120},
+		{field: "plan_category", headerName: "상품운영구분", width: 120},
 		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
 		},
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
-		{field: "sup_com", headerName: "공급업체", width: 120},
+		{field: "sup_com", headerName: "업체명", width: 120},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 		{field: "price", headerName: "정상가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "현재가", type: 'currencyType', width: 80},
@@ -472,10 +472,10 @@
 			return alert("브랜드를 선택해주세요.");
 		}
 
-		// 년도 선택여부
+		// 연도 선택여부
 		if (f1.year.selectedIndex == 0) {
 			f1.year.focus();
-			return alert("년도를 선택해주세요.");
+			return alert("연도를 선택해주세요.");
 		}
 
 		// 시즌 선택여부
@@ -521,10 +521,10 @@
 			return alert("사이즈를 선택해주세요.");
 		}
 
-		// 기획구분 선택여부
+		// 상품운영구분 선택여부
 		if (f1.plan_category.selectedIndex == 0) {
 			f1.plan_category.focus();
-			return alert("기획구분을 선택해주세요.");
+			return alert("상품운영구분을 선택해주세요.");
 		}
 
 		// 상품명 입력여부
@@ -539,10 +539,10 @@
 			return alert("상품명(영문)을 입력해주세요.");
 		}
 
-		// 공급업체 선택여부
+		// 업체명 선택여부
 		if (f1.sup_com.selectedIndex == 0) {
 			f1.sup_com.focus();
-			return alert("공급업체를 선택해주세요.");
+			return alert("업체명를 선택해주세요.");
 		}
 
 		// 원가 입력여부
@@ -718,7 +718,7 @@
 	}
 
 	/**
-	 * 브랜드+년도+시즌+성별+품목값을 합친 값을 조회해서 같은 품번을 가지고있는 상품이 있으면 해당 상품의 스타일 넘버를 자동완성 시켜주고
+	 * 브랜드+연도+시즌+성별+품목값을 합친 값을 조회해서 같은 품번을 가지고있는 상품이 있으면 해당 상품의 스타일 넘버를 자동완성 시켜주고
 	 * 없을 시 새로운 스타일넘버를 입력하고 뒤에 (신규)라고 출력하는 부분
 	 */
 	function checkData() {
@@ -736,7 +736,7 @@
 			return false;
 		} else if (year == "") {
 			$('#year').focus();
-			alert('년도를 선택해주세요.');
+			alert('연도를 선택해주세요.');
 			return false;
 		} else if (season == "") {
 			$('#season').focus();

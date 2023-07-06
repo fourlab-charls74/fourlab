@@ -103,7 +103,7 @@
         {field: "goods_nm",	headerName: "상품명", width: 220},
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 220},
         {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
+		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
 		{field: "sup_com", headerName: "공급업체", width: 120, cellStyle: {"text-align": "center"}},

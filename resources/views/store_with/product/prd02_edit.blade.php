@@ -73,13 +73,13 @@
 											<td>{{ $product->style_no }}</td>
 										</tr>
 										<tr>
-											<th>TAG가</th>
+											<th>정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='{{ $product->goods_sh }}' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											<th>판매가</th>
+											<th>현재가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='{{ $product->price }}' onkeyup="onlynum(this)">
