@@ -107,7 +107,10 @@ class std02Controller extends Controller
 
 		$result = DB::select($query);
 
-		foreach($result as $row){/*
+		foreach($result as $row){
+			//주소 전체 나오게 처리
+			$row->addr1	= $row->addr1 . $row->addr2;
+			/*
 			$row->manager_deposit	= Lib::cm($row->manager_deposit);
 			$row->manager_fee		= Lib::cm($row->manager_fee);
 			$row->manager_sfee		= Lib::cm($row->manager_sfee);
@@ -116,7 +119,8 @@ class std02Controller extends Controller
 			$row->interior_cost		= Lib::cm($row->interior_cost);
 			$row->interior_burden	= Lib::cm($row->interior_burden);
 			$row->fee				= Lib::cm($row->fee);
-		*/}
+			*/
+		}
 
 		return response()->json([
 			"code"	=> 200,
