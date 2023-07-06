@@ -128,7 +128,7 @@
                     <div class="flex_box">
                         <span style="font-size:small"><strong>사용여부 : </strong></span>&nbsp&nbsp
                         <select name='charge_yn' id="charge_yn" style="width:150px" class="form-control form-control-sm" onchange="changeUseYn();">
-                            <option value="">전체</option>
+                            <option value="A" selected>전체</option>
                             <option value="Y">Y</option>
                             <option value="N">N</option>
                         </select>
@@ -240,12 +240,15 @@
     }
 
     // 세부정보 grid 조회
-    function SearchDetail(store_cd, store_nm) {
+    function SearchDetail(store_cd, store_nm, use_yn) {
         if(store_cd === '') return;
-        
+        if(use_yn == undefined) $('#charge_yn').val('A');
         cur_store_cd = store_cd;
         cur_store_nm = store_nm;
-        gx2.Request("/store/standard/std07/search-store-fee/" + store_cd, "", -1, function(d) {
+
+        let data = "store_cd=" + cur_store_cd; 
+        data += "&use_yn=" + use_yn;
+        gx2.Request("/store/standard/std07/search-store-fee", data, -1, function(d) {
             $("#select_store_nm").text(` - ${store_nm}`);
         })
     }
@@ -312,25 +315,7 @@
     // 사용여부가 선택될때 바로 검색 후 리스트에 출력하는 부분
     function changeUseYn() {
         const charge_yn = document.getElementById("charge_yn").value;
-		$.ajax({
-			method: 'get',
-			url: '/store/standard/std07/changeUseYn',
-			data: {
-				'charge_yn' : charge_yn
-				},
-			dataType: 'json',
-			success: function (res) {
-				if(res.code == 200){
-                    SearchDetail();
-					
-				} else {
-					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-				}
-			},
-			error: function(e) {
-				console.log(e.responseText)
-			}
-		});
+        SearchDetail(cur_store_cd, cur_store_nm, charge_yn);
     }
 </script>
 @stop

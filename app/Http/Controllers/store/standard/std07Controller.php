@@ -101,11 +101,14 @@ class std07Controller extends Controller
 		]);
 	}
 
-	public function search_store_fee($store_cd)
+	public function search_store_fee(Request $request)
 	{
+		$store_cd = $request->input('store_cd');
+		$use_yn = $request->input('use_yn','A');
+
 		$code = 200;
 
-		$rows = $this->_get_store_fee($store_cd);
+		$rows = $this->_get_store_fee($store_cd, $use_yn);
 
 		return response()->json([
 			"code" => $code,
@@ -119,8 +122,25 @@ class std07Controller extends Controller
 		]);
 	}
 
-	public function _get_store_fee($store_cd) 
+	public function _get_store_fee($store_cd, $use_yn) 
 	{
+		$where="";
+		$store_fee_sql = "";
+		if($use_yn != '') {
+			if($use_yn == 'Y') {
+				$where .= "and sf.use_yn = 'Y'";
+				$store_fee_sql = "inner join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code)";
+			} else if($use_yn == 'N') {
+				$where .= "and sf.use_yn is null";
+				$store_fee_sql = "left outer join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code)";
+			} else {
+				$store_fee_sql = "left outer join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code)";
+			}
+		}
+
 		$sql = "
 			select 
 				sf.idx, 
@@ -137,17 +157,17 @@ class std07Controller extends Controller
 				sf.use_yn
 			from code cd
 				inner join store s on s.store_cd = '$store_cd'
-				left outer join store_fee sf
-					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code) and sf.use_yn = 'Y'
+				$store_fee_sql
 				left outer join store_grade sg 
 					on sg.grade_cd = s.grade_cd 
 					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
 					and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
-			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
+			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y' $where
 			order by cd.code_seq
 		";
 
 		$rows = DB::select($sql);
+
 		return $rows;
 	}
 
@@ -290,53 +310,67 @@ class std07Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	// public function change_use_yn(Request $request) 
-	// {
-	// 	$charge_yn = $request->input('charge_yn');
+	public function change_use_yn(Request $request) 
+	{
+		$charge_yn = $request->input('charge_yn','');
+		$store_cd = $request->input('store_cd');
+		$store_nm = $request->input('store_nm');
 
-	// 	$code = 200;
+		$where="";
+		if($charge_yn != '') {
+			if($charge_yn == 'Y') {
+				$where .= "and sf.use_yn != ''";
+			} else if($charge_yn == 'N') {
+				$where .= "and sf.use_yn = ''";
+			}
+		}
 
-	// 	$sql = "
-	// 		select 
-	// 			sf.idx, 
-	// 			cd.code_id as pr_code_cd, 
-	// 			cd.code_val as pr_code_nm, 
-	// 			s.store_cd, 
-	// 			sf.store_fee,
-	// 			s.grade_cd,
-	// 			sg.idx as grade_idx,
-	// 			sg.name as grade_nm,
-	// 			sf.sdate, 
-	// 			sf.edate, 
-	// 			sf.comment, 
-	// 			sf.use_yn
-	// 		from code cd
-	// 			inner join store s on s.store_cd = '$store_cd'
-	// 			left outer join store_fee sf
-	// 				on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code) and sf.use_yn = 'Y'
-	// 			left outer join store_grade sg 
-	// 				on sg.grade_cd = s.grade_cd 
-	// 				and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
-	// 				and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
-	// 		where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
-	// 		order by cd.code_seq
-	// 	";
 
-	// 	$rows = DB::select($sql);
+		$code = 200;
 
-	// 	return response()->json([
-	// 		"code" => $code,
-	// 		"head" => [
-	// 			"total" => count($rows),
-	// 			"page" => 1,
-	// 			"page_cnt" => 1,
-	// 			"page_total" => 1
-	// 		],
-	// 		"body" => $rows
-	// 	]);
+		$sql = "
+			select 
+				sf.idx, 
+				cd.code_id as pr_code_cd, 
+				cd.code_val as pr_code_nm, 
+				s.store_cd, 
+				sf.store_fee,
+				s.grade_cd,
+				sg.idx as grade_idx,
+				sg.name as grade_nm,
+				sf.sdate, 
+				sf.edate, 
+				sf.comment, 
+				sf.use_yn
+			from code cd
+				inner join store s on s.store_cd = '$store_cd'
+				inner join store_fee sf
+					on cd.code_id = sf.pr_code and sf.store_cd = s.store_cd and sf.idx in (select max(idx) from store_fee where store_cd = '$store_cd' group by pr_code) $where
+				left outer join store_grade sg 
+					on sg.grade_cd = s.grade_cd 
+					and concat(sg.sdate, '-01 00:00:00') <= date_format(now(), '%Y-%m-%d 00:00:00') 
+					and concat(sg.edate, '-31 23:59:59') >= date_format(now(), '%Y-%m-%d 00:00:00')			
+			where cd.code_kind_cd = 'PR_CODE' and cd.use_yn = 'Y'
+			order by cd.code_seq
+
+		";
+
+		$rows = DB::select($sql);
+
+		return response()->json([
+			"code" => $code,
+			"head" => [
+				"total" => count($rows),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1
+			],
+			"body" => $rows,
+			"store_nm" => $store_nm
+		]);
 
 		
 
-	// }
+	}
 }
 
