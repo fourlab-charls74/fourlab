@@ -757,28 +757,14 @@ SearchPrdcdRange.prototype.SetGridCond = async function() {
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
             { field: "item", headerName: conds[cond_title], width: "auto",
-                cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
-                editable: (params) => (params.data.key || '') === 'contain',
                 cellRenderer: (params) => {
                     if((params.data.key || '') === 'contain') return params.value;
                     return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
-                },
-                cellEditorSelector: function(params) {
-                    if((params.data.key || '') === 'contain') {
-                        return {
-                            component: 'agRichSelectCellEditor',
-                            params: { 
-                                values: ['포함', '미포함']
-                            },
-                        };
-                    }
-                    return false;
                 },
             },
         );
 
         this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-range-" + cond_title ), columns, {
-            pinnedTopRowData: [{item: "포함", key: "contain"}],
             getRowStyle: (params) => {
                 if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
             },
@@ -816,10 +802,10 @@ SearchPrdcdRange.prototype.Choice = function() {
                 data += `&${c}[]=${r.code_id}`;
             });
             
-            let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
+            let is_contain = this[c + '_grid'];
             data += `&${c}_contain=${is_contain}`;
             
-            if(rows.length > 0) text.push(conds[c] + "(" + rows.map(r => r.code_val).join(",") + ")" + (is_contain ? " 포함" : " 미포함"));
+            if(rows.length > 0) text.push(conds[c] + "(" + rows.map(r => r.code_val).join(",") + ")");
         });
         data += '&match='+this.isMatch;
 
