@@ -266,7 +266,7 @@
 											
 										</tr>
 										<tr>
-											<th>정산관리여부(+수수료등급)</th>
+											<th>정산관리여부(+수수료정보)</th>
 											<td style="width:35%;">
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
@@ -279,7 +279,7 @@
 													</div>
 													&nbsp;&nbsp;&nbsp;
 													<select name='grade_cd' id="grade_cd" class="form-control form-control-sm" style="width: 70%;">
-														<option value=''>미등록</option>
+														<option value=''>--</option>
 														@foreach ($grades as $grade)
 															<option value='{{ $grade->code_id }}' @if(@$store->grade_cd == $grade->code_id) selected @endif>{{ $grade->code_val }}</option>
 														@endforeach
