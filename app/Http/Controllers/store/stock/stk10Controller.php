@@ -35,30 +35,6 @@ class stk10Controller extends Controller
     public function index()
 	{
         $sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-            order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
-
-        $sql = "
             select
                 *
             from code
@@ -79,8 +55,8 @@ class stk10Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             // 'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
-            'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+            'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk10', $values);

@@ -25,31 +25,6 @@ class sal01Controller extends Controller
 
 	//
 	public function index() {
-
-		$sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-			order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
-
         $mutable	= now();
         $sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
@@ -93,8 +68,8 @@ class sal01Controller extends Controller
 			'event_cds'		=> $event_cds,
 			'sell_types'	=> $sell_types,
 			'code_kinds'	=> $code_kinds,
-			'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
 		return view( Config::get('shop.store.view') . '/sale/sal01',$values);

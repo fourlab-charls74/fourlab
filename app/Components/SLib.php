@@ -249,4 +249,33 @@ class SLib
         return 'N';
     }
 
+    //판매채널 가져오는 부분
+    public static function getStoreChannel()
+    {
+        $sql = "
+			select
+				store_channel
+				, store_channel_cd
+				, use_yn
+			from store_channel
+			where dep = 1 and use_yn = 'Y'
+			order by seq
+		";
+        return DB::select($sql);
+    }
+
+    //매장구분 가져오는 부분
+    public static function getStoreKind()
+    {
+        $sql = "
+            select
+                store_kind
+                , store_kind_cd
+                , use_yn
+            from store_channel
+            where dep = 2 and use_yn = 'Y'
+        ";
+        return DB::select($sql);
+    }
+
 }

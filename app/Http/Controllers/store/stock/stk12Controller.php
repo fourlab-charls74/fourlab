@@ -20,29 +20,6 @@ class stk12Controller extends Controller
     public function index()
 	{
         $sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-            order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
-        $sql = "
             select
                 *
             from code
@@ -62,8 +39,8 @@ class stk12Controller extends Controller
             // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
             'storages'      => $storages, // 창고리스트
             'rel_order_res' => $rel_order_res, //초도출고차수
-            'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+            'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk12', $values);

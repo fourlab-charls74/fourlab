@@ -77,29 +77,6 @@ class std05Controller extends Controller
 
 	public function show($sale_type_cd = '') 
 	{
-
-		$sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
 		$sale_type = "";
 
 		if($sale_type_cd != '') {
@@ -131,8 +108,8 @@ class std05Controller extends Controller
 			"sale_type" => $sale_type,
 			"sale_kinds" => $sale_kinds,
 			"store_types" => SLib::getCodes("STORE_TYPE"),
-			'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
 		return view(Config::get('shop.store.view') . '/standard/std05_show', $values);

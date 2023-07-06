@@ -23,15 +23,6 @@ class stk30Controller extends Controller
 {
     public function index()
 	{
-		$store_channel = DB::table('store_channel')
-			->where('dep', 1)->where('use_yn', 'Y')
-			->orderBy('seq')
-			->select('store_channel', 'store_channel_cd', 'use_yn')->get();
-
-		$store_kind = DB::table('store_channel')
-			->where('dep', 2)->where('use_yn', 'Y')
-			->select('store_kind', 'store_kind_cd', 'use_yn')->get();
-
         $storages = DB::table("storage")->where('use_yn', 'Y')
 			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
 			->orderByDesc('default_yn')->get();
@@ -42,8 +33,8 @@ class stk30Controller extends Controller
             'storages'      => $storages,
             'sr_states'	    => SLib::getCodes("SR_CODE"),	// 반품상태
             'sr_reasons'	=> SLib::getCodes("SR_REASON"),	// 반품사유
-            'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk30', $values);
 	}

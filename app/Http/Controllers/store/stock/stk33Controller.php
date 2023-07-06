@@ -14,29 +14,6 @@ class stk33Controller extends Controller
 {
     public function index(Request $request)
     {
-        $sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-            order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
         $mutable = Carbon::now();
         $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
         $edate = date("Y-m-d");
@@ -54,8 +31,8 @@ class stk33Controller extends Controller
             'competitors' => SLib::getCodes("COMPETITOR"),
             'sdate' => $sdate,
             'edate' => $edate,
-            'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+            'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
         ];
 
         return view(Config::get('shop.store.view') . '/stock/stk33', $values);

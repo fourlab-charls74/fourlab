@@ -198,29 +198,6 @@ class stk01Controller extends Controller
 	/** 재고팝업 */
 	public function show($prd_cd, Request $request)
 	{
-		$sql = "
-			select
-				store_channel
-				, store_channel_cd
-				, use_yn
-			from store_channel
-			where dep = 1 and use_yn = 'Y'
-			order by seq
-		";
-
-		$store_channel = DB::select($sql);
-
-		$sql = "
-			select
-				store_kind
-				, store_kind_cd
-				, use_yn
-			from store_channel
-			where dep = 2 and use_yn = 'Y'
-		";
-
-		$store_kind = DB::select($sql);
-
 		$sdate = $request->input("date", '');
 		if($sdate == '') $sdate = date("Y-m-d");
 
@@ -296,8 +273,8 @@ class stk01Controller extends Controller
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 			'storages' => $storages, // 창고리스트
 			'prd' => $row,
-			'store_channel'	=> $store_channel,
-			'store_kind'	=> $store_kind
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 		return view(Config::get('shop.store.view') . '/stock/stk01_show', $values);
 	}
