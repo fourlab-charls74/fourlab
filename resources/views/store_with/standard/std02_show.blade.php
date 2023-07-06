@@ -63,7 +63,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">매장코드</th>
+                                            <th style="width:15%;" class="required">매장코드</th>
                                             <td style="width:35%;">
                                                 <div class="d-flex flex-column">
                                                     <div class="d-flex">
@@ -73,7 +73,7 @@
 													<input type="hidden" name="pre_store_cd" id="pre_store_cd" value="{{ @$store->store_cd }}">
                                                 </div>
                                             </td>
-											<th class="required">매장명</th>
+											<th style="width:15%;" class="required">매장명</th>
 											<td style="width:35%;">
 												<div class="form-inline">
 													<input type="text" name="store_nm" id="store_nm" value="{{ @$store->store_nm }}" class="form-control form-control-sm w-100" />
@@ -115,7 +115,7 @@
 											<th></th>
 											<td></td>
 											<th class="required" hidden>매장명(약칭)</th>
-											<td style="width:35%;" hidden>
+											<td hidden>
 												<div class="form-inline">
 													<input type="text" name="store_nm_s" id="store_nm_s" value="{{ @$store->store_nm_s }}" class="form-control form-control-sm w-100" />
 												</div>
@@ -267,7 +267,7 @@
 										</tr>
 										<tr>
 											<th>정산관리여부(+수수료정보)</th>
-											<td style="width:35%;">
+											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="account_y" name="account_yn" value="Y" @if(@$store->account_yn == 'Y') checked @endif />
@@ -287,7 +287,7 @@
 												</div>
 											</td>
 											<th>출고우선순위</th>
-											<td style="width:35%;">
+											<td>
 												<div class="flex_box">
 													<select name='priority' class="form-control form-control-sm">
 														<option value=''>전체</option>
@@ -298,7 +298,7 @@
 												</div>
 											</td>
 											<th hidden>관리기준</th>
-											<td style="width:35%;" hidden>
+											<td hidden>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="manage_type_M" name="manage_type" value="M" @if(@$store->vat_yn != 'M') checked @endif />
@@ -313,7 +313,7 @@
 										</tr>
 										<tr>
 											<th hidden>경비관리</th>
-											<td style="width:35%;" hidden>
+											<td hidden>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="exp_manage_yn_Y" name="exp_manage_yn" value="Y" @if(@$store->vat_yn == 'Y') checked @endif />
@@ -480,7 +480,7 @@
                                             @if(@$store->store_type !== '11' && @$store->addr1 !== null && @$store->map_code !== null)
 												<tr>
 													<th>지도</th>
-													<td style="width:100%;">
+													<td colspan="3">
 														<div class="form-inline">
 															<div id="map" style="width:100%;height:400px;"></div>
 														</div>
