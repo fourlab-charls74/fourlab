@@ -34,6 +34,7 @@ class cs02Controller extends Controller
             'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
             'items'			=> SLib::getItems(), // 품목
+            'return_reason' => SLib::getCodes("RETURN_REASON")
 		];
 
         return view(Config::get('shop.store.view') . '/cs/cs02', $values);
@@ -51,6 +52,7 @@ class cs02Controller extends Controller
         $target_storage_cd  = $request->input("target_storage_cd", "");
         $sgr_type           = $request->input("sgr_type", "");
         $sgr_state          = $request->input("sgr_state", "");
+        $return_reason      = $request->input("return_reason","");
         
         // where
         $sdate = str_replace("-", "", $sdate);
@@ -64,6 +66,7 @@ class cs02Controller extends Controller
         if($target_storage_cd != "")    $where .= " and sgr.target_type = 'S' and sgr.target_cd = '$target_storage_cd'";
         if($sgr_type != "")             $where .= " and sgr.sgr_type = '" . $sgr_type . "'";
         if($sgr_state != "")            $where .= " and sgr.sgr_state = '" . $sgr_state . "'";
+        if($return_reason != "")        $where .= " and sgr.return_reason = '" . $return_reason . "'";
 
         // ordreby
         $ord_field  = 'sgr.' . $request->input("ord_field", "sgr_cd");
@@ -93,9 +96,12 @@ class cs02Controller extends Controller
                 if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
                 (select sum(return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_qty,
                 (select sum(return_price * return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_price,
-                sgr.comment
+                sgr.comment,
+                sgr.return_reason,
+                c.code_val as return_reason_nm
             from storage_return sgr
                 inner join storage on storage.storage_cd = sgr.storage_cd
+                left outer join code c on c.code_id = sgr.return_reason and code_kind_cd = 'RETURN_REASON'
             where 1=1 $where
             $orderby
             $limit
@@ -324,7 +330,8 @@ class cs02Controller extends Controller
                     sgr.target_cd,
                     sgr.return_addr,
                     if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
-                    sgr.comment
+                    sgr.comment,
+                    sgr.return_reason
                 from storage_return sgr
                 where sgr_cd = :sgr_cd
             ";
@@ -359,7 +366,8 @@ class cs02Controller extends Controller
             'companies'     => $companies,
             'sgr'           => $sgr,
             'new_sgr_cd'    => $new_sgr_cd,
-            'com_addr'      => $com_addr
+            'com_addr'      => $com_addr,
+            'return_reason' => SLib::getCodes('RETURN_REASON')
         ];
         return view(Config::get('shop.store.view') . '/cs/cs02_show', $values);
     }
@@ -437,6 +445,7 @@ class cs02Controller extends Controller
         $target_cd = $request->input("target_cd", "");
         $return_addr = $request->input("return_addr","");
         $comment = $request->input("comment", "");
+        $return_reason = $request->input("return_reason","");
         $products = $request->input("products", []);
 
         try {
@@ -456,6 +465,7 @@ class cs02Controller extends Controller
                     'sgr_state' => $sgr_state,
                     'return_addr' => $return_addr,
                     'comment' => $comment,
+                    'return_reason' => $return_reason,
                     'rt' => now(),
                     'admin_id' => $admin_id,
                 ]);
@@ -600,6 +610,7 @@ class cs02Controller extends Controller
         $sgr_cd = $request->input("sgr_cd", "");
         $comment = $request->input("comment", "");
         $return_addr = $request->input("return_addr", "");
+        $return_reason = $request->input("return_reason");
         $products = $request->input("products", []);
 
         try {
@@ -610,6 +621,7 @@ class cs02Controller extends Controller
                 ->update([
                     'return_addr' => $return_addr,
                     'comment' => $comment,
+                    'return_reason' => $return_reason,
                     'ut' => now(),
                     'admin_id' => $admin_id,
                 ]);

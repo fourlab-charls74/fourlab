@@ -538,6 +538,7 @@ CREATE TABLE `storage_return` (
 	`sgr_state` varchar(30) NOT NULL COMMENT '반품상태 - 접수(10) / 완료(30)',
 	`return_addr` varchar(100) COMMENT '반품업체 주소',
 	`comment` varchar(255) DEFAULT NULL COMMENT '메모',
+	`return_reason` varchar(10) NOT NULL COMMENT '반품사유',
 	`rt` datetime DEFAULT NULL COMMENT '등록일자',
 	`ut` datetime DEFAULT NULL COMMENT '수정일자',
 	`admin_id` varchar(30) DEFAULT NULL COMMENT '관리자아이디',

@@ -114,6 +114,23 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <th>상품반품사유</th>
+                                            <td>
+                                                <div class="form-inline">
+                                                    <select name='return_reason' id="return_reason" class="form-control form-control-sm w-100">
+                                                        <option value="">전체</option>
+                                                    @foreach (@$return_reason as $rr)
+                                                        <option value='{{ $rr->code_id }}' @if(@$cmd == 'update' && @$sgr->return_reason == $rr->code_id) selected @endif>{{ $rr->code_val }}</option>
+                                                    @endforeach
+                                                    </select>
+                                                </div>
+                                            </td>
+                                            <th></th>
+                                            <td></td>
+                                            <th></th>
+                                            <td></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -269,15 +286,16 @@
         let comment = document.f1.comment.value;
         let return_addr = document.f1.return_addr.value;
         let rows = gx.getRows();
+        let return_reason = document.f1.return_reason.value;
 
         if(cmd === 'add') {
             let sgr_date = document.f1.sdate.value;
             let storage_cd = document.f1.storage_cd.value;
             let target_type = document.f1.target_type.value;
             let target_cd = document.f1.target_cd.value;
-            
 
             if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
+            if(return_reason == "") return alert("반품사유를 선택해주세요.");
 
             let zero_qtys = rows.filter(r => r.qty < 1);
             if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
@@ -297,6 +315,7 @@
                     target_cd,
                     return_addr,
                     comment,
+                    return_reason,
                     products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
                 },
             }).then(function (res) {
@@ -325,6 +344,7 @@
                     sgr_cd,
                     comment,
                     return_addr,
+                    return_reason,
                     products: rows.map(r => ({ sgr_prd_cd: r.sgr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
                 },
             }).then(function (res) {

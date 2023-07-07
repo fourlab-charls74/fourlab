@@ -74,22 +74,15 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            {{-- 반품이동처 --}}
-                            <label for="">반품업체</label>
+                            <label for="">반품사유</label>
                             <div class="flex_box">
-                                <select name='target_com_cd' class="form-control form-control-sm" style="width: 100%;">
+                                <select name='return_reason' class="form-control form-control-sm" style="width: 100%;">
                                     <option value="">전체</option>
-                                    @foreach (@$sup_coms as $sup_com)
-                                        <option value='{{ $sup_com->com_id }}'>{{ $sup_com->com_nm }}</option>
+                                    @foreach (@$return_reason as $rr)
+                                        <option value='{{ $rr->code_id }}'>{{ $rr->code_val }}</option>
                                     @endforeach
                                 </select>
-                                <!-- <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='target_storage_cd' class="form-control form-control-sm" style="width: 47%;">
-                                    <option value="">창고 전체</option>
-                                    @foreach (@$storages as $storage)
-                                        <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
-                                    @endforeach
-                                </select> -->
+                               
                             </div>
                         </div>
                     </div>
@@ -146,6 +139,29 @@
                                     <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
                                     <input type="radio" name="ord" id="sort_asc" value="asc">
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            {{-- 반품이동처 --}}
+                            <label for="">반품업체</label>
+                            <div class="flex_box">
+                                <select name='target_com_cd' class="form-control form-control-sm" style="width: 100%;">
+                                    <option value="">전체</option>
+                                    @foreach (@$sup_coms as $sup_com)
+                                        <option value='{{ $sup_com->com_id }}'>{{ $sup_com->com_nm }}</option>
+                                    @endforeach
+                                </select>
+                                <!-- <span class="text_line" style="width: 6%; text-align: center;">/</span>
+                                <select name='target_storage_cd' class="form-control form-control-sm" style="width: 47%;">
+                                    <option value="">창고 전체</option>
+                                    @foreach (@$storages as $storage)
+                                        <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
+                                    @endforeach
+                                </select> -->
                             </div>
                         </div>
                     </div>
@@ -213,6 +229,7 @@
         {field: "sgr_qty", headerName: "반품수량", type: "currencyType", width: 60},
         {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 300},
+        {field: "return_reason_nm", headerName: "반품사유", width: 200},
         {width: "auto"}
 	];
 </script>
