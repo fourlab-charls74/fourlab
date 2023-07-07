@@ -18,7 +18,6 @@ class std04Controller extends Controller
 	public function index()
 	{
 		$values = [
-			"store_types" => SLib::getCodes("STORE_TYPE"),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
@@ -51,12 +50,16 @@ class std04Controller extends Controller
 		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		$sql = "
-			select s.store_cd, s.store_nm as store_nm, s.use_yn, sc.store_channel as store_channel, sc2.store_kind as store_channel_kind
+			select 
+				s.store_cd
+				, s.store_nm as store_nm
+				, sc.store_channel as store_channel
+				, sc2.store_kind as store_channel_kind
+				, (select count(*) from competitor where store_cd = s.store_cd and use_yn = 'Y') as competitor_cnt
 			from store s
-				inner join code c on c.code_kind_cd = 'STORE_TYPE' and c.code_id = s.store_type
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1 and sc.use_yn = 'Y'
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2 and sc2.use_yn = 'Y'
-			where $where
+			where 1=1
 			order by store_cd
 		";
 
@@ -102,7 +105,7 @@ class std04Controller extends Controller
 				left outer join competitor com 
 					on cd.code_id = com.competitor_cd and com.store_cd = :store_cd
 			where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y'
-			order by cd.code_seq
+			order by cd.code_id
 		";
 
 		$rows = DB::select($sql, ["store_cd" => $store_cd]);

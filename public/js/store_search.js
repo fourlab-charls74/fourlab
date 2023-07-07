@@ -755,8 +755,8 @@ SearchPrdcdRange.prototype.SetGridCond = async function() {
         let columns = [];
         
         columns.push(
-            { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
-            { field: "item", headerName: conds[cond_title], width: "auto",
+            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28  },
+            { field: "item", headerName: conds[cond_title], width: "auto",  sortable: true,
                 cellRenderer: (params) => {
                     if((params.data.key || '') === 'contain') return params.value;
                     return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
@@ -764,11 +764,7 @@ SearchPrdcdRange.prototype.SetGridCond = async function() {
             },
         );
 
-        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-range-" + cond_title ), columns, {
-            getRowStyle: (params) => {
-                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
-            },
-        });
+        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-range-" + cond_title ), columns);
         document.querySelector( "#div-gd-prdcd-range-" + cond_title ).style.height = '204px';
     });
     const { data: { body: res } } = await axios({ 
@@ -786,7 +782,7 @@ SearchPrdcdRange.prototype.Reset = function() {
             node.setSelected(false);
         });
 
-        this[c + '_grid'].gridOptions.api.setPinnedTopRowData([{item: "포함", key: "contain"}]);
+        // this[c + '_grid'].gridOptions.api.setPinnedTopRowData([{item: "포함", key: "contain"}]);
     });
 }
 

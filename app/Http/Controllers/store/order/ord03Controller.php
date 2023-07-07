@@ -198,9 +198,9 @@ class ord03Controller extends Controller
 		foreach ($range_opts as $opt) {
 			$rows = $prd_cd_range[$opt] ?? [];
 			if (count($rows) > 0) {
-				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
 				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$where .= " and pc.$opt $in_query ($opt_join) ";
+				$where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
 
@@ -974,9 +974,9 @@ class ord03Controller extends Controller
 		foreach ($range_opts as $opt) {
 			$rows = $prd_cd_range[$opt] ?? [];
 			if (count($rows) > 0) {
-				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
 				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$where .= " and pc.$opt $in_query ($opt_join) ";
+				$where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
 
@@ -1172,9 +1172,9 @@ class ord03Controller extends Controller
 		foreach ($range_opts as $opt) {
 			$rows = $prd_cd_range[$opt] ?? [];
 			if (count($rows) > 0) {
-				$in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
 				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$where .= " and pc.$opt $in_query ($opt_join) ";
+				$where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
 

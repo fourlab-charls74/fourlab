@@ -148,7 +148,7 @@
                 return `<a href='javascript:void(0)' onclick='SearchDetail("${params.data.store_cd}", "${params.value}")'>${params.value}</a>`;
             }
         },
-        {field: "use_yn", headerName: "사용여부", cellStyle: {"text-align": "center"}, width: 60},
+        {field: "competitor_cnt", headerName: "동종업계수", cellStyle: {"text-align": "center"}, width: 80},
         {width: "auto"},
     ];
 
@@ -256,6 +256,7 @@
         }).then(function (res) {
             if(res.data.code === 200) {
                 alert(res.data.msg);
+                Search();
             } else {
                 console.log(res.data.msg);
                 alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
