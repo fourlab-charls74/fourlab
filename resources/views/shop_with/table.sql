@@ -936,6 +936,8 @@ CREATE TABLE `order_receipt_product` (
 	`dlv_location_type` VARCHAR(10) NOT NULL COMMENT '매장(STORE) / 창고(STORAGE)',
 	`dlv_location_cd` VARCHAR(30) NOT NULL COMMENT '매장코드 or 창고코드',
 	`comment` VARCHAR(255) DEFAULT NULL COMMENT '메모',
+	`reject_yn` CHAR(1) DEFAULT 'N' COMMENT '출고거부여부 (Y/N)',
+	`reject_reason` VARCHAR(10) DEFAULT NULL COMMENT '출고거부사유 (code : REL_REJECT_REASON)',
 	`rt` DATETIME DEFAULT NULL COMMENT '등록일시',
 	`ut` DATETIME DEFAULT NULL COMMENT '수정일시',
 	PRIMARY KEY (`or_prd_cd`)

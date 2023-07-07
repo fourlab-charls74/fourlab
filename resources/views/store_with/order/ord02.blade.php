@@ -385,6 +385,7 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
+		{field: "pay_stat", hide: true, aggFunc: "first"},
         // {field: "pay_stat_nm", headerName: "입금상태", pinned: 'left', width: 55, cellStyle: {'text-align': 'center'},
         //     aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 		// 	cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -396,10 +397,14 @@
         {field: "ord_kind", headerName: "출고구분코드", hide: true,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
         },
-        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind, pinned: 'left',
+        {field: "ord_kind_nm", headerName: "출고구분", width: 80, cellStyle: StyleOrdKind, pinned: 'left',
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
+		{field: "reject_reason_nm", headerName: "출고거부사유", width: 80, pinned: 'left',
+			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+		},
         {field: "sale_place", headerName: "판매처코드", hide: true,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -448,6 +453,21 @@
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
         {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold"}, aggFunc: "first"},
+		{field: "dlv_place_type", headerName: "배송처타입", hide: true},
+		{field: "dlv_place_cd", headerName: "배송처코드", hide: true},
+		{field: "dlv_place", headerName: "배송처", width: 130, editable: true,
+			cellStyle: (params) => {
+				return {
+					'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none',
+					'color': params.data ? (params.data?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff') : (params.node.aggData?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff'),
+				};
+			}
+		},
+		{field: "comment", headerName: "접수메모", width: 120, editable: true,
+			cellStyle: (params) => {
+				return {'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none'};
+			},
+		},
         @foreach (@$dlv_locations as $loc)
             {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 80, type: "currencyType",
                 cellStyle: (params) => {
@@ -459,21 +479,6 @@
                 }
             },
         @endforeach
-        {field: "dlv_place_type", headerName: "배송처타입", hide: true},
-        {field: "dlv_place_cd", headerName: "배송처코드", hide: true},
-        {field: "dlv_place", headerName: "배송처", width: 130, editable: true, 
-            cellStyle: (params) => {
-                return {
-                    'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none',
-                    'color': params.data ? (params.data?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff') : (params.node.aggData?.dlv_place_type === 'store' ? '#ff0000' : '#0000ff'),
-                };
-            }
-        },
-        {field: "comment", headerName: "접수메모", width: 120, editable: true,
-            cellStyle: (params) => {
-                return {'background-color': params.node.level == 0 ? '#ffff99' : params.node.level == 1 ? params.data?.dlv_place || params.data?.comment ? '#C5FF9D' : '#eeeeee' : 'none'};
-            },
-        },
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'},
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -718,7 +723,7 @@
         // validation
         if(!$("#rel_order").val()) return alert("출고차수를 선택해주세요.");
         if(rows.length < 1) return alert("접수할 주문건을 선택해주세요.");
-        if(rows.filter(r => r.pay_stat_nm != '입금').length > 0) return alert("입금완료된 주문건만 접수가 가능합니다.");
+        if(rows.filter(r => r.pay_stat < 1).length > 0) return alert("입금완료된 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_state != 10).length > 0) return alert("출고요청 상태의 주문건만 접수가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 접수할 수 없습니다.");
         if(rows.filter(r => !r.dlv_place_cd).length > 0) return alert("배송처가 선택되지 않은 주문건이 있습니다.\n확인 후 다시 접수해주세요.");

@@ -227,10 +227,10 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="o.ord_date">주문일자</option>
-                                        <option value="o.ord_no">주문번호</option>
+                                        <option value="o.ord_opt_no">주문번호</option>
                                         <option value="om.user_nm">주문자명</option>
                                         <option value="om.r_nm">수령자</option>
-                                        <option value="p.prd_cd">바코드</option>
+                                        <option value="pc.prd_cd">바코드</option>
                                         <option value="g.goods_nm">상품명</option>
                                     </select>
                                 </div>
@@ -399,17 +399,22 @@
                             @endforeach
                         </select>
                     </div>
-                    <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm">온라인출고완료</a>
+                    <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 mr-1"></i> 온라인출고완료</a>
                     <span class="ml-2 mr-2 text-secondary">|</span>
                     <div class="d-flex">
-                        <span class="mr-2">출고구분 :</span>
+                        <span class="mr-2">출고구분/거부사유 :</span>
                         <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2" style='width:120px;'>
                             @foreach (@$ord_kinds as $ord_kind)
                                 <option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
                             @endforeach
                         </select>
+	                    <select id='rel_reject_reason' name='rel_reject_reason' class="form-control form-control-sm mr-2" style='width:120px;'>
+		                    @foreach (@$rel_reject_reasons as $rel_reject_reason)
+			                    <option value='{{ $rel_reject_reason->code_id }}'>{{ $rel_reject_reason->code_val }}</option>
+		                    @endforeach
+	                    </select>
                     </div>
-                    <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm">출고요청처리</a>
+                    <a href="javascript:void(0);" onclick="return updateOrdKind();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-redo fa-sm text-white-50 mr-1"></i> 출고거부</a>
                 </div>
 			</div>
 		</div>
@@ -564,26 +569,28 @@
         let rows = gx.getSelectedRows();
 
         // validation
-        if(rows.length < 1) return alert("출고요청상태로 변경할 주문건을 선택해주세요.");
+        if(rows.length < 1) return alert("출고거부할 주문건을 선택해주세요.");
         const ord_kind_nm = $("#ord_kind option:checked").text();
+        const reject_reason = $("#rel_reject_reason option:checked").text();
 
-        if(!confirm(`선택한 주문건의 출고구분을 '${ord_kind_nm}' 상태로 변경하고, 출고요청처리하시겠습니까?`)) return;
+        if(!confirm(`아래 내용과 같이 출고거부처리하시겠습니까?\n출고구분: ${ord_kind_nm} / 거부사유: ${reject_reason}`)) return;
 
         axios({
             url: '/store/order/ord03/update/ord-kind',
             method: 'post',
             data: { 
                 ord_kind: $("#ord_kind").val(),
+				reject_reason: $("#rel_reject_reason").val(),
                 ord_opt_nos: rows.map(r => r.ord_opt_no),
                 or_prd_cds: rows.map(r => r.or_prd_cd),
             },
         }).then(function (res) {
             if(res.data.code === 200) {
-                alert("출고요청처리가 정상적으로 완료되었습니다.");
+                alert("출고거부처리가 정상적으로 완료되었습니다.");
                 Search();
             } else {
                 console.log(res.data);
-                alert("출고요청처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("출고거부처리 중 오류가 발생했습니다.\n다시 시도해주세요.");
             }
         }).catch(function (err) {
             console.log(err);

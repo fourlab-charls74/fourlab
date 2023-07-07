@@ -22,17 +22,15 @@ const PRODUCT_STOCK_TYPE_STORE_SALE = 2; // (매장)주문
 const PRODUCT_STOCK_TYPE_STORE_RT = 15; // (매장)RT
 const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // (창고)출고
 
-const HEAD = 'HEAD';
-const STORAGE = 'STORAGE';
-
-const TEST_USER_GROUP = HEAD;
+const HEAD_GROUP = 'HEAD';
+const STORAGE_GROUP = 'STORAGE';
 
 /** 온라인 배송처리 */
 class ord03Controller extends Controller
 {
-	public function index(Request $request) {
+	public function index() {
 
-		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+		$user_group = Auth('head')->user()->logistics_group_yn === 'Y' ? STORAGE_GROUP : HEAD_GROUP;
 
 		$sdate = Carbon::now()->sub(3, 'day')->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
@@ -59,12 +57,13 @@ class ord03Controller extends Controller
 			'items'			    => SLib::getItems(), // 품목
             'sale_kinds'        => SLib::getUsedSaleKinds(), // 판매유형
 			'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
+			'rel_reject_reasons'=> SLib::getCodes('REL_REJECT_REASON'), // 출고거부사유
 			'dlv_cd'			=> $cfg_dlv_cd,
 			'dlvs'				=> SLib::getCodes('DELIVERY'), // 택배사목록
 			'user_group'		=> $user_group,
 			'user_groups'		=> [
-				'HEAD' 		=> HEAD,
-				'STORAGE' 	=>  STORAGE,
+				'HEAD' 		=> HEAD_GROUP,
+				'STORAGE' 	=>  STORAGE_GROUP,
 			]
 		];
         return view( Config::get('shop.store.view') . '/order/ord03', $values );
@@ -72,7 +71,7 @@ class ord03Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+		$user_group = Auth('head')->user()->logistics_group_yn === 'Y' ? STORAGE_GROUP : HEAD_GROUP;
 
 		$search_date_stat = $request->input('search_date_stat', 'receipt');
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
@@ -206,7 +205,8 @@ class ord03Controller extends Controller
 		}
 
 		// order by
-		$orderby = sprintf("order by %s %s", $ord_field, $ord);
+		if ($ord_field === 'o.ord_date') $ord_field = "date_format(o.ord_date, '%Y-%m-%d')";
+		$orderby = sprintf("order by %s %s, om.r_nm asc", $ord_field, $ord);
 
 		// pagination
 		$page_size = $limit;
@@ -254,7 +254,8 @@ class ord03Controller extends Controller
 						from store s
 							inner join store_grade sg on sg.grade_cd = s.grade_cd
 					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				where rcp.reject_yn = 'N'
+					and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
@@ -287,7 +288,8 @@ class ord03Controller extends Controller
 					inner join product_code pc on pc.prd_cd = rcp.prd_cd
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				where rcp.reject_yn = 'N'
+					and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 			";
@@ -315,7 +317,7 @@ class ord03Controller extends Controller
 	{
 		$dlv_locations = [];
 
-		if ($user_group === HEAD) {
+		if ($user_group === HEAD_GROUP) {
 			$dlv_locations_sql = "
 				(
 					select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq 
@@ -331,7 +333,7 @@ class ord03Controller extends Controller
 				order by seq, location_cd
 			";
 			$dlv_locations = DB::select($dlv_locations_sql);
-		} else if ($user_group === STORAGE) {
+		} else if ($user_group === STORAGE_GROUP) {
 			$dlv_locations_sql = "
 				select 
 					'storage' as location_type, 
@@ -620,6 +622,7 @@ class ord03Controller extends Controller
 		];
 		$ord_state = 10; //	출고요청
 		$ord_kind = $request->input('ord_kind', '');
+		$reject_reason = $request->input('reject_reason', '');
 		$ord_opt_nos = $request->input('ord_opt_nos', []);
 		$ord_opt_nos = implode(', ', $ord_opt_nos);
 		$or_prd_cds = $request->input('or_prd_cds', []);
@@ -653,27 +656,16 @@ class ord03Controller extends Controller
 			$or_cds = DB::select("select or_cd, or_prd_cd from order_receipt_product where or_prd_cd in ($or_prd_cds_join)");
 
 			$sql = "
-				delete from order_receipt_product
+				update order_receipt_product set
+					reject_yn = 'Y',
+					reject_reason = :reject_reason
 				where or_prd_cd in ($or_prd_cds_join)
 			";
-			DB::delete($sql);
-
-			foreach ($or_cds as $cd) {
-				$sql = "
-					select count(*) as cnt, or_cd
-					from order_receipt_product
-					where or_prd_cd = '$cd->or_prd_cd'
-				";
-				$receipt_cnt = DB::selectOne($sql);
-				if ($receipt_cnt != null && $receipt_cnt->cnt < 1) {
-					$or_cd = $cd->or_cd;
-					DB::table('order_receipt')->where('or_cd', $or_cd)->delete();
-				}
-			}
+			DB::update($sql, [ 'reject_reason' => $reject_reason ]);
 
 			DB::commit();
 			$code = 200;
-			$msg = "출고구분변경 및 출고요청처리가 정상적으로 완료되었습니다.";
+			$msg = "출고거부처리가 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollBack();
 			$code = 500;
@@ -820,7 +812,7 @@ class ord03Controller extends Controller
 	/** 택배송장일괄입력 팝업 show */
 	public function show_batch(Request $request)
 	{
-		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+		$user_group = Auth('head')->user()->logistics_group_yn === 'Y' ? STORAGE_GROUP : HEAD_GROUP;
 
 		$conf   = new Conf();
         $cfg_dlv_cd = $conf->getConfigValue("delivery","dlv_cd");
@@ -855,7 +847,7 @@ class ord03Controller extends Controller
 	/** 배송목록받기 */
 	private function _get_dlv_list(Request $request)
 	{
-		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+		$user_group = Auth('head')->user()->logistics_group_yn === 'Y' ? STORAGE_GROUP : HEAD_GROUP;
 
 		$search_date_stat = $request->input('search_date_stat', 'receipt');
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
@@ -1012,7 +1004,8 @@ class ord03Controller extends Controller
 				inner join goods g on g.goods_no = o.goods_no
 				left outer join payment p on p.ord_no = o.ord_no
 				left outer join brand b on b.brand = g.brand
-			where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+			where rcp.reject_yn = 'N' 
+			  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 				and o.clm_state in (-30,1,90,0)
 				$where
 			group by rcp.prd_cd
@@ -1251,7 +1244,8 @@ class ord03Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join brand b on b.brand = g.brand
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				where rcp.reject_yn = 'N' 
+				  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
@@ -1359,7 +1353,7 @@ class ord03Controller extends Controller
 	/** 주문일련번호로 온라인주문접수목록 조회 */
 	public function batch_search_orders(Request $request)
 	{
-		$user_group = TEST_USER_GROUP; // 추후 로직적용 필요
+		$user_group = Auth('head')->user()->logistics_group_yn === 'Y' ? STORAGE_GROUP : HEAD_GROUP;
 
         $data = $request->input('data', []);
 		$opt_nos = join(',', array_map(function($row) { return $row['ord_opt_no'] ?? ''; }, $data));
@@ -1407,7 +1401,8 @@ class ord03Controller extends Controller
 						from store s
 							inner join store_grade sg on sg.grade_cd = s.grade_cd
 					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
-				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				where rcp.reject_yn = 'N' 
+				  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					and o.ord_opt_no in ($opt_nos)
 				order by rc.or_cd desc

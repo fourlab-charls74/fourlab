@@ -233,6 +233,7 @@ class ord02Controller extends Controller
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
 				, pt.code_val as pay_type_nm, ps.code_val as pay_stat_nm
+				, rcpr.code_val as reject_reason_nm
 				, null as goods_no_group
 				, if(a.goods_no_group < 2, null, a.ord_opt_no) as ord_opt_no_group
 			from (
@@ -254,6 +255,7 @@ class ord02Controller extends Controller
 							and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 							$prd_where
 					) as goods_no_group
+					, ifnull(rcp.reject_reason, '') as reject_reason
 					$qty_sql
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
@@ -270,6 +272,7 @@ class ord02Controller extends Controller
 						from product_code p
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 					) pc on pc.goods_no = o.goods_no and lower(pc.color_nm) = lower(substring_index(o.goods_opt, '^', 1)) and lower(replace(pc.size_nm, ' ', '')) = lower(replace(substring_index(o.goods_opt, '^', -1), ' ', ''))
+					left outer join order_receipt_product rcp on rcp.ord_opt_no = o.ord_opt_no and rcp.reject_yn = 'Y'
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 					and o.clm_state in (-30,1,90,0)
 					$where
@@ -284,6 +287,7 @@ class ord02Controller extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = a.dlv_baesong_kind
 				left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = a.pay_type
 				left outer join code ps on ps.code_kind_cd = 'G_PAY_STAT' and ps.code_id = a.pay_stat
+				left outer join code rcpr on rcpr.code_kind_cd = 'REL_REJECT_REASON' and rcpr.code_id = a.reject_reason
 				left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
 				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place
 		";
@@ -438,6 +442,16 @@ class ord02Controller extends Controller
 					];
 					$order->AddStateLog($state_log);
 					$order->DlvProc($dlv_series_no, $ord_state, $row['prd_cd'] ?? '');
+					
+					// 기존에 등록된 이력이 있는 해당 주문건에 대한 출고요청건 삭제
+					$rel_ords = DB::table('order_receipt_product')->where('ord_opt_no', $row['ord_opt_no']);
+					$cur_or_cd = $rel_ords->value('or_cd');
+					$rel_ords->delete();
+
+					$or_prd_cd_cnt = DB::table('order_receipt_product')->where('or_cd', $cur_or_cd)->count();
+					if ($or_prd_cd_cnt < 1) {
+						DB::table('order_receipt')->where('or_cd', $cur_or_cd)->delete();
+					}
 
 					// 온라인주문접수 상품리스트 등록
 					DB::table('order_receipt_product')->insert([
@@ -449,6 +463,8 @@ class ord02Controller extends Controller
 						'dlv_location_type' => strtoupper($row['dlv_place_type'] ?? ''),
 						'dlv_location_cd' => $row['dlv_place_cd'],
 						'comment' => $row['comment'] ?? '',
+						'reject_yn' => 'N',
+						'reject_reason' => '',
 						'rt' => now(),
 					]);
 
