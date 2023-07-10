@@ -602,7 +602,7 @@ class ord03Controller extends Controller
 	private function update_sale_store($ord_opt_no)
 	{
 		$ord = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->select('sale_place', 'store_cd')->first();
-		if ($ord->sale_place != '' && $ord->store_cd == '') {
+		if ($ord->sale_place != '') {
 			$store = DB::table('store')->where('sale_place_match_yn', 'Y')->where('com_id', $ord->sale_place)->select('store_cd')->first();
 			if ($store !== null) {
 				DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'store_cd' => $store->store_cd ]);
@@ -652,16 +652,16 @@ class ord03Controller extends Controller
 			}
 
 			// 온라인주문접수에서 제거
-			$or_prd_cds_join = implode(', ', $or_prd_cds);			
-			$or_cds = DB::select("select or_cd, or_prd_cd from order_receipt_product where or_prd_cd in ($or_prd_cds_join)");
+			$or_prd_cds_join = implode(', ', $or_prd_cds);
 
 			$sql = "
 				update order_receipt_product set
 					reject_yn = 'Y',
-					reject_reason = :reject_reason
+					reject_reason = :reject_reason,
+					ut = :now
 				where or_prd_cd in ($or_prd_cds_join)
 			";
-			DB::update($sql, [ 'reject_reason' => $reject_reason ]);
+			DB::update($sql, [ 'reject_reason' => $reject_reason, 'now' => now() ]);
 
 			DB::commit();
 			$code = 200;

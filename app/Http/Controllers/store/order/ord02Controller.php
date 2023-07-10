@@ -444,7 +444,7 @@ class ord02Controller extends Controller
 					$order->DlvProc($dlv_series_no, $ord_state, $row['prd_cd'] ?? '');
 					
 					// 기존에 등록된 이력이 있는 해당 주문건에 대한 출고요청건 삭제
-					$rel_ords = DB::table('order_receipt_product')->where('ord_opt_no', $row['ord_opt_no']);
+					$rel_ords = DB::table('order_receipt_product')->where('ord_opt_no', $row['ord_opt_no'])->where('reject_yn', 'Y');
 					$cur_or_cd = $rel_ords->value('or_cd');
 					$rel_ords->delete();
 
