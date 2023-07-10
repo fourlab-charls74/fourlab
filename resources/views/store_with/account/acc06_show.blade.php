@@ -9,9 +9,9 @@
 				<h4>
 					매장중간관리자정산 - {{ @$store_nm }}
 					@if (@$closed_yn == 'Y')
-					<span class="ml-2 p-1 pl-2 pr-2 fs-14 text-white bg-success rounded">마감완료</span>
+					<span class="ml-2 p-1 pl-2 pr-2 fs-14 text-white bg-success rounded">정산완료</span>
 					@elseif (@$closed_yn == 'N')
-					<span class="ml-2 p-1 pl-2 pr-2 fs-14 text-white bg-danger rounded">마감추가</span>
+					<span class="ml-2 p-1 pl-2 pr-2 fs-14 text-white bg-danger rounded">정산처리중</span>
 					@endif
 				</h4>
 				<div class="flex_box">

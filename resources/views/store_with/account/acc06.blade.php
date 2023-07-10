@@ -138,6 +138,9 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 					<p id="current_date" class="ml-3 pl-2 pr-2 fs-14 text-white bg-secondary rounded"></p>
 				</div>
+				<!-- <div style="text-align: right;">
+					<a href="javascript:void(0);" onclick="batchClosed()" class="btn btn-sm btn-primary mr-1"><i class="fas fa-plus fa-sm"></i> 일괄정산처리</a>
+				</div> -->
 			</div>
 		</div>
 		<div class="table-responsive basic-option">
@@ -146,15 +149,24 @@
 	</div>
 </div>
 <script language="javascript">
-	const CLOSED_STATUS = { 'Y': '마감완료', 'N': '마감추가' };
+	const CLOSED_STATUS = { 'Y': '정산완료', 'N': '정산처리중' };
 	const CENTER = { 'text-align': 'center' };
 
     let columns = [
-        { headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
-			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
-        },
-		{ field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 57,
-            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : (CLOSED_STATUS[params.value] || '-'),
+        { headerName: "", field: "", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER, checkboxSelection: true, headerCheckboxSelection: true,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : '',
+		},
+        // { headerName: "#", field: "num", type: 'NumType', pinned: 'left', width: 30, cellStyle: CENTER,
+		// 	cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+        // },
+		{ field: "closed_yn", headerName: "마감상태", pinned: 'left', width: 65,
+			cellRenderer:function(params) {
+				if(params.node.rowPinned === 'top') {
+					return '';
+				}else {
+					return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + (CLOSED_STATUS[params.value] || '정산대기') +'</a>';
+				}
+			},
             cellStyle: (params) => ({
                 ...CENTER, 
                 "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
@@ -177,7 +189,7 @@
 					cellRenderer: (params) => {
 						if (params.value == undefined) return 0;
 						if (params.node.rowPinned === 'top') return params.valueFormatted;
-						return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + params.valueFormatted +'</a>';
+						return + params.valueFormatted;
 					}
 				},
 				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
