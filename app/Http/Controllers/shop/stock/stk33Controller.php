@@ -45,11 +45,11 @@ class stk33Controller extends Controller
                 c.code_id
                 ,c.code_val
             from code c
-                left outer join competitor com on com.competitor_cd = c.code_id and com.store_cd = 'L0025'
+                left outer join competitor com on com.competitor_cd = c.code_id and com.store_cd = :store_cd
             where c.code_kind_cd = 'COMPETITOR' and c.use_yn = 'Y' and com.use_yn = 'Y'
         ";
 
-        $competitors = DB::select($sql);
+        $competitors = DB::select($sql, [ 'store_cd' => $store_cd ]);
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
