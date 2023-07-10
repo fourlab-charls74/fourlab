@@ -347,7 +347,9 @@
             hide: !(STATE > 0 && STATE < 40),
         },
         {field: "prd_cd", headerName: "바코드", width: 120, pinned: 'left', cellStyle: StyleCenter},
-        {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left', cellStyle: StyleCenter},
+        {field: "style_no" ,headerName:"스타일넘버", width: 80, cellStyle: StyleCenter},
+        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: StyleCenter},
+        {field: "goods_nm_eng", headerName:"상품명(영문)", width: 150},
         {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 150,
             cellRenderer: (params) => {
                 if (params.data.goods_no === undefined) return '';
@@ -358,14 +360,13 @@
                 }
             }   
         },
-        {field: "goods_nm_eng", headerName:"상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: StyleCenter},
+       
+        
         {field: "color", headerName: "컬러", width: 55, cellStyle: StyleCenter},
+        {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: StyleCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleCenter},
-        {field: "opt_kor", headerName: "옵션", width: 130},
         {field: "item" ,headerName: "품목", width: 70, cellStyle: StyleCenter},
         {field: "brand" ,headerName:"브랜드", width: 70, cellStyle: StyleCenter},
-        {field: "style_no" ,headerName:"스타일넘버", width: 80, cellStyle: StyleCenter},
         {field: "total_qty", headerName: "총재고", type:'currencyType', width: 60},
         {field: "sg_qty", headerName: "창고재고", type:'currencyType', width: 60},
         @if(@$state < 40)
@@ -871,12 +872,12 @@
                     gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'qty' });
                     return false;
                 }
-                if (unit_cost == "" || unit_cost == 0) { // check unit_cost
-                    alert("단가를 입력해주세요.");
-                    gx.gridOptions.api.stopEditing(); // stop editing
-                    gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
-                    return false;
-                }
+                // if (unit_cost == "" || unit_cost == 0) { // check unit_cost
+                //     alert("단가를 입력해주세요.");
+                //     gx.gridOptions.api.stopEditing(); // stop editing
+                //     gx.gridOptions.api.startEditingCell({ rowIndex: rowIdx, colKey: 'unit_cost' });
+                //     return false;
+                // }
             }
         }
 

@@ -51,19 +51,6 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label>원부자재코드</label>
-								<div class="form-inline">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-4 inner-td">
-							<div class="form-group">
 								<label for="type">구분</label>
 								<div class="flex_box">
 									<select name="type" class="form-control form-control-sm w-100">
@@ -77,6 +64,19 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label>원부자재코드</label>
+								<div class="form-inline">
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='text' id="prd_cd_sub" name='prd_cd_sub' class="form-control form-control-sm w-100 ac-style-no search-enter">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd_sub"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="prd_nm">원부자재명</label>
 								<div class="flex_box">
 									<input type='text' class="form-control form-control-sm search-enter" name='prd_nm' id="prd_nm" value=''>
@@ -85,6 +85,7 @@
 						</div>
 					</div>
 					<div class="row">
+						{{--
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="name">원부자재업체</label>
@@ -99,6 +100,7 @@
 								</div>
 							</div>
 						</div>
+						--}}
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>

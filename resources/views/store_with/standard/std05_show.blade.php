@@ -151,7 +151,7 @@
 							판매채널/매장구분 : 
 							<div class="d-flex align-items-center ml-2" >
 								<div class="flex_box w-100">
-									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" style="width:110px" onchange="chg_store_channel();">
 										<option value=''>전체</option>
 									@foreach ($store_channel as $sc)
 										<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
@@ -160,7 +160,7 @@
 								</div>
 								<span class="mr-2 ml-2">/</span>
 								<div class="flex_box w-100">
-									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" style="width:110px" disabled>
 										<option value=''>전체</option>
 									@foreach ($store_kind as $sk)
 										<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
@@ -298,6 +298,7 @@
     function changeUseYnValWhenChangeDate(fieldName, e, rowIndex) {
         const node = gx.getRowNode(rowIndex);
         node.data[fieldName] = e.value;
+        console.log(node.data[fieldName]);
         node.setDataValue(fieldName, e.value);
     }
 

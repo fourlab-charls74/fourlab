@@ -206,7 +206,7 @@ class stk20Controller extends Controller
                 from product_stock_rotation psr
                     inner join goods g on g.goods_no = psr.goods_no
                     left outer join product_code pc on pc.prd_cd = psr.prd_cd
-                where 1=1 $where
+                where 1=1 and psr.del_yn = 'N' $where
             ";
 
             $row = DB::selectOne($sql);

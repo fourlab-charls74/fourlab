@@ -802,9 +802,9 @@ class cs01Controller extends Controller {
 				, if(s.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(s.goods_no = 0, p.price, g.price) as price
 				, b.brand_nm
-				, ps.goods_opt as opt_kor
 				, pc.prd_cd_p
 				, pc.color
+				, c.code_val as color_nm
 				, pc.size
 				, ifnull(s.exp_qty, 0) as exp_qty
 				, ifnull(s.qty, 0) as qty
@@ -830,6 +830,7 @@ class cs01Controller extends Controller {
 				inner join product_stock ps on s.prd_cd = ps.prd_cd
 				left outer join goods g on s.goods_no = g.goods_no
 				left outer join brand b on b.br_cd = s.brand
+				left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
 			where stock_no = '$stock_no'
 			order by stock_prd_no asc
 		";
