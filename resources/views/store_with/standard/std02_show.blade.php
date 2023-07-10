@@ -566,16 +566,30 @@
 											</td>
 										</tr>
 										<tr>
-											<th>매장보증금</th>
+											<th>현금</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="deposit_cash" id="deposit_cash" value="{{ @$store->deposit_cash }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="cash" id="cash" value="{{ @$store->cash }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
+											<th>보증보험</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="warranty" id="warranty" value="{{ @$store->warranty }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th>부동산담보</th>
 											<td>
 												<div class="form-inline">
 													<input type="text" name="deposit_coll" id="deposit_coll" value="{{ @$store->deposit_coll }}" class="form-control form-control-sm w-100" />
+												</div>
+											</td>
+											<th>기타담보</th>
+											<td>
+												<div class="form-inline">
+													<input type="text" name="etc_coll" id="etc_coll" value="{{ @$store->etc_coll }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
 										</tr>
