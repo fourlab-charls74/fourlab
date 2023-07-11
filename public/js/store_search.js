@@ -756,7 +756,7 @@ SearchPrdcdRange.prototype.SetGridCond = async function() {
         
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28  },
-            { field: "item", headerName: conds[cond_title], width: "auto",  sortable: true,
+            { field: "code_id", headerName: conds[cond_title], width: 0,
                 cellRenderer: (params) => {
                     if((params.data.key || '') === 'contain') return params.value;
                     return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
