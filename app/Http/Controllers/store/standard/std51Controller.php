@@ -291,7 +291,14 @@ class std51Controller extends Controller
                         ->where('code_kind_cd','=',$code)
                         ->where('code_id','=',$code_ids[$i])
                         ->delete();
+
+                    if($code == 'COMPETITOR') {
+                        DB::table('competitor')
+                            ->where('competitor_cd', '=', $code_ids[$i])
+                            ->delete();
+                    }
                 }
+
             });
             $code = 200;
             $msg = "";

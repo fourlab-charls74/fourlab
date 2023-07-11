@@ -185,7 +185,7 @@ class goods extends Controller
             if ($include_not_match === 'Y') $sqls = $this->_storage_include_not_match_sql($storage_cd, $where, $orderby, $limit, $having, ['com_id' => $com_id]);
             else $sqls = $this->_storage_sql($storage_cd, $where, $orderby, $limit, $having, ['com_id' => $com_id]);
         }
-        else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $orderby, $limit, ['com_id' => $com_id]);
+        else if ($include_not_match === 'Y') $sqls = $this->_normal_include_not_match_sql($where, $limit, ['com_id' => $com_id], $ord_field, $ord);
         else if ($com_type->com_type??'' == 6) $sqls = $this->_wonboo_sql($where, $orderby, $limit, ['com_id' => $com_id]);
         else $sqls = $this->_normal_sql($where, $orderby, $limit, ['com_id' => $com_id]);
 
@@ -292,11 +292,18 @@ class goods extends Controller
     }
 
     // 기본 상품검색 sql (비매칭상품 포함검색)
-    private function _normal_include_not_match_sql($where = '', $orderby = '', $limit = '', $values = [])
+    private function _normal_include_not_match_sql($where = '', $limit = '', $values = [], $ord_field, $ord)
     {
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "s_50";
 
+        $delimiter = ".";
+        $ordfield = substr($ord_field, strpos($ord_field, $delimiter) + 1);
+        if($ordfield == 'rt') {
+            $ordfield = 'reg_dm';
+        }
+        $orderby2 = sprintf("order by a.%s %s, a.prd_cd asc", $ordfield, $ord);
+        
         $inner_where = "";
         if (isset($values['com_id'])) $inner_where .= " and a.com_id = '" . Lib::quote($values['com_id'] ?? '') . "'";
 
@@ -316,7 +323,11 @@ class goods extends Controller
         ";
 
         $sql = "
-            select a.*, com.com_nm
+            select
+                a.prd_cd, a.style_no, a.prd_cd_p, a.goods_no, a.brand_cd, a.color, a.size, a.goods_opt, a.opt, a.reg_dm, a.s_qty, 
+                a.sg_qty, a.total_qty, a.goods_nm, a.goods_nm_eng, a.goods_sh, a.price, a.wonga, a.margin_rate, a.margin_amt, a.com_id,
+                a.org_nm, a.make, a.opt_kind_cd, a.img, a.brand, a.color_nm
+                , com.com_nm
                 , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
                 , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
             from (
@@ -346,12 +357,12 @@ class goods extends Controller
                     left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
                 where p.type = 'N' $where
                 group by pc.prd_cd
-                $orderby
             ) a
                 left outer join company com on com.com_id = a.com_id
                 left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
                 left outer join code c on c.code_kind_cd = 'PRD_CD_OPT' and c.code_id = a.opt
             where 1=1 $inner_where
+            $orderby2
             $limit
         ";
 

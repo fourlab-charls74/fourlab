@@ -149,7 +149,6 @@
                                             name='exchange_rate' id='exchange_rate' value="{{ @$exchange_rate ?? 0 }}"
                                             onkeypress="checkFloat(event);" onkeyup="com3(this);calCustomTaxRate();" onfocus="this.select()" 
                                             {{ @$currency_unit == 'KRW' ? 'readonly disabled' : '' }}>
-                                        <span class="ml-1">원</span>
                                     </div>
                                 </div>
                             </div>

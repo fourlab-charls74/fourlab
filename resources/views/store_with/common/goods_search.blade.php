@@ -191,8 +191,8 @@
                                     <span class="text_line">/</span>
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
-                                            <option value="pc.rt">등록일</option>
                                             <option value="pc.prd_cd">바코드</option>
+                                            <option value="pc.rt">등록일</option>
                                             <option value="pc.goods_no">온라인코드</option>
                                             <option value="g.goods_nm">상품명</option>
                                         </select>

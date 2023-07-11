@@ -393,8 +393,8 @@ class cs02Controller extends Controller
                     if(pc.goods_no = 0, p.style_no, g.style_no) as style_no,
                     if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh,
                     pc.color,
+                    c.code_val as color_nm,
                     pc.size,
-                    pc.goods_opt,
                     pc.opt,
                     g.opt_kind_cd,
                     pc.brand as brand_cd,
@@ -412,6 +412,7 @@ class cs02Controller extends Controller
                     left outer join storage_return sr on sr.sgr_cd = srp.sgr_cd
                     left outer join product_stock_storage pss on pss.storage_cd = sr.storage_cd and pss.prd_cd = srp.prd_cd
                     left outer join brand b on b.br_cd = pc.brand
+                    left outer join code c on c.code_id = pc.color and code_kind_cd = 'PRD_CD_COLOR'
                 , (select @rownum :=0) as r
                 where srp.sgr_cd = :sgr_cd
             ) a
@@ -724,7 +725,7 @@ class cs02Controller extends Controller
                     , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
                     , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
                 from (
-                    select pc.prd_cd, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
+                    select pc.prd_cd, pc.prd_cd_p, pc.color, pc.size, code.code_val as color_nm, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
                         , pc.brand as brand_cd
                         , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                         , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
@@ -748,6 +749,7 @@ class cs02Controller extends Controller
                         left outer join goods g on g.goods_no = pc.goods_no
                         left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                         left outer join brand b on b.br_cd = pc.brand
+                        left outer join code code on code.code_id = pc.color and code.code_kind_cd = 'PRD_CD_COLOR'
                     where pc.prd_cd = '$prd_cd'
                     limit 1
                 ) a
