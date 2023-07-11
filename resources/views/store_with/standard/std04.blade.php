@@ -231,6 +231,7 @@
         
         cur_store_cd = store_cd;
         cur_store_nm = store_nm;
+		gx2.gridOptions.columnApi.applyColumnState({ defaultState: { sort: null } });
         gx2.Request("/store/standard/std04/search-competitor/" + store_cd, "", -1, function(d) {
             $("#select_store_nm").text(`${store_nm} - `);
         })
