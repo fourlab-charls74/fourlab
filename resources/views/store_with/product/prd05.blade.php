@@ -150,8 +150,8 @@
             {field: "goods_no", headerName: "온라인코드", width: 80, cellClass: 'hd-grid-code'},
             {field: "brand", headerName: "브랜드", width: 80, cellClass: 'hd-grid-code'},
             {field: "opt_kind_nm", headerName: "품목", width: 70, cellClass: 'hd-grid-code'},
-            {field: "goods_nm", headerName: "상품명", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType"},
-            {field: "goods_nm_eng", headerName: "상품명(영문)", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType"},
+            {field: "goods_nm", headerName: "상품명", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType", cellStyle: {"text-align": "left"}},
+            {field: "goods_nm_eng", headerName: "상품명(영문)", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType", cellStyle: {"text-align": "left"}},
             {field: "color", headerName: "컬러", width: 100, cellClass: 'hd-grid-code'},
             {field: "size", headerName: "사이즈", width: 60, cellClass: 'hd-grid-code'},
             {field: "goods_sh", headerName: "정상가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
@@ -173,6 +173,12 @@
 					}
 				}
 			},
+			{field: "change_price", headerName: "변경가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+				cellRenderer:function(params) {
+					return Comma(params.data.change_price) + '원';
+				}
+			},
+			{field: "plan_category", headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},
             {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
             {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
             {field: "change_type", headerName: "적용타입", width: 80, cellClass: 'hd-grid-code',

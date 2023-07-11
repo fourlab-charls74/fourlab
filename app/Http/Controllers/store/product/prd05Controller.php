@@ -204,9 +204,17 @@ class prd05Controller extends Controller
 				, pp.apply_yn
 				, pp.change_cnt
 				, pp.change_type
+			    , ppl.change_price
 				, pp.rt
 				, pp.ut
 				, pc.prd_cd
+			    , 
+			    case
+			        when pc.plan_category = '01' then '정상매장'
+			        when pc.plan_category = '02' then '전매장'
+			        when pc.plan_category = '03' then '이월취급점'
+			        when pc.plan_category = '04' then '아울렛전용'
+			    end as plan_category
 				, opt.opt_kind_nm as opt_kind_nm
 				, ifnull(pc.goods_no,0) as goods_no
 				, pc.style_no

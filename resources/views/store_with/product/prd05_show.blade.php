@@ -103,6 +103,22 @@
                                                 </div>
                                             </td>
                                         </tr>
+										<tr>
+											<th class="required">상품운영 구분</th>
+											<td>
+												<div class="flax_box">
+													<select name='plan_category' id="plan_category" class="form-control form-control-sm">
+														<option value=''>00 : 변경없음</option>
+														<option value='01'>01 : 정상매장</option>
+														<option value='02'>02 : 전매장</option>
+														<option value='03'>03 : 이월취급점</option>
+														<option value='04'>04 : 아울렛전용</option>
+													</select>
+												</div>
+											</td>
+											<th>&nbsp;</th>
+											<td>&nbsp;</td>
+										</tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -196,7 +212,7 @@
     const pApp = new App('', { gridId: "#div-gd" });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(340);
+        pApp.ResizeGrid(380);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
