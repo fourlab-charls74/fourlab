@@ -273,14 +273,14 @@ body.sidebar-enable nav .side_menu > ul > li > ul > li > ul > li > a{padding-lef
 .filter_wrap:after{content:""; display:block; float:none; clear:both;}
 .filter_wrap h6{display:inline-block;font-size:16px;line-height:30px;color:#111;}
 .filter_wrap h6 .text-primary{color:#111 !important;}
-.filter_wrap .fl_box{float: left;}
+.filter_wrap .fl_box{float: left;display: inline-flex;}
 .filter_wrap .fr_box{float: right;text-align:right;}
 
 .filter_wrap_inner {font-size:14px;line-height:30px;color:#111;font-weight:400;}
 .filter_wrap_inner:after{content:""; display:block; float:none; clear:both;}
 .filter_wrap_inner h6{display:inline-block;font-size:16px;line-height:30px;color:#111;}
 .filter_wrap_inner h6 .text-primary{color:#111 !important;}
-.filter_wrap_inner .fl_box{float: left;}
+.filter_wrap_inner .fl_box{float: left;display: inline-flex;}
 .filter_wrap_inner .fr_box{float: right;text-align:right;}
 
 .resul_btn_wrap{display:none;text-align:center;}
@@ -702,3 +702,9 @@ footer a:active{color:#fff !important;}
 .grid-date[value=""]::-webkit-datetime-edit {
     color: transparent;
 }
+
+/* setting-grid-column button */
+.setting-grid-col {width: 30px;font-size: 18px;border: none;background-color: inherit;transition: font-size 200ms ease-in-out;}
+.setting-grid-col:hover {font-size: 24px;}
+.popover {border: 1px solid #aaa;}
+.popover > .arrow::before {border-right-color: #aaa;}

@@ -733,6 +733,72 @@ function numberFormat(number) {
   return number_format_obj.format(number);
 }
 
+/** 그리드 헤더 개인화 설정 레이어 */
+function SetMyGridHeader() {
+	this.grid = null;
+	this.setting_btn = null;
+	this.save_callback = null;
+	this.reset_callback = null;
+}
+
+SetMyGridHeader.prototype.Init = function(grid_object = null, save_callback = null, reset_callback = null) {
+	this.grid = grid_object;
+	this.save_callback = save_callback;
+	this.reset_callback = reset_callback;
+
+	if ($(".setting-grid-col").length > 0) {
+		this.DrawComponent($(".setting-grid-col")[0]);
+	}
+}
+
+SetMyGridHeader.prototype.DrawComponent = function(ele) {
+	this.setting_btn = ele;
+	if (ele) {
+		$(ele).after(`
+			<div id="setting-grid-layer" class="hide">
+				<div class="p-2">
+					<p class="fs-14 font-weight-bold mb-3"><i class="fas fa-cog mr-1"></i> 테이블 헤더 사용자화</p>
+					<div class="flex" style="height:35px;">
+						<button type="button" class="btn btn-outline-secondary h-100 mr-2" onclick="return setMyGridHeader.Reset();" style="width: 100px;">초기화</button>
+						<button type="button" class="btn btn-primary h-100" onclick="return setMyGridHeader.Save(this);" style="width: 100px;">저장</button>
+					</div>
+				</div>
+			</div>
+		`);
+		$(ele).data('toggle', 'popover');
+		$(ele).popover({
+			container: 'body',
+			placement: 'right',
+			html: true,
+			sanitize: false,
+			content: $('#setting-grid-layer').html(),
+		});
+	}
+};
+
+SetMyGridHeader.prototype.Save = function(obj) {
+	// 저장 시 로직 추가 start
+	console.log('save');
+	// 저장 시 로직 추가 end
+	
+	// 아래코드는 저장완료 표시 후 팝오버를 닫는 코드입니다. 저장완료 후 실행해주세요.
+	$(obj).html('<i class="fas fa-check"></i> 저장');
+	setTimeout(() => {
+		$(this.setting_btn).popover('hide');
+	}, 500);
+};
+
+SetMyGridHeader.prototype.Reset = function() {
+	if (!confirm("초기화하시겠습니까?")) return;
+	// 삭제 시 로직 추가 start
+	console.log('reset');
+	// 삭제 시 로직 추가 end
+
+	$(this.setting_btn).popover('hide');
+};
+
+let setMyGridHeader = new SetMyGridHeader();
+
 function SearchBrand(){
     this.grid = null;
 }

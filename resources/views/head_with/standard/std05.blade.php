@@ -90,10 +90,11 @@
 
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
     <div class="card-body shadow">
-        <div class="card-title mb-3">
+        <div class="card-title">
             <div class="filter_wrap">
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+{{--	                <button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>--}}
                 </div>
                 <div class="fr_box">
 
@@ -187,6 +188,7 @@
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
         Search();
+		setMyGridHeader.Init(gx);
     });
     /*
     function Search() {
