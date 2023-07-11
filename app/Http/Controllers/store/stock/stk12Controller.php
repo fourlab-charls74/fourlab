@@ -67,7 +67,7 @@ class stk12Controller extends Controller
         }
         if($r['invoice_no'] != null) {
             $invoice_no = $r['invoice_no'];
-            $where .= " and p.prd_cd in (select prd_cd from stock_product where invoice_no = '$invoice_no')";
+            $where .= " and p.prd_cd in (select prd_cd from product_stock_order_product where invoice_no = '$invoice_no')";
         }
         if(isset($r['goods_stat'])) {
             $goods_stat = $r['goods_stat'];

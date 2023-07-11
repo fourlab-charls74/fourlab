@@ -29,8 +29,8 @@ class stk15Controller extends Controller
 		$rel_order_res = DB::select($sql);
 
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderBy('default_yn')->get();
-
+        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderBy('default_yn','desc')->get();
+        
 		$values = [
             'today'         => date("Y-m-d"),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분

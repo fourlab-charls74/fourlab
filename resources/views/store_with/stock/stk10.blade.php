@@ -657,7 +657,8 @@
     function delRelease() {
         let rows = gx.getSelectedRows();
         if(rows.length < 1) return alert("삭제할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 20).length > 0) return alert("'출고처리중'상태의 항목만 삭제 가능합니다.");
+        console.log(rows.filter(r => r.state !== 20).length > 0);
+        if(rows.filter(r => r.state !== 20 && r.state !== 10).length > 0) return alert("'출고요청', '출고처리중'상태의 항목만 삭제 가능합니다.");
         if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
 
         axios({

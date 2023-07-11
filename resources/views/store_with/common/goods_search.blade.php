@@ -69,87 +69,6 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label>바코드</label>
-								<div class="flex_box">
-									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-								</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="style_no">스타일넘버/온라인코드</label>
-                                <div class="form-inline">
-                                    <div class="form-inline-inner input_box">
-                                        <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
-                                    </div>
-                                    <span class="text_line">/</span>
-                                    <div class="form-inline-inner input-box" style="width:47%">
-                                        <div class="form-inline-inner inline_btn_box">
-                                            <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_nm">상품명</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        {{-- <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_stat">전시상태</label>
-                                <div class="flax_box">
-                                    <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                        <option value=''>전체</option>
-                                        @foreach ($goods_stats as $goods_stat)
-                                            <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div> --}}
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="item">품목</label>
-                                <div class="flax_box">
-                                    <select name="item" class="form-control form-control-sm">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="brand_cd">브랜드</label>
-                                <div class="form-inline inline_btn_box">
-                                    <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                    <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="goods_nm_eng">상품명(영문)</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
                                 <label for="prd_cd">상품검색조건</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
@@ -173,6 +92,33 @@
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label>바코드</label>
+								<div class="flex_box">
+									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="goods_nm">상품명</label>
+                                <div class="flax_box">
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 inner-td">
+                            <div class="form-group">
+                                <label for="goods_nm_eng">상품명(영문)</label>
+                                <div class="flax_box">
+                                    <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
                                 </div>
                             </div>
                         </div>

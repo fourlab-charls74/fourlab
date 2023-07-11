@@ -49,6 +49,20 @@
                     </div> --}}
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="prd_cd">상품검색조건</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="prd_cd">바코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
@@ -73,34 +87,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flax_box">
-                                <select name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                   
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_stat">전시상태</label>
-                            <div class="flax_box">
-                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($goods_stats as $goods_stat)
-                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_nm">상품명</label>
@@ -114,36 +103,6 @@
                             <label for="goods_nm_eng">상품명(영문)</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">상품검색조건</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -178,6 +137,33 @@
                     </div>
                 </div>
                 <div class="row search-area-ext d-none">
+                    <div class="col-lg-4 inner-td" hidden>
+                        <div class="form-group">
+                            <label for="name">공급업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td" hidden>
+                        <div class="form-group">
+                            <label for="item">품목</label>
+                            <div class="flax_box">
+                                <select name="item" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    @foreach ($items as $item)
+                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="brand_cd">브랜드</label>
@@ -189,13 +175,11 @@
                     </div>
                 </div>
             </div>
-		</div>
-
-		<div class="resul_btn_wrap mb-3">
+        </div>
+        <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
-		</div>
-
+            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+        </div>
 	</div>
 </form>
 <!-- DataTales Example -->
