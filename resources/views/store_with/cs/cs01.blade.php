@@ -185,7 +185,7 @@
             { field: "custom_tax_rate", headerName: "통관세율(%)", width: 80, type:'percentType' },
             { field: "exp_qty", headerName: "수량(예정)", type:'currencyType' },
             { field: "qty", headerName: "수량(확정)", type:'currencyType', cellStyle: { 'font-weight': '700' } },
-            { field: "total_cost", headerName: "총원가(원)", type:'currencyType' },
+            { field: "total_cost", headerName: "총원가(원, VAT별도)", width: 130, type:'currencyType' },
             // { field: "buy_order_qty", headerName: "발주 후 입고수", width: 110, type:'numberType', },
             // { field: "name", headerName: "입고자", width: 80, cellStyle:{ 'text-align': 'center' } },
             // { field: "rt", headerName: "최종수정일", width: 120, cellStyle:{ 'text-align': 'center' } },       {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},

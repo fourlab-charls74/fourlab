@@ -815,8 +815,8 @@ class cs01Controller extends Controller {
 				, s.unit_cost as unit_cost
 				, (s.unit_cost * s.qty) as unit_total_cost
 				, s.cost as cost
-				, (s.cost * s.qty) as total_cost
-				, (s.cost_notax * s.qty) as total_cost_novat
+				, s.total_cost as total_cost
+				, s.total_cost * 1.1 as total_cost_novat
 				, date_format(s.stock_date, '%Y-%m-%d') as stock_date
 				, ifnull((
 					select stock_prd_no 

@@ -392,9 +392,9 @@
         {field: "unit_total_cost", headerName: "금액", width: 80, cellStyle: StyleRight, valueFormatter: numberFormatter},
         {field: "income_amt", headerName: "수입금액(원)", width: 80, cellStyle: StyleRight, valueFormatter: KRWFormatter},
         {field: "income_total_amt", headerName: "총수입금액(원)", width: 90, cellStyle: StyleRight, valueFormatter: KRWFormatter},
-        {field: "cost", headerName: "개당원가(원, VAT포함)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
-        {field: "total_cost", headerName: "총원가(원)", width: 90, cellStyle: StyleRight, valueFormatter: KRWFormatter},
-        {field: "total_cost_novat", headerName: "총원가(원, VAT별도)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
+        {field: "cost", headerName: "개당원가(원, VAT별도)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
+        {field: "total_cost", headerName: "총원가(원, VAT별도)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
+        {field: "total_cost_novat", headerName: "총원가(원, VAT포함)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
         {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
         {field: "stock_date", headerName: "최근입고일자", width: 90, cellStyle: StyleCenter},
@@ -678,7 +678,7 @@
             ff.tariff_amt.value = Comma(Math.round(tariff_amt));
             ff.tariff_rate.value = tariff_rate.toFixed(2);
             ff.freight_rate.value = freight_rate.toFixed(2);
-            ff.custom_tax.value = Comma(custom_tax);
+            ff.custom_tax.value = Comma(Math.round(custom_tax));
             ff.custom_tax_rate.value = custom_tax_rate.toFixed(2);
         }
 
@@ -740,7 +740,7 @@
             total_cost = income_total_amt + (income_total_amt * ((prd_tariff_rate / 100) + freight_rate)); // 총원가 = 총수입금액 + (총수입금액 * (상품당관세율 + 운임율))
             cost = total_cost / (qty || 1);
         }
-        let total_cost_novat = total_cost / 1.1; // 총원가 vat 별도
+        let total_cost_novat = total_cost * 1.1; // 총원가 vat 포함
 
         await gx.gridOptions.api.applyTransaction({ 
             update: [{
@@ -748,9 +748,9 @@
                 unit_total_cost: qty * unit_cost, // 금액
                 income_amt: Math.round(income_amt), // 수입금액
                 income_total_amt: Math.round(income_total_amt), // 총수입금액
-                cost: Math.round(cost), // 원가 (원, VAT 포함)
-                total_cost: Math.round(total_cost), // 총원가 (원)
-                total_cost_novat: Math.round(total_cost_novat), // 총원가 (원, VAT 별도)
+                cost: Math.round(cost), // 개당원가 (원, VAT 별도)
+                total_cost: Math.round(total_cost), // 총원가 (원, VAT 별도)
+                total_cost_novat: Math.round(total_cost_novat), // 총원가 (원, VAT 포함)
             }] 
         });
     }
