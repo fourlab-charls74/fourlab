@@ -191,7 +191,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('std10', 'std10Controller@index');
         Route::post('std10/save', 'std10Controller@save');
         Route::get('std10/search', 'std10Controller@search');
-        Route::get('std10/create', 'std10Controller@create');
+		Route::get('std10/create', 'std10Controller@create');
+		Route::post('std10/change-seq', 'std10Controller@change_seq');
         Route::get('std10/{code?}', 'std10Controller@show');
         Route::put('std10/{code?}', 'std10Controller@update');
         Route::delete('std10/{code}', 'std10Controller@delete');

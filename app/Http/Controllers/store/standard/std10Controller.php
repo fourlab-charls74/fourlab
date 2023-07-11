@@ -64,8 +64,11 @@ class std10Controller extends Controller
 
         $sql = /** @lang text */
             "
-            select * from size_kind 
+            select 
+            	size_kind_cd, size_kind_nm, use_yn, admin_nm, rt, ut, seq 
+            from size_kind 
 			where 1=1 $where
+			order by seq
         ";
 
         $rows = DB::select($sql);
@@ -348,4 +351,29 @@ class std10Controller extends Controller
 		}
         return response()->json(['code' => $code,"msg" => $msg]);
     }
+
+	//사이즈 리스트 순서변경
+	public function change_seq(Request $request) {
+
+		$size_kind_cds = $request->input('size_kind_cds');
+
+		try {
+			DB::beginTransaction();
+			for($i=0;$i<count($size_kind_cds);$i++) {
+				DB::table('size_kind')
+					->where('size_kind_cd','=',$size_kind_cds[$i])
+					->update(['seq' => $i+1]);
+			}
+
+			$msg = "사이즈 리스트 순서가 변경되었습니다.";
+			$code = 200;
+			DB::commit();
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+		return response()->json(['code' => $code,"msg" => $msg]);
+	}
+	
 }

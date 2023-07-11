@@ -77,7 +77,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-
+					<button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeq()" >순서변경</a>
                 </div>
             </div>
         </div>
@@ -92,7 +92,8 @@
     const columns = [{
             field: "size_kind_cd",
             headerName: "사이즈구분",
-            width: 120
+            width: 180,
+			rowDrag: true
         },
         {
             field: "size_kind_nm",
@@ -120,12 +121,17 @@
             width: 130,
             cellStyle:{'text-align':'center'}
         },
-        {
-            field: "ut",
-            headerName: "수정일시",
-            width: 130,
-            cellStyle:{'text-align':'center'}
-        },
+		{
+			field: "ut",
+			headerName: "수정일시",
+			width: 130,
+			cellStyle:{'text-align':'center'}
+		},
+		{
+			field: "seq",
+			headerName: "순서",
+			hide: "true"
+		},
         {
             field: "",
             headerName: "",
@@ -144,6 +150,8 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
+		gx.gridOptions.rowDragManaged = true;
+		gx.gridOptions.animateRows = true;
         Search();
     });
 
@@ -161,5 +169,34 @@
         const url = '/store/standard/std10/create';
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=380");
     }
+
+	function changeSeq(){
+		let size_kind_cds = [];
+		gx.gridOptions.api.forEachNode(function(node) {
+			size_kind_cds.push(node.data.size_kind_cd);
+		});
+
+		if(confirm('사이즈 리스트 순서를 변경 하시겠습니까?')){
+			$.ajax({
+				method: 'post',
+				url: '/store/standard/std10/change-seq',
+				data: {'size_kind_cds': size_kind_cds},
+				dataType: 'json',
+				success: function (res) {
+					if(res.code == '200'){
+						alert(res.msg);
+						Search();
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function(e) {
+					console.log(e.responseText)
+				}
+			});
+		}
+		return true;
+	}
+
 </script>
 @stop
