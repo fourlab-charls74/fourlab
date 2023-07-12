@@ -201,6 +201,13 @@ function openCouponDetail(type = "add", no = "") {
     );
 }
 
+/** GNB layer 오픈/닫힘 */
+function openGNB(element) {
+	$("#gnb").toggleClass('d-none');
+	$(element).toggleClass('act');
+	
+	if ($(element).hasClass('act')) $("#gnb_search_keyword").focus();
+}
 
 function sortnumber(n1, n2) {
     if (n1 === null && n2 === null) {

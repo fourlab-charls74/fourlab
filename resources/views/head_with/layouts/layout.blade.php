@@ -19,6 +19,7 @@
         <!-- header -->
         @include('head_with.layouts.top')
         @include('head_with.layouts.lnb')
+        @include('head_with.layouts.gnb')
         <!-- header -->
         <!-- content -->
         <div id="content">
