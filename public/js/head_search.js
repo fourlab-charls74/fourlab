@@ -768,7 +768,7 @@ SetMyGridHeader.prototype.DrawComponent = function(ele) {
 		$(ele).data('toggle', 'popover');
 		$(ele).popover({
 			container: 'body',
-			placement: 'right',
+			placement: 'left',
 			html: true,
 			sanitize: false,
 			content: $('#setting-grid-layer').html(),

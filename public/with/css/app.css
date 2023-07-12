@@ -730,4 +730,4 @@ footer a:active{color:#fff !important;}
 .setting-grid-col {width: 30px;font-size: 18px;border: none;background-color: inherit;transition: font-size 200ms ease-in-out;}
 .setting-grid-col:hover {font-size: 24px;}
 .popover {border: 1px solid #aaa;}
-.popover > .arrow::before {border-right-color: #aaa;}
+.popover > .arrow::before {border-left-color: #aaa;border-right-color: #aaa;}

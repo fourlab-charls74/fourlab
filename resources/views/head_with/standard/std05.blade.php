@@ -94,10 +94,9 @@
             <div class="filter_wrap">
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-{{--	                <button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>--}}
                 </div>
                 <div class="fr_box">
-
+{{--	                <button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>--}}
                 </div>
             </div>
         </div>
