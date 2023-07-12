@@ -89,12 +89,12 @@ class ProductPriceBatch extends Command
 					->where('idx', '=', $product_price_cd)
 					->update(['apply_yn'=> 'Y','ut' => DB::raw('now()')]);
 
+				echo "test";
+
 			}			
 
 			DB::commit();
 			$code = 0;
-
-			echo "test";
 			
 		} catch (Exception $e) {
 			DB::rollback();
