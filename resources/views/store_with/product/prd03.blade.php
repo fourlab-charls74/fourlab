@@ -223,26 +223,26 @@
 			
 			{
 				field: "color",
-				headerName: "칼라",
+				headerName: "칼라명",
 				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "size",
-				headerName: "사이즈",
+				headerName: "사이즈명",
 				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "tag_price",
-				headerName: "Tag가",
+				headerName: "정상가",
 				type: 'currencyType',
 				cellStyle: DEFAULT,
 				width: 80
 			},
 			{
 				field: "price",
-				headerName: "판매가",
+				headerName: "현재가",
 				type: 'currencyType',
 				cellStyle: DEFAULT,
 				width: 80

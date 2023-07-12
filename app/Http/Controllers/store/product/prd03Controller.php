@@ -131,7 +131,7 @@ class prd03Controller extends Controller
 				i.img_url as img,
 				p.prd_cd as prd_cd,
 				c7.code_val as color,
-				c8.code_val as size,
+				size.size_nm as size,
 				p.prd_nm as prd_nm,
 				p.tag_price as tag_price,
 				p.price as price,
@@ -161,7 +161,8 @@ class prd03Controller extends Controller
 				left outer join code c5 on c5.code_kind_cd = 'PRD_CD_GENDER' and c5.code_id = pc.gender
 				left outer join code c6 on c6.code_kind_cd = 'PRD_CD_ITEM' and c6.code_id = pc.item
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
-				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
+				-- left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
+				left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
 			where p.use_yn = 'Y' and p.type <> 'N' 
 				$where

@@ -262,23 +262,16 @@
                 field: 'storage_wqty',
                 headerName: '창고재고',
                 type: 'currencyType', // 대표창고의 재고를 조회
-                cellRenderer: function(params) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                    }
-                },
-
-            },
-            {
-                field: 'store_info',
-                headerName: '',
-                hide: true,
+                // cellRenderer: function(params) {
+                //     if (params.value !== undefined) {
+                //         return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                //     }
+                // },
                 children: [
                     {
-                        field: 'store_qty',
+                        field: 'storage_qty',
                         headerName: '재고', 
                         type: "currencyType",
-                        hide: true,
                         width: 50,
                         cellRenderer: function(params) {
                             if (params.value !== undefined) {
@@ -287,10 +280,9 @@
                         }
                     },
                     {
-                        field: 'store_wqty',
+                        field: 'storage_wqty',
                         headerName: '보유재고',
                         type: "currencyType",
-                        hide: true,
                         width: 80,
                         cellRenderer: function(params) {
                             if (params.value !== undefined) {
@@ -298,12 +290,19 @@
                             }
                         }
                     },
+                ],
+            },
+            {
+                field: 'store_info',
+                headerName: '',
+                hide: true,
+                children: [
                     {
                         field: 'rel_qty',
                         headerName: '배분수량',
                         type: "currencyType",
                         hide: true,
-                        width: 80,
+                        width: 100,
                         editable: true,
                         cellStyle: {'background-color': '#ffff99'},
                         valueFormatter: formatNumber

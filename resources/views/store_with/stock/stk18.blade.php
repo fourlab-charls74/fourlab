@@ -201,7 +201,7 @@
                         <span class="mr-1">출고예정일</span>
                         <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
                             <div class="input-group">
-                                <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $today }}" autocomplete="off" readonly />
+                                <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $today }}" autocomplete="off" disabled />
                                 <div class="input-group-append">
                                     <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                         <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -257,13 +257,13 @@
         },
         {
             field: "color",
-            headerName: "칼라",
+            headerName: "칼라명",
             cellStyle: DEFAULT,
             width: 100
         },
         {
             field: "size",
-            headerName: "사이즈",
+            headerName: "사이즈명",
             cellStyle: DEFAULT,
             width: 90
         },
@@ -275,7 +275,7 @@
         },
         {
             field: "price",
-            headerName: "판매가",
+            headerName: "현재가",
             type: 'currencyType',
             cellStyle: DEFAULT,
             width: 80
@@ -287,22 +287,31 @@
             cellStyle: DEFAULT,
             width: 80
         },
-		{headerName: "창고보유재고",
+		{headerName: "대표창고재고",
             children: [
-                @foreach (@$storages as $storage)
-                    @if ($storage->default_yn == "Y")
-                    {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
-                        cellRenderer: function(params) {
-                            let storage_cd = '{{ $storage->storage_cd }}';
-                            let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-                            if (arr.length > 0) {
-                                return arr[0].wqty;
-                            }
-                            return 0;
+                {
+                    field: 'storage_qty',
+                    headerName: '재고', 
+                    type: "currencyType",
+                    width: 50,
+                    cellRenderer: function(params) {
+                        console.log(params.data);
+                        if (params.value !== undefined) {
+                            return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.data.storage_qty[0].qty + '</a>';
                         }
-                    },
-                    @endif
-                @endforeach
+                    }
+                },
+                {
+                    field: 'storage_wqty',
+                    headerName: '보유재고',
+                    type: "currencyType",
+                    width: 80,
+                    cellRenderer: function(params) {
+                        if (params.value !== undefined) {
+                            return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        }
+                    }
+                },
             ],
         },
 		{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
@@ -330,10 +339,100 @@
             }
         });
         Search();
-
-        // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
-        load_store_channel();
     });
+
+     // 판매채널 셀렉트박스가 선택되지 않으면 매장구분 셀렉트박스는 disabled처리
+	$(document).ready(function() {
+		const store_channel = document.getElementById("store_channel");
+		const store_channel_kind = document.getElementById("store_channel_kind");
+		const store = document.getElementById("store");
+
+		store_channel.addEventListener("change", () => {
+			if (store_channel.value) {
+				store_channel_kind.disabled = false;
+                $('#store').empty();
+                let select =  $("<option value=''>전체</option>");
+                $('#store').append(select);
+			} else {
+				store_channel_kind.disabled = true;
+			}
+		});
+
+		store_channel_kind.addEventListener("change", () => {
+			if (store_channel.value) {
+				store.disabled = false;
+			} else {
+				store.disabled = true;
+			}
+		});
+	});
+
+    // 판매채널이 변경되면 해당 판매채널의 매장구분을 가져오는 부분
+	function chg_store_channel() {
+        const sel_channel = document.getElementById("store_channel").value;
+
+        $.ajax({
+            method: 'post',
+            url: '/store/standard/std02/show/chg-store-channel',
+            data: {
+                'store_channel' : sel_channel
+                },
+            dataType: 'json',
+            success: function (res) {
+                if(res.code == 200){
+                    $('#store_channel_kind').empty();
+                    let select =  $("<option value=''>전체</option>");
+                    $('#store_channel_kind').append(select);
+
+                    for(let i = 0; i < res.store_kind.length; i++) {
+                        let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+                        $('#store_channel_kind').append(option);
+                    }
+
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                console.log(e.responseText)
+            }
+        });
+    }
+
+
+    // 매장구분이 변경되면 해당 매장구분의 매장을 가져오는 부분
+    function chg_store_channel_kind() {
+
+        const sel_channel = document.getElementById("store_channel").value;
+        const sel_channel_kind = document.getElementById("store_channel_kind").value;
+
+        $.ajax({
+            method: 'post',
+            url: '/store/standard/std02/show/chg-store-channel_kind',
+            data: {
+                'store_channel_kind' : sel_channel_kind
+                },
+            dataType: 'json',
+            success: function (res) {
+                if(res.code == 200){
+                    $('#store').empty();
+                    let select =  $("<option value=''>전체</option>");
+                    $('#store').append(select);
+
+                    for(let i = 0; i < res.stores.length; i++) {
+                        let option = $("<option value="+ res.stores[i].store_cd +">" + res.stores[i].store_nm + "</option>");
+                        $('#store').append(option);
+                    }
+
+                } else {
+                    alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+                }
+            },
+            error: function(e) {
+                console.log(e.responseText)
+            }
+        });
+    }	
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
@@ -415,51 +514,5 @@
 
   
 
-    /**
-     * 일반출고 매장구분 추가 후 매장 구분 선택시 해당되는 매장 출력
-     */
-    function change_store_type(e) {
-
-        let store_type = document.getElementById('store_type').value;
-
-        $.ajax({
-            method: 'get',
-            url: '/store/stock/stk18/chg-store-type',
-            data: {
-                store_type : store_type
-            },
-            success: function (res) {
-                if(res.code === 200) {
-                    $('#store').empty();
-                    $('#store').append("<option value=''>선택</option>");
-                    for(let i = 0; i <= res.result.length ; i++) {
-                        if(store_type == '06') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '07') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '08') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '10') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '11') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '12') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '13') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '15') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        } else if (store_type == '') {
-                            $('#store').append("<option value='" + res.result[i].store_cd +"'>" + res.result[i].store_nm + "</option>");
-                        }
-                    }
-                }else {
-                }
-            },
-            error: function(error) {
-                console.log(error)
-            }
-        });        
-    }
 </script>
 @stop

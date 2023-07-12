@@ -88,6 +88,27 @@
                         </div>
                     </div>
 				</div>
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+						<label for="">매장사용 유무</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="store_yn" value="" id="store_a" class="custom-control-input" checked>
+									<label class="custom-control-label" for="store_a">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="store_yn" value="Y" id="store_y" class="custom-control-input">
+									<label class="custom-control-label" for="store_y">Y</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="store_yn" value="N" id="store_n" class="custom-control-input">
+									<label class="custom-control-label" for="store_n">N</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
@@ -156,10 +177,6 @@
 					cellRenderer : function(params) {
 						let recv_amt = toInt(params.data.recv_amt);
 						let last_recv_amt = toInt(params.data.last_recv_amt);
-
-						console.log("금액 : " + recv_amt);
-						console.log("전년 : " + last_recv_amt);
-
 						if(recv_amt != 0 && last_recv_amt != 0) {
 							return ((recv_amt / last_recv_amt)*100).toFixed(0);
 						} else {
@@ -269,10 +286,12 @@
 			onCellValueChanged: params => evtAfterEdit(params)
 		}
 		gx = new HDGrid(gridDiv, columns, options);
+		initStore()
 
-        if ($('#is_searched').val() === 'y') {
+        // if ($('#is_searched').val() === 'y') {
             Search();
-        }
+        // }
+
 
 		// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
 		load_store_channel();
@@ -281,6 +300,7 @@
 	function isSearch(val){
         $('#is_searched').val(val);
     }
+	
 	function Search() {
 		if ($('#is_searched').val() === 'y') {
 			let data = $('form[name="search"]').serialize();
@@ -292,8 +312,17 @@
 		}
 	}
 
-	// const afterSearch = (e) => {
-	// };
+	function initStore() {
+        const store_cd = '{{ @$store->store_cd }}';
+        const store_nm = '{{ @$store->store_nm }}';
+
+		console.log(store_cd, store_nm);
+
+        if(store_cd != '') {
+            const option = new Option(store_nm, store_cd, true, true);
+            $('#store_cd').append(option).trigger('change');
+        }
+    }
 
 	const formReset = () => {
 		document.search.reset();

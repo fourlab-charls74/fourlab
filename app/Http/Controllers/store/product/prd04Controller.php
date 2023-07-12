@@ -262,6 +262,14 @@ class prd04Controller extends Controller
 				, ps.qty as hqty
 				, ps.wqty as hwqty
 				, pss2.storage_cd as storage_cd
+				-- , pc.plan_category as plan_category
+				, case pc.plan_category
+					when '01' then '정상매장'
+					when '02' then '전매장'
+					when '03' then '이월취급점'
+					when '04' then '아울렛전용'
+					else ''
+				end as 'plan_category'
 			from product_code pc
 				inner join product_stock ps on pc.prd_cd = ps.prd_cd
 				$in_store_sql
@@ -307,7 +315,6 @@ class prd04Controller extends Controller
 
 			$result[] = $row;
 		}
-
 
 		return response()->json([
 			"code"	=> 200,

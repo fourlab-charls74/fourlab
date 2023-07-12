@@ -330,7 +330,7 @@
             cellRenderer: function(params) {
                 if (params.data.state != 10) {
                     if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                     }
                 } else {
                     return params.data.qty

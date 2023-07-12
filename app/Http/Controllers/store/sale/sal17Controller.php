@@ -21,6 +21,15 @@ class sal17Controller extends Controller
         $store_type = $request->input('store_type', "");
         $store_cd = $request->input('store_cd', "");
 
+		$sql = "
+			select 
+				store_nm
+			from store
+			where store_cd = '$store_cd'
+		";
+		$store_nm = DB::selectOne($sql);
+
+
 		// 매장구분
 		$sql = /** @lang text */
             " 
@@ -34,7 +43,6 @@ class sal17Controller extends Controller
 		$months = [];
 		$sd = Carbon::parse($sdate);
         while($sd <= Carbon::parse($edate)){
-            //$months[] = [ "val" => $sd->format("Y-m"), "fmt" => $sd->format("Y-m") ];
             $months[] = [ "val" => $sd->format("Ym"), "fmt" => $sd->format("Y-m") ];
             $sd->addMonth();
         }
@@ -65,8 +73,7 @@ class sal17Controller extends Controller
 			'is_searched' 	=> $is_searched,
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
-			// 'event_cds'	=> $event_cds,
-			// 'sell_types'	=> $sell_types
+			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
 		];
         return view( Config::get('shop.store.view') . '/sale/sal17', $values);
 	}
@@ -81,11 +88,13 @@ class sal17Controller extends Controller
 		$store_cd = $request->input('store_cd', "");
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
+		$store_yn = $request->input('store_yn');
 
 		$where = "";
 		if ($store_cd != "") $where .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+		if ($store_yn != "") $where .= "and s.use_yn = '" . Lib::quote($store_yn). "'";
 
 		/**
 		 * 합계 쿼리 작성
