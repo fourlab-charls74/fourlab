@@ -403,7 +403,7 @@
 
             const data = {
                 products: rows, 
-                store_cd,
+                store_cd: store_cd,
                 // exp_dlv_day: $('[name=exp_dlv_day]').val(),
                 // rel_order: $('[name=rel_order]').val(),
             };

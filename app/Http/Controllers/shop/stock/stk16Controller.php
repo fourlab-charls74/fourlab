@@ -138,6 +138,7 @@ class stk16Controller extends Controller
                 cast(psr.exp_dlv_day as date) as exp_dlv_day, 
                 psr.rel_order, 
                 psr.comment,
+                psr.req_comment,
                 psr.req_id, 
                 psr.req_rt, 
                 psr.rec_id, 

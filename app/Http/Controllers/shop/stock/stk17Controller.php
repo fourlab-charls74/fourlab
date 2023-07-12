@@ -163,7 +163,7 @@ class stk17Controller extends Controller
                         // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         // 'rel_order' => $rel_order,
                         'req_id' => $admin_id,
-                        'req_comment' => $row['req_comment'],
+                        'req_comment' => $row['req_comment']??'',
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);
