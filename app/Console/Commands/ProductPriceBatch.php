@@ -93,13 +93,13 @@ class ProductPriceBatch extends Command
 
 			DB::commit();
 			$code = 0;
+
+			echo "test";
 			
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = $e->getMessage();
 		}
-		
-		echo "test";
 		
         return $code;
     }
