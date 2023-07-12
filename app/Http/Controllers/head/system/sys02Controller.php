@@ -20,7 +20,7 @@ class sys02Controller extends Controller
         $sql =
             /** @lang text */
             "
-            select * from mgr_controller a
+            select * from handle_controller a
 			where entry = 1 and is_del = 0 and state >= 0
 			order by seq
             ";
@@ -50,7 +50,7 @@ class sys02Controller extends Controller
         $sql =
             /** @lang text */
             "
-            select * from mgr_controller a
+            select * from handle_controller a
 			where entry = 1 and is_del = 0 and state >= 0
 			order by seq
             ";
@@ -65,7 +65,7 @@ class sys02Controller extends Controller
             $sql = /** @lang text */
                 "
                 select *
-                from mgr_controller a
+                from handle_controller a
                 where entry = :entry and kind = 'M' order by seq            
             ";
             $stmt2 = $pdo->prepare($sql);
@@ -90,7 +90,7 @@ class sys02Controller extends Controller
         $sql =
             /** @lang text */
             "
-            select * from mgr_controller 
+            select * from handle_controller 
 			where menu_no = :code
             ";
 
@@ -99,8 +99,8 @@ class sys02Controller extends Controller
         $sql =
             /** @lang text */
             "
-            select * from mgr_controller a
-			where entry = ( select entry from mgr_controller where menu_no = :entry ) and is_del = 0 and state >= 0
+            select * from handle_controller a
+			where entry = ( select entry from handle_controller where menu_no = :entry ) and is_del = 0 and state >= 0
 			order by seq
             ";
 
@@ -115,7 +115,7 @@ class sys02Controller extends Controller
             $sql = /** @lang text */
                 "
                 select *
-                from mgr_controller a
+                from handle_controller a
                 where entry = :entry and kind = 'M' order by seq            
             ";
             $stmt2 = $pdo->prepare($sql);
@@ -163,7 +163,7 @@ class sys02Controller extends Controller
         $sql =
             /** @lang text */
             "
-            select * from mgr_controller 
+            select * from handle_controller 
 			where entry = 1 $menu_no_where $where order by seq
         ";
         $pdo = DB::connection()->getPdo();
@@ -176,8 +176,8 @@ class sys02Controller extends Controller
 
             $sql = /** @lang text */
                 "
-                select a.*, ( select count(*) from mgr_controller where entry = a.menu_no ) as cnt
-                from mgr_controller a
+                select a.*, ( select count(*) from handle_controller where entry = a.menu_no ) as cnt
+                from handle_controller a
                 where entry = :entry $where order by seq            
             ";
             $stmt2 = $pdo->prepare($sql);
@@ -189,7 +189,7 @@ class sys02Controller extends Controller
                 if($row2["cnt"] > 0){
                     $sql = /** @lang text */
                             "
-                        select * from mgr_controller 
+                        select * from handle_controller 
                         where entry = :entry $where order by seq            
                     ";
                     $stmt3 = $pdo->prepare($sql);
@@ -233,7 +233,7 @@ class sys02Controller extends Controller
                 $sql = "
                     select
                         *
-                    from mgr_controller
+                    from handle_controller
                     where menu_no = '$entry'
                 ";
                 $result = DB::selectOne($sql);
@@ -246,11 +246,11 @@ class sys02Controller extends Controller
         }
 
 
-        $user_cnt = DB::table('mgr_controller')
+        $user_cnt = DB::table('handle_controller')
             ->where('pid', $pid)->count();
         if ($user_cnt == 0) {
 
-            $mgr_controller = [
+            $handle_controller = [
                 'entry' => $entry,
                 'pid' => $pid,
                 'kor_nm' => $kor_nm,
@@ -267,8 +267,8 @@ class sys02Controller extends Controller
             ];
 
             try {
-                DB::transaction(function () use (&$result, $mgr_controller) {
-                    DB::table('mgr_controller')->insert($mgr_controller);
+                DB::transaction(function () use (&$result, $handle_controller) {
+                    DB::table('handle_controller')->insert($handle_controller);
                 });
                 $code = 200;
                 $msg = "";
@@ -306,7 +306,7 @@ class sys02Controller extends Controller
             $sql = "
                 select
                     *
-                from mgr_controller
+                from handle_controller
                 where menu_no = '$entry'
             ";
     
@@ -316,7 +316,7 @@ class sys02Controller extends Controller
         }
 
 
-        $mgr_controller = [
+        $handle_controller = [
             'entry' => $entry,
             'pid' => $pid,
             'kor_nm' => $kor_nm,
@@ -333,10 +333,10 @@ class sys02Controller extends Controller
         ];
 
         try {
-            DB::transaction(function () use (&$result, $code, $mgr_controller, $roles) {
-                DB::table('mgr_controller')
+            DB::transaction(function () use (&$result, $code, $handle_controller, $roles) {
+                DB::table('handle_controller')
                     ->where('menu_no', '=', $code)
-                    ->update($mgr_controller);
+                    ->update($handle_controller);
 
                 foreach ($roles as $group_no => $group_role) {
                     DB::table('mgr_group_menu_role')
@@ -367,7 +367,7 @@ class sys02Controller extends Controller
     {
         try {
             DB::transaction(function () use (&$result, $code) {
-                DB::table('mgr_controller')->where('menu_no', $code)->delete();
+                DB::table('handle_controller')->where('menu_no', $code)->delete();
             });
 
             DB::transaction(function () use (&$result, $code) {

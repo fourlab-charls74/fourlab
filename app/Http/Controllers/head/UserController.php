@@ -224,7 +224,7 @@ class UserController extends Controller
 
         $query = /** @lang text */
         "
-            select * from mgr_controller 
+            select * from handle_controller 
             where is_del = 0 and state >= 0
         ";
 

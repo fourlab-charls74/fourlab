@@ -162,8 +162,8 @@ class SLib
             $query = DB::table('shop_controller as lnb');
             $main_table = 'shop_controller';
         } else if ($type == 'head') {
-            $query = DB::table('mgr_controller as lnb');
-            $main_table = 'mgr_controller';
+            $query = DB::table('handle_controller as lnb');
+            $main_table = 'handle_controller';
         }
         $query = $query->selectRaw("
             lnb.*,
@@ -191,8 +191,8 @@ class SLib
             $menu_table = 'shop_controller as lnb';
             $main_table = 'shop_controller';
         } else if ($type == 'head') {
-            $menu_table = 'mgr_controller as lnb';
-            $main_table = 'mgr_controller';
+            $menu_table = 'handle_controller as lnb';
+            $main_table = 'handle_controller';
         }
 
         $sql = "

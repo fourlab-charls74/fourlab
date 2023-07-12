@@ -78,7 +78,7 @@ class Head
                             "
                             select
                                 a.menu_no,a.pid,a.kor_nm,a.eng_nm,a.kind
-                            from mgr_controller a
+                            from handle_controller a
                             where a.pid = :pid
                             having (
                                     select count(*) from mgr_group_menu_role

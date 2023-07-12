@@ -145,10 +145,10 @@
         {field: "sys_menu", headerName: "유저", width: 100, cellClass: 'hd-grid-code'},
         {field: "regi_date", headerName: "등록일시", type:'DateTimeType'},
         {field: "ut", headerName: "수정일시", type:'DateTimeType'},
-        {field: "is_del", headerName: "삭제여부", width: 100, cellClass: 'hd-grid-code'},
-        {
-            width: 'auto'
-        }
+        {field: "is_del", headerName: "삭제여부", width: 100, cellClass: 'hd-grid-code',
+            cellRenderer: (params) => params.value < 1 ? 'N' : 'Y',
+        },
+        {width: 0}
     ];
 </script>
 
