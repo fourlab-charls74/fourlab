@@ -18,7 +18,8 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                        <a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
+						<a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
+						<a href="#" onclick="Add('batch_add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2" hidden><i class="bx bx-plus fs-16"></i> 가격변경 일괄등록</a>
                         <!-- <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a> -->
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
@@ -87,7 +88,8 @@
 											<option value="prd_cd">바코드</option>
 											<option value="idx">가격정보 코드</option>
 											<option value="change_date">변경일자</option>
-											<option value="rt" selected>등록일</option>
+											<option value="rt">등록일</option>
+											<option value="ut" selected>수정일</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -105,10 +107,12 @@
 				</div>
 			</div>
 			<div class="resul_btn_wrap mb-3">
-			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+				<a href="#" onclick="Add('add');" class="btn btn-sm btn-primary"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
+				<a href="#" onclick="Add('batch_add');" class="btn btn-sm btn-secondary" hidden><i class="bx bx-plus fs-16"></i> 가격변경 일괄등록</a>
+			</div>
 		</div>
-	</div>
-</form>
+	</form>
+	
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
     <div class="card-body shadow">
         <div class="card-title mb-3">
@@ -159,18 +163,23 @@
 					return Comma(params.data.goods_sh) + '원';
 				}
 			},
-            {field: "price", headerName: "현재가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+            {field: "org_price", headerName: "변경전가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
 				cellRenderer:function(params) {
-					return Comma(params.data.price) + '원';
+					return Comma(params.data.org_price) + '원';
 				}
 			},
             {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
 				cellRenderer:function(params) {
 					if (params.data.change_kind == 'P'){
-						return params.data.change_val + '%'
+						return '(' + params.data.price_kind + ')' +  params.data.change_val + '%'
 					} else {
-						return Comma(params.data.change_val) + '원'
+						return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
 					}
+				}
+			},
+			{field: "change_price", headerName: "변경후가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+				cellRenderer:function(params) {
+					return Comma(params.data.change_price) + '원';
 				}
 			},
 			{field: "plan_category", headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},
@@ -234,14 +243,17 @@
         gx.Request('/store/product/prd05/search', data,1);
     }
 
-    function Add (cmd) {
+    function Add(cmd) {
 		if (cmd == 'add') {
 			const url = '/store/product/prd05/show/';
+			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+		}else if (cmd == 'batch_add') {
+			const url = '/store/product/prd05/batch-import/';
 			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
 		}
     };
 
-	function cmd (code) {
+	function cmd(code) {
 		const url = '/store/product/prd05/show/' + code;
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
     };

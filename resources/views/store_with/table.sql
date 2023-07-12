@@ -1143,32 +1143,40 @@ CREATE TABLE `bizest_stock_data` (
 
 -- 상품가격 변경 마스터
 CREATE TABLE `product_price` (
-  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
-  `change_date` varchar(30) NOT NULL COMMENT '변경날짜',
-  `change_kind` char(1) NOT NULL COMMENT '변경종류 (퍼센트 : P , 원 : W)',
-  `change_val` int(11) NOT NULL COMMENT '변경금액(율)',
-  `apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '가격적용유무 (Y/N)',
-  `change_cnt` int(11) NOT NULL COMMENT '적용상품수',
-  `change_type` char(1) NOT NULL DEFAULT 'R' COMMENT '가격변경 타입 (예약 : R , 즉시 : A)',
-  `plan_category` char(2) NOT NULL DEFAULT '' COMMENT '상품운영구분 (01 : 정상매장, 02 : 전매장, 03 : 이월취급점, 04 : 아울렛전용 )',
-  `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
-  `rt` datetime NOT NULL COMMENT '등록일자',
-  `ut` datetime DEFAULT NULL COMMENT '수정일자',
-  PRIMARY KEY (`idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+	 `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	 `change_date` varchar(30) NOT NULL COMMENT '(사용안함)변경날짜',
+	 `price_kind` char(1) NOT NULL COMMENT '(사용안함)기준가격 (정상가 : T , 현재가 : P)',
+	 `change_kind` char(1) NOT NULL COMMENT '(사용안함)변경종류 (퍼센트 : P , 원 : W)',
+	 `change_val` int(11) NOT NULL COMMENT '(사용안함)변경금액(율)',
+	 `apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '(사용안함)가격적용유무 (Y/N)',
+	 `change_cnt` int(11) NOT NULL COMMENT '적용상품수',
+	 `change_type` char(1) NOT NULL DEFAULT 'R' COMMENT '(사용안함)가격변경 타입 (예약 : R , 즉시 : A)',
+	 `apply_kind` char(1) NOT NULL DEFAULT 'N' COMMENT '적용종류 (일반:N, 일괄:B)',
+	 `plan_category` char(2) DEFAULT NULL COMMENT '상품운영구분 (01 : 정상매장, 02 : 전매장, 03 : 이월취급점, 04 : 아울렛전용 )',
+	 `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
+	 `rt` datetime NOT NULL COMMENT '등록일자',
+	 `ut` datetime DEFAULT NULL COMMENT '수정일자',
+	 PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 상품가격 변경 리스트
 CREATE TABLE `product_price_list` (
-  `idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
-  `product_price_cd` int(11) NOT NULL COMMENT '상품가격코드 (참조 : product_price -> idx)',
-  `prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
-  `org_price` int(11) NOT NULL COMMENT '기존가격',
-  `change_price` int(11) NOT NULL COMMENT '변경가격',
-  `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
-  `rt` datetime NOT NULL COMMENT '등록일자',
-  `ut` datetime NOT NULL COMMENT '수정일자',
-  PRIMARY KEY (`idx`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`change_date` varchar(30) NOT NULL COMMENT '변경일자',
+	`price_kind` char(1) NOT NULL COMMENT '기준가격 (정상가 : T , 현재가 : P)',
+	`change_kind` char(1) NOT NULL COMMENT '변경종류 (퍼센트 : P , 원 : W)',
+	`change_val` int(11) NOT NULL COMMENT '변경금액(율)',
+	`apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '가격적용유무 (Y/N)',
+	`change_type` char(1) NOT NULL DEFAULT 'R' COMMENT '가격변경 타입 (예약 : R , 즉시 : A)',
+	`product_price_cd` int(11) NOT NULL COMMENT '상품가격코드 (참조 : product_price -> idx)',
+	`prd_cd` varchar(50) NOT NULL COMMENT '상품코드',
+	`org_price` int(11) NOT NULL COMMENT '기존가격',
+	`change_price` int(11) NOT NULL COMMENT '변경가격',
+	`admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
+	`rt` datetime NOT NULL COMMENT '등록일자',
+	`ut` datetime NOT NULL COMMENT '수정일자',
+	PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 검색어 바로가기
 CREATE TABLE `search_shortcut` (

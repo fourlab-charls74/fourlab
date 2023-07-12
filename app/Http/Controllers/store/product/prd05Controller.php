@@ -27,7 +27,7 @@ class prd05Controller extends Controller
 
 		$values = [
 			'sdate'         => $sdate,
-			'edate'         => date("Y-m-d"),
+			'edate'         => date("Y-m-d", strtotime('3 day')),
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd05',$values);
@@ -107,11 +107,12 @@ class prd05Controller extends Controller
 		}
 	
         $values = [
-			'code'			=> $code,
-			'res'			=> $res,
-			'cmd'           => $cmd,
-			'sdate'         => $sdate,
-			'edate'         => date("Y-m-d"),
+			'code'	=> $code,
+			'res'	=> $res,
+			'cmd'	=> $cmd,
+			'sdate'	=> $sdate,
+			'edate'	=> date("Y-m-d"),
+			'rdate'	=> date("Y-m-d", strtotime('1 day'))
 		];
 
         return view( Config::get('shop.store.view') . '/product/prd05_show',$values);
@@ -181,10 +182,10 @@ class prd05Controller extends Controller
 
 		$where = "";
 		if( $prd_cd != "" ) $where .= " and pc.prd_cd like '$prd_cd%'";
-		if($nud == 'Y') $where .= " and ( pp.change_date >= '$sdate' and pp.change_date < date_add('$edate',interval 1 day)) ";
+		if($nud == 'Y') $where .= " and ( ppl.change_date >= '$sdate' and ppl.change_date < date_add('$edate',interval 1 day)) ";
 
 		// ordreby
-        $ord_field  = $request->input("ord_field", "pp.change_date");
+        $ord_field  = $request->input("ord_field", "ppl.change_date");
         $ord        = $request->input("ord", "desc");
         $orderby    = sprintf("order by %s %s", $ord_field, $ord);
         
@@ -194,19 +195,25 @@ class prd05Controller extends Controller
         if ($page < 1 or $page == "") $page = 1;
         $startno    = ($page - 1) * $page_size;
         $limit      = " limit $startno, $page_size ";
-
+		
 		$sql = "
 			select
-				pp.idx
-				, pp.change_date
-				, pp.change_kind
-				, pp.change_val
-				, pp.apply_yn
+				ppl.idx
+				, ppl.change_date
+			    , 
+			    case
+			        when ppl.price_kind = 'T' then '정상가'
+			        when ppl.price_kind = 'P' then '현재가'
+			    end as price_kind
+				, ppl.change_kind
+				, ppl.change_val
+				, ppl.apply_yn
 				, pp.change_cnt
-				, pp.change_type
+				, ppl.change_type
+			    , ppl.org_price
 			    , ppl.change_price
-				, pp.rt
-				, pp.ut
+				, ppl.rt
+				, ppl.ut
 				, pc.prd_cd
 			    , 
 			    case
@@ -217,7 +224,7 @@ class prd05Controller extends Controller
 			    end as plan_category
 				, opt.opt_kind_nm as opt_kind_nm
 				, ifnull(pc.goods_no,0) as goods_no
-				, pc.style_no
+				, g.style_no
 				, b.brand_nm as brand
 				, g.goods_nm
 				, g.goods_nm_eng
@@ -389,14 +396,8 @@ class prd05Controller extends Controller
 
 				$product_price_cd = DB::table('product_price')
 					->insertGetId([
-						'change_date'	=> $change_date,
-						'change_kind'	=> $change_kind,
-						'change_val'	=> $change_price,
-						'price_kind'	=> $price_kind,
-						'apply_yn'		=> $apply_yn,
 						'change_cnt'	=> $change_cnt,
-						'change_type'	=> $change_type,
-						'plan_category'	=> $plan_category,
+						'apply_kind'	=> 'N',
 						'admin_id'		=> $admin_id,
 						'rt' => now(),
 						'ut' => now()
@@ -405,9 +406,16 @@ class prd05Controller extends Controller
 				foreach ($data as $d) {
 					DB::table('product_price_list')
 						->insert([
+							'change_date'		=> $change_date,
+							'change_kind'		=> $change_kind,
+							'change_val'		=> $change_price,
+							'price_kind'		=> $price_kind,
+							'apply_yn'			=> $apply_yn,
+							'change_type'		=> $change_type,
+							'plan_category'		=> $plan_category,
 							'product_price_cd'	=> $product_price_cd,
 							'prd_cd'			=> $d['prd_cd'],
-							'org_price'			=> $d['goods_sh'],
+							'org_price'			=> $d['price'],
 							'change_price'		=> $d['change_val'],
 							'admin_id'			=> $admin_id,
 							'rt' => now(),
@@ -625,12 +633,8 @@ class prd05Controller extends Controller
 		try {
             DB::beginTransaction();
 			foreach ($data as $d) {
-				DB::table('product_price')
-					->where('idx', '=', $d['idx'])
-					->delete();
-
 				DB::table('product_price_list')
-					->where('product_price_cd', '=' , $d['idx'])
+					->where('idx', '=' , $d['idx'])
 					->delete();
 			}
 				
@@ -682,7 +686,20 @@ class prd05Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
 
+	}
 
+	public function import_excel(Request $request) {
+
+		$mutable	= now();
+		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
+		$res = '';
+
+		$values = [
+			'sdate'         => $sdate,
+			'edate'         => date("Y-m-d"),
+		];
+
+		return view( Config::get('shop.store.view') . '/product/prd05_batch_show',$values);
 	}
 
 	

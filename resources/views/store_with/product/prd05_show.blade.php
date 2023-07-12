@@ -83,7 +83,7 @@
                                                 <div class="form-inline" id="sel_date">
                                                     <div class="docs-datepicker form-inline-inner input_box w-100">
                                                         <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date_res" id="change_date_res" value="@if($cmd == 'update') {{$res->change_date}} @else {{$edate}} @endif" autocomplete="off">
+                                                            <input type="text" class="form-control form-control-sm docs-date" name="change_date_res" id="change_date_res" value="@if($cmd == 'update') {{$res->change_date}} @else {{$rdate}} @endif" autocomplete="off">
                                                             <div class="input-group-append">
                                                                 <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                                                     <i class="fa fa-calendar" aria-hidden="true"></i>
