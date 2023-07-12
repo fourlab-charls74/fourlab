@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '상품매칭 ')
+@section('title', '상품맵핑 ')
 @section('content')
 
 
@@ -7,12 +7,12 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">상품매칭</h3>
+			<h3 class="d-inline-flex">상품맵핑</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
 				<span>/ 상품코드관리</span>
-				<span>/ 상품매칭</span>
+				<span>/ 상품맵핑</span>
 			</div>
 		</div>
 		<div class="d-flex">
@@ -35,10 +35,10 @@
                 <div class="card-header mb-0">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tab-nav-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="send" aria-selected="false">코드 생성 및 매칭</button>
+                            <button class="nav-link" id="tab-nav-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="send" aria-selected="false">코드 생성 및 맵핑</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tab-nav-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="list" aria-selected="false">매칭</button>
+                            <button class="nav-link" id="tab-nav-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="list" aria-selected="false">맵핑</button>
                         </li>
                        
                     </ul>
@@ -190,7 +190,7 @@
 												<table class="table incont table-bordered" width="100%" cellspacing="0">
 													<tbody>
 														<tr>
-															<th class="required" style="text-align:center;vertical-align:middle;">바코드(매칭 X)</th>
+															<th class="required" style="text-align:center;vertical-align:middle;">바코드(맵핑 X)</th>
 															<td>
 																<div class="flex_box">
 																	<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">

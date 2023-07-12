@@ -1,5 +1,5 @@
 @extends('head_with.layouts.layout-nav')
-@section('title','바코드 일괄 매칭')
+@section('title','바코드 일괄 맵핑')
 @section('content')
 
 <script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
@@ -7,7 +7,7 @@
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
-			<h3 class="d-inline-flex">바코드 일괄 매칭</h3>
+			<h3 class="d-inline-flex">바코드 일괄 맵핑</h3>
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
@@ -49,7 +49,7 @@
 												</div>
 											</td>
 											<th>샘플파일</th>
-											<td style="width:35%;"><a href="/data/head/sample/상품매칭_샘플.xlsx"> 상품매칭_샘플.xlsx</a></td>
+											<td style="width:35%;"><a href="/data/head/sample/상품맵핑_샘플.xlsx"> 상품맵핑_샘플.xlsx</a></td>
 										</tr>
 									</tbody>
 								</table>
@@ -64,7 +64,7 @@
 					</div>
 					<ul class="mb-0">
 						<li>- 해당 온라인코드의 재고가 초기화 됩니다.</li>
-						<li>- 해당 온라인코드에 이미 매칭된 바코드가 있다면 삭제됩니다.</li>
+						<li>- 해당 온라인코드에 이미 맵핑된 바코드가 있다면 삭제됩니다.</li>
 					</ul>
 				</div>
 
@@ -161,7 +161,7 @@
 			},
 			success: function (data) {
 				if( data.code == "200" ){
-					alert("상품 매칭 데이터가 등록되었습니다.");
+					alert("상품 맵핑 데이터가 등록되었습니다.");
 					window.opener.Search();
 					self.close();
 				}else{

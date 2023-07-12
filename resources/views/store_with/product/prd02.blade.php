@@ -59,8 +59,8 @@
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 						<a href="#" onclick="AddProduct_upload();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록</a>
 						<a href="#" onclick="AddProduct_upload_new();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 바코드 등록(NEW)</a>
-						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 매칭</a>
-						<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄매칭</a>
+						<a href="#" onclick="AddProduct();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 상품 맵핑</a>
+						<a href="#" onclick="AddProducts();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx fs-16"></i> 상품일괄맵핑</a>
 						<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 						<!-- <a href="#" onclick="initSearchInputs()" class="btn btn-sm btn-outline-primary">검색조건 초기화</a> -->
 						<a href="#" class="export-excel btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
