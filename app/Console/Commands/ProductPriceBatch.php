@@ -91,8 +91,6 @@ class ProductPriceBatch extends Command
 
 			}
 
-			echo $chk_date;
-
 			DB::commit();
 			$code = 0;
 			
