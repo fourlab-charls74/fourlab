@@ -584,6 +584,7 @@ footer a:active{color:#fff !important;}
 @media (max-width: 991px) {
     header .top_inner_box span.shop-title {font-size: 14px;margin-bottom: 0px;}
     header .top_inner_box span.shop-title2 {font-size: 14px;margin-bottom: 0px;}
+	header .top_inner_box .top_link_btn li > a.menu {display: none;}
 
     /* 검색 레이아웃 */
     .inner-td{margin-top:10px;}

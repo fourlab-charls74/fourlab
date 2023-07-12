@@ -56,6 +56,24 @@ class LoginController extends Controller
                         'visit_date' => DB::raw('now()')
                     ]);
 
+				$menu = [];
+				$kind['head']  = SLib::getLnbs('head');
+				foreach($kind as $key => $kind_val) {
+					foreach($kind_val as $menu_val) {
+						$arr_menu = (array)$menu_val;
+						if(isset($menu[$key][$arr_menu['entry']])) {
+							$menu[$key][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
+						} else {
+							if($arr_menu['main_no']) {
+								$menu[$key][$arr_menu['main_no']]['sub'][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
+							} else {
+								$menu[$key][$arr_menu['menu_no']] = $arr_menu;
+							}
+						}
+					}
+					Cache::forever($key.'_gnb', $menu[$key]);
+				}
+
                 //return redirect('/head/order/ord01');
                 return redirect('/head/dashboard');
             } else {
