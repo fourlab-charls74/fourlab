@@ -203,6 +203,7 @@
         {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
         {field: "price", headerName: "현재가", type: "currencyType", width: 65},
         {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 80 @if ($cmd == 'update' && $res->apply_yn == 'N') ,editable:true, cellStyle: {'background' : '#ffff99'} @elseif($cmd == 'add') ,editable:true, cellStyle: {'background' : '#ffff99'} @endif},
+		{width : 'auto'}
     ];
 </script>
 
@@ -403,16 +404,21 @@
     }
 
     function Save() {
-        let change_date_res = $('#change_date_res').val();
-        let change_date_now = document.getElementById('change_date_now').innerText;
-        let change_price = parseInt($('#change_price').val());
-        let change_kind = $('#change_kind').val();
-        let type = $("input[name='product_price_type']:checked").val();
-        let rows = gx.getSelectedRows();
-        let change_cnt = rows.length;
-        let price_kind = $('#price_kind').val();
+		let change_date_res	= $('#change_date_res').val();
+		let change_date_now	= document.getElementById('change_date_now').innerText;
+		let change_price	= parseInt($('#change_price').val());
+		let change_kind		= $('#change_kind').val();
+		let type			= $("input[name='product_price_type']:checked").val();
+		let rows			= gx.getSelectedRows();
+		let change_cnt		= rows.length;
+		let price_kind		= $('#price_kind').val();
+		let plan_category	= $('#plan_category').val();
 
-        if(rows.length < 1) return alert('저장할 상품을 선택해주세요.');
+        if(rows.length < 1)		return alert('저장할 상품을 선택해주세요.');
+
+		if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
+		if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
+		if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
 
         if(!confirm("선택한 상품의 변경금액(율)을 저장하시겠습니까?")) return;
 
@@ -427,7 +433,8 @@
                 change_price : change_price,
                 change_cnt : change_cnt,
                 type : type,
-                price_kind : price_kind
+                price_kind : price_kind,
+				plan_category : plan_category
                 
             },
         }).then(function (res) {
@@ -444,13 +451,14 @@
         });
     }
 
+	// 수정 사용하지 않음
     function Update() {
-        let change_date = $('#change_date').val();
-        let change_price = parseInt($('#change_price').val());
-        let change_kind = $('#change_kind').val();
-        let product_price_cd = '{{@$code}}';
-        let rows = gx.getRows();
-        let change_cnt = rows.length;
+		let change_date			= $('#change_date').val();
+		let change_price		= parseInt($('#change_price').val());
+		let change_kind			= $('#change_kind').val();
+		let product_price_cd	= '{{@$code}}';
+		let rows				= gx.getRows();
+		let change_cnt			= rows.length;
 
         for(let i = 0; i < rows.length;i++) {
             if(rows[i].change_val == 0){
@@ -512,7 +520,11 @@
             gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
         }
         gx.gridOptions.api.applyTransaction({ add : change_return_price });
-        gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
+        gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
+
+		$('#price_kind').val('tag_price').prop("selected", true);
+		$('#change_kind').val('P').prop("selected", true);
+		$('#change_price').val('0');
     }
 
 </script>

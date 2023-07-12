@@ -45,7 +45,7 @@ class ProductPriceBatch extends Command
 			DB::beginTransaction();
 			
 			$sql	= "
-				select idx from product_price pp
+				select idx, plan_category from product_price pp
 				where
 					pp.change_type = 'R'
 					and pp.apply_yn = 'N'
@@ -54,6 +54,7 @@ class ProductPriceBatch extends Command
 			$rows = DB::select($sql,['change_date' => $chk_date]);
 			foreach ($rows as $row) {
 				$product_price_cd	= $row->idx;
+				$plan_category		= $row->plan_category;
 				
 				$sql_list = "
 					select
@@ -80,6 +81,12 @@ class ProductPriceBatch extends Command
 						DB::table('product')
 							->where('prd_cd', '=', $prd_cd)
 							->update(['price'=> $change_price]);
+
+						if($plan_category != '00'){
+							DB::table('product_code')
+								->where('prd_cd', '=', $prd_cd)
+								->update(['plan_category' => $plan_category]);
+						}
 					}
 
 				}

@@ -1149,7 +1149,8 @@ CREATE TABLE `product_price` (
   `change_val` int(11) NOT NULL COMMENT '변경금액(율)',
   `apply_yn` char(1) NOT NULL DEFAULT 'N' COMMENT '가격적용유무 (Y/N)',
   `change_cnt` int(11) NOT NULL COMMENT '적용상품수',
-  `change_type` char(1) NOT NULL DEFAULT 'R' COMMENT '가격변경 타입 (예약 : R , 즉시 : A)'
+  `change_type` char(1) NOT NULL DEFAULT 'R' COMMENT '가격변경 타입 (예약 : R , 즉시 : A)',
+  `plan_category` char(2) NOT NULL DEFAULT '' COMMENT '상품운영구분 (01 : 정상매장, 02 : 전매장, 03 : 이월취급점, 04 : 아울렛전용 )',
   `admin_id` varchar(50) NOT NULL COMMENT '관리자아이디',
   `rt` datetime NOT NULL COMMENT '등록일자',
   `ut` datetime DEFAULT NULL COMMENT '수정일자',

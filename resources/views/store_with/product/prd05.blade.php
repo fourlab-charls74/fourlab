@@ -86,8 +86,8 @@
 										<select name="ord_field" class="form-control form-control-sm">
 											<option value="prd_cd">바코드</option>
 											<option value="idx">가격정보 코드</option>
-											<option value="change_date" selected>변경일자</option>
-											<option value="rt">등록일</option>
+											<option value="change_date">변경일자</option>
+											<option value="rt" selected>등록일</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -171,11 +171,6 @@
 					} else {
 						return Comma(params.data.change_val) + '원'
 					}
-				}
-			},
-			{field: "change_price", headerName: "변경가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
-				cellRenderer:function(params) {
-					return Comma(params.data.change_price) + '원';
 				}
 			},
 			{field: "plan_category", headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},

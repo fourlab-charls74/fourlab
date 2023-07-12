@@ -350,22 +350,22 @@ class prd05Controller extends Controller
 
 	
 	//상품가격변경
-	public function change_price (Request $request) {
+	public function change_price(Request $request) {
 
-		$data = $request->input('data');
-		$change_date_res = $request->input('change_date_res');
-		$change_date_now = $request->input('change_date_now');
-		$change_kind = $request->input('change_kind');
-		$change_price = $request->input('change_price');
-		$change_cnt = $request->input('change_cnt');
-		$type = $request->input('type');
-		$admin_id = Auth('head')->user()->id;
-		$del_product = $request->input('del_product', []);
-		$price_kind = $request->input('price_kind');
+		$data				= $request->input('data');
+		$change_date_res	= $request->input('change_date_res');
+		$change_date_now	= $request->input('change_date_now');
+		$change_kind		= $request->input('change_kind');
+		$change_price		= $request->input('change_price');
+		$change_cnt			= $request->input('change_cnt');
+		$type				= $request->input('type');
+		$admin_id			= Auth('head')->user()->id;
+		$price_kind			= $request->input('price_kind');
+		$plan_category		= $request->input('plan_category');
 
-		$change_date = '';
-		$change_type = '';
-		$apply_yn = '';
+		$change_date	= '';
+		$change_type	= '';
+		$apply_yn		= '';
 
 
 		if ($type == 'reservation') {
@@ -389,14 +389,15 @@ class prd05Controller extends Controller
 
 				$product_price_cd = DB::table('product_price')
 					->insertGetId([
-						'change_date' => $change_date,
-						'change_kind' => $change_kind,
-						'change_val' => $change_price,
-						'price_kind' => $price_kind,
-						'apply_yn' => $apply_yn,
-						'change_cnt' => $change_cnt,
-						'change_type' => $change_type,
-						'admin_id' => $admin_id,
+						'change_date'	=> $change_date,
+						'change_kind'	=> $change_kind,
+						'change_val'	=> $change_price,
+						'price_kind'	=> $price_kind,
+						'apply_yn'		=> $apply_yn,
+						'change_cnt'	=> $change_cnt,
+						'change_type'	=> $change_type,
+						'plan_category'	=> $plan_category,
+						'admin_id'		=> $admin_id,
 						'rt' => now(),
 						'ut' => now()
 					]);
@@ -404,11 +405,11 @@ class prd05Controller extends Controller
 				foreach ($data as $d) {
 					DB::table('product_price_list')
 						->insert([
-							'product_price_cd' => $product_price_cd,
-							'prd_cd' => $d['prd_cd'],
-							'org_price' => $d['goods_sh'],
-							'change_price' => $d['change_val'],
-							'admin_id' => $admin_id,
+							'product_price_cd'	=> $product_price_cd,
+							'prd_cd'			=> $d['prd_cd'],
+							'org_price'			=> $d['goods_sh'],
+							'change_price'		=> $d['change_val'],
+							'admin_id'			=> $admin_id,
 							'rt' => now(),
 							'ut' => now()
 						]);
@@ -423,6 +424,12 @@ class prd05Controller extends Controller
 						DB::table('product')
 						->where('prd_cd', '=', $d['prd_cd'])
 						->update(['price'=> $d['change_val']]);
+
+						if($plan_category != '00'){
+							DB::table('product_code')
+								->where('prd_cd', '=', $d['prd_cd'])
+								->update(['plan_category' => $plan_category]);
+						}
 					}
 				}
 				
