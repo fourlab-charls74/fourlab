@@ -19,7 +19,7 @@ class ProductPriceBatch extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'update product price';
 
     /**
      * Create a new command instance.
@@ -98,6 +98,8 @@ class ProductPriceBatch extends Command
 			DB::rollback();
 			$code = $e->getMessage();
 		}
+		
+		echo "test";
 		
         return $code;
     }
