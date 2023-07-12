@@ -18,7 +18,7 @@ use PDO;
 class prd02Controller extends Controller
 {
 
-	public function index() 
+	public function index(Request $request) 
 	{
 		$mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
@@ -31,6 +31,8 @@ class prd02Controller extends Controller
 		$conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
 
+		$goods_no = $request->query('goods_no')??'';
+
 		$values = [
 			'sdate'         => $sdate,
 			'edate'         => date("Y-m-d"),
@@ -39,6 +41,7 @@ class prd02Controller extends Controller
 			'code_kinds'	=> $code_kinds,
 			'domain'		=> $domain,
 			'style_no'		=> "",
+			'goods_no'		=> $goods_no??'',
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
 			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
 			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분

@@ -3605,4 +3605,92 @@ class prd01Controller extends Controller
 	}
 
 
+	// 바코드 맵핑 정보 검색
+	public function get_barcode_mapping(Request $request, $goods_no)
+	{
+		if( $goods_no != "" ){
+			$sql = "
+				select
+					gs.goods_no
+					, g.style_no
+					, g.goods_nm
+					, gs.goods_opt
+					, pc.prd_cd
+					, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd1
+					, pc.color
+					, pc.size, if(ifnull(pc.prd_cd,'') = '', '', 'Y') as match_yn
+					, if(ifnull(pc.prd_cd,'') = '', '', '삭제') as del
+				from goods_summary gs
+					inner join goods g on gs.goods_no = g.goods_no and g.goods_sub = 0
+					left outer join product_code pc on pc.goods_no = gs.goods_no and pc.goods_opt = gs.goods_opt
+				where
+					gs.goods_no = :goods_no
+				order by pc.prd_cd
+			
+			";
+		}
+
+		$rows = DB::select($sql, ['goods_no' => $goods_no]);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($rows),
+            ),
+            "body" => $rows
+        ]);
+	}
+
+	// 바코드 맵핑 정보 맵핑 삭제
+	public function del_mapping(Request $request)
+	{
+		$prd_cd	= $request->input('prd_cd');
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('product_code')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::table('product')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'match_yn' => 'N'
+				]);
+			
+			DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::table('product_stock_store')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::table('product_stock_storage')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);	
+
+			DB::commit();
+			$code = 200;
+			$msg = "맵핑 삭제가 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+
 }

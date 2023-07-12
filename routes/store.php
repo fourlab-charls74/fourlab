@@ -246,6 +246,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd01/create', 'prd01Controller@create');
         Route::post('prd01/cleanup-trash', 'prd01Controller@cleanup_trash');
 
+        //바코드 맵핑 정보
+        Route::get("prd01/{no}/get-barcode-mapping", "prd01Controller@get_barcode_mapping");
+        Route::put('prd01/del-mapping', 'prd01Controller@del_mapping');
+
         // 상품관리 - 일괄수정
         Route::match(['get', 'post'], 'prd01/edit', 'prd01Controller@edit_index');
         Route::post('prd01/edit/search', 'prd01Controller@edit_search');

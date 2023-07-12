@@ -872,6 +872,28 @@
                         </div>
                     </div>
                 </div>
+                @if ($type !== 'create')
+                    <div class="card">
+                        <div class="card-header mb-0">
+                            <a href="#">바코드 맵핑 정보</a>
+                        </div>
+                        <div class="card-body pt-2">
+                            <div class="card-title">
+                                <div class="filter_wrap">
+                                    <div class="fl_box px-0 mx-0">
+                                        <h6 class="m-0 font-weight-bold">총 : <span id="barcode-mapping-info-total" class="text-primary">0</span> 건</h6>
+                                    </div>
+                                    <div class="fr_box">
+                                        <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="barcodeMappingGoodsNo()"><span class="fs-12">맵핑 등록</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <div id="barcode-mapping-info" style="height:300px;width:100%;" class="ag-theme-balham"></div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header mb-0">
                         <a href="#">상품 옵션 관리</a>
@@ -3458,9 +3480,12 @@
     */
 
     let gx3;
+    let gx4;
+
 
     $(document).ready(function() {
         if (type !== 'create') SetSimilarTable();
+        if (type == '') barcodeMapping();
 
         $(".similar-add-btn").on("click", function(e) {
             e.preventDefault();
@@ -3471,6 +3496,10 @@
             e.preventDefault();
             DeleteSimilarGoods();
         })
+
+         
+
+
     });
 
     function SetSimilarTable() {
@@ -3494,9 +3523,77 @@
         SearchSimilarGoods();
     }
 
+    function barcodeMapping() {
+        const barcode_mapping_columns = [
+            {field:"prd_cd",	headerName: "바코드",	    width:120},
+            {field:"goods_no",	headerName: "온라인코드",	width:72, cellStyle:{'text-align':'center'}},
+            {field:"style_no",	headerName: "스타일넘버",	width:72, cellStyle:{'text-align':'center'}},
+            {field:"goods_nm",	headerName: "상품명",		width:250},
+            {field:"goods_opt",	headerName: "상품옵션",		width:200},
+            {field:"prd_cd1",	headerName: "품번",		    width:120},
+            {field:"color",		headerName: "컬러",			width:72, cellStyle:{'text-align':'center'}},
+            {field:"size",		headerName: "사이즈",		width:72, cellStyle:{'text-align':'center'}},
+            {field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
+            {field:"del",       headerName: "맵핑삭제",  		width:60, cellStyle:{'text-align':'center'},
+                cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        if( params.value != ''){
+                            return '<a href="#" onclick="return delMapping(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        }
+                    }
+                }
+		    },
+            {field: "", headerName:"", width:"auto"},
+        ];
+        
+        const pApp4 = new App('', { gridId:"#barcode-mapping-info" });
+        gridDiv = document.querySelector(pApp4.options.gridId);
+        options = {};
+        gx4 = new HDGrid(gridDiv, barcode_mapping_columns, options);
+
+        SearchBarcodeMapping();
+
+    }
+
+    // 바코드 맵핑 정보 삭제
+    function delMapping(prd_cd) {
+
+        if(!confirm("바코드 맵핑 정보를 삭제하시겠습니까?")) return ;
+
+        axios({
+			url: `/store/product/prd01/del-mapping`,
+			method: 'put',
+			data: {
+				prd_cd : prd_cd,
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+                SearchBarcodeMapping();
+			} else {
+				console.log(res.data);
+				alert("바코드 맵핑 정보 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+    }
+
+    //바코드 맵핑 등록
+    function barcodeMappingGoodsNo() {
+		const url=`/store/product/prd02?goods_no=${goods_no}`;
+        window.open(url,"_blank");
+    }
+
+
     function SearchSimilarGoods() {
         const data = `goods_sub=${goods_sub}`;
         gx3.Request(`/store/product/prd01/${goods_no}/get-similar-goods`, data, -1);
+    }
+
+    function SearchBarcodeMapping() {
+        const data = `goods_sub=${goods_sub}`;
+        gx4.Request(`/store/product/prd01/${goods_no}/get-barcode-mapping`, data, -1);
     }
 
     function ChoiceGoodsNo(nos, add_goods) {

@@ -94,11 +94,15 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="style_no">스타일넘버</label>
+								<label for="style_no">스타일넘버/온라인코드</label>
 								<div class="form-inline">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type='text' class="form-control form-control-sm ac-style-no w-100 search-enter" name='style_no' id='style_no' value=''>
+									<div class="form-inline-inner input_box">
+										<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="">
+									</div>
+									<span class="text_line">/</span>
+									<div class="form-inline-inner input-box" style="width:47%">
+										<div class="form-inline-inner inline_btn_box">
+											<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
 											<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
@@ -260,7 +264,7 @@
 					}
 				}
 			},
-			// {field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+			{field: "goods_no", headerName: "온라인코드", pinned: 'left',width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 			{field: "style_no", headerName: "스타일넘버", pinned: 'left', cellStyle: {"line-height": "30px", "text-align": "center"}, aggFunc: "first"},
 			{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}",
 				aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
@@ -397,6 +401,8 @@
 
 		async function Search() {
 			await setColumn();
+			let goods_no = '{{@$goods_no}}';
+			$('#goods_no').val(goods_no);
 			let ischeck = $('#ext_storage_qty').is(':checked');
 			let data = $('form[name="search"]').serialize();
 			data += '&ext_storage_qty=' + ischeck;
