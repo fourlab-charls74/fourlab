@@ -17,20 +17,26 @@
 	const gnb_list = Object.keys(gnb_menu_obj || {}).map(a => ({
 		title: gnb_menu_obj[a].kor_nm,
 		icon: gnb_menu_obj[a].icon,
-		sub: Object.keys(gnb_menu_obj[a].sub || {}).length > 0 
-			? Object.keys(gnb_menu_obj[a].sub).map(aa => ({
-					title: gnb_menu_obj[a].sub[aa].kor_nm,
-					url: gnb_menu_obj[a].sub[aa].action,
-					target: gnb_menu_obj[a].sub[aa].target,
-					sub: Object.keys(gnb_menu_obj[a].sub[aa].sub || {}).length > 0 
-						? Object.keys(gnb_menu_obj[a].sub[aa].sub).map(aaa => ({
-								title: gnb_menu_obj[a].sub[aa].sub[aaa].kor_nm,
-								url: gnb_menu_obj[a].sub[aa].sub[aaa].action,
-								target: gnb_menu_obj[a].sub[aa].sub[aaa].target,
-							}))
-						: undefined,
-				}))
-			: undefined,
+		sub: gnb_menu_obj[a].kind === 'P' 
+			? [{
+				title: gnb_menu_obj[a].kor_nm,
+				url: gnb_menu_obj[a].action,
+				target: gnb_menu_obj[a].target,
+			}]
+			: Object.keys(gnb_menu_obj[a].sub || {}).length > 0 
+				? Object.keys(gnb_menu_obj[a].sub).map(aa => ({
+						title: gnb_menu_obj[a].sub[aa].kor_nm,
+						url: gnb_menu_obj[a].sub[aa].action,
+						target: gnb_menu_obj[a].sub[aa].target,
+						sub: Object.keys(gnb_menu_obj[a].sub[aa].sub || {}).length > 0 
+							? Object.keys(gnb_menu_obj[a].sub[aa].sub).map(aaa => ({
+									title: gnb_menu_obj[a].sub[aa].sub[aaa].kor_nm,
+									url: gnb_menu_obj[a].sub[aa].sub[aaa].action,
+									target: gnb_menu_obj[a].sub[aa].sub[aaa].target,
+								}))
+							: undefined,
+					}))
+				: undefined,
 	}));
 	
 	$(document).ready(function () {

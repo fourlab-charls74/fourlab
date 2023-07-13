@@ -61,17 +61,24 @@ class LoginController extends Controller
 				foreach($kind as $key => $kind_val) {
 					foreach($kind_val as $menu_val) {
 						$arr_menu = (array)$menu_val;
-						if(isset($menu[$key][$arr_menu['entry']])) {
-							$menu[$key][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
-						} else {
-							if($arr_menu['main_no']) {
-								$menu[$key][$arr_menu['main_no']]['sub'][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
+						// 매출/통계(82)와 시스템(104) 메뉴는 시스템관리자만 사용 가능합니다.
+						if (!in_array($arr_menu['menu_no'], [82, 104]) || $user->grade === 'S') {
+							if(isset($menu[$key][$arr_menu['entry']])) {
+								$menu[$key][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
 							} else {
-								$menu[$key][$arr_menu['menu_no']] = $arr_menu;
+								if($arr_menu['main_no']) {
+									$menu[$key][$arr_menu['main_no']]['sub'][$arr_menu['entry']]['sub'][$arr_menu['menu_no']] = $arr_menu;
+								} else {
+									$menu[$key][$arr_menu['menu_no']] = $arr_menu;
+								}
 							}
 						}
 					}
+					// GNB 캐싱처리
 					Cache::forever($key.'_gnb', $menu[$key]);
+					// LNB 캐싱처리
+					$html[$key] = view(Config::get('shop.'.$key.'.view') . '/layouts/lnb', ['menu_list' => $menu[$key]])->render();
+					Cache::forever($key.'_lnb', $html[$key]);
 				}
 
                 //return redirect('/head/order/ord01');

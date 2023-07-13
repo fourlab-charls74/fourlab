@@ -18,7 +18,9 @@
     <body class="sidebar-enable">
         <!-- header -->
         @include('head_with.layouts.top')
-        @include('head_with.layouts.lnb')
+        @if(Cache::has('head_lnb'))
+	        {!! Cache::get('head_lnb') !!}
+        @endif
         @include('head_with.layouts.gnb')
         <!-- header -->
         <!-- content -->
