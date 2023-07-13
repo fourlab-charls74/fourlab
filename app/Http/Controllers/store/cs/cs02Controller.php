@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
+use App\Exports\ExcelViewExport;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 use App\Models\Conf;
 
@@ -775,4 +779,129 @@ class cs02Controller extends Controller
             "body" => $result
         ]);
     }
+
+    // 상품반품명세서 출력
+	public function download(Request $request)
+	{
+		$sgr_cd = $request->input('sgr_cd');
+
+		$sql = "
+            select
+                sr.sgr_cd
+                , sr.storage_cd
+                , sr.target_cd
+                , sr.target_type
+                , sr.sgr_date
+                , sr.sgr_type
+                , sr.sgr_state
+                , sr.return_addr
+                , sr.return_reason
+                , srp.prd_cd
+                , g.goods_nm
+                , pc.color
+                , pc.size
+                , srp.price
+                , srp.return_price
+                , srp.return_qty
+                , s.storage_nm
+                , s.addr1
+                , s.addr2
+                , s.phone
+                , s.fax
+            from storage_return sr
+                inner join storage s on s.storage_cd = sr.storage_cd and s.use_yn = 'Y'
+                left outer join storage_return_product srp on srp.sgr_cd = sr.sgr_cd
+                inner join product_code pc on pc.prd_cd = srp.prd_cd
+                inner join goods g on g.goods_no = pc.goods_no
+            where srp.sgr_cd = :sgr_cd
+
+		";
+		$rows = DB::select($sql, [ 'sgr_cd' => $sgr_cd]);
+
+		$data = [
+			'one_sheet_count' => 38,
+			'sgr_cd' => sprintf('%04d', $sgr_cd),
+			'products' => $rows
+		];
+
+		if (count($rows) > 0) {
+			$data['receipt_date']		= date('Y-m-d'); // 접수일자? 출고일자? 논의 후 수정필요
+			$data['rel_type'] 			= $rows[0]->type_nm ?? '';
+			$data['store_nm'] 			= $rows[0]->store_nm ?? '';
+			$data['store_addr'] 		= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);
+			$data['store_phone'] 		= $rows[0]->phone ?? '';
+			$data['store_fax'] 			= $rows[0]->fax ?? '';
+			$data['biz_no'] 			= $rows[0]->biz_no ?? '';
+			$data['biz_ceo'] 			= $rows[0]->biz_ceo ?? '';
+			$data['biz_uptae'] 			= $rows[0]->biz_uptae ?? '';
+			$data['biz_upjong'] 		= $rows[0]->biz_upjong ?? '';
+			$data['storage_addr'] 		= $rows[0]->storage_addr ?? '';
+			$data['storage_manager'] 	= $rows[0]->storage_manager ?? '';
+
+			$conf = new Conf();
+			$company = $conf->getConfig('shop');
+			$data['business_registration_number'] = $company['business_registration_number'];
+			$data['company_name'] = $company['company_name'];
+			$data['company_ceo_name'] = $company['company_ceo_name'];
+			$data['company_address'] = $company['company_address'];
+			
+			/* 하단 정보는 값등록 후 수정이 필요합니다. */
+			$data['company_uptae'] = '도소매';
+			$data['company_upjong'] = '의류,신발,악세서리';
+			$data['company_office_phone'] = '02) 332-0018';
+			$data['company_fax'] = '';
+			$data['company_bank_number'] = '국민은행 / 730637-04-005212 / (주) 알펜인터내셔널';
+			/* 상단 정보는 값등록 후 수정이 필요합니다. */
+		}
+
+		$style = [
+			'A1:AH52' => [
+				'alignment' => [
+					'vertical' => Alignment::VERTICAL_CENTER,
+					'horizontal' => Alignment::HORIZONTAL_CENTER
+				],
+				'font' => [ 'size' => 22, 'name' => '굴림' ]
+			],
+			'A3:AH3' => [
+				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
+				'font' => [ 'size' => 25 ]
+			],
+			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'A4:AH52' => [
+				'borders' => [
+					'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
+					'outline' => [ 'borderStyle' => Border::BORDER_THICK ],
+				],
+			],
+			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AC49:AH52' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_THICK ] ] ],
+			'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'F10:F47' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'W10:AH48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
+			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 70 ] ],
+			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 10 ] ],
+			'V5' => [ 'font' => [ 'size' => 18 ] ],
+			'V6' => [ 'font' => [ 'size' => 18 ] ],
+			'Q5' => [ 'font' => [ 'size' => 16 ] ],
+			'AH5' => [ 'font' => [ 'size' => 16 ] ],
+			'B10:Q47' => [ 'font' => [ 'size' => 18 ] ],
+			'Y10:AH47' => [ 'font' => [ 'size' => 19 ] ],
+			'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
+			'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
+		];
+
+		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
+
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 }

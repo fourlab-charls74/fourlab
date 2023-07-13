@@ -106,6 +106,7 @@ class std09Controller extends Controller
                 , store_channel_cd
             from store_channel
             where use_yn = 'Y' and dep = '1'
+            order by seq
         ";
 
         $channels = DB::select($sql);
@@ -134,6 +135,7 @@ class std09Controller extends Controller
                         , use_yn
                     from store_channel
                     where store_channel_cd = '$code' and dep = 1
+                    order by seq
                 ";
     
                 $edit2  = DB::selectOne($sql);
@@ -147,6 +149,7 @@ class std09Controller extends Controller
                         , use_yn
                     from store_channel
                     where store_kind_cd = '$code' and dep = 2
+                    order by seq
                 ";
     
                 $edit2  = DB::selectOne($sql);

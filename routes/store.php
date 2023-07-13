@@ -450,6 +450,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('cs02/batch','cs02Controller@batch_show'); // 상품반품이동 일괄등록
         Route::post('cs02/batch-import','cs02Controller@import_excel'); // 상품반품이동 엑셀파일 적용
         Route::post('cs02/batch-getgoods','cs02Controller@get_goods'); // 일괄적용 시 상품정보 조회
+        Route::get('cs02/download','cs02Controller@download'); // 명세서출력
 
         // 원부자재입고/반품
         Route::get('cs03', 'cs03Controller@index');

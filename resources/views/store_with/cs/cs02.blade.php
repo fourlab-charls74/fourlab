@@ -230,6 +230,15 @@
         {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 300},
         {field: "return_reason_nm", headerName: "반품사유", width: 200},
+        {field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+			cellRenderer: function(params) {
+				if(params.data.sgr_state >= 10) {
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.sgr_cd})">출력</a>`;
+				} else{
+					return '-';
+				}
+			}
+		},
         {width: "auto"}
 	];
 </script>
@@ -317,5 +326,10 @@
             console.log(err);
         });
     }
+
+    // 상품반품 명세서 출력
+	function printDocument(sgr_cd) {
+		location.href = '/store/cs/cs02/download?sgr_cd=' + sgr_cd;
+	}
 </script>
 @stop
