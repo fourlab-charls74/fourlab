@@ -129,19 +129,29 @@
 	};
 
 	const columns = [
-		{field:"goods_no",	headerName: "온라인코드",		width:72},
+		{field:"prd_cd",	headerName: "바코드",		width:120},
+		{field:"goods_no",	headerName: "온라인코드",	width:72},
 		{field:"style_no",	headerName: "아이템코드",	width:72},
 		{field:"goods_nm",	headerName: "상품명",		width:250},
 		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd1",	headerName: "바코드",		width:120},
-		{field:"color",		headerName: "컬러",			width:72},
-		{field:"size",		headerName: "사이즈",		width:72},
+		{field:"prd_cd_p",	headerName: "품번",			width:90},
+		{field:"color",		headerName: "컬러",			width:72, cellStyle:{'text-align':'center'}},
+		{field:"size",		headerName: "사이즈",		width:72, cellStyle:{'text-align':'center'}},
 		{field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
 		{field:"del",       headerName: "삭제",  		width:60, cellStyle:{'text-align':'center'},
 			cellRenderer: function(params) {
 				if (params.value !== undefined) {
 					if( params.value != ''){
 						return '<a href="#" onclick="return delPrdCd(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+					}
+				}
+			}
+		},
+		{field:"del_mapping",       headerName: "맵핑삭제",  		width:60, cellStyle:{'text-align':'center'},
+			cellRenderer: function(params) {
+				if (params.value !== undefined) {
+					if( params.value != ''){
+						return '<a href="#" onclick="return delMapping(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
 					}
 				}
 			}
@@ -165,13 +175,12 @@
 	let gx;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(470);
+		pApp.ResizeGrid(530);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 
 		let options = {
             getRowStyle: (params) => {
-				console.log(params.data);
                 if (params.data.prd_cd == $("#prd_cd").val()) return CELL_COLOR.THISPRD;
             }
         }
@@ -244,9 +253,34 @@
 				alert(res.data.msg);
 				opener.Search();
 				Search();
+			} else if (res.data.code === 201) {
+				alert("해당 바코드의 재고가 존재합니다. 삭제할 수 없습니다.");
 			} else {
 				console.log(res.data);
 				alert("바코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
+
+	 // 바코드 맵핑 정보 삭제
+	 function delMapping(prd_cd) {
+		if(!confirm("해당상품의 맵핑정보를 삭제하시겠습니까?")) return ;
+
+		axios({
+			url: `/store/product/prd02/del-mapping`,
+			method: 'put',
+			data: {
+				prd_cd : prd_cd,
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				SearchBarcodeMapping();
+			} else {
+				console.log(res.data);
+				alert("바코드 맵핑 정보 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function (err) {
 			console.log(err);

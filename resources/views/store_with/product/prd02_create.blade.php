@@ -239,7 +239,7 @@
 							</div>		
 						</div>	
 					</div>
-				</div>하위품목
+				</div>
 			</div>
 		</form>
 	</div>
@@ -481,7 +481,15 @@
 	}
 
 	$(document).ready(function(){
-        $('#tab-nav-1').trigger("click");  
+		const mapping_yn = "{{ @$mapping }}";
+		const goods_no = "{{ @$goods_no }}"
+
+		if (mapping_yn == 'Y') {
+			$('#tab-nav-2').trigger("click");
+			$('#goods_no2').val(goods_no);
+		} else {
+			$('#tab-nav-1').trigger("click");  
+		}
     }); 
 
 	// 바코드 검색 클릭 이벤트 바인딩 및 콜백 사용

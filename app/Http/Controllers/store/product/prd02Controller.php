@@ -69,7 +69,6 @@ class prd02Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 		$ext_storage_qty = $request->input('ext_storage_qty');
-		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
 
 		$prd_cd		= $request->input("prd_cd", "");
@@ -219,7 +218,6 @@ class prd02Controller extends Controller
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
-		$goods_img_url		= '';
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
@@ -317,8 +315,10 @@ class prd02Controller extends Controller
 		$opt_sql	= " select code_id, code_val from code where code_kind_cd = 'prd_cd_opt' order by code_val asc";
 		$opts	= DB::select($opt_sql);
 
-		
-		
+		//상품정보관리에서 바코드맵핑추가 버튼을 클릭시 넘어오는 정보
+		$mapping = $request->query("mapping","");
+		$goods_no = $request->query("goods_no","");
+
 		$values = [
 			'brands'	=> $brands,
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
@@ -326,6 +326,8 @@ class prd02Controller extends Controller
 			'genders'	=> SLib::getCodes("PRD_CD_GENDER"),
 			'items'		=> $items,
 			'opts'		=> $opts,
+			'mapping'	=> $mapping,
+			'goods_no'	=> $goods_no,
 			
 		];
 
@@ -343,8 +345,6 @@ class prd02Controller extends Controller
 		$goods_sub	= 0;
 		$prd_cd1	= "";
 		$seq		= "01";
-		$prd_yn		= "N";
-		$chk_prd_cd	= "";
 
 		$sql	= "
 			select
@@ -476,7 +476,8 @@ class prd02Controller extends Controller
 
 	}
 
-	public function add_product_code(Request $request){
+	public function add_product_code(Request $request)
+	{
 		$admin_id	= Auth('head')->user()->id;
         $datas		= $request->input("data", []);
         try {
@@ -567,8 +568,8 @@ class prd02Controller extends Controller
 	}
 
 
-	public function add_product_product(Request $request){
-		$admin_id	= Auth('head')->user()->id;
+	public function add_product_product(Request $request)
+	{
         $datas		= $request->input("data", []);
 		$now		= now();
 
@@ -639,7 +640,8 @@ class prd02Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	public function edit_goods_no($product_code, $goods_no, Request $request){
+	public function edit_goods_no($product_code, $goods_no, Request $request)
+	{
 
 		if( $goods_no != "" ){
 			$sql	= "
@@ -667,25 +669,22 @@ class prd02Controller extends Controller
 
 	}
 
-	public function prd_edit_search(Request $request){
-		$prd_cd		= $request->input('prd_cd');
+	public function prd_edit_search(Request $request)
+	{
 		$goods_no	= $request->input('goods_no');
-
-		$prd_cd1	= "";
-		$seq		= "01";
-		$chk_prd_cd	= "";
 
 		$sql	= "
 			select
-				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, c.prd_cd,
-				concat(c.brand, c.year, c.season, c.gender, c.item, c.seq, c.opt) as prd_cd1, c.color, 
-				c.size, if(ifnull(c.prd_cd,'') = '', '', 'Y') as match_yn, if(ifnull(c.prd_cd,'') = '', '', '삭제') as del
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, c.prd_cd
+				, concat(c.brand, c.year, c.season, c.gender, c.item, c.seq, c.opt) as prd_cd_p, c.color
+				, c.size, if(ifnull(c.prd_cd,'') = '', '', 'Y') as match_yn, if(ifnull(c.prd_cd,'') = '', '', '삭제') as del
+				, if(ifnull(c.prd_cd,'') = '', '', '삭제') as del_mapping
 			from goods_summary a
 			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
 			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
 			where
-				a.goods_no = :goods_no
-			order by a.seq
+				a.goods_no = :goods_no and a.use_yn = 'Y'
+			order by c.prd_cd
 		";
 
 		$result = DB::select($sql,['goods_no'	=> $goods_no]);
@@ -700,35 +699,45 @@ class prd02Controller extends Controller
 
 	}
 
-	public function del_product_code(Request $request){
+	public function del_product_code(Request $request)
+	{
 
 		$prd_cd		= $request->input('prd_cd');
-		$goods_no	= $request->input('goods_no');
-
-
-		////
-		//		product_stock 재고 수량이 존재하면 삭제되지 않게 해야함(현재미적용)
-		////
 
 		try {
 			DB::beginTransaction();
 
-			DB::table('product')
-				->where('prd_cd', '=', $prd_cd)
-				->delete();
+			$sql = "
+				select
+					qty
+					, wqty
+				from product_stock
+				where prd_cd = :prd_cd
+			";
+			$product_stock_cnt = DB::selectOne($sql,[ 'prd_cd' => $prd_cd ]);
 
-			DB::table('product_code')
-				->where('prd_cd', '=', $prd_cd)
-				->delete();
+			if ($product_stock_cnt->qty == 0 && $product_stock_cnt->wqty == 0) {
+				DB::table('product')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
 
-			DB::table('product_stock')
-				->where('prd_cd', '=', $prd_cd)
-				->delete();
+				DB::table('product_code')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
 
-			DB::commit();
-			$code = 200;
-			$msg = "바코드 삭제가 완료되었습니다.";
+				DB::table('product_stock')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
 
+				DB::commit();
+				$code = 200;
+				$msg = "바코드 삭제가 완료되었습니다.";
+		
+			} else {
+				$code = 201;
+				$msg = "해당 상품의 재고가 남아있습니다.";
+			}
+			
 		} catch (\Exception $e) {
 			DB::rollback();
 			$code = 500;
@@ -738,7 +747,8 @@ class prd02Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	public function match_goods_no($product_code, Request $request){
+	public function match_goods_no($product_code, Request $request)
+	{
 
 		$sql	= "
 			select
@@ -760,7 +770,8 @@ class prd02Controller extends Controller
 
 	}
 
-	public function prd_edit_match_search(Request $request){
+	public function prd_edit_match_search(Request $request)
+	{
 		$prd_cd		= $request->input('prd_cd');
 		$goods_no	= $request->input('goods_no');
 
@@ -804,11 +815,9 @@ class prd02Controller extends Controller
 
 	}
 
-	public function edit_match_product_code(Request $request){
-
-		$admin_id	= Auth('head')->user()->id;
+	public function edit_match_product_code(Request $request)
+	{
         $datas		= $request->input("data", []);
-		$now		= now();
 
         try {
             DB::beginTransaction();
@@ -1011,7 +1020,7 @@ class prd02Controller extends Controller
 
 		//#####상풍코드용 추가 작업 시작
 		////
-		for( $i = 0; $i < count($datas); $i++ ){
+		for ( $i = 0; $i < count($datas); $i++ ) {
 			$data	= (array)$datas[$i];
 
 			$prd_cd		= $data["xmd_code"];
@@ -1130,7 +1139,8 @@ class prd02Controller extends Controller
 		return view( Config::get('shop.store.view') . '/product/prd02_product_upload',$values);
 	}
 
-	public function save_product(Request $request){
+	public function save_product(Request $request)
+	{
 		$admin_id = Auth('head')->user()->id;
 		$sel_data = $request->input("sel_data");
 
@@ -1271,7 +1281,8 @@ class prd02Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	public function update_product(Request $request){
+	public function update_product(Request $request)
+	{
 		$admin_id = Auth('head')->user()->id;
 		$admin_name = Auth('head')->user()->name;
 
@@ -1326,7 +1337,8 @@ class prd02Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
-	public function getSeq(Request $request) {
+	public function getSeq(Request $request)
+	{
 		$brand = $request->input('brand');
 		$year = $request->input('year');
 		$season = $request->input('season');
@@ -1482,7 +1494,8 @@ class prd02Controller extends Controller
         return view(Config::get('shop.store.view') . '/product/prd02_batch', $values);
     }
 
-	public function import_excel(Request $request) {
+	public function import_excel(Request $request)
+	{
 		if (count($_FILES) > 0) {
 			if ( 0 < $_FILES['file']['error'] ) {
 				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
@@ -1508,7 +1521,8 @@ class prd02Controller extends Controller
 		}
 	}
 
-	public function get_products(Request $request) {
+	public function get_products(Request $request)
+	{
         $data = $request->input('data', []);
         $result = [];
 
@@ -1736,7 +1750,8 @@ class prd02Controller extends Controller
 	***
 	*/
 
-	public function index_slider(Request $request) {
+	public function index_slider(Request $request)
+	{
 
         $where = '';
         foreach(explode(",", $request->goods_nos) as $goods_no) {
@@ -1781,5 +1796,56 @@ class prd02Controller extends Controller
 			'goods_list' => $goods_list,
 		];
 		return view( Config::get('shop.store.view') . '/product/prd02_slider', $values);
+	}
+
+	// 바코드 맵핑 정보 맵핑 삭제
+	public function del_mapping(Request $request)
+	{
+		$prd_cd	= $request->input('prd_cd');
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('product_code')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::table('product')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'match_yn' => 'N'
+				]);
+			
+			DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::table('product_stock_store')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::table('product_stock_storage')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'goods_no' => 0
+				]);
+
+			DB::commit();
+			$code = 200;
+			$msg = "맵핑 삭제가 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+        return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }

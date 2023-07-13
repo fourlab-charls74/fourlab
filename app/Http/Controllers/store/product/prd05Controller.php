@@ -33,17 +33,12 @@ class prd05Controller extends Controller
 		return view( Config::get('shop.store.view') . '/product/prd05',$values);
 	}
 
-    public function show($code = '') {
-
+    public function show($code = '')
+	{
         $mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 		$cmd = 'add';
 		$res = '';
-
-		if($code != '') {
-			
-		}
-
 
 		if($code != '') {
 			$cmd = 'update';
@@ -102,8 +97,6 @@ class prd05Controller extends Controller
 	
 				$res = DB::selectOne($sql);
 			}
-			
-
 		}
 	
         $values = [
@@ -118,13 +111,13 @@ class prd05Controller extends Controller
         return view( Config::get('shop.store.view') . '/product/prd05_show',$values);
     }
 
-	public function view($code = '') {
+	public function view($code = '')
+	{
 
         $mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 		$cmd = 'add';
 		$res = '';
-
 
 		if($code != '') {
 			$cmd = 'update';
@@ -156,7 +149,6 @@ class prd05Controller extends Controller
 			";
 
 			$res = DB::selectOne($sql);
-
 		}
 	
         $values = [
@@ -175,7 +167,6 @@ class prd05Controller extends Controller
 	{
 		$sdate = $request->input('sdate');
 		$edate = $request->input('edate');
-		$change_kind = $request->input('change_kind');
 		$prd_cd = $request->input('prd_cd');
 		$nud = $request->input("s_nud", "N");
 
@@ -266,8 +257,6 @@ class prd05Controller extends Controller
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 	
-		
-
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
@@ -281,8 +270,8 @@ class prd05Controller extends Controller
 	}
 
 	//상품가격변경 예약
-	public function show_search(Request $request) {
-
+	public function show_search(Request $request)
+	{
 		$product_price_cd = $request->input('product_price_cd');
 
 		 // pagination
@@ -357,7 +346,8 @@ class prd05Controller extends Controller
 
 	
 	//상품가격변경
-	public function change_price(Request $request) {
+	public function change_price(Request $request)
+	{
 
 		$data				= $request->input('data');
 		$change_date_res	= $request->input('change_date_res');
@@ -451,12 +441,12 @@ class prd05Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
-
 	}
 
 	//상품가격변경 즉시
 	// 현재 사용하지 않음 (추후 사용하지 않을시 삭제예정 )
-	public function change_price_now (Request $request) {
+	public function change_price_now(Request $request)
+	{
 
 		$data = $request->input('data');
 		$change_date = $request->input('change_date');
@@ -514,11 +504,11 @@ class prd05Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
-
 	}
 
 	//상품가격변경 수정 예약
-	public function update_price (Request $request) {
+	public function update_price(Request $request) 
+	{
 
 		$data = $request->input('data');
 		$change_date = $request->input('change_date');
@@ -571,63 +561,8 @@ class prd05Controller extends Controller
 
 	}
 
-	//상품가격변경 수정 예약
-	public function update_price_now (Request $request) {
-
-		$data = $request->input('data');
-		$change_date = $request->input('change_date');
-		$change_kind = $request->input('change_kind');
-		$change_price = $request->input('change_price');
-		$change_cnt = $request->input('change_cnt');
-		$product_price_cd = $request->input('product_price_cd');
-		$admin_id = Auth('head')->user()->id;
-
-		try {
-            DB::beginTransaction();
-
-				DB::table('product_price_list')
-					->where('product_price_cd', '=', $product_price_cd)
-					->delete();
-
-				foreach ($data as $d) {
-					DB::table('product_price_list')
-						->insert([
-							'product_price_cd' => $product_price_cd,
-							'prd_cd' => $d['prd_cd'],
-							'org_price' => $d['price'],
-							'change_price' => $d['change_val'],
-							'admin_id' => $admin_id,
-							'rt' => now(),
-							'ut' => now()
-						]);
-				}
-
-				DB::table('product_price')
-					->where('idx', '=', $product_price_cd)
-					->update([
-						'change_date' => $change_date,
-						'change_kind' => $change_kind,
-						'change_val' => $change_price,
-						'change_cnt' => $change_cnt,
-						'ut' => now()
-					]);
-				
-			DB::commit();
-            $code = 200;
-            $msg = "변경한 상품 가격이 저장되었습니다.";
-		} catch (Exception $e) {
-			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
-		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
-
-	}
-
-
-	public function del_product_price (Request $request) {
-
+	public function del_product_price(Request $request) 
+	{
 		$data = $request->input('data');
 
 		try {
@@ -648,13 +583,11 @@ class prd05Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
-
-
 	}
 
 
-	public function del_product (Request $request) {
-
+	public function del_product(Request $request)
+	{
 		$data = $request->input('data');
 		$idx = (int)$request->input('idx');
 		$row_cnt = $request->input('cnt');
@@ -685,14 +618,12 @@ class prd05Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
-
 	}
 
-	public function import_excel(Request $request) {
-
+	public function import_excel(Request $request)
+	{
 		$mutable	= now();
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
-		$res = '';
 
 		$values = [
 			'sdate'         => $sdate,
@@ -701,6 +632,4 @@ class prd05Controller extends Controller
 
 		return view( Config::get('shop.store.view') . '/product/prd05_batch_show',$values);
 	}
-
-	
 }

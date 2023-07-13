@@ -249,6 +249,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         //바코드 맵핑 정보
         Route::get("prd01/{no}/get-barcode-mapping", "prd01Controller@get_barcode_mapping");
         Route::put('prd01/del-mapping', 'prd01Controller@del_mapping');
+        Route::put('prd01/del-product-code', 'prd01Controller@del_product_code');
 
         // 상품관리 - 일괄수정
         Route::match(['get', 'post'], 'prd01/edit', 'prd01Controller@edit_index');
@@ -322,6 +323,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd02/prd-edit-match-search', 'prd02Controller@prd_edit_match_search');
         Route::put('prd02/del-product-code', 'prd02Controller@del_product_code');
         Route::put('prd02/edit-match-product-code', 'prd02Controller@edit_match_product_code');
+        Route::put('prd02/del-mapping', 'prd02Controller@del_mapping');
 
         Route::get('prd02/batch', 'prd02Controller@batch_show');
         Route::post('prd02/batch-import', 'prd02Controller@import_excel');

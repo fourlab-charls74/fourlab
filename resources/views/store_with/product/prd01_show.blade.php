@@ -3534,7 +3534,16 @@
             {field:"color",		headerName: "컬러",			width:72, cellStyle:{'text-align':'center'}},
             {field:"size",		headerName: "사이즈",		width:72, cellStyle:{'text-align':'center'}},
             {field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
-            {field:"del",       headerName: "맵핑삭제",  		width:60, cellStyle:{'text-align':'center'},
+            {field:"del",       headerName: "삭제",  		width:60, cellStyle:{'text-align':'center'},
+                cellRenderer: function(params) {
+                    if (params.value !== undefined) {
+                        if( params.value != ''){
+                            return '<a href="#" onclick="return delPrdCd(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                        }
+                    }
+                }
+		    },
+            {field:"del_mapping",       headerName: "맵핑삭제",  		width:60, cellStyle:{'text-align':'center'},
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         if( params.value != ''){
@@ -3579,10 +3588,36 @@
 		});
     }
 
+    function delPrdCd(prd_cd){
+		if(!window.confirm("바코드를 삭제하면 기존 재고 정보도 함께 삭제됩니다.\r\n삭제하시겠습니까?")) return;
+
+		axios({
+			url: '/store/product/prd01/del-product-code',
+			method: 'put',
+			data: {
+				prd_cd : prd_cd, 
+				goods_no : $("#goods_no").val()
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				opener.Search();
+				Search();
+			} else if (res.data.code === 201) {
+				alert("해당 바코드의 재고가 존재합니다. 삭제할 수 없습니다.");
+			} else {
+				console.log(res.data);
+				alert("바코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
+
     //바코드 맵핑 등록
     function barcodeMappingGoodsNo() {
-		const url=`/store/product/prd02?goods_no=${goods_no}`;
-        window.open(url,"_blank");
+		const url = `/store/product/prd02/create?goods_no=${goods_no}&mapping=Y`;
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
     }
 
 
