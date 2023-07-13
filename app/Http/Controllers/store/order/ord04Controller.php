@@ -14,8 +14,7 @@ use Carbon\Carbon;
 class ord04Controller extends Controller
 {
 	private $product_stock_type = [
-		'exchange' => 5, // 교환 (매장)
-		'refund' => 6, // 환불 (매장)
+		'sale_refund' => 2, // 주문 마이너스 (매장)
 		'return' => 11, // 반품 (매장/창고)
 	];
 
@@ -296,11 +295,7 @@ class ord04Controller extends Controller
 					]);
 
 				// 3) product_stock_hst -> 판매매장 증감/차감 & 반품창고 증감 로그
-				$clm_state = $row['clm_state'] ?? 0;
-				if ($clm_state === 40) $clm_state = $this->product_stock_type['exchange'];
-				else if ($clm_state === 41) $clm_state = $this->product_stock_type['refund'];
-				else $clm_state = 0;
-				$this->insertProductStockHst($row, 'STORE', $row['store_cd'], $clm_state, $qty, $user);
+				$this->insertProductStockHst($row, 'STORE', $row['store_cd'], $this->product_stock_type['sale_refund'], $qty, $user);
 				$this->insertProductStockHst($row, 'STORE', $row['store_cd'], $this->product_stock_type['return'], ($qty * -1), $user);
 				$this->insertProductStockHst($row, 'STORAGE', $return_storage_cd, $this->product_stock_type['return'], $qty, $user);
 
