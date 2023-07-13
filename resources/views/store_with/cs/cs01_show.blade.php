@@ -51,7 +51,7 @@
                     <div class="row">
                         <div class="col-lg-4 mb-2 mb-lg-0">
                             <div class="form-group">
-                                <label for="com_nm" class="required">공급처</label>
+                                <label for="com_nm" class="required">공급업체</label>
                                 <div class="form-inline inline_select_box">
                                     <div class="form-inline-inner input-box w-75 pr-1">
                                         <div class="form-inline inline_btn_box">
@@ -395,8 +395,8 @@
         {field: "cost", headerName: "개당원가(원, VAT별도)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
         {field: "total_cost", headerName: "총원가(원, VAT별도)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
         {field: "total_cost_novat", headerName: "총원가(원, VAT포함)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
-        {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
+        {field: "goods_sh", headerName: "정상가", width: 70, type: "currencyType"},
+        {field: "price", headerName: "현재가", width: 70, type: "currencyType"},
         {field: "stock_date", headerName: "최근입고일자", width: 90, cellStyle: StyleCenter},
         {width: "auto"}
     ];

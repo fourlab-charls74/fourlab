@@ -185,7 +185,7 @@
 			{field: "plan_category", headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},
             {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
             {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
-            {field: "change_type", headerName: "적용타입", width: 80, cellClass: 'hd-grid-code',
+            {field: "change_type", headerName: "적용구분", width: 80, cellClass: 'hd-grid-code',
 				cellStyle: params => {
 					if (params.data.change_type == 'A') {
 						return { "background-color": "#FFDFDF" }

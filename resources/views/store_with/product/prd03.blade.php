@@ -223,7 +223,7 @@
 			
 			{
 				field: "color",
-				headerName: "칼라명",
+				headerName: "컬러명",
 				cellStyle: DEFAULT,
 				width: 80
 			},

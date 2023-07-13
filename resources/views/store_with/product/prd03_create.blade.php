@@ -131,7 +131,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th class="required">칼라</th>
+											<th class="required">컬러</th>
 											<td>
 												<div class="flax_box">
 													<select name='color' class="form-control form-control-sm">
@@ -304,7 +304,7 @@
 		},
 		{
 			field: "color",
-			headerName: "칼라",
+			headerName: "컬러",
 			cellRenderer: (params) => params.data.color.split(':')[1],
 			width: 80
 		},
@@ -592,10 +592,10 @@
 			return alert("품목을 선택해주세요.");
 		}
 
-		// 칼라 선택여부
+		// 컬러 선택여부
 		if (f1.color.selectedIndex == 0) {
 			f1.color.focus();
-			return alert("칼라를 선택해주세요.");
+			return alert("컬러를 선택해주세요.");
 		}
 
 		// 사이즈 선택여부

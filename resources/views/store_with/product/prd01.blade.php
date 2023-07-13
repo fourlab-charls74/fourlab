@@ -375,7 +375,7 @@
             }
         },
         {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
-        {field: "com_nm", headerName: "업체", width:84},
+        {field: "com_nm", headerName: "공급업체", width:84},
         {field: "opt_kind_nm", headerName: "품목", width:96},
         {field: "brand_nm", headerName: "브랜드"},
         {field: "style_no", headerName: "스타일넘버", editable: true, width:70, cellStyle: {'text-align':'center', 'background' : '#ffff99'}},
@@ -388,7 +388,7 @@
         {field: "sale_stat_cl", headerName: "전시상태", width:70, type: 'GoodsStateTypeLH50'},
         {field: "normal_price", headerName: "정상가", type: 'currencyType', hide:true},
         {field: "goods_sh", headerName: "정상가", type: 'currencyType'},
-        {field: "price", headerName: "판매가", editable: true, type: 'currencyType', width:60, cellStyle: {'background' : '#ffff99'}},
+        {field: "price", headerName: "현재가", editable: true, type: 'currencyType', width:60, cellStyle: {'background' : '#ffff99'}},
         {field: "sale_amt", headerName: "할인율", cellStyle:{'text-align' : 'right'}},
         {field: "coupon_price", headerName: "쿠폰가", type: 'currencyType', width:60},
         {field: "sale_rate", headerName: "세일율(,%)", type: 'percentType', hide: true},

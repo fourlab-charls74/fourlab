@@ -362,13 +362,13 @@
         {field: "prd_nm", headerName: "원부자재명", width: 120},
         {
             field: "color",
-            headerName: "칼라",
+            headerName: "컬러명",
             cellStyle: DEFAULT,
             width: 100
         },
         {
             field: "size",
-            headerName: "사이즈",
+            headerName: "사이즈명",
             cellStyle: DEFAULT,
             width: 80
         },

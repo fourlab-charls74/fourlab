@@ -236,8 +236,8 @@
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {field: "prd_cd", headerName: "원부자재코드", width: 130},
         {field: "prd_nm", headerName: "원부자재명", width: 84},
-        {field: "color", headerName: "칼라", width: 96},
-        {field: "size", headerName: "사이즈", width: 84},
+        {field: "color", headerName: "컬러명", width: 96},
+        {field: "size", headerName: "사이즈명", width: 84},
         {field: "unit", headerName: "단위", width: 84},
         {field: "qty", headerName: "수량", width: 60, type: 'numberType',
             cellRenderer: function(params) {

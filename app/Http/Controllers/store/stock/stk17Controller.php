@@ -70,7 +70,7 @@ class stk17Controller extends Controller
                 p.prd_cd as prd_cd,
                 p.prd_nm as prd_nm,
                 c3.code_val as color,
-                c4.code_val as size,
+                size.size_nm as size,
                 c5.code_val as unit,
                 ifnull(p.price, 0) as price,
                 ifnull(p.wonga, 0) as wonga,
@@ -88,8 +88,8 @@ class stk17Controller extends Controller
                 left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                 left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                 left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
-                left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
                 left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
+                left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
             where 
                 pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')  and p.type <> 'N'
                 $where

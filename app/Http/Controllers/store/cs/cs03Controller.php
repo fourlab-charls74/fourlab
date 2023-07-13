@@ -134,7 +134,7 @@ class cs03Controller extends Controller
 				i.img_url as img,
 				p1.prd_nm as prd_nm,
 				c1.code_val as color,
-				c2.code_val as size,
+				size.size_nm as size,
 				c3.code_val as unit,
 				ifnull(p1.qty, 0) as qty,
 				ifnull(p1.price, 0) as price,
@@ -159,9 +159,9 @@ class cs03Controller extends Controller
 				left outer join product_image i on p1.prd_cd = i.prd_cd
 				inner join company cp on p1.com_id = cp.com_id
 				left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
-				left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
 				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 				left outer join mgr_user m on p2.admin_id = m.id
+				left outer join size size on size.size_cd = p4.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
 			where 1=1 and p2.rt >= :sdate and p2.rt < date_add(:edate, interval 1 day)
 			$where $where1
 			$having
