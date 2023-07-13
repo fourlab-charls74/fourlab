@@ -943,6 +943,22 @@ CREATE TABLE `order_receipt_product` (
 	PRIMARY KEY (`or_prd_cd`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='주문접수 상품리스트';
 
+-- (온라인)교환환불 재고처리 내역
+CREATE TABLE `claim_stock_check` (
+	`csc_cd` INT(11) NOT NULL AUTO_INCREMENT COMMENT '클레임재고처리코드',
+	`ord_opt_no` INT(11) NOT NULL DEFAULT '0' COMMENT '주문일련번호',
+	`prd_cd` VARCHAR(50) NOT NULL DEFAULT '0' COMMENT '상품코드',
+	`qty` INT(11) NOT NULL COMMENT '상품 검수수량',
+	`state` INT(11) NOT NULL COMMENT '30(검수완료)',
+	`store_cd` VARCHAR(30) NOT NULL COMMENT '교환/환불된 판매매장코드',
+	`storage_cd` VARCHAR(30) NOT NULL COMMENT '반품된 창고코드',
+	`comment` VARCHAR(255) DEFAULT NULL COMMENT '메모',
+	`rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+	`ut` DATETIME DEFAULT NULL COMMENT '수정일시',
+	`admin_id` VARCHAR(30) DEFAULT NULL COMMENT '관리자아이디',
+	PRIMARY KEY (`csc_cd`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='온라인교환환불 재고처리내역';
+
 -- 고객수선
 CREATE TABLE `after_service` (
 	`idx` int(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',

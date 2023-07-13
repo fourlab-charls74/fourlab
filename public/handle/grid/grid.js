@@ -339,7 +339,8 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
             },
 
             StoreOrderNoType:{
-                width:170,
+                width:140,
+				cellClass: 'hd-grid-code',
                 cellRenderer: function(params) {
                     if(params.value){
                         return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data.ord_no + '\',\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';

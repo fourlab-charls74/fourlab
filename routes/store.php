@@ -734,6 +734,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('ord03/download/{cmd}', 'ord03Controller@download');
         Route::post('ord03/batch-import', 'ord03Controller@batch_import');
         Route::post('ord03/search-orders', 'ord03Controller@batch_search_orders');
+
+		// 온라인 교환환불 재고처리
+		Route::get('ord04','ord04Controller@index');
+		Route::get('ord04/search','ord04Controller@search');
+		Route::post('ord04/complete-check','ord04Controller@completeStockCheck'); // 재고검수완료처리
     });
 
     // 고객관리
