@@ -222,6 +222,7 @@ class sys02Controller extends Controller
         $action = $request->input('action');
         $sys_menu = $request->input('sys_menu');
         $state = $request->input('state');
+        $keyword = $request->input('keyword', '');
 
         $id = Auth::guard('head')->user()->id;
 
@@ -264,6 +265,7 @@ class sys02Controller extends Controller
                 'regi_date' => DB::raw('now()'),
                 'ut' => DB::raw('now()'),
                 'is_del' => 'Y',
+                'keyword' => $keyword,
             ];
 
             try {
@@ -295,6 +297,7 @@ class sys02Controller extends Controller
         $action = $request->input('action');
         $sys_menu = $request->input('sys_menu');
         $state = $request->input('state');
+        $keyword = $request->input('keyword', '');
         $roles = (object)json_decode($request->input('roles'));
 
         $id = Auth::guard('head')->user()->id;
@@ -330,6 +333,7 @@ class sys02Controller extends Controller
             'regi_date' => DB::raw('now()'),
             'ut' => DB::raw('now()'),
             'is_del' => 'Y',
+            'keyword' => $keyword,
         ];
 
         try {

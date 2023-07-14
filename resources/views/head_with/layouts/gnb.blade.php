@@ -22,17 +22,20 @@
 				title: gnb_menu_obj[a].kor_nm,
 				url: gnb_menu_obj[a].action,
 				target: gnb_menu_obj[a].target,
+				keyword: gnb_menu_obj[a].keyword || '',
 			}]
 			: Object.keys(gnb_menu_obj[a].sub || {}).length > 0 
 				? Object.keys(gnb_menu_obj[a].sub).map(aa => ({
 						title: gnb_menu_obj[a].sub[aa].kor_nm,
 						url: gnb_menu_obj[a].sub[aa].action,
 						target: gnb_menu_obj[a].sub[aa].target,
+						keyword: gnb_menu_obj[a].sub[aa].keyword || '',
 						sub: Object.keys(gnb_menu_obj[a].sub[aa].sub || {}).length > 0 
 							? Object.keys(gnb_menu_obj[a].sub[aa].sub).map(aaa => ({
 									title: gnb_menu_obj[a].sub[aa].sub[aaa].kor_nm,
 									url: gnb_menu_obj[a].sub[aa].sub[aaa].action,
 									target: gnb_menu_obj[a].sub[aa].sub[aaa].target,
+									keyword: gnb_menu_obj[a].sub[aa].sub[aaa].keyword || '',
 								}))
 							: undefined,
 					}))
@@ -58,9 +61,17 @@
 		const searched_list = list.map(a => ({
 			...a, sub: a.sub ? a.sub.map(aa => ({
 				...aa,
-				title: aa.title?.includes(kw) || (aa.sub ? aa.sub.filter(aaa => aaa.title.includes(kw)).length > 0 : 0) ? aa.title : '',
+				title: aa.title?.includes(kw) || aa.keyword?.includes(kw) || (aa.sub ? aa.sub.filter(aaa => aaa.title.includes(kw)).length > 0 : 0) 
+					? kw !== '' && aa.keyword?.includes(kw)
+						? aa.title + ' - ' + aa.keyword.split(',').filter(k => k.includes(kw)).map(k => '#' + k).join(' ')
+						: aa.title 
+					: '',
 				sub: aa.sub ? aa.sub.map(aaa => ({
-					...aaa, title: aaa.title.includes(kw) ? aaa.title : ''
+					...aaa, title: aaa.title.includes(kw) || aaa.keyword.includes(kw) 
+						? kw !== '' && aaa.keyword.includes(kw)
+							? aaa.title + ' - ' + aaa.keyword.split(',').filter(k => k.includes(kw)).map(k => '#' + k).join(' ')
+							: aaa.title 
+						: ''
 				})) : undefined
 			})) : undefined
 		}));

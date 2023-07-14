@@ -141,6 +141,17 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            <tr>
+	                                            <th>키워드</th>
+	                                            <td class="pb-1">
+		                                            <div class="d-flex flex-column">
+			                                            <div class="flax_box">
+				                                            <input type='text' class="form-control form-control-sm search-enter w-100" name='keyword' id="keyword" value='{{@$menu->keyword}}'>
+			                                            </div>
+			                                            <p class="text-secondary fs-12 mt-1">* 쉼표( &#44; )로 구분해서 작성해주세요. ex) 상품&#44;주문&#44;회원</p>
+		                                            </div>
+	                                            </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

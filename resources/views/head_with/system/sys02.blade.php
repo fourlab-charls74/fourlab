@@ -143,6 +143,7 @@
         },
         {field: "action", headerName: "동작", width: 200},
         {field: "sys_menu", headerName: "유저", width: 100, cellClass: 'hd-grid-code'},
+        {field: "keyword", headerName: "키워드", width: 150},
         {field: "regi_date", headerName: "등록일시", type:'DateTimeType'},
         {field: "ut", headerName: "수정일시", type:'DateTimeType'},
         {field: "is_del", headerName: "삭제여부", width: 100, cellClass: 'hd-grid-code',
@@ -177,12 +178,12 @@
         if (cd !== '') {
             url = '/head/system/sys02/create?entry=' + cd;
         }
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1000");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1024");
     }
 
     function Edit(a) {
         let url = '/head/system/sys02/' + $(a).attr('data-code');
-        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1000");
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=1024");
     }
 </script>
 @stop

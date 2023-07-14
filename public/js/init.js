@@ -180,6 +180,9 @@ $( document ).ready(function() {
         if (e.key === 'Escape') {
             if ($(".modal.show").length > 0) {
                 $(".modal.show").modal('hide');
+            } else if ($("#gnb").length > 0 && !$("#gnb").hasClass('d-none')) {
+				$("#gnb").addClass('d-none');
+				$(".top_link_btn .menu").removeClass('act');
             } else if (opener !== null) {
                 window.close();
             }
