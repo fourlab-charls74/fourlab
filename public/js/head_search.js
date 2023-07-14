@@ -1187,7 +1187,7 @@ SearchGoodsNos.prototype.SetGrid = function(divId){
 SearchGoodsNos.prototype.Search = function(){
     // let data = $('form[name="search_goods_nos"]').serialize();
     let data = "";
-    // data += "sch_goods_nos=" + $("#sch_goods_nos").val().split("\n").filter(v => v).join(",");
+    data += "sch_goods_nos=" + $("#sch_goods_nos").val().split("\n").filter(v => v).join(",");
     data += "&sch_style_nos=" + $("#sch_style_nos").val().split("\n").filter(v => v).join(",");
     data += "&cmd=modal";
     this.grid.Request('/head/api/goods', data,-1);
@@ -1199,9 +1199,18 @@ SearchGoodsNos.prototype.Choice = function(){
     let style_nos = checkRows.map(function(row) {
         return row.style_no;
     });
+    let goods_nos = checkRows.map(function(row) {
+        return row.goods_no;
+    });
+    let goods_no = document.getElementById('sch_goods_nos').value;
+    let style_no = document.getElementById('sch_style_nos').value;
 
-    $('#style_no').val(style_nos);
-   
+    if(goods_no == "" || style_no != "") {
+        $('#style_no').val(style_nos);
+    } else if (goods_no != "" || style_no == "") {
+        $('#goods_no').val(goods_nos);
+    }
+
     $('#SearchGoodsNosModal').modal('toggle');
 };
 let searchGoodsNos = new SearchGoodsNos();

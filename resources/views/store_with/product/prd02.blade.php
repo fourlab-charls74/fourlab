@@ -401,8 +401,6 @@
 
 		async function Search() {
 			await setColumn();
-			let goods_no = '{{@$goods_no}}';
-			$('#goods_no').val(goods_no);
 			let ischeck = $('#ext_storage_qty').is(':checked');
 			let data = $('form[name="search"]').serialize();
 			data += '&ext_storage_qty=' + ischeck;

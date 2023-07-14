@@ -106,6 +106,7 @@ class prd01Controller extends Controller
         $style_no = $request->input("style_no");
         $goods_no = $request->input("goods_no");
         $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
+        $style_nos = $request->input('style_nos', '');       // 상품번호 textarea
         $item = $request->input("item");
         $brand_nm = $request->input("brand_nm");
         $brand_cd = $request->input("brand_cd");
@@ -135,7 +136,6 @@ class prd01Controller extends Controller
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         $where = "";
-        if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
         if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
         if ($brand_cd != "") {
             $where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
@@ -188,6 +188,25 @@ class prd01Controller extends Controller
                 $where .= " and g.goods_no in ( $in_goods_nos ) ";
             } else {
                 if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+             }
+        }
+		if($style_nos        != ""){
+            $style_no = $style_nos;
+        }
+		$style_no = preg_replace("/\s/",",",$style_no);
+        $style_no = preg_replace("/\t/",",",$style_no);
+        $style_no = preg_replace("/\n/",",",$style_no);
+        $style_no = preg_replace("/,,/",",",$style_no);
+
+
+        if( $style_no != "" ){
+            $style_nos = explode(",",$style_no);
+            if(count($style_nos) > 1){
+                if(count($style_nos) > 500) array_splice($style_nos,500);
+                $in_style_nos = join(",",$style_nos);
+                $where .= " and g.style_no in ( $in_style_nos ) ";
+            } else {
+                if ($style_no != "") $where .= " and g.style_no = '" . Lib::quote($style_no) . "' ";
              }
         }
 
