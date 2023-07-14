@@ -397,7 +397,8 @@
         {field: "total_cost_novat", headerName: "총원가(원, VAT포함)", width: 130, cellStyle: StyleRight, valueFormatter: KRWFormatter},
         {field: "goods_sh", headerName: "정상가", width: 70, type: "currencyType"},
         {field: "price", headerName: "현재가", width: 70, type: "currencyType"},
-        {field: "stock_date", headerName: "최근입고일자", width: 90, cellStyle: StyleCenter},
+        {field: "recent_stock_date", headerName: "최근입고일자", width: 90, cellClass: 'hd-grid-code'},
+        {field: "stock_cnt", headerName: "(품번)입고순번", width: 90, type: 'currencyType'},
         {width: "auto"}
     ];
 
@@ -546,9 +547,35 @@
 
     /** 선택한 상품 적용 */
     var goods_search_cmd = '';
-    var goodsCallback = (row) => addRow(row);
+    var goodsCallback = (row) => {
+		$.ajax({
+			url: COMMAND_URL,
+			method: 'post',
+			data: { cmd: 'search-stock-log', prd_cds: [row.prd_cd] },
+			success: function (res) {
+				addRow(({ ...row, ...res.data[0] }));
+			},
+			error: function(response, status, error) {
+				const { code, msg } = response?.responseJSON;
+				alert(msg);
+			}
+		});
+    }
     var multiGoodsCallback = (rows) => {
-        if (rows && Array.isArray(rows)) rows.forEach(row => addRow(row));
+        if (rows && Array.isArray(rows)) {
+			$.ajax({
+				url: COMMAND_URL,
+				method: 'post',
+				data: { cmd: 'search-stock-log', prd_cds: rows.map(row => row.prd_cd) },
+				success: function (res) {
+					rows.forEach(row => addRow({ ...row, ...res.data.find(d => d.prd_cd === row.prd_cd) }));
+				},
+				error: function(response, status, error) {
+					const { code, msg } = response?.responseJSON;
+					alert(msg);
+				}
+			});
+        }
     }
     var beforeSearchCallback = (api_document) => {
         api_document.search.com_nm.value = document.search.com_nm.value;

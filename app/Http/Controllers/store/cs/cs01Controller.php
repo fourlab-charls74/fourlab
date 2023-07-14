@@ -302,6 +302,10 @@ class cs01Controller extends Controller {
 				$stock_no = $request->input('stock_no');
 				$response = $this->listProduct($stock_no);
 				break;
+			case 'search-stock-log':
+				$prd_cds = $request->input('prd_cds', '');
+				$response = $this->searchProductStockLog($prd_cds);
+				break;
 			case 'getgood':
 				$prd_cd = $request->input("prd_cd");
 				$response = $this->getGood($prd_cd);
@@ -818,6 +822,13 @@ class cs01Controller extends Controller {
 				, s.total_cost as total_cost
 				, s.total_cost * 1.1 as total_cost_novat
 				, date_format(s.stock_date, '%Y-%m-%d') as stock_date
+			    , date_format((select stock_date from product_stock_order_product where prd_cd = s.prd_cd order by stock_date desc limit 1), '%Y-%m-%d') as recent_stock_date
+				, (
+			    	select (count(ss.stock_prd_no) + 1) as stock_cnt
+			    	from product_stock_order_product ss
+			    		inner join product_code pp on pp.prd_cd = ss.prd_cd
+			    	where pp.prd_cd_p = pc.prd_cd_p and ss.rt < s.rt
+			  	) as stock_cnt
 				, ifnull((
 					select stock_prd_no 
 					from product_stock_order_product 
@@ -836,6 +847,30 @@ class cs01Controller extends Controller {
 		";
 		$rows = DB::select($sql);
 		return response()->json(['rows' => $rows], 200);
+	}
+	
+	/** 입고추가 시, 선택상품의 최근입고일자/입고순번 등 정보조회 */
+	public function searchProductStockLog($prd_cds)
+	{
+		$prd_cd_sql = join(',', array_map(function($s) { return "'$s'"; }, $prd_cds));
+		$sql = "
+			select
+			    s.prd_cd
+			    , date_format((select stock_date from product_stock_order_product where prd_cd = s.prd_cd order by stock_date desc limit 1), '%Y-%m-%d') as recent_stock_date
+				, (
+					select (count(ss.stock_prd_no) + 1) as stock_cnt
+					from product_stock_order_product ss
+					   inner join product_code pp on pp.prd_cd = ss.prd_cd
+					where pp.prd_cd_p = pc.prd_cd_p and ss.rt <= max(s.rt)
+			  	) as stock_cnt
+			from product_stock_order_product s
+				inner join product_code pc on pc.prd_cd = s.prd_cd
+			where s.prd_cd in ($prd_cd_sql)
+			group by s.prd_cd
+			order by s.stock_prd_no desc
+		";
+		$rows = DB::select($sql);
+		return response()->json([ 'data' => $rows ], 200);
 	}
 
 	/**
