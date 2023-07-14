@@ -213,6 +213,7 @@
 			},
         });
 
+        $('#charge_yn').val('Y');
         // 최초검색
         Search();
 
@@ -245,7 +246,10 @@
     // 세부정보 grid 조회
     function SearchDetail(store_cd, store_nm, use_yn) {
         if(store_cd === '') return;
-        if(use_yn == undefined) $('#charge_yn').val('A');
+        if (use_yn == undefined) {
+            use_yn = 'Y';
+            $('#charge_yn').val('Y');
+        }
         cur_store_cd = store_cd;
         cur_store_nm = store_nm;
 

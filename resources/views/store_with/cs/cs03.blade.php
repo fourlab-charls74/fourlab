@@ -212,7 +212,7 @@
         },
         {field: "reg_date", headerName: "등록일자", width: 100, hide:true},
         {field: "prd_ord_date", headerName: "일자", width: 100},
-        { field: "prd_ord_no", headerName: "송장번호", width: 120, cellStyle:{ 'text-align': 'center' }},
+        { field: "prd_ord_no", headerName: "입고번호", width: 120, cellStyle:{ 'text-align': 'center' }},
         {field: "state", headerName: "상태", width: 72, cellStyle: {'text-align' : 'center', 'font-weight': '700'},
             cellRenderer: (params) => { // 상태:입고대기(10), 입고처리중(20), 입고완료(30), 반품대기(-10), 반품처리중(-20), 반품완료(-30)
                 const state = params.data.state;

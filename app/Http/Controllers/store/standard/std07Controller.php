@@ -81,7 +81,7 @@ class std07Controller extends Controller
 	public function search_store_fee(Request $request)
 	{
 		$store_cd = $request->input('store_cd');
-		$use_yn = $request->input('use_yn','A');
+		$use_yn = $request->input('use_yn','Y');
 
 		$code = 200;
 
