@@ -632,4 +632,26 @@ class prd05Controller extends Controller
 
 		return view( Config::get('shop.store.view') . '/product/prd05_batch_show',$values);
 	}
+
+	// 엑셀업로드 
+	public function upload(Request $request)
+	{
+
+		if ( 0 < $_FILES['file']['error'] ) {
+			echo json_encode(array(
+				"code" => 500,
+				"errmsg" => 'Error: ' . $_FILES['file']['error']
+			));
+		}
+		else {
+			$file = sprintf("data/store/prd05/%s", $_FILES['file']['name']);
+			move_uploaded_file($_FILES['file']['tmp_name'], $file);
+			echo json_encode(array(
+				"code" => 200,
+				"file" => $file
+			));
+		}
+
+	}
+	
 }

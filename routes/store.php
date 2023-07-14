@@ -397,6 +397,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd05/del-product-price', 'prd05Controller@del_product_price');
         Route::put('prd05/del-product', 'prd05Controller@del_product');
 		Route::get('prd05/batch-import', 'prd05Controller@import_excel');
+		Route::post('prd05/upload', 'prd05Controller@upload');
 
         // 온라인 재고 매핑
         Route::get('prd06', 'prd06Controller@index');

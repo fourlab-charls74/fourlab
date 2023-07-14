@@ -94,21 +94,19 @@
 													</select>
 												</div>
 											</td>
-											<th>&nbsp;</th>
-											<td>&nbsp;</td>
+											<th>샘플파일</th>
+											<td><a href="/data/store/sample/product_price_sample.xlsx"> product_price_sample.xlsx</a></td>
 										</tr>
 										<tr>
 											<th class="required">파일</th>
-											<td>
+											<td colspan="3">
 												<div class="d-flex flex-column">
 													<div class="d-flex" style="width:100%;">
-														<input id="excelfile" type="file" name="excelfile" class="w-50 mr-2" />
+														<input id="excelfile" type="file" name="excelfile" class="mr-2" />
 														<button type="button" class="btn btn-outline-primary" onclick="Upload();"><i class="fas fa-sm"></i>자료 불러오기</button>
 													</div>
 												</div>
 											</td>
-											<th>샘플파일</th>
-											<td><a href="/data/head/sample/상품매칭_샘플.xlsx"> 가격관리일괄.xlsx</a></td>
 										</tr>
 										</tbody>
 									</table>
@@ -130,7 +128,7 @@
 						</div>
 					</div>
 					<div class="table-responsive">
-						<div id="div-gd" style="height:calc(100vh - 380px);width:100%;" class="ag-theme-balham"></div>
+						<div id="div-gd" style="height:calc(100vh - 460px);width:100%;" class="ag-theme-balham"></div>
 					</div>
 				</div>
 
@@ -139,39 +137,101 @@
 	</div>
 
 	<script language="javascript">
-		let columns = [
+		let columnDefs = [
 			{field: "num", headerName: "#", filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-			{field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-			{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-			{field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
-			{field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
-			{field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-			{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
-			{field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
-			{field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
-			{field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
-			{field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-			{field: "goods_opt", headerName: "옵션", width: 153},
-			{field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
-			{field: "price", headerName: "현재가", type: "currencyType", width: 65},
-			{field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 80 ,editable:true, cellStyle: {'background' : '#ffff99'}},
-			{width : 'auto'}
+			{field: "prd_cd_p", headerName: "품번", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+			{field: "goods_sh", headerName: "정상가", type: "currencyType", width: 75},
+			{field: "price", headerName: "현재가", type: "currencyType", width: 75},
+			{field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 120 ,editable:true, cellStyle: {'background' : '#ffff99'}},
+			{field: "change_kind", headerName: "율/액", type: "currencyType", width: 80 ,editable:true, cellStyle: {'background' : '#ffff99'}},
 		];
+
+		// let the grid know which columns to use
+		var gridOptions = {
+			columnDefs: columnDefs,
+			defaultColDef: {
+				// set every column width
+				//flex: 1,
+				//width: 100,
+				// make every column editable
+				editable: true,
+				resizable: true,
+				autoHeight: true,
+				// make every column use 'text' filter by default
+				filter: 'agTextColumnFilter'
+			},
+			rowSelection:'multiple',
+			rowHeight: 275,
+		};
+
+		// lookup the container we want the Grid to use
+		var eGridDiv = document.querySelector('#div-gd');
+
+		new agGrid.Grid(eGridDiv, gridOptions);
 	</script>
 
 	<script type="text/javascript" charset="utf-8">
-		let add_product = [];
-		let gx;
-		const pApp = new App('', { gridId: "#div-gd" });
 
 		$(document).ready(function() {
-			pApp.ResizeGrid(440);
-			pApp.BindSearchEnter();
-			let gridDiv = document.querySelector(pApp.options.gridId);
-			gx = new HDGrid(gridDiv, columns);
-			$('#cur_date').hide();
+			gridOptions.api.setRowData([]);
 		});
 
+		var GridData = [];
+
+		function Save() {
+
+			let change_date_res	= $('#change_date_res').val();
+			let change_date_now	= document.getElementById('change_date_now').innerText;
+			let change_price	= parseInt($('#change_price').val());
+			let change_kind		= $('#change_kind').val();
+			let type			= $("input[name='product_price_type']:checked").val();
+			let rows			= gx.getSelectedRows();
+			let change_cnt		= rows.length;
+			let price_kind		= $('#price_kind').val();
+			let plan_category	= $('#plan_category').val();
+
+			if(rows.length < 1)		return alert('저장할 상품을 선택해주세요.');
+
+			if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
+			if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
+			if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
+
+			if(GridData.length === 0){
+				alert('입력할 자료를 선택해 주십시오.');
+				return false;
+			}
+
+			if(!confirm("등록한 상품의 변경금액(율)을 저장하시겠습니까?")) return;
+
+			axios({
+				url: '/store/product/prd05/batch_update',
+				method: 'put',
+				data: {
+					data: rows,
+					change_date_res : change_date_res,
+					change_date_now : change_date_now,
+					change_kind : change_kind,
+					change_price : change_price,
+					change_cnt : change_cnt,
+					type : type,
+					price_kind : price_kind,
+					plan_category : plan_category
+
+				},
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					alert(res.data.msg);
+					window.close();
+					opener.Search();
+				} else {
+					console.log(res.data);
+					alert("상품가격 변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
+		}
+		
 		$("input[name='product_price_type']").change(function(){
 			let type = $("input[name='product_price_type']:checked").val();
 
@@ -184,6 +244,126 @@
 				$('#cur_date').show();
 			}
 		});
+
+		// read the raw data and convert it to a XLSX workbook
+		function convertDataToWorkbook(data) {
+			/* convert data to binary string */
+			var data = new Uint8Array(data);
+			var arr = new Array();
+
+			for (var i = 0; i !== data.length; ++i) {
+				arr[i] = String.fromCharCode(data[i]);
+			}
+
+			var bstr = arr.join("");
+
+			return XLSX.read(bstr, {type: "binary"});
+		}
+
+		function makeRequest(method, url, success, error) {
+			var httpRequest = new XMLHttpRequest();
+			httpRequest.open("GET", url, true);
+			httpRequest.responseType = "arraybuffer";
+
+			httpRequest.open(method, url);
+			httpRequest.onload = function () {
+				success(httpRequest.response);
+			};
+			httpRequest.onerror = function () {
+				error(httpRequest.response);
+			};
+			httpRequest.send();
+		}
+
+		function populateGrid(workbook) {
+			// our data is in the first sheet
+			var firstSheetName = workbook.SheetNames[0];
+			var worksheet = workbook.Sheets[firstSheetName];
+
+			var columns	= {
+				'A': 'prd_cd_p',
+				'B': 'goods_sh',
+				'C': 'price',
+				'D': 'change_val',
+				'E': 'change_kind',
+			};
+
+
+			// start at the 2nd row - the first row are the headers
+			var rowIndex = 2;
+
+			var rowData = [];
+
+			// iterate over the worksheet pulling out the columns we're expecting
+			while (worksheet['A' + rowIndex]) {
+				var row = {};
+				Object.keys(columns).forEach(function(column) {
+					if(worksheet[column + rowIndex] !== undefined){
+						row[columns[column]] = worksheet[column + rowIndex].w;
+					}
+				});
+
+				rowData.push(row);
+
+				rowIndex++;
+			}
+
+			GridData = rowData;
+
+			// finally, set the imported rowData into the grid
+			gridOptions.api.setRowData(rowData);
+
+			//토탈 갯수 보여주기
+			$("#gd-total").text(rowData.length);
+		}
+
+		function Upload(){
+			var file_data = $('#excelfile').prop('files')[0];
+			var form_data = new FormData();
+			form_data.append('file', file_data);
+			form_data.append('_token', "{{ csrf_token() }}");
+			$.ajax({
+				url: '/store/product/prd05/upload', // point to server-side PHP script
+				dataType: 'json',  // what to expect back from the PHP script, if anything
+				cache: false,
+				contentType: false,
+				processData: false,
+				data: form_data,
+				type: 'post',
+				success: function(res){
+					if(res.code == "200"){
+						file = res.file;
+						//alert(file);
+						importExcel("/" + file);
+					}else{
+						alert('엑셀 파일 업로드 오류 입니다[1].');
+						console.log(res.errmsg);
+					}
+				},
+				error: function(request, status, error) {
+					alert('엑셀 파일 업로드 오류 입니다[2].');
+					console.log(error)
+				}
+			});
+			return false;
+		}
+
+		function importExcel(url) {
+
+			makeRequest('GET',
+				//'https://www.ag-grid.com/example-excel-import/OlymicData.xlsx',
+				url,
+				// success
+				function (data) {
+					var workbook = convertDataToWorkbook(data);
+					populateGrid(workbook);
+				},
+				// error
+				function (error) {
+					throw error;
+				}
+			);
+		}
 		
 
 	</script>
