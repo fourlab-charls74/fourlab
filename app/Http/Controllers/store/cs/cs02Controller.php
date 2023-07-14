@@ -796,9 +796,10 @@ class cs02Controller extends Controller
                 , sr.sgr_state
                 , sr.return_addr
                 , sr.return_reason
-                , srp.return_qty as qty
+                , (srp.return_price * srp.return_qty) as total_price
                 , srp.prd_cd
                 , g.goods_nm
+                , g.goods_nm_eng
                 , pc.color
                 , pc.size
                 , srp.price
@@ -809,6 +810,8 @@ class cs02Controller extends Controller
                 , s.addr2
                 , s.phone
                 , s.fax
+                , s.ceo
+                , (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = s.storage_cd) as storage_addr
             from storage_return sr
                 inner join storage s on s.storage_cd = sr.storage_cd and s.use_yn = 'Y'
                 left outer join storage_return_product srp on srp.sgr_cd = sr.sgr_cd
@@ -820,20 +823,21 @@ class cs02Controller extends Controller
 		$rows = DB::select($sql, [ 'sgr_cd' => $sgr_cd]);
 
 		$data = [
-			'one_sheet_count' => 38,
+			'one_sheet_count' => 36,
 			'sgr_cd' => sprintf('%04d', $sgr_cd),
 			'products' => $rows
 		];
 
 		if (count($rows) > 0) {
 			$data['receipt_date']		= date('Y-m-d'); // 접수일자? 출고일자? 논의 후 수정필요
-			$data['rel_type'] 			= $rows[0]->type_nm ?? '';
-			$data['storage_nm'] 			= $rows[0]->storage_nm ?? '';
-			$data['return_addr'] 		= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);
-			$data['store_phone'] 		= $rows[0]->phone ?? '';
-			$data['store_fax'] 			= $rows[0]->fax ?? '';
+			$data['storage_nm'] 		= $rows[0]->storage_nm ?? '';
+			$data['storage_phone'] 		= $rows[0]->phone ?? '';
+			$data['storage_fax'] 		= $rows[0]->fax ?? '';
 			$data['storage_addr'] 		= $rows[0]->storage_addr ?? '';
-			$data['storage_manager'] 	= $rows[0]->storage_manager ?? '';
+			$data['return_price'] 	    = $rows[0]->return_price ?? '';
+			$data['return_qty'] 	    = $rows[0]->return_qty ?? '';
+			$data['storage_ceo'] 	    = $rows[0]->ceo ?? '';
+			$data['storage_cd'] 	    = $rows[0]->storage_cd ?? '';
 
 			$conf = new Conf();
 			$company = $conf->getConfig('shop');
@@ -851,8 +855,8 @@ class cs02Controller extends Controller
 			/* 상단 정보는 값등록 후 수정이 필요합니다. */
 		}
 
-		$style = [
-			'A1:AH52' => [
+        $style = [
+			'A1:AH50' => [
 				'alignment' => [
 					'vertical' => Alignment::VERTICAL_CENTER,
 					'horizontal' => Alignment::HORIZONTAL_CENTER
@@ -865,7 +869,7 @@ class cs02Controller extends Controller
 			],
 			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
 			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
-			'A4:AH52' => [
+			'A4:AH50' => [
 				'borders' => [
 					'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
 					'outline' => [ 'borderStyle' => Border::BORDER_THICK ],
@@ -873,32 +877,32 @@ class cs02Controller extends Controller
 			],
 			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
-			'AC49:AH52' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AC47:AH50' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
 			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_THICK ] ] ],
 			'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
 			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-			'F10:F47' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-			'W10:AH48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
-			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 70 ] ],
-			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 10 ] ],
-			'V5' => [ 'font' => [ 'size' => 18 ] ],
-			'V6' => [ 'font' => [ 'size' => 18 ] ],
+			'F10:F45' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'W10:AH46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
+			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'A46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 20 ] ],
+			'A47:A49' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
+			'V5' => [ 'font' => [ 'size' => 22 ] ],
+			'V6' => [ 'font' => [ 'size' => 22 ] ],
 			'Q5' => [ 'font' => [ 'size' => 16 ] ],
 			'AH5' => [ 'font' => [ 'size' => 16 ] ],
-			'B10:Q47' => [ 'font' => [ 'size' => 18 ] ],
-			'Y10:AH47' => [ 'font' => [ 'size' => 19 ] ],
+			'B10:Q45' => [ 'font' => [ 'size' => 18 ] ],
+			'Y10:AH45' => [ 'font' => [ 'size' => 19 ] ],
 			'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
 			'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
 		];
 
 		$view_url = Config::get('shop.store.view') . '/cs/cs02_document';
 		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
-		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 150 ]];
 
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '상품반품명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }
