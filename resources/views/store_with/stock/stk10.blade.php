@@ -317,12 +317,14 @@
                         <!-- <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm ml-1">거부</a> -->
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         @endif
+                        <a href="javascript:printSelectedDocuments();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download mr-1"></i>명세서 일괄출력</a>
+                        <span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
                         @if(Auth('head')->user()->logistics_group_yn == 'N')
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a>
                         @endif
                         <span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="delRelease()" class="btn btn-sm btn-primary shadow-sm mr-1">삭제</a>
+                        <a href="javascript:void(0);" onclick="delRelease()" class="btn btn-sm btn-primary shadow-sm">삭제</a>
                     </div>
 				</div>
 			</div>
@@ -359,9 +361,9 @@
         {field: "idx", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28, headerCheckboxSelection: true,
-            checkboxSelection: function(params) {
-                return params.data.state < 40 && params.data.state > 0;
-            },
+            // checkboxSelection: function(params) {
+            //     return params.data.state < 40 && params.data.state > 0;
+            // },
         },
         {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
             cellRenderer: function(params) {
@@ -681,6 +683,22 @@
 	// 출고 거래명세서 출력
 	function printDocument(document_number, idx) {
 		location.href = '/store/stock/stk10/download?document_number=' + document_number + '&idx=' + idx;
+	}
+
+	// 출고 거래명세서 일괄출력
+	function printSelectedDocuments() {
+		let rows = gx.getSelectedRows();
+		if (rows.length < 1) return alert("일괄출력할 명세서를 선택해주세요.");
+
+		axios({
+			url: '/store/stock/stk10/download-zip',
+			method: 'post',
+			data: { data: rows.map(row => ({ document_number: row.document_number, idx: row.idx })) },
+		}).then(function (res) {
+			window.location = '/' + res.data.file_path;
+		}).catch(function (err) {
+			console.log(err);
+		});
 	}
 </script>
 @stop
