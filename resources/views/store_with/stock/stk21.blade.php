@@ -412,6 +412,7 @@
                 suppressSizeToFit: false,
                 sortable:true,
             },
+			suppressCopyRowsToClipboard: true,
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
                 if (e.column.colId == "rt_qty") {
