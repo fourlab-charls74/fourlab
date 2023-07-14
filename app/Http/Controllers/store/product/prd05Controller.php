@@ -626,8 +626,9 @@ class prd05Controller extends Controller
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
 		$values = [
-			'sdate'         => $sdate,
-			'edate'         => date("Y-m-d"),
+			'sdate'	=> $sdate,
+			'edate'	=> date("Y-m-d"),
+			'rdate'	=> date("Y-m-d", strtotime('1 day'))
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd05_batch_show',$values);
@@ -653,5 +654,119 @@ class prd05Controller extends Controller
 		}
 
 	}
+
+	public function batch_update(Request $request)
+	{
+		$admin_id = Auth('head')->user()->id;
+		$code	= "200";
+		$msg	= "";
+
+		$change_date_res	= $request->input('change_date_res');
+		$change_date_now	= $request->input('change_date_now');
+		$type				= $request->input('type');
+		$change_cnt			= $request->input('change_cnt');
+		$plan_category		= $request->input('plan_category');
+
+		if ($type == 'reservation') {
+			$change_date = $change_date_res;
+			$change_type = 'R';
+			$apply_yn = 'N';
+		} else {
+			$change_date = $change_date_now;
+			$change_type = 'A';
+			$apply_yn = 'Y';
+		}
+
+		$datas = $request->input('data');
+		$datas = json_decode($datas);
+
+		if ($datas == "") {
+			$error_code = "400";
+		}
+
+		try {
+			DB::beginTransaction();
 	
+			$product_price_cd = DB::table('product_price')
+				->insertGetId([
+					'change_cnt'	=> $change_cnt,
+					'apply_kind'	=> 'N',
+					'admin_id'		=> $admin_id,
+					'rt' => now(),
+					'ut' => now()
+				]);
+			
+			for( $i = 0; $i < count($datas); $i++ ) {
+				$data = (array)$datas[$i];
+	
+				$prd_cd_p		= $data['prd_cd_p'];
+				$price			= Lib::uncm($data['price']);
+				$price_kind		= $data['price_kind'];
+				$change_val		= Lib::uncm($data['change_val']);
+				$change_kind	= $data['change_kind'];
+				$change_price	= Lib::uncm($data['change_price']);
+
+				$price_kind	= ($price_kind == "정상가")?"T":"P";
+				$change_kind	= ($change_kind == "%")?"P":"W";
+				
+				$sql	= " select prd_cd, goods_no from product_code where prd_cd_p = :prd_cd_p ";
+				$rows	= DB::select($sql,['prd_cd_p' => $prd_cd_p]);
+	
+				foreach ($rows as $row) {
+					$prd_cd		= $row->prd_cd;
+					$goods_no	= $row->goods_no;
+	
+					DB::table('product_price_list')
+						->insert([
+							'change_date'		=> $change_date,
+							'change_kind'		=> $change_kind,
+							'change_val'		=> $change_val,
+							'price_kind'		=> $price_kind,
+							'apply_yn'			=> $apply_yn,
+							'change_type'		=> $change_type,
+							'plan_category'		=> $plan_category,
+							'product_price_cd'	=> $product_price_cd,
+							'prd_cd'			=> $prd_cd,
+							'org_price'			=> $price,
+							'change_price'		=> $change_price,
+							'admin_id'			=> $admin_id,
+							'rt' => now(),
+							'ut' => now()
+						]);
+	
+					if ($type == 'now') {
+						//goods 테이블 price 가격변경
+						if($plan_category != '00') {
+							DB::table('goods')
+								->where('goods_no', '=', $goods_no)
+								->update(['price' => $change_price]);
+						}
+	
+						//product 테이블 price 가격변경
+						DB::table('product')
+							->where('prd_cd', '=', $prd_cd)
+							->update(['price'=> $change_price]);
+	
+						if($plan_category != '00'){
+							DB::table('product_code')
+								->where('prd_cd', '=', $prd_cd)
+								->update(['plan_category' => $plan_category]);
+						}
+					}
+					
+				}			
+			
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "변경한 상품 가격이 저장되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}	
 }

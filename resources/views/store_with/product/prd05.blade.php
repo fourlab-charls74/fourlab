@@ -19,7 +19,7 @@
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 						<a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
-						<a href="#" onclick="Add('batch_add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2" hidden><i class="bx bx-plus fs-16"></i> 가격변경 일괄등록</a>
+						<a href="#" onclick="Add('batch_add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 일괄등록</a>
                         <!-- <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a> -->
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
@@ -65,9 +65,13 @@
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="prd_cd">바코드</label>
-								<div class="flex_box">
-									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								<div class="form-inline">
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>

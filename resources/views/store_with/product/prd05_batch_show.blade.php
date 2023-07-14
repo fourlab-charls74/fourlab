@@ -61,7 +61,7 @@
 												<div class="form-inline" id="sel_date">
 													<div class="docs-datepicker form-inline-inner input_box w-100">
 														<div class="input-group">
-															<input type="text" class="form-control form-control-sm docs-date" name="change_date_res" id="change_date_res" value="{{$edate}}" autocomplete="off">
+															<input type="text" class="form-control form-control-sm docs-date" name="change_date_res" id="change_date_res" value="{{$rdate}}" autocomplete="off">
 															<div class="input-group-append">
 																<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 																	<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -142,8 +142,10 @@
 			{field: "prd_cd_p", headerName: "품번", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
 			{field: "goods_sh", headerName: "정상가", type: "currencyType", width: 75},
 			{field: "price", headerName: "현재가", type: "currencyType", width: 75},
+			{field: "price_kind", headerName: "기준", width: 80},
 			{field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 120 ,editable:true, cellStyle: {'background' : '#ffff99'}},
-			{field: "change_kind", headerName: "율/액", type: "currencyType", width: 80 ,editable:true, cellStyle: {'background' : '#ffff99'}},
+			{field: "change_kind", headerName: "율/액", width: 80 ,editable:true, cellStyle: {'background' : '#ffff99'}},
+			{field: "change_price", headerName: "변경가", type: "currencyType", width: 75},
 		];
 
 		// let the grid know which columns to use
@@ -174,6 +176,8 @@
 
 		$(document).ready(function() {
 			gridOptions.api.setRowData([]);
+
+			$('#cur_date').hide();
 		});
 
 		var GridData = [];
@@ -182,20 +186,10 @@
 
 			let change_date_res	= $('#change_date_res').val();
 			let change_date_now	= document.getElementById('change_date_now').innerText;
-			let change_price	= parseInt($('#change_price').val());
-			let change_kind		= $('#change_kind').val();
 			let type			= $("input[name='product_price_type']:checked").val();
-			let rows			= gx.getSelectedRows();
-			let change_cnt		= rows.length;
-			let price_kind		= $('#price_kind').val();
 			let plan_category	= $('#plan_category').val();
-
-			if(rows.length < 1)		return alert('저장할 상품을 선택해주세요.');
-
-			if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
-			if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
-			if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
-
+			let change_cnt		= GridData.length;
+			
 			if(GridData.length === 0){
 				alert('입력할 자료를 선택해 주십시오.');
 				return false;
@@ -204,23 +198,20 @@
 			if(!confirm("등록한 상품의 변경금액(율)을 저장하시겠습니까?")) return;
 
 			axios({
-				url: '/store/product/prd05/batch_update',
+				url: '/store/product/prd05/batch-update',
 				method: 'put',
 				data: {
-					data: rows,
+					data: JSON.stringify(GridData),
 					change_date_res : change_date_res,
 					change_date_now : change_date_now,
-					change_kind : change_kind,
-					change_price : change_price,
 					change_cnt : change_cnt,
 					type : type,
-					price_kind : price_kind,
 					plan_category : plan_category
 
 				},
 			}).then(function (res) {
 				if(res.data.code === 200) {
-					alert(res.data.msg);
+					alert('상품가격 일괄변경 내용이 등록되었습니다.');
 					window.close();
 					opener.Search();
 				} else {
@@ -228,6 +219,7 @@
 					alert("상품가격 변경 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 				}
 			}).catch(function (err) {
+				alert("시스템 에러입니다. 관리자에게 문의하여 주십시요.");
 				console.log(err);
 			});
 		}
@@ -284,8 +276,10 @@
 				'A': 'prd_cd_p',
 				'B': 'goods_sh',
 				'C': 'price',
-				'D': 'change_val',
-				'E': 'change_kind',
+				'D': 'price_kind',
+				'E': 'change_val',
+				'F': 'change_kind',
+				'G': 'change_price',
 			};
 
 
