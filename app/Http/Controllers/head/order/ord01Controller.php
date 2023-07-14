@@ -1531,7 +1531,7 @@ class ord01Controller extends Controller
 					concat('$goods_img_url',replace(a.img,'$cfg_img_size_real','$cfg_img_size_list')) as img,
 					a.goods_type,
 					'2' as depth,
-					a.sms_name, a.sms_mobile, a.head_desc
+					a.sms_name, a.sms_mobile, a.head_desc, a.clm_stock_check_yn
 				from (
 					select
 						b.ord_no, a.ord_opt_no, a.ord_state, d.pay_stat, c.goods_type, c.style_no, a.goods_nm,
@@ -1557,6 +1557,7 @@ class ord01Controller extends Controller
 						if(d.cash_apply_yn = 'Y', '신청', '') as cash_apply_yn,
 						if(d.cash_yn = 'Y', '발행', '') as cash_yn,
                         b.dlv_type,
+                        if(csc.state = 30, 'Y', 'N') as clm_stock_check_yn,
                         a.head_desc,
 						if(ifnull(a.goods_addopt,'') = '',
 							(select ifnull(group_concat(if(addopt_amt>0,concat(addopt,'(+',addopt_amt,')'),addopt)),'')
@@ -1573,6 +1574,7 @@ class ord01Controller extends Controller
 						left outer join claim g on g.ord_opt_no = a.ord_opt_no
 						left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
 						left outer join order_track ot on a.ord_no = ot.ord_no
+						left outer join claim_stock_check csc on csc.ord_opt_no = a.ord_opt_no
 					where 1=1 $where
 					order by $str_order_by
 					$limit
