@@ -186,7 +186,8 @@ nav{position:fixed;left:0px;top:70px;background:#1c1e2a;width:210px;height:calc(
 #gnb .search-tab .search-box input {width:calc(100vw - 100px);max-width: 600px;}
 #gnb .list-tab {margin-bottom: 70px;}
 #gnb .list-tab a {color: inherit;}
-#gnb .list-tab a:hover {color: #556ee6;}
+#gnb .list-tab a:hover {color: #556ee6 !important;}
+#gnb .list-tab a:hover > span {color: #556ee6 !important;}
 #gnb .list-tab .list-1 {display: flex;flex-wrap: wrap;}
 #gnb .list-tab .list-1 > li {width:19%;padding-bottom:12px;margin-bottom:30px;border-bottom: 1px solid #ddd;border-right: 1px solid #ddd;}
 #gnb .list-tab .list-1 > li:not(:nth-child(5n)) {margin-right: 1%;}
