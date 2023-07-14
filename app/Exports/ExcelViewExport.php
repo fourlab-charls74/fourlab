@@ -34,7 +34,7 @@ class ExcelViewExport implements WithMultipleSheets
 	public function sheets(): array
 	{
 		$sheets = [];
-		$sheets_count = floor(count($this->data[$this->keys['list_key'] ?? 'list'] ?? []) / ($this->keys['one_sheet_count'] ?? 25)) - 1;
+		$sheets_count = floor(count($this->data[$this->keys['list_key'] ?? 'list'] ?? []) / ($this->keys['one_sheet_count'] ?? 25));
 		if ($sheets_count < 0) $sheets_count = 0;
 
 		foreach (range(0, $sheets_count) as $i) {
