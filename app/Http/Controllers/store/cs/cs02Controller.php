@@ -796,6 +796,7 @@ class cs02Controller extends Controller
                 , sr.sgr_state
                 , sr.return_addr
                 , sr.return_reason
+                , srp.return_qty as qty
                 , srp.prd_cd
                 , g.goods_nm
                 , pc.color
@@ -827,14 +828,10 @@ class cs02Controller extends Controller
 		if (count($rows) > 0) {
 			$data['receipt_date']		= date('Y-m-d'); // 접수일자? 출고일자? 논의 후 수정필요
 			$data['rel_type'] 			= $rows[0]->type_nm ?? '';
-			$data['store_nm'] 			= $rows[0]->store_nm ?? '';
-			$data['store_addr'] 		= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);
+			$data['storage_nm'] 			= $rows[0]->storage_nm ?? '';
+			$data['return_addr'] 		= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);
 			$data['store_phone'] 		= $rows[0]->phone ?? '';
 			$data['store_fax'] 			= $rows[0]->fax ?? '';
-			$data['biz_no'] 			= $rows[0]->biz_no ?? '';
-			$data['biz_ceo'] 			= $rows[0]->biz_ceo ?? '';
-			$data['biz_uptae'] 			= $rows[0]->biz_uptae ?? '';
-			$data['biz_upjong'] 		= $rows[0]->biz_upjong ?? '';
 			$data['storage_addr'] 		= $rows[0]->storage_addr ?? '';
 			$data['storage_manager'] 	= $rows[0]->storage_manager ?? '';
 
@@ -898,7 +895,7 @@ class cs02Controller extends Controller
 			'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
 		];
 
-		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
+		$view_url = Config::get('shop.store.view') . '/cs/cs02_document';
 		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
 		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
 

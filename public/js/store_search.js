@@ -1432,6 +1432,71 @@ ControlOption.prototype.Delete = async function() {
 
 let controlOption2 = new ControlOption();
 
+
+function SearchGoodsNos(){
+    this.grid = null;
+    this.id = '';
+}
+
+SearchGoodsNos.prototype.Init = function () { // 검색조건 초기화 기능 추가 - 사용 예) searchGoodsNos.Init();
+    document.querySelector("form[name='search_goods_nos']").reset();
+    document.querySelector("#gd-goods_nos-total").innerHTML = 0;
+    if (this.grid) this.grid.deleteRows();
+};
+
+SearchGoodsNos.prototype.Open = function(id = 'goods_no',callback = null){
+    if(this.grid === null){
+        this.SetGrid("#div-gd-goods_nos");
+        $("#SearchGoodsNosModal").draggable();
+        this.id = id;
+        this.callback = callback;
+    }
+    let goods_no = $('#' + this.id).val();
+    if(goods_no !== ""){
+        $('#sch_goods_nos').val(goods_no);
+    }
+    $('#SearchGoodsNosModal').modal({
+        keyboard: false
+    });
+};
+
+SearchGoodsNos.prototype.SetGrid = function(divId){
+    const columns = [
+        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
+        {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left'},
+        {field: "style_no", headerName: "스타일넘버", width: 70, pinned: 'left'},
+        {field: "img", headerName: "이미지", type:'GoodsImageType',width: 50},
+        {field: "img", headerName: "이미지_url", hide: true},
+        {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType',width: 80},
+        {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
+        {field:"nvl" , headerName:""},
+    ];
+
+    this.grid = new HDGrid(document.querySelector( divId ), columns);
+};
+
+SearchGoodsNos.prototype.Search = function(){
+    // let data = $('form[name="search_goods_nos"]').serialize();
+    let data = "";
+    data += "sch_goods_nos=" + $("#sch_goods_nos").val().split("\n").filter(v => v).join(",");
+    data += "&sch_style_nos=" + $("#sch_style_nos").val().split("\n").filter(v => v).join(",");
+    data += "&cmd=modal";
+    this.grid.Request('/head/api/goods', data,-1);
+};
+
+SearchGoodsNos.prototype.Choice = function(){
+
+    let checkRows = this.grid.getSelectedRows();
+    let style_nos = checkRows.map(function(row) {
+        return row.style_no;
+    });
+
+    $('#style_no').val(style_nos);
+   
+    $('#SearchGoodsNosModal').modal('toggle');
+};
+let searchGoodsNos = new SearchGoodsNos();
+
 $( document ).ready(function() {
     // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-store" ).on("click", function() {
@@ -1459,6 +1524,12 @@ $( document ).ready(function() {
     // 품번 검색 클릭 이벤트 바인딩 및 콜백 사용
     $(".sch-prdcd-p").on("click", function() {
         searchPrdcd.Open(null, false, true);
+    });
+
+    $( ".sch-goods_nos" ).click(function() {
+        if($(this).attr("data-name") !== null){
+            searchGoodsNos.Open($(this).attr("data-name"));
+        }
     });
 
     // 상품검색조건 클릭 이벤트 바인딩 및 콜백 사용
