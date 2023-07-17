@@ -534,7 +534,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk10/receipt','stk10Controller@receipt'); // 접수
         Route::post('stk10/release','stk10Controller@release'); // 출고
         Route::post('stk10/receive','stk10Controller@receive'); // 매장입고
-        Route::post('stk10/reject','stk10Controller@reject'); // 거부
+		Route::post('stk10/reject','stk10Controller@reject'); // 거부
+		Route::post('stk10/restore','stk10Controller@restore'); // 요청(원복)
         Route::post('stk10/del-release','stk10Controller@del_release'); // 거부
 
         // 초도출고

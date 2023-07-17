@@ -539,6 +539,43 @@ class stk10Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
     }
 
+	// 요청(원복) (-10 -> 10)
+	public function restore(Request $request)
+	{
+		$ori_state = -10;
+		$new_state = 10;
+		$admin_id = Auth('head')->user()->id;
+		$data = $request->input("data", []);
+
+		try {
+			DB::beginTransaction();
+
+			foreach($data as $d) {
+				if($d['state'] != $ori_state) continue;
+
+				DB::table('product_stock_release')
+					->where('idx', '=', $d['idx'])
+					->update([
+						'state'		=> $new_state,
+						'req_rt'	=> now(),
+						'fin_id'	=> '',
+						'fin_rt'	=> '',
+						'ut'		=> now(),
+					]);
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "요청(원복)이 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
     //삭제
     public function del_release(Request $request) 
     {

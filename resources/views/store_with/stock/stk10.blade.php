@@ -310,6 +310,7 @@
                             </select>
                         <select id='change_state_type' name='change_state_type' class="form-control form-control-sm mr-1"  style='width:100px;display:inline'>
                                 <option value='20'>출고처리중</option>
+								<option value='10'>출고요청(원복)</option>
                                 <option value='-10'>거부</option>
                         </select>
                         </div>
@@ -498,61 +499,85 @@
     }
 
     function changeState() {
-        let state = $('#change_state_type').val();
-        let rows = gx.getSelectedRows();
+		
+		let state = $('#change_state_type').val();
+		let rows = gx.getSelectedRows();
 
-        if(state == '20') {
-            if(rows.length < 1) return alert("출고처리중으로 변경할 항목을 선택해주세요.");
-            if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리중으로 변경 가능합니다.");
-            if(!confirm("선택한 항목을 출고처리중으로 변경하시겠습니까?")) return;
+		//출고처리중 상태 변경 
+		if(state == '20') {
+			if(rows.length < 1) return alert("출고처리중으로 변경할 항목을 선택해주세요.");
+			if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리중으로 변경 가능합니다.");
+			if(!confirm("선택한 항목을 출고처리중으로 변경하시겠습니까?")) return;
 
-            axios({
-                url: '/store/stock/stk10/receipt',
-                method: 'post',
-                data: {
-                    data: rows, 
-                    exp_dlv_day: $("[name=exp_dlv_day]").val(), 
-                    rel_order: $("[name=exp_rel_order]").val(),
-                },
-            }).then(function (res) {
-                if(res.data.code === 200) {
-                    alert(res.data.msg);
-                    Search();
-                } else {
-                    console.log(res.data);
-                    alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        } else {
-            if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
-            if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
-            if(rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
-            if(!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
+			axios({
+				url: '/store/stock/stk10/receipt',
+				method: 'post',
+				data: {
+					data: rows,
+					exp_dlv_day: $("[name=exp_dlv_day]").val(),
+					rel_order: $("[name=exp_rel_order]").val(),
+				},
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					alert(res.data.msg);
+					Search();
+				} else {
+					console.log(res.data);
+					alert("접수처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
 
-            axios({
-                url: '/store/stock/stk10/reject',
-                method: 'post',
-                data: {data: rows},
-            }).then(function (res) {
-                if(res.data.code === 200) {
-                    alert(res.data.msg);
-                    Search();
-                } else {
-                    console.log(res.data);
-                    alert("거부처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-                }
-            }).catch(function (err) {
-                console.log(err);
-            });
-        }
+		//출고요청(원복) 상태 변경
+		} else if(state == '10') {
+			if(rows.length < 1) return alert("출고요청(원복)할 항목을 선택해주세요.");
+			if(rows.filter(r => r.state !== -10).length > 0) return alert("'거부'상태의 항목만 거부처리 가능합니다.");
+			if(!confirm("선택한 항목을 출고요청(원복)처리하시겠습니까?")) return;
 
+			axios({
+				url: '/store/stock/stk10/restore',
+				method: 'post',
+				data: {data: rows},
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					alert(res.data.msg);
+					Search();
+				} else {
+					console.log(res.data);
+					alert("출고요청(원복) 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
 
+		//출고거부 상태 변경	
+		} else if(state == '-10') {
+			if(rows.length < 1) return alert("거부처리할 항목을 선택해주세요.");
+			if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 거부처리 가능합니다.");
+			if(rows.filter(r => !r.comment).length > 0) return alert("'메모'에 거부사유를 반드시 입력해주세요.");
+			if(!confirm("선택한 항목을 거부처리하시겠습니까?")) return;
 
+			axios({
+				url: '/store/stock/stk10/reject',
+				method: 'post',
+				data: {data: rows},
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					alert(res.data.msg);
+					Search();
+				} else {
+					console.log(res.data);
+					alert("거부처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
+		} else {
+			alert('변경할 수 없는 출고상태 입니다.');
+		}
 
-
-    }
+	}
 
     // 접수 (10 -> 20)
     function receipt() {
