@@ -304,6 +304,7 @@
             setAllRowGroupExpanded($("#grid_expand").is(":checked"));
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = d.head.total_data;
+            console.log(total_data);
 			if(pinnedRow && total_data != '') {
 				gx.gridOptions.api.setPinnedTopRowData([
 					{ ...pinnedRow.data, ...total_data }

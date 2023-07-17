@@ -300,32 +300,45 @@
         {width: "auto"},
 	];
 
+    
+    const pinnedRowData = [{ dep_store_nm : '합계', qty : 0, wqty : 0, send_qty : 0, send_wqty : 0, rt_qty : 0}];
+
     let stock_columns = [
         {field: "prd_cd", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"},
+            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+        },
         {field: "dep_store_cd",	headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", width: 140},
 		{headerName: "보내는 매장재고",
 			children: [
-				{field: "qty", headerName: "재고", type: "currencyType", width: 65,
+				{field: "qty", headerName: "재고", type: "currencyType", width: 65, aggFunc: 'first',
 					cellRenderer: function(params) {
 						if (params.value !== undefined) {
-							return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            if (params.node.rowPinned === "top") {
+                                return params.value;
+                            } else {
+                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
 						}
 					}
 				},
-				{field: "wqty", headerName: "보유재고", type: "currencyType", width: 65,
+				{field: "wqty", headerName: "보유재고", type: "currencyType", width: 65, 
 					cellRenderer: function(params) {
 						if (params.value !== undefined) {
-							return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            if (params.node.rowPinned === "top") {
+                                return params.value;
+                            } else {
+                                return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }   
 						}
 					}
 				},
 			]
 		},
         {field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "받는 매장", width: 140, cellStyle: {"background-color": "#ffff99"},
-            editable: true,
+        {field: "store_nm",	headerName: "받는 매장", width: 140, cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffff99"},
+            editable: (params) => params.node.rowPinned === "top" ? false : true,
             cellEditor: GridAutoCompleteEditor,
             cellEditorParams: {
                 cellEditor: GridAutoCompleteEditor,
@@ -341,8 +354,12 @@
 				{field: "send_wqty", headerName: "보유재고", type: "currencyType", width: 65},
 			]
 		},
-        {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65, editable: true, cellStyle: {"background-color": "#ffFF99"}},
-        {field: "comment", headerName: "메모", width: "auto", editable: true, cellStyle: {"background-color": "#ffFF99"}},
+        {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65,
+            editable: (params) => params.node.rowPinned === "top" ? false : true,
+            cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffFF99"}},
+        {field: "comment", headerName: "메모", width: "auto",
+            editable: (params) => params.node.rowPinned === "top" ? false : true,
+            cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffFF99"}},
     ];
 
     let rt_columns = [
@@ -403,6 +420,10 @@
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, stock_columns, {
+            pinnedTopRowData: pinnedRowData,
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
+            },
             defaultColDef: {
                 suppressMenu: true,
                 resizable: false,
@@ -417,6 +438,9 @@
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx2.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                        
+                    } else {
+                        updatePinnedRow();
                     }
                 }
                 if (e.column.colId == "store_nm") {
@@ -434,6 +458,7 @@
 								e.data.send_wqty = res.stock?.wqty || 0;
 								e.api.redrawRows({rowNodes:[e.node]});
 								gx2.setFocusedWorkingCell();
+                                updatePinnedRow();
 							},
 							error: function(e) {
 								console.log(e.responseText);
@@ -493,6 +518,14 @@
         gx2.Request('/store/stock/stk22/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
             $("#storage_stock").html('재고 ' + d.body[0]?.storage_qty + ' / ' + '가용재고 ' + d.body[0]?.storage_wqty);
+            let pinnedRow = gx2.gridOptions.api.getPinnedTopRow(0);
+            let total_data = d.head.total_data;
+			if(pinnedRow && total_data != '') {
+				gx2.gridOptions.api.setPinnedTopRowData([
+					{ ...pinnedRow.data, ...total_data }
+				]);
+			}
+
         });
     }
 
@@ -579,5 +612,25 @@
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
     }
+
+    function updatePinnedRow() {
+        const rows = gx2.getSelectedRows();
+
+        let row = {};
+        
+        if (rows.length > 0) {
+            row = rows.reduce((a, c) => ({
+                    send_qty : a.send_qty + c.send_qty,
+                    send_wqty : a.send_wqty + c.send_qty,
+                    rt_qty : isNaN(parseInt(a.rt_qty) + parseInt(c.rt_qty)) ? 0 : parseInt(a.rt_qty) + parseInt(c.rt_qty)
+                }), { dep_store_nm : '합계', qty : 0, wqty : 0, send_qty : 0, send_wqty : 0, rt_qty : 0}
+            );
+        }
+
+        let pinnedRow = gx2.gridOptions.api.getPinnedTopRow(0);
+        gx2.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
+
+    }
+
 </script>
 @stop

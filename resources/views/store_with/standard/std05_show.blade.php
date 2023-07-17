@@ -283,23 +283,41 @@
     // 매장별 사용여부 변경
     function changeUseYnVal(e, rowIndex) {
         const node = gx.getRowNode(rowIndex);
-        node.data.use_yn = e.target.checked ? 'Y' : 'N';
+        // node.data.use_yn = e.target.checked ? 'Y' : 'N';
+        e.node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
         node.setSelected(e.target.checked);
     }
 
     // 브랜드별 사용여부 변경
     function changeUseYnVal2(e, rowIndex) {
         const node = gx2.getRowNode(rowIndex);
-        node.data.use_yn = e.target.checked ? 'Y' : 'N';
+        // node.data.use_yn = e.target.checked ? 'Y' : 'N';
+        e.node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
         node.setSelected(e.target.checked);
     }
 
     // 매장 시작일/종료일 변경 시 사용여부 변경
+    // function changeUseYnValWhenChangeDate(fieldName, e, rowIndex) {
+    //     const node = gx.getRowNode(rowIndex);
+    //     node.data[fieldName] = e.value;
+    //     node.setDataValue(fieldName, e.value);
+    // }
+
     function changeUseYnValWhenChangeDate(fieldName, e, rowIndex) {
+        // 정렬 상태 저장
+        const sortModel = gx.gridOptions.api.getSortModel();
+
+        // 정렬 해제
+        gx.gridOptions.api.setSortModel(null);
+
         const node = gx.getRowNode(rowIndex);
-        node.data[fieldName] = e.value;
-        console.log(node.data[fieldName]);
         node.setDataValue(fieldName, e.value);
+
+        // // 데이터 변경 후 그리드 갱신
+        gx.gridOptions.api.refreshCells({ rowNodes: [node], columns: [fieldName] });
+
+        // // 이전의 정렬 모델로 다시 설정
+        gx.gridOptions.api.setSortModel(sortModel);
     }
 
     // 판매유형 등록 / 수정
