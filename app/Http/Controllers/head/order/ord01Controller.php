@@ -1272,6 +1272,7 @@ class ord01Controller extends Controller
 		$stat_pay_type  = $req->input("stat_pay_type", "");
 		$ord_state      = $req->input("ord_state", "");
 		$clm_state      = $req->input("clm_state", "");
+		$clm_stock_check = $req->input("clm_stock_check", "");
 		$dlv_no         = $req->input("dlv_no", "");
 		$sale_place     = $req->input("sale_place", "");
 		$com_type       = $req->input("com_type", "");
@@ -1391,6 +1392,9 @@ class ord01Controller extends Controller
 			}
         }
 
+		if ($clm_stock_check == "0") $where .= " and csc.state is null ";
+		else if ($clm_stock_check == "1") $where .= " and csc.state = 30 ";
+
 		if($baesong_kind != "")	$where .= " and c.baesong_kind = '$baesong_kind' ";
 
 		//2005.12.27 추가 지명근
@@ -1484,6 +1488,7 @@ class ord01Controller extends Controller
                 left outer join claim g on g.ord_opt_no = a.ord_opt_no
                 left outer join order_opt_memo h on a.ord_opt_no = h.ord_opt_no
                 left outer join order_track ot on a.ord_no = ot.ord_no
+				left outer join claim_stock_check csc on csc.ord_opt_no = a.ord_opt_no
 				where 1=1 $where
 			";
 

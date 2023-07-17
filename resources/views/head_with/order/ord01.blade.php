@@ -215,17 +215,31 @@
                     <!-- end col -->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">클레임 상태</label>
-                            <div class="flax_box">
-                                <select name='clm_state' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($clm_states as $clm_state)
-                                        <option value='{{ $clm_state->code_id }}'>
-                                            {{ $clm_state->code_val }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <label for="name">클레임/창고처리상태</label>
+	                        <div class="form-inline">
+		                        <div class="form-inline-inner input_box">
+			                        <div class="form-group">
+				                        <select name='clm_state' class="form-control form-control-sm">
+					                        <option value=''>전체</option>
+					                        @foreach ($clm_states as $clm_state)
+						                        <option value='{{ $clm_state->code_id }}'>
+							                        {{ $clm_state->code_val }}
+						                        </option>
+					                        @endforeach
+				                        </select>
+			                        </div>
+		                        </div>
+		                        <span class="text_line">/</span>
+		                        <div class="form-inline-inner input_box">
+			                        <div class="form-group">
+				                        <select name='clm_stock_check' class="form-control form-control-sm">
+					                        <option value=''>전체</option>
+					                        <option value="0">재고처리안됨</option>
+					                        <option value="1">재고처리완료</option>
+				                        </select>
+			                        </div>
+		                        </div>
+	                        </div>
                         </div>
                     </div>
                     <!-- end col -->

@@ -690,6 +690,8 @@
 		let rows = gx.getSelectedRows();
 		if (rows.length < 1) return alert("일괄출력할 명세서를 선택해주세요.");
 
+		alert("명세서를 일괄출력하고 있습니다. 잠시만 기다려주세요.");
+
 		axios({
 			url: '/store/stock/stk10/download-zip',
 			method: 'post',
