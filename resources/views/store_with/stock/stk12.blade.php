@@ -276,7 +276,17 @@
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
                     {field: "storage_qty", headerName: "재고", type: 'currencyType', width: 100},
-                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType'},
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType',
+                        cellRenderer:function(params) {
+                            let storage_wqty = params.value;
+                            if (typeof storage_wqty === 'string' && storage_wqty.includes(' ')) {
+                                let qty = storage_wqty.split(' ');
+                                return qty[0] + " <span style='color:red'>" + qty[1] + "</span>";
+                            } else {
+                                return storage_wqty;
+                            }
+                        }
+                    },
                 ]
             },
         ];
@@ -329,6 +339,7 @@
     <script type="text/javascript" charset="utf-8">
         let gx;
         const pApp = new App('', { gridId: "#div-gd" });
+        let total_rel_qty = [];
 
         $(document).ready(function() {
             pApp.ResizeGrid(275);
@@ -350,13 +361,15 @@
                             if (e.oldValue != undefined) {
                                 let oldValue = e.oldValue * 1;
                                 let newValue = e.newValue * 1;
-                                let qty = (e.data.storage_wqty + oldValue) - newValue;
-                                e.data.storage_wqty = qty;
+                                let qty = (parseInt(e.data.storage_wqty) + oldValue) - newValue;
+                                let total_qty = e.data.storage_wqty2 - qty;
+                                e.data.storage_wqty = qty + " (-" + total_qty + ")";
                                 gx.gridOptions.api.updateRowData({update: [e.data]});
                             } else if (e.oldValue == undefined) {
                                 let newValue = e.newValue * 1;
-                                let qty = e.data.storage_wqty - newValue;
-                                e.data.storage_wqty = qty;
+                                let qty = parseInt(e.data.storage_wqty) - newValue;
+                                let total_qty = e.data.storage_wqty2 - qty;
+                                e.data.storage_wqty = qty + " (-" + total_qty + ")";
                                 gx.gridOptions.api.updateRowData({update: [e.data]});
                             }
                         }

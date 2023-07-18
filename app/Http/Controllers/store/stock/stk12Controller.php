@@ -194,6 +194,7 @@ class stk12Controller extends Controller
                 p.goods_opt,
                 p.qty as storage_qty,
                 p.wqty as storage_wqty,
+                p.wqty as storage_wqty2,
                 $store_select_sql
                 '' as blank
             from product_stock_storage p
