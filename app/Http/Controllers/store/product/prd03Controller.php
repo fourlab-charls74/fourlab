@@ -221,60 +221,58 @@ class prd03Controller extends Controller
 
 			foreach($data as $row) {
 
-				$brand = $row['brand'];
-				$type = $row['type'];
+				$brand	= $row['brand'];
+				$type	= $row['type'];
 
-				$year = $row['year'];
 				$season	= $row['season'];
 				$gender	= $row['gender'];
-				$item = $row['item'];
-				$seq = $row['seq'];
-				$opt = $row['opt'];
-				$color = $row['color'];
-				$size = $row['size'];
+				$item	= $row['item'];
+				$seq	= $row['seq'];
+				$opt	= $row['opt'];
+				$color	= $row['color'];
+				$size	= $row['size'];
 
 				$tag_price = $row['tag_price'];
-				$price = $row['price'];
-				$wonga = $row['wonga'];
+				$price	= $row['price'];
+				$wonga	= $row['wonga'];
 
 				$sup_com = $row['sup_com'];
-				$unit = $row['unit'];
-				$year = $row['year'];
+				$unit	= $row['unit'];
+				$year	= $row['year'];
 				
 				$prd_nm	= $row['prd_nm'];
-				// $prd_nm_eng	= $row['prd_nm_eng'];
 				$prd_cd	= $row['prd_cd'];
 
-				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				$prd_cd_p	= $brand . $year . $season . $gender . $item . $seq . $opt;
+
+				$sql	= "select count(*) as count from product where prd_cd = :prd_cd";
 				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
-				if ($result->count == 0) {
+				if($result->count == 0) {
 
 					DB::table('product')->insert([
-						'prd_cd' => $prd_cd,
-						'prd_nm' => $prd_nm,
-						// 'prd_nm_eng' => $prd_nm_eng,
-						'type' => $type,
-						'tag_price' => $tag_price,
-						'price' => $price,
-						'wonga' => $wonga,
-						'com_id' => $sup_com,
-						'unit' => $unit,
-						'rt' => now(),
-						'ut' => now(),
-						'admin_id' => $admin_id
+						'prd_cd'	=> $prd_cd,
+						'prd_nm'	=> $prd_nm,
+						'type'		=> $type,
+						'tag_price'	=> $tag_price,
+						'price'		=> $price,
+						'wonga'		=> $wonga,
+						'com_id'	=> $sup_com,
+						'unit'		=> $unit,
+						'rt'		=> now(),
+						'ut'		=> now(),
+						'admin_id'	=> $admin_id
 					]);
 
 					/**
 					 * 원부자재 상품 이미지 저장 (단일 이미지)
 					 */
-
-					$wonboo_cd = substr($prd_cd,0,2);
+					$wonboo_cd	= substr($prd_cd,0,2);
 
 					$save_path = "";
-					if ($wonboo_cd == 'PR') {
+					if($wonboo_cd == 'PR') {
 						$save_path = "/images/s_goods/pr/";
-					} else if ($wonboo_cd == 'SM') {
+					}else if($wonboo_cd == 'SM') {
 						$save_path = "/images/s_goods/sm/";
 					}
 
@@ -285,20 +283,21 @@ class prd03Controller extends Controller
 					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
 		
 					DB::table('product_code')->insert([
-						'prd_cd' => $prd_cd,
-						'seq' => $seq,
-						'goods_no' => "",
-						'brand' => $brand,
-						'year' => $year,
-						'season' => $season,
-						'gender' => $gender,
-						'item' => $item,
-						'opt' => $opt,
-						'color' => $color,
-						'size' => $size,
-						'type' => $type,
-						'rt' => now(),
-						'ut' => now(),
+						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd_p,
+						'seq'		=> $seq,
+						'goods_no'	=> "",
+						'brand'		=> $brand,
+						'year'		=> $year,
+						'season'	=> $season,
+						'gender'	=> $gender,
+						'item'		=> $item,
+						'opt'		=> $opt,
+						'color'		=> $color,
+						'size'		=> $size,
+						'type'		=> $type,
+						'rt'		=> now(),
+						'ut'		=> now(),
 						'admin_id'	=> $admin_id
 					]);
 					

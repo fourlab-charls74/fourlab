@@ -486,9 +486,9 @@
 			const brand = document.f1.type.value;
 			let type = "";
 			if (brand == "SM") { 
-				type = "S";
+				type = "S";		//부자재
 			} else if (brand == "PR") {
-				type = "G";
+				type = "G";		//사은품
 			}
 			
 			const no_color_size_prd_cd = 
