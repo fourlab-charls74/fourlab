@@ -211,6 +211,32 @@ class stk21Controller extends Controller
             $r->prd_cd = $prd_cd;
         }
 
+        $sql = "
+            select
+                sum(a.qty) as qty
+                , sum(a.wqty) as wqty
+                , 0 as rt_qty
+            from (
+                select
+                    s.store_cd as dep_store_cd,
+                    s.store_nm as dep_store_nm,
+                    ifnull(ps.qty, 0) as qty,
+                    ifnull(ps.wqty, 0) as wqty,
+                    ifnull(pss.qty, 0) as storage_qty,
+                    ifnull(pss.wqty, 0) as storage_wqty
+                from store s
+                    left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
+                    left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
+                where
+                    s.use_yn = 'Y'
+                    and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+                    $where
+            ) as a
+        ";
+
+    $row = DB::selectOne($sql);
+    $total_data = $row;
+
 		return response()->json([
 			"code" => $code,
 			"head" => [
@@ -218,6 +244,7 @@ class stk21Controller extends Controller
 				"page" => 1,
 				"page_cnt" => 1,
 				"page_total" => 1,
+                "total_data" => $total_data,
 			],
 			"body" => $result
 		]);
