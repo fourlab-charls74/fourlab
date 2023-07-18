@@ -119,8 +119,8 @@
 											<option value="prd_nm">원부자재명</option>
 											<option value="p.price">판매가</option>
 											<option value="p.wonga">원가</option>
-											<option value="i.rt" selected>등록일자</option> 
-											<option value="i.ut">수정일자</option>
+											<option value="p.rt" selected>등록일자</option> 
+											<option value="p.ut">수정일자</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -325,7 +325,7 @@
 
 		function EditProduct(product_code) {
 			var url = '/store/product/prd03/edit/' + product_code;
-			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=555");
+			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=900");
 		}
 
 		//원부자재 업체 검색

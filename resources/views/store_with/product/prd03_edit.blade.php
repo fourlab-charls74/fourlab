@@ -50,6 +50,8 @@
 	</style>
 
 	<form name="f1" id="f1">
+		<input type="hidden" name="prd_cd_p" id="prd_cd_p" value="{{$prd_cd_p}}">
+		
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
 				<div class="card-header mb-0">
@@ -141,12 +143,56 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="card">
+			<div class="card-header mb-0">
+				<a href="#">원부자재 세부코드 정보</a>
+			</div>
+			<div class="card-body pt-2">
+				<div class="card-title">
+					<div class="filter_wrap">
+						<div class="fl_box px-0 mx-0">
+							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+						</div>
+						<div class="fr_box">
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<div id="div-gd" class="ag-theme-balham"></div>
+				</div>
+			</div>
+		</div>
+
 	</form>
 
 </div>
+<script>
+	const columns = [
+		{field:"prd_cd",	headerName: "바코드",		width:120},
+		{field:"color",		headerName: "컬러",			width:72, cellStyle:{'text-align':'center'}},
+		{field:"color_nm",	headerName: "컬러명",		width:120, cellStyle:{'text-align':'center'}},
+		{field:"size",		headerName: "사이즈",		width:80, cellStyle:{'text-align':'center'}},
+		{width:"auto"}
+	];	
+</script>
 <script type="text/javascript" charset="utf-8">
 
+	const pApp = new App('', {
+		gridId: "#div-gd",
+	});
+	let gx;
+
 	$(document).ready(function() {
+		pApp.ResizeGrid(700);
+		pApp.BindSearchEnter();
+		let gridDiv = document.querySelector(pApp.options.gridId);
+		let options = {}
+		gx = new HDGrid(gridDiv, columns, options);
+		gx.gridOptions.rowDragManaged = true;
+		gx.gridOptions.animateRows = true;
+		Search();
+
 		if('{{$method}}' === 'show') {
 			//view일 떈, readonly 처리
 			$("#prd_nm").attr("readonly",true); 
@@ -155,6 +201,14 @@
 			$("#unit").attr("readonly",true); 
 		}
 	});
+
+	function Search() {
+		let data = $('form[name="f1"]').serialize();
+
+		console.log(data);
+
+		gx.Request('/store/product/prd03/edit-search/', data);
+	}
 	
 	const onlyNum = (obj) => {
 		val = obj.value;
@@ -222,6 +276,7 @@
 			method: 'post',
 			data: {
 				prd_cd: PRD_CD,
+				prd_cd_p: document.f1.prd_cd_p.value,
 				prd_nm: document.f1.prd_nm.value,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value,

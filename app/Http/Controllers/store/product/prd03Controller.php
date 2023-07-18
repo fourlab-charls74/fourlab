@@ -128,7 +128,7 @@ class prd03Controller extends Controller
 			select
 				c.code_val as type_nm,
 				c2.code_val as opt,
-				i.img_url as img,
+				( select img_url from product_image where prd_cd = p.prd_cd order by seq limit 1 ) as img,
 				p.prd_cd as prd_cd,
 				c7.code_val as color,
 				size.size_nm as size,
@@ -145,11 +145,10 @@ class prd03Controller extends Controller
 				c6.code_val as item,
 				cp.com_nm as sup_com,
 				c9.code_val as unit,
-				i.rt as rt,
-				i.ut as ut
+				p.rt as rt,
+				p.ut as ut
 			from product p
 				inner join product_code pc on p.prd_cd = pc.prd_cd
-				left outer join product_image i on p.prd_cd = i.prd_cd
 				left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
 				left outer join product_stock_store pss2 on p.prd_cd = pss2.prd_cd
 				inner join company cp on p.com_id = cp.com_id
@@ -170,9 +169,11 @@ class prd03Controller extends Controller
 			$orderby
 			$limit
 		";
+		
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($query);
 		$stmt->execute();
+
 		$result	= [];
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$result[] = $row;
@@ -352,6 +353,7 @@ class prd03Controller extends Controller
 	public function showAndEdit($type, $product_code) {
 		$sql = "
 			select
+			    pc.prd_cd_p,
 				c.code_val as type_nm,
 				c3.code_val as year,
 				c4.code_val as season,
@@ -390,30 +392,54 @@ class prd03Controller extends Controller
 		
 		return view( Config::get('shop.store.view').'/product/prd03_edit' , $values);
 	}
+	
+	public function edit_search(Request $request)
+	{
+		$prd_cd_p	= $request->input('prd_cd_p');
+		
+		$sql	= "
+			select
+				pc.prd_cd, pc.color, pc.size
+				, c.code_val as color_nm
+			from product_code pc
+			inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+			where
+			    prd_cd_p	= :prd_cd_p
+		";
+
+		$result = DB::select($sql,['prd_cd_p'	=> $prd_cd_p]);
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body" => $result
+		]);
+	}
 
 	public function edit(Request $request) {
-		$admin_id = Auth('head')->user()->id;
-        $data = $request->input();
-
+		$admin_id	= Auth('head')->user()->id;
+        $data		= $request->input();
 
 		try {
 
 			DB::beginTransaction();
 
-			$prd_cd	= $data['prd_cd'];
-			$prd_nm	= $data['prd_nm'];
-			$price = $data['price'];
-			$wonga = $data['wonga'];
+			$prd_cd		= $data['prd_cd'];
+			$prd_cd_p	= $data['prd_cd_p'];
+			$prd_nm		= $data['prd_nm'];
+			$price		= $data['price'];
+			$wonga		= $data['wonga'];
 			
-			$unit = $data['unit'];
-			$seq = $data['seq'];
+			$unit		= $data['unit'];
+			$seq		= $data['seq'];
 
-			$img = $data['img'];
+			$img		= $data['img'];
 
 			/**
 			 * 원부자재 상품 이미지 수정
 			 */
-
 			$i_prd_cd = substr($prd_cd,0,2);
 
 			$save_path = "";
@@ -484,15 +510,22 @@ class prd03Controller extends Controller
 
 				}
 			}
+			
+			$sql	= " select prd_cd from product_code where prd_cd_p = :prd_cd_p";
+			$result = DB::select($sql,['prd_cd_p' => $prd_cd_p]);
 
-			DB::table('product')->where('prd_cd', '=', $prd_cd)->update([
-				'prd_nm' => $prd_nm,
-				'price' => $price,
-				'wonga' => $wonga,
-				'unit' => $unit,
-				'ut' => now(),
-				'admin_id' => $admin_id
-			]);
+			foreach($result as $row) {
+				$prd_cd	= $row->prd_cd;
+
+				DB::table('product')->where('prd_cd', '=', $prd_cd)->update([
+					'prd_nm' => $prd_nm,
+					'price' => $price,
+					'wonga' => $wonga,
+					'unit' => $unit,
+					'ut' => now(),
+					'admin_id' => $admin_id
+				]);
+			}	
 
 			$code = 200;
 			DB::commit();
