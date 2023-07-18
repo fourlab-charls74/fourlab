@@ -537,12 +537,13 @@ class prd03Controller extends Controller
 			select ifnull(max(seq),'00') as seq 
 			from product_code 
 			where 
-				type = :type
+				brand = :type
 				and year = :year
 				and season = :season
 				and item = :item
 				and opt = :opt
 		";
+		
 		$result	= DB::selectOne($sql, ['type' => $type, 'year' => $year, 'season' => $season, 'item' => $item, 'opt' => $opt]);
 		$seq = $result->seq + 1;
 		if (strlen($seq) == "1") $seq = "0" . $seq;
