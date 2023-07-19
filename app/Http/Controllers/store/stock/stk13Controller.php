@@ -164,26 +164,61 @@ class stk13Controller extends Controller
 
 		if ($page == 1) {
 			$sql = "
-				select count(total) as total
-				from (
-					select count(pc.prd_cd) as total
-					from order_opt o
-						inner join product_code pc on pc.prd_cd = o.prd_cd
-						inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
-						inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
-						inner join store on store.store_cd = o.store_cd
-						left outer join goods g on g.goods_no = o.goods_no
-						left outer join brand b on b.brand = g.brand
-						left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-					where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
-						and o.ord_state = 30 and o.clm_state in (90,-30,0)
-						and ($store_where)
-						$where
-					group by o.store_cd, o.prd_cd
-					order by $orderby
+			select
+				count(a.total) as total
+				, sum(a.storage_qty) as storage_qty
+				, sum(a.storage_wqty) as storage_wqty
+				, sum(a.store_qty) as store_qty
+				, sum(a.store_wqty) as store_wqty
+				, sum(a.sale_cnt) as sale_cnt
+				, sum(a.total_sale_cnt) as total_sale_cnt
+				, sum(a.rel_qty) as rel_qty
+				, sum(a.rel_qty2) as rel_qty2
+			from (
+				select 
+					o.store_cd,
+					count(pc.prd_cd) as total,
+					(select store_nm from store where store_cd = o.store_cd) as store_nm,
+					o.prd_cd,
+					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
+					pc.color,
+					pc.size,
+					o.goods_no,
+					op.opt_kind_nm,
+					b.brand_nm, 
+					g.style_no,
+					g.goods_nm,
+					g.goods_nm_eng,
+					o.goods_opt,
+					ifnull(pss.qty, 0) as storage_qty,
+					ifnull(pss.wqty, 0) as storage_wqty,
+					ifnull(ps.qty, 0) as store_qty, 
+					ifnull(ps.wqty, 0) as store_wqty,
+					sum(ifnull(o.qty, 0)) as sale_cnt,
+					(select sum(qty) from order_opt where (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0) and prd_cd = o.prd_cd and store_cd = o.store_cd) as total_sale_cnt,
+					DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
+					-- LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
+					0 as rel_qty,
+					0 as rel_qty2
+				from order_opt o
+					inner join product_code pc on pc.prd_cd = o.prd_cd
+					inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
+					inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
+					inner join store on store.store_cd = o.store_cd
+					left outer join goods g on g.goods_no = o.goods_no
+					left outer join brand b on b.brand = g.brand
+					left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
+					and o.ord_state = 30 and o.clm_state in (90,-30,0)
+					and ($store_where)
+					$where
+				group by o.store_cd, o.prd_cd
+				order by $orderby
 				) a
 			";
-			$total = DB::selectOne($sql)->total;
+			$row	= DB::select($sql);
+			$total	= $row[0]->total;
+			$total_data = $row[0];
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
@@ -292,6 +327,7 @@ class stk13Controller extends Controller
 				"page_cnt" => $page_cnt,
 				"page_total" => count($result),
 				"rel_products" => $releases,
+				"total_data" => $total_data,
 			],
 			"body" => $result
 		]);

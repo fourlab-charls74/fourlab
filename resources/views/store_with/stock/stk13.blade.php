@@ -298,6 +298,7 @@
     </style>
     <script language="javascript">
         let rel_products = {};
+        const pinnedRowData = [{ prd_cd: '합계' }];
         let columns = [
             {field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true, width: 150, pinned: "left", checkboxSelection: true, headerCheckboxSelection: true},
             {field: "store_cd" , headerName: "매장코드", width: 70, pinned: "left", cellStyle: {"text-align": "center"},
@@ -346,8 +347,12 @@
                     if (params.value !== undefined) {
                         color = "#ffff99";
                         if (params.data !== undefined) {
-                            if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#6666ff";
-                            if (params.data.sale_cnt >= 10) color = "#ff6666";
+                            if (params.node.rowPinned === 'top') {
+                                color = "none";
+                            } else {
+                                if (params.data.store_wqty >= params.data.sale_cnt * 2 && params.data.store_wqty >= 5) color = "#6666ff";
+                                if (params.data.sale_cnt >= 10) color = "#ff6666";
+                            }
                         }
                     }
                     return { "background-color": color };
@@ -355,19 +360,20 @@
             },
             {field: "rel_qty2", headerName: "배분수량", type: "currencyType", width: 60, valueFormatter: formatNumber,
                 editable: params => {
-                  if (params.node.level != 0) {
-                    return true;
-                  } else {
-                    return false;
-                  }
+                    if (params.node.rowPinned === 'top') {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 },
                 cellStyle: params => {
-                    if(params.node.level != 0) {
-                        return {'background-color':'#ffff99'};
-                    } else {
+                    if (params.node.rowPinned === 'top') {
                         return {};
+                    } else {
+                        if (params.node.level != 0) {
+                            return {'background-color':'#ffff99'};
+                        }
                     }
-                   
                 },
             },
             // {width: "auto"}
@@ -391,6 +397,10 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+                pinnedTopRowData: pinnedRowData,
+                getRowStyle: (params) => {
+                    if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+                },
 				defaultColDef: {
 					suppressMenu: true,
 					resizable: false,
@@ -411,6 +421,7 @@
                             alert("0 이상의 숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
+                            updatePinnedRow();
                             if (!rel_products[e.data.prd_cd]) rel_products[e.data.prd_cd] = {};
                             let predicted_already_cnt = Object.keys(rel_products[e.data.prd_cd])
                                 .reduce((a,c) => a + ((c === e.data.store_cd || c === 'storage_wqty') ? 0 : rel_products[e.data.prd_cd][c]), 0) + (e.newValue * 1);
@@ -443,6 +454,7 @@
 
             // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
             load_store_channel();
+
         });
 
         // 검색버튼 클릭 시
@@ -458,6 +470,31 @@
                 gx.gridOptions.api.forEachNode((node) => {
                     if (!!node.data && node.data.rel_qty > 0) node.setSelected(true);
                 });
+
+                let t = d.head.total_data;
+
+                const rows = gx.getSelectedRows();
+
+                let row = {};
+
+                if (rows.length > 0) {
+                    row = rows.reduce((a, c) => ({
+                            rel_qty : isNaN(parseInt(a.rel_qty) + parseInt(c.rel_qty)) ? 0 : parseInt(a.rel_qty) + parseInt(c.rel_qty),
+                            rel_qty2 : isNaN(parseInt(a.rel_qty2) + parseInt(c.rel_qty2)) ? 0 : parseInt(a.rel_qty2) + parseInt(c.rel_qty2)
+                        }), { prd_cd: '합계', storage_qty: 0, storage_wqty: 0, total_sale_cnt : 0, sale_cnt: 0, store_qty: 0, store_wqty: 0, rel_qty: 0, rel_qty2: 0 }
+                    );
+                }
+
+                gx.gridOptions.api.setPinnedTopRowData([{ 
+                    storage_qty : t.storage_qty,
+                    storage_wqty : t.storage_wqty,
+                    total_sale_cnt : t.total_sale_cnt,
+                    sale_cnt : t.sale_cnt,
+                    store_qty : t.store_qty,
+                    store_wqty : t.store_wqty,
+                    rel_qty : row.rel_qty,
+                    rel_qty2 : row.rel_qty2,
+                }]);
             });
         }
 
@@ -547,7 +584,44 @@
 			document.getElementsByClassName('sch-prdcd-range')[0].click();
 		}
 
-    
+        function updatePinnedRow() {
+            const rows = gx.getSelectedRows();
+
+            let row = {};
+            
+            if (rows.length > 0) {
+                row = rows.reduce((a, c) => ({
+                        rel_qty : isNaN(parseInt(a.rel_qty) + parseInt(c.rel_qty)) ? 0 : parseInt(a.rel_qty) + parseInt(c.rel_qty),
+                        rel_qty2 : isNaN(parseInt(a.rel_qty2) + parseInt(c.rel_qty2)) ? 0 : parseInt(a.rel_qty2) + parseInt(c.rel_qty2)
+                    }), { prd_cd: '합계', storage_qty: 0, storage_wqty: 0, total_sale_cnt : 0, sale_cnt: 0, store_qty: 0, store_wqty: 0, rel_qty: 0, rel_qty2: 0 }
+                );
+            }
+
+            let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+            gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
+
+        }
+
+        // const updatePinnedRow = () => {
+        //     let [ storage_qty, storage_wqty, total_sale_cnt, sale_cnt, store_qty, store_wqty, rel_qty, rel_qty2 ] = [ 0, 0, 0, 0, 0, 0, 0, 0];
+        //     const rows = gx.getRows();
+        //     if (rows && Array.isArray(rows) && rows.length > 0) {
+        //         rows.forEach((row, idx) => {
+        //             storage_qty += parseFloat(row.storage_qty);
+        //             storage_wqty += parseFloat(row.storage_wqty);
+        //             total_sale_cnt += parseFloat(row.total_sale_cnt);
+        //             sale_cnt += parseFloat(row.sale_cnt);
+        //             store_qty += parseFloat(row.store_qty);
+        //             store_wqty += parseFloat(row.store_wqty);
+        //             rel_qty += parseFloat(row.rel_qty);
+        //             rel_qty2 += parseFloat(row.rel_qty2);
+        //         });
+        //     };
+        //     let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+        //     gx.gridOptions.api.setPinnedTopRowData([
+        //         { ...pinnedRow.data, storage_qty, storage_wqty, total_sale_cnt, sale_cnt, store_qty, store_wqty, rel_qty, rel_qty2 }
+        //     ]);
+        // }
 
     </script>
 @stop
