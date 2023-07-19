@@ -155,9 +155,9 @@
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
-                <div class="fr_box">
-                   
-                </div>
+				<div class="fr_box">
+					<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+				</div>
             </div>
         </div>
         <div class="table-responsive">
@@ -170,6 +170,7 @@
 <script language="javascript">
 	let columns = [
         {
+			field:"seq",
             headerName: '#',
             width:35,
             pinned:'left',
@@ -251,8 +252,24 @@
                 // console.log(params);
             }
         };
-        gx = new HDGrid(gridDiv, columns, gridOptions);
-        Search(1);
+		
+		let url_path_array = String(window.location.href).split('/');
+		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+
+		get_indiv_columns(pid, columns, function(data) {
+			if(data !== null) {
+				gx = new HDGrid(gridDiv, data);
+			} else {
+				gx = new HDGrid(gridDiv, columns);
+			}
+
+			setMyGridHeader.Init(gx,
+				indiv_grid_save.bind(this, pid, gx),
+				indiv_grid_init.bind(this, pid)
+			);
+
+			Search(1);
+		});
     });
 
     pApp.BindSearchEnter();

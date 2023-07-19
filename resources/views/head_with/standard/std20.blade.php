@@ -104,14 +104,21 @@
             <div class="col-sm-6">
                 <div class="card_wrap h-100">
                     <div class="card shadow h-100">
-                        <div class="card-header mb-0">
-                            <h5 class="m-0 font-weight-bold">상품 세부 정보</h5>
-                        </div>
-                        <div class="card-body pt-3">
-                            <div class="table-responsive">
-                                <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-                            </div>
-                        </div>
+						<div class="card-title mb-3">
+							<div class="filter_wrap">
+								<div class="fl_box">
+									<h5 class="m-0 font-weight-bold">상품 세부 정보</h5>
+								</div>
+								<div class="fr_box">
+									<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body pt-3">
+							<div class="table-responsive">
+								<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+							</div>
+						</div>
                     </div>
                 </div>
             </div>
@@ -219,51 +226,68 @@
     </form>
 </div>
 
-<script language="javascript">
-var columns = [
-        // this row shows the row index, doesn't use any data from the row
-       
-        {
-            headerName: '#',
-            width:35,
-            maxWidth: 100,
-            // it is important to have node.id here, so that when the id changes (which happens
-            // when the row is loaded) then the cell is refreshed.
-            valueGetter: 'node.id',
-            cellRenderer: 'loadingRenderer',
-            cellStyle: {"background":"#F5F7F7"}
-        },
-        {field:"kind",headerName:"템플릿 구분",width:80,cellStyle:StyleGoodsTypeNM,editable: true, },
-        {field:"tplkind",headerName:"템플릿 유형",width:80,editable: true, },
-        {field:"subject",headerName:"제목", width:150, editable: true, 
-            cellRenderer:function(params){
-                return '<a href="javascript:;" data-code="'+params.data.qna_no+'" onClick="GetInfo(this)">'+ params.value+'</a>'
-            }
-        },
-        {field:"use_yn",headerName:"사용여부", editable: true, width:58,
-            cellStyle: {'text-align':'center'},
-            cellRenderer: function(params) {
+<script type="text/javascript" charset="utf-8">
+	var columns = [
+		// this row shows the row index, doesn't use any data from the row
+
+		{
+			headerName: '#',
+			field: 'seq',
+			width:35,
+			maxWidth: 100,
+			// it is important to have node.id here, so that when the id changes (which happens
+			// when the row is loaded) then the cell is refreshed.
+			valueGetter: 'node.id',
+			cellRenderer: 'loadingRenderer',
+			cellStyle: {"background":"#F5F7F7"}
+		},
+		{field:"kind",headerName:"템플릿 구분",width:80,cellStyle:StyleGoodsTypeNM,editable: true, },
+		{field:"tplkind",headerName:"템플릿 유형",width:80,editable: true, },
+		{field:"subject",headerName:"제목", width:150, editable: true,
+			cellRenderer:function(params){
+				return '<a href="javascript:;" data-code="'+params.data.qna_no+'" onClick="GetInfo(this)">'+ params.value+'</a>'
+			}
+		},
+		{field:"use_yn",headerName:"사용여부", editable: true, width:58,
+			cellStyle: {'text-align':'center'},
+			cellRenderer: function(params) {
 				if(params.value === 'Y') return "사용"
 				else if(params.value === 'N') return "미사용"
-                else return params.value
+				else return params.value
 			}
-        },
-        {field:"qna_no", headerName:"qna_no", hide:true,},
-        {field:"", headerName:"", width:0}
-];
+		},
+		{field:"qna_no", headerName:"qna_no", hide:true,},
+		{field:"", headerName:"", width:0}
+	];
 
-</script>
-<script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
+	
+	const pApp = new App('',{
         gridId:"#div-gd",
     });
     let gx;
+	
     $(document).ready(function() {
         pApp.ResizeGrid(275); //280
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        Search(1);
+
+		let url_path_array = String(window.location.href).split('/');
+		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+		
+		get_indiv_columns(pid, columns, function(data) {
+			if(data !== null) {
+				gx = new HDGrid(gridDiv, data);
+			} else {
+				gx = new HDGrid(gridDiv, columns);
+			}
+
+			setMyGridHeader.Init(gx,
+				indiv_grid_save.bind(this, pid, gx),
+				indiv_grid_init.bind(this, pid)
+			);
+
+			Search(1);
+		});
     });
 
     pApp.BindSearchEnter();

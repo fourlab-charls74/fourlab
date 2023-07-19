@@ -596,3 +596,210 @@ function stringCut(str, max_length){
 
 	return str.substring(0, i);
 }
+
+//json 예외문자 치환
+function escape(str) {
+	return str
+		.replace(/[\\]/g, '\\\\')
+		.replace(/[\"]/g, '\\\"')
+		.replace(/[\']/g, '\\\'')
+		.replace(/[\/]/g, '\\/')
+		.replace(/[\b]/g, '\\b')
+		.replace(/[\f]/g, '\\f')
+		.replace(/[\n]/g, '\\n')
+		.replace(/[\r]/g, '\\r')
+		.replace(/[\t]/g, '\\t');
+};
+
+//글자, 숫자만 필터
+function filter_pid (str) {
+	return str.replace('/^[A-Za-z0-9+]*$/', '');
+}
+
+function indiv_grid_save2(pid, column_data) {
+	
+	let data = {
+		'pid'	 : pid,
+		'indiv_columns' : escape(JSON.stringify(column_data, function (key, value) {
+			if (typeof value === 'function') {
+				return value.toString();
+			}
+			return value;
+		}))
+	}
+	
+	$.ajax({
+		method: 'post',
+		url: '/head/indiv-columns/save',
+		data: data,
+		success: function (data) {
+			console.log(data);
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+function indiv_grid_init2(pid) {
+
+	let data = {
+		'pid' : pid
+	}
+
+	$.ajax({
+		method: 'delete',
+		url: '/head/indiv-columns/init',
+		data: data,
+		success: function (data) {
+			console.log(data);
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+function get_indiv_columns2(pid, callback) {
+	$.ajax({
+		method: 'get',
+		url: `/head/indiv-columns/get?pid=${pid}`,
+		success: function (data) {
+			let parseData = null;
+			if(data.body !== null) {
+				parseData = JSON.parse(data.body.indiv_columns, function parser(key, value) {
+					if (typeof value == "object" && value != null) {
+						return value;
+					} else if(String(value).includes('function') > 0 || String(value).indexOf('(') === 0){
+						return eval("(" + value + ")");
+					} else {
+						return value;
+					}
+				});
+
+				//그리드 자체 오류로 인한 null 값 제거
+				parseData.forEach(d => {
+					Object.keys(d).forEach((key) => (d[key] == null) && delete d[key]);
+				});	
+			}
+			
+			callback.call(this, parseData);
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+function clone(o) {
+	if(!isObject(o)) {
+		throw 'o must be a a non-function object';
+	}
+	return (function inner(a, b = {}) {
+		Object.keys(a).forEach(k => {
+			isObject(a[k])? b[k] = inner(a[k]) : b[k] = a[k];
+		});
+		return b;
+	}(o));
+}
+
+function isObject(o) {
+	return o !== null && typeof o === 'object'
+}
+
+function get_indiv_columns(pid, columns, callback) {
+	$.ajax({
+		method: 'get',
+		url: `/head/indiv-columns/get?pid=${pid}`,
+		success: function (data) {
+			let parseData = null;
+			let resData = [];
+			
+			if(data.body !== null) {
+				parseData = JSON.parse(data.body.indiv_columns);
+				parseData.forEach((value) => {
+					columns.forEach((col) => {
+						if(value['field'] === col['field']) {
+							if(value['children'] !== undefined) {
+								let value_children = value['children'];
+								let col_children = value['children'];
+								let new_children = [];
+
+								Object.keys(value_children).forEach((key) => {
+									if(value_children[key]['hide'] === true) {
+										new_children.push(Object.assign(col_children[key], {'hide': true }));
+									} else {
+										new_children.push(col_children[key]);
+									}
+								});
+								
+								col['children'] = new_children;
+								resData.push(col);
+							} else {
+								if(value['hide'] === true) {
+									resData.push(Object.assign(clone(col), {'hide': true }));
+								} else {
+									resData.push(clone(col));
+								}	
+							}
+						}
+					})
+				});
+			}
+			console.log(resData);
+			if(resData.length === 0) {
+				callback.call(this, columns);	
+			} else {
+				callback.call(this, resData);
+			}
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+function indiv_grid_save (pid, gx) {
+	let column_datalist = gx.gridOptions.api.getColumnDefs();
+	let new_column_datalist = [];
+	
+	column_datalist.forEach((value) => {
+		//new_column_datalist.push(clone{ 'field' : value['field'], 'hide': value['hide'] });
+		new_column_datalist.push(clone(value));
+	});
+
+	let data = {
+		'pid'	 : pid,
+		'indiv_columns' : JSON.stringify(new_column_datalist)
+	}
+
+	$.ajax({
+		method: 'post',
+		url: '/head/indiv-columns/save',
+		data: data,
+		success: function (data) {
+			console.log(data);
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+function indiv_grid_init (pid) {
+	let data = {
+		'pid' : pid
+	}
+
+	$.ajax({
+		method: 'delete',
+		url: '/head/indiv-columns/init',
+		data: data,
+		success: function (data) {
+			console.log(data);
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
