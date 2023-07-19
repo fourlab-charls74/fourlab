@@ -256,6 +256,7 @@ class ord02Controller extends Controller
 							$prd_where
 					) as goods_no_group
 					, ifnull(rcp.reject_reason, '') as reject_reason
+					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), if(rcp.dlv_location_type = 'STORE', (select store_nm from store where store_cd = rcp.dlv_location_cd), '')) as reject_location_nm 
 					$qty_sql
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
