@@ -339,7 +339,6 @@
     <script type="text/javascript" charset="utf-8">
         let gx;
         const pApp = new App('', { gridId: "#div-gd" });
-        let total_rel_qty = [];
 
         $(document).ready(function() {
             pApp.ResizeGrid(275);
@@ -385,7 +384,6 @@
             // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
             load_store_channel();
         });
-
         function Search() {
             let store_channel = $("[name=store_channel]").val();
             let store_nos = $("[name='store_no[]']").val();

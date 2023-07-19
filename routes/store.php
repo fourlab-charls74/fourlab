@@ -566,6 +566,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk15/search','stk15Controller@search');
         Route::post('stk15/request-release', 'stk15Controller@request_release');
         Route::post('stk15/chg-store-type', 'stk15Controller@chg_store_type');
+        Route::get('stk15/batch','stk15Controller@batch_show'); // 엑셀 업로드
+        Route::post('stk15/batch-import','stk15Controller@import_excel'); 
+        Route::post('stk15/batch-getgoods','stk15Controller@get_goods'); 
+        Route::post('stk15/request-release-excel', 'stk15Controller@request_release_excel');
+        
 
         // 원부자재 출고
         Route::get('stk16','stk16Controller@index');

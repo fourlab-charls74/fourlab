@@ -497,7 +497,7 @@ class stk12Controller extends Controller
                     , pc.color
                     , pc.size
                     , s.goods_opt
-                    , (select wqty from product_stock_storage where prd_cd = s.prd_cd) as storage_qty
+                    , ps.wqty as storage_qty
                     , (select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = s.prd_cd) as store_qty
                     , '$qty' as qty
                     , '$store_cd' as store_cd

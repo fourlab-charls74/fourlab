@@ -602,26 +602,6 @@
 
         }
 
-        // const updatePinnedRow = () => {
-        //     let [ storage_qty, storage_wqty, total_sale_cnt, sale_cnt, store_qty, store_wqty, rel_qty, rel_qty2 ] = [ 0, 0, 0, 0, 0, 0, 0, 0];
-        //     const rows = gx.getRows();
-        //     if (rows && Array.isArray(rows) && rows.length > 0) {
-        //         rows.forEach((row, idx) => {
-        //             storage_qty += parseFloat(row.storage_qty);
-        //             storage_wqty += parseFloat(row.storage_wqty);
-        //             total_sale_cnt += parseFloat(row.total_sale_cnt);
-        //             sale_cnt += parseFloat(row.sale_cnt);
-        //             store_qty += parseFloat(row.store_qty);
-        //             store_wqty += parseFloat(row.store_wqty);
-        //             rel_qty += parseFloat(row.rel_qty);
-        //             rel_qty2 += parseFloat(row.rel_qty2);
-        //         });
-        //     };
-        //     let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-        //     gx.gridOptions.api.setPinnedTopRowData([
-        //         { ...pinnedRow.data, storage_qty, storage_wqty, total_sale_cnt, sale_cnt, store_qty, store_wqty, rel_qty, rel_qty2 }
-        //     ]);
-        // }
 
     </script>
 @stop

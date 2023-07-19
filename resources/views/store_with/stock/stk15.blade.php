@@ -17,6 +17,7 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
+                    <a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 엑셀 업로드</a>
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <a href="/store/stock/stk10" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="fas fa-step-backward fa-sm"></i> 출고 리스트</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -316,14 +317,30 @@
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else {
+                        if (e.oldValue != undefined) {
+                            console.log(e);
+                            let oldValue = e.oldValue * 1;
+                            let newValue = e.newValue * 1;
+                            let qty = (parseInt(e.data.storage_qty[0].wqty) + oldValue) - newValue;
+                            let total_qty = e.data.storage_qty[0].wqty2 - qty;
+                            e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
+                            // console.log(e.data.storage_qty[0].wqty);
+                            gx.gridOptions.api.updateRowData({update: [e.data.storage_qty[0].wqty]});
+                        } else if (e.oldValue == undefined) {
+                            console.log(e);
+                            let newValue = e.newValue * 1;
+                            let qty = parseInt(e.data.storage_qty[0].wqty) - newValue;
+                            let total_qty = e.data.storage_qty[0].wqty2 - qty;
+                            e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
+                            // console.log(e.data.storage_qty[0].wqty);
+                            gx.gridOptions.api.updateRowData({update: [e.data.storage_qty[0].wqty]});
+                        }
                     }
                 }
             }
         });
         Search();
-
-        // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
-        load_store_channel();
     });
 
 	function Search() {
@@ -390,6 +407,11 @@
 
     function openApi() {
         document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
+
+    const openBatchPopup = () => {
+        const url = '/store/stock/stk15/batch';
+        window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
     }
 
 </script>
