@@ -531,7 +531,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk10','stk10Controller@index');
         Route::get('stk10/search','stk10Controller@search');
 		Route::get('stk10/download','stk10Controller@download'); // 명세서출력
-		Route::post('stk10/download-zip','stk10Controller@downloadZip'); // 명세서일괄출력
+		Route::post('stk10/download-multi','stk10Controller@downloadMulti'); // 명세서일괄출력 (excel)
+		// Route::post('stk10/download-zip','stk10Controller@downloadZip'); // 명세서일괄출력 (zip)
         Route::post('stk10/receipt','stk10Controller@receipt'); // 접수
         Route::post('stk10/release','stk10Controller@release'); // 출고
         Route::post('stk10/receive','stk10Controller@receive'); // 매장입고

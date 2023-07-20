@@ -718,7 +718,7 @@
 		alert("명세서를 일괄출력하고 있습니다. 잠시만 기다려주세요.");
 
 		axios({
-			url: '/store/stock/stk10/download-zip',
+			url: '/store/stock/stk10/download-multi',
 			method: 'post',
 			data: { data: rows.map(row => ({ document_number: row.document_number, idx: row.idx })) },
 		}).then(function (res) {

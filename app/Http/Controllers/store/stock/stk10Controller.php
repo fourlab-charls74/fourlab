@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Exception;
-use ZipArchive;
+// use ZipArchive;
 use App\Exports\ExcelViewExport;
+use App\Exports\ExcelSheetViewExport;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -697,8 +698,8 @@ class stk10Controller extends Controller
 		return Excel::download($export, '출고거래명세서_' . $document_number . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 
-	// 출고 거래명세서 일괄출력
-	public function downloadZip(Request $request)
+	/** 출고 거래명세서 일괄출력 (엑셀파일 형식) */
+	public function downloadMulti(Request $request)
 	{
 		$data = $request->input('data', []);
 		$data = array_reduce($data, function($a, $c) {
@@ -707,38 +708,69 @@ class stk10Controller extends Controller
 			return $a;
 		}, []);
 		
-		$save_path = "data/store/stk10/" . date('YmdHis') . "/";
-		$file_name = "출고거래명세서_";
-
+		$save_path = "data/store/stk10/";
+		$file_name = "출고거래명세서_일괄출력_" . date('YmdHis') . '.xlsx';
+		
 		if (!Storage::disk('public')->exists($save_path)) {
 			Storage::disk('public')->makeDirectory($save_path);
 		}
 
+		$exports = [];
 		foreach ($data as $row) {
 			$document_number = $row['document_number'] ?? '';
 			$idx = $row['idx'] ?? '';
 			$export = $this->_getDocumentFile($document_number, $idx);
-		
-			$file = sprintf("%s%s%s%s", $save_path, $file_name, $document_number,'.xlsx');
-			Excel::store($export, $file);
-		}
-
-		$zip = new ZipArchive;
-		$save_path = "app/" . $save_path;
-		$zip_save_path = "data/store/stk10/";
-		$zipName = $zip_save_path . $file_name . date('YmdHis') . '.zip';
-
-		if ($zip->open(public_path($zipName), ZipArchive::CREATE) === TRUE) {
-			$files = \File::files(storage_path($save_path));
-			foreach ($files as $key => $value) {
-				$file = basename($value);
-				$zip->addFile($value, $file);
+			foreach ($export->sheets() as $sht) {
+				$exports[] = $sht;
 			}
-			$zip->close();
 		}
-		
-		return response()->json([ 'file_path' => $zipName ]);
+
+		Excel::store(new ExcelSheetViewExport($exports), sprintf("%s%s%s", "public/", $save_path, $file_name));
+		return response()->json([ 'file_path' => sprintf("%s%s%s", "", $save_path, $file_name) ]);
 	}
+
+	/** 출고 거래명세서 일괄출력 (zip 형식) - 추후작업 시 참고용으로 사용하도록 주석처리함 */
+	// public function downloadZip(Request $request)
+	// {
+	// 	$data = $request->input('data', []);
+	// 	$data = array_reduce($data, function($a, $c) {
+	// 		$is_already = in_array($c['document_number'], array_map(function($item) { return $item['document_number']; }, $a));
+	// 		if (!$is_already) return array_merge($a, [$c]);
+	// 		return $a;
+	// 	}, []);
+	//	
+	// 	$save_path = "data/store/stk10/" . date('YmdHis') . "/";
+	// 	$file_name = "출고거래명세서_";
+	//
+	// 	if (!Storage::disk('public')->exists($save_path)) {
+	// 		Storage::disk('public')->makeDirectory($save_path);
+	// 	}
+	//
+	// 	foreach ($data as $row) {
+	// 		$document_number = $row['document_number'] ?? '';
+	// 		$idx = $row['idx'] ?? '';
+	// 		$export = $this->_getDocumentFile($document_number, $idx);
+	//	
+	// 		$file = sprintf("%s%s%s%s", $save_path, $file_name, $document_number,'.xlsx');
+	// 		Excel::store($export, $file);
+	// 	}
+	//
+	// 	$zip = new ZipArchive;
+	// 	$save_path = "app/" . $save_path;
+	// 	$zip_save_path = "data/store/stk10/";
+	// 	$zipName = $zip_save_path . $file_name . date('YmdHis') . '.zip';
+	//
+	// 	if ($zip->open(public_path($zipName), ZipArchive::CREATE) === TRUE) {
+	// 		$files = \File::files(storage_path($save_path));
+	// 		foreach ($files as $key => $value) {
+	// 			$file = basename($value);
+	// 			$zip->addFile($value, $file);
+	// 		}
+	// 		$zip->close();
+	// 	}
+	//	
+	// 	return response()->json([ 'file_path' => $zipName ]);
+	// }
 	
 	public function _getDocumentFile($document_number, $idx) {
 		$sql = "
@@ -854,7 +886,7 @@ class stk10Controller extends Controller
 		];
 
 		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
-		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48, 'sheet_name' => '출고거래명세서' . $document_number ];
 		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
 
 		return new ExcelViewExport($view_url, $data, $style, $images, $keys);

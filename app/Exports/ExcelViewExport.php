@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -45,7 +46,20 @@ class ExcelViewExport implements WithMultipleSheets
 	}
 }
 
-class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings
+class ExcelSheetViewExport implements WithMultipleSheets
+{
+	public function __construct($sheets)
+	{
+		$this->sheets = $sheets;
+	}
+
+	public function sheets(): array
+	{
+		return $this->sheets;
+	}
+}
+
+class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings, WithTitle
 {
 	public function __construct($view_url, $data, $style, $images, $keys, $sheet_num)
 	{
@@ -60,6 +74,11 @@ class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings
 	public function view(): View
 	{
 		return view($this->view_url, $this->data);
+	}
+
+	public function title(): string
+	{
+		return ($this->keys['sheet_name'] ?? 'Worksheet') . '_' . (($this->data['sheet_num'] ?? 0) + 1);
 	}
 
 	public function styles(Worksheet $sheet)
