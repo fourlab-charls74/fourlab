@@ -5,6 +5,7 @@ namespace App\Http\Controllers\head;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\RedisInstance;
 
 class IndivColumnsController extends Controller
 {
@@ -14,6 +15,11 @@ class IndivColumnsController extends Controller
 		$indiv_columns = $req->input('indiv_columns', '');
 		
 		try {
+			$redis = app(RedisInstance::class)->getInstance();
+
+			if($redis) {
+				throw new \InvalidArgumentException('레디스 정보를 가져올 수 없습니다.');
+			}
 			
 			DB::beginTransaction();
 			
@@ -76,12 +82,18 @@ class IndivColumnsController extends Controller
 				
 			DB::insert($sql);
 			DB::insert($log_sql);
-			
 			DB::commit();
+
+			$redis->set($pid.":".$user_id, $indiv_columns);
 		} catch (Exception $e) {
 			return response()->json([
 				"code" => 500 ,
 				"message" => $e->getMessage()
+			]);
+		} catch (\RedisException $re) {
+			return response()->json([
+				"code" => 500 ,
+				"message" => $re->getMessage()
 			]);
 		}
 
@@ -94,22 +106,33 @@ class IndivColumnsController extends Controller
 	public function get(Request $req) {
 		$user_id = Auth('head')->user()->id;
 		$pid = $req->input('pid', '');
+		
+		try {
+			$redis = app(RedisInstance::class)->getInstance();
+			$redis_columns = $redis->get($pid.":".$user_id);
 
-		$sql = /** @lang text */
-			"
-          	select 
-          		indiv_columns
-          	from 
-          		indivisualization_columns
-          	where
-          		user_id = '$user_id'
-          		and pid = '$pid'
-        ";
+			$sql = /** @lang text */
+				"
+				select 
+					indiv_columns
+				from 
+					indivisualization_columns
+				where
+					user_id = '$user_id'
+					and pid = '$pid'
+			";
 
-		return response()->json([
-			"code" => 200 ,
-			"body" => DB::selectOne($sql)
-		]);
+			return response()->json([
+				"code" => 200 ,
+				"body" => $redis_columns !== null ? ['indiv_columns' => $redis_columns] : DB::selectOne($sql)
+			]);
+			
+		} catch (\RedisException $re) {
+			return response()->json([
+				"code" => 500 ,
+				"message" => $re->getMessage()
+			]);
+		}
 	}
 
 	public function init(Request $req) {
@@ -124,6 +147,7 @@ class IndivColumnsController extends Controller
 		}
 		
 		try {
+			$redis = app(RedisInstance::class)->getInstance();
 			DB::beginTransaction();
 			
 			$insert_sql = "
@@ -161,12 +185,27 @@ class IndivColumnsController extends Controller
 				
 			DB::insert($insert_sql);
 			DB::delete($sql);
+
+			if($type === 'E') {
+				$keys = $redis->keys($pid);
+				
+				foreach ($keys as $key) {
+					$redis->del($key);
+				}
+			} else {
+				$redis->del($pid.":".$user_id);
+			}
 			
 			DB::commit();
 		} catch (exception $e) {
 			return response()->json([
 				"code" => 500 ,
 				"message" => $e->getMessage()
+			]);
+		}  catch (\RedisException $re) {
+			return response()->json([
+				"code" => 500 ,
+				"message" => $re->getMessage()
 			]);
 		}
 		

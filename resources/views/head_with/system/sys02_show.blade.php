@@ -168,7 +168,7 @@
 				<div class="fl_box">
 					<a href="#">개인화 컬럼 초기화</a>
 					&nbsp;
-					<button href="javascript:init_indiv_columns('{{@$menu->pid}}');" class="btn btn-sm btn-primary">초기화</button>
+					<button onclick="init_indiv_columns('{{@$menu->pid}}'); return false;" class="btn btn-sm btn-primary">초기화</button>
 				</div>
 			</div>
 		</div>
@@ -353,7 +353,7 @@
 					console.log(data);
 				},
 				error: function (request, status, error) {
-					console.log("error")
+					console.log(request);
 				}
 			});
 		}

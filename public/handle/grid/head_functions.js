@@ -725,16 +725,20 @@ function get_indiv_columns(pid, columns, callback) {
 								let col_children = value['children'];
 								let new_children = [];
 
-								Object.keys(value_children).forEach((key) => {
-									if(value_children[key]['hide'] === true) {
-										new_children.push(Object.assign(col_children[key], {'hide': true }));
-									} else {
-										new_children.push(col_children[key]);
-									}
-								});
-								
-								col['children'] = new_children;
-								resData.push(col);
+								if(value['hide'] === true) {
+									resData.push(Object.assign(clone(col), {'hide': true }));
+								} else {
+									Object.keys(value_children).forEach((key) => {
+										if(value_children[key]['hide'] === true) {
+											new_children.push(Object.assign(col_children[key], {'hide': true }));
+										} else {
+											new_children.push(col_children[key]);
+										}
+									});
+
+									col['children'] = new_children;
+									resData.push(col);
+								}
 							} else {
 								if(value['hide'] === true) {
 									resData.push(Object.assign(clone(col), {'hide': true }));
@@ -746,7 +750,7 @@ function get_indiv_columns(pid, columns, callback) {
 					})
 				});
 			}
-			console.log(resData);
+
 			if(resData.length === 0) {
 				callback.call(this, columns);	
 			} else {
@@ -764,7 +768,6 @@ function indiv_grid_save (pid, gx) {
 	let new_column_datalist = [];
 	
 	column_datalist.forEach((value) => {
-		//new_column_datalist.push(clone{ 'field' : value['field'], 'hide': value['hide'] });
 		new_column_datalist.push(clone(value));
 	});
 
