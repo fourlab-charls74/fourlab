@@ -212,6 +212,7 @@ class stk15Controller extends Controller
                 where s.use_yn = 'Y' and p.use_yn = 'Y'
             ";
             $row = DB::select($sql);
+            
             $re->storage_qty = $row;
         }
 

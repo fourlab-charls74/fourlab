@@ -193,6 +193,7 @@
     }
 
     async function DataSave() {
+        if (confirm("중간관리자수수료 정보를 저장하시겠습니까?") === false) return;
         let arr = [];
         let rows = gx.getRows();
         let seq = 0;

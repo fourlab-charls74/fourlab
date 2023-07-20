@@ -126,7 +126,7 @@
         },
         {field: "sale_apply", headerName: "기준금액", width: 70, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                    return params.value === "price" ? "판매가" : params.value === "tag" ? "Tag가" : "";
+                    return params.value === "price" ? "판매가" : params.value === "tag" ? "정상가" : "";
         }},
         {field: "amt_kind", headerName: "적용구분", width: 70, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {

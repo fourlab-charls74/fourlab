@@ -319,22 +319,18 @@
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     } else {
                         if (e.oldValue != undefined) {
-                            console.log(e);
                             let oldValue = e.oldValue * 1;
                             let newValue = e.newValue * 1;
                             let qty = (parseInt(e.data.storage_qty[0].wqty) + oldValue) - newValue;
                             let total_qty = e.data.storage_qty[0].wqty2 - qty;
                             e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
-                            // console.log(e.data.storage_qty[0].wqty);
-                            gx.gridOptions.api.updateRowData({update: [e.data.storage_qty[0].wqty]});
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
                         } else if (e.oldValue == undefined) {
-                            console.log(e);
                             let newValue = e.newValue * 1;
                             let qty = parseInt(e.data.storage_qty[0].wqty) - newValue;
                             let total_qty = e.data.storage_qty[0].wqty2 - qty;
                             e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
-                            // console.log(e.data.storage_qty[0].wqty);
-                            gx.gridOptions.api.updateRowData({update: [e.data.storage_qty[0].wqty]});
+                            gx.gridOptions.api.updateRowData({update: [e.data]});
                         }
                     }
                 }

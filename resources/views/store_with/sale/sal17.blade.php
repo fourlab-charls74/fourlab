@@ -127,6 +127,9 @@
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
+				<div class="fr_box">
+					<a href="#" id="save_btn" onclick="Save();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50"></i> 저장</a>
+                </div>
 			</div>
 		</div>
 		<div class="table-responsive">
@@ -316,8 +319,6 @@
         const store_cd = '{{ @$store->store_cd }}';
         const store_nm = '{{ @$store->store_nm }}';
 
-		console.log(store_cd, store_nm);
-
         if(store_cd != '') {
             const option = new Option(store_nm, store_cd, true, true);
             $('#store_cd').append(option).trigger('change');
@@ -354,48 +355,68 @@
 					rowNode.setDataValue(column_name, prev_value);
 					return false;
 				} else {
-					prev_value = toInt(params.oldValue);
-					value = toInt(params.newValue);
 
-					regExp = new RegExp(/[proj_amt_]/, "g");
-					const Ym = column_name.replace(regExp, "");
+					/* 목표 바꾸면 같이 바뀌는 부분 일괄저장을 하기 때문에 필요없어보이지만 혹시 몰라 주석처리 */
 
-					// 목표 금액부터 반영
-					row[column_name] = value;
-					gx.gridOptions.api.applyTransaction({ update: [row] });
+					// prev_value = toInt(params.oldValue);
+					// value = toInt(params.newValue);
 
-					// 목표 금액, 달성률 반영
-					regExp = /(?=proj_amt_).+/i;
-					const proj_keys = Object.keys(row).filter(key => {
-						return key.match(regExp) ? true : false;
-					});
+					// regExp = new RegExp(/[proj_amt_]/, "g");
+					// const Ym = column_name.replace(regExp, "");
 
-					let total_proj = 0;
-					proj_keys.map(key => {
-						total_proj = total_proj + toInt(row[key]);
-					});
+					// // 목표 금액부터 반영
+					// row[column_name] = value;
+					// gx.gridOptions.api.applyTransaction({ update: [row] });
 
-					row['proj_amt'] = total_proj;
-					row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
+					// // 목표 금액, 달성률 반영
+					// regExp = /(?=proj_amt_).+/i;
+					// const proj_keys = Object.keys(row).filter(key => {
+					// 	return key.match(regExp) ? true : false;
+					// });
 
-					//변경된 목표 저장
-					const response = await axios({
-						url: `/store/sale/sal17/update`, method: 'post',
-						data: { 'store_cd': row.scd, 'proj_amt': value, 'Ym': Ym }
-					});
-					const { data, status } = response;
-					if (data?.code == 200) {
-						gx.gridOptions.api.applyTransaction({ update: [row] });
-						gx.CalAggregation();
-						Search();
-						return true;
-					} else if (data?.code == 500) {
-						alert('목표 저장에 실패했습니다. 잠시후 다시 시도해주세요.');
-					}
+					// let total_proj = 0;
+					// proj_keys.map(key => {
+					// 	total_proj = total_proj + toInt(row[key]);
+					// });
+
+					// row['proj_amt'] = total_proj;
+					// row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
+
 				}
 			}
 		}
 	};
+
+	//매장별 목표 저장
+	async function Save() {
+		if (!confirm("목표를 저장하시겠습니까?")) return;
+
+		let rows = gx.getRows();
+		let sdate = $("#sdate").val();
+		let edate = $("#edate").val();
+
+        try {
+            const response = await axios({ 
+                url: '/store/sale/sal17/update',
+                method: 'post', 
+                data: { 
+					data: rows,
+					sdate : sdate,
+					edate : edate
+				}
+            });
+            const { data } = response;
+            if (data?.code == 200) {
+				alert(data.msg);
+                Search();
+            } else {
+                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+            }
+        } catch (error) {
+            // console.log(error);
+        }
+
+	}
 
 	const toInt = (value) => {
 		if (value == "" || value == NaN || value == null || value == undefined) return 0;

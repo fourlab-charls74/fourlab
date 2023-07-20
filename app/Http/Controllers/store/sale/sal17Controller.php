@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use DateInterval;
+use DatePeriod;
+use DateTime;
+use Exception;
 
 class sal17Controller extends Controller
 {
@@ -63,7 +67,7 @@ class sal17Controller extends Controller
 		// 	where
 		// 		code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
 		// ";
-		$sell_types	= DB::select($sql);
+		// $sell_types	= DB::select($sql);
 
 		$values = [
             'sdate'         => $sdate,
@@ -217,35 +221,61 @@ class sal17Controller extends Controller
 
 	}
 
+	// 자동저장 기능 삭제 후 수동저장기능으로 변경
 	public function update(Request $request)
 	{
-		$store_cd = $request->input('store_cd');
-		$proj_amt = $request->input('proj_amt');
-		$Ym = $request->input('Ym');
+		$data = $request->input("data");
+		$sdate = $request->input("sdate");
+		$edate = $request->input("edate");
 		$admin_id = Auth('head')->user()->id;
 		$admin_nm = Auth('head')->user()->name;
-		try {
-			DB::transaction(function () use ($store_cd, $proj_amt, $Ym, $admin_id, $admin_nm) {
-                $cnt = DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->count();
-                if($cnt === 0){
-                    DB::table('store_sales_projection')->insert([
-                        "store_cd" => $store_cd,
-                        "ym" => $Ym,
-                        "amt" => $proj_amt,
-                        "uid" => $admin_id,
-                        "unm" => $admin_nm,
-						"rt"  => now(),
-						"ut"  => now()
-                    ]);
-                } else {
-                    DB::table('store_sales_projection')->where('store_cd', $store_cd)->where('ym', $Ym)->update(['amt' => $proj_amt, 'ut' => now()]);
-                }
-			});
-			$code = 200;
-		} catch (\Exception $e) {
-			$code = 500;
-		}
-		return response()->json(['code' => $code]);
+		$start_date = new DateTime($sdate);
+		$end_date = new DateTime($edate);
+		$interval = new DateInterval('P1M'); // P1M은 1달을 의미합니다.
+		$period = new DatePeriod($start_date, $interval, $end_date);
 
+		$date_arr = [];
+		foreach ($period as $date) {
+			array_push($date_arr, $date->format('Ym'));
+		}
+		$date_arr[] = $end_date->format('Ym');
+
+		try {
+			DB::beginTransaction();
+
+			foreach ($date_arr as $ym) {
+				foreach ($data as $d) {
+					$store_cd = $d['scd'];
+					$proj_amt = $d['proj_amt_' . $ym] ?? 0;
+
+					DB::table('store_sales_projection')->upsert(
+						[
+							'store_cd' => $store_cd,
+							'ym' => $ym,
+							'amt' => $proj_amt,
+							'uid' => $admin_id,
+							'unm' => $admin_nm,
+							'rt' => now(),
+							'ut' => now(),
+						],
+						['store_cd', 'ym'],
+						['amt', 'uid', 'unm', 'rt', 'ut']
+					);
+				}
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "매장별 목표가 저장되었습니다.";
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json([
+			"code" => $code,
+			"msg" => $msg
+		]);
 	}
 }
