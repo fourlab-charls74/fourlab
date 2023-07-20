@@ -35,11 +35,7 @@ class std04Controller extends Controller
 		$store_channel_kind	= $request->input("store_channel_kind");
 
 		$code = 200;
-<<<<<<< Updated upstream
 		$where = " and s.competitor_yn = 'Y' "; // 동종업계정보입력을 사용하는 항목만 조회
-=======
-		$where = " and s.competitor_yn = 'Y'"; // 동종업계정보입력을 사용하는 항목만 조회
->>>>>>> Stashed changes
 
 		if($store_type != null) 
 			$where .= " and s.store_type = '$store_type'";
@@ -63,14 +59,9 @@ class std04Controller extends Controller
 			from store s
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1 and sc.use_yn = 'Y'
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2 and sc2.use_yn = 'Y'
-<<<<<<< Updated upstream
 			where 1=1
 				$where
 			order by s.store_cd
-=======
-			where 1=1 $where
-			order by store_cd
->>>>>>> Stashed changes
 		";
 
 		$rows = DB::select($sql);
