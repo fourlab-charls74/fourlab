@@ -9,8 +9,10 @@ use App\Models\Conf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 use App\Exports\ExcelViewExport;
+use App\Exports\ExcelSheetViewExport;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -527,7 +529,45 @@ class stk10Controller extends Controller
 	{
 		$document_number = $request->input('document_number');
 		$idx = $request->input('idx');
+		$export = $this->_getDocumentFile($document_number, $idx);
+		return Excel::download($export, '출고거래명세서_' . $document_number . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 
+	/** 출고 거래명세서 일괄출력 (엑셀파일 형식) */
+	public function downloadMulti(Request $request)
+	{
+		$data = $request->input('data', []);
+		$data = array_reduce($data, function($a, $c) {
+			$is_already = in_array($c['document_number'], array_map(function($item) { return $item['document_number']; }, $a));
+			if (!$is_already) return array_merge($a, [$c]);
+			return $a;
+		}, []);
+		
+		$store_cd = Auth('head')->user()->store_cd;
+		$store_nm = DB::table('store')->where('store_cd', $store_cd)->value('store_nm');
+
+		$save_path = "data/shop/stk10/";
+		$file_name = $store_nm . "_출고거래명세서_일괄출력_" . date('YmdHis') . '.xlsx';
+
+		if (!Storage::disk('public')->exists($save_path)) {
+			Storage::disk('public')->makeDirectory($save_path);
+		}
+
+		$exports = [];
+		foreach ($data as $row) {
+			$document_number = $row['document_number'] ?? '';
+			$idx = $row['idx'] ?? '';
+			$export = $this->_getDocumentFile($document_number, $idx);
+			foreach ($export->sheets() as $sht) {
+				$exports[] = $sht;
+			}
+		}
+
+		Excel::store(new ExcelSheetViewExport($exports), sprintf("%s%s%s", "public/", $save_path, $file_name));
+		return response()->json([ 'file_path' => sprintf("%s%s%s", "", $save_path, $file_name) ]);
+	}
+
+	public function _getDocumentFile($document_number, $idx) {
 		$sql = "
 			select p.prd_cd
 			     , type.code_val as type_nm
@@ -644,6 +684,6 @@ class stk10Controller extends Controller
 		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
 		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
 
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '출고거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return new ExcelViewExport($view_url, $data, $style, $images, $keys);
 	}
 }

@@ -240,6 +240,8 @@
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a> -->
+	                    <a href="javascript:printSelectedDocuments();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download mr-1"></i>명세서 일괄출력</a>
+	                    <span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
                         <!-- <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a> -->
                     </div>
@@ -508,6 +510,24 @@
 	// 출고 거래명세서 출력
 	function printDocument(document_number, idx) {
 		location.href = '/shop/stock/stk10/download?document_number=' + document_number + '&idx=' + idx;
+	}
+
+	// 출고 거래명세서 일괄출력
+	function printSelectedDocuments() {
+		let rows = gx.getSelectedRows();
+		if (rows.length < 1) return alert("일괄출력할 명세서를 선택해주세요.");
+
+		alert("명세서를 일괄출력하고 있습니다. 잠시만 기다려주세요.");
+
+		axios({
+			url: '/shop/stock/stk10/download-multi',
+			method: 'post',
+			data: { data: rows.map(row => ({ document_number: row.document_number, idx: row.idx })) },
+		}).then(function (res) {
+			window.location = '/' + res.data.file_path;
+		}).catch(function (err) {
+			console.log(err);
+		});
 	}
 </script>
 @stop
