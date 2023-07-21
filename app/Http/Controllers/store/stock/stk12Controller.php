@@ -149,12 +149,16 @@ class stk12Controller extends Controller
         $store_channel_kind = $r['store_channel_kind'] ?? '';
         $stores = [];
         $store_select_sql = "";
+        $total_store_select_sql = "";
+        $total_store = "";
         foreach($store_cds as $store_cd) {
             $row = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_cd', '=', $store_cd)->first();
             if($store_channel == '' or ($store_channel != '' and $row->store_channel == $store_channel)) {
                 array_push($stores, $row);
                 $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
                 $store_select_sql .= "(select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_wqty,";
+                $total_store_select_sql .= "sum((select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd)) as $store_cd" . "_qty,";
+                $total_store .= "$store_cd"."_qty,";
             }
         }
         if(count($store_cds) < 1) {
@@ -164,6 +168,8 @@ class stk12Controller extends Controller
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
                     $store_select_sql .= "(select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_wqty,";
+                    $total_store_select_sql .= "sum((select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd)) as $store_cd" . "_qty,";
+                    $total_store .= "$store_cd"."_qty,";
                 }
             } elseif ($store_channel_kind != "" && $store_channel != "") {
                 $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_channel', '=', $store_channel)->where('store_channel_kind','=',$store_channel_kind)->get();
@@ -171,10 +177,12 @@ class stk12Controller extends Controller
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
                     $store_select_sql .= "(select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_wqty,";
+                    $total_store_select_sql .= "sum((select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd)) as $store_cd" . "_qty,";
+                    $total_store .= "$store_cd"."_qty,";
                 }
             }
-           
         }
+
 
 		$sql = "
             select
@@ -215,19 +223,33 @@ class stk12Controller extends Controller
         $page_cnt = 0;
         if($page == 1) {
             $sql = "
-                select count(*) as total
-                from product_stock_storage p
-                    left outer join product_code pc on pc.prd_cd = p.prd_cd
-                    inner join goods g on g.goods_no = p.goods_no
-                    inner join brand b on b.brand = g.brand
-                    inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                    inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
-                    inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
+                select
+                    a.total as total,
+                    sum(a.storage_qty) as storage_qty,
+                    sum(a.storage_wqty) as storage_wqty,
+                    $total_store
+                    '' as blank
+                from (
+                    select 
+                        count(pc.prd_cd) as total,
+                        sum(p.qty) as storage_qty,
+                        sum(p.wqty) as storage_wqty,
+                        $total_store_select_sql
+                        '' as blank
+                    from product_stock_storage p
+                        left outer join product_code pc on pc.prd_cd = p.prd_cd
+                        inner join goods g on g.goods_no = p.goods_no
+                        inner join brand b on b.brand = g.brand
+                        inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                        inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                        inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                    where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
+                    $orderby
+                ) a
             ";
-
-            $row = DB::selectOne($sql);
-            $total = $row->total;
+            $row = DB::select($sql);
+            $total = $row[0]->total;
+            $total_data = $row[0];
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
@@ -239,6 +261,7 @@ class stk12Controller extends Controller
 				"page_cnt" => $page_cnt,
 				"page_total" => count($result),
                 "stores" => $stores,
+                "total_data" => $total_data??''
 			],
 			"body" => $result
 		]);

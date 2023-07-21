@@ -259,6 +259,7 @@
         </div>
     </div>
     <script language="javascript">
+        const pinnedRowData = [{ style_no: '합계', storage_qty : 0, storage_wqty: 0 }];
         let columns = [
             {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
             {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
@@ -302,32 +303,14 @@
                     field: cd,
                     headerName: nm,
                     children: [
-                        {
-                            field: cd + '_qty',
-                            headerName: '재고',
-                            type: "currencyType",
-                            width: 50,
+                        {field: cd + '_qty', headerName: '재고', type: "currencyType", width: 50,
                             cellRenderer: function(params) {
                                 return params.data[cd + "_qty"] || 0;
                             }
                         },
-                        // {
-                        //     field: cd + '_wqty',
-                        //     headerName: '보유재고',
-                        //     type: "currencyType",
-                        //     width: 80,
-                        //     cellRenderer: function(params) {
-                        //         return params.data[cd + "_wqty"] || 0;
-                        //     }
-                        // },
-                        {
-                            field: cd + '_rel_qty',
-                            headerName: '배분수량',
-                            type: "currencyType",
-                            width: 80,
-                            editable: true,
-                            cellStyle: {'background-color': '#ffff99'},
-                            valueFormatter: formatNumber
+                        {field: cd + '_rel_qty', headerName: '배분수량', type: "currencyType", width: 80, valueFormatter: formatNumber,
+                            editable : (params) => params.node.rowPinned === 'top' ? false : true,
+                            cellStyle : (params) => params.node.rowPinned === 'top' ? {} : {'background-color' : '#ffff99'}
                         },
                     ],
                 });
@@ -345,6 +328,10 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+                pinnedTopRowData: pinnedRowData,
+                getRowStyle: (params) => {
+                    if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+                },
 				defaultColDef: {
 					suppressMenu: true,
 					resizable: false,
@@ -357,6 +344,7 @@
                             alert("숫자만 입력가능합니다.");
                             gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                         } else {
+                            updatePinnedRow();
                             if (e.oldValue != undefined) {
                                 let oldValue = e.oldValue * 1;
                                 let newValue = e.newValue * 1;
@@ -393,12 +381,31 @@
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
             gx.Request('/store/stock/stk12/search', data, 1, function(d) {
                 setColumn(d.head.stores);
+
+                let t = d.head.total_data;
+                let stores = d.head.stores;
+
+                const rows = gx.getSelectedRows();
+
+                const pinnedRowData = {
+                    style_no : '합계',
+                    storage_qty: t.storage_qty,
+                    storage_wqty: t.storage_wqty
+                };
+
+                for (let i = 0; i < stores.length; i++) {
+                    let store_cd = stores[i].store_cd;
+                    pinnedRowData[`${store_cd}_qty`] = t[`${store_cd}_qty`] || 0;
+                    pinnedRowData[`${store_cd}_rel_qty`] = 0;
+                }
+
+                gx.gridOptions.api.setPinnedTopRowData([pinnedRowData]);
             });
         }
 
-        function setInvoiceNo(invoice_no) {
-            $("[name=invoice_no]").val(invoice_no);
-        }
+                function setInvoiceNo(invoice_no) {
+                    $("[name=invoice_no]").val(invoice_no);
+                }
 
         // 출고요청
         function requestRelease() {
@@ -470,5 +477,39 @@
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
         }
 
+        function updatePinnedRow() {
+            const rows = gx.getSelectedRows();
+
+            let store_rel_qty_map = {};
+
+            for (let i = 0; i < rows.length; i++) {
+                for (const key in rows[i]) {
+                    if (key.includes('_rel_qty')) { 
+                        let keys = key;
+                        let keys_str = keys.split("_");
+                        let store_cd = keys_str[0];
+
+                        if (!store_rel_qty_map[store_cd]) {
+                            store_rel_qty_map[store_cd] = 0;
+                        }
+
+                        store_rel_qty_map[store_cd] += parseInt(rows[i][key]);
+                    }
+                }
+            }
+
+            let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+
+            for (const store_cd in store_rel_qty_map) {
+                pinnedRow.data[`${store_cd}_rel_qty`] = store_rel_qty_map[store_cd];
+            }
+
+            gx.gridOptions.api.setPinnedTopRowData([pinnedRow.data]);
+        }
+
     </script>
 @stop
+
+
+
+
