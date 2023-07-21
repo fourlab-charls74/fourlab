@@ -179,8 +179,10 @@
 		]},
 		{headerName:"매니저수수료등급",		field:"grade_nm",	width:110, cellStyle:{"text-align":"center"}},
 		{headerName:"보증금",		children:[
-			{headerName:"매장",		field:"deposit_cash",	width:72, type: 'currencyType'},
-			{headerName:"담보",		field:"deposit_coll",	width:72, type: 'currencyType'},
+			{headerName:"현금",		field:"cash",		width:72, type: 'currencyType'},
+			{headerName:"보증보험",	field:"warranty",	width:72, type: 'currencyType'},
+			{headerName:"부동산담보",		field:"deposit_coll",	width:72, type: 'currencyType'},
+			{headerName:"기타담보",	field:"etc_coll",	width:72, type: 'currencyType'},
 		]},
 		// {headerName:"점포수수료",	field:"fee", width:80, type: 'currencyType',
 		// 	cellRenderer:function(params) {
