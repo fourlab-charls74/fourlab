@@ -14,7 +14,7 @@ class RedisInstance extends Redis
 	// method
 	public function set($key, $value)
 	{
-		$this->singleton->client()->set($key, $value);
+		$this->singleton->client()->set($key, $value, 'EX', 3600 * 24);
 	}
 
 	public function get($key)
@@ -26,9 +26,5 @@ class RedisInstance extends Redis
 	{
 		$this->singleton->client()->del($key);
 	}
-
-	public function keys($prefix)
-	{
-		return $this->singleton->client()->keys($prefix.':*');
-	}
+	
 }

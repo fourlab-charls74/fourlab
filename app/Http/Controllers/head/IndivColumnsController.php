@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\RedisInstance;
+use Predis\Collection\Iterator;
 
 class IndivColumnsController extends Controller
 {
@@ -15,11 +16,26 @@ class IndivColumnsController extends Controller
 		$indiv_columns = $req->input('indiv_columns', '');
 		
 		try {
+			
+			/*$ip = env('');
+			$port = '22';
+			$url = $ip . ':' . $port;
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$data = curl_exec($ch);
+			$health = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			curl_close($ch);
+			if ($health) {
+				$json = json_encode(['health' => $health, 'status' => '1']);
+				return $json;
+			} else {
+				$json = json_encode(['health' => $health, 'status' => '0']);
+				return $json;
+			}*/
+			
 			$redis = app(RedisInstance::class)->getInstance();
-
-			if($redis) {
-				throw new \InvalidArgumentException('레디스 정보를 가져올 수 없습니다.');
-			}
 			
 			DB::beginTransaction();
 			
@@ -36,7 +52,16 @@ class IndivColumnsController extends Controller
 			$row = DB::selectOne($select_sql);
 			
 			if($row->cnt >= 1) {
-				throw new \InvalidArgumentException('이미 개인화된 컬럼이 존재합니다. 초기화후 다시 시도해주세요');
+				$delete_sql = "
+					delete 
+					from 
+						indivisualization_columns
+					where
+						user_id = '$user_id'
+						and pid = '$pid'
+				";
+				
+				DB::update($delete_sql);
 			}
 			
 			$max_sql = "
@@ -82,19 +107,24 @@ class IndivColumnsController extends Controller
 				
 			DB::insert($sql);
 			DB::insert($log_sql);
-			DB::commit();
 
-			$redis->set($pid.":".$user_id, $indiv_columns);
+			$redis->set('indiv_menu_list:'.$user_id.":".$pid, $indiv_columns);
 		} catch (Exception $e) {
 			return response()->json([
 				"code" => 500 ,
 				"message" => $e->getMessage()
 			]);
+
+			$redis->del('indiv_menu_list:'.$user_id.":".$pid);
 		} catch (\RedisException $re) {
 			return response()->json([
 				"code" => 500 ,
 				"message" => $re->getMessage()
 			]);
+			
+			DB::rollBack();
+		} finally {
+			DB::commit();
 		}
 
 		return response()->json([
@@ -109,8 +139,9 @@ class IndivColumnsController extends Controller
 		
 		try {
 			$redis = app(RedisInstance::class)->getInstance();
-			$redis_columns = $redis->get($pid.":".$user_id);
-
+			$redis_columns = $redis->get('indiv_menu_list:'.$user_id.":".$pid);
+			$return_columns = null;
+			
 			$sql = /** @lang text */
 				"
 				select 
@@ -122,9 +153,21 @@ class IndivColumnsController extends Controller
 					and pid = '$pid'
 			";
 
+			if($redis_columns !== null) {
+				$return_columns = ['indiv_columns' => $redis_columns];
+			} else {
+				$return_columns = DB::selectOne($sql);
+				
+				if($return_columns === null) {
+					$return_columns = ['indiv_columns' => []];
+				} else {
+					$redis->set('indiv_menu_list:'.$user_id.":".$pid, $return_columns->indiv_columns);	
+				}
+			}
+			
 			return response()->json([
 				"code" => 200 ,
-				"body" => $redis_columns !== null ? ['indiv_columns' => $redis_columns] : DB::selectOne($sql)
+				"body" => $return_columns
 			]);
 			
 		} catch (\RedisException $re) {
@@ -187,16 +230,17 @@ class IndivColumnsController extends Controller
 			DB::delete($sql);
 
 			if($type === 'E') {
-				$keys = $redis->keys($pid);
-				
-				foreach ($keys as $key) {
-					$redis->del($key);
+				$iterator = null;
+				while ($keys = $redis->scan($iterator, ['match' => "*:".strtoupper($pid), 'count' => 20])) {
+					$iterator = $keys[0];
+					foreach ($keys[1] as $key) {
+						$redis->del($key);
+					}
 				}
 			} else {
-				$redis->del($pid.":".$user_id);
+				$redis->del('indiv_menu_list:'.$user_id.":".$pid);
 			}
 			
-			DB::commit();
 		} catch (exception $e) {
 			return response()->json([
 				"code" => 500 ,
@@ -207,6 +251,10 @@ class IndivColumnsController extends Controller
 				"code" => 500 ,
 				"message" => $re->getMessage()
 			]);
+			
+			DB::rollBack();
+		} finally {
+			DB::commit();
 		}
 		
 		return response()->json([

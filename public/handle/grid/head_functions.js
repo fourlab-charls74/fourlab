@@ -715,14 +715,14 @@ function get_indiv_columns(pid, columns, callback) {
 			let parseData = null;
 			let resData = [];
 			
-			if(data.body !== null) {
+			if(data.body.indiv_columns.length > 0) {
 				parseData = JSON.parse(data.body.indiv_columns);
 				parseData.forEach((value) => {
 					columns.forEach((col) => {
 						if(value['field'] === col['field']) {
-							if(value['children'] !== undefined) {
+							if(value['children'].length > 0) {
 								let value_children = value['children'];
-								let col_children = value['children'];
+								let col_children = col['children'];
 								let new_children = [];
 
 								if(value['hide'] === true) {
@@ -747,6 +747,7 @@ function get_indiv_columns(pid, columns, callback) {
 								}	
 							}
 						}
+						
 					})
 				});
 			}
@@ -768,7 +769,16 @@ function indiv_grid_save (pid, gx) {
 	let new_column_datalist = [];
 	
 	column_datalist.forEach((value) => {
-		new_column_datalist.push(clone(value));
+		let value_children = value['children'];
+		let newchildren = [];
+		
+		if(value['children'] !== undefined) {
+			value_children.forEach((val) => {
+				newchildren.push({'field': val['field'], 'hide': val['hide']});
+			});	
+		}
+		
+		new_column_datalist.push({'field': value['field'], 'hide': value['hide'], 'children': newchildren});
 	});
 
 	let data = {
@@ -782,6 +792,7 @@ function indiv_grid_save (pid, gx) {
 		data: data,
 		success: function (data) {
 			console.log(data);
+			window.location.reload();
 		},
 		error: function(request, status, error) {
 			console.log("error")
@@ -800,6 +811,7 @@ function indiv_grid_init (pid) {
 		data: data,
 		success: function (data) {
 			console.log(data);
+			window.location.reload();
 		},
 		error: function(request, status, error) {
 			console.log("error")
