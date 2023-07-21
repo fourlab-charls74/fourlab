@@ -128,6 +128,8 @@ class stk16Controller extends Controller
                 ifnull(p.price, 0) as price,
                 ifnull(p.wonga, 0) as wonga,
                 psr.qty,
+                ifnull(psr.rec_qty, psr.qty) as rec_qty,
+                ifnull(psr.prc_qty, psr.qty) as prc_qty,
                 psr.store_cd,
                 s.store_nm, 
                 psr.storage_cd,
@@ -228,6 +230,7 @@ class stk16Controller extends Controller
                 $prd_cd = $row['prd_cd'];
                 $price = $row['price'];
                 $wonga = $row['wonga'];
+				$qty = $row['rec_qty'] ?? 0;
 
                 $result = DB::table('product_stock_storage')
                 ->where('prd_cd', '=', $prd_cd)
@@ -236,7 +239,7 @@ class stk16Controller extends Controller
 
                 $storage_qty = $result->wqty;
 
-                if ((int)$row['qty'] > $storage_qty) { // 창고수량보다 접수 수량이 많은 경우 에러처리
+                if ((int)$qty > $storage_qty) { // 창고수량보다 접수 수량이 많은 경우 에러처리
                     DB::rollback();
                     return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
                 }
@@ -244,7 +247,8 @@ class stk16Controller extends Controller
                 DB::table('sproduct_stock_release')
                     ->where('idx', '=', $row['idx'])
                     ->update([
-                        'qty' => $row['qty'] ?? 0,
+                        'rec_qty' => $qty,
+                        'prc_qty' => $qty,
                         'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
                         'rel_order' => $rel_order,
                         'state' => $new_state,
@@ -258,7 +262,7 @@ class stk16Controller extends Controller
                 DB::table('product_stock')
                     ->where('prd_cd', '=', $prd_cd)
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . $qty),
                         'ut' => now(),
                     ]);
 
@@ -267,7 +271,7 @@ class stk16Controller extends Controller
                     ->where('prd_cd', '=', $prd_cd)
                     ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . $qty),
                         'ut' => now(),
                     ]);
 
@@ -280,7 +284,7 @@ class stk16Controller extends Controller
                         'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
                         'price' => $price,
                         'wonga' => $wonga,
-                        'qty' => ($row['qty'] ?? 0) * -1,
+                        'qty' => $qty * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
                         'comment' => '창고출고',
@@ -302,7 +306,7 @@ class stk16Controller extends Controller
                             'prd_cd' => $prd_cd,
                             'store_cd' => $row['store_cd'],
                             'qty' => 0,
-                            'wqty' => $row['qty'] ?? 0,
+                            'wqty' => $qty,
                             'use_yn' => 'Y',
                             'rt' => now(),
                         ]);
@@ -312,7 +316,7 @@ class stk16Controller extends Controller
                         ->where('prd_cd', '=', $prd_cd)
                         ->where('store_cd', '=', $row['store_cd'])
                         ->update([
-                            'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
+                            'wqty' => DB::raw('wqty + ' . $qty),
                             'ut' => now(),
                         ]);
                 }
@@ -326,7 +330,7 @@ class stk16Controller extends Controller
                         'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
                         'price' => $price,
                         'wonga' => $wonga,
-                        'qty' => $row['qty'] ?? 0,
+                        'qty' => $qty,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
                         'comment' => '매장입고',
@@ -363,49 +367,101 @@ class stk16Controller extends Controller
             DB::beginTransaction();
             foreach ($data as $row) {
                 $prd_cd = $row['prd_cd'];
-                $qty = $row['qty'];
+                $qty = $row['prc_qty'] ?? 0;
 
                 if ($row['state'] != $ori_state) continue;
 
                 DB::table('sproduct_stock_release')
                     ->where('idx', '=', $row['idx'])
                     ->update([
+						'prc_qty' => $qty,
                         'state' => $new_state,
                         'prc_id' => $admin_id,
                         'prc_rt' => now(),
                         'ut' => now(),
                     ]);
+				
+				$rec_qty = DB::table('sproduct_stock_release')->where('idx', $row['idx'])->value('rec_qty');
 
-                // product_stock_storage 창고 실재고 차감
+				// product_stock -> 창고보유재고 차감
+				DB::table('product_stock')
+					->where('prd_cd', '=', $prd_cd)
+					->update([
+						'wqty' => DB::raw('wqty + ' . $rec_qty . ' - ' . $qty),
+						'ut' => now(),
+					]);
+
+                // product_stock_storage 창고 실재고 차감 / 보유재고 조정
                 DB::table('product_stock_storage')
                     ->where('prd_cd', '=', $prd_cd)
                     ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
-                        'qty' => DB::raw('qty - ' . ($qty ?? 0)),
+                        'qty' => DB::raw('qty - ' . $qty),
+                        'wqty' => DB::raw('wqty + ' . $rec_qty . ' - ' . $qty),
                         'ut' => now(),
                     ]);
 
-                    $res = "
-                    select 
-                        a.goods_no as goods_no,
-                        a.goods_opt as goods_opt,
-                        b.price as price,
-                        b.wonga as wonga
+				// product_stock_store 매장 보유재고 조정
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $prd_cd)
+					->where('store_cd', '=', $row['store_cd'])
+					->update([
+						'wqty' => DB::raw('wqty - ' . $rec_qty . ' + ' . $qty),
+						'ut' => now(),
+					]);
+
+
+				$res = "
+                    select a.goods_no as goods_no, a.goods_opt as goods_opt, b.price as price, b.wonga as wonga
                     from product_code a
                         inner join product b on a.prd_cd = b.prd_cd
                     where a.prd_cd = '$prd_cd'
                 ";
                 $r = DB::selectOne($res);
 
-                $query = "
-                    insert into 
-                    product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-                    values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '17', '$r->price', '$r->wonga', '$qty', '$stock_state_date', '창고출고(원부자재)', '$now', '$admin_id', '$admin_nm')
-                ";
-
-                DB::insert($query);
-
+				if ($rec_qty - $qty != 0) {
+					// 창고 재고이력 등록
+					DB::table('product_stock_hst')
+						->insert([
+							'goods_no' => $r->goods_no,
+							'prd_cd' => $prd_cd,
+							'goods_opt' => $r->goods_opt ?? '',
+							'location_cd' => $row['storage_cd'],
+							'location_type' => 'STORAGE',
+							'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
+							'price' => $row['price'],
+							'wonga' => $row['wonga'],
+							'qty' => $rec_qty - $qty,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => '',
+							'comment' => '창고출고',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						]);
+					
+					// 매장 재고이력 등록
+					DB::table('product_stock_hst')
+						->insert([
+							'goods_no' => $r->goods_no,
+							'prd_cd' => $prd_cd,
+							'goods_opt' => $r->goods_opt ?? '',
+							'location_cd' => $row['store_cd'],
+							'location_type' => 'STORE',
+							'type' => PRODUCT_STOCK_TYPE_STORE_IN,
+							'price' => $row['price'],
+							'wonga' => $row['wonga'],
+							'qty' => ($rec_qty - $qty) * -1,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => '',
+							'comment' => '매장입고',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						]);
+				}
             }
+
             $code = 200;
             DB::commit();
         } catch (Exception $e) {
@@ -440,7 +496,7 @@ class stk16Controller extends Controller
                     ->where('prd_cd', '=', $row['prd_cd'])
                     ->where('store_cd', '=', $row['store_cd'])
                     ->update([
-                        'qty' => DB::raw('qty + ' . ($row['qty'] ?? 0)),
+                        'qty' => DB::raw('qty + ' . ($row['prc_qty'] ?? 0)),
                         'ut' => now(),
                     ]);
             }
@@ -500,6 +556,7 @@ class stk16Controller extends Controller
                 $prd_cd = $row['prd_cd'];
                 $price = $row['price'];
                 $wonga = $row['wonga'];
+				$qty = $row['rec_qty'] ?? 0;
 
                 DB::table('sproduct_stock_release')
                     ->where('idx', '=', $row['idx'])
@@ -509,7 +566,7 @@ class stk16Controller extends Controller
                 DB::table('product_stock')
                     ->where('prd_cd', '=', $prd_cd)
                     ->update([
-                        'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty + ' . $qty),
                         'ut' => now(),
                     ]);
 
@@ -518,7 +575,7 @@ class stk16Controller extends Controller
                     ->where('prd_cd', '=', $prd_cd)
                     ->where('storage_cd', '=', $row['storage_cd'])
                     ->update([
-                        'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty + ' . $qty),
                         'ut' => now(),
                     ]);
 
@@ -531,10 +588,10 @@ class stk16Controller extends Controller
                         'type' => PRODUCT_STOCK_TYPE_STORAGE_IN, 
                         'price' => $price,
                         'wonga' => $wonga,
-                        'qty' => ($row['qty'] ?? 0),
+                        'qty' => $qty,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
-                        'comment' => '창고입고',
+                        'comment' => '창고출고취소',
                         'rt' => now(),
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
@@ -545,7 +602,7 @@ class stk16Controller extends Controller
                     ->where('prd_cd', '=', $prd_cd)
                     ->where('store_cd', '=', $row['store_cd'])
                     ->update([
-                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
+                        'wqty' => DB::raw('wqty - ' . $qty),
                         'ut' => now(),
                     ]);
 
@@ -558,10 +615,10 @@ class stk16Controller extends Controller
                         'type' => PRODUCT_STOCK_TYPE_STORE_OUT,
                         'price' => $price,
                         'wonga' => $wonga,
-                        'qty' => ($row['qty'] ?? 0) * -1,
+                        'qty' => $qty * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
-                        'comment' => '매장출고',
+                        'comment' => '매장입고취소',
                         'rt' => now(),
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,

@@ -157,7 +157,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row search-area-ext d-none">
+                <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_nm">원부자재명</label>
@@ -179,53 +179,53 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="opt">품목</label>
-                            <div class="flax_box">
-                                <select name='opt' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($opts as $opt)
-                                    <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="">자료수/정렬</label>
+			                <div class="form-inline">
+				                <div class="form-inline-inner input_box" style="width:24%;">
+					                <select name="limit" class="form-control form-control-sm">
+						                <option value="100">100</option>
+						                <option value="500">500</option>
+						                <option value="1000">1000</option>
+						                <option value="2000">2000</option>
+					                </select>
+				                </div>
+				                <span class="text_line">/</span>
+				                <div class="form-inline-inner input_box" style="width:45%;">
+					                <select name="ord_field" class="form-control form-control-sm">
+						                <option value="req_rt">출고요청일</option>
+						                <option value="p.prd_cd">바코드</option>
+						                <option value="p.price">판매가</option>
+						                <option value="p.wonga">원가</option>
+					                </select>
+				                </div>
+				                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+					                <div class="btn-group" role="group">
+						                <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+						                <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+					                </div>
+					                <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+					                <input type="radio" name="ord" id="sort_asc" value="asc">
+				                </div>
+			                </div>
+		                </div>
+	                </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="">자료수/정렬</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box" style="width:24%;">
-                                    <select name="limit" class="form-control form-control-sm">
-                                        <option value="100">100</option>
-                                        <option value="500">500</option>
-                                        <option value="1000">1000</option>
-                                        <option value="2000">2000</option>
-                                    </select>
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input_box" style="width:45%;">
-                                    <select name="ord_field" class="form-control form-control-sm">
-                                        <option value="req_rt">출고요청일</option>
-                                        <option value="p.prd_cd">바코드</option>
-                                        <option value="p.price">판매가</option>
-                                        <option value="p.wonga">원가</option>
-                                    </select>
-                                </div>
-                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-                                    <div class="btn-group" role="group">
-                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
-                                    </div>
-                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                    <input type="radio" name="ord" id="sort_asc" value="asc">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row search-area-ext d-none">
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="opt">품목</label>
+			                <div class="flax_box">
+				                <select name='opt' class="form-control form-control-sm">
+					                <option value=''>전체</option>
+					                @foreach ($opts as $opt)
+						                <option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
+					                @endforeach
+				                </select>
+			                </div>
+		                </div>
+	                </div>
                 </div>
             </div>
 		</div>
@@ -291,9 +291,6 @@
 	</div>
 </div>
 <script language="javascript">
-
-    const DEFAULT = { lineHeight : "30px" };
-
     let rel_states = <?= json_encode(@$rel_states) ?> ;
     let rel_orders = <?= json_encode(@$rel_orders) ?> ;
 
@@ -318,102 +315,68 @@
 
 	let columns = [
         {field: "idx", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28,
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellClass: 'hd-grid-code'},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 29,
             checkboxSelection: function(params) {
                 return params.data.state < 40 && params.data.state > 0;
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
-        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
+        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellClass: 'hd-grid-code', 
             cellRenderer: function(params) {
                 return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
             }
         },
-        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState,
+        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 60,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 80, cellStyle: {"text-align": "center"}},
-        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
-        {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
-        {
-            field: "type_nm",
-            headerName: "구분",
-            width: 70,
-            cellStyle: DEFAULT
-        },
-        {
-            field: "opt",
-            headerName: "품목",
-            width: 70,
-            cellStyle: DEFAULT
-        },
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
-        {field: "img", headerName: "이미지_url", hide: true},
-        {field: "prd_cd", headerName: "바코드", width:120, cellStyle: DEFAULT,
+        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 60, cellClass: 'hd-grid-code'},
+        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100},
+        {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100},
+		{field: "type_nm", headerName: "구분", width: 60, cellClass: 'hd-grid-code'},
+		{field: "opt", headerName: "품목", width: 80, cellClass: 'hd-grid-code'},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, surl: "{{config('shop.front_url')}}"},
+		{field: "img", headerName: "이미지_url", hide: true},
+		{field: "prd_cd", headerName: "바코드", width: 130,
             cellRenderer: function(params) {
                 if (params.value !== undefined) {
                     return '<a href="#" onclick="return ShowProduct(\'' + params.value + '\');">' + params.value + '</a>';
                 }
             }
         },
-        {field: "prd_nm", headerName: "원부자재명", width: 120},
-        {
-            field: "color",
-            headerName: "컬러명",
-            cellStyle: DEFAULT,
-            width: 100
+        {field: "prd_nm", headerName: "원부자재명", width: 150},
+		{field: "color", headerName: "컬러명", width: 80},
+		{field: "size", headerName: "사이즈명", width: 80},
+		{field: "unit", headerName: "단위", width: 100},
+		{field: "price", headerName: "판매가", type: 'currencyType', width: 70},
+		{field: "wonga", headerName: "원가", type: 'currencyType', width: 70},
+		{field: "qty", headerName: "요청수량", type: "numberType", width: 60,
+			cellRenderer: (params) => {
+				if (params.value !== undefined) {
+					return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+				}
+				return params.value;
+			}
+		},
+		{field: "rec_qty", headerName: "접수수량", type: "numberType", width: 60,
+			editable: (params) => params.data.state === 10,
+			cellClass: (params) => ['hd-grid-number', params.data.state === 10 ? 'hd-grid-edit': ''],
         },
-        {
-            field: "size",
-            headerName: "사이즈명",
-            cellStyle: DEFAULT,
-            width: 80
-        },
-        {
-            field: "unit",
-            headerName: "단위",
-            cellStyle: DEFAULT,
-            width: 120
-        },
-        {
-            field: "price",
-            headerName: "판매가",
-            type: 'currencyType',
-            cellStyle: DEFAULT,
-            width: 80
-        },
-        {
-            field: "wonga",
-            headerName: "원가",
-            type: 'currencyType',
-            cellStyle: DEFAULT,
-            width: 80
-        },
-		{field: "qty", headerName: "수량", type: "numberType",
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
-            cellRenderer: function(params) {
-                if (params.data.state != 10) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                    }
-                } else {
-                    return params.data.qty
-                }
-            }
-        },
-        {field: "origin_qty", headerName: "수량", type: "numberType", hide: true},
+		{field: "prc_qty", headerName: "출고수량", type: "numberType", width: 60,
+			editable: (params) => params.data.state === 20,
+			cellClass: (params) => ['hd-grid-number', params.data.state === 20 ? 'hd-grid-edit': ''],
+			cellRenderer: (params) => params.data.state >= 20 ? params.value : `<span class="text-secondary">(${params.value})</span>`,
+		},
         {field: "amount", headerName: "합계", type: 'currencyType', width: 80, valueGetter: (params) => calAmount(params)},
-		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"},
+		{field: "exp_dlv_day", headerName: "출고예정일자", cellClass: 'hd-grid-code',
             // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
             // cellRenderer: (params) => {
             //         return params.data.state === 10 ? `<input type="date" class="grid-date" value="${params.value ?? ''}" onchange="selectCurRow('exp_dlv_day', this, '${params.rowIndex}')" />` : params.value;
             // }
         },
-		{field: "rel_order", headerName: "출고차수", width: 100, 
+		{field: "rel_order", headerName: "출고차수", width: 150, cellClass: 'hd-grid-code',
             // editable: function(params) {return params.data.state === 10;}, 
             // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
             // cellEditorSelector: function(params) {
@@ -422,36 +385,34 @@
             //         params: { values: rel_orders.map(o => o.code_val) },
             //     };
             // },
-            cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
                 return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
             }
         },
-        {field: "req_comment", headerName: "매장메모", width: 300},
-        {field: "comment", headerName: "본사메모", width: 300, 
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
+        {field: "req_comment", headerName: "매장메모", width: 200},
+        {field: "comment", headerName: "본사메모", width: 200,
+			editable: (params) => params.data.state === 10,
+			cellClass: (params) => ['hd-grid-number', params.data.state === 10 ? 'hd-grid-edit': ''],
         },
-        {field: "req_id", headerName: "요청자", cellStyle: {"text-align": "center"}},
-        {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "rec_id", headerName: "접수자", cellStyle: {"text-align": "center"}},
-        {field: "rec_rt", headerName: "접수일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "prc_id", headerName: "처리자", cellStyle: {"text-align": "center"}},
-        {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
-        {field: "fin_id", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
-        {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-        
-        {width: 'auto'}
+        {field: "req_id", headerName: "요청자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "req_rt", headerName: "요청일시", type: "DateTimeType"},
+        {field: "rec_id", headerName: "접수자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "rec_rt", headerName: "접수일시", type: "DateTimeType"},
+        {field: "prc_id", headerName: "처리자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "prc_rt", headerName: "처리일시", type: "DateTimeType"},
+        {field: "fin_id", headerName: "완료(입고)자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "fin_rt", headerName: "완료(입고)일시", type: "DateTimeType"},
+		{width: 0}
 	];
 </script>
 
 <script type="text/javascript" charset="utf-8">
 
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {

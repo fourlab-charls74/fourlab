@@ -7,36 +7,22 @@
             <span class="home"></span>
             <span>원부자재관리</span>
             <span>/ 원부자재출고</span>
-            <span>/ 요청분출고</span>
+            <span>/ 원부자재 요청분출고</span>
         </div>
     </div>
     <form method="get" name="search">
         <div id="search-area" class="search_cum_form">
             <div class="card mb-3">
-
                 <div class="d-flex card-header justify-content-between">
                     <h4>검색</h4>
                     <div class="flax_box">
                         <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                        <a href="/store/stock/stk16" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="fas fa-step-backward fa-sm"></i> 출고 리스트</a>
+                        <a href="/store/stock/stk16" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="fas fa-step-backward fa-sm"></i> 출고리스트</a>
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        {{-- <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="store_type">매장구분</label>
-                                <div class="flex_box">
-                                    <select name='store_type' class="form-control form-control-sm">
-                                        <option value=''>전체</option>
-                                        @foreach ($store_types as $store_type)
-                                            <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div> --}}
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="store_cd">요청매장</label>
@@ -126,24 +112,9 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="name">공급업체</label>
-                                <div class="form-inline inline_select_box">
-                                    <div class="form-inline-inner input-box w-100">
-                                        <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_cd" name="com_cd" />
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
-                                            <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
                     </div>
                 </div>
             </div>
-
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
@@ -160,20 +131,6 @@
                         <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     </div>
                     <div class="d-flex flex-grow-1 flex-column flex-lg-row justify-content-end align-items-end align-items-lg-center">
-                        {{-- <div class="d-flex mr-1 mb-1 mb-lg-0">
-                            <span class="mr-1">출고예정일</span>
-                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $today }}" autocomplete="off" readonly />
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </div>
-                        </div> --}}
                         <div class="d-flex">
                             <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
                                 <input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y" checked>
@@ -182,169 +139,78 @@
                         </div>
                         <span class="d-none d-lg-block mr-2 tex-secondary">|</span>
                         <div class="d-flex">
-                            {{-- <select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-                                @foreach ($rel_orders as $rel_order)
-                                    <option value='{{ $rel_order->code_id }}'>{{ $rel_order->code_val }}</option>
-                                @endforeach
-                            </select> --}}
-                            <a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
+                            <a href="javascript:requestRelease();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 mr-2"></i>출고요청</a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                <div id="div-gd" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
-    <script language="javascript">
-
-        const DEFAULT = { lineHeight : "30px" };
-
+    <script type="text/javascript" charset="utf-8">
         let columns = [
-            {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
-            {
-                field: "type_nm",
-                headerName: "구분",
-                width: 70,
-                cellStyle: DEFAULT
-            },
-            {
-                field: "opt",
-                headerName: "품목",
-                width: 80,
-                cellStyle: DEFAULT
-            },
-            {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, cellStyle: DEFAULT, surl:"{{config('shop.front_url')}}"},
+            {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 29, sort: null},
+            {field: "type_nm", headerName: "구분", width: 60, cellClass: 'hd-grid-code'},
+            {field: "opt", headerName: "품목", width: 80, cellClass: 'hd-grid-code'},
+            {field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, surl: "{{config('shop.front_url')}}"},
             {field: "img", headerName: "이미지_url", hide: true},
             {field: "prd_nm", headerName: "원부자재명", width: 200},
-            {field: "prd_cd", headerName: "바코드", width:120, cellStyle: DEFAULT,
+            {field: "prd_cd", headerName: "바코드", width: 130,
                 cellRenderer: function(params) {
                     if (params.value !== undefined) {
                         return '<a href="#" onclick="return EditProduct(\'' + params.value + '\');">' + params.value + '</a>';
                     }
                 }
             },
-            {
-                field: "color",
-                headerName: "컬러명",
-                cellStyle: DEFAULT,
-                width: 100
-            },
-            {
-                field: "size",
-                headerName: "사이즈명",
-                cellStyle: DEFAULT,
-                width: 90
-            },
-            {
-                field: "unit",
-                headerName: "단위",
-                cellStyle: DEFAULT,
-                width: 120
-            },
-            {
-                field: "price",
-                headerName: "판매가",
-                type: 'currencyType',
-                cellStyle: DEFAULT,
-                width: 80
-            },
-            {
-                field: "wonga",
-                headerName: "원가",
-                type: 'currencyType',
-                cellStyle: DEFAULT,
-                width: 80,
-                hide: true
-            },
-            {   
-                field: 'storage_wqty',
-                headerName: '창고재고',
-                type: 'currencyType', // 대표창고의 재고를 조회
-                // cellRenderer: function(params) {
-                //     if (params.value !== undefined) {
-                //         return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                //     }
-                // },
+            {field: "color", headerName: "컬러명", width: 100},
+            {field: "size", headerName: "사이즈명", width: 100},
+            {field: "unit", headerName: "단위", width: 120},
+            {field: "price", headerName: "판매가", type: 'currencyType', width: 80},
+            {field: "wonga", headerName: "원가", type: 'currencyType', width: 80, hide: true},
+            {field: 'storage_wqty', headerName: '창고재고',
                 children: [
-                    {
-                        field: 'storage_qty',
-                        headerName: '재고', 
-                        type: "currencyType",
-                        width: 50,
+                    {field: 'storage_qty', headerName: '재고', type: "currencyType", width: 60,
                         cellRenderer: function(params) {
                             if (params.value !== undefined) {
                                 return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                             }
-                        }
-                    },
-                    {
-                        field: 'storage_wqty',
-                        headerName: '보유재고',
-                        type: "currencyType",
-                        width: 80,
+                    }},
+                    {field: 'storage_wqty', headerName: '보유재고', type: "currencyType", width: 80,
                         cellRenderer: function(params) {
                             if (params.value !== undefined) {
                                 return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
                             }
-                        }
-                    },
+                    }},
                 ],
             },
-            {
-                field: 'store_info',
-                headerName: '',
-                hide: true,
+            {field: 'store_info', headerName: '', hide: true,
                 children: [
-                    {
-                        field: 'rel_qty',
-                        headerName: '배분수량',
-                        type: "currencyType",
-                        hide: true,
-                        width: 100,
-                        editable: true,
-                        cellStyle: {'background-color': '#ffff99'},
-                        valueFormatter: formatNumber
+                    {field: 'rel_qty', headerName: '요청수량', type: "currencyType", hide: true, width: 100, editable: true, 
+	                    cellClass: ['hd-grid-edit', 'hd-grid-number'], 
+	                    valueFormatter: formatNumber
                     },
                 ],
             },
-            {field: "amount", headerName: "합계", type: 'currencyType', width:100, valueGetter: (params) => calAmount(params)},
-            {field: "req_comment", headerName: "매장메모", width: 300, editable: true,cellStyle: {'background-color': '#ffff99'}},
-            {width: 'auto'}
+            {field: "amount", headerName: "합계", type: 'currencyType', width: 100, valueGetter: (params) => calAmount(params)},
+            {field: "req_comment", headerName: "매장메모", width: 305, editable: true, cellClass: 'hd-grid-edit'},
+            {width: 0}
         ];
 
-        const calAmount = (params) => {
-            const row = params.data;
-            const result = parseInt(row.price) * parseInt(row.rel_qty);
-            return isNaN(result) ? 0 : result;
-        };
-
-        function setColumn(store) {
-            if (!store) return;
-
-            columns[13].headerName = store.store_nm;
-            gx.gridOptions.api.setColumnDefs(columns);
-
-            gx.gridOptions.columnApi.applyColumnState({
-                state: [
-                    {colId: 'store_info', hide: false},
-                    {colId: 'store_qty', hide: false},
-                    {colId: 'store_wqty', hide: false},
-                    {colId: 'rel_qty', hide: false},
-                ],
-            });
-        }
-    </script>
-    <script type="text/javascript" charset="utf-8">
         let gx;
-        const pApp = new App('', { gridId: "#div-gd" });
+        const pApp = new App('', { gridId: "#div-gd", height: 265 });
 
         $(document).ready(function() {
-            pApp.ResizeGrid(275);
+            pApp.ResizeGrid(265);
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             gx = new HDGrid(gridDiv, columns, {
+				defaultColDef: {
+					suppressMenu: true,
+					resizable: false,
+					sortable: true,
+				},
                 onCellValueChanged: (e) => {
                     e.node.setSelected(true);
                     if (e.column.colId == "rel_qty") {
@@ -355,12 +221,29 @@
                     }
                 }
             });
-            gx.gridOptions.defaultColDef = {
-                suppressMenu: true,
-                resizable: false,
-                sortable: true,
-            };
         });
+
+		const calAmount = (params) => {
+			const row = params.data;
+			const result = parseInt(row.price) * parseInt(row.rel_qty);
+			return isNaN(result) ? 0 : result;
+		};
+
+		function setColumn(store) {
+			if (!store) return;
+
+			columns[13].headerName = store.store_nm;
+			gx.gridOptions.api.setColumnDefs(columns);
+
+			gx.gridOptions.columnApi.applyColumnState({
+				state: [
+					{colId: 'store_info', hide: false},
+					{colId: 'store_qty', hide: false},
+					{colId: 'store_wqty', hide: false},
+					{colId: 'rel_qty', hide: false},
+				],
+			});
+		}
 
         function EditProduct(product_code) {
 			var url = '/store/product/prd03/edit/' + product_code;

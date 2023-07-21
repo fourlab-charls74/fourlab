@@ -8,7 +8,6 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class stk17Controller extends Controller
 {
@@ -154,7 +153,9 @@ class stk17Controller extends Controller
                         'prd_cd' => $row['prd_cd'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
-                        'qty' => $row['rel_qty'] ?? 0,
+                        'qty' => $row['rel_qty'] ?? 0, // 요청수량
+                        'rec_qty' => $row['rel_qty'] ?? 0, // 접수수량
+                        'prc_qty' => $row['rel_qty'] ?? 0, // 출고수량
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
