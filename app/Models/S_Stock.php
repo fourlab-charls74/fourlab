@@ -1014,4 +1014,47 @@ class S_Stock
             return 0;
         }
     }
+	
+	/** 변경재고 로그내역 추가 */
+	public function insertStockHistory($values)
+	{
+		$goods_no = $values->goods_no ?? '';
+		$prd_cd = $values->prd_cd;
+		$goods_opt = $values->goods_opt ?? '';
+		$location_cd = $values->location_cd;
+		$location_type = $values->location_type;
+		$type = $values->type ?? '';
+		$price = $values->price ?? 0;
+		$wonga = $values->wonga ?? 0;
+		$qty = $values->qty ?? 0;
+		$invoice_no = $values->invoice_no ?? '';
+		$stock_state_date = $values->stock_state_date ?? date('Ymd');
+		$com_id = $values->com_id ?? '';
+		$ord_opt_no = $values->ord_opt_no ?? '';
+		$comment = $values->comment ?? '';
+		$rt = $values->rt ?? now();
+		$admin_id = $values->admin_id ?? $this->user['id'];
+		$admin_nm = $values->admin_nm ?? $this->user['name'];
+		
+		return DB::table('product_stock_hst')
+			->insert([
+				'goods_no' => $goods_no,
+				'prd_cd' => $prd_cd,
+				'goods_opt' => $goods_opt,
+				'location_cd' => $location_cd,
+				'location_type' => $location_type,
+				'type' => $type,
+				'price' => $price,
+				'wonga' => $wonga,
+				'qty' => $qty,
+				'invoice_no' => $invoice_no,
+				'stock_state_date' => $stock_state_date,
+				'com_id' => $com_id,
+				'ord_opt_no' => $ord_opt_no,
+				'comment' => $comment,
+				'rt' => $rt,
+				'admin_id' => $admin_id,
+				'admin_nm' => $admin_nm,
+			]);
+	}
 }
