@@ -674,55 +674,41 @@
 <script>
 	$(document).ready(function() {
 		var mapContainer = document.getElementById('map');
-		var input = document.getElementById('map_code');
-		var map_code = input ? input.value : '';
-		var map_cd = map_code.split(',');
-	
-		var	mapOption = {
-			center: new kakao.maps.LatLng(map_cd[0], map_cd[1]),
-			level: 4
-		};
-		var map = new kakao.maps.Map(mapContainer, mapOption); 
-		var geocoder = new kakao.maps.services.Geocoder();
-		let address = document.getElementById('addr1').value;
-		let store_nm = document.getElementById('store_nm').value;
+		var map_code = document.getElementById('map_code').value;
+		
+		if(map_code != '') {
+			
+			var map_cd = map_code.split(',');
 
-		// 좌표 값에 마커와 인포윈도우 출력
-		var markerPosition  = new kakao.maps.LatLng(map_cd[0], map_cd[1]); 
+			var	mapOption = {
+				center: new kakao.maps.LatLng(map_cd[0], map_cd[1]),
+				level: 4
+			};
+			var map = new kakao.maps.Map(mapContainer, mapOption);
+			var geocoder = new kakao.maps.services.Geocoder();
+			let address = document.getElementById('addr1').value;
+			let store_nm = document.getElementById('store_nm').value;
 
-		var marker = new kakao.maps.Marker({
-			position: markerPosition
-		});
+			// 좌표 값에 마커와 인포윈도우 출력
+			var markerPosition  = new kakao.maps.LatLng(map_cd[0], map_cd[1]);
 
-		marker.setMap(map);
+			var marker = new kakao.maps.Marker({
+				position: markerPosition
+			});
 
-		var iwContent = '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
+			marker.setMap(map);
+
+			var iwContent = '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
 			iwPosition = new kakao.maps.LatLng(map_cd[0], map_cd[1]);
 
-		var infowindow = new kakao.maps.InfoWindow({
-			position : iwPosition, 
-			content : iwContent 
-		});
+			var infowindow = new kakao.maps.InfoWindow({
+				position : iwPosition,
+				content : iwContent
+			});
+
+			infowindow.open(map, marker);
+		}
 		
-		infowindow.open(map, marker); 
-
-
-		// 주소 값으로 키워드 검색 기능
-		// geocoder.addressSearch(address, function(result, status) {
-		// 	if (status === kakao.maps.services.Status.OK) {
-		// 		var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-		// 		var marker = new kakao.maps.Marker({
-		// 			map: map,
-		// 			position: coords
-		// 		});
-		// 		var infowindow = new kakao.maps.InfoWindow({
-		// 			content: '<div style="width:150px;text-align:center;padding:6px 0;">'+store_nm+'</div>'
-		// 		});
-		// 		infowindow.open(map, marker);
-		// 		map.setCenter(coords);
-		// 	} 
-		// });
-
 });
 
 	// 이미지
@@ -1107,7 +1093,16 @@
 
 		// 주소 입력여부
 		if(f1.zipcode.value === '') return alert("주소를 입력해주세요.");
-		return true;
+
+		var rxDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+		
+		if( f1.sdate.value !== '' && f1.sdate.value.match(rxDatePattern) == null) {
+			return alert('오픈일이 형식에 맞지 않습니다.');
+		}
+
+		if( f1.edate.value !== '' && f1.edate.value.match(rxDatePattern) == null) {
+			return alert('종료일이 형식에 맞지 않습니다.');
+		}
 
 		// 매장지역 선택여부
 		if(f1.store_area.selectedIndex == 0) {
@@ -1119,7 +1114,8 @@
 		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
 			return alert('매칭할 업체를 선택해주세요.');
 		}
-
+		
+		return true;
 		
 	}
 
