@@ -77,6 +77,24 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="goods_nm">상품명</label>
+								<div class="flax_box">
+									<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="goods_nm_eng">상품명(영문)</label>
+								<div class="flax_box">
+									<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="">자료수/정렬</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">

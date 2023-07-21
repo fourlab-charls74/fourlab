@@ -243,26 +243,29 @@ class sal17Controller extends Controller
 		try {
 			DB::beginTransaction();
 
+			$upsertData = [];
+
 			foreach ($date_arr as $ym) {
 				foreach ($data as $d) {
 					$store_cd = $d['scd'];
 					$proj_amt = $d['proj_amt_' . $ym] ?? 0;
-
-					DB::table('store_sales_projection')->upsert(
-						[
-							'store_cd' => $store_cd,
-							'ym' => $ym,
-							'amt' => $proj_amt,
-							'uid' => $admin_id,
-							'unm' => $admin_nm,
-							'rt' => now(),
-							'ut' => now(),
-						],
-						['store_cd', 'ym'],
-						['amt', 'uid', 'unm', 'rt', 'ut']
-					);
+	
+					$upsertData[] = [
+						'store_cd' => $store_cd,
+						'ym' => $ym,
+						'amt' => $proj_amt,
+						'uid' => $admin_id,
+						'unm' => $admin_nm,
+						'rt' => now(),
+						'ut' => now(),
+					];
 				}
 			}
+			DB::table('store_sales_projection')->upsert(
+				$upsertData,
+				['store_cd', 'ym'],
+				['amt', 'uid', 'unm', 'rt', 'ut']
+			);
 
 			DB::commit();
 			$code = 200;

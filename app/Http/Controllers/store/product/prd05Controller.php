@@ -169,11 +169,14 @@ class prd05Controller extends Controller
 		$edate = $request->input('edate');
 		$prd_cd = $request->input('prd_cd');
 		$nud = $request->input("s_nud", "N");
-
+		$goods_nm = $request->input("goods_nm");
+		$goods_nm_eng = $request->input("goods_nm_eng");
 
 		$where = "";
 		if( $prd_cd != "" ) $where .= " and pc.prd_cd like '$prd_cd%'";
 		if($nud == 'Y') $where .= " and ( ppl.change_date >= '$sdate' and ppl.change_date < date_add('$edate',interval 1 day)) ";
+		if ($goods_nm != "") $where .= " and g.goods_nm like '%". Lib::quote($goods_nm)."%' ";
+		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%". Lib::quote($goods_nm_eng)."%' ";
 
 		// ordreby
         $ord_field  = $request->input("ord_field", "ppl.change_date");
@@ -248,6 +251,7 @@ class prd05Controller extends Controller
 				from product_price_list ppl
 				inner join product_price pp on pp.idx = ppl.product_price_cd
 				inner join product_code pc on ppl.prd_cd = pc.prd_cd
+				left outer join goods g on g.goods_no = pc.goods_no
 				where 1=1
 				$where
 			";
