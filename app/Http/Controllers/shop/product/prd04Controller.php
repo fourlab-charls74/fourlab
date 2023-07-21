@@ -55,6 +55,7 @@ class prd04Controller extends Controller
 		$ord_field	= $request->input('ord_field','prd_cd_p');
 		if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
 		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);	//22-12-08 매칭된 상품을 상단으로
+		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
@@ -62,6 +63,8 @@ class prd04Controller extends Controller
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
 		$next_store_qty_sql = "";
+
+		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
 
 		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
 		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
@@ -117,7 +120,7 @@ class prd04Controller extends Controller
 			$where .= " and ( g.goods_nm like '%" . Lib::quote($goods_nm) . "%' or p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ) ";
 		}
 		if( $store_no != "" ){
-			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
 
 			$where	.= " and ( 1<>1";
 			foreach($store_no as $store_cd) {
@@ -164,9 +167,9 @@ class prd04Controller extends Controller
 			"
 				select
 					count(prd_cd) as total,
-					sum(a.goods_sh * a.wqty) as total_goods_sh,
-					sum(a.price * a.wqty) as total_price,
-					sum(a.wonga * a.wqty) as total_wonga,
+					sum(a.goods_sh * a.sqty) as total_goods_sh,
+					sum(a.price * a.sqty) as total_price,
+					sum(a.wonga * a.sqty) as total_wonga,
 					sum(a.wqty) as total_wqty,
 					sum(a.sqty) as total_sqty
 				from (
@@ -209,7 +212,6 @@ class prd04Controller extends Controller
 				) a
 			";
 
-
 			$row	= DB::select($query);
 			$total	= $row[0]->total;
 			$total_row = $row[0];
@@ -246,6 +248,13 @@ class prd04Controller extends Controller
 				, ps.qty as hqty
 				, ps.wqty as hwqty
 				, pss2.storage_cd as storage_cd
+				, case pc.plan_category
+					when '01' then '정상매장'
+					when '02' then '전매장'
+					when '03' then '이월취급점'
+					when '04' then '아울렛전용'
+					else ''
+				end as 'plan_category'
 			from product_code pc
 				inner join product_stock ps on pc.prd_cd = ps.prd_cd
 				$in_store_sql

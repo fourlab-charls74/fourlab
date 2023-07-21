@@ -127,6 +127,22 @@
 					</div>
 				</div>
 				<div class="row search-area-ext d-none">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="style_no">상품운영구분</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:100%;">
+									<select name="plan_category" class="form-control form-control-sm">
+										<option value="">전체</option>
+										<option value="01">정상매장</option>
+										<option value="02">전매장</option>
+										<option value="03">이월취급점</option>
+										<option value="04">아룰렛전용</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
 					<!-- <div class="col-lg-4 inner-td">
 						<div class="form-group">
 						<label for="formrow-email-input">매칭여부</label>
@@ -271,7 +287,8 @@
 		{field: "size", headerName: "사이즈", width: 50, cellStyle: StyleLineHeight},
 		{field: "goods_opt", headerName: "옵션", width: 190},
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
-		{field: "goods_sh", headerName: "TAG가", type: 'currencyType', width: 100, aggFunc: 'first'},
+		{field: "plan_category", headerName: "상품운영구분", width: 100, cellStyle: StyleLineHeight},
+		{field: "goods_sh", headerName: "정상가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "price", headerName: "판매가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {

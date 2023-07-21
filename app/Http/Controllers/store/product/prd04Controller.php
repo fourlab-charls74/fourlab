@@ -53,6 +53,7 @@ class prd04Controller extends Controller
 		$ord_field	= $request->input('ord_field','prd_cd_p');
 		if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
 		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);	//22-12-08 매칭된 상품을 상단으로
+		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
@@ -60,6 +61,8 @@ class prd04Controller extends Controller
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
 		$next_store_qty_sql = "";
+		
+		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
 
 		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
 		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
@@ -178,9 +181,9 @@ class prd04Controller extends Controller
 			"
 				select
 					count(prd_cd) as total,
-					ifnull(sum(a.goods_sh),0) as total_goods_sh,
-					ifnull(sum(a.price),0) as total_price,
-					ifnull(sum(a.wonga),0) as total_wonga,
+					ifnull(sum(a.goods_sh * a.wqty + a.goods_sh * a.sqty),0) as total_goods_sh,
+					ifnull(sum(a.price * a.wqty + a.price * a.sqty),0) as total_price,
+					ifnull(sum(a.wonga * a.wqty + a.wonga * a.sqty),0) as total_wonga,
 					ifnull(sum(a.wqty),0) as total_wqty,
 					ifnull(sum(a.sqty),0) as total_sqty
 				from (
