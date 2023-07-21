@@ -8,13 +8,10 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use Exception;
 
-use App\Models\Conf;
-
 const PRODUCT_STOCK_TYPE_STORE_IN = 1; // (매장)입고
-const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
+const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // (창고)출고
 
 class stk16Controller extends Controller
 {
@@ -124,28 +121,34 @@ class stk16Controller extends Controller
                 c.code_val as type_nm,
                 c2.code_val as opt,
                 c3.code_val as color,
-                c4.code_val as size,
+				size.size_nm as size,
                 c5.code_val as unit,
                 c6.code_val as rel_type,
                 ifnull(p.price, 0) as price,
                 ifnull(p.wonga, 0) as wonga,
                 psr.qty,
+                ifnull(psr.rec_qty, psr.qty) as rec_qty,
+                ifnull(psr.prc_qty, psr.qty) as prc_qty,
                 psr.store_cd,
                 s.store_nm, 
                 psr.storage_cd,
                 sg.storage_nm, 
                 psr.state, 
                 cast(psr.exp_dlv_day as date) as exp_dlv_day, 
-                psr.rel_order, 
+				c7.code_val3 as rel_order, 
                 psr.comment,
                 psr.req_comment,
                 psr.req_id, 
+                ifnull((select name from mgr_user where id = psr.req_id), '') as req_nm,
                 psr.req_rt, 
                 psr.rec_id, 
+				ifnull((select name from mgr_user where id = psr.rec_id), '') as rec_nm,
                 psr.rec_rt, 
                 psr.prc_id, 
+				ifnull((select name from mgr_user where id = psr.prc_id), '') as prc_nm,
                 psr.prc_rt, 
                 psr.fin_id, 
+				ifnull((select name from mgr_user where id = psr.fin_id), '') as fin_nm,
                 psr.fin_rt,
                 psr.req_comment
             from sproduct_stock_release psr
@@ -155,9 +158,10 @@ class stk16Controller extends Controller
                 left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                 left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                 left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
-                left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+				left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
                 left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
                 left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
+                left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
             where 1=1 $where
@@ -179,9 +183,10 @@ class stk16Controller extends Controller
                     left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                     left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                     left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
-                    left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+                    left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
                     left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
                     left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
+                    left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
                     left outer join store s on s.store_cd = psr.store_cd
                     left outer join storage sg on sg.storage_cd = psr.storage_cd
                 where 1=1 $where
@@ -205,229 +210,28 @@ class stk16Controller extends Controller
         ]);
     }
 
-    // 접수 (10 -> 20)
-    public function receipt(Request $request)
-    {
-        $ori_state = 10;
-        $new_state = 20;
-        $admin_id = Auth('head')->user()->id;
-        $admin_nm = Auth('head')->user()->name;
-
-        $data = $request->input("data", []);
-        $exp_dlv_day = $request->input("exp_dlv_day", '');
-        $rel_order = $request->input("rel_order", '');
-
-        try {
-
-            DB::beginTransaction();
-
-            foreach ($data as $row) {
-
-                if ($row['state'] != $ori_state) continue;
-
-                $prd_cd = $row['prd_cd'];
-                $price = $row['price'];
-                $wonga = $row['wonga'];
-
-                $result = DB::table('product_stock_storage')
-                ->where('prd_cd', '=', $prd_cd)
-                ->where('storage_cd', '=', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))
-                ->get()[0];
-
-                $storage_qty = $result->wqty;
-
-                if ((int)$row['qty'] > $storage_qty) { // 창고수량보다 접수 수량이 많은 경우 에러처리
-                    DB::rollback();
-                    return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
-                }
-                
-                DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
-                    ->update([
-                        'qty' => $row['qty'] ?? 0,
-                        'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-                        'rel_order' => $rel_order,
-                        'state' => $new_state,
-                        'comment' => $row['comment'],
-                        'rec_id' => $admin_id,
-                        'rec_rt' => now(),
-                        'ut' => now(),
-                    ]);
-
-                // product_stock -> 창고보유재고 차감
-                DB::table('product_stock')
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->update([
-                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
-                        'ut' => now(),
-                    ]);
-
-                // product_stock_storage -> 보유재고 차감
-                DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->where('storage_cd', '=', $row['storage_cd'])
-                    ->update([
-                        'wqty' => DB::raw('wqty - ' . ($row['qty'] ?? 0)),
-                        'ut' => now(),
-                    ]);
-
-                // 재고이력 등록
-                // DB::table('product_stock_hst')
-                //     ->insert([
-                //         'prd_cd' => $prd_cd,
-                //         'location_cd' => $row['storage_cd'],
-                //         'location_type' => 'STORAGE',
-                //         'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
-                //         'price' => $price,
-                //         'wonga' => $wonga,
-                //         'qty' => ($row['qty'] ?? 0) * -1,
-                //         'stock_state_date' => date('Ymd'),
-                //         'ord_opt_no' => '',
-                //         'comment' => '창고출고',
-                //         'rt' => now(),
-                //         'admin_id' => $admin_id,
-                //         'admin_nm' => $admin_nm,
-                //     ]);
-
-                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-                $store_stock_cnt =
-                    DB::table('product_stock_store')
-                    ->where('store_cd', '=', $row['store_cd'])
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->count();
-                if ($store_stock_cnt < 1) {
-                    // 해당 매장에 상품 기존재고가 없을 경우
-                    DB::table('product_stock_store')
-                        ->insert([
-                            'prd_cd' => $prd_cd,
-                            'store_cd' => $row['store_cd'],
-                            'qty' => 0,
-                            'wqty' => $row['qty'] ?? 0,
-                            'use_yn' => 'Y',
-                            'rt' => now(),
-                        ]);
-                } else {
-                    // 해당 매장에 상품 기존재고가 이미 존재할 경우
-                    DB::table('product_stock_store')
-                        ->where('prd_cd', '=', $prd_cd)
-                        ->where('store_cd', '=', $row['store_cd'])
-                        ->update([
-                            'wqty' => DB::raw('wqty + ' . ($row['qty'] ?? 0)),
-                            'ut' => now(),
-                        ]);
-                }
-
-                // // 재고이력 등록
-                // DB::table('product_stock_hst')
-                //     ->insert([
-                //         'prd_cd' => $prd_cd,
-                //         'location_cd' => $row['store_cd'],
-                //         'location_type' => 'STORE',
-                //         'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
-                //         'price' => $price,
-                //         'wonga' => $wonga,
-                //         'qty' => $row['qty'] ?? 0,
-                //         'stock_state_date' => date('Ymd'),
-                //         'ord_opt_no' => '',
-                //         'comment' => '매장입고',
-                //         'rt' => now(),
-                //         'admin_id' => $admin_id,
-                //         'admin_nm' => $admin_nm,
-                //     ]);
-
-            }
-            $code = 200;
-            DB::commit();
-        } catch (Exception $e) {
-            // $msg = $e->getMessage();
-            $code = 500;
-            DB::rollback();
-        }
-
-        return response()->json(["code" => $code]);
-    }
-
-    // 출고 (20 -> 30)
-    public function release(Request $request)
-    {
-        $ori_state = 20;
-        $new_state = 30;
-        $admin_id = Auth('head')->user()->id;
-        $admin_nm = Auth('head')->user()->name;
-        $data = $request->input("data", []);
-		$date = Carbon::now()->timezone('Asia/Seoul')->format('Y-m-d');
-		$stock_state_date = str_replace("-", "", $date); 
-		$now = now();
-
-        try {
-            DB::beginTransaction();
-            foreach ($data as $row) {
-                $prd_cd = $row['prd_cd'];
-                $qty = $row['qty'];
-
-                if ($row['state'] != $ori_state) continue;
-
-                DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
-                    ->update([
-                        'state' => $new_state,
-                        'prc_id' => $admin_id,
-                        'prc_rt' => now(),
-                        'ut' => now(),
-                    ]);
-
-                // product_stock_storage 창고 실재고 차감
-                DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->where('storage_cd', '=', $row['storage_cd'])
-                    ->update([
-                        'qty' => DB::raw('qty - ' . ($qty ?? 0)),
-                        'ut' => now(),
-                    ]);
-
-                    $res = "
-                    select 
-                        a.goods_no as goods_no,
-                        a.goods_opt as goods_opt,
-                        b.price as price,
-                        b.wonga as wonga
-                    from product_code a
-                        inner join product b on a.prd_cd = b.prd_cd
-                    where a.prd_cd = '$prd_cd'
-                ";
-                $r = DB::selectOne($res);
-
-                $query = "
-                    insert into 
-                    product_stock_hst(goods_no, prd_cd, goods_opt, location_type, type, price, wonga, qty, stock_state_date, comment, rt, admin_id, admin_nm) 
-                    values('$r->goods_no', '$prd_cd', '$r->goods_opt', 'STORAGE', '17', '$r->price', '$r->wonga', '$qty', '$stock_state_date', '창고출고(원부자재)', '$now', '$admin_id', '$admin_nm')
-                ";
-
-                DB::insert($query);
-
-            }
-            $code = 200;
-            DB::commit();
-        } catch (Exception $e) {
-            $code = 500;
-            DB::rollback();
-        }
-        return response()->json(["code" => $code]);
-    }
-
     // 매장입고 (30 -> 40)
     public function receive(Request $request)
     {
+		$code = 200;
+		$msg = "";
+
         $ori_state = 30;
         $new_state = 40;
         $admin_id = Auth('head')->user()->id;
         $data = $request->input("data", []);
+
         try {
             DB::beginTransaction();
+
             foreach ($data as $row) {
-                if ($row['state'] != $ori_state) continue;
+				$rel_idx = $row['idx'];
+				$rel = DB::table('sproduct_stock_release')->where('idx', $rel_idx)->first();
+				if ($rel->state != $ori_state) continue;
+
+				// 1. 출고테이블 매장입고처리
                 DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
+					->where('idx', $rel_idx)
                     ->update([
                         'state' => $new_state,
                         'fin_id' => $admin_id,
@@ -435,53 +239,23 @@ class stk16Controller extends Controller
                         'ut' => now(),
                     ]);
 
-                // product_stock_store 매장 실재고 플러스
+                // 2. product_stock_store -> 매장실재고 증감
                 DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $row['prd_cd'])
-                    ->where('store_cd', '=', $row['store_cd'])
+                    ->where('prd_cd', '=', $rel->prd_cd)
+                    ->where('store_cd', '=', $rel->store_cd)
                     ->update([
-                        'qty' => DB::raw('qty + ' . ($row['qty'] ?? 0)),
+                        'qty' => DB::raw('qty + ' . $rel->prc_qty),
                         'ut' => now(),
                     ]);
             }
-            $code = 200;
-            DB::commit();
-        } catch (Exception $e) {
-            $code = 500;
-            DB::rollback();
-            // $msg = $e->getMessage();
-        }
-        return response()->json(["code" => $code]);
-    }
 
-    // 거부 (10 -> -10)
-    public function reject(Request $request)
-    {
-        $ori_state = 10;
-        $new_state = -10;
-        $admin_id = Auth('head')->user()->id;
-        $data = $request->input("data", []);
-        try {
-            DB::beginTransaction();
-            foreach ($data as $row) {
-                if ($row['state'] != $ori_state) continue;
-                DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
-                    ->update([
-                        'state' => $new_state,
-                        'comment' => $row['comment'] ?? '',
-                        'fin_id' => $admin_id,
-                        'fin_rt' => now(),
-                        'ut' => now(),
-                    ]);
-            }
-            $code = 200;
+			$msg = "매장입고처리가 정상적으로 완료되었습니다.";
             DB::commit();
         } catch (Exception $e) {
-            $code = 500;
             DB::rollback();
-            // $msg = $e->getMessage();
+            $code = 500;
+            $msg = $e->getMessage();
         }
-        return response()->json(["code" => $code]);
+		return response()->json([ 'code' => $code, 'msg' => $msg ]);
     }
 }

@@ -72,7 +72,7 @@ class stk17Controller extends Controller
                 p.prd_cd as prd_cd,
                 p.prd_nm as prd_nm,
                 c3.code_val as color,
-                c4.code_val as size,
+				size.size_nm as size,
                 c5.code_val as unit,
                 ifnull(p.price, 0) as price,
                 ifnull(p.wonga, 0) as wonga,
@@ -90,7 +90,7 @@ class stk17Controller extends Controller
                 left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                 left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                 left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
-                left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+                left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
                 left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
             where 
                 pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')  and p.type <> 'N'
@@ -110,8 +110,13 @@ class stk17Controller extends Controller
                 from product p
                     inner join product_stock_storage pss on p.prd_cd = pss.prd_cd
                     inner join product_code pc on p.prd_cd = pc.prd_cd
+                    left outer join product_image i on p.prd_cd = i.prd_cd
+					inner join company cp on p.com_id = cp.com_id
                     left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                     left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
+                left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
+					left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
+					left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
                 where 
                     pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and p.type <> 'N'
                 $where
@@ -156,14 +161,14 @@ class stk17Controller extends Controller
                         'prd_cd' => $row['prd_cd'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
-                        'qty' => $row['rel_qty'] ?? 0,
+						'qty' => $row['rel_qty'] ?? 0, // 요청수량
+						'rec_qty' => $row['rel_qty'] ?? 0, // 접수수량
+						'prc_qty' => $row['rel_qty'] ?? 0, // 출고수량
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
-                        // 'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
-                        // 'rel_order' => $rel_order,
                         'req_id' => $admin_id,
-                        'req_comment' => $row['req_comment']??'',
+                        'req_comment' => $row['req_comment'] ?? '',
                         'req_rt' => now(),
                         'rt' => now(),
                     ]);

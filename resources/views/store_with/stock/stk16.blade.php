@@ -363,7 +363,8 @@
 		{field: "rec_qty", headerName: "접수수량", type: "numberType", width: 60,
 			editable: (params) => params.data.state === 10,
 			cellClass: (params) => ['hd-grid-number', params.data.state === 10 ? 'hd-grid-edit': ''],
-        },
+			cellRenderer: (params) => params.data.state < 0 ? '-' : params.value,
+		},
 		{field: "prc_qty", headerName: "출고수량", type: "numberType", width: 60,
 			editable: (params) => params.data.state === 20,
 			cellClass: (params) => ['hd-grid-number', params.data.state === 20 ? 'hd-grid-edit': ''],
@@ -394,13 +395,13 @@
 			editable: (params) => params.data.state === 10,
 			cellClass: (params) => [params.data.state === 10 ? 'hd-grid-edit': ''],
         },
-        {field: "req_id", headerName: "요청자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "req_nm", headerName: "요청자", width: 80, cellClass: 'hd-grid-code'},
         {field: "req_rt", headerName: "요청일시", type: "DateTimeType"},
-        {field: "rec_id", headerName: "접수자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "rec_nm", headerName: "접수자", width: 80, cellClass: 'hd-grid-code'},
         {field: "rec_rt", headerName: "접수일시", type: "DateTimeType"},
-        {field: "prc_id", headerName: "처리자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "prc_nm", headerName: "처리자", width: 80, cellClass: 'hd-grid-code'},
         {field: "prc_rt", headerName: "처리일시", type: "DateTimeType"},
-        {field: "fin_id", headerName: "완료(입고)자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "fin_nm", headerName: "완료(입고)자", width: 80, cellClass: 'hd-grid-code'},
         {field: "fin_rt", headerName: "완료(입고)일시", type: "DateTimeType"},
 		{width: 0}
 	];
@@ -418,7 +419,7 @@
         gx = new HDGrid(gridDiv, columns, {
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
-                if (e.column.colId == "qty") {
+                if (e.column.colId == "rec_qty" || e.column.colId == "prc_qty") {
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
@@ -449,9 +450,9 @@
     }
 
     const calAmount = (params) => {
-        const row = params.data;
-        const result = parseInt(row.price) * parseInt(row.qty);
-        return isNaN(result) ? 0 : result;
+		const qty = params.data.state > 20 ? params.data.prc_qty : params.data.state > 10 ? params.data.rec_qty : params.data.qty;
+		const result = parseInt(params.data.price) * parseInt(qty);
+		return isNaN(result) ? 0 : result;
     };
 
     // 접수 (10 -> 20)

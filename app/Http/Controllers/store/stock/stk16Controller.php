@@ -138,12 +138,16 @@ class stk16Controller extends Controller
                 psr.comment,
                 psr.req_comment,
                 psr.req_id, 
+				ifnull((select name from mgr_user where id = psr.req_id), '') as req_nm,
                 psr.req_rt, 
                 psr.rec_id, 
+                ifnull((select name from mgr_user where id = psr.rec_id), '') as rec_nm,
                 psr.rec_rt, 
                 psr.prc_id, 
+                ifnull((select name from mgr_user where id = psr.prc_id), '') as prc_nm,
                 psr.prc_rt, 
                 psr.fin_id, 
+                ifnull((select name from mgr_user where id = psr.fin_id), '') as fin_nm,
                 psr.fin_rt
             from sproduct_stock_release psr
                 inner join product p on psr.prd_cd = p.prd_cd
@@ -178,9 +182,11 @@ class stk16Controller extends Controller
                     left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
                     left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
                     left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
-                    left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+                    -- left outer join `code` c4 on c4.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c4.code_id = pc.size
+                    left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
                     left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
                     left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
+                    left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
                     left outer join store s on s.store_cd = psr.store_cd
                     left outer join storage sg on sg.storage_cd = psr.storage_cd
                 where 1=1 $where

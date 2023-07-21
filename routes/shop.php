@@ -435,10 +435,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 원부자재 출고
         Route::get('stk16','stk16Controller@index');
         Route::get('stk16/search','stk16Controller@search');
-        Route::post('stk16/receipt','stk16Controller@receipt'); // 접수
-        Route::post('stk16/release','stk16Controller@release'); // 출고
         Route::post('stk16/receive','stk16Controller@receive'); // 매장입고
-        Route::post('stk16/reject','stk16Controller@reject'); // 거부
 
         // 원부자재 - 요청분출고
         Route::get('stk17','stk17Controller@index');
