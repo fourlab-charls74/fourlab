@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\head;
+namespace App\Http\Controllers\head\common;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\head\exception;
+use App\RedisInstance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\RedisInstance;
-use Predis\Collection\Iterator;
 
-class IndivColumnsController extends Controller
+class com01Controller extends Controller
 {
     public function save(Request $req) {
         $user_id = Auth('head')->user()->id;

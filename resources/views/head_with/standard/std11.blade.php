@@ -190,12 +190,8 @@
 		let url_path_array = String(window.location.href).split('/');
 		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
 
-		get_indiv_columns(pid, columnDefs, function(data) {
-			if(data !== null) {
-				gx = new HDGrid(gridDiv, data);
-			} else {
-				gx = new HDGrid(gridDiv, columnDefs);
-			}
+		get_indiv_columns(pid, columns, function(data) {
+			gx = new HDGrid(gridDiv, data);
 
 			setMyGridHeader.Init(gx,
 				indiv_grid_save.bind(this, pid, gx),

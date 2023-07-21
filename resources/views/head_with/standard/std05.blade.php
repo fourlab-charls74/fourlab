@@ -192,19 +192,15 @@
 		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
 
 		//gx = new HDGrid(gridDiv, columns);
-		
+
 		get_indiv_columns(pid, columns, function(data) {
-			if(data !== null) {
-				gx = new HDGrid(gridDiv, data);
-			} else {
-				gx = new HDGrid(gridDiv, columns);
-			}
-			
+			gx = new HDGrid(gridDiv, data);
+
 			setMyGridHeader.Init(gx,
 				indiv_grid_save.bind(this, pid, gx),
 				indiv_grid_init.bind(this, pid)
 			);
-			
+
 			Search();
 		});
 		

@@ -710,7 +710,7 @@ function isObject(o) {
 function get_indiv_columns(pid, columns, callback) {
 	$.ajax({
 		method: 'get',
-		url: `/head/indiv-columns/get?pid=${pid}`,
+		url: `/head/com01/get?pid=${pid}`,
 		success: function (data) {
 			let parseData = null;
 			let resData = [];
@@ -788,7 +788,7 @@ function indiv_grid_save (pid, gx) {
 
 	$.ajax({
 		method: 'post',
-		url: '/head/indiv-columns/save',
+		url: '/head/com01/save',
 		data: data,
 		success: function (data) {
 			console.log(data);
@@ -807,7 +807,7 @@ function indiv_grid_init (pid) {
 
 	$.ajax({
 		method: 'delete',
-		url: '/head/indiv-columns/init',
+		url: '/head/com01/init',
 		data: data,
 		success: function (data) {
 			console.log(data);

@@ -68,10 +68,10 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('/style-no2', 'AutoCompleteController@style_no2');
     });
 
-	Route::prefix("indiv-columns")->group(function () {
-		Route::post('/save', 'IndivColumnsController@save');
-		Route::get('/get', 'IndivColumnsController@get');
-		Route::delete('/init', 'IndivColumnsController@init');
+	Route::prefix("com01")->namespace('common')->group(function () {
+		Route::post('/save', 'com01Controller@save');
+		Route::get('/get', 'com01Controller@get');
+		Route::delete('/init', 'com01Controller@init');
 	});
 
     Route::prefix("api")->namespace('api')->group(function () {
