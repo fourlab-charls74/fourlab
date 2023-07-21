@@ -1036,6 +1036,8 @@ class S_Stock
 		$admin_id = $values->admin_id ?? $this->user['id'];
 		$admin_nm = $values->admin_nm ?? $this->user['name'];
 		
+		if ($qty === 0) return 0;
+		
 		return DB::table('product_stock_hst')
 			->insert([
 				'goods_no' => $goods_no,

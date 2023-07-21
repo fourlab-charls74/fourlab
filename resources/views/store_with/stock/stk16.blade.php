@@ -367,7 +367,7 @@
 		{field: "prc_qty", headerName: "출고수량", type: "numberType", width: 60,
 			editable: (params) => params.data.state === 20,
 			cellClass: (params) => ['hd-grid-number', params.data.state === 20 ? 'hd-grid-edit': ''],
-			cellRenderer: (params) => params.data.state >= 20 ? params.value : `<span class="text-secondary">(${params.value})</span>`,
+			cellRenderer: (params) => params.data.state < 0 ? '-' : params.data.state > 10 ? params.value : `<span class="text-secondary">(${params.value})</span>`,
 		},
         {field: "amount", headerName: "합계", type: 'currencyType', width: 80, valueGetter: (params) => calAmount(params)},
 		{field: "exp_dlv_day", headerName: "출고예정일자", cellClass: 'hd-grid-code',
@@ -386,13 +386,13 @@
             //     };
             // },
             cellRenderer: function(params) {
-                return params.data.state === 10 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
+                return params.data.state < 20 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
             }
         },
         {field: "req_comment", headerName: "매장메모", width: 200},
         {field: "comment", headerName: "본사메모", width: 200,
 			editable: (params) => params.data.state === 10,
-			cellClass: (params) => ['hd-grid-number', params.data.state === 10 ? 'hd-grid-edit': ''],
+			cellClass: (params) => [params.data.state === 10 ? 'hd-grid-edit': ''],
         },
         {field: "req_id", headerName: "요청자", width: 80, cellClass: 'hd-grid-code'},
         {field: "req_rt", headerName: "요청일시", type: "DateTimeType"},

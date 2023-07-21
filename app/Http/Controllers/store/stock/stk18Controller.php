@@ -274,7 +274,7 @@ class stk18Controller extends Controller
                         'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
-                        'qty' => $d['rel_qty'] ?? 0,
+                        'qty' => $row['rel_qty'] ?? 0,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
                         'comment' => '매장입고',

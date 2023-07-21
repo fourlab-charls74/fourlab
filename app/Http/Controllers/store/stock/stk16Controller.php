@@ -457,166 +457,176 @@ class stk16Controller extends Controller
     // 매장입고 (30 -> 40)
     public function receive(Request $request)
     {
+		$code = 200;
+		$msg = "";
+
         $ori_state = 30;
         $new_state = 40;
-        $admin_id = Auth('head')->user()->id;
+		$admin = $this->_getAdmin();
         $data = $request->input("data", []);
+
         try {
             DB::beginTransaction();
+
             foreach ($data as $row) {
-                if ($row['state'] != $ori_state) continue;
+				$rel_idx = $row['idx'];
+				$rel = $this->_getReleaseInfo($rel_idx);
+				if ($rel->state != $ori_state) continue;
+
+				// 1. 출고테이블 매장입고처리
                 DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
+					->where('idx', $rel_idx)
                     ->update([
                         'state' => $new_state,
-                        'fin_id' => $admin_id,
+                        'fin_id' => $admin['id'],
                         'fin_rt' => now(),
                         'ut' => now(),
                     ]);
 
-                // product_stock_store 매장 실재고 플러스
+                // 2. product_stock_store -> 매장실재고 증감
                 DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $row['prd_cd'])
-                    ->where('store_cd', '=', $row['store_cd'])
+					->where('prd_cd', $rel->prd_cd)
+					->where('store_cd', $rel->store_cd)
                     ->update([
-                        'qty' => DB::raw('qty + ' . ($row['prc_qty'] ?? 0)),
+                        'qty' => DB::raw('qty + ' . $rel->prc_qty),
                         'ut' => now(),
                     ]);
             }
-            $code = 200;
+
+			$msg = "매장입고처리가 정상적으로 완료되었습니다.";
             DB::commit();
         } catch (Exception $e) {
-            $code = 500;
             DB::rollback();
-            // $msg = $e->getMessage();
+            $code = 500;
+            $msg = $e->getMessage();
         }
-        return response()->json(["code" => $code]);
+		return response()->json([ 'code' => $code, 'msg' => $msg ]);
     }
 
     // 거부 (10 -> -10)
     public function reject(Request $request)
     {
+		$code = 200;
+		$msg = "";
+
         $ori_state = 10;
         $new_state = -10;
-        $admin_id = Auth('head')->user()->id;
+		$admin = $this->_getAdmin();
         $data = $request->input("data", []);
+
         try {
             DB::beginTransaction();
+
             foreach ($data as $row) {
                 if ($row['state'] != $ori_state) continue;
+				
+				// 1. 출고테이블 거부처리
                 DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
+                    ->where('idx', $row['idx'])
                     ->update([
                         'state' => $new_state,
                         'comment' => $row['comment'] ?? '',
-                        'fin_id' => $admin_id,
+                        'fin_id' => $admin['id'],
                         'fin_rt' => now(),
                         'ut' => now(),
                     ]);
             }
-            $code = 200;
+
+			$msg = "거부처리가 정상적으로 완료되었습니다.";
             DB::commit();
         } catch (Exception $e) {
-            $code = 500;
             DB::rollback();
-            // $msg = $e->getMessage();
+            $code = 500;
+            $msg = $e->getMessage();
         }
-        return response()->json(["code" => $code]);
+		return response()->json([ 'code' => $code, 'msg' => $msg ]);
     }
 
     //삭제
     public function del_release(Request $request) 
     {
-        $admin_id = Auth('head')->user()->id;
-        $admin_nm = Auth('head')->user()->name;
+		$code = 200;
+		$msg = "";
+
+		$ori_state = 20;
+		$admin = $this->_getAdmin();
         $data = $request->input("data", []);
 
         try {
             DB::beginTransaction();
 
+			$stock = new S_Stock($admin);
+
 			foreach ($data as $row) {
+				$rel_idx = $row['idx'];
+				$rel = $this->_getReleaseInfo($rel_idx);
+				if ($rel->state != $ori_state) continue;
 
-                $prd_cd = $row['prd_cd'];
-                $price = $row['price'];
-                $wonga = $row['wonga'];
-				$qty = $row['rec_qty'] ?? 0;
+				$goods = DB::table('product_code')->select('goods_no', 'goods_opt')->where('prd_cd', $rel->prd_cd)->first();
+				$rel->goods_no = $goods->goods_no;
+				$rel->goods_opt = $goods->goods_opt;
 
-                DB::table('sproduct_stock_release')
-                    ->where('idx', '=', $row['idx'])
-                    ->delete();
+				$qty = ($rel->rec_qty ?? 0) * 1;
+				
+				// 1. 창고재고 증감
+				// 1-1. product_stock -> 창고보유재고 증감
+				DB::table('product_stock')
+					->where('prd_cd', $rel->prd_cd)
+					->update([
+						'wqty' => DB::raw('wqty + ' . $qty),
+						'ut' => now(),
+					]);
 
-                // product_stock 보유재고 플러스
-                DB::table('product_stock')
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->update([
-                        'wqty' => DB::raw('wqty + ' . $qty),
-                        'ut' => now(),
-                    ]);
+				// 1-2. product_stock_storage -> 창고보유재고 증감
+				DB::table('product_stock_storage')
+					->where('prd_cd', $rel->prd_cd)
+					->where('storage_cd', $rel->storage_cd)
+					->update([
+						'wqty' => DB::raw('wqty + ' . $qty),
+						'ut' => now(),
+					]);
 
-                // product_stock_storage -> 보유재고 플러스
-                DB::table('product_stock_storage')
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->where('storage_cd', '=', $row['storage_cd'])
-                    ->update([
-                        'wqty' => DB::raw('wqty + ' . $qty),
-                        'ut' => now(),
-                    ]);
+				// 1-3. product_stock_hst -> 재고이력 등록
+				$hst_values = (object) array_merge((array) $rel, [
+					'location_type' => 'STORAGE',
+					'location_cd' => $rel->storage_cd,
+					'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT,
+					'qty' => $qty,
+					'comment' => "창고출고삭제",
+				]);
+				$stock->insertStockHistory($hst_values);
+				
+				// 2. 매장재고 차감
+				// 2-1. product_stock_store -> 매장보유재고 차감
+				DB::table('product_stock_store')
+					->where('prd_cd', $rel->prd_cd)
+					->where('store_cd', $rel->store_cd)
+					->update([
+						'wqty' => DB::raw('wqty - ' . $qty),
+						'ut' => now(),
+					]);
 
-                // 재고이력 등록
-                DB::table('product_stock_hst')
-                    ->insert([
-                        'prd_cd' => $prd_cd,
-                        'location_cd' => $row['storage_cd'],
-                        'location_type' => 'STORAGE',
-                        'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, 
-                        'price' => $price,
-                        'wonga' => $wonga,
-                        'qty' => $qty,
-                        'stock_state_date' => date('Ymd'),
-                        'ord_opt_no' => '',
-                        'comment' => '창고출고취소',
-                        'rt' => now(),
-                        'admin_id' => $admin_id,
-                        'admin_nm' => $admin_nm,
-                    ]);
+				// 2-2. product_stock_hst -> 재고이력 등록
+				$hst_values = (object) array_merge((array) $rel, [
+					'location_type' => 'STORE',
+					'location_cd' => $rel->store_cd,
+					'type' => PRODUCT_STOCK_TYPE_STORE_IN,
+					'qty' => $qty * -1,
+					'comment' => "매장입고삭제",
+				]);
+				$stock->insertStockHistory($hst_values);
 
-                // 매장재고 원복
-                DB::table('product_stock_store')
-                    ->where('prd_cd', '=', $prd_cd)
-                    ->where('store_cd', '=', $row['store_cd'])
-                    ->update([
-                        'wqty' => DB::raw('wqty - ' . $qty),
-                        'ut' => now(),
-                    ]);
-
-                // // 재고이력 등록
-                DB::table('product_stock_hst')
-                    ->insert([
-                        'prd_cd' => $prd_cd,
-                        'location_cd' => $row['store_cd'],
-                        'location_type' => 'STORE',
-                        'type' => PRODUCT_STOCK_TYPE_STORE_IN,
-                        'price' => $price,
-                        'wonga' => $wonga,
-                        'qty' => $qty * -1,
-                        'stock_state_date' => date('Ymd'),
-                        'ord_opt_no' => '',
-                        'comment' => '매장입고취소',
-                        'rt' => now(),
-                        'admin_id' => $admin_id,
-                        'admin_nm' => $admin_nm,
-                    ]);
+				// 3. 출고테이블 삭제처리
+                DB::table('sproduct_stock_release')->where('idx', $rel_idx)->delete();
             }
 
+            $msg = "출고건이 정상적으로 삭제되었습니다.";
 			DB::commit();
-            $code = 200;
-            $msg = "삭제가 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
 			$msg = $e->getMessage();
 		}
-
-        return response()->json(["code" => $code, "msg" => $msg]);
+		return response()->json([ 'code' => $code, 'msg' => $msg ]);
     }
 }

@@ -159,7 +159,7 @@ class stk17Controller extends Controller
                         'store_cd' => $store_cd,
                         'storage_cd' => $storage_cd,
                         'state' => $state,
-                        'req_comment' => $row['req_comment'],
+                        'req_comment' => $row['req_comment'] ?? '',
                         'req_id' => $admin_id,
                         'req_rt' => now(),
                         'rt' => now(),
