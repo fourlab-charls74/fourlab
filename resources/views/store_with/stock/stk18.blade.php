@@ -243,6 +243,7 @@
         },
 		{field: "rel_qty", headerName: "요청수량", type: "currencyType", width: 70, editable: true, cellClass: ['hd-grid-edit', 'hd-grid-number']},
         {field: "amount", headerName: "합계", type: 'currencyType', width: 100, valueGetter: (params) => calAmount(params)},
+		{field: "comment", headerName: "본사메모", width: 200, editable: true, cellClass: 'hd-grid-edit'},
         {width: 0}
     ];
 </script>
