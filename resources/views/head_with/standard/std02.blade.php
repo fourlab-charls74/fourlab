@@ -257,7 +257,7 @@
 		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
 
 		get_indiv_columns(pid, columns, function(data) {
-			gx = new HDGrid(gridDiv, data);
+			gx = new HDGrid(gridDiv, data, gridOptions);
 
 			setMyGridHeader.Init(gx,
 				indiv_grid_save.bind(this, pid, gx),

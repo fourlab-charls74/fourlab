@@ -172,21 +172,25 @@
     const pApp = new App('', {
         gridId: "#div-gd"
     });
-    const gridDiv = document.querySelector(pApp.options.gridId);
 
-	let url_path_array = String(window.location.href).split('/');
-	const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+	$(document).ready(function() {
+		const gridDiv = document.querySelector(pApp.options.gridId);
 
-	get_indiv_columns(pid, columns, function(data) {
-		gx = new HDGrid(gridDiv, data);
+		let url_path_array = String(window.location.href).split('/');
+		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
 
-		setMyGridHeader.Init(gx,
-			indiv_grid_save.bind(this, pid, gx),
-			indiv_grid_init.bind(this, pid)
-		);
+		get_indiv_columns(pid, columns, function(data) {
+			gx = new HDGrid(gridDiv, data);
 
-		Search();
+			setMyGridHeader.Init(gx,
+				indiv_grid_save.bind(this, pid, gx),
+				indiv_grid_init.bind(this, pid)
+			);
+
+			Search();
+		});
 	});
+	
 
     pApp.ResizeGrid(275);
     pApp.BindSearchEnter();

@@ -35,7 +35,7 @@ class com01Controller extends Controller
 				return $json;
 			}*/
 			
-			$redis = app(RedisInstance::class)->getInstance();
+			//$redis = app(RedisInstance::class)->getInstance();
 			
 			DB::beginTransaction();
 			
@@ -108,14 +108,14 @@ class com01Controller extends Controller
 			DB::insert($sql);
 			DB::insert($log_sql);
 
-			$redis->set('indiv_menu_list:'.$user_id.":".$pid, $indiv_columns);
+			//$redis->set('indiv_menu_list:'.$user_id.":".$pid, $indiv_columns);
 		} catch (Exception $e) {
 			return response()->json([
 				"code" => 500 ,
 				"message" => $e->getMessage()
 			]);
 
-			$redis->del('indiv_menu_list:'.$user_id.":".$pid);
+			//$redis->del('indiv_menu_list:'.$user_id.":".$pid);
 		} catch (\RedisException $re) {
 			return response()->json([
 				"code" => 500 ,
@@ -138,8 +138,8 @@ class com01Controller extends Controller
 		$pid = $req->input('pid', '');
 		
 		try {
-			$redis = app(RedisInstance::class)->getInstance();
-			$redis_columns = $redis->get('indiv_menu_list:'.$user_id.":".$pid);
+			//$redis = app(RedisInstance::class)->getInstance();
+			//$redis_columns = $redis->get('indiv_menu_list:'.$user_id.":".$pid);
 			$return_columns = null;
 			
 			$sql = /** @lang text */
@@ -153,7 +153,7 @@ class com01Controller extends Controller
 					and pid = '$pid'
 			";
 
-			if($redis_columns !== null) {
+			/*if($redis_columns !== null) {
 				$return_columns = ['indiv_columns' => $redis_columns];
 			} else {
 				$return_columns = DB::selectOne($sql);
@@ -163,7 +163,9 @@ class com01Controller extends Controller
 				} else {
 					$redis->set('indiv_menu_list:'.$user_id.":".$pid, $return_columns->indiv_columns);	
 				}
-			}
+			}*/
+
+			$return_columns = DB::selectOne($sql);
 			
 			return response()->json([
 				"code" => 200 ,
@@ -190,7 +192,7 @@ class com01Controller extends Controller
 		}
 		
 		try {
-			$redis = app(RedisInstance::class)->getInstance();
+			//$redis = app(RedisInstance::class)->getInstance();
 			DB::beginTransaction();
 			
 			$insert_sql = "
@@ -229,7 +231,7 @@ class com01Controller extends Controller
 			DB::insert($insert_sql);
 			DB::delete($sql);
 
-			if($type === 'E') {
+			/*if($type === 'E') {
 				$iterator = null;
 				while ($keys = $redis->scan($iterator, ['match' => "*:".strtoupper($pid), 'count' => 20])) {
 					$iterator = $keys[0];
@@ -239,7 +241,7 @@ class com01Controller extends Controller
 				}
 			} else {
 				$redis->del('indiv_menu_list:'.$user_id.":".$pid);
-			}
+			}*/
 			
 		} catch (exception $e) {
 			return response()->json([
