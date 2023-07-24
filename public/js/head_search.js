@@ -757,7 +757,7 @@ SetMyGridHeader.prototype.DrawComponent = function(ele) {
 		$(ele).after(`
 			<div id="setting-grid-layer" class="hide">
 				<div class="p-2">
-					<p class="fs-14 font-weight-bold mb-3"><i class="fas fa-cog mr-1"></i> 테이블 헤더 사용자화</p>
+					<p class="fs-14 font-weight-bold mb-3"><i class="fas fa-cog mr-1"></i> 컬럼 순서 설정</p>
 					<div class="flex" style="height:35px;">
 						<button type="button" class="btn btn-outline-secondary h-100 mr-2" onclick="return setMyGridHeader.Reset();" style="width: 100px;">초기화</button>
 						<button type="button" class="btn btn-primary h-100" onclick="return setMyGridHeader.Save();" style="width: 100px;">저장</button>
