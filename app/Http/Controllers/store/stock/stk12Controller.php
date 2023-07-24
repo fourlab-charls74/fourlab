@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Exception;
 
 const PRODUCT_STOCK_TYPE_STORE_IN = 1; // (매장)입고
 const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
@@ -273,7 +274,8 @@ class stk12Controller extends Controller
         $state = 20;
         $admin_id = Auth('head')->user()->id;
         $admin_nm = Auth('head')->user()->name;
-        $stores = $request->input("stores", '');
+        // $stores = $request->input("stores", []);
+        $rel_qty_values = $request->input("rel_qty_values", []);
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
         $data = $request->input("products", []);
@@ -300,7 +302,7 @@ class stk12Controller extends Controller
 
             $rel_order = DB::selectOne($sql);
 
-            foreach($data as $d) {
+            foreach($rel_qty_values as $d) {
                 $cnt = 0;
 
                 $sql = "
@@ -314,82 +316,77 @@ class stk12Controller extends Controller
                 if($prd == null) continue;
 
 
-                foreach($stores as $store_cd) {
-                    $rel_qty = $d[$store_cd . '_rel_qty'] ?? 0;
+                DB::table('product_stock_release')
+                    ->insert([
+                        'document_number' => $document_number,
+                        'type' => $release_type,
+                        'goods_no' => $prd->goods_no,
+                        'prd_cd' => $prd->prd_cd,
+                        'goods_opt' => $prd->goods_opt,
+                        'qty' => $d['rel_qty'],
+                        'store_cd' => $d['store_cd'],
+                        'storage_cd' => $storage_cd,
+                        'state' => $state,
+                        'exp_dlv_day' => $exp_dlv_day_data,
+                        'rel_order' => $rel_order->code_val,
+                        'req_id' => $admin_id,
+                        'req_rt' => now(),
+                        'rec_id' => $admin_id,
+                        'rec_rt' => now(),
+                        'rt' => now(),
+                    ]);
 
-
-                    DB::table('product_stock_release')
-                        ->insert([
-                            'document_number' => $document_number,
-                            'type' => $release_type,
-                            'goods_no' => $prd->goods_no,
-                            'prd_cd' => $prd->prd_cd,
-                            'goods_opt' => $prd->goods_opt,
-                            'qty' => $rel_qty,
-                            'store_cd' => $store_cd,
-                            'storage_cd' => $storage_cd,
-                            'state' => $state,
-                            'exp_dlv_day' => $exp_dlv_day_data,
-                            'rel_order' => $rel_order->code_val,
-                            'req_id' => $admin_id,
-                            'req_rt' => now(),
-                            'rec_id' => $admin_id,
-                            'rec_rt' => now(),
-                            'rt' => now(),
-                        ]);
-
-                    // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-                    $store_stock_cnt = 
-                        DB::table('product_stock_store')
-                            ->where('store_cd', '=', $store_cd)
-                            ->where('prd_cd', '=', $prd->prd_cd)
-                            ->count();
-                    if($store_stock_cnt < 1) {
-                        // 해당 매장에 상품 기존재고가 없을 경우
-                        DB::table('product_stock_store')
-                            ->insert([
-                                'goods_no' => $prd->goods_no,
-                                'prd_cd' => $prd->prd_cd,
-                                'store_cd' => $store_cd,
-                                'qty' => 0,
-                                'wqty' => $rel_qty,
-                                'goods_opt' => $prd->goods_opt,
-                                'use_yn' => 'Y',
-                                'rt' => now(),
-                            ]);
-                    } else {
-                        // 해당 매장에 상품 기존재고가 이미 존재할 경우
-                        DB::table('product_stock_store')
-                            ->where('prd_cd', '=', $prd->prd_cd)
-                            ->where('store_cd', '=', $store_cd) 
-                            ->update([
-                                'wqty' => DB::raw('wqty + ' . ($rel_qty)),
-                                'ut' => now(),
-                            ]);
-                    }
-
-                    // 재고이력 등록
-                    DB::table('product_stock_hst')
+                // product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
+                $store_stock_cnt = 
+                    DB::table('product_stock_store')
+                        ->where('store_cd', '=', $d['store_cd'])
+                        ->where('prd_cd', '=', $prd->prd_cd)
+                        ->count();
+                if($store_stock_cnt < 1) {
+                    // 해당 매장에 상품 기존재고가 없을 경우
+                    DB::table('product_stock_store')
                         ->insert([
                             'goods_no' => $prd->goods_no,
                             'prd_cd' => $prd->prd_cd,
+                            'store_cd' => $d['store_cd'],
+                            'qty' => 0,
+                            'wqty' => $d['rel_qty'],
                             'goods_opt' => $prd->goods_opt,
-                            'location_cd' => $store_cd,
-                            'location_type' => 'STORE',
-                            'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
-                            'price' => $prd->price,
-                            'wonga' => $prd->wonga,
-                            'qty' => $rel_qty,
-                            'stock_state_date' => date('Ymd'),
-                            'ord_opt_no' => '',
-                            'comment' => '매장입고',
+                            'use_yn' => 'Y',
                             'rt' => now(),
-                            'admin_id' => $admin_id,
-                            'admin_nm' => $admin_nm,
                         ]);
-
-                    $cnt += $rel_qty;
+                } else {
+                    // 해당 매장에 상품 기존재고가 이미 존재할 경우
+                    DB::table('product_stock_store')
+                        ->where('prd_cd', '=', $prd->prd_cd)
+                        ->where('store_cd', '=', $d['store_cd']) 
+                        ->update([
+                            'wqty' => DB::raw('wqty + ' . ($d['rel_qty'])),
+                            'ut' => now(),
+                        ]);
                 }
+
+                // 재고이력 등록
+                DB::table('product_stock_hst')
+                    ->insert([
+                        'goods_no' => $prd->goods_no,
+                        'prd_cd' => $prd->prd_cd,
+                        'goods_opt' => $prd->goods_opt,
+                        'location_cd' => $d['store_cd'],
+                        'location_type' => 'STORE',
+                        'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
+                        'price' => $prd->price,
+                        'wonga' => $prd->wonga,
+                        'qty' => $d['rel_qty'],
+                        'stock_state_date' => date('Ymd'),
+                        'ord_opt_no' => '',
+                        'comment' => '매장입고',
+                        'rt' => now(),
+                        'admin_id' => $admin_id,
+                        'admin_nm' => $admin_nm,
+                    ]);
+
+                $cnt += $d['rel_qty'];
     
                 // product_stock -> 창고보유재고 차감
                 DB::table('product_stock')
@@ -427,7 +424,7 @@ class stk12Controller extends Controller
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
                     ]);
-            }
+                }
 
             DB::commit();
             $code = 200;

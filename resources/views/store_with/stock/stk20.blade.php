@@ -230,7 +230,7 @@
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="item">품목</label>
+                            <label for="item">품목 (온라인)</label>
                             <div class="flax_box">
                                 <select name="item" class="form-control form-control-sm">
                                     <option value="">전체</option>

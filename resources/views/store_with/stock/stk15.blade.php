@@ -290,7 +290,11 @@
                             let storage_cd = '{{ $storage->storage_cd }}';
                             let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
                             if(arr.length > 0) {
-                                return arr[0].wqty;
+                                let wqty = arr[0].wqty.toString();
+                                let targetString = "(";
+                                let redText = `<span style="color: red;">${targetString}</span>`;
+                                let highlightedWqty = wqty.replace(targetString, redText);
+                                return highlightedWqty;
                             }
                             return 0;
                         }
@@ -324,13 +328,9 @@
                             let qty = (parseInt(e.data.storage_qty[0].wqty) + oldValue) - newValue;
                             let total_qty = e.data.storage_qty[0].wqty2 - qty;
                             e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
-                            gx.gridOptions.api.updateRowData({update: [e.data]});
-                        } else if (e.oldValue == undefined) {
-                            let newValue = e.newValue * 1;
-                            let qty = parseInt(e.data.storage_qty[0].wqty) - newValue;
-                            let total_qty = e.data.storage_qty[0].wqty2 - qty;
-                            e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
-                            gx.gridOptions.api.updateRowData({update: [e.data]});
+                            console.log(e.data);
+                            gx.gridOptions.api.applyTransaction({update: [e.data]});
+                            gx.gridOptions.api.redrawRows();
                         }
                     }
                 }

@@ -372,6 +372,9 @@
             // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
             load_store_channel();
         });
+
+        let stores = [];
+
         function Search() {
             let store_channel = $("[name=store_channel]").val();
             let store_nos = $("[name='store_no[]']").val();
@@ -383,7 +386,7 @@
                 setColumn(d.head.stores);
 
                 let t = d.head.total_data;
-                let stores = d.head.stores;
+                stores = d.head.stores;
 
                 const rows = gx.getSelectedRows();
 
@@ -412,37 +415,46 @@
             let rows = gx.getSelectedRows();
             if(rows.length < 1) return alert("출고요청할 상품을 선택해주세요.");
 
-            let stores = $("[name='store_no[]']").val();
-            let emptyRow = rows.filter(r => {
-                for(let store_cd of stores) {
-                    let q = r[store_cd + '_rel_qty'];
-                    if(!q || !q.trim() || q == 0 || isNaN(parseInt(q))) return true;
-                }
-                return false;
-            });
-            if(emptyRow.length > 0) {
-                return alert("선택한 상품의 매장별 배분수량을 모두 입력해주세요.");
-            }
+            let rel_qty_values = [];
 
-            // let storage_cd = $('[name=storage]').val();
-            // if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
+            for (let i = 0; i < rows.length; i++) {
+                const prd_cd = rows[i].prd_cd;
+
+                for (const key in rows[i]) {
+                    if (key.includes('_rel_qty')) {
+                        let keys = key;
+                        let keys_str = keys.split("_");
+                        let store_cd = keys_str[0];
+                        let rel_qty = parseInt(rows[i][key]);
+
+                        rel_qty_values.push({
+                            prd_cd: prd_cd,
+                            store_cd: store_cd,
+                            rel_qty: rel_qty,
+                        });
+                    }
+                }
+            }
 
             let over_qty_rows = rows.filter(r => {
                 let cnt = 0;
-                for(let store_cd of stores) {
-                    let q = r[store_cd + '_rel_qty'];
+                for (let store of stores) {
+                    let q = r[store.store_cd + '_rel_qty']?? 0;
+
+                    console.log(q);
                     cnt += parseInt(q);
                 }
-                if(cnt > (r.storage_wqty || 0)) return true;
+                if (cnt > (r.storage_wqty2 || 0)) return true;
                 else return false;
             });
-            // if(over_qty_rows.length > 0) return alert(`대표창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+
+            if(over_qty_rows.length > 0) return alert(`대표창고의 보유재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
             if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
 
             const data = {
                 products: rows,
-                stores: $("[name='store_no[]']").val(),
+                rel_qty_values : rel_qty_values,
                 exp_dlv_day: $('[name=exp_dlv_day]').val(),
                 rel_order: $('[name=rel_order]').val(),
             };
