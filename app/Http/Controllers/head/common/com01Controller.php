@@ -166,6 +166,10 @@ class com01Controller extends Controller
 			}*/
 
 			$return_columns = DB::selectOne($sql);
+
+			if($return_columns === null) {
+				$return_columns = ['indiv_columns' => []];
+			}
 			
 			return response()->json([
 				"code" => 200 ,
