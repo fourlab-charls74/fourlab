@@ -446,6 +446,5 @@
         }
 
     }
-    Search(1);
 </script>
 @stop
