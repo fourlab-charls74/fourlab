@@ -96,7 +96,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-{{--	                <button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>--}}
+	                <button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
                 </div>
             </div>
         </div>
@@ -111,6 +111,7 @@
         // this row shows the row index, doesn't use any data from the row
 
         {
+			field: "seq",
             headerName: '#',
             width: 35,
             maxWidth: 100,
@@ -136,9 +137,9 @@
             field: "question",
             headerName: "제목",
             width: 400,
-            cellRenderer: function(params) {
+            cellRenderer: function (params) {
                 if (params.value !== undefined && params.data.no != "") {
-                    return '<a href="javascript:;" onclick="FaqDetail(' + params.data.no + ');" >' + params.value + '</a>';
+                    return '<a href="javascript::" onclick="FaqDetail(' + params.data.no + ');" >' + params.value + '</a>';
                 }
             }
         },
@@ -157,7 +158,7 @@
             headerName: "공개여부",
             width:58,
             cellStyle: {'text-align':'center'},
-            cellRenderer: function(params) {
+            cellRenderer: function (params) {
 				if(params.value === 'Y') return "공개"
 				else if(params.value === 'N') return "비공개"
                 else return params.value
@@ -180,24 +181,44 @@
     const pApp = new App('', {
         gridId: "#div-gd",
     });
+	
     let gx;
     $(document).ready(function() {
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        Search();
-		setMyGridHeader.Init(gx);
+		
+		let url_path_array = String(window.location.href).split('/');
+		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+
+		//gx = new HDGrid(gridDiv, columns);
+
+		get_indiv_columns(pid, columns, function(data) {
+			gx = new HDGrid(gridDiv, data);
+
+			setMyGridHeader.Init(gx,
+				indiv_grid_save.bind(this, pid, gx),
+				indiv_grid_init.bind(this, pid)
+			);
+
+			Search();
+		});
+		
     });
-    /*
+	
     function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Aggregation({
-            "sum":"top",
-        });
-        gx.Request('/partner/cs/cs72/search', data);
-    }
-    */
+		let data = $('form[name="search"]').serialize();
+		gx.Aggregation({
+			"sum": "top",
+		});
+		gx.Request('/partner/cs/cs72/search', data);
+	}
+
+	function test() {
+		
+		console.log(newTest);
+	}
+	
 </script>
 <script type="text/javascript" charset="utf-8">
     var _isloading = false;

@@ -68,6 +68,12 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('/style-no2', 'AutoCompleteController@style_no2');
     });
 
+	Route::prefix("com01")->namespace('common')->group(function () {
+		Route::post('/save', 'com01Controller@save');
+		Route::get('/get', 'com01Controller@get');
+		Route::delete('/init', 'com01Controller@init');
+	});
+
     Route::prefix("api")->namespace('api')->group(function () {
         //스타일 넘버 자동 완성 리스트
         Route::get('autocomplete/get_style_no/{search_str}', 'autocomplete@get_style_no');

@@ -161,6 +161,19 @@
                 </div>
             </div>
     </form>
+
+	<div class="card shadow">
+		<div class="card-header mb-0">
+			<div class="filter_wrap">
+				<div class="fl_box">
+					<a href="#">개인화 컬럼 초기화</a>
+					&nbsp;
+					<button onclick="init_indiv_columns('{{@$menu->pid}}'); return false;" class="btn btn-sm btn-primary">초기화</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
     <div class="card shadow">
         <div class="card-header mb-0">
             <a href="#">그룹별메뉴권한</a>
@@ -322,6 +335,28 @@
             });
         }
     }
+	
+	function init_indiv_columns(pid) {
+		if (confirm('정말 초기화 하시겠습니까? 개인화 정보는 모두 삭제됩니다.')) {
+			
+			let data = {
+				'pid': pid,
+				'type': 'E'
+			}
+
+			$.ajax({
+				method: 'delete',
+				url: '/head/indiv-columns/init',
+				data: data,
+				success: function (data) {
+					console.log(data);
+				},
+				error: function (request, status, error) {
+					console.log(request);
+				}
+			});
+		}
+	}
 </script>
 
 <script type="text/javascript" charset="utf-8">

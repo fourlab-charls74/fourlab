@@ -134,8 +134,15 @@
 			<div class="col-lg-6">
 				<div class="card_wrap">
 					<div class="card">
-						<div class="card-header mb-0">
-							<h5 class="m-0 font-weight-bold">상품 세부 정보</h5>
+						<div class="card-title mb-3">
+							<div class="filter_wrap">
+								<div class="fl_box">
+									<h5 class="m-0 font-weight-bold">상품 세부 정보</h5>
+								</div>
+								<div class="fr_box">
+									<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+								</div>
+							</div>
 						</div>
 						<div class="card-body pt-3">
 							<div class="row">
@@ -454,6 +461,7 @@
 		// this row shows the row index, doesn't use any data from the row
 
 		{
+			field: 'seq',
 			headerName: '#',
 			width: 35,
 			maxWidth: 100,
@@ -532,9 +540,19 @@
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
-		//console.log(gs.gridOptions.onBodyScroll);
-		Search(1);
+		let url_path_array = String(window.location.href).split('/');
+		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+
+		get_indiv_columns(pid, columns, function(data) {
+			gx = new HDGrid(gridDiv, data);
+
+			setMyGridHeader.Init(gx,
+				indiv_grid_save.bind(this, pid, gx),
+				indiv_grid_init.bind(this, pid)
+			);
+
+			Search(1);
+		});
 	});
 
 

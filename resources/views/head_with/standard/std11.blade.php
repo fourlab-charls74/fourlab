@@ -110,9 +110,9 @@
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
-                <div class="fr_box">
-                   
-                </div>
+				<div class="fr_box">
+					<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+				</div>
             </div>
         </div>
         <div class="table-responsive">
@@ -187,9 +187,20 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		const gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columnDefs);
+		let url_path_array = String(window.location.href).split('/');
+		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
 
-		Search();
+		get_indiv_columns(pid, columns, function(data) {
+			gx = new HDGrid(gridDiv, data);
+
+			setMyGridHeader.Init(gx,
+				indiv_grid_save.bind(this, pid, gx),
+				indiv_grid_init.bind(this, pid)
+			);
+
+			Search();
+		});
+
 	});
 
     function Search(){
