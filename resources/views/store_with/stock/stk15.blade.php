@@ -282,6 +282,7 @@
 		{field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
 		{field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
 		{field: "goods_opt", headerName: "옵션", width: 200},
+		{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
 		{headerName: "창고보유재고",
             children: [
                 @foreach (@$storages as $storage)
@@ -306,7 +307,6 @@
                 @endforeach
             ],
         },
-		{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
         {width: 'auto'}
     ];
 </script>
@@ -372,6 +372,9 @@
             }
             return true; // 상품재고가 없는경우
         });
+		
+		alert(over_qty_rows);
+		
         if(over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
         if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
