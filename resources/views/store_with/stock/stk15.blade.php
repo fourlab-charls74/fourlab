@@ -358,13 +358,13 @@
         if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
         
         let store_cd =$('[name=store_no]').val();
-        console.log(store_cd);
         if(store_cd === null) return alert("상품을 보낼 매장을 선택해주세요.");
 
         let over_qty_rows = rows.filter(row => {
             let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);
+            console.log(cur_storage);
             if(cur_storage.length > 0) {
-                if(cur_storage[0].wqty < parseInt(row.rel_qty)) {
+                if(cur_storage[0].wqty2 < parseInt(row.rel_qty)) {
                     return true;
                 } else {
                     return false;

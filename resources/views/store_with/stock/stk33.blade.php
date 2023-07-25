@@ -216,8 +216,6 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0
         pApp.BindSearchEnter();
         Search();
 
-        // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
-        load_store_channel();
     });
 
     function Search() {
@@ -230,7 +228,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0
 				gx.gridOptions.api.setPinnedTopRowData([
 					{ ...pinnedRow.data, ...total_data }
 				]);
-			}
+            }
         });
 
     }
