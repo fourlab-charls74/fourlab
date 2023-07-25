@@ -39,15 +39,15 @@ class stk34Controller extends Controller
 		$store_channel_kind	= $request->input("store_channel_kind");
 
         $where = "";
-        $orderby = "";
+        // $orderby = "";
         if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
         if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
         // ordreby
-        $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "s.rt";
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        // $ord = $r['ord'] ?? 'desc';
+        // $ord_field = $r['ord_field'] ?? "s.rt";
+        // $orderby = sprintf("order by %s %s ", $ord_field, $ord);
 
         $page = $request->input('page', 1);
         if ($page < 1 or $page == "") $page = 1;
@@ -60,12 +60,6 @@ class stk34Controller extends Controller
                     s.store_nm
                     , date_format(cs.sale_date, '%Y-%m') as sale_date
                     , sum(cs.sale_amt) as total_amt
-                    , (
-                        select 
-                            if(ord_state = 60 or ord_state = 61, sum(recv_amt * -1) , sum(recv_amt)) as store_amt 
-                        from order_opt_wonga
-                        where ord_state in(30, 60, 61) and store_cd = cs.store_cd and ord_state_date >= replace(concat(date_format(cs.sale_date, '%Y-%m'),'-01'), '-','') and ord_state_date <= replace(concat(date_format(cs.sale_date, '%Y-%m'),'-31'),'-','')
-                        ) as store_amt
                     , cs.store_cd
                     , cs.competitor_cd
                     , s.store_type
@@ -73,12 +67,11 @@ class stk34Controller extends Controller
                     , sum(cs.sale_amt) as sale_amt
                     , cs.sale_memo
                 from competitor_sale cs
-                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
-                    left outer join store s on s.store_cd = cs.store_cd
+                    inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    inner join store s on s.store_cd = cs.store_cd
                 where 1=1 and cs.sale_date >= '$sdate-01' and cs.sale_date <= '$edate-31' and cs.sale_amt > 0
                 $where
                 group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd, cs.competitor_cd
-                $orderby
                 $limit
             ";
 
@@ -114,10 +107,47 @@ class stk34Controller extends Controller
                 ";
             }
             $row = DB::selectOne($query);
+
             $total_data = $row;
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
-            
+
+
+            $sql = "
+                select 
+                    date_format(cs.sale_date, '%Y-%m') as sale_date
+                    , s.store_nm
+                    , cs.store_cd
+                from competitor_sale cs
+                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    left outer join store s on s.store_cd = cs.store_cd
+                where 1=1 and cs.sale_date >= '$sdate-01' and cs.sale_date <= '$edate-31' and cs.sale_amt > 0
+                group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd
+            ";
+
+            $res = DB::select($sql);
+
+            $store_amt = [];
+
+            foreach ($res as $r) {
+                $sql = "
+                    select
+                        if(ord_state = 60 or ord_state = 61, sum(recv_amt * -1) , sum(recv_amt)) as store_amt
+                        , '$r->store_cd' as store_cd
+                        , '$r->sale_date' as sale_date
+                        , '$r->store_nm' as store_nm
+                        , '피엘라벤' as competitor
+                    from order_opt_wonga
+                    where ord_state in(30, 60, 61) and store_cd = '$r->store_cd' 
+                        and ord_state_date >= replace(concat('$r->sale_date','-01'), '-','')
+                        and ord_state_date <= replace(concat('$r->sale_date','-31'),'-','')
+                ";
+
+                $result = DB::select($sql);
+                $store_amt[] = $result;
+
+            }
+
         return response()->json([
             "code" => 200,
             "head" => array(
@@ -125,7 +155,8 @@ class stk34Controller extends Controller
                 "page" => $page,
                 "page_cnt" => $page_cnt,
                 "page_total" => count($rows),
-                "total_data" => $total_data
+                "total_data" => $total_data,
+                "store_amt" => $store_amt
             ),
             "body" => $rows
         ]);

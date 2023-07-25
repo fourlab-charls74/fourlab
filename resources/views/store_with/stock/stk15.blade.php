@@ -362,7 +362,6 @@
 
         let over_qty_rows = rows.filter(row => {
             let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);
-            console.log(cur_storage);
             if(cur_storage.length > 0) {
                 if(cur_storage[0].wqty2 < parseInt(row.rel_qty)) {
                     return true;
