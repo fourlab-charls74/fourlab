@@ -734,33 +734,37 @@ function numberFormat(number) {
 }
 
 /** 그리드 헤더 개인화 설정 레이어 */
+let myGridHeaderCount = 0;
 function SetMyGridHeader() {
 	this.grid = null;
+	this.grid_idx = 0;
 	this.setting_btn = null;
 	this.save_callback = null;
 	this.reset_callback = null;
 }
 
-SetMyGridHeader.prototype.Init = function(grid_object = null, save_callback = null, reset_callback = null) {
+SetMyGridHeader.prototype.Init = function(grid_object = null, save_callback = null, reset_callback = null, btn_class = 'setting-grid-col') {
 	this.grid = grid_object;
+	this.grid_idx = ++myGridHeaderCount;
 	this.save_callback = save_callback;
 	this.reset_callback = reset_callback;
 
-	if ($(".setting-grid-col").length > 0) {
-		this.DrawComponent($(".setting-grid-col")[0]);
+	if ($("." + btn_class).length > 0) {
+		this.DrawComponent($("." + btn_class)[0]);
 	}
 }
 
 SetMyGridHeader.prototype.DrawComponent = function(ele) {
 	this.setting_btn = ele;
 	if (ele) {
+		const this_grid = this;
 		$(ele).after(`
-			<div id="setting-grid-layer" class="hide">
+			<div id="setting-grid-layer-${this_grid.grid_idx}" class="hide">
 				<div class="p-2">
 					<p class="fs-14 font-weight-bold mb-3"><i class="fas fa-cog mr-1"></i> 컬럼 순서 설정</p>
 					<div class="flex" style="height:35px;">
-						<button type="button" class="btn btn-outline-secondary h-100 mr-2" onclick="return setMyGridHeader.Reset();" style="width: 100px;">초기화</button>
-						<button type="button" class="btn btn-primary h-100" onclick="return setMyGridHeader.Save();" style="width: 100px;">저장</button>
+						<button type="button" class="btn btn-outline-secondary h-100 mr-2 btn-reset-grid-${this_grid.grid_idx}" data-idx="${this_grid.grid_idx}" style="width: 100px;">초기화</button>
+						<button type="button" class="btn btn-primary h-100 btn-save-grid-${this_grid.grid_idx}" data-idx="${this_grid.grid_idx}" style="width: 100px;">저장</button>
 					</div>
 				</div>
 			</div>
@@ -771,14 +775,23 @@ SetMyGridHeader.prototype.DrawComponent = function(ele) {
 			placement: 'left',
 			html: true,
 			sanitize: false,
-			content: $('#setting-grid-layer').html(),
+			content: $('#setting-grid-layer-' + this_grid.grid_idx).html(),
+		});
+
+		$(ele).on('shown.bs.popover', function () {
+			$(".btn-reset-grid-" + this_grid.grid_idx).on("click", function (e) {
+				this_grid.Reset();
+			});
+			$(".btn-save-grid-" + this_grid.grid_idx).on("click", function (e) {
+				this_grid.Save();
+			});
 		});
 	}
 };
 
 SetMyGridHeader.prototype.Save = function(obj) {
-
 	this.save_callback.call();
+
 	// 아래코드는 저장완료 표시 후 팝오버를 닫는 코드입니다. 저장완료 후 실행해주세요.
 	$(obj).html('<i class="fas fa-check"></i> 저장');
 	setTimeout(() => {
@@ -788,10 +801,9 @@ SetMyGridHeader.prototype.Save = function(obj) {
 
 SetMyGridHeader.prototype.Reset = function() {
 	if (!confirm("초기화하시겠습니까?")) return;
-	// 삭제 시 로직 추가 start
 
+	// 삭제 시 로직 추가 start
 	this.reset_callback.call();
-	console.log('reset');
 	// 삭제 시 로직 추가 end
 
 	$(this.setting_btn).popover('hide');

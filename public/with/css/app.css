@@ -729,7 +729,7 @@ footer a:active{color:#fff !important;}
 }
 
 /* setting-grid-column button */
-.setting-grid-col {width: 30px;font-size: 18px;border: none;background-color: inherit;transition: font-size 200ms ease-in-out;}
-.setting-grid-col:hover {font-size: 24px;}
+.setting-grid-col, .setting-grid-col-btn{width: 30px;font-size: 18px;border: none;background-color: inherit;transition: font-size 200ms ease-in-out;}
+.setting-grid-col:hover, .setting-grid-col-btn:hover{font-size: 24px;}
 .popover {border: 1px solid #aaa;}
 .popover > .arrow::before {border-left-color: #aaa;border-right-color: #aaa;}
