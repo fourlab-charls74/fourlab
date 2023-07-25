@@ -197,11 +197,11 @@ class PosController extends Controller
                 , '' as pr_code
                 , '' as coupon_no
             from product_code pc
-                left outer join product_stock_store ps on ps.store_cd = :store_cd and ps.prd_cd = pc.prd_cd
+                inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
                 -- left outer join (select prd_cd, store_cd from product_stock_release where type = 'F' and state >= 30 group by prd_cd) psr on psr.prd_cd = pc.prd_cd and psr.store_cd = ps.store_cd   -- 해당매장에 초도출고된적이 있는 상품만 검색가능하도록 설정
-            where 1=1 $where
+            where ps.store_cd = :store_cd $where
               -- and if(ps.wqty > 0, 1=1, psr.prd_cd is not null) 
             order by (case when pc.year = '99' then 0 else 1 end) desc
                 , (case when pc.brand = 'F' then 0 else 1 end) asc
@@ -214,11 +214,11 @@ class PosController extends Controller
             $sql = "
                 select count(*) as total
                 from product_code pc
-					left outer join product_stock_store ps on ps.store_cd = :store_cd and ps.prd_cd = pc.prd_cd
+					inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
                     inner join goods g on g.goods_no = pc.goods_no
                     inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
                     -- inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
-                where 1=1 $where
+                where ps.store_cd = :store_cd $where
 			";
             $row = DB::selectOne($sql, [ 'store_cd' => $store_cd ]);
             $total = $row->total;
