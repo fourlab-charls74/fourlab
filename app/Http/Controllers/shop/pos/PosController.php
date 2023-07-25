@@ -25,14 +25,19 @@ class PosController extends Controller
         $sql = "
             select
                 s.idx as sale_type, s.sale_kind, s.sale_type_nm,
-                s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per,
-                (select group_concat(brand) from sale_type_brand b where b.sale_type_cd = s.idx and use_yn = 'Y') as brands
+                s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per
             from sale_type_store ss
                 inner join sale_type s on s.idx = ss.sale_type_cd
             where ss.store_cd = '$store_cd' and ss.use_yn = 'Y' and ss.sdate <= '$today 00:00:00' and ss.edate >= '$today 23:59:59'
             order by s.sale_kind
         ";
         $sale_types = DB::select($sql);
+
+		foreach ($sale_types as $key => $type) {
+			$sql = " select brand from sale_type_brand where sale_type_cd = :idx and use_yn = 'Y' ";
+			$brands = array_column(DB::select($sql, [ 'idx' => $type->sale_type ]), 'brand');
+			$type->brands = join(',', $brands);
+		}
 
         $sql = "
 			select sf.pr_code, c.code_val as pr_code_nm
@@ -180,37 +185,42 @@ class PosController extends Controller
                     select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                     from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
                 )) as img
-                , ps.wqty
+                , ifnull(ps.wqty, 0) as wqty
                 , color.code_val as color
-                , if(pc.gender in ('M', 'W', 'U'), size.code_val, size.code_val2) as size
+                , (
+					select s.size_nm from size s 
+					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+						and s.size_cd = pc.size
+						and use_yn = 'Y'
+				) as size
                 , '' as sale_type
                 , '' as pr_code
                 , '' as coupon_no
             from product_code pc
-                inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
+                left outer join product_stock_store ps on ps.store_cd = :store_cd and ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
-                inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
-                left outer join (select prd_cd, store_cd from product_stock_release where type = 'F' and state >= 30 group by prd_cd) psr on psr.prd_cd = pc.prd_cd and psr.store_cd = ps.store_cd   -- 해당매장에 초도출고된적이 있는 상품만 검색가능하도록 설정
-            where ps.store_cd = '$store_cd' and if(ps.wqty > 0, 1=1, psr.prd_cd is not null) $where
+                -- left outer join (select prd_cd, store_cd from product_stock_release where type = 'F' and state >= 30 group by prd_cd) psr on psr.prd_cd = pc.prd_cd and psr.store_cd = ps.store_cd   -- 해당매장에 초도출고된적이 있는 상품만 검색가능하도록 설정
+            where 1=1 $where
+              -- and if(ps.wqty > 0, 1=1, psr.prd_cd is not null) 
             order by (case when pc.year = '99' then 0 else 1 end) desc
                 , (case when pc.brand = 'F' then 0 else 1 end) asc
                 , pc.prd_cd desc
             $limit
         ";
-        $rows = DB::select($sql);
+        $rows = DB::select($sql, [ 'store_cd' => $store_cd ]);
 
         if ($page == 1) {
             $sql = "
                 select count(*) as total
                 from product_code pc
-                    inner join product_stock_store ps on ps.prd_cd = pc.prd_cd
+					left outer join product_stock_store ps on ps.store_cd = :store_cd and ps.prd_cd = pc.prd_cd
                     inner join goods g on g.goods_no = pc.goods_no
                     inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
-                    inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
-                where ps.store_cd = '$store_cd' $where
+                    -- inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
+                where 1=1 $where
 			";
-            $row = DB::selectOne($sql);
+            $row = DB::selectOne($sql, [ 'store_cd' => $store_cd ]);
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
