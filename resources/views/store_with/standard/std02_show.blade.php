@@ -414,7 +414,7 @@
 											<td hidden>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="Y" checked/>
+														<input type="radio" class="custom-control-input" id="open_month_stock_y" name="open_month_stock_yn" value="N" checked/>
 														<label class="custom-control-label" for="open_month_stock_y">Y</label>
 													</div>
 													<div class="custom-control custom-radio">
