@@ -90,7 +90,7 @@ class stk30Controller extends Controller
                 sr.store_cd,
                 store.store_nm,
                 store.store_type,
-                sc.code_val as store_type_nm,
+                sc.store_kind as store_type_nm,
                 sr.sr_date,
                 sr.sr_kind,
                 sr.sr_state,
@@ -110,9 +110,9 @@ class stk30Controller extends Controller
 				left outer join product_stock_store pss on pss.prd_cd = srp.prd_cd and pss.store_cd = sr.store_cd
                 inner join storage on storage.storage_cd = sr.storage_cd
                 inner join store on store.store_cd = sr.store_cd
+                inner join store_channel sc on sc.store_channel_cd = store.store_channel and sc.store_kind_cd = store.store_channel_kind
                 inner join code c on c.code_kind_cd = 'SR_CODE' and c.code_id = sr.sr_state
                 inner join code co on co.code_kind_cd = 'SR_REASON' and co.code_id = sr.sr_reason
-                inner join code sc on sc.code_kind_cd = 'STORE_TYPE' and sc.code_id = store.store_type
             where 1=1 $where
 			group by sr.sr_cd
             $orderby
@@ -133,9 +133,9 @@ class stk30Controller extends Controller
 						left outer join product_stock_store pss on pss.prd_cd = srp.prd_cd and pss.store_cd = sr.store_cd
 						inner join storage on storage.storage_cd = sr.storage_cd
 						inner join store on store.store_cd = sr.store_cd
+						inner join store_channel sc on sc.store_channel_cd = store.store_channel and sc.store_kind_cd = store.store_channel_kind
 						inner join code c on c.code_kind_cd = 'SR_CODE' and c.code_id = sr.sr_state
 						inner join code co on co.code_kind_cd = 'SR_REASON' and co.code_id = sr.sr_reason
-						inner join code sc on sc.code_kind_cd = 'STORE_TYPE' and sc.code_id = store.store_type
 					where 1=1 $where
 					group by sr.sr_cd
 				) a
