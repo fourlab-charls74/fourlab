@@ -289,12 +289,16 @@
                         cellRenderer: function(params) {
                             let storage_cd = '{{ $storage->storage_cd }}';
                             let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-                            if(arr.length > 0) {
+                            if (arr.length > 0) {
                                 let wqty = arr[0].wqty.toString();
-                                let targetString = "(";
-                                let redText = `<span style="color: red;">${targetString}</span>`;
-                                let highlightedWqty = wqty.replace(targetString, redText);
-                                return highlightedWqty;
+                                let spaceIndex = wqty.indexOf(" ");
+                                if (spaceIndex !== -1) {
+                                    let red_text = `<span style="color: red;">${wqty.slice(spaceIndex)}</span>`;
+                                    let change_red_font = wqty.slice(0, spaceIndex) + red_text;
+                                    return change_red_font;
+                                } else {
+                                    return arr[0].wqty;
+                                }
                             }
                             return 0;
                         }
@@ -328,7 +332,6 @@
                             let qty = (parseInt(e.data.storage_qty[0].wqty) + oldValue) - newValue;
                             let total_qty = e.data.storage_qty[0].wqty2 - qty;
                             e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
-                            console.log(e.data);
                             gx.gridOptions.api.applyTransaction({update: [e.data]});
                             gx.gridOptions.api.redrawRows();
                         }
