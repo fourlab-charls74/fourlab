@@ -86,6 +86,7 @@ class prd07Controller extends Controller
 		$row["goods_sh"] = array_key_exists('goods_sh', $row) ? $this->checkInt(Lib::Rq($row["goods_sh"])) : null;
 		$row["price"] = array_key_exists('price', $row) ? $this->checkInt(Lib::Rq($row["price"])) : null;
 		$row["wonga"] = array_key_exists('wonga', $row) ? $this->checkInt(Lib::Rq($row["wonga"])) : null;
+		$row["goods_cont"] = array_key_exists('goods_cont', $row) ? Lib::Rq($row["goods_cont"]) : null;
 
 		// 데이터의 각각 키 이름들로 변수 할당
 		foreach ($row as $key => $value) {
