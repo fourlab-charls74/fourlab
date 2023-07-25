@@ -373,8 +373,6 @@
             return true; // 상품재고가 없는경우
         });
 		
-		alert(over_qty_rows);
-		
         if(over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
 
         if(!confirm("해당 상품을 출고요청하시겠습니까?")) return;
