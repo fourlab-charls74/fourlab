@@ -277,5 +277,16 @@ class SLib
         ";
         return DB::select($sql);
     }
+	
+	//창고 리스트
+	public static function getStorage()
+	{
+		$storages = DB::table("storage")
+						->where('use_yn', '=', 'Y')
+						->select('storage_cd', 'storage_nm', 'default_yn')
+						->orderByDesc('default_yn');
+
+		return $storages->get();
+	}
 
 }
