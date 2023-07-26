@@ -194,15 +194,13 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="name">공급업체</label>
-							<div class="form-inline inline_select_box">
-								<div class="form-inline-inner input-box w-100">
-									<div class="form-inline inline_btn_box">
-										<input type="hidden" id="com_cd" name="com_cd" />
-										<input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
-										<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
-								</div>
+							<label>검수여부</label>
+							<div class="form-inline">
+								<select name='stock_check_yn' id="stock_check_yn" class="form-control form-control-sm w-100">
+									<option value=''>전체</option>
+									<option value='N' selected>검수전</option>
+									<option value='Y'>검수완료</option>
+								</select>
 							</div>
 						</div>
 					</div>
@@ -313,6 +311,20 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">공급업체</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type="hidden" id="com_cd" name="com_cd" />
+										<input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
+										<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -357,6 +369,10 @@
 		{field: "ord_type", hide: true}, // 주문구분
 		{field: "ord_kind", hide: true}, // 출고구분
 		{field: "ord_kind_nm", headerName: "출고구분", pinned: 'left', width: 70, cellStyle: StyleOrdKind},
+		{field: "stock_check_yn", headerName: "검수여부", pinned: 'left', width: 70, cellClass: 'hd-grid-code',
+			cellStyle: (params) => ({ color: params.value === 'Y' ? '#ff0000' : '#999' }),
+			cellRenderer: (params) => params.value === 'Y' ? '검수완료' : '검수전',
+		},
 		{field: "sale_place", hide: true}, // 판매처
 		{field: "sale_place_nm", headerName: "판매처", pinned: 'left', width: 80},
 	@if (@$user_group === 'N')
@@ -373,7 +389,10 @@
 		{field: "size", headerName: "사이즈", width: 55, cellClass: 'hd-grid-code'},
 		{field: "goods_opt", headerName: "옵션", width: 100},
 		{field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold"}},
-		{field: "comment", headerName: "검수메모", width: 150, cellClass: 'hd-grid-edit', editable: true},
+		{field: "comment", headerName: "검수메모", width: 150, 
+			cellClass: (params) => params.data.stock_check_yn !== 'Y' ? 'hd-grid-edit' : '', 
+			editable: (params) => params.data.stock_check_yn !== 'Y'
+		},
 		{field: "user_nm", headerName: "주문자(아이디)", width: 120, cellClass: 'hd-grid-code'},
 		{field: "r_nm", headerName: "수령자", width: 70, cellClass: 'hd-grid-code'},
 		{field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
@@ -396,7 +415,9 @@
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+			isRowSelectable: (params) => params.data.stock_check_yn !== 'Y'
+		});
 		Search();
 	});
 

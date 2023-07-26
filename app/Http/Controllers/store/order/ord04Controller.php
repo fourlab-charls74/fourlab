@@ -72,6 +72,7 @@ class ord04Controller extends Controller
 		$prd_cd_range_text = $request->input('prd_cd_range', '');
 		$goods_nm = $request->input('goods_nm', '');
 		$goods_nm_eng = $request->input('goods_nm_eng', '');
+		$stock_check_yn = $request->input('stock_check_yn', 'N');
 
 		$ord_field = $request->input('ord_field', 'o.ord_date');
 		$ord = $request->input('ord', 'desc');
@@ -138,6 +139,9 @@ class ord04Controller extends Controller
 		if ($goods_nm != '') $where .= " and g.goods_nm like '%" . $goods_nm . "%' ";
 		if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%" . $goods_nm_eng . "%' ";
 
+		if ($stock_check_yn === 'N') $where .= " and (csc.state is null or csc.state <> 30)";
+		else if ($stock_check_yn === 'Y') $where .= " and csc.state = 30";
+
 		// 상품번호 검색
 		$goods_no = preg_replace("/\s/", ",", $goods_no);
 		$goods_no = preg_replace("/\t/", ",", $goods_no);
@@ -192,6 +196,7 @@ class ord04Controller extends Controller
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, g.goods_nm, g.goods_nm_eng, g.style_no, g.price as goods_price, g.goods_sh
 					, ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p, pc.color, pc.size
+					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
 				    inner join claim c on c.ord_opt_no = o.ord_opt_no
@@ -201,7 +206,6 @@ class ord04Controller extends Controller
 				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 					and o.clm_state in (40,41)
 					$where
-				    and (csc.state is null or csc.state <> 30)
 				$orderby
 				$limit
 			) a
@@ -231,7 +235,6 @@ class ord04Controller extends Controller
 				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 					and o.clm_state in (40,41)
 					$where
-					and (csc.state is null or csc.state <> 30)
 			";
 			$row = DB::selectOne($sql);
 			$total = $row->total;
