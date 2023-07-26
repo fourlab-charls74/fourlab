@@ -269,7 +269,8 @@
 		{field: "color", headerName: "컬러명", width: 80},
 		{field: "size", headerName: "사이즈명", width: 80},
 		{field: "unit", headerName: "단위", width: 100},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 70},
+		{field: "goods_price", headerName: "판매가", type: 'currencyType', width: 70},
+		{field: "price", headerName: "출고가", type: 'currencyType', width: 70},
 		{field: "qty", headerName: "요청수량", type: "numberType", width: 60,
 			cellRenderer: (params) => {
 				if (params.value !== undefined) {

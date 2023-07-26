@@ -1032,7 +1032,7 @@ class S_Stock
 		$com_id = $values->com_id ?? '';
 		$ord_opt_no = $values->ord_opt_no ?? '';
 		$comment = $values->comment ?? '';
-		$rt = $values->rt ?? now();
+		$rt = now();
 		$admin_id = $values->admin_id ?? $this->user['id'];
 		$admin_nm = $values->admin_nm ?? $this->user['name'];
 		

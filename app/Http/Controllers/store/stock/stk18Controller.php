@@ -88,6 +88,7 @@ class stk18Controller extends Controller
                 c3.code_val as color,
                 size.size_nm as size,
                 c5.code_val as unit,
+                ifnull(p.price, 0) as goods_price,
                 ifnull(p.price, 0) as price,
                 ifnull(p.wonga, 0) as wonga,
                 ifnull(pss.qty, 0) as storage_qty,
@@ -195,6 +196,7 @@ class stk18Controller extends Controller
 			foreach($data as $row) {
 				
 				$qty = ($row['rel_qty'] ?? 0) * 1;
+				$rel_price = ($row['price'] ?? 0) * 1;
 
 				// 0. 창고수량과 비교하여 접수수량이 더 많을 경우 에러처리
 				$storage_qty = DB::table('product_stock_storage')->where([
@@ -211,7 +213,7 @@ class stk18Controller extends Controller
 				$rel = [
 					'type' => $release_type,
 					'prd_cd' => $row['prd_cd'],
-					'price' => $row['price'],
+					'price' => $rel_price,
 					'wonga' => $row['wonga'],
 					'qty' => $qty, // 요청수량
 					'rec_qty' => $qty, // 접수수량
@@ -256,6 +258,7 @@ class stk18Controller extends Controller
 					'location_cd' => $storage_cd,
 					'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT,
 					'qty' => $qty * -1,
+					'price' => $rel_price,
 					'comment' => "창고출고",
 				]);
 				$stock->insertStockHistory($hst_values);
@@ -286,6 +289,7 @@ class stk18Controller extends Controller
 					'location_cd' => $store_cd,
 					'type' => PRODUCT_STOCK_TYPE_STORE_IN,
 					'qty' => $qty,
+					'price' => $rel_price,
 					'comment' => "매장입고",
 				]);
 				$stock->insertStockHistory($hst_values);

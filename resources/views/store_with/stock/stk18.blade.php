@@ -222,8 +222,9 @@
 		{field: "color", headerName: "컬러명", width: 100},
 		{field: "size", headerName: "사이즈명", width: 100},
 		{field: "unit", headerName: "단위", width: 120},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
+		{field: "goods_price", headerName: "판매가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80, hide: true},
+		{field: "price", headerName: "출고가", type: 'currencyType', width: 80, editable: true, cellClass: ['hd-grid-edit', 'hd-grid-number']},
 		{headerName: "대표창고재고",
             children: [
                 {field: 'storage_qty', headerName: '재고', type: "currencyType", width: 60,
@@ -241,7 +242,7 @@
                 }},
             ],
         },
-		{field: "rel_qty", headerName: "요청수량", type: "currencyType", width: 70, editable: true, cellClass: ['hd-grid-edit', 'hd-grid-number']},
+		{field: "rel_qty", headerName: "접수수량", type: "currencyType", width: 70, editable: true, cellClass: ['hd-grid-edit', 'hd-grid-number']},
         {field: "amount", headerName: "합계", type: 'currencyType', width: 100, valueGetter: (params) => calAmount(params)},
 		{field: "comment", headerName: "본사메모", width: 200, editable: true, cellClass: 'hd-grid-edit'},
         {width: 0}

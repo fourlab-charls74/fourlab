@@ -122,8 +122,9 @@ class stk16Controller extends Controller
                 size.size_nm as size,
                 c5.code_val as unit,
                 c6.code_val as rel_type,
-                ifnull(p.price, 0) as price,
+                ifnull(p.price, 0) as goods_price,
                 ifnull(p.wonga, 0) as wonga,
+                psr.price,
                 psr.qty,
                 ifnull(psr.rec_qty, psr.qty) as rec_qty,
                 ifnull(psr.prc_qty, psr.qty) as prc_qty,
@@ -257,6 +258,7 @@ class stk16Controller extends Controller
 				$rel->goods_opt = $goods->goods_opt;
 
 				$qty = ($row['rec_qty'] ?? 0) * 1;
+				$rel_price = ($row['price'] ?? 0) * 1;
 
 				// 0. 창고수량과 비교하여 접수수량이 더 많을 경우 에러처리
 				$storage_qty = DB::table('product_stock_storage')->where([
@@ -274,6 +276,7 @@ class stk16Controller extends Controller
                 DB::table('sproduct_stock_release')
                     ->where('idx', $rel_idx)
                     ->update([
+						'price' => $rel_price,
                         'rec_qty' => $qty,
                         'prc_qty' => $qty,
                         'exp_dlv_day' => $exp_dlv_day,
@@ -309,6 +312,7 @@ class stk16Controller extends Controller
 					'location_cd' => $rel->storage_cd,
 					'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT,
 					'qty' => $qty * -1,
+					'price' => $rel_price,
 					'comment' => "창고출고",
 				]);
 				$stock->insertStockHistory($hst_values);
@@ -339,6 +343,7 @@ class stk16Controller extends Controller
 					'location_cd' => $rel->store_cd,
 					'type' => PRODUCT_STOCK_TYPE_STORE_IN,
 					'qty' => $qty,
+					'price' => $rel_price,
 					'comment' => "매장입고",
 				]);
 				$stock->insertStockHistory($hst_values);
@@ -382,11 +387,13 @@ class stk16Controller extends Controller
 				$rel->goods_opt = $goods->goods_opt;
 
                 $qty = ($row['prc_qty'] ?? 0) * 1;
+				$rel_price = ($row['price'] ?? 0) * 1;
 
 				// 1. 출고테이블 출고처리
                 DB::table('sproduct_stock_release')
 					->where('idx', $rel_idx)
                     ->update([
+						'price' => $rel_price,
 						'prc_qty' => $qty,
                         'state' => $new_state,
                         'prc_id' => $admin['id'],
@@ -420,6 +427,7 @@ class stk16Controller extends Controller
 						'location_cd' => $rel->storage_cd,
 						'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT,
 						'qty' => $rel->rec_qty - $qty,
+						'price' => $rel_price,
 						'comment' => "창고출고",
 						'stock_state_date' => $stock_state_date
 					]);
@@ -443,6 +451,7 @@ class stk16Controller extends Controller
 						'location_cd' => $rel->store_cd,
 						'type' => PRODUCT_STOCK_TYPE_STORE_IN,
 						'qty' => ($rel->rec_qty - $qty) * -1,
+						'price' => $rel_price,
 						'comment' => "매장입고",
 						'stock_state_date' => $stock_state_date
 					]);
