@@ -107,6 +107,7 @@ class sal02Controller extends Controller
 		$sum = "";
 		$sum_true = "";
 		$sum_false = 0;
+		$total_sum = "";
 		switch ($list_type) {
 			case 'qty':
 				$sum_true = "o.qty";
@@ -129,6 +130,7 @@ class sal02Controller extends Controller
 			$day = $i + 1;
 			$comma = ($day == $max_day) ? "" : ",";
 			$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) as ${day}_val${comma}";
+			$total_sum .= ", sum(t.${day}_val) as ${day}_val";
 
 			// 해당 월의 모든 요일 구하기
 			$day = sprintf("%02d", $day);
@@ -138,30 +140,76 @@ class sal02Controller extends Controller
 
 		$sql = /** @lang text */
             "
-			select s.store_nm,c.code_val as store_type_nm,a.*,ifnull(p.amt,0) as proj_amt
-			from store s left outer join (
-				select 
-					m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
-					${sum}
-				from order_mst m 
-					inner join order_opt o on m.ord_no = o.ord_no 
-					inner join goods g on o.goods_no = g.goods_no
-					left outer join brand b on g.brand = b.brand
-				where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
-				group by m.store_cd
-			) a on s.store_cd = a.store_cd
+			select 
+				s.store_nm
+				, a.*
+				, ifnull(p.amt,0) as proj_amt
+				, sc.store_channel as store_channel
+				, sc2.store_kind as store_channel_kind
+			from store s 
+				left outer join (
+					select 
+						m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
+						${sum}
+					from order_mst m 
+						inner join order_opt o on m.ord_no = o.ord_no 
+						inner join goods g on o.goods_no = g.goods_no
+						left outer join brand b on g.brand = b.brand
+					where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
+					group by m.store_cd
+				) a on s.store_cd = a.store_cd
                 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
-                left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
             where 1=1 $where2
 		";
 
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
 
+		$sql = "
+			select 
+					count(t.store_nm) as total
+					, sum(t.proj_amt) as proj_amt
+					, sum(t.recv_amt) as recv_amt
+					, sum(t.qty) as qty
+					, sum(t.ord_amt) as ord_amt
+					${total_sum}
+			from (
+				select 
+					s.store_nm
+					, a.*
+					, ifnull(p.amt,0) as proj_amt
+					, sc.store_channel as store_channel
+					, sc2.store_kind as store_channel_kind
+				from store s 
+					left outer join (
+						select 
+							m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
+							${sum}
+						from order_mst m 
+							inner join order_opt o on m.ord_no = o.ord_no 
+							inner join goods g on o.goods_no = g.goods_no
+							left outer join brand b on g.brand = b.brand
+						where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
+						group by m.store_cd
+					) a on s.store_cd = a.store_cd
+					left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
+					left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+					left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+				where 1=1 $where2
+			) t
+		";
+
+		$res = DB::selectOne($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
+
+		$total_data = $res;
+
 		return response()->json([
             "code" => 200,
             "head" => array(
                 "total" => count($rows),
-				"yoil_codes" => $yoil_codes
+				"yoil_codes" => $yoil_codes,
+				"total_data" => $total_data
             ),
             "body" => $rows
         ]);
