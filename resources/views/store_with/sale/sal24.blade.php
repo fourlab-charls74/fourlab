@@ -52,6 +52,165 @@
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="good_types">판매채널/매장구분</label>
+							<div class="d-flex align-items-center">
+								<div class="flex_box w-100">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<option value=''>전체</option>
+									@foreach ($store_channel as $sc)
+										<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+									@endforeach
+									</select>
+								</div>
+								<span class="mr-2 ml-2">/</span>
+								<div class="flex_box w-100">
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<option value=''>전체</option>
+									@foreach ($store_kind as $sk)
+										<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+									@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="prd_cd">상품검색조건</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label>매장명</label>
+                            <div class="form-inline inline_btn_box">
+                                <input type='hidden' id="store_nm" name="store_nm">
+                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 27px;"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="sell_type">판매유형</label>
+                            <div class="flax_box">
+                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($sale_kinds as $sale_kind)
+                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="pr_code">행사코드</label>
+                            <div class="flax_box">
+                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($pr_codes as $pr_code)
+                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="">온라인/오프라인</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" checked>
+                                    <label class="custom-control-label" for="on_off_all" value="">전체</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
+                                    <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input">
+                                    <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="name">판매처</label>
+                            <div class="flax_box">
+                                <select name='sale_place' class="form-control form-control-sm">
+                                    <option value=''>전체</option>
+                                    @foreach ($sale_places as $sale_place)
+                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="formrow-inputZip">상품명</label>
+                            <div class="flax_box">
+                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm' value='{{ @$goods_nm }}'>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="formrow-inputCity">품목</label>
+                            <div class="flax_box">
+                                <select id='item' name='item' class="form-control form-control-sm">
+                                    <option value=''>전체</option>
+                                    @foreach ($items as $t)
+                                    <option value='{{ $t->cd }}' @if($item == $t->cd) selected @endif>{{ $t->val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="formrow-inputState">브랜드</label>
+                            <div class="form-inline inline_btn_box">
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 26px;"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="formrow-email-input">매출시점</label>
+                            <div class="form-inline form-radio-box">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" @if($ord_state == '10' or $ord_state == '') checked @endif>
+                                    <label class="custom-control-label" for="ord_state10" value="10">출고요청</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" @if($ord_state == '30') checked @endif>
+                                    <label class="custom-control-label" for="ord_state30" value="30">출고완료</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>주문구분</label>
                             <div class="form-inline form-check-box">
@@ -96,89 +255,6 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-email-input">매출시점</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" @if($ord_state == '10' or $ord_state == '') checked @endif>
-                                    <label class="custom-control-label" for="ord_state10" value="10">출고요청</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" @if($ord_state == '30') checked @endif>
-                                    <label class="custom-control-label" for="ord_state30" value="30">출고완료</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>매장명</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 27px;"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="sell_type">판매유형</label>
-                            <div class="flax_box">
-                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_kinds as $sale_kind)
-                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="pr_code">행사코드</label>
-                            <div class="flax_box">
-                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($pr_codes as $pr_code)
-                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label for="">온라인/오프라인</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="on_off_all" value="">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
-                                    <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input">
-                                    <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label for="name">판매처</label>
-                            <div class="flax_box">
-                                <select name='sale_place' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_places as $sale_place)
-                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
-                        <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
                                 <div class="custom-control custom-checkbox">
@@ -212,42 +288,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputCity">품목</label>
-                            <div class="flax_box">
-                                <select id='item' name='item' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($items as $t)
-                                    <option value='{{ $t->cd }}' @if($item == $t->cd) selected @endif>{{ $t->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputState">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 26px;"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputZip">상품명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm' value='{{ @$goods_nm }}'>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="search-area-ext d-none row">
-                   
                 </div>
             </div>
         </div>
@@ -631,11 +671,16 @@
 
         
         initStore();
+        initStoreChannel();
+        initStoreChannelKind()
         initPrCode();
         initSellType()
         onoffyn()
         
         Search();
+
+        // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
+        load_store_channel();
 
         // // 매장 다중검색
         // $( ".sch-store" ).on("click", function() {
@@ -654,11 +699,7 @@
     });
 
     function Search() {
-        //$('[name=ord_state]').val(10);
-
         let data = $('form[name="search"]').serialize();
-
-        // console.log(data);
 
         gx.Aggregation({
             "sum": "top",
@@ -830,6 +871,20 @@
             $('#store_no').append(option).trigger('change');
         }
     }
+
+    //월별매출통계에서 가져온 판매채널값을 바로 검색하는 기능
+    function initStoreChannel() {
+        const store_channel = '{{ @$q_store_channel }}'
+
+        $('#store_channel').val(store_channel);
+    }
+
+    //월별매출통계에서 가져온 매장구분값을 바로 검색하는 기능
+    function initStoreChannelKind() {
+        const store_channel_kind = '{{ @$q_store_channel_kind }}'
+
+        $('#store_channel_kind').val(store_channel_kind);
+    }
     
     //월별매출통계에서 가져온 행사코드값을 바로 검색하는 기능
     function initPrCode() {
@@ -877,7 +932,10 @@
         } else {
             $(":radio[name='on_off_yn'][value='']").attr('checked', true);
         }
+    }
 
+    function openApi() {
+        document.getElementsByClassName('sch-prdcd-range')[0].click();
     }
 </script>
 

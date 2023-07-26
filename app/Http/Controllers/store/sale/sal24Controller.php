@@ -22,15 +22,16 @@ class sal24Controller extends Controller
         $sdate	 = $mutable->sub(1, 'month')->format('Y-m-d');
 		$edate	 = date("Y-m-d");
 
-		$sell_type = $req->input('sell_type');
-        $store_cd = $req->input('store_cd', '');
-        $pr_code = $req->input('pr_code');
-		$on_off_yn = $req->input('on_off_yn');
-		$store_nm = $req->input('store_nm');
-		$goods_nm = $req->input('goods_nm');
-
-		$pr_code_arr = explode(",", $pr_code);
-        $sell_type_arr = explode(",", $sell_type);
+		$sell_type 				= $req->input('sell_type');
+        $store_cd 				= $req->input('store_cd', '');
+        $pr_code 				= $req->input('pr_code');
+		$on_off_yn 				= $req->input('on_off_yn');
+		$store_nm 				= $req->input('store_nm');
+		$goods_nm 				= $req->input('goods_nm');
+		$q_store_channel 		= $req->query('store_channel');
+		$q_store_channel_kind 	= $req->query('store_channel_kind');
+		$pr_code_arr 			= explode(",", $pr_code);
+        $sell_type_arr			= explode(",", $sell_type);
 
 		// 행사코드 쿼리스트링 받아온값을 보내주는 부분
         $pr_code_str = "";
@@ -126,29 +127,33 @@ class sal24Controller extends Controller
 		$com_nm = $req->input("com_nm");
 
         $values = [
-            'sdate' 		=> $sdate,
-            'edate' 		=> $edate,
-            'items' 		=> SLib::getItems(),
-			'item'			=> $item,
-			'sale_places'   => SLib::getSalePlaces(),
-			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
-			'ord_state'		=> $ord_state,
-			'ord_type'		=> $ord_type,
-			'pop_search'	=> $pop_search,
-			'brand'			=> $brand,
-			'goods_nm'		=> $goods_nm,
-			'stat_pay_type'	=> $stat_pay_type,
-			'com_nm'		=> $com_nm,
-			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
-			'store_nm'      => DB::table('store')->select('store_cd', 'store_nm')->where('store_nm', '=', $store_nm)->first(),   
-			'sell_type'     => $sell_type,
-			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
-			'pr_codes'		=> SLib::getCodes('PR_CODE'),
-            'pr_code_id'    => $str,
-            'pr_code_val'   => $str2,
-            'sell_type_id'  => $sell_str,
-            'sell_type_val' => $sell_str2,
-			'on_off_yn'		=> $on_off_yn
+            'sdate' 				=> $sdate,
+            'edate' 				=> $edate,
+            'items' 				=> SLib::getItems(),
+			'item'					=> $item,
+			'sale_places'   		=> SLib::getSalePlaces(),
+			'ord_types'     		=> SLib::getCodes('G_ORD_TYPE'),
+			'ord_state'				=> $ord_state,
+			'ord_type'				=> $ord_type,
+			'pop_search'			=> $pop_search,
+			'brand'					=> $brand,
+			'goods_nm'				=> $goods_nm,
+			'stat_pay_type'			=> $stat_pay_type,
+			'com_nm'				=> $com_nm,
+			'store'         		=> DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
+			'store_nm'      		=> DB::table('store')->select('store_cd', 'store_nm')->where('store_nm', '=', $store_nm)->first(),   
+			'sell_type'     		=> $sell_type,
+			'sale_kinds'			=> SLib::getCodes('SALE_KIND'),
+			'pr_codes'				=> SLib::getCodes('PR_CODE'),
+            'pr_code_id'    		=> $str,
+            'pr_code_val'   		=> $str2,
+            'sell_type_id'  		=> $sell_str,
+            'sell_type_val' 		=> $sell_str2,
+			'on_off_yn'				=> $on_off_yn,
+			'store_channel'			=> SLib::getStoreChannel(),
+			'store_kind'			=> SLib::getStoreKind(),
+			'q_store_channel' 		=> $q_store_channel,
+			'q_store_channel_kind' 	=> $q_store_channel_kind,
         ];
         return view( Config::get('shop.store.view') . '/sale/sal24',$values);
     }
@@ -158,23 +163,39 @@ class sal24Controller extends Controller
         $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
         $edate = str_replace("-","",$request->input('edate',date("Ymd")));
 
-        $brand_cd 		= $request->input("brand_cd");
-        $goods_nm 		= $request->input("goods_nm");
-        $item			= $request->input("item");
-        $ord_state		= $request->input("ord_state");
-		$ord_type 		= $request->input("ord_type", "");
-		$sale_place 	= $request->input("sale_place", "");
-		$stat_pay_type 	= $request->input("stat_pay_type");
-
-        $store_cd       = $request->input('store_no');
-        $sell_type      = $request->input('sell_type');
-        $pr_code        = $request->input('pr_code');
-        $on_off_yn      = $request->input('on_off_yn');
+        $brand_cd 			= $request->input("brand_cd");
+        $goods_nm 			= $request->input("goods_nm");
+        $item				= $request->input("item");
+        $ord_state			= $request->input("ord_state");
+		$ord_type 			= $request->input("ord_type", "");
+		$sale_place 		= $request->input("sale_place", "");
+		$stat_pay_type 		= $request->input("stat_pay_type");
+        $store_cd       	= $request->input('store_no');
+        $sell_type      	= $request->input('sell_type');
+        $pr_code        	= $request->input('pr_code');
+        $on_off_yn      	= $request->input('on_off_yn');
+		$store_channel		= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
+		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
 		$where = "";
 
+		// 판매채널/매장구분 검색
+		if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
 
 		// 매장검색
 		if ( $store_cd != "" ) {
@@ -334,6 +355,8 @@ class sal24Controller extends Controller
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
+						inner join store store on store.store_cd = o.store_cd
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
@@ -356,6 +379,8 @@ class sal24Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
 						left outer join claim clm on w.ord_opt_no = clm.ord_opt_no
+						inner join store store on store.store_cd = o.store_cd
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)

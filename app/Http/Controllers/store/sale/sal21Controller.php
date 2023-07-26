@@ -27,15 +27,15 @@ class sal21Controller extends Controller
 
     public function search(Request $request)
     {
-        $sdate = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
-        $edate = $request->input('edate', date('Y-m-d'));
-        $next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
-        $store_cds = $request->input('store_no', []);
-        $close_yn = $request->input('close_yn', 'N');
-        $prd_cds = $request->input('prd_cd', '');
-        $prd_cd_range_text = $request->input("prd_cd_range", '');
-        $ext_term_qty = $request->input('ext_term_qty', ''); // 기간재고 0 제외여부
-        $store_channel	= $request->input("store_channel");
+        $sdate              = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
+        $edate              = $request->input('edate', date('Y-m-d'));
+        $next_edate         = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
+        $store_cds          = $request->input('store_no', []);
+        $close_yn           = $request->input('close_yn', 'N');
+        $prd_cds            = $request->input('prd_cd', '');
+        $prd_cd_range_text  = $request->input("prd_cd_range", '');
+        $ext_term_qty       = $request->input('ext_term_qty', ''); // 기간재고 0 제외여부
+        $store_channel	    = $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 
         $where = "";
