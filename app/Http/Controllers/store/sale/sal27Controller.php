@@ -12,15 +12,18 @@ use Carbon\Carbon;
 
 class sal27Controller extends Controller
 {
-	//
 	public function index(Request $request)
 	{
-        $edate = $request->input('date', now()->format("Y-m"));
+		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m"));
+		$edate = $request->input('edate', now()->format("Y-m"));
 
 		$values = [
-            'date' => $edate,
+            'sdate' => $sdate,
+            'edate' => $edate,
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
-        return view( Config::get('shop.store.view') . '/sale/sal27', $values);
+        return view(Config::get('shop.store.view') . '/sale/sal27', $values);
 	}
 
 	public function search(Request $request)

@@ -1683,7 +1683,7 @@ $( document ).ready(function() {
         searchStore.Open();
     });
 
-    // 매장 검색 클릭 이벤트 바인딩 및 콜백 사용
+	// 창고 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-storage" ).on("click", function() {
         searchStorage.Open();
     });

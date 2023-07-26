@@ -1440,6 +1440,9 @@ $( document ).ready(function() {
     $( ".sch-store" ).on("click", function() {
         searchStore.Open();
     });
+	$( ".sch-store-multiple" ).on("click", function() {
+		searchStore.Open(null, "multiple");
+	});
 
     // 창고 검색 클릭 이벤트 바인딩 및 콜백 사용
     $( ".sch-storage" ).on("click", function() {

@@ -25,52 +25,79 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="date_period">일자 / 기간</label>
-							<div class="form-inline date-select-inbox">
+							<label>일자</label>
+							<div class="form-inline">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" id="date" name="date" value="{{ $date }}" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
 										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>
 									</div>
 									<div class="docs-datepicker-container"></div>
 								</div>
-                                <span class="text_line">/</span>
-                                <select id="period" name='period' class="form-control form-control-sm" style="width: 47%;">
-                                    <option value='1'>1개월</option>
-                                    <option value='3'>3개월</option>
-                                    <option value='6'>6개월</option>
-                                    <option value='9'>9개월</option>
-                                    <option value='12'>12개월</option>
-                                   
-                                </select>
+								<span class="text_line">~</span>
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
 							</div>
 						</div>
 					</div>
 					<div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>바코드</label>
-                            <div class="flex_box">
-                                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
+						<div class="form-group">
+							<label for="good_types">판매채널/매장구분</label>
+							<div class="d-flex align-items-center">
+								<div class="flex_box w-100">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<option value=''>전체</option>
+										@foreach ($store_channel as $sc)
+											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+										@endforeach
+									</select>
+								</div>
+								<span class="mr-2 ml-2">/</span>
+								<div class="flex_box w-100">
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<option value=''>전체</option>
+										@foreach ($store_kind as $sk)
+											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>매장명</label>
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
                                 <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store-multiple"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
                     </div>
 				</div>
                 <div class="row">
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label>바코드</label>
+			                <div class="flex_box">
+				                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+				                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+			                </div>
+		                </div>
+	                </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품검색조건</label>
@@ -95,6 +122,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+				<div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
@@ -263,10 +292,7 @@
         // { headerName: "", field: "", width: "auto" }
     ];
 
-	
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
+	const pApp = new App('', { gridId:"#div-gd" });
 	let gx;
 
 	$(document).ready(function() {
@@ -284,13 +310,14 @@
 			enableRangeSelection: true,
 			animateRows: true,
 		});
-        
-        Search();
+
+		load_store_channel();
 	});
     
     var mutable_cols = [];
 
 	function Search() {
+		return alert("개발중입니다.");
         let data = $('form[name="search"]').serialize();
         gx.Request('/store/sale/sal27/search', data, -1, function(e) {
             updatePinnedRow();
