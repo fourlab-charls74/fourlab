@@ -187,10 +187,10 @@ class stk10Controller extends Controller
                 opt.opt_kind_nm,
                 brand.brand_nm as brand,
                 pc.color,
+                d.code_val as color_nm,
                 pc.size,
                 psr.prd_cd,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, 
-                psr.goods_opt, 
                 psr.qty,
                 pss.wqty as storage_wqty,
                 pss2.wqty as store_wqty,
@@ -227,6 +227,7 @@ class stk10Controller extends Controller
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
+                left outer join code d on d.code_id = pc.color and d.code_kind_cd = 'PRD_CD_COLOR'
             where 1=1 $where
             $orderby
             $limit

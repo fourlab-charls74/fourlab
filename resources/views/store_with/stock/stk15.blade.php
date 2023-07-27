@@ -280,8 +280,8 @@
 		{field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 250},
         {field: "prd_cd_p", headerName: "품번", width: 110, cellStyle: {"text-align": "center"}},
 		{field: "color", headerName: "컬러", width: 50, cellStyle: {"text-align": "center"}},
+        {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: {"text-align": "center"}},
 		{field: "size", headerName: "사이즈", width: 50, cellStyle: {"text-align": "center"}},
-		{field: "goods_opt", headerName: "옵션", width: 200},
 		{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
 		{headerName: "창고보유재고",
             children: [

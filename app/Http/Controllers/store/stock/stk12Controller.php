@@ -200,7 +200,7 @@ class stk12Controller extends Controller
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 pc.color,
                 pc.size,
-                p.goods_opt,
+                c.code_val as color_nm,
                 p.qty as storage_qty,
                 p.wqty as storage_wqty,
                 p.wqty as storage_wqty2,
@@ -213,6 +213,7 @@ class stk12Controller extends Controller
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
             where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
             $limit

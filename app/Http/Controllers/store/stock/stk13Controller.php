@@ -230,6 +230,7 @@ class stk13Controller extends Controller
 				o.prd_cd,
 				concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 				pc.color,
+				c.code_val as color_nm,
 				pc.size,
 				o.goods_no,
 				op.opt_kind_nm,
@@ -237,7 +238,6 @@ class stk13Controller extends Controller
 				g.style_no,
 				g.goods_nm,
 				g.goods_nm_eng,
-				o.goods_opt,
 				ifnull(pss.qty, 0) as storage_qty,
 				ifnull(pss.wqty, 0) as storage_wqty,
 				ifnull(ps.qty, 0) as store_qty, 
@@ -256,6 +256,7 @@ class stk13Controller extends Controller
 				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+				left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
 			where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 				and o.ord_state = 30 and o.clm_state in (90,-30,0)
 				and ($store_where)

@@ -280,7 +280,6 @@
             {field: "color",	headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
             {field: "color_nm",	headerName: "컬러명", width: 100},
             {field: "size",	headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
-            {field: "goods_opt", headerName: "옵션", width: 200},
             {
                 headerName: '창고재고', // 대표창고의 재고를 조회
                 children: [

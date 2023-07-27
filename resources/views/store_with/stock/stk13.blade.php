@@ -314,8 +314,8 @@
             {field: "goods_nm_eng",	headerName: "상품명(영문)", type: 'HeadGoodsNameType', width: 200},
             {field: "prd_cd_sm", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
             {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+            {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: {"text-align": "center"}},
             {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-            {field: "goods_opt", headerName: "옵션", width: 130},
             {
                 headerName: '(대표)창고재고', // 대표창고의 재고를 조회
                 children: [
