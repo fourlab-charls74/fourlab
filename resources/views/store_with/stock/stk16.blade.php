@@ -196,7 +196,7 @@
 					                <select name="ord_field" class="form-control form-control-sm">
 						                <option value="req_rt">출고요청일</option>
 						                <option value="p.prd_cd">바코드</option>
-						                <option value="p.price">판매가</option>
+						                <option value="p.price">현재가</option>
 						                <option value="p.wonga">원가</option>
 					                </select>
 				                </div>
@@ -350,7 +350,7 @@
 		{field: "color", headerName: "컬러명", width: 80},
 		{field: "size", headerName: "사이즈명", width: 80},
 		{field: "unit", headerName: "단위", width: 100},
-		{field: "goods_price", headerName: "판매가", type: 'currencyType', width: 70},
+		{field: "goods_price", headerName: "현재가", type: 'currencyType', width: 70},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 70},
 		{field: "price", headerName: "출고가", type: 'currencyType', width: 70,
 			editable: (params) => params.data.state > 0 && params.data.state < 30,

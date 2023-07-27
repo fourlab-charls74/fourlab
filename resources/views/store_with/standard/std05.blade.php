@@ -28,7 +28,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="sale_kind">판매구분</label>
+							<label for="sale_kind">판매유형</label>
                             <div class="form-inline">
                                 <select id="sale_kind" name="sale_kind" class="form-control form-control-sm w-100">
                                     <option value="">전체</option>
@@ -117,7 +117,7 @@
 <script language="javascript">
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
-        {field: "sale_kind", headerName: "판매구분코드", pinned: "left", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "sale_kind", headerName: "판매유형코드", pinned: "left", width: 90, cellStyle: {"text-align": "center"}},
         // {field: "sale_kind_nm", headerName: "판매구분", pinned: "left", width: 120},
         {field: "sale_type_nm", headerName: "판매유형명", width: 150,
             cellRenderer: function(params) {

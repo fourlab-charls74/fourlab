@@ -71,7 +71,7 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <th class="required">반품창고</th>
+                                            <th class="required">출고창고</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <select name='storage_cd' id="storage_cd" class="form-control form-control-sm w-100" @if(@$cmd == 'update') disabled @endif>

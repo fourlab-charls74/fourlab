@@ -180,13 +180,13 @@
 											</td> -->
 										</tr>
 										<tr>
-											<th class="required">Tag가</th>
+											<th class="required">정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											<th class="required">판매가</th>
+											<th class="required">현재가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
@@ -331,13 +331,13 @@
 		},
 		{
 			field: "tag_price",
-			headerName: "Tag가",
+			headerName: "정상가",
 			type: 'currencyType',
 			width: 80
 		},
 		{
 			field: "price",
-			headerName: "판매가",
+			headerName: "현재가",
 			type: 'currencyType',
 			width: 80
 		},
@@ -622,16 +622,16 @@
 			return alert("원부자재 업체를 선택해주세요.");
 		}
 
-		// Tag가 입력여부
+		// 정상가 입력여부
 		if (f1.tag_price.value.trim() === '') {
 			f1.tag_price.focus();
-			return alert("Tag가를 입력해주세요.");
+			return alert("정상가를 입력해주세요.");
 		}
 
-		// 판매가 입력여부
+		// 현재가 입력여부
 		if (f1.price.value.trim() === '') {
 			f1.price.focus();
-			return alert("판매가를 입력해주세요.");
+			return alert("현재가를 입력해주세요.");
 		}
 
 		// 원가 입력여부

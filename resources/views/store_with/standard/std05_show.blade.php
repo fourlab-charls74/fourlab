@@ -48,7 +48,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">판매구분코드</th>
+                                            <th class="required">판매유형코드</th>
                                             <td>
                                                 <div class="d-flex">
                                                     <input type="text" name="sale_type_cd" id="sale_type_cd" value="{{@$sale_type->sale_type_cd}}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="width:280px;" @if($cmd == "update") readonly @endif />
@@ -355,14 +355,14 @@
     // 저장 시 입력값 확인
     const validation = (cmd) => {
         if(cmd === "add") {
-            // 판매구분코드 선택여부
+            // 판매유형코드 선택여부
             if(f1.sale_type_cd.value.trim() === '') {
 				f1.sale_type_cd.focus();
-				return alert("판매구분코드를 입력해주세요.");
+				return alert("판매유형코드를 입력해주세요.");
 			}
 			
 			// 중복체크여부 검사
-			if($("[name='sale_type_only']").val() !== "true") return alert("판매구분코드 중복체크를 해주세요.");
+			if($("[name='sale_type_only']").val() !== "true") return alert("판매유형코드 중복체크를 해주세요.");
         }
 
         if(f1.sale_type_nm.value === "") {
@@ -434,7 +434,7 @@
 
     async function checkCode() {
         const sale_type_cd = $("[name=sale_type_cd]").val().trim();
-        if( sale_type_cd === '' )	return alert("판매구분코드를 입력해주세요.");
+        if( sale_type_cd === '' )	return alert("판매유형코드를 입력해주세요.");
         const response = await axios({ 
             url: `/store/standard/std05/check-code/${sale_type_cd}`, 
             method: 'get' 

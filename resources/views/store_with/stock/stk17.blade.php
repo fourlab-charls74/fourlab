@@ -98,7 +98,7 @@
                                     <div class="form-inline-inner input_box" style="width:45%;">
                                         <select name="ord_field" class="form-control form-control-sm">
                                             <option value="p.prd_cd">바코드</option>
-                                            <option value="p.price">판매가</option>
+                                            <option value="p.price">현재가</option>
                                         </select>
                                     </div>
                                     <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -167,7 +167,7 @@
             {field: "color", headerName: "컬러명", width: 100},
             {field: "size", headerName: "사이즈명", width: 100},
             {field: "unit", headerName: "단위", width: 120},
-            {field: "price", headerName: "판매가", type: 'currencyType', width: 80},
+            {field: "price", headerName: "현재가", type: 'currencyType', width: 80},
             {field: "wonga", headerName: "원가", type: 'currencyType', width: 80, hide: true},
             {field: 'storage_wqty', headerName: '창고재고',
                 children: [

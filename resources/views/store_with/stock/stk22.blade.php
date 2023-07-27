@@ -295,8 +295,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}, aggFunc: "first"},
         {field: "color_nm", headerName: "컬러명", width: 70, aggFunc: "first"},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}, aggFunc: "first"},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60, aggFunc: "first"},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 60, aggFunc: "first"},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60, aggFunc: "first"},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 60, aggFunc: "first"},
         {width: "auto"},
 	];
 
@@ -390,8 +390,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 60},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 60},
         {field: "wonga", headerName: "원가", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 200},
     ];

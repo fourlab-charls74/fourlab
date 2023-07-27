@@ -16,9 +16,9 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-                    <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청RT</a>
-                    <a href="/store/stock/stk22" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반RT</a>
+					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                    <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>매장요청RT</a>
+                    <a href="/store/stock/stk22" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>본사요청RT</a>
                     <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- {{-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> --}} -->
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -255,8 +255,9 @@
 		</div>
 
         <div class="resul_btn_wrap mb-3">
-            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
-            <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>RT요청</a>
+            <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+            <a href="/store/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>매장요청RT</a>
+            <a href="/store/stock/stk22" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>본사요청RT</a>
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
 
@@ -379,8 +380,8 @@
         {field: "color",	headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size",	headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
+        {field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType"},
+        {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
         {field: "qty", headerName: "수량", type: "currencyType", width: 60, cellStyle: {"font-weight": "700"},
             cellRenderer: function(params) {
                     if (params.value !== undefined) {
