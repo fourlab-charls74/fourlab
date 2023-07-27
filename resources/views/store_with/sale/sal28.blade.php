@@ -29,9 +29,9 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disabled>
+										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
 										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disabled>
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>
@@ -90,12 +90,12 @@
 <script>
 	const columns = [
 		{headerName: '#',	width:35,	type:'NumType',	cellStyle: {"background":"#F5F7F7", "text-align":"center"}},
-		{field: "rt",	headerName: "일자",	width: 200,	cellClass: 'hd-grid-code'},
-		{field: "match_y_cnt",	headerName: "입고",	width: 100,	cellClass: 'hd-grid-code'},
-		{field: "match_n_cnt",	headerName: "출고",	width: 100,	cellClass: 'hd-grid-code'},
-		{field: "store_cnt",	headerName: "반품",	width: 100,	cellClass: 'hd-grid-code'},
-		{field: "id",	headerName: "LOSS",	width: 100,	cellClass: 'hd-grid-code'},
-		{field: "store_cnt",	headerName: "재고",	width: 100,	cellClass: 'hd-grid-code'},
+		{field: "d",	headerName: "일자",	width: 120,	cellClass: 'hd-grid-code'},
+		{field: "in_qty",	headerName: "입고",	width: 100, type: "currencyType"},
+		{field: "out_qty",	headerName: "출고",	width: 100, type: "currencyType"},
+		{field: "return_qty",	headerName: "반품",	width: 100, type: "currencyType"},
+		{field: "loss_qty",	headerName: "LOSS",	width: 100, type: "currencyType"},
+		{field: "store_cnt",	headerName: "재고",	width: 100, type: "currencyType"},
 		{field: "",	headerName: "",	width: "auto"}
 	];
 </script>
@@ -114,8 +114,8 @@
 	});
 
 	function Search() {
-		//let data = $('form[name="search"]').serialize();
-		//gx.Request('/store/product/prd06/search', data, 1);
+		let data = $('form[name="search"]').serialize();
+		gx.Request('/store/sale/sal28/search', data, 1);
 	}
 </script>
 	
