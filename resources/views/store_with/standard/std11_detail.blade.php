@@ -158,23 +158,23 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">수량</th>
+                                            <!-- <th class="required">수량</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <input type='text' class="form-control form-control-sm" name='qty' id="qty" value='{{@$row->qty}}' onkeyup="onlynum(this)">
                                                 </div>
-                                            </td>
+                                            </td> -->
                                             <th class="required">수선 유료구분</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y" @if($row->is_free == 'Y') checked @endif/>
-                                                            <label class="custom-control-label" for="use_y">유료</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
                                                             <input type="radio" name="is_free" id="use_n" class="custom-control-input" value="N" @if($row->is_free == 'N') checked @endif/>
                                                             <label class="custom-control-label" for="use_n">무료</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y" @if($row->is_free == 'Y') checked @endif/>
+                                                            <label class="custom-control-label" for="use_y">유료</label>
                                                         </div>
                                                     </div>
                                                     <div >
@@ -423,11 +423,6 @@
 
         if ($("#size").val() == "") {
             alert("사이즈를 선택해 주세요");
-            return false;
-        }
-
-        if ($("#qty").val() == "") {
-            alert("수량을 입력해 주세요");
             return false;
         }
 

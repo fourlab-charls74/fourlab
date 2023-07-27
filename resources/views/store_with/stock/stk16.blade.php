@@ -408,6 +408,15 @@
         {field: "prc_rt", headerName: "처리일시", type: "DateTimeType"},
         {field: "fin_nm", headerName: "완료(입고)자", width: 80, cellClass: 'hd-grid-code'},
         {field: "fin_rt", headerName: "완료(입고)일시", type: "DateTimeType"},
+        {field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+			cellRenderer: function(params) {
+				if(params.data.state >= 10) {
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.idx})">출력</a>`;
+				} else{
+					return '-';
+				}
+			}
+		},
 		{width: 0}
 	];
 </script>
@@ -583,6 +592,11 @@
             console.log(err);
         });
     }
+
+    // 원부자재출고 명세서 출력
+	function printDocument(idx) {
+		location.href = '/store/stock/stk16/download?idx=' + idx;
+	}
 
 </script>
 @stop

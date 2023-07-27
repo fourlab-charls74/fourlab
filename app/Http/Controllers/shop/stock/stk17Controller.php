@@ -78,8 +78,6 @@ class stk17Controller extends Controller
                 ifnull(p.wonga, 0) as wonga,
                 ifnull(pss.qty, 0) as storage_qty,
                 ifnull(pss.wqty, 0) as storage_wqty,
-                ifnull((select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd), 0) as store_qty,
-                ifnull((select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd), 0) as store_wqty,
                 '0' as rel_qty,
                 '0' as amount
             from product p

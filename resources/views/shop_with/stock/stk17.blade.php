@@ -166,24 +166,6 @@
                     }
                 }
             },
-            {field: 'store_info', headerName: '매장재고',
-                children: [
-                    {field: 'store_qty', headerName: '재고', type: "currencyType", width: 60,
-                        cellRenderer: function(params) {
-                            if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                            }
-                        }
-                    },
-                    {field: 'store_wqty', headerName: '보유재고', type: "currencyType", width: 60,
-                        cellRenderer: function(params) {
-                            if (params.value !== undefined) {
-                                return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                            }
-                        }
-                    },
-                ],
-            },
             {field: 'rel_qty', headerName: '요청수량', type: "currencyType", width: 60, editable: true,
 				cellClass: ['hd-grid-edit', 'hd-grid-number'],
 				valueFormatter: formatNumber

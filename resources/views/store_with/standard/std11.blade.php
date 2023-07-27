@@ -281,7 +281,7 @@
         { field: "goods_nm", headerName: "상품명", width: 300, cellStyle: DEFAULT_STYLE,  },
         { field: "color", headerName: "컬러", width: 60, cellStyle: DEFAULT_STYLE,  },
         { field: "size", headerName: "사이즈", width: 60, cellStyle: DEFAULT_STYLE, },
-        { field: "qty", headerName: "수량", width: 60, cellStyle: DEFAULT_STYLE, },
+        // { field: "qty", headerName: "수량", width: 60, cellStyle: DEFAULT_STYLE, },
         { field: "is_free", headerName: "수선 유료구분", width: 100, cellStyle: DEFAULT_STYLE, },
         { field: "as_amt", headerName: "수선 금액", width: 80, cellStyle: {'text-align' : 'right'}, type: 'currencyType'},
         { field: "content", headerName: "수선내용", width: 300, cellStyle: DEFAULT_STYLE, },

@@ -153,23 +153,23 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">수량</th>
+                                            <!-- <th class="required">수량</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <input type='text' class="form-control form-control-sm" name='qty' id="qty" value='' onkeyup="onlynum(this)">
                                                 </div>
-                                            </td>
+                                            </td> -->
                                             <th class="required">수선 유료구분</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y"/>
-                                                            <label class="custom-control-label" for="use_y">유료</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
                                                             <input type="radio" name="is_free" id="use_n" class="custom-control-input" value="N" checked/>
                                                             <label class="custom-control-label" for="use_n">무료</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y"/>
+                                                            <label class="custom-control-label" for="use_y">유료</label>
                                                         </div>
                                                     </div>
                                                     <div >
@@ -327,10 +327,10 @@
             return false;
         }
 
-        if ($("#qty").val() == "") {
-            alert("수량을 입력해 주세요");
-            return false;
-        }
+        // if ($("#qty").val() == "") {
+        //     alert("수량을 입력해 주세요");
+        //     return false;
+        // }
 
         if($("input:radio[name=is_free]:checked").val()=='Y'){
             if ($("#as_amt").val() == "") {
