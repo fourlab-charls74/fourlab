@@ -492,7 +492,6 @@ class prd07Controller extends Controller
 			$point_unit = $d['point_unit'];				//적립금 단위
 			$point_amt = $d['point_amt']??'';			//적립금 금액
 			$org_nm = $d['org_nm'];						//원산지
-			$md_nm = $d['md_nm']??'';					//MD
 			$make = $d['make']??'';						//제조사
 			$goods_cont = $d['goods_cont']??'';			//상품상세
 			$spec_desc = $d['spec_desc']??'';			//제품사양
@@ -537,7 +536,6 @@ class prd07Controller extends Controller
 					'$point_unit' as point_unit,
 					'$point_amt' as point_amt,
 					'$org_nm' as org_nm,
-					'$md_nm' as md_nm,
 					'$make' as make,
 					'$goods_cont' as goods_cont,
 					'$spec_desc' as spec_desc,
@@ -629,15 +627,10 @@ class prd07Controller extends Controller
 		$goods_no = $goods->GetNextGoodsNo();
 		$goods_sub = 0;
 
-		// MD 이름, 아이디 얻기
-		$sql = "
-			select id from mgr_user where name = '" . @$md_nm . "'
-		";
-		$result = DB::selectOne($sql);
-		$md_id = isset($result->id) ? $result->id : "";
+		// 일괄등록 시 MD를 입력하지 않고 로그인한 아이디 이름으로 저장
+		$user_id = Auth('head')->user()->id;
+		$user_nm = Auth('head')->user()->name;
 
-
-		
 		$today_his = date("Y-m-d H:i:s");
 		$param = @array(
 			"goods_no"		=> $goods_no,
@@ -666,8 +659,8 @@ class prd07Controller extends Controller
 			"point_unit"	=> $point_unit,
 			"point"			=> $point,
 			"org_nm"		=> $org_nm,
-			"md_id"			=> $md_id,
-			"md_nm"			=> $md_nm,
+			"md_id"			=> $user_id,
+			"md_nm"			=> $user_nm,
 			"make"			=> $make,
 			"goods_cont"	=> $goods_cont,
 			"spec_desc"		=> $spec_desc,
