@@ -256,7 +256,7 @@
 </div>
 <script language="javascript">
     let rel_states = <?= json_encode(@$rel_states) ?> ;
-    let rel_orders = <?= json_encode(@$rel_orders) ?> ;
+	{{--let rel_orders = <?= json_encode(@$rel_orders) ?> ;--}}
 
     function StyleReleaseState(params) {
         let state = {
