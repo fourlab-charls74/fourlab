@@ -216,34 +216,35 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <!-- <div class="d-flex mr-1 mb-1 mb-lg-0">
-                            <span class="mr-1">출고예정일</span>
-                            <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $edate }}" autocomplete="off" readonly />
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                            <i class="fa fa-calendar" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="docs-datepicker-container"></div>
-                            </div>
-                        </div>
-                        <div class="d-flex">
-                            <select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-                                @foreach ($rel_order_res as $rel_order)
-                                    <option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
-                        <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a> -->
-	                    <a href="javascript:printSelectedDocuments();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download mr-1"></i>명세서 일괄출력</a>
-	                    <span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
-                        <!-- <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a> -->
+					{{--	
+						<!-- <div class="d-flex mr-1 mb-1 mb-lg-0">
+							<span class="mr-1">출고예정일</span>
+							<div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
+								<div class="input-group">
+									<input type="text" class="form-control form-control-sm docs-date bg-white" name="exp_dlv_day" value="{{ $edate }}" autocomplete="off" readonly />
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+											<i class="fa fa-calendar" aria-hidden="true"></i>
+										</button>
+									</div>
+								</div>
+								<div class="docs-datepicker-container"></div>
+							</div>
+						</div>
+						<div class="d-flex">
+							<select id='exp_rel_order' name='exp_rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
+								@foreach ($rel_order_res as $rel_order)
+									<option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
+								@endforeach
+							</select>
+						</div>
+						<a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
+						<span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+						<a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
+						<span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span> -->
+					--}}
+						<a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm">매장입고</a>
+					{{--<!-- <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a> -->--}}
                     </div>
 				</div>
 			</div>
