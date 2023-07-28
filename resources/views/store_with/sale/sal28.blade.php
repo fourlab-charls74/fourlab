@@ -90,12 +90,12 @@
 <script>
 	const columns = [
 		{headerName: '#',	width:35,	type:'NumType',	cellStyle: {"background":"#F5F7F7", "text-align":"center"}},
-		{field: "d",	headerName: "일자",	width: 120,	cellClass: 'hd-grid-code'},
+		{field: "stock_state_date",	headerName: "일자",	width: 120,	cellClass: 'hd-grid-code'},
 		{field: "in_qty",	headerName: "입고",	width: 100, type: "currencyType"},
 		{field: "out_qty",	headerName: "출고",	width: 100, type: "currencyType"},
 		{field: "return_qty",	headerName: "반품",	width: 100, type: "currencyType"},
 		{field: "loss_qty",	headerName: "LOSS",	width: 100, type: "currencyType"},
-		{field: "store_cnt",	headerName: "재고",	width: 100, type: "currencyType"},
+		{field: "term_qty",	headerName: "재고",	width: 100, type: "currencyType"},
 		{field: "",	headerName: "",	width: "auto"}
 	];
 </script>

@@ -29,8 +29,9 @@ class sal28Controller extends Controller
 	
 	public function search(Request $request)
 	{
-		$sdate	= str_replace("-", "", $request->input("sdate", date('Ymd')));
-		$edate	= str_replace("-", "", $request->input("edate", date("Ymd")));
+		$sdate		= str_replace("-", "", $request->input("sdate", date('Ymd')));
+		$edate		= str_replace("-", "", $request->input("edate", date("Ymd")));
+		$storage_cd	= $request->input('storage_cd');
 
 		$where	= "";
 
@@ -50,63 +51,84 @@ class sal28Controller extends Controller
 			// 갯수 얻기
 			$sql =
 				" 
-				select
-				    count(*) as total
-				    /*
-					m.d,
-					ifnull(( hst_gr.storage_in_qty + hst_gr.rt_in_qty ), 0) as in_qty,
-					ifnull(( hst_gr.storage_return_qty + hst_gr.storage_out_qty + hst_gr.rt_out_qty ), 0) as out_qty,
-					ifnull(hst_gr.store_return_qty, 0) as return_qty,
-					ifnull(hst_gr.loss_qty, 0) as loss_qty
-					*/
-				from mdate m
-				where
-					d >= :sdate and d <= :edate
+					select
+						count(*) as total
+					from
+					(
+						select
+							hst.stock_state_date
+						from product_stock_hst hst
+						where
+							hst.location_type = 'STORAGE'
+							and hst.location_cd = :storage_cd
+							and hst.stock_state_date >= :sdate and hst.stock_state_date <= :edate
+						group by hst.stock_state_date
+					) a
 				";
-			$row = DB::selectOne($sql, ['sdate' => $sdate, 'edate' => $edate]);
+			$row = DB::selectOne($sql, ['storage_cd' => $storage_cd, 'sdate' => $sdate, 'edate' => $edate]);
 			$total = $row->total;
 			if ($total > 0) {
 				$page_cnt = (int)(($total - 1) / $page_size) + 1;
 			}
 		}
-
-		$sql =
-			"
+		
+		//창고 총재고 정보
+		$sql	= " select sum(qty) as period_out_qty from product_stock_storage where storage_cd = :storage_cd ";
+		$row	= DB::selectOne($sql, ['storage_cd' => $storage_cd]);
+		$total_qty	= $row->period_out_qty;
+		
+		//기간 후 재고 정보
+		$sql	= "
 			select
-				m.d,
-				ifnull(( hst_gr.storage_in_qty + hst_gr.rt_in_qty ), 0) as in_qty,
-				ifnull(( hst_gr.storage_return_qty + hst_gr.storage_out_qty + hst_gr.rt_out_qty ), 0) as out_qty,
-				ifnull(hst_gr.store_return_qty, 0) as return_qty,
-				ifnull(hst_gr.loss_qty, 0) as loss_qty
-			from mdate m
-			left outer join 
-			(
-				select
-					hst.stock_state_date,
-					sum(if(hst.type = 1, hst.qty, 0)) as storage_in_qty,				-- 상품입고
-					sum(if(hst.type = 16 and hst.qty > 0, hst.qty, 0)) as rt_in_qty,	-- 이동입고
-			
-					sum(if(hst.type = 9, hst.qty, 0)) as storage_return_qty,			-- 생산반품
-					sum(if(hst.type = 17, hst.qty * -1, 0)) as storage_out_qty,			-- 매장출고
-					sum(if(hst.type = 16 and hst.qty < 0, hst.qty * -1, 0)) as rt_out_qty,	-- 이동출고
-			
-					sum(if(hst.type = 11, hst.qty, 0)) as store_return_qty,				-- 매장반품
-			
-					sum(if(hst.type = 14, hst.qty * -1, 0)) as loss_qty					-- LOSS
-				from product_stock_hst hst
-				where
-					hst.location_type = 'STORAGE'
-					and hst.location_cd = 'A0009'
-					and hst.stock_state_date >= :sdate1 and hst.stock_state_date <= :edate1
-				group by hst.stock_state_date
-			) as hst_gr on m.d = hst_gr.stock_state_date
+				ifnull(sum(hst.qty), 0) as period_out_qty
+			from product_stock_hst hst
 			where
-				d >= :sdate2 and d <= :edate2
-			order by d
-            limit $startno,$page_size
-            ";
+				hst.location_type = 'STORAGE'
+				and hst.location_cd = :storage_cd
+				and hst.stock_state_date >= :sdate
+		";
+		$row	= DB::selectOne($sql, ['storage_cd' => $storage_cd, 'sdate' => $sdate]);
+		$period_out_qty	= $row->period_out_qty;
 
-		$rows = DB::select($sql, ['sdate1' => $sdate, 'edate1' => $edate, 'sdate2' => $sdate, 'edate2' => $edate]);
+		$sql	=
+			"
+				select
+					a.stock_state_date,
+					( a.storage_in_qty + a.rt_in_qty ) as in_qty,
+					( a.storage_return_qty + a.storage_out_qty + a.rt_out_qty ) as out_qty,
+					a.store_return_qty as return_qty,
+					a.loss_qty as loss_qty,
+					a.qty as period_in_qty,
+					0 as term_qty
+				from
+				(
+					select
+						hst.stock_state_date,
+						sum(if(hst.type = 1, hst.qty, 0)) as storage_in_qty,					-- 상품입고
+						sum(if(hst.type = 16 and hst.qty > 0, hst.qty, 0)) as rt_in_qty,		-- 이동입고
+						sum(if(hst.type = 9, hst.qty, 0)) as storage_return_qty,				-- 생산반품
+						sum(if(hst.type = 17, hst.qty * -1, 0)) as storage_out_qty,				-- 매장출고
+						sum(if(hst.type = 16 and hst.qty < 0, hst.qty * -1, 0)) as rt_out_qty,	-- 이동출고
+						sum(if(hst.type = 11, hst.qty, 0)) as store_return_qty,					-- 매장반품
+						sum(if(hst.type = 14, hst.qty * -1, 0)) as loss_qty,					-- LOSS
+						sum(hst.qty) as qty														-- 기간재고
+					from product_stock_hst hst
+					where
+						hst.location_type = 'STORAGE'
+						and hst.location_cd = :storage_cd
+						and hst.stock_state_date >= :sdate and hst.stock_state_date <= :edate
+					group by hst.stock_state_date
+				) a
+	            limit $startno,$page_size
+            ";
+		
+		$term_qty	= $total_qty - $period_out_qty;
+		
+		$rows = DB::select($sql, ['storage_cd' => $storage_cd, 'sdate' => $sdate, 'edate' => $edate]);
+		foreach ($rows as $row) {
+			$term_qty		= $term_qty + $row->period_in_qty;
+			$row->term_qty	= $term_qty;
+		}		
 
 		return response()->json([
 			"code"	=> 200,

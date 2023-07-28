@@ -167,7 +167,7 @@ class sal22Controller extends Controller
                 
             from product_stock_storage p
                 inner join product_code pc on pc.prd_cd = p.prd_cd
-                left outer join product pd on pd.prd_cd = p.prd_cd
+                inner join product pd on pd.prd_cd = p.prd_cd
                 left outer join goods g on g.goods_no = p.goods_no
                 inner join storage storage on storage.storage_cd = p.storage_cd
                 left outer join brand b on b.br_cd = pc.brand
