@@ -81,12 +81,12 @@ class sal27Controller extends Controller
 		// 바코드검색
 		$product_where = "";
 		if ($prd_cd != '') {
-			$prd_cd = join(',',
-				array_map(
-					function($s) { return "'" . Lib::quote($s) . "'"; }, 
-					explode(",", $prd_cd)
+			$product_where .= " and (1<>1";
+			$product_where .= join('', array_map(
+				function($s) { return " or pc.prd_cd like '" . Lib::quote($s) . "%'"; },
+				explode(",", $prd_cd)
 			));
-			$product_where .= " and pc.prd_cd in (" . $prd_cd . ")";
+			$product_where .= ") ";
 		}
 
 		// 상품조건검색
