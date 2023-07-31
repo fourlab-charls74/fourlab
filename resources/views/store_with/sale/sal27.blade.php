@@ -246,8 +246,12 @@
                 {field: "sale_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
                 {field: "sale_recv_price", headerName: "실판매가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
                 {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
-                {field: "none", headerName: "판매율", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
-                {field: "none", headerName: "할인율", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
+                {field: "sale_ratio", headerName: "판매율", width: 80, type: "percentType",
+	                aggFunc: (params) => {
+						return params.rowNode ? params.rowNode.aggData ? (params.rowNode.aggData.sale_qty / params.rowNode.aggData.term_in_qty * 100) : 0 : 0;
+	                } 
+                },
+                {field: "discount_ratio", headerName: "할인율", width: 80, type: "percentType"},
             ]
         },
         {
@@ -277,6 +281,7 @@
 				{field: "term_total_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
 			]
 		},
+		{ field: "term_sale_qty", headerName: "판매계", width: 60, type: "currencyType", aggFunc: sumValuesFunc },
 		{ field: "com_id", headerName: "업체코드", width: 60, cellClass: 'hd-grid-code' },
 		{ field: "com_nm", headerName: "업체명", width: 80 },
     ];
@@ -355,7 +360,7 @@
 			.reduce((a, c) => (!!c.children && Array.isArray(c.children)) ? a.concat(c.children.concat(c)) : a.concat(c), [])
 			.filter(col => col.type === 'currencyType')
 			.map(col => col.field);
-		let totals = {};
+		const totals = {};
 
 		const rows = gx.getRows();
 		if (rows && Array.isArray(rows) && rows.length > 0) {
@@ -367,7 +372,11 @@
 		}
 
 		let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-		gx.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...totals }]);
+		gx.gridOptions.api.setPinnedTopRowData([{ 
+			...pinnedRow.data, 
+			...totals, 
+			sale_ratio: totals.sale_qty / (totals.term_in_qty === 0 ? 1 : totals.term_in_qty) * 100,
+		}]);
 	};
 </script>
 @stop
