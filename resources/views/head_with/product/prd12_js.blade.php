@@ -147,7 +147,7 @@
 
             var frm = $('form');
             //console.log(frm.serialize());
-            let d_cat_cd = '{{ @$plan->p_no }}';
+			let d_cat_cd = $('#d_cat_cd').val();
 
             $.ajax({
                 method: 'post',
