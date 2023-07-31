@@ -187,11 +187,24 @@ class stk18Controller extends Controller
         $store_cd = $request->input("store_cd", '');
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
+        $rel_date = date_format(date_create(now()), "Ymd");
 
         try {
             DB::beginTransaction();
 
 			$stock = new S_Stock($admin);
+
+            $sql = "
+                select
+                    release_no
+                from sproduct_stock_release
+                order by idx desc
+            ";
+
+            $last_seq = DB::selectOne($sql);
+            $seq = explode('_', $last_seq->release_no);
+            $no = (int)$seq[2] + 1;
+
 
 			foreach($data as $row) {
 				
@@ -212,6 +225,7 @@ class stk18Controller extends Controller
 				
 				$rel = [
 					'type' => $release_type,
+                    'release_no' => $release_type.'_'.$rel_date.'_'.$no,
 					'prd_cd' => $row['prd_cd'],
 					'price' => $rel_price,
 					'wonga' => $row['wonga'],

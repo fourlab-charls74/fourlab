@@ -316,6 +316,7 @@
 	let columns = [
         {field: "idx", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellClass: 'hd-grid-code'},
+        {field: "release_no", headerName: "출고번호",pinned:'left', hide:true},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 29,
             checkboxSelection: function(params) {
                 return params.data.state < 40 && params.data.state > 0;
@@ -411,7 +412,7 @@
         {field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
 			cellRenderer: function(params) {
 				if(params.data.state >= 10) {
-					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.idx})">출력</a>`;
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument('${params.data.release_no}')">출력</a>`;
 				} else{
 					return '-';
 				}
@@ -594,8 +595,9 @@
     }
 
     // 원부자재출고 명세서 출력
-	function printDocument(idx) {
-		location.href = '/store/stock/stk16/download?idx=' + idx;
+	function printDocument(release_no) {
+        console.log(release_no);
+		location.href = `/store/stock/stk16/download?release_no=${release_no}`;
 	}
 
 </script>

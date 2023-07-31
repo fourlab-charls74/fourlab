@@ -154,7 +154,8 @@ class stk16Controller extends Controller
                 psr.prc_rt, 
                 psr.fin_id, 
                 ifnull((select name from mgr_user where id = psr.fin_id), '') as fin_nm,
-                psr.fin_rt
+                psr.fin_rt,
+                psr.release_no
             from sproduct_stock_release psr
                 inner join product p on psr.prd_cd = p.prd_cd
                 inner join product_code pc on p.prd_cd = pc.prd_cd
@@ -653,126 +654,138 @@ class stk16Controller extends Controller
     // 원부자재출고명세서 출력
 	public function download(Request $request)
 	{
-		$idx = $request->input('idx');
+		$release_no = $request->input('release_no');
 
-		// $sql = "
-        //     select
-        //         sr.sgr_cd
-        //         , sr.storage_cd
-        //         , sr.target_cd
-        //         , sr.target_type
-        //         , sr.sgr_date
-        //         , sr.sgr_type
-        //         , sr.sgr_state
-        //         , sr.return_addr
-        //         , sr.return_reason
-        //         , (srp.return_price * srp.return_qty) as total_price
-        //         , srp.prd_cd
-        //         , g.goods_nm
-        //         , g.goods_nm_eng
-        //         , pc.color
-        //         , pc.size
-        //         , srp.price
-        //         , srp.return_price
-        //         , srp.return_qty
-        //         , s.storage_nm
-        //         , s.addr1
-        //         , s.addr2
-        //         , s.phone
-        //         , s.fax
-        //         , s.ceo
-        //         , (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = s.storage_cd) as storage_addr
-        //     from storage_return sr
-        //         inner join storage s on s.storage_cd = sr.storage_cd and s.use_yn = 'Y'
-        //         left outer join storage_return_product srp on srp.sgr_cd = sr.sgr_cd
-        //         inner join product_code pc on pc.prd_cd = srp.prd_cd
-        //         inner join goods g on g.goods_no = pc.goods_no
-        //     where srp.sgr_cd = :sgr_cd
+        $sql = "
+            select
+                ssr.release_no
+                , ssr.type
+                , ssr.prd_cd
+                , p.prd_nm
+                , ssr.price
+                , ssr.wonga
+                , ssr.qty
+                , ssr.rec_qty
+                , ssr.prc_qty
+                , (ssr.price * ssr.qty) as total_price
+                , (ssr.price * ssr.rec_qty) as total_price2
+                , (ssr.price * ssr.prc_qty) as total_price3
+                , ssr.store_cd
+                , s2.store_nm
+                , ssr.storage_cd
+                , s.storage_nm
+                , ssr.state
+                , pc.color
+                , pc.size
+                , s.addr1
+                , s.addr2
+                , s.phone
+                , s.fax
+                , s.ceo
+                , s2.phone as store_phone
+                , s2.fax as store_fax
+                , s2.manager_nm
+                , (select concat(addr1, ifnull(addr2, '')) from store where store_cd = ssr.store_cd) as store_addr
+                , (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = s.storage_cd) as storage_addr
+            from sproduct_stock_release ssr
+                inner join storage s on ssr.storage_cd = s.storage_cd and s.use_yn = 'Y'
+                inner join store s2 on s2.store_cd = ssr.store_cd
+                inner join product_code pc on pc.prd_cd = ssr.prd_cd
+                inner join product p on p.prd_cd = ssr.prd_cd
+            where ssr.release_no = :release_no
+        ";
 
-		// ";
-		// $rows = DB::select($sql, [ 'idx' => $idx]);
+		$rows = DB::select($sql, [ 'release_no' => $release_no]);
 
-		// $data = [
-		// 	'one_sheet_count' => 36,
-		// 	'idx' => sprintf('%04d', $idx),
-		// 	'products' => $rows
-		// ];
+		$data = [
+			'one_sheet_count' => 36,
+			'release_no' => $release_no,
+			'products' => $rows
+		];
 
-		// if (count($rows) > 0) {
-		// 	$data['receipt_date']		= date('Y-m-d'); // 접수일자? 출고일자? 논의 후 수정필요
-		// 	$data['storage_nm'] 		= $rows[0]->storage_nm ?? '';
-		// 	$data['storage_phone'] 		= $rows[0]->phone ?? '';
-		// 	$data['storage_fax'] 		= $rows[0]->fax ?? '';
-		// 	$data['storage_addr'] 		= $rows[0]->storage_addr ?? '';
-		// 	$data['return_price'] 	    = $rows[0]->return_price ?? '';
-		// 	$data['return_qty'] 	    = $rows[0]->return_qty ?? '';
-		// 	$data['storage_ceo'] 	    = $rows[0]->ceo ?? '';
-		// 	$data['storage_cd'] 	    = $rows[0]->storage_cd ?? '';
+		if (count($rows) > 0) {
+			$data['receipt_date']		= date('Y-m-d'); // 접수일자? 출고일자? 논의 후 수정필요
+			$data['storage_nm'] 		= $rows[0]->storage_nm ?? '';
+			$data['storage_phone'] 		= $rows[0]->phone ?? '';
+			$data['storage_fax'] 		= $rows[0]->fax ?? '';
+			$data['storage_addr'] 		= $rows[0]->storage_addr ?? '';
+			$data['store_phone'] 		= $rows[0]->store_phone ?? '';
+			$data['store_fax']  		= $rows[0]->store_fax ?? '';
+			$data['store_addr'] 		= $rows[0]->store_addr ?? '';
+			$data['price'] 	            = $rows[0]->price ?? '';
+			$data['qty']         	    = $rows[0]->qty ?? '';
+			$data['rec_qty']         	= $rows[0]->rec_qty ?? '';
+			$data['prc_qty']         	= $rows[0]->prc_qty ?? '';
+			$data['storage_ceo'] 	    = $rows[0]->ceo ?? '';
+			$data['manager_nm'] 	    = $rows[0]->manager_nm ?? '';
+			$data['storage_cd'] 	    = $rows[0]->storage_cd ?? '';
+			$data['store_cd'] 	        = $rows[0]->store_cd ?? '';
+			$data['store_nm'] 	        = $rows[0]->store_nm ?? '';
 
-		// 	$conf = new Conf();
-		// 	$company = $conf->getConfig('shop');
-		// 	$data['business_registration_number'] = $company['business_registration_number'];
-		// 	$data['company_name'] = $company['company_name'];
-		// 	$data['company_ceo_name'] = $company['company_ceo_name'];
-		// 	$data['company_address'] = $company['company_address'];
+			$conf = new Conf();
+			$company = $conf->getConfig('shop');
+			$data['business_registration_number'] = $company['business_registration_number'];
+			$data['company_name'] = $company['company_name'];
+			$data['company_ceo_name'] = $company['company_ceo_name'];
+			$data['company_address'] = $company['company_address'];
 			
-		// 	/* 하단 정보는 값등록 후 수정이 필요합니다. */
-		// 	$data['company_uptae'] = '도소매';
-		// 	$data['company_upjong'] = '의류,신발,악세서리';
-		// 	$data['company_office_phone'] = '02) 332-0018';
-		// 	$data['company_fax'] = '';
-		// 	$data['company_bank_number'] = '국민은행 / 730637-04-005212 / (주) 알펜인터내셔널';
-		// 	/* 상단 정보는 값등록 후 수정이 필요합니다. */
-		// }
+			/* 하단 정보는 값등록 후 수정이 필요합니다. */
+			$data['company_uptae'] = '도소매';
+			$data['company_upjong'] = '의류,신발,악세서리';
+			$data['company_office_phone'] = '02) 332-0018';
+			$data['company_fax'] = '';
+			$data['company_bank_number'] = '국민은행 / 730637-04-005212 / (주) 알펜인터내셔널';
+			/* 상단 정보는 값등록 후 수정이 필요합니다. */
+		}
 
-        // $style = [
-		// 	'A1:AH50' => [
-		// 		'alignment' => [
-		// 			'vertical' => Alignment::VERTICAL_CENTER,
-		// 			'horizontal' => Alignment::HORIZONTAL_CENTER
-		// 		],
-		// 		'font' => [ 'size' => 22, 'name' => '굴림' ]
-		// 	],
-		// 	'A3:AH3' => [
-		// 		'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
-		// 		'font' => [ 'size' => 25 ]
-		// 	],
-		// 	'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
-		// 	'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
-		// 	'A4:AH50' => [
-		// 		'borders' => [
-		// 			'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
-		// 			'outline' => [ 'borderStyle' => Border::BORDER_THICK ],
-		// 		],
-		// 	],
-		// 	'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
-		// 	'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
-		// 	'AC47:AH50' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
-		// 	'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_THICK ] ] ],
-		// 	'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-		// 	'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-		// 	'F10:F45' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
-		// 	'W10:AH46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
-		// 	'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-		// 	'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-		// 	'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-		// 	'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-		// 	'A46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 20 ] ],
-		// 	'A47:A49' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
-		// 	'V5' => [ 'font' => [ 'size' => 22 ] ],
-		// 	'V6' => [ 'font' => [ 'size' => 22 ] ],
-		// 	'Q5' => [ 'font' => [ 'size' => 16 ] ],
-		// 	'AH5' => [ 'font' => [ 'size' => 16 ] ],
-		// 	'B10:Q45' => [ 'font' => [ 'size' => 18 ] ],
-		// 	'Y10:AH45' => [ 'font' => [ 'size' => 19 ] ],
-		// 	'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
-		// 	'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
-		// ];
+        $style = [
+			'A1:AH50' => [
+				'alignment' => [
+					'vertical' => Alignment::VERTICAL_CENTER,
+					'horizontal' => Alignment::HORIZONTAL_CENTER
+				],
+				'font' => [ 'size' => 22, 'name' => '굴림' ]
+			],
+			'A3:AH3' => [
+				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
+				'font' => [ 'size' => 25 ]
+			],
+			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
+			'A4:AH50' => [
+				'borders' => [
+					'allBorders' => [ 'borderStyle' => Border::BORDER_THIN ],
+					'outline' => [ 'borderStyle' => Border::BORDER_THICK ],
+				],
+			],
+			'M5:Q5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AD5:AH5' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'AC47:AH50' => [ 'borders' => [ 'inside' => [ 'borderStyle' => Border::BORDER_NONE ] ] ],
+			'A9:AH9' => [ 'borders' => [ 'top' => [ 'borderStyle' => Border::BORDER_THICK ] ] ],
+			'E5:E6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'F10:F45' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
+			'W10:AH46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
+			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
+			'A46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 20 ] ],
+			'A47:A49' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
+			'V5' => [ 'font' => [ 'size' => 22 ] ],
+			'V6' => [ 'font' => [ 'size' => 22 ] ],
+			'Q5' => [ 'font' => [ 'size' => 16 ] ],
+			'AH5' => [ 'font' => [ 'size' => 16 ] ],
+			'B10:Q45' => [ 'font' => [ 'size' => 18 ] ],
+			'Y10:AH45' => [ 'font' => [ 'size' => 19 ] ],
+			'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
+			'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
+		];
 
-		// $view_url = Config::get('shop.store.view') . '/cs/cs02_document';
-		// $keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
-		// $images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 150 ]];
+		$view_url = Config::get('shop.store.view') . '/stock/stk16_document';
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 150 ]];
 
-		// return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '상품반품명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '원부자재출고_명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }
