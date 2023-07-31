@@ -664,12 +664,6 @@ class stk16Controller extends Controller
                 , p.prd_nm
                 , ssr.price
                 , ssr.wonga
-                -- , ssr.qty
-                -- , ssr.rec_qty
-                -- , ssr.prc_qty
-                -- , (ssr.price * ssr.qty) as total_price
-                -- , (ssr.price * ssr.rec_qty) as total_price2
-                -- , (ssr.price * ssr.prc_qty) as total_price3
                 , case
                     when (ssr.state = 10) then (ssr.price * ssr.qty)
                     when (ssr.state = 20) then (ssr.price * ssr.rec_qty)
@@ -724,8 +718,6 @@ class stk16Controller extends Controller
 			$data['store_addr'] 		= $rows[0]->store_addr ?? '';
 			$data['price'] 	            = $rows[0]->price ?? '';
 			$data['qty']         	    = $rows[0]->qty ?? '';
-			// $data['rec_qty']         	= $rows[0]->rec_qty ?? '';
-			// $data['prc_qty']         	= $rows[0]->prc_qty ?? '';
 			$data['storage_ceo'] 	    = $rows[0]->ceo ?? '';
 			$data['manager_nm'] 	    = $rows[0]->manager_nm ?? '';
 			$data['storage_cd'] 	    = $rows[0]->storage_cd ?? '';
