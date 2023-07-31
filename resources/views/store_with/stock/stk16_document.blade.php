@@ -78,40 +78,16 @@
 			<td colspan="12">{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->prd_nm ?? '' }}</td>
 			<td colspan="2">{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->color ?? '' }}</td>
 			<td colspan="3">{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->size ?? '' }}</td>
-			<td colspan="3">
-				@if ($state = 10)
-					{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->qty ?? '' }}
-				@elseif ($state = 20)
-					{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->rec_qty ?? '' }}
-				@elseif ($state = 30)
-					{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->prc_qty ?? '' }}
-				@endif
-			</td>
+			<td colspan="3">{{ $products[($i - 1) + ($sheet_num * $one_sheet_count)]->qty ?? '' }}</td>
 			<td colspan="4">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->price ?? 0) }} @endif</td>
-			<td colspan="5">
-				@if ($state = 10)
-					@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_price ?? 0) }} @endif
-				@elseif ($state = 20) 
-					@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_price2 ?? 0) }} @endif
-				@elseif ($state = 30)
-					@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_price3 ?? 0) }} @endif
-				@endif
-			</td>
+			<td colspan="5">@if (isset($products[($i - 1) + ($sheet_num * $one_sheet_count)])) {{ number_format($products[($i - 1) + ($sheet_num * $one_sheet_count)]->total_price ?? 0) }} @endif</td>
 		</tr>
 	@endforeach
 		<tr>
 			<td colspan="22">합 계</td>
 			<td colspan="3">{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->qty * 1); }, 0)) }}</td>
 			<td colspan="4">{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->price * 1); }, 0)) }}</td>
-			<td colspan="5">
-				@if ($state = 10)
-					{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_price * 1); }, 0)) }}
-				@elseif ($state = 20)
-					{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_price2 * 1); }, 0)) }}
-				@elseif ($state = 30)
-					{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_price2 * 1); }, 0)) }}
-				@endif
-			</td>
+			<td colspan="5">{{ number_format(array_reduce($products, function ($a, $c) { return $a + ($c->total_price * 1); }, 0)) }}</td>
 		</tr>
 		<tr>
 			<td colspan="5" rowspan="2">입금계좌</td>
