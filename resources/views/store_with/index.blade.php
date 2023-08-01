@@ -266,48 +266,33 @@
     let chartData = <?= json_encode($result)?>;
     let all_date = getDatesStartToLast(sdate, edate);
 
+    let labels = [];
+    for (let i=0;i<all_date.length;i++) {
+        labels.push(all_date[i]);
+    }
+
+    let sum_amt_datas = [];
+    let sum_wonga_datas = [];
+    for (let i=0;i<chartData.length;i++) {
+        sum_amt_datas.push(chartData[i].sum_amt);
+        sum_wonga_datas.push(chartData[i].sum_wonga);
+    }
+
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: [
-                all_date[0],
-                all_date[1],
-                all_date[2],
-                all_date[3],
-                all_date[4],
-                all_date[5],
-                all_date[6],
-                all_date[7],
-            ],
+            labels: labels,
             datasets: [
                 {
                     label: '매출액',
-                    data: [
-                        chartData[0].sum_amt,
-                        chartData[1].sum_amt,
-                        chartData[2].sum_amt,
-                        chartData[3].sum_amt,
-                        chartData[4].sum_amt,
-                        chartData[5].sum_amt,
-                        chartData[6].sum_amt,
-                        chartData[7].sum_amt,
-                    ],
+                    data: sum_amt_datas,
                     borderColor: '#36A2EB',
                     backgroundColor: '#9BD0F5',
                     borderWidth: 1
                 },
                 {
                     label: '매출원가',
-                    data: [
-                        chartData[0].sum_wonga,
-                        chartData[1].sum_wonga,
-                        chartData[2].sum_wonga,
-                        chartData[3].sum_wonga,
-                        chartData[4].sum_wonga,
-                        chartData[5].sum_wonga,
-                        chartData[6].sum_wonga,
-                        chartData[7].sum_wonga,
-                    ],
+                    data: sum_wonga_datas,
                     borderColor: '#FF6384',
                     backgroundColor: '#FFB1C1',
                     borderWidth: 1
@@ -360,37 +345,22 @@
 
     let pieChartData = <?= json_encode($pieResult)?>;
 
+    let store_nm_pie_labels = [];
+    let sum_amt_pie_datas = [];
+    for (let i=0;i<10;i++) {
+        store_nm_pie_labels.push(pieChartData[i].store_nm);
+        sum_amt_pie_datas.push(pieChartData[i].sum_amt);
+    }
+
     const ctx2 = document.getElementById('myChart2');
 
     const pieChart = new Chart(ctx2, {
         type: 'pie',
         data: {
-            labels: [
-                pieChartData[0].store_nm,
-                pieChartData[1].store_nm,
-                pieChartData[2].store_nm,
-                pieChartData[3].store_nm,
-                pieChartData[4].store_nm,
-                pieChartData[5].store_nm,
-                pieChartData[6].store_nm,
-                pieChartData[7].store_nm,
-                pieChartData[8].store_nm,
-                pieChartData[9].store_nm,
-            ],
+            labels: store_nm_pie_labels,
             datasets: [{
                 label: '매출액',
-                data: [
-                    pieChartData[0].sum_amt,
-                    pieChartData[1].sum_amt,
-                    pieChartData[2].sum_amt,
-                    pieChartData[3].sum_amt,
-                    pieChartData[4].sum_amt,
-                    pieChartData[5].sum_amt,
-                    pieChartData[6].sum_amt,
-                    pieChartData[7].sum_amt,
-                    pieChartData[8].sum_amt,
-                    pieChartData[9].sum_amt,
-                ],
+                data: sum_amt_pie_datas,
                 backgroundColor: [
                     'rgb(255, 99, 132)',
                     'rgb(54, 162, 235)',
@@ -432,54 +402,30 @@
 
     let chartData2 = <?= json_encode($chart2Result)?>;
 
+    let prd_nm_labels = [];
+    let recv_amt_datas = [];
+    let wonga_datas = [];
+    for (let i=0;i<chartData2.length;i++) {
+        prd_nm_labels.push(chartData2[i].prd_nm);
+        recv_amt_datas.push(chartData2[i].recv_amt);
+        wonga_datas.push(chartData2[i].wonga);
+    }
+
     new Chart(ctx3, {
         type: 'bar',
         data: {
-            labels: [
-                chartData2[0].prd_nm,
-                chartData2[1].prd_nm,
-                chartData2[2].prd_nm,
-                chartData2[3].prd_nm,
-                chartData2[4].prd_nm,
-                chartData2[5].prd_nm,
-                chartData2[6].prd_nm,
-                chartData2[7].prd_nm,
-                chartData2[8].prd_nm,
-                chartData2[9].prd_nm,
-            ],
+            labels: prd_nm_labels,
             datasets: [
                 {
                     label: '매출액',
-                    data: [
-                        chartData2[0].recv_amt,
-                        chartData2[1].recv_amt,
-                        chartData2[2].recv_amt,
-                        chartData2[3].recv_amt,
-                        chartData2[4].recv_amt,
-                        chartData2[5].recv_amt,
-                        chartData2[6].recv_amt,
-                        chartData2[7].recv_amt,
-                        chartData2[8].recv_amt,
-                        chartData2[9].recv_amt,
-                    ],
+                    data: recv_amt_datas,
                     borderColor: '#36A2EB',
                     backgroundColor: '#9BD0F5',
                     borderWidth: 1
                 },
                 {
                     label: '매출원가',
-                    data: [
-                        chartData2[0].wonga,
-                        chartData2[1].wonga,
-                        chartData2[2].wonga,
-                        chartData2[3].wonga,
-                        chartData2[4].wonga,
-                        chartData2[5].wonga,
-                        chartData2[6].wonga,
-                        chartData2[7].wonga,
-                        chartData2[8].wonga,
-                        chartData2[9].wonga,
-                    ],
+                    data: wonga_datas,
                     borderColor: '#FF6384',
                     backgroundColor: '#FFB1C1',
                     borderWidth: 1
@@ -519,36 +465,21 @@
 
     let chartData3 = <?= json_encode($chart3Result)?>;
 
+    let prd_nm_chart3_labels = [];
+    let qty_datas = [];
+    for (let i=0;i<chartData3.length;i++) {
+        prd_nm_chart3_labels.push(chartData3[i].prd_nm);
+        qty_datas.push(chartData3[i].qty);
+    }
+
     new Chart(ctx4, {
         type: 'bar',
         data: {
-            labels: [
-                chartData3[0].prd_nm,
-                chartData3[1].prd_nm,
-                chartData3[2].prd_nm,
-                chartData3[3].prd_nm,
-                chartData3[4].prd_nm,
-                chartData3[5].prd_nm,
-                chartData3[6].prd_nm,
-                chartData3[7].prd_nm,
-                chartData3[8].prd_nm,
-                chartData3[9].prd_nm,
-            ],
+            labels: prd_nm_chart3_labels,
             datasets: [
                 {
                     label: '주문수량',
-                    data: [
-                        chartData3[0].qty,
-                        chartData3[1].qty,
-                        chartData3[2].qty,
-                        chartData3[3].qty,
-                        chartData3[4].qty,
-                        chartData3[5].qty,
-                        chartData3[6].qty,
-                        chartData3[7].qty,
-                        chartData3[8].qty,
-                        chartData3[9].qty,
-                    ],
+                    data: qty_datas,
                     borderColor: '#36A2EB',
                     backgroundColor: '#9BD0F5',
                     borderWidth: 1
