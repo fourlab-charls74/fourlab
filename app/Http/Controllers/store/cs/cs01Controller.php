@@ -809,7 +809,12 @@ class cs01Controller extends Controller {
 				, pc.prd_cd_p
 				, pc.color
 				, c.code_val as color_nm
-				, pc.size
+				, (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
 				, ifnull(s.exp_qty, 0) as exp_qty
 				, ifnull(s.qty, 0) as qty
 				, ifnull(s.prd_tariff_rate, 0) as prd_tariff_rate
@@ -1216,7 +1221,12 @@ class cs01Controller extends Controller {
 					, pc.goods_no
 					, pc.prd_cd_p
 					, pc.color
-					, pc.size
+					, (
+						select s.size_cd from size s
+						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+							and s.size_cd = pc.size
+							and use_yn = 'Y'
+					) as size
 					, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 					, if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
 					, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no

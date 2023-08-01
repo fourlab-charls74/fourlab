@@ -200,14 +200,14 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size",	headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 100},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 70},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 70},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 70},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params) && now_state < 30,
             cellStyle: (params) => checkIsEditable(params) && now_state < 30 ? {"background-color": "#ffff99"} : {}
         },
 		{headerName: "매장재고", children: [
-			{field: "store_qty", headerName: "실재고", width: 60, type: 'currencyType'},
+			{field: "store_qty", headerName: "재고", width: 60, type: 'currencyType'},
 	        {field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
 		]},
         {field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},

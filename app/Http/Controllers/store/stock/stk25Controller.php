@@ -97,7 +97,12 @@ class stk25Controller extends Controller
                 g.goods_nm_eng,
                 o.goods_opt,
                 pc.color,
-                pc.size,
+                (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 (ow.qty * if(ow.ord_state = 61, -1, 1)) as qty,
                 o.price,

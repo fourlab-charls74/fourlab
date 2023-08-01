@@ -422,7 +422,7 @@ class ord01Controller extends Controller
                 a.goods_nm_eng,
                 a.prd_cd_p,
                 a.color,
-                a.size,
+                a.size
                 a.img,
                 replace(a.goods_opt, '^', ' : ') as opt_val,
                 a.qty,
@@ -475,7 +475,12 @@ class ord01Controller extends Controller
                     )) as img,
                     '' as img_view,
                     pc.color,
-                    pc.size,
+                    (
+                        select s.size_cd from size s
+                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                            and s.size_cd = pc.size
+                            and use_yn = 'Y'
+                    ) as size,
                     o.qty,
                     om.user_id,
                     om.user_nm,

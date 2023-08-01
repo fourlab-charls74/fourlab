@@ -253,7 +253,13 @@ class prd04Controller extends Controller
 				)) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
-				, pc.color, c.code_val as color_nm, pc.size
+				, pc.color, c.code_val as color_nm,
+				, (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
 				, pc.goods_opt
 				, (sum(pss2.wqty) - ifnull(_next_storage.qty, 0)) as wqty
 				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty

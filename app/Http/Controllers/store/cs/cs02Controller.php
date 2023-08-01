@@ -398,7 +398,12 @@ class cs02Controller extends Controller
                     if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh,
                     pc.color,
                     c.code_val as color_nm,
-                    pc.size,
+                    (
+                        select s.size_cd from size s
+                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                            and s.size_cd = pc.size
+                            and use_yn = 'Y'
+                    ) as size,
                     pc.opt,
                     g.opt_kind_cd,
                     pc.brand as brand_cd,
@@ -729,7 +734,13 @@ class cs02Controller extends Controller
                     , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
                     , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
                 from (
-                    select pc.prd_cd, pc.prd_cd_p, pc.color, pc.size, code.code_val as color_nm, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
+                    select pc.prd_cd, pc.prd_cd_p, pc.color, code.code_val as color_nm, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
+                        , (
+                            select s.size_cd from size s
+                            where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                                and s.size_cd = pc.size
+                                and use_yn = 'Y'
+                        ) as size
                         , pc.brand as brand_cd
                         , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                         , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
@@ -801,7 +812,12 @@ class cs02Controller extends Controller
                 , g.goods_nm
                 , g.goods_nm_eng
                 , pc.color
-                , pc.size
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 , srp.price
                 , srp.return_price
                 , srp.return_qty

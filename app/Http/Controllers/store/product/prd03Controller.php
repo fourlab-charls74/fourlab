@@ -131,7 +131,12 @@ class prd03Controller extends Controller
 				( select img_url from product_image where prd_cd = p.prd_cd order by seq limit 1 ) as img,
 				p.prd_cd as prd_cd,
 				c7.code_val as color,
-				size.size_nm as size,
+				(
+                    select s.size_nm from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size, 
 				p.prd_nm as prd_nm,
 				p.tag_price as tag_price,
 				p.price as price,
@@ -160,8 +165,6 @@ class prd03Controller extends Controller
 				left outer join code c5 on c5.code_kind_cd = 'PRD_CD_GENDER' and c5.code_id = pc.gender
 				left outer join code c6 on c6.code_kind_cd = 'PRD_CD_ITEM' and c6.code_id = pc.item
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
-				-- left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
-				left outer join size size on size.size_cd = pc.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
 			where p.use_yn = 'Y' and p.type <> 'N' 
 				$where
@@ -361,7 +364,12 @@ class prd03Controller extends Controller
 				c6.code_val as item,
 				c2.code_val as opt,
 				c7.code_val as color,
-				c8.code_val as size,
+				(
+                    select s.size_nm from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size,
 				p.prd_nm as prd_nm,
 				cp.com_nm as sup_com,
 				p.price as price,
@@ -382,7 +390,6 @@ class prd03Controller extends Controller
 				left outer join code c5 on c5.code_kind_cd = 'PRD_CD_GENDER' and c5.code_id = pc.gender
 				left outer join code c6 on c6.code_kind_cd = 'PRD_CD_ITEM' and c6.code_id = pc.item
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
-				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
 			where p.prd_cd = :prd_cd
 		";
@@ -399,7 +406,13 @@ class prd03Controller extends Controller
 		
 		$sql	= "
 			select
-				pc.prd_cd, pc.color, pc.size
+				pc.prd_cd, pc.color
+				, (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
 				, c.code_val as color_nm
 			from product_code pc
 			inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id

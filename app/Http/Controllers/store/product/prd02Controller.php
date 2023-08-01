@@ -227,7 +227,19 @@ class prd02Controller extends Controller
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
 				, '' as img_view
 				, opt.opt_kind_nm
-				, pc.color, pc.size
+				, pc.color
+				, (
+					select s.size_cd from size s 
+					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+						and s.size_cd = pc.size
+						and use_yn = 'Y'
+				) as size
+				, (
+					select s.size_nm from size s 
+					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+						and s.size_cd = pc.size
+						and use_yn = 'Y'
+				) as size_nm
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -236,11 +248,6 @@ class prd02Controller extends Controller
 				, if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
 				, pc.goods_opt
 				, c.code_val as color_nm
-				, case
-					when pc.gender = 'M' then ( select code_val from code where code_kind_cd = 'PRD_CD_SIZE_MEN' and code_id =  pc.size  )
-					when pc.gender = 'W' then ( select code_val from code where code_kind_cd = 'PRD_CD_SIZE_WOMEN' and code_id =  pc.size  )
-					when pc.gender = 'U' then ( select code_val from code where code_kind_cd = 'PRD_CD_SIZE_UNISEX' and code_id =  pc.size  )
-					else '-' end as size_nm
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh

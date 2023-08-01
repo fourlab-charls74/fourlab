@@ -111,7 +111,6 @@ class cs03Controller extends Controller
 					left outer join product_image i on p1.prd_cd = i.prd_cd
 					inner join company cp on p1.com_id = cp.com_id
 					left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
-					left outer join `code` c2 on c2.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c2.code_id = p4.size
 					left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 					left outer join mgr_user m on p2.admin_id = m.id
 				where 1=1 $where
@@ -134,7 +133,12 @@ class cs03Controller extends Controller
 				i.img_url as img,
 				p1.prd_nm as prd_nm,
 				c1.code_val as color,
-				size.size_nm as size,
+				(
+                    select s.size_nm from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size,
 				c3.code_val as unit,
 				ifnull(p1.qty, 0) as qty,
 				ifnull(p1.price, 0) as price,
@@ -161,7 +165,6 @@ class cs03Controller extends Controller
 				left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
 				left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 				left outer join mgr_user m on p2.admin_id = m.id
-				left outer join size size on size.size_cd = p4.size and size_kind_cd = 'PRD_CD_SIZE_UNISEX'
 			where 1=1 and p2.rt >= :sdate and p2.rt < date_add(:edate, interval 1 day)
 			$where $where1
 			$having
@@ -627,7 +630,12 @@ class cs03Controller extends Controller
 				p.prd_nm as prd_nm,
 				i.img_url as img,
 				c7.code_val as color,
-				c8.code_val as size,
+				(
+                    select s.size_nm from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size,
 				c9.code_val as unit,
 				ifnull(pss.wqty, 0) as stock_qty,
 				0 as in_qty,
@@ -643,7 +651,6 @@ class cs03Controller extends Controller
 				left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
 				left outer join code c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
 				left outer join code c7 on c7.code_kind_cd = 'PRD_CD_COLOR' and c7.code_id = pc.color
-				left outer join code c8 on c8.code_kind_cd = 'PRD_CD_SIZE_MATCH' and c8.code_id = pc.size
 				left outer join code c9 on c9.code_kind_cd = 'PRD_CD_UNIT' and c9.code_id = p.unit
 			where p.use_yn = 'Y' and p.type <> 'N'
 				$where

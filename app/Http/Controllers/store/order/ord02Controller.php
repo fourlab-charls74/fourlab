@@ -239,7 +239,13 @@ class ord02Controller extends Controller
 			from (
 				select
 					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
-					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color, pc.size
+					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color,
+					, (
+						select s.size_cd from size s
+						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+							and s.size_cd = pc.size
+							and use_yn = 'Y'
+					) as size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
@@ -263,7 +269,13 @@ class ord02Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join (
-						select p.prd_cd, p.goods_no, p.goods_opt, p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt, p.color, p.size, c.code_val as color_nm
+						select p.prd_cd, p.goods_no, p.goods_opt, p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt, p.color, c.code_val as color_nm
+								, (
+									select s.size_cd from size s
+									where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+										and s.size_cd = pc.size
+										and use_yn = 'Y'
+								) as size
 							, (
 								select s.size_nm from size s 
 								where size_kind_cd = if(p.size_kind != '', p.size_kind, if(p.gender = 'M', 'PRD_CD_SIZE_MEN', if(p.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
@@ -299,7 +311,13 @@ class ord02Controller extends Controller
 				$sql = "
 						select
 							pc.prd_cd, if(pc.prd_cd_p = '', concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt), pc.prd_cd_p) as prd_cd_p
-							, pc.color, pc.size, o.ord_opt_no as ord_opt_no_group, pc.match_yn as prd_match
+							, pc.color, o.ord_opt_no as ord_opt_no_group, pc.match_yn as prd_match
+							, (
+								select s.size_cd from size s
+								where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+									and s.size_cd = pc.size
+									and use_yn = 'Y'
+							) as size
 							$qty_sql
 						from order_opt o
 							inner join order_mst om on om.ord_no = o.ord_no

@@ -370,7 +370,12 @@ class cs04Controller extends Controller
                     if(pc.goods_no = 0, p.style_no, g.style_no) as style_no,
                     if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh,
                     pc.color,
-                    pc.size,
+                    (
+                        select s.size_cd from size s
+                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                            and s.size_cd = pc.size
+                            and use_yn = 'Y'
+                    ) as size,
                     pc.goods_opt,
                     pc.opt,
                     g.opt_kind_cd,

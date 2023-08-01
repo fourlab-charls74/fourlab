@@ -278,7 +278,12 @@ class goods extends Controller
                 , pc.brand as brand_cd
                 , b.brand_nm as brand
                 , pc.color, c.code_val as color_nm
-                , pc.size
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 , pc.goods_opt
                 , (ps.qty - ps.wqty) as s_qty
                 , ps.wqty as sg_qty
@@ -350,7 +355,13 @@ class goods extends Controller
                 , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
             from (
                 select p.prd_cd, p.style_no
-                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.size, pc.goods_opt, pc.opt, pc.rt as reg_dm
+                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.goods_opt, pc.opt, pc.rt as reg_dm
+                    , (
+                        select s.size_cd from size s
+                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                            and s.size_cd = pc.size
+                            and use_yn = 'Y'
+                    ) as size
                     , (ps.qty - ps.wqty) as s_qty, ps.wqty as sg_qty, ps.qty as total_qty
                     , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                     , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
@@ -431,7 +442,12 @@ class goods extends Controller
                 , pc.brand as brand_cd
                 , b.brand_nm as brand
                 , pc.color, c.code_val as color_nm
-                , pc.size
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 , pc.goods_opt
                 , sum(ifnull(pss.qty, 0)) as store_qty
                 , sum(ifnull(pss.wqty, 0)) as store_wqty
@@ -510,7 +526,12 @@ class goods extends Controller
                 , pc.brand as brand_cd
                 , b.brand_nm as brand
                 , pc.color, c.code_val as color_nm
-                , pc.size
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 , pc.goods_opt
                 , sum(ifnull(pss.qty, 0)) as storage_qty
                 , sum(ifnull(pss.wqty, 0)) as storage_wqty
@@ -580,7 +601,13 @@ class goods extends Controller
                 , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
             from (
                 select p.prd_cd, p.style_no
-                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.size, pc.goods_opt, pc.opt, pc.rt as reg_dm
+                    , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.goods_opt, pc.opt, pc.rt as reg_dm
+                    , (
+                        select s.size_cd from size s
+                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                            and s.size_cd = pc.size
+                            and use_yn = 'Y'
+                    ) as size
                     , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                     , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
                     , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
@@ -656,7 +683,12 @@ class goods extends Controller
                 , d.code_val as brand
                 , c.code_val as opt_kind_nm
                 , pc.color as color
-                , pc.size as size
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 , pc.goods_opt
                 , p.prd_nm as goods_nm
                 , p.prd_nm_eng as goods_nm_eng
@@ -827,12 +859,17 @@ class goods extends Controller
                 , concat(c.code_val, '^',d.code_val2) as goods_opt
                 , concat(pc.brand,pc.year, pc.season, pc.gender
                 , pc.item, pc.opt, pc.seq) as prd_cd1,
-                pc.color, pc.size, p.match_yn
+                pc.color, p.match_yn
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 from product_code pc
                     left outer join goods g on g.goods_no = pc.goods_no
                     inner join product p on pc.prd_cd = p.prd_cd
                     inner join code c on pc.color = c.code_id
-			        inner join code d on pc.size = d.code_id
                 where 1=1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
                 $where
             ";
@@ -840,7 +877,13 @@ class goods extends Controller
             // 상품매칭
             $sql = "
                 select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt, pc.seq) as prd_cd1,
-                pc.color, pc.size, p.match_yn, pc.rt
+                pc.color, p.match_yn, pc.rt
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 from product_code pc
                     inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
@@ -1070,11 +1113,16 @@ class goods extends Controller
                 , p.prd_nm
                 , pc.goods_no
                 , concat(c.code_val, '^',d.code_val2) as goods_opt
-                , pc.color, pc.size
+                , pc.color
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
             from product_code pc 
                 inner join product p on p.prd_cd = pc.prd_cd
                 inner join code c on pc.color = c.code_id
-                inner join code d on pc.size = d.code_id
             where 1=1 and pc.brand in('PR','SM') and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
             $where
         ";
