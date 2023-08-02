@@ -422,7 +422,7 @@ class ord01Controller extends Controller
                 a.goods_nm_eng,
                 a.prd_cd_p,
                 a.color,
-                a.size
+                a.size,
                 a.img,
                 replace(a.goods_opt, '^', ' : ') as opt_val,
                 a.qty,
