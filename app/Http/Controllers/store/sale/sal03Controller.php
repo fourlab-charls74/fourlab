@@ -162,7 +162,7 @@ class sal03Controller extends Controller
 				select 
 					s.size_cd 
 				from size s
-				left join product_code pc on pc.size = s.size_cd
+					inner join product_code pc on pc.size = s.size_cd
 				where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
 					and s.size_cd = pc.size
 					and use_yn = 'Y'
