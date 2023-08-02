@@ -185,8 +185,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
         {field: "goods_opt", headerName: "옵션", width: 120},
-        {field: "tag_price", headerName: "TAG가", width: 60, type: "currencyType", aggFunc: "first"},
-        {field: "price", headerName: "판매가", width: 60, type: "currencyType", aggFunc: "first"},
+        {field: "tag_price", headerName: "정상가", width: 60, type: "currencyType", aggFunc: "first"},
+        {field: "price", headerName: "현재가", width: 60, type: "currencyType", aggFunc: "first"},
         {field: "wonga", headerName: "원가", width: 60, type: "currencyType", aggFunc: "first"},
         {
             headerName: "이전재고",
@@ -202,8 +202,8 @@
                         }
                     }
                 },
-                {field: "prev_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "prev_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "prev_tag_price", headerName: "정상가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "prev_price", headerName: "현재가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "prev_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
@@ -211,8 +211,8 @@
             headerName: "기간입고",
             children: [
                 {field: "stock_in_qty", headerName: "수량", width: 65, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "stock_in_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "stock_in_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "stock_in_tag_price", headerName: "정상가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "stock_in_price", headerName: "현재가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "stock_in_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
@@ -220,8 +220,8 @@
             headerName: "기간반품",
             children: [
                 {field: "stock_return_qty", headerName: "수량", width: 65, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "stock_return_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "stock_return_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "stock_return_tag_price", headerName: "정상가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "stock_return_price", headerName: "현재가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "stock_return_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
@@ -229,8 +229,8 @@
             headerName: "판매",
             children: [
                 {field: "sale_qty", headerName: "수량", width: 65, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "sale_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_tag_price", headerName: "정상가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "sale_price", headerName: "현재가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "sale_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
@@ -238,8 +238,8 @@
             headerName: "LOSS",
             children: [
                 {field: "loss_qty", headerName: "수량", width: 65, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "loss_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "loss_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "loss_tag_price", headerName: "정상가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "loss_price", headerName: "현재가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "loss_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
@@ -257,8 +257,8 @@
                         }
                     }
                 },
-                {field: "term_tag_price", headerName: "TAG가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
-                {field: "term_price", headerName: "판매가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "term_tag_price", headerName: "정상가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "term_price", headerName: "현재가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
                 {field: "term_wonga", headerName: "원가 합계", width: 100, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },

@@ -302,7 +302,7 @@
         {field: "img", headerName: "이미지_url", hide: true},
 		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "30px"}, width: 150},
 		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150, cellStyle: {"line-height": "30px"}},
-		{field: "prd_cd_p", headerName: "코드일련", cellStyle: StyleLineHeight, width: 90},
+		{field: "prd_cd_p", headerName: "바코드", cellStyle: StyleLineHeight, width: 90},
 		{field: "color", headerName: "컬러", cellStyle: StyleLineHeight, width: 55},
 		{field: "size", headerName: "사이즈", cellStyle: StyleLineHeight, width: 55},
 		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "30px"}, width: 130},

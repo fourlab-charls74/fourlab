@@ -856,7 +856,7 @@ class goods extends Controller
                 pc.prd_cd
                 , pc.goods_no
                 , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
-                , concat(c.code_val, '^',d.code_val2) as goods_opt
+                , concat(c.code_val, '^',s.size_nm) as goods_opt
                 , concat(pc.brand,pc.year, pc.season, pc.gender
                 , pc.item, pc.opt, pc.seq) as prd_cd1,
                 pc.color, p.match_yn
@@ -870,7 +870,8 @@ class goods extends Controller
                     left outer join goods g on g.goods_no = pc.goods_no
                     inner join product p on pc.prd_cd = p.prd_cd
                     inner join code c on pc.color = c.code_id
-                where 1=1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+                    inner join size s on s.size_cd = pc.size
+                where 1=1 and c.code_kind_cd = 'PRD_CD_COLOR'
                 $where
             ";
         } else {
@@ -1112,7 +1113,7 @@ class goods extends Controller
                   pc.prd_cd
                 , p.prd_nm
                 , pc.goods_no
-                , concat(c.code_val, '^',d.code_val2) as goods_opt
+                , concat(c.code_val, '^',s.size_nm) as goods_opt
                 , pc.color
                 , (
                     select s.size_cd from size s
@@ -1123,6 +1124,7 @@ class goods extends Controller
             from product_code pc 
                 inner join product p on p.prd_cd = pc.prd_cd
                 inner join code c on pc.color = c.code_id
+                inner join size s on s.size_cd = pc.size
             where 1=1 and pc.brand in('PR','SM') and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
             $where
         ";

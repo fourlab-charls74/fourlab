@@ -52,6 +52,17 @@ class std11Controller extends Controller
 		$size_sql = "select code_id, code_val, code_val2 from code where code_kind_cd = 'prd_cd_size_match' order by code_id asc ";
 		$sizes = DB::select($size_sql);
 
+		//사이즈구분
+		$size_kind_sql = "
+			select 
+				size_kind_cd
+				, size_kind_nm
+			from size_kind 
+			where use_yn = 'Y' 
+			order by seq asc
+		";
+		$size_kind = DB::select($size_kind_sql);
+
 		$values = [
             'sdate' 	=> $sdate,
             'edate' 	=> date("Y-m-d"),
@@ -59,7 +70,8 @@ class std11Controller extends Controller
 		    'com_types' => $com_types,
 		    'as_states' => $as_states,
 			'colors'	=> $colors,
-			'sizes'		=> $sizes
+			'sizes'		=> $sizes,
+			'size_kind' => $size_kind
         ];
 		return view(Config::get('shop.store.view') . '/standard/std11_view', $values);
 	}
@@ -85,10 +97,39 @@ class std11Controller extends Controller
 
 		$query = /** @lang text */
             "select
-				a.*
+				a.idx
+				, a.receipt_date
+				, a.as_state
+				, s.store_cd
 				, s.store_nm as store_nm
+				, a.as_type
+				, a.customer_no
+				, a.customer
+				, a.mobile
+				, a.zipcode
+				, a.addr1
+				, a.addr2
+				, a.prd_cd
+				, a.goods_nm
+				, a.color
+				, (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
+				, a.is_free
+				, a.as_amt
+				, a.content
+				, a.h_receipt_date
+				, a.end_date
+				, a.err_date
+				, a.h_content
+				, a.rt
+				, a.ut
 			from repair_service a
-				left outer join store s on s.store_cd = a.store_cd 
+				left outer join store s on s.store_cd = a.store_cd
+				inner join product_code pc on pc.prd_cd = a.prd_cd
 			where 1=1 
 			$where
 			order by a.idx desc
@@ -697,6 +738,37 @@ class std11Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function change_size(Request $request)
+	{
+		$size_kind = $request->input('size_kind');
+
+		try {
+			DB::beginTransaction();
+
+			$sql = "
+				select
+					size_kind_cd
+					, size_cd
+					, size_nm
+					, use_yn
+				from size
+				where size_kind_cd = '$size_kind'
+				and use_yn = 'Y'
+				order by size_seq asc
+			";
+
+			$result = DB::select($sql);
+
+            DB::commit();
+            $code = 200;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $code = 500;
+        }
+
+        return response()->json(["code" => $code, "result" => $result]);
 	}
 
 }

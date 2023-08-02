@@ -253,7 +253,7 @@ class prd04Controller extends Controller
 				)) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
-				, pc.color, c.code_val as color_nm,
+				, pc.color, c.code_val as color_nm
 				, (
                     select s.size_cd from size s
                     where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))

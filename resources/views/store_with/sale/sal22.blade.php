@@ -200,14 +200,14 @@
         {field: "prd_cd_p", headerName: "품번", rowGroup: true, hide: true},
         {field: "goods_opt", headerName: "옵션", width: 150},
         {field: "wonga", headerName: "원가", width: 80, type: "currencyType"},
-        {field: "goods_sh", headerName: "TAG가", width: 80, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 80, type: "currencyType"},
+        {field: "goods_sh", headerName: "정상가", width: 80, type: "currencyType"},
+        {field: "price", headerName: "현재가", width: 80, type: "currencyType"},
         {
             headerName: "이전재고",
             children: [
                 {field: "prev_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "prev_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "prev_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "prev_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "prev_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "prev_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -215,8 +215,8 @@
             headerName: "상품입고",
             children: [
                 {field: "storage_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "storage_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "storage_in_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "storage_in_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "storage_in_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "storage_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -224,8 +224,8 @@
             headerName: "상품반품",
             children: [
                 {field: "storage_return_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "storage_return_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "storage_return_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "storage_return_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "storage_return_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "storage_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -233,8 +233,8 @@
             headerName: "매장출고",
             children: [
                 {field: "store_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_out_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "store_out_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "store_out_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "store_out_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "store_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -242,8 +242,8 @@
             headerName: "매장반품",
             children: [
                 {field: "store_return_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_return_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "store_return_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "store_return_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "store_return_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "store_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -251,8 +251,8 @@
             headerName: "이동입고",
             children: [
                 {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_in_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "rt_in_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "rt_in_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "rt_in_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "rt_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -260,8 +260,8 @@
             headerName: "이동출고",
             children: [
                 {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_out_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "rt_out_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "rt_out_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "rt_out_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "rt_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
@@ -269,8 +269,8 @@
             headerName: "LOSS",
             children: [
                 {field: "loss_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "loss_sh", headerName: "TAG금액", width: 80, type: "currencyType"},
-                {field: "loss_price", headerName: "판매가금액", width: 80, type: "currencyType"},
+                {field: "loss_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "loss_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "loss_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
             ]
         },
@@ -278,8 +278,8 @@
             headerName: "기말재고",
             children: [
                 {field: "term_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "term_sh", headerName: "Tag가", width: 80, type: "currencyType"},
-                {field: "term_price", headerName: "판매가", width: 80, type: "currencyType"},
+                {field: "term_sh", headerName: "정상가", width: 80, type: "currencyType"},
+                {field: "term_price", headerName: "현재가", width: 80, type: "currencyType"},
                 {field: "term_wonga", headerName: "원가", width: 80, type: "currencyType"},
             ]
         },
