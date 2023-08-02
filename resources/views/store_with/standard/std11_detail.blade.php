@@ -437,6 +437,15 @@
 
     function change_state() {
         if (validate() === false) return;
+
+        let prd_cd = $('#prd_cd').val();
+        const prd = prd_cd.split(/\s|,/).map(prd_cd => removeCommasAndSpaces(prd_cd));
+
+        if (prd.length > 1) {
+            alert("상품은 1개씩만 가능합니다. 새로 접수해주세요.");
+            return false;
+        }
+
         if (confirm('수선정보를 저장하시겠습니까?') === false) return;
 
         let idx = '{{@$row->idx}}';
@@ -460,6 +469,10 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
+
+    function removeCommasAndSpaces(prd_cd) {
+        return prd_cd.replace(/[\s,]+/g, '');
     }
 
     // 본사접수일이 선택되면 접수구분이 매장A/S접수/진행으로 변경
