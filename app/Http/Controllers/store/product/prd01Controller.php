@@ -115,6 +115,7 @@ class prd01Controller extends Controller
         $cat_type = $request->input("cat_type");
         $cat_cd = $request->input("cat_cd");
         $is_unlimited = $request->input("is_unlimited");
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
 		$com_id = $request->input("com_cd");
 		$com_type = $request->input("com_type");
@@ -156,6 +157,18 @@ class prd01Controller extends Controller
                 $where .= " and ( select count(*) from category_goods where cat_type = 'ITEM' and d_cat_cd = '". Lib::quote($cat_cd) . "' and goods_no = g.goods_no ) > 0 ";
             }
         }
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
 
         if ($head_desc != "") $where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
 		if ($ad_desc != "") $where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
@@ -241,6 +254,7 @@ class prd01Controller extends Controller
 					left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 					left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 					left outer join code c on c.code_id = com.com_type and c.code_kind_cd = 'G_COM_TYPE'
+					-- left outer join product_code pc on pc.goods_no = g.goods_no
                 where 1=1
                     $where
 			";
@@ -261,7 +275,7 @@ class prd01Controller extends Controller
 				, g.goods_no , g.goods_sub
 				, ifnull( type.code_val, 'N/A') as goods_type
 				, com.com_nm
-				, opt.opt_kind_nm
+				, d.code_val as opt_kind_nm
 				, brand.brand_nm
 				, cat.full_nm
 				, g.style_no
@@ -312,8 +326,9 @@ class prd01Controller extends Controller
 				,g.sale_type,g.sale_yn,g.before_sale_price,g.sale_price,0 as sale_rate,
 				g.sale_dt_yn,g.sale_s_dt,g.sale_e_dt
 				, c.code_id as com_type
-
 			from goods g
+				inner join product_code pc on pc.goods_no = g.goods_no
+				left outer join code d on d.code_id = pc.item and d.code_kind_cd = 'prd_cd_item'
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id

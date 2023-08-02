@@ -89,17 +89,14 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_stat">전시상태</label>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($goods_stats as $goods_stat)
-                                    <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="custom-control custom-checkbox form-check-box" style="min-width: 100px;margin-left:10px">
-                                    <input type="checkbox" class="custom-control-input" name="except_trash" id="except_trash" value="Y" checked>
-                                    <label class="custom-control-label font-weight-normal" for="except_trash">휴지통 제외</label>
+                            <label for="prd_cd">상품검색조건</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -167,6 +164,23 @@
                     
                 </div>
                 <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="goods_stat">전시상태</label>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
+                                    <option value=''>전체</option>
+                                    @foreach ($goods_stats as $goods_stat)
+                                    <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="custom-control custom-checkbox form-check-box" style="min-width: 100px;margin-left:10px">
+                                    <input type="checkbox" class="custom-control-input" name="except_trash" id="except_trash" value="Y" checked>
+                                    <label class="custom-control-label font-weight-normal" for="except_trash">휴지통 제외</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                      <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">상품구분</label>
@@ -201,6 +215,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="search-area-ext d-none row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
@@ -209,9 +225,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                </div>
-                <div class="search-area-ext d-none row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">카테고리</label>
@@ -264,20 +277,7 @@
                             </div>
                         </div>
 					</div>
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label>상단홍보글/하단홍보글</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width: 47%">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
-								</div>
-								<span class="text_line" style="width: 6%">/</span>
-								<div class="form-inline-inner input-box" style="width: 47%">
-                                    <input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
-								</div>
-							</div>
-						</div>
-					</div>
+                    
                     <!-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">재고구분</label>
@@ -297,6 +297,22 @@
                             </div>
                         </div>
                     </div> -->
+                </div>
+                <div class="search-area-ext d-none row">
+                    <div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>상단홍보글/하단홍보글</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width: 47%">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
+								</div>
+								<span class="text_line" style="width: 6%">/</span>
+								<div class="form-inline-inner input-box" style="width: 47%">
+                                    <input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
+								</div>
+							</div>
+						</div>
+					</div>
                 </div>
             </div>
         </div>
@@ -376,7 +392,7 @@
         },
         {field: "goods_type", headerName: "상품구분", width: 58, pinned: 'left', type: 'StyleGoodsTypeNM'},
         {field: "com_nm", headerName: "공급업체", width:84},
-        {field: "opt_kind_nm", headerName: "품목", width:96},
+        {field: "opt_kind_nm", headerName: "품목", width:96, cellStyle:{'text-align': 'center'}},
         {field: "brand_nm", headerName: "브랜드"},
         {field: "style_no", headerName: "스타일넘버", editable: true, width:70, cellStyle: {'text-align':'center', 'background' : '#ffff99'}},
         {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: { 'background' : '#ffff99'}},
@@ -636,5 +652,9 @@
 			});
 		}
 	}
+
+    function openApi() {
+        document.getElementsByClassName('sch-prdcd-range')[0].click();
+    }
 </script>
 @stop
