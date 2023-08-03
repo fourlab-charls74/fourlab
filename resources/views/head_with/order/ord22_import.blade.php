@@ -264,7 +264,7 @@ $(".out-complate-btn").click(function()
 					send_sms_yn: $("[name=snd_sms_yn]:checked").val()
 				},
 				success: function (data) {
-					console.log(data);
+					// console.log(data);
 					
 					gx.gridOptions.api.forEachNode(node => {
 						if (node.data.ord_opt_no === order[1]) {

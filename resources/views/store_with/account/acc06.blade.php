@@ -138,9 +138,9 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 					<p id="current_date" class="ml-3 pl-2 pr-2 fs-14 text-white bg-secondary rounded"></p>
 				</div>
-				<!-- <div style="text-align: right;">
-					<a href="javascript:void(0);" onclick="batchClosed()" class="btn btn-sm btn-primary mr-1"><i class="fas fa-plus fa-sm"></i> 일괄정산처리</a>
-				</div> -->
+				<div style="text-align: right;">
+					<a href="javascript:void(0);" onclick="return batchClosed();" class="btn btn-sm btn-primary"><i class="fas fa-plus fa-sm"></i> 일괄마감추가</a>
+				</div>
 			</div>
 		</div>
 		<div class="table-responsive basic-option">
@@ -149,7 +149,7 @@
 	</div>
 </div>
 <script language="javascript">
-	const CLOSED_STATUS = { 'Y': '정산완료', 'N': '정산처리중' };
+	const CLOSED_STATUS = { 'Y': '정산완료', 'N': '정산처리중', 'ING': '마감추가중...', 'FAIL': '오류발생' };
 	const CENTER = { 'text-align': 'center' };
 
     let columns = [
@@ -164,13 +164,18 @@
 				if(params.node.rowPinned === 'top') {
 					return '';
 				}else {
-					return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' + (CLOSED_STATUS[params.value] || '정산대기') +'</a>';
+					return '<a href="#" onClick="openDetailPopup(\''+ params.data.store_cd +'\')">' 
+						+ (CLOSED_STATUS[params.value] || '정산대기')
+						+ (params.value === 'FAIL' ? ': ' + (params.data.closed_error_msg || '') : '')
+						+'</a>';
 				}
 			},
             cellStyle: (params) => ({
                 ...CENTER, 
-                "background-color": params.value === 'Y' ? '#E2FFE0' : params.value === 'N' ? '#FFE9E9' : 'none',
-                "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
+                "background-color": params.value === 'Y' ? '#E2FFE0' 
+	                : params.value === 'N' ? '#FFE9E9' 
+		                : params.value === 'FAIL' ? '#FF4444'
+							: params.value === 'ING' ? '#E2E2E2' : 'none',
             }),
         },
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 57, cellStyle: CENTER,
@@ -189,7 +194,7 @@
 					cellRenderer: (params) => {
 						if (params.value == undefined) return 0;
 						if (params.node.rowPinned === 'top') return params.valueFormatted;
-						return + params.valueFormatted;
+						return params.valueFormatted;
 					}
 				},
 				{ field: "sales_amt_except_vat", headerName: "매출합계(-VAT)", width: 100, headerClass: "merged-cell", type: 'currencyType', aggregation: true },
@@ -255,6 +260,7 @@
 			]
 		},
         { field: "total_fee_amt", headerName: "최종지급액", type: 'currencyType', width: 100, aggregation: true, cellStyle: { "font-weight": "bold", "color": "#dd0000" } },
+		{ field: 'closed_error_msg', hide: true },
         { width: "auto" }
     ];
 </script>
@@ -268,6 +274,7 @@
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
 			getRowStyle: (params) => params.node.rowPinned === 'top' ? { 'background': '#ededed', 'font-weight': '600' } : {},
+			isRowSelectable: (params) => !CLOSED_STATUS[params.data.closed_yn] || params.data.closed_yn === 'FAIL',
 		});
 		gx.Aggregation({ "sum": "top" });
 
@@ -304,6 +311,68 @@
 		const url = '/store/account/acc05/show?date=' + sdate.replaceAll('-', '') + '&store_cd=' + store_cd;
 		window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 	}
+	
+	// 일괄마감추가
+	function batchClosed() {
+		const nodes = gx.getSelectedNodes();
+		const sdate = $("#sdate").val();
 
+		if (nodes.length < 1) return alert("마감추가할 매장을 선택해주세요.");
+		if(!confirm("선택하신 매장에 마감내역을 추가하시겠습니까?")) return;
+		
+		let count = 0;
+		nodes[count].setDataValue('closed_yn', 'ING');
+		setTimeout(() => {
+			gx.gridOptions.api.ensureIndexVisible(nodes[count].rowIndex, 'bottom');
+			connectBatchClosed({ store_cd: nodes[count].data.store_cd, sdate });
+		}, 0);
+
+		function connectBatchClosed(data) {
+			$.ajax({
+				async: false,
+				type: 'put',
+				url: '/store/account/acc06/closed',
+				data: data,
+				success: function(res) {
+					if (res.code === '000') {
+						nodes[count].setData({ ...nodes[count].data, closed_yn: 'N' });
+					} else {
+						nodes[count].setData({ ...nodes[count].data, closed_yn: 'FAIL', closed_error_msg: getClosedMsg(res.code) });
+					}
+					count++;
+					if (count < nodes.length) {
+						nodes[count].setDataValue('closed_yn', 'ING');
+						setTimeout(() => {
+							gx.gridOptions.api.ensureIndexVisible(nodes[count].rowIndex, 'bottom');
+							connectBatchClosed({ store_cd: nodes[count].data.store_cd, sdate });
+						}, 0);
+					} else {
+						alert("일괄마감추가가 완료되었습니다. 마감상태를 확인해주세요.");
+					}
+				},
+				error: function(request, status, error) {
+					alert("일괄마감추가 중 오류가 발생했습니다. 다시 시도해주세요.");
+					console.log(request.responseText);
+				}
+			});
+		}
+	}
+
+	function getClosedMsg(code){
+		/*
+			<에러코드 구분>
+			000 : 성공
+			100 : 부정확한 요청
+			110 : 마감처리된 내역
+			999 : 자료등록 시 오류
+		*/
+		const results = {
+			"000": "마감내역을 정상적으로 추가완료했습니다.",
+			"100": "부정확한 요청입니다.",
+			"110": "이미 마감처리된 내역입니다.",
+			"999": "마감정보추가 시 오류가 발생했습니다."
+		}
+		return results[code] || '';
+	}
 </script>
 @stop
