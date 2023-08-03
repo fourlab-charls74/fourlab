@@ -360,7 +360,6 @@ class std11Controller extends Controller
 					'goods_nm' => $data['goods_nm'],
 					'color' => $data['color'],
 					'size' => $data['size'],
-					'qty' => $data['qty'],
 					'is_free' => $data['is_free'],
 					'as_amt' => $data['as_amt']??'',
 					'content' => $data['content']??'',
@@ -405,6 +404,7 @@ class std11Controller extends Controller
 		 */
 
 		$data = $request->all();
+		$user_store = Auth('head')->user()->store_cd;
 		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
 
@@ -417,7 +417,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 10,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => '1',
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -429,7 +429,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
@@ -447,7 +446,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 11,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => '2',
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -459,7 +458,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
@@ -477,7 +475,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 12,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => '3',
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -489,7 +487,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
@@ -507,7 +504,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 30,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => $data['as_type'],
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -519,7 +516,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
@@ -535,7 +531,7 @@ class std11Controller extends Controller
 						->update([
 							'receipt_date' => $data['edate'],
 							'as_state' => 40,
-							'store_cd' => $data['store_no'],
+							'store_cd' => $user_store,
 							'as_type' => $data['as_type'],
 							'customer_no' => $data['customer_no'],
 							'customer' => $data['customer'],
@@ -547,7 +543,6 @@ class std11Controller extends Controller
 							'goods_nm' => $data['goods_nm'],
 							'color' => $data['color'],
 							'size' => $data['size'],
-							'qty' => $data['qty'],
 							'is_free' => $data['is_free'],
 							'as_amt' => $data['as_amt']??'',
 							'content' => $data['content']??'',
@@ -564,7 +559,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 50,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => $data['as_type'],
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -576,7 +571,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
@@ -592,7 +586,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 30,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => '4',
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -604,7 +598,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',
@@ -620,7 +613,7 @@ class std11Controller extends Controller
 						->update([
 							'receipt_date' => $data['edate'],
 							'as_state' => 40,
-							'store_cd' => $data['store_no'],
+							'store_cd' => $user_store,
 							'as_type' => '5',
 							'customer_no' => $data['customer_no'],
 							'customer' => $data['customer'],
@@ -632,7 +625,6 @@ class std11Controller extends Controller
 							'goods_nm' => $data['goods_nm'],
 							'color' => $data['color'],
 							'size' => $data['size'],
-							'qty' => $data['qty'],
 							'is_free' => $data['is_free'],
 							'as_amt' => $data['as_amt']??'',
 							'content' => $data['content']??'',
@@ -649,7 +641,7 @@ class std11Controller extends Controller
 					->update([
 						'receipt_date' => $data['edate'],
 						'as_state' => 50,
-						'store_cd' => $data['store_no'],
+						'store_cd' => $user_store,
 						'as_type' => '6',
 						'customer_no' => $data['customer_no'],
 						'customer' => $data['customer'],
@@ -661,7 +653,6 @@ class std11Controller extends Controller
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
 						'size' => $data['size'],
-						'qty' => $data['qty'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
 						'content' => $data['content']??'',

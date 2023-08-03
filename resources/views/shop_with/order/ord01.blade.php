@@ -424,6 +424,7 @@
         {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
         {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
         {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "sale_kind", headerName: "판매유형", hide:true},
         {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
         {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},

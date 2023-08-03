@@ -157,24 +157,25 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">수량</th>
+                                            <!-- <th class="required">수량</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <input type='text' class="form-control form-control-sm" name='qty' id="qty" value='{{@$row->qty}}' onkeyup="onlynum(this)">
                                                 </div>
-                                            </td>
+                                            </td> -->
                                             <th class="required">수선 유료구분</th>
                                             <td>
                                                 <div class="flex_box">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y" @if($row->is_free == 'Y') checked @endif/>
-                                                            <label class="custom-control-label" for="use_y">유료</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
                                                             <input type="radio" name="is_free" id="use_n" class="custom-control-input" value="N" @if($row->is_free == 'N') checked @endif/>
                                                             <label class="custom-control-label" for="use_n">무료</label>
                                                         </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y" @if($row->is_free == 'Y') checked @endif/>
+                                                            <label class="custom-control-label" for="use_y">유료</label>
+                                                        </div>
+                                                        
                                                     </div>
                                                     <div >
                                                         <input type='text' class="form-control form-control-sm" name='as_amt' id="as_amt" style="width:100%" placeholder="금액을 입력해주세요." value='{{@$row->as_amt}}' onkeyup="onlynum(this)">
@@ -396,10 +397,10 @@
             return false;
         }
 
-        if ($("#qty").val() == "") {
-            alert("수량을 입력해 주세요");
-            return false;
-        }
+        // if ($("#qty").val() == "") {
+        //     alert("수량을 입력해 주세요");
+        //     return false;
+        // }
 
         if($("input:radio[name=is_free]:checked").val()=='Y'){
             if ($("#as_amt").val() == "") {
@@ -411,6 +412,14 @@
 
     function change_state() {
         if (validate() === false) return;
+        let prd_cd = $('#prd_cd').val();
+        const prd = prd_cd.split(/\s|,/).map(prd_cd => removeCommasAndSpaces(prd_cd));
+
+        if (prd.length > 1) {
+            alert("상품은 1개씩만 가능합니다. 새로 접수해주세요.");
+            return false;
+        }
+
         if (confirm('수선정보를 저장하시겠습니까?') === false) return;
 
         let idx = '{{@$row->idx}}';
@@ -434,6 +443,10 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
+
+    function removeCommasAndSpaces(prd_cd) {
+        return prd_cd.replace(/[\s,]+/g, '');
     }
         
 </script>

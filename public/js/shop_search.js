@@ -709,11 +709,11 @@ SearchPrdcd.prototype.Open = async function(callback = null, match = false, prd_
 };
 
 SearchPrdcd.prototype.SetModal = function() {
-    $("#SearchPrdcdModalLabel").text("코드일련 검색");
+    $("#SearchPrdcdModalLabel").text("품번 검색");
     $("#search_prdcd_match").addClass("d-none");
     $("#search_prdcd_code").addClass("col-lg-6");
     $("#search_prdcd_name").addClass("col-lg-6");
-    $("#search_prdcd_code label").text("코드일련");
+    $("#search_prdcd_code label").text("품번");
     $("#select_prdcd_btn").addClass("d-none");
 }
 
@@ -723,10 +723,10 @@ SearchPrdcd.prototype.SetGrid = function(divId){
     if (this.isMatch) {
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-            { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
-            { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
             { field: "prd_nm", headerName: "상품명", width: 300 },
-            { field: "prd_cd1", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
             { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
@@ -738,8 +738,8 @@ SearchPrdcd.prototype.SetGrid = function(divId){
             { headerName: "선택", width: 60, cellStyle: {"text-align": "center"},
                 cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return searchPrdcd.ChoiceOne('${params.data.prd_cd_p}');">선택</a>`,
             },
-            { field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"} },
-            { field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"} },
+            { field: "prd_cd_p", headerName: "품전", width: 100, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"} },
             { field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {"text-align": "center"} },
             { field: "goods_nm", headerName: "상품명", width: 300 },
             { field: "goods_nm_eng", headerName: "상품명(영문)", width: 280 },
@@ -748,11 +748,11 @@ SearchPrdcd.prototype.SetGrid = function(divId){
     } else {
         columns.push(
             { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-            { field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {"text-align": "center"} },
-            { field: "goods_no", headerName: "상품번호", width: 60, cellStyle: {"text-align": "center"} },
+            { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
             { field: "goods_nm", headerName: "상품명", width: 300 },
             { field: "goods_opt", headerName: "옵션", width: 150 },
-            { field: "prd_cd1", headerName: "코드일련", width: 120, cellStyle: {"text-align": "center"} },
+            { field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
             { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
@@ -847,6 +847,7 @@ SearchPrdcd.prototype.Choice = function() {
     } else {
         let rows = this.grid.getSelectedRows();
         if(rows.length < 1) return alert("항목을 선택해주세요.");
+        if(rows.length > 1) return alert("항목을 한 개만 선택해주세요.");
         
         if($('#prd_cd').length > 0){
             $('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
@@ -1539,24 +1540,31 @@ SearchGoodsNos.prototype.SetGrid = function(divId){
 };
 
 SearchGoodsNos.prototype.Search = function(){
-    let data = $('form[name="search_goods_nos"]').serialize();
+    let data = "";
+    data += "sch_goods_nos=" + $("#sch_goods_nos").val().split("\n").filter(v => v).join(",");
+    data += "&sch_style_nos=" + $("#sch_style_nos").val().split("\n").filter(v => v).join(",");
+    data += "&cmd=modal";
     this.grid.Request('/shop/api/goods-search', data, 1);
 };
 
 SearchGoodsNos.prototype.Choice = function(){
 
     let checkRows = this.grid.getSelectedRows();
+    let style_nos = checkRows.map(function(row) {
+        return row.style_no;
+    });
     let goods_nos = checkRows.map(function(row) {
         return row.goods_no;
     });
+    let goods_no = document.getElementById('sch_goods_nos').value;
+    let style_no = document.getElementById('sch_style_nos').value;
 
-    if(this.callback !== null){
-        this.callback();
-    } else {
-        if($('#' + this.id).length > 0){
-            $('#' + this.id).val(goods_nos.join(","));
-        }
+    if(goods_no == "" || style_no != "") {
+        $('#style_no').val(style_nos);
+    } else if (goods_no != "" || style_no == "") {
+        $('#goods_no').val(goods_nos);
     }
+    
     $('#SearchGoodsNosModal').modal('toggle');
 };
 let searchGoodsNos = new SearchGoodsNos();

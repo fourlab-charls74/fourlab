@@ -126,8 +126,25 @@ class stk10Controller extends Controller
                 $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
             }
         }
-        if($r['style_no'] != null) 
-            $where .= " and g.style_no = '" . $r['style_no'] . "'";
+
+        $style_no = $r['style_no'];
+        $style_nos = $request->input('style_nos', '');
+        if($style_nos != '') $style_no = $style_nos;
+        $style_no = preg_replace("/\s/",",",$style_no);
+        $style_no = preg_replace("/\t/",",",$style_no);
+        $style_no = preg_replace("/\n/",",",$style_no);
+        $style_no = preg_replace("/,,/",",",$style_no);
+
+        if($style_no != ""){
+            $style_nos = explode(",", $style_no);
+            if(count($style_nos) > 1) {
+                if(count($style_nos) > 500) array_splice($style_nos, 500);
+                $in_style_nos = join(",", $style_nos);
+                $where .= " and g.style_no in ( $in_style_nos ) ";
+            } else {
+                if ($style_no != "") $where .= " and g.style_no = '" . Lib::quote($style_no) . "' ";
+            }
+        }
 
         $goods_no = $r['goods_no'];
         $goods_nos = $request->input('goods_nos', '');

@@ -304,7 +304,7 @@ class goods extends Controller
 		if( $style_no != "" ) {
 			$style_nos = explode(",",$style_no);
 			if(count($style_nos) > 1){
-				if(count($style_nos) > 500) array_splice($style_nos,500);
+				// if(count($style_nos) > 500) array_splice($style_nos,500);
 				$in_style_nos = "";
 				for($i=0; $i<count($style_nos); $i++){
 					if(isset($style_nos[$i]) && $style_nos[$i] != ""){

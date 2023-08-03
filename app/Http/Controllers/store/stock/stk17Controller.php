@@ -142,6 +142,7 @@ class stk17Controller extends Controller
 
         $store_cd = $request->input("store_cd", '');
         $data = $request->input("products", []);
+
         // $exp_dlv_day = $request->input("exp_dlv_day", '');
         // $rel_order = $request->input("rel_order", '');
 
@@ -160,8 +161,14 @@ class stk17Controller extends Controller
             ";
 
             $last_seq = DB::selectOne($sql);
-            $seq = explode('_', $last_seq->release_no);
-            $no = (int)$seq[2] + 1;
+
+            if ($last_seq == null) {
+                $no = 1;
+            } else {
+                $seq = explode('_', $last_seq->release_no);
+                $no = (int)$seq[2] + 1;
+            }
+
 
 			foreach($data as $row) {
                 DB::table('sproduct_stock_release')

@@ -394,7 +394,7 @@ class ord01Controller extends Controller
                 a.dlv_end_date,
                 a.last_up_date,
                 if(a.ord_state <= 10 and a.clm_state = 0 and ord_opt_cnt = 0, 'Y', 'N') as ord_del_yn,
-                '2' as depth
+                '2' as depth,
             from (
                 select
                     om.ord_no,

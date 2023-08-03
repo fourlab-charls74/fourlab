@@ -23,11 +23,11 @@ const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
 class stk10Controller extends Controller
 {
     private $rel_states = [
-        '10' => '요청',
-        '20' => '접수',
-        '30' => '출고',
+        '10' => '출고요청',
+        '20' => '출고처리중',
+        '30' => '출고완료',
         '40' => '매장입고',
-        '-10' => '거부',
+        '-10' => '출고거부',
     ];
 
     public function index()
@@ -46,7 +46,7 @@ class stk10Controller extends Controller
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            // 'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
+            'rel_orders'     => SLib::getCodes("REL_ORDER"), // 출고차수
             'rel_order_res' => $rel_order_res,
             'rel_types'     => SLib::getCodes("REL_TYPE"), // 출고구분
             'rel_states'    => $this->rel_states, // 출고상태
@@ -78,14 +78,16 @@ class stk10Controller extends Controller
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
         ";
 
+        if($r['rel_order'] != null)
+            $where .= " and psr.rel_order like '%" . $r['rel_order'] . "'";
 		if($r['rel_type'] != null) 
 			$where .= " and psr.type = '" . $r['rel_type'] . "'";
 		if($r['state'] != null) 
 			$where .= " and psr.state = '" . $r['state'] . "'";
         if($r['ext_done_state'] ?? '' != '')
             $where .= " and psr.state != '40'";
-		if(isset($r['store_no'])) 
-			$where .= " and s.store_cd = '" . $r['store_no'] . "'";
+		// if(isset($r['store_no'])) 
+		// 	$where .= " and s.store_cd = '" . $r['store_no'] . "'";
 		if($r['prd_cd'] != null) {
             $prd_cd = explode(',', $r['prd_cd']);
 			$where .= " and (1!=1";
@@ -117,8 +119,25 @@ class stk10Controller extends Controller
                 $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
             }
         }
-        if($r['style_no'] != null) 
-            $where .= " and g.style_no = '" . $r['style_no'] . "'";
+        
+        $style_no = $r['style_no'];
+        $style_nos = $request->input('style_nos', '');
+        if($style_nos != '') $style_no = $style_nos;
+        $style_no = preg_replace("/\s/",",",$style_no);
+        $style_no = preg_replace("/\t/",",",$style_no);
+        $style_no = preg_replace("/\n/",",",$style_no);
+        $style_no = preg_replace("/,,/",",",$style_no);
+
+        if($style_no != ""){
+            $style_nos = explode(",", $style_no);
+            if(count($style_nos) > 1) {
+                if(count($style_nos) > 500) array_splice($style_nos, 500);
+                $in_style_nos = join(",", $style_nos);
+                $where .= " and g.style_no in ( $in_style_nos ) ";
+            } else {
+                if ($style_no != "") $where .= " and g.style_no = '" . Lib::quote($style_no) . "' ";
+            }
+        }
 
         $goods_no = $r['goods_no'];
         $goods_nos = $request->input('goods_nos', '');
@@ -139,6 +158,12 @@ class stk10Controller extends Controller
             }
         }
 
+        if($r['com_cd'] != null) 
+            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
+        if($r['item'] != null) 
+            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
+        if(isset($r['brand_cd']))
+            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
         if($r['goods_nm'] != null) 
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
@@ -162,7 +187,7 @@ class stk10Controller extends Controller
 		$sql = "
             select
                 psr.idx,
-				psr.document_number,
+                psr.document_number,
                 cast(if(psr.state < 30, psr.exp_dlv_day, psr.prc_rt) as date) as dlv_day,
                 c.code_val as rel_type, 
                 psr.goods_no, 
@@ -172,10 +197,15 @@ class stk10Controller extends Controller
                 opt.opt_kind_nm,
                 brand.brand_nm as brand,
                 pc.color,
-                pc.size,
+                d.code_val as color_nm,
+                (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size,
                 psr.prd_cd,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, 
-                psr.goods_opt, 
                 psr.qty,
                 pss.wqty as storage_wqty,
                 pss2.wqty as store_wqty,
@@ -186,6 +216,7 @@ class stk10Controller extends Controller
                 psr.state, 
                 -- cast(psr.exp_dlv_day as date) as exp_dlv_day, 
                 psr.exp_dlv_day as exp_dlv_day_data,
+                psr.prc_rt as last_release_date,
                 psr.rel_order, 
                 psr.req_comment,
                 psr.comment,
@@ -211,6 +242,7 @@ class stk10Controller extends Controller
                 left outer join code c on c.code_kind_cd = 'REL_TYPE' and c.code_id = psr.type
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
+                left outer join code d on d.code_id = pc.color and d.code_kind_cd = 'PRD_CD_COLOR'
             where 1=1 $where
             $orderby
             $limit

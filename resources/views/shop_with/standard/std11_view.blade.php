@@ -145,12 +145,6 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">수량</th>
-                                            <td>
-                                                <div class="flex_box">
-                                                    <input type='text' class="form-control form-control-sm" name='qty' id="qty" value='' onkeyup="onlynum(this)">
-                                                </div>
-                                            </td>
                                             <th class="required">수선 유료구분</th>
                                             <td>
                                                 <div class="flex_box">
@@ -204,6 +198,9 @@
         const { name } = row;
         const { user_id } = row;
         const { phone } = row;
+        const { zip } = row;
+        const { addr } = row;
+        const { addr2 } = row;
 
         let num = phone.split('-');
 
@@ -213,6 +210,9 @@
         $('#phone1').val(num[0]);
         $('#phone2').val(num[1]);
         $('#phone3').val(num[2]);
+        $('#zipcode').val(zip);
+        $('#addr1').val(addr);
+        $('#addr2').val(addr2);
     };
 
     const getMember = () => {
@@ -292,11 +292,6 @@
             return false;
         }
 
-        if ($("#qty").val() == "") {
-            alert("수량을 입력해 주세요");
-            return false;
-        }
-
         if($("input:radio[name=is_free]:checked").val()=='Y'){
             if ($("#as_amt").val() == "") {
                 alert("수선금액을 입력해 주세요");
@@ -308,7 +303,16 @@
 
     function Save() {
         if (validate() === false) return;
+        let prd_cd = $('#prd_cd').val();
+        const prd = prd_cd.split(/\s|,/).map(prd_cd => removeCommasAndSpaces(prd_cd));
+
+        if (prd.length > 1) {
+            alert("상품은 1개씩만 가능합니다. 새로 접수해주세요.");
+            return false;
+        }
+
         if (confirm('수선정보를 등록하시겠습니까?') === false) return;
+
 
         axios({
             url: '/shop/standard/std11/repair-info-save',
@@ -326,9 +330,10 @@
         }).catch(function (err) {
             console.log(err);
         });
+    }
 
-
-
+    function removeCommasAndSpaces(prd_cd) {
+        return prd_cd.replace(/[\s,]+/g, '');
     }
         
 

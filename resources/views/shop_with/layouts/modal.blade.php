@@ -357,7 +357,7 @@
 
     <div id="SearchGoodsNosModal" class="modal fade" role="dialog" aria-labelledby="SearchGoodsNosModalLabel" aria-hidden="true">
         <div class="modal-dialog" >
-            <div class="modal-content" style="width:600px">
+            <div class="modal-content" style="width:700px">
                 <div class="modal-header">
                     <h5 class="modal-title mt-0" id="myModalLabel">상품 검색</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -371,9 +371,17 @@
                                 <div class="card-body">
                                     <div class="row_wrap">
                                         <div class="row">
-                                            <div class="col-lg-12 inner-td">
+                                            <div class="col-lg-6 inner-td">
                                                 <div class="form-group">
-                                                    <label style="min-width:60px;">상품</label>
+                                                    <label style="min-width:70px;">스타일넘버</label>
+                                                    <div class="flax_box">
+                                                        <textarea name="sch_style_nos" id="sch_style_nos" rows=4 class="form-control form-control-sm" ></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 inner-td">
+                                                <div class="form-group">
+                                                    <label style="min-width:70px;">온라인코드</label>
                                                     <div class="flax_box">
                                                         <textarea name="sch_goods_nos" id="sch_goods_nos" rows=4 class="form-control form-control-sm" ></textarea>
                                                     </div>
@@ -383,16 +391,19 @@
                                         <div class="row">
                                             <div class="col-lg-12 inner-td">
                                                 <div class="form-group">
-                                                    <label style="min-width:60px;">&nbsp;</label>
+                                                    {{-- <label style="min-width:60px;">&nbsp;</label> --}}
                                                     <div class="flax_box">
-                                                        <div class="resul_btn_wrap mt-2" style="display:block;">
-                                                            <a href="#" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                                                            <a href="#" onclick="return searchGoodsNos.Choice();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>선택</a>
+                                                        <div class="resul_btn_wrap mt-2" style="display:block;text-align:right;margin-left:auto;">
+                                                            <a href="javascript:void(0);" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                                                            <a href="javascript:void(0);" onclick="return searchGoodsNos.Choice();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>선택</a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="resul_btn_wrap">
+                                        <a href="javascript:void(0);" id="search_sbtn" onclick="return searchGoodsNos.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                     </div>
                                 </div>
                             </form>
@@ -418,6 +429,7 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
 
     <style>
         /* 전시카테고리 상품 이미지 사이즈 픽스 */

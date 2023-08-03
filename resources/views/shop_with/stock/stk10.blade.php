@@ -62,14 +62,18 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="rel_order">출고구분</label>
+							<label for="rel_order">출고구분/차수</label>
                             <div class="flex_box">
-                                <select name='rel_type' class="form-control form-control-sm">
+                                <select name='rel_type' class="form-control form-control-sm" style="width:37%;">
                                     <option value=''>전체</option>
                                     @foreach ($rel_types as $rel_type)
                                         <option value='{{ $rel_type->code_id }}'>{{ $rel_type->code_val }}</option>
                                     @endforeach
                                 </select>
+                                <span class="text_line" style="text-align: center; width: 5%">/</span>
+                                <div class="form-inline-inner input_box" style="width: 58%">
+                                    <input type='text' class="form-control form-control-sm search-enter" name='rel_order' id="rel_order" value="">
+                                </div>
                             </div>
 						</div>
 					</div>
@@ -92,28 +96,27 @@
 					</div>
 				</div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td" style="display:none">
+                    
+                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="store_no">매장명</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            <label for="style_no">스타일넘버/온라인코드</label>
+                            <div class="form-inline">
+                                <div class="form-inline-inner input_box">
+                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
+                                </div>
+                                <span class="text_line">/</span>
+                                <div class="form-inline-inner input-box" style="width:47%">
+                                    <div class="form-inline-inner inline_btn_box">
+                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
-                            <div class="flex_box">
-                                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
@@ -127,16 +130,37 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
+                            <label for="name">공급업체</label>
+                            <div class="form-inline inline_select_box">
+                                <div class="form-inline-inner input-box w-100">
+                                    <div class="form-inline inline_btn_box">
+                                        <input type="hidden" id="com_cd" name="com_cd" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="prd_cd">바코드</label>
+                            <div class="flex_box">
+                                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
                             <label for="goods_nm">상품명</label>
                             <div class="flax_box">
                                 <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                   
-                   
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
@@ -145,20 +169,28 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품번호</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input-box" style="width:47%">
-                                    <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
+                            <label for="item">품목</label>
+                            <div class="flax_box">
+                                <select name="item" class="form-control form-control-sm">
+                                    <option value="">전체</option>
+                                    @foreach ($items as $item)
+                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 inner-td">
+                        <div class="form-group">
+                            <label for="brand_cd">브랜드</label>
+                            <div class="form-inline inline_btn_box">
+                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
                     </div>
@@ -178,8 +210,8 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="req_rt">출고요청일</option>
-                                        <option value="goods_no">상품번호</option>
-                                        <option value="prd_cd">상품코드</option>
+                                        <option value="goods_no">온라인코드</option>
+                                        <option value="prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -282,26 +314,35 @@
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28, headerCheckboxSelection: true,
             checkboxSelection: function(params) {
-                return params.data.state < 40 && params.data.state > 0;
+                if (params.data.state == 30) {
+                    return true;
+                } else {
+                    return false;
+                }
             },
         },
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
         {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
         cellRenderer: function(params) {
-            return params.data.state > 0 ? (params.value || '') + (params.data.state < 30 ? ' (예정)' : '') : '';
+            return params.data.state > 0 ? (params.value || '') : '';
         }
-    },
-    {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
-    {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
-        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 60,
+        },
+        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
+        {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+        {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 70,
             cellRenderer: function(params) {
                 return rel_states[params.value];
             }
         },
+        {field: "exp_dlv_day", headerName: "출고예정일자", pinned:'left', cellStyle: {"text-align": "center"}, width: 90,
+           cellRenderer: function(params) {
+                return params.data.dlv_day;
+           }
+        },
         {field: "storage_cd",	headerName: "창고코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
         {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
-        {field: "prd_cd", headerName: "상품코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-		{field: "goods_no",	headerName: "상품번호", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+		{field: "goods_no",	headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
 		{field: "opt_kind_nm",	headerName: "품목", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "style_no",	headerName: "스타일넘버", cellStyle: {"text-align": "center"}},
@@ -321,10 +362,11 @@
                 }
             }
         },
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-		{field: "goods_opt", headerName: "옵션", width: 130},
+        {field: "storage_wqty", headerName: "창고재고", width: 60, type: "currencyType"},
 		{field: "store_wqty", headerName: "매장재고", width: 60, type: "currencyType"},
 		{field: "qty", headerName: "수량", type: "currencyType", width: 50,
             cellRenderer: function(params) {
@@ -337,10 +379,23 @@
                 }
             }
         },
-		{field: "exp_dlv_day", headerName: "출고예정일자", cellStyle: {"text-align": "center"}, width: 90,
-           cellRenderer: function(params) {
-                return params.data.dlv_day;
-           }
+        {field: "last_release_date", headerName: "최근출고일", width: 90,
+            cellRenderer: function(params){
+                let last_release_date = params.data.last_release_date;
+                let date = new Date(last_release_date);
+                let year = date.getFullYear();
+                let month = date.getMonth() + 1;
+                let day = date.getDate();
+
+                if (year > 1970) {
+                    return `${year}-${month >= 10 ? month : '0' + month}-${day >= 10 ? day : '0' + day}`;
+                }
+            },
+            cellStyle : function(params) {
+                if(params.data.prc_rt == params.data.last_release_date || params.data.req_rt == params.data.last_release_date) {
+                    return {"color" : "red", "text-align" : "center"};
+                } 
+            }
         },
         {field: "req_comment", headerName: "매장메모", width: 300},
         {field: "comment", headerName: "본사메모", width: 300},
@@ -352,7 +407,7 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_nm", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
+		// {field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">

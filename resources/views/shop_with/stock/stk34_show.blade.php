@@ -18,8 +18,8 @@
                 <div class="d-flex card-header justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
-                        <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
                         <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+                        <a href="#" id="search_sbtn" onclick="Save_amt();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -183,7 +183,7 @@
                     day_headerName = i +'일';
                     day_field = 'sale_amt_' + i;
                 }
-                let add_col = {field: day_field, headerName: day_headerName, minWidth: 60, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99","text-align": "right"}};
+                let add_col = {field: day_field, headerName: day_headerName, minWidth: 75, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99","text-align": "right"}};
                 col.children.push(add_col)
             }
             return col;

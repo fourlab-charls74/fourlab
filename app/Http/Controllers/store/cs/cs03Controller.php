@@ -135,8 +135,8 @@ class cs03Controller extends Controller
 				c1.code_val as color,
 				(
                     select s.size_nm from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
+                    where s.size_kind_cd = if(p4.size_kind != '', p4.size_kind, if(p4.gender = 'M', 'PRD_CD_SIZE_MEN', if(p4.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = p4.size
                         and use_yn = 'Y'
                 ) as size,
 				c3.code_val as unit,
