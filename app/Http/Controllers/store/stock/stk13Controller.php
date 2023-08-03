@@ -256,13 +256,20 @@ class stk13Controller extends Controller
 				(select sum(qty) from order_opt where (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0) and prd_cd = o.prd_cd and store_cd = o.store_cd) as total_sale_cnt,
 				DATE_FORMAT(DATE_ADD(NOW(), INTERVAL (ifnull(ROUND(ps.wqty * (TIMESTAMPDIFF(DAY, '$sdate 00:00:00', '$edate 23:59:59') / sum(o.qty))), 0)) DAY),'%Y-%m-%d') as exp_soldout_day,
 				-- LEAST(if(sum(ifnull(o.qty, 0)) < 0, 0, sum(o.qty)), ifnull(pss.wqty, 0)) as rel_qty
+				store.store_seq,
+				store.store_seq_cd,
+				store.store_seq_nm,
 				0 as rel_qty,
 				0 as rel_qty2
 			from order_opt o
 				inner join product_code pc on pc.prd_cd = o.prd_cd
 				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
 				inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
-				inner join store on store.store_cd = o.store_cd
+				inner join (
+					select s.store_cd, s.store_channel, s.store_channel_kind, ifnull(c.code_seq, 999) as store_seq, c.code_id as store_seq_cd, c.code_val as store_seq_nm
+					from store s
+						left outer join code c on c.code_kind_cd = 'PRIORITY' and c.code_id = s.priority
+				) store on store.store_cd = o.store_cd
 				left outer join goods g on g.goods_no = o.goods_no
 				left outer join brand b on b.brand = g.brand
 				left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
@@ -272,7 +279,7 @@ class stk13Controller extends Controller
 				and ($store_where)
 				$where
 			group by o.store_cd, o.prd_cd
-			order by $orderby
+			order by $orderby, store.store_seq asc
 			$limit
 		";
 		$result = DB::select($sql);
@@ -286,6 +293,7 @@ class stk13Controller extends Controller
 					'rel_qty' => 0,
 					'sale_cnt' => ($row->sale_cnt * 1),
 					'store_wqty' => $row->store_wqty,
+					'store_seq' => $row->store_seq,
 				]
 			]);
 
@@ -301,11 +309,15 @@ class stk13Controller extends Controller
 		
 		foreach ((array) $releases as $key => $value) {
 			$sort_arr = [];
+			$seq_sort_arr = [];
 			foreach ((array) $releases[$key] as $k => $v) {
-				if ($k !== 'storage_wqty') $sort_arr[] = $v['sale_cnt'];
+				if ($k !== 'storage_wqty') {
+					$sort_arr[] = $v['sale_cnt'];
+					$seq_sort_arr[] = $v['store_seq'];
+				}
 			}
 			$data_arr = array_filter($releases[$key], function($n, $r) { return $r !== 'storage_wqty'; }, ARRAY_FILTER_USE_BOTH);
-			array_multisort($sort_arr, SORT_DESC, $data_arr);
+			array_multisort($seq_sort_arr, SORT_ASC, $sort_arr, SORT_DESC, $data_arr);
 			$releases[$key] = array_merge(['storage_wqty' => $releases[$key]['storage_wqty']], $data_arr);
 
 			foreach ((array) $releases[$key] as $k => $v) {

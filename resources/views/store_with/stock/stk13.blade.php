@@ -305,7 +305,7 @@
                 aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
                 cellRenderer: (params) => params.data ? '' : params.value,
             },
-            {field: "prd_cd" , headerName: "바코드",  pinned: "left", width: 150, cellStyle: {"text-align": "center"}, checkboxSelection: true, },
+            {field: "prd_cd" , headerName: "바코드",  pinned: "left", width: 170, cellStyle: {"text-align": "center"}, checkboxSelection: true, },
             {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
             {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
             {field: "brand_nm", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
@@ -341,6 +341,9 @@
                     {field: "exp_soldout_day", headerName: "소진예상일", cellStyle: {"text-align": "center"}, width: 80},
                 ]
             },
+			{field: "store_seq_nm", headerName: "출고우선순위", width: 80, cellStyle: {"text-align": "center"},
+				cellRenderer: (params) => params.data && params.data.store_seq_cd ? (`[${params.data?.store_seq_cd}] ` + params.value) : '',
+			},
             {field: "rel_qty", headerName: "배분추천수량", type: "currencyType", width: 85, valueFormatter: formatNumber,
                 cellStyle: params => {
                     let color = "none";
@@ -403,7 +406,7 @@
                 },
 				defaultColDef: {
 					suppressMenu: true,
-					resizable: false,
+					resizable: true,
 					sortable: true,
 				},
                 rollup: true,
@@ -507,7 +510,7 @@
                     : c.field === "prd_cd_sm"
                         ? ({...c, rowGroup: false, hide: false})
                         : c.field === "prd_cd"
-                            ? ({...c, width: 150})
+                            ? ({...c, width: 170})
                             : c
                 );
                 gx.gridOptions.api.setColumnDefs(prd_columns);
@@ -520,7 +523,7 @@
                         : c.field === "prd_cd_sm"
                             ? ({...c, rowGroup: true, hide: true})
                             : c.field === "prd_cd"
-                                ? ({...c, checkboxSelection: false, width: 110})
+                                ? ({...c, checkboxSelection: false, width: 130})
                                 : c
                 );
                 gx.gridOptions.api.setColumnDefs(prd_columns);
