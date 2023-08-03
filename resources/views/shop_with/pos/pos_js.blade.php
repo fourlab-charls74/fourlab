@@ -259,8 +259,8 @@
         let sale_type = document.getElementById("sale_type");
         $(sale_type).find("option").remove();
         sale_types.forEach((type, key) => {
-            if(isJsGoods || (!isJsGoods && ((type.amt_kind == 'per' && type.sale_per <= 0) || (type.amt_kind == 'amt' && type.sale_amt <= 0)))) {
-				if (type.brands === null || (type.brands?.split(',') || []).includes(goods.brand)) {
+            if((isJsGoods && type.sale_apply === 'tag') || (!isJsGoods && ((type.amt_kind == 'per' && type.sale_per >= 0) || (type.amt_kind == 'amt' && type.sale_amt >= 0)))) {
+				if (!type.brands || (type.brands?.split(',') || []).includes(goods.brand)) {
                     sale_type[sale_type.options.length] = new Option(type.sale_type_nm, type.sale_kind);
 				}
             }
