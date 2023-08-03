@@ -190,8 +190,11 @@
         { headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', width: 130, pinned: 'left' },
         { headerName: '품번', showRowGroup: 'prd_cd_p', cellRenderer: 'agGroupCellRenderer', width: 150, pinned: 'left' },
         { field: "prd_cd", headerName: "바코드", width: 130, pinned: 'left', cellClass: 'hd-grid-code' },
-        { field: "goods_no", headerName: "온라인코드", width: 70, cellClass: 'hd-grid-code' },
+        { field: "goods_no", headerName: "온라인코드", width: 70, cellClass: 'hd-grid-code',
+            aggFunc: (params) => (params?.rowNode?.level || 0) > 1 ? params.values[0] : '',
+        },
         { field: "goods_nm", headerName: "상품명", width: 200,
+			aggFunc: (params) => (params?.rowNode?.level || 0) > 1 ? params.values[0] : '',
             cellRenderer: function (params) {
                 if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
                     return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
@@ -202,6 +205,7 @@
             }
         },
         { field: "goods_nm_eng", headerName: "상품명(영문)", width: 150,
+			aggFunc: (params) => (params?.rowNode?.level || 0) > 1 ? params.values[0] : '',
             cellRenderer: function (params) {
                 if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
                     return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
@@ -211,7 +215,10 @@
                 }
             }
         },
-        { field: "color", headerName: "컬러", width: 50, cellClass: 'hd-grid-code' },
+        { field: "color", headerName: "컬러", width: 50, cellClass: 'hd-grid-code',
+			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 3 ? params.value : '',
+        },
 		{ headerName: '컬러명', showRowGroup: 'color_nm', cellRenderer: 'agGroupCellRenderer', width: 130 },
         { field: "size", headerName: "사이즈", width: 50, cellClass: 'hd-grid-code' },
         { field: "goods_opt", headerName: "옵션", width: 150 },
@@ -248,7 +255,7 @@
                 {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
                 {field: "sale_ratio", headerName: "판매율", width: 80, type: "percentType",
 	                aggFunc: (params) => {
-						return params.rowNode ? params.rowNode.aggData ? (params.rowNode.aggData.sale_qty / params.rowNode.aggData.term_in_qty * 100) : 0 : 0;
+						return params.rowNode ? params.rowNode.aggData ? (params.rowNode.aggData.sale_qty / (params.rowNode.aggData.term_in_qty === 0 ? 1 : params.rowNode.aggData.term_in_qty) * 100) : 0 : 0;
 	                } 
                 },
                 {field: "discount_ratio", headerName: "할인율", width: 80, type: "percentType"},
@@ -282,8 +289,12 @@
 			]
 		},
 		{ field: "term_sale_qty", headerName: "판매계", width: 60, type: "currencyType", aggFunc: sumValuesFunc },
-		{ field: "com_id", headerName: "업체코드", width: 60, cellClass: 'hd-grid-code' },
-		{ field: "com_nm", headerName: "업체명", width: 80 },
+		{ field: "com_id", headerName: "업체코드", width: 60, cellClass: 'hd-grid-code',
+			aggFunc: (params) => (params?.rowNode?.level || 0) > 1 ? params.values[0] : '',
+		},
+		{ field: "com_nm", headerName: "업체명", width: 80,
+			aggFunc: (params) => (params?.rowNode?.level || 0) > 1 ? params.values[0] : '',
+		},
     ];
 
 	const pApp = new App('', { gridId:"#div-gd", height: 265 });

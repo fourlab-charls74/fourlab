@@ -54,12 +54,11 @@ class sal27Controller extends Controller
 		// $date_where2 = " and stock_state_date >= '" . $sdate_day . "' and stock_state_date <= '" . $edate_day . "'";
 		// $date_where3 = " and replace(sr_date, '-', '') >= '" . $sdate_day . "' and replace(sr_date, '-', '') <= '" . $edate_day . "'";
 		// $date_where4 = " and rec_rt >= '" . $sdate_time . "' and rec_rt <= '" . $edate_time . "'";
-		// $date_where5 = " and h.stock_state_date >= '" . $next_edate_day . "' and h.stock_state_date <= '" . $today_day . "'";
 		$date_where1 = " and ord_state_date <= '" . $edate_day . "'";
 		$date_where2 = " and stock_state_date <= '" . $edate_day . "'";
 		$date_where3 = " and replace(sr_date, '-', '') <= '" . $edate_day . "'";
 		$date_where4 = " and rec_rt <= '" . $edate_time . "'";
-		$date_where5 = " and h.stock_state_date <= '" . $today_day . "'";
+		$date_where5 = " and h.stock_state_date >= '" . $next_edate_day . "' and h.stock_state_date <= '" . $today_day . "'";
 		$date_where6 = " and ord_state_date >= '" . $sdate_day . "' and ord_state_date <= '" . $edate_day . "'";
 
 		// 매장검색
