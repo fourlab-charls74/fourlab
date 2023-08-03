@@ -1240,7 +1240,8 @@ CREATE TABLE `size` (
   `admin_nm` varchar(20) NOT NULL COMMENT '관리자명',
   `rt` datetime DEFAULT NULL COMMENT '등록일시',
   `ut` datetime DEFAULT NULL COMMENT '수정일시',
-  PRIMARY KEY (`no`)
+  PRIMARY KEY (`no`),
+  KEY `idx_sizekindcd_sizece` (`size_kind_cd`,`size_cd`)
 ) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `size_kind` (
