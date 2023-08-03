@@ -13,6 +13,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Replace;
 
 class sal17Controller extends Controller
 {
@@ -247,8 +248,9 @@ class sal17Controller extends Controller
 
 			foreach ($date_arr as $ym) {
 				foreach ($data as $d) {
+
+					$proj_amt = str_replace(",","",$d['proj_amt_' . $ym])??0;
 					$store_cd = $d['scd'];
-					$proj_amt = $d['proj_amt_' . $ym] ?? 0;
 	
 					$upsertData[] = [
 						'store_cd' => $store_cd,
@@ -261,6 +263,7 @@ class sal17Controller extends Controller
 					];
 				}
 			}
+
 			DB::table('store_sales_projection')->upsert(
 				$upsertData,
 				['store_cd', 'ym'],

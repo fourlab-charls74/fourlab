@@ -337,7 +337,7 @@
 
 	const evtAfterEdit = async (params) => {
 
-		let prev_value = params.oldValue;
+		let prev_value = parseInt(params.oldValue);
         let value = params.newValue;
 
 		if (prev_value !== value) {
@@ -348,11 +348,13 @@
 
 			let regExp = /(?=proj_amt_).+/i;
 			let arr = column_name.match(regExp);
+			let parseValue = parseInt(value);
+
 			if (arr) {
-				if (isNaN(value) == true || value == "" || parseFloat(value) < 0) {
+				if (isNaN(parseValue) == true || parseValue == "") {
 					alert("숫자만 입력가능합니다.");
 					startEditingCell(row_index, column_name);
-					rowNode.setDataValue(column_name, prev_value);
+					rowNode.setDataValue(column_name, parseInt(0));
 					return false;
 				} else {
 
