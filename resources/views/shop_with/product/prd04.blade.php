@@ -249,7 +249,7 @@
 				}
 			}
 		},
-		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		// {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}",
@@ -283,13 +283,15 @@
 			}
 		},
 		{field: "color", headerName: "컬러", width: 50, cellStyle: StyleLineHeight},
-		{field: "color_nm", headerName: "컬러명", width: 90, cellStyle: {"line-height": "30px"}},
+		{field: "color_nm", headerName: "컬러명", width: 90, cellStyle: {"line-height": "30px", 'text-align' : 'center'}},
 		{field: "size", headerName: "사이즈", width: 50, cellStyle: StyleLineHeight},
-		{field: "goods_opt", headerName: "옵션", width: 190},
+		{field: "size_nm", headerName: "사이즈명", width: 70, cellStyle: StyleLineHeight},
+		// {field: "goods_opt", headerName: "옵션", width: 190},
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "plan_category", headerName: "상품운영구분", width: 100, cellStyle: StyleLineHeight},
 		{field: "goods_sh", headerName: "정상가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "price", headerName: "판매가", type: 'currencyType', width: 100, aggFunc: 'first'},
+		{field: "sale_rate", headerName: "할인율", width: 70, cellStyle:{'text-align':'right'}},
 		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);

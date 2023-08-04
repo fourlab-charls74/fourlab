@@ -45,7 +45,7 @@
                         </div>
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">
-                                <label for="store_cd">코드일련</label>
+                                <label for="store_cd">바코드</label>
                                 <div class="form-inline">
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">

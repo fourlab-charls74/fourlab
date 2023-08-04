@@ -237,13 +237,26 @@ class prd04Controller extends Controller
 				)) as img
 				, if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, g.goods_nm_eng
-				, pc.color, c.code_val as color_nm, pc.size
+				, pc.color, c.code_val as color_nm
+				, (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
+				, (
+                    select s.size_nm from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size_nm
 				, pc.goods_opt
 				, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
 				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+				, round(((g.goods_sh - g.price) / g.goods_sh) * 100, 2) as sale_rate
 				, p.match_yn
 				, ps.qty as hqty
 				, ps.wqty as hwqty
@@ -392,12 +405,15 @@ class prd04Controller extends Controller
 
 			// get sizes
 			$sql = "
-				select size
-				from product_code
-				where prd_cd like '$prd_cd_p%'
-				group by size
+				select 
+					pc.size, s.size_cd
+				from product_code pc
+					left outer join size s on s.size_cd = pc.size 
+				where pc.prd_cd like '$prd_cd_p%'
+				group by s.size_cd
+				order by s.size_seq asc
 			";
-			$sizes = array_map(function($row) {return $row->size;}, DB::select($sql));
+			$sizes = array_map(function($row) {return $row->size_cd;}, DB::select($sql));
 
 			// get goods info
 			$cfg_img_size_real = "a_500";
