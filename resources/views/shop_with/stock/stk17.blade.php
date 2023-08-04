@@ -159,12 +159,24 @@
 			{field: "size", headerName: "사이즈명", width: 100},
 			{field: "unit", headerName: "단위", width: 120},
 			{field: "price", headerName: "판매가", type: 'currencyType', width: 80},
-            {field: "storage_wqty", headerName: '창고재고', type: 'currencyType', width: 80,
-                cellRenderer: function(params) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                    }
-                }
+            {
+                headerName: '창고재고', // 대표창고의 재고를 조회
+                children: [
+                    {field: "storage_qty", headerName: "재고", type: 'currencyType',
+                        cellRenderer: function(params) {
+                            if (params.value !== undefined) {
+                                return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
+                        }
+                    },
+                    {field: "storage_wqty", headerName: "보유재고", type: 'currencyType',
+                        cellRenderer: function(params) {
+                            if (params.value !== undefined) {
+                                return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+                            }
+                        }
+                    },
+                ]
             },
             {field: 'rel_qty', headerName: '요청수량', type: "currencyType", width: 60, editable: true,
 				cellClass: ['hd-grid-edit', 'hd-grid-number'],

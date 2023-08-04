@@ -258,6 +258,8 @@
         {width: "auto"},
     ];
 
+    const pinnedRowData = [{ dep_store_nm : '합계', qty : 0, wqty : 0, rt_qty : 0}];
+
     let stock_columns = [
         {field: "prd_cd", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
@@ -272,21 +274,33 @@
                 {field: "qty", headerName: "재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
                         if (params.value !== undefined) {
-                            return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+                            if (params.node.rowPinned === 'top') {
+                                return params.value;
+                            } else {
+                                return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+                            }
                         }
                     }
                 },
                 {field: "wqty", headerName: "보유재고", type: "currencyType", width: 65,
                     cellRenderer: function(params) {
-                        if (params.value !== undefined) {
+                        if (params.node.rowPinned === 'top') {
+                            return params.value;
+                        } else {
                             return '<a href="#" onclick="return OpenStoreStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
                         }
                     }
                 },
             ]
         },
-        {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65, editable: true, cellStyle: {"background-color": "#ffFF99"}},
-        {field: "comment", headerName: "메모", width: "auto", editable: true, cellStyle: {"background-color": "#ffFF99"}},
+        {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65, 
+            editable: (params) => params.node.rowPinned === "top" ? false : true,
+            cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffFF99"}
+        },
+        {field: "comment", headerName: "메모", width: "auto",
+            editable: (params) => params.node.rowPinned === "top" ? false : true,
+            cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffFF99"},
+        },
         {width: 'auto'}
     ];
 
@@ -347,6 +361,10 @@
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, stock_columns, {
+            pinnedTopRowData: pinnedRowData,
+            getRowStyle: (params) => { // 고정된 row styling
+                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
+            },
             defaultColDef: {
                 suppressMenu: true,
                 resizable: false,
@@ -361,6 +379,8 @@
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx2.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+                    } else {
+                        updatePinnedRow();
                     }
                 }
             }
@@ -406,6 +426,13 @@
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
             $("#storage_stock").html(d.body[0]?.storage_qty + ' / ' + d.body[0]?.storage_wqty);
             $("#store_stock").html(d.body[0]?.send_qty + ' / ' + d.body[0]?.send_wqty);
+            let pinnedRow = gx2.gridOptions.api.getPinnedTopRow(0);
+            let total_data = d.head.total_data;
+			if(pinnedRow && total_data != '') {
+				gx2.gridOptions.api.setPinnedTopRowData([
+					{ ...pinnedRow.data, ...total_data }
+				]);
+			}
         });
     }
 
@@ -487,6 +514,25 @@
     function openShopProduct(prd_no){
         var url = '/shop/product/prd01/' + prd_no;
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+    }
+    
+    function updatePinnedRow() {
+        const rows = gx2.getSelectedRows();
+
+        let row = {};
+        
+        if (rows.length > 0) {
+            row = rows.reduce((a, c) => ({
+                    send_qty : a.send_qty + c.send_qty,
+                    send_wqty : a.send_wqty + c.send_qty,
+                    rt_qty : isNaN(parseInt(a.rt_qty) + parseInt(c.rt_qty)) ? 0 : parseInt(a.rt_qty) + parseInt(c.rt_qty)
+                }), { dep_store_nm : '합계', qty : 0, wqty : 0, send_qty : 0, send_wqty : 0, rt_qty : 0}
+            );
+        }
+
+        let pinnedRow = gx2.gridOptions.api.getPinnedTopRow(0);
+        gx2.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
+
     }
 </script>
 @stop

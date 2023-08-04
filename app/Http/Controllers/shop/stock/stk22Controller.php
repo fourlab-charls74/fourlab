@@ -129,7 +129,12 @@ class stk22Controller extends Controller
                 , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                 , pc.color
                 , color.code_val as color_nm
-                , pc.size
+                , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
                 , pc.goods_opt
                 , if(pc.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
                 , if(pc.goods_no <> '0', g.price, p.price) as price
@@ -214,6 +219,31 @@ class stk22Controller extends Controller
             $r->prd_cd = $prd_cd;
         }
 
+        $sql = "
+            select
+                sum(a.qty) as qty
+                , sum(a.wqty) as wqty
+                , 0 as rt_qty
+            from (
+                select
+                    s.store_cd as dep_store_cd,
+                    s.store_nm as dep_store_nm,
+                    ifnull(ps.qty, 0) as qty,
+                    ifnull(ps.wqty, 0) as wqty,
+                    ifnull(pss.qty, 0) as storage_qty,
+                    ifnull(pss.wqty, 0) as storage_wqty
+                from store s
+                    left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
+                    left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
+                where
+                    s.use_yn = 'Y'
+                    and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+            ) as a
+        ";
+
+        $row = DB::selectOne($sql);
+        $total_data = $row;
+
         return response()->json([
             "code" => $code,
             "head" => [
@@ -221,6 +251,7 @@ class stk22Controller extends Controller
                 "page" => 1,
                 "page_cnt" => 1,
                 "page_total" => 1,
+                "total_data" => $total_data,
             ],
             "body" => $result
         ]);

@@ -394,7 +394,7 @@ class ord01Controller extends Controller
                 a.dlv_end_date,
                 a.last_up_date,
                 if(a.ord_state <= 10 and a.clm_state = 0 and ord_opt_cnt = 0, 'Y', 'N') as ord_del_yn,
-                '2' as depth,
+                '2' as depth
             from (
                 select
                     om.ord_no,
@@ -415,7 +415,12 @@ class ord01Controller extends Controller
                     )) as img,
                     '' as img_view,
                     pc.color,
-                    pc.size,
+                    (
+                        select s.size_cd from size s
+                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                            and s.size_cd = pc.size
+                            and use_yn = 'Y'
+                    ) as size,
                     o.qty,
                     om.user_id,
                     om.user_nm,

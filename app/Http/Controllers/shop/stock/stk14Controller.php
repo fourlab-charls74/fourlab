@@ -141,7 +141,12 @@ class stk14Controller extends Controller
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 pc.color,
                 c.code_val as color_nm,
-                pc.size,
+                (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size,
                 g.goods_nm_eng,
                 p.goods_opt,
                 p.qty as storage_qty,

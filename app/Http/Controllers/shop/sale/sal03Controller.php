@@ -153,7 +153,14 @@ class sal03Controller extends Controller
 			
 			$color =  "(select pc.color from product_code pc where pc.prd_cd = final.prd_cd) as color,";
 
-			$size =  "(select pc.size from product_code pc where pc.prd_cd = final.prd_cd) as size,";
+			$size = "(
+						select 
+							s.size_cd 
+						from size s
+						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+							and s.size_cd = pc.size
+							and use_yn = 'Y'
+					) as size, ";
 
 			$stock_qty = "(select sum(ifnull(ps.qty, '0')) from product_stock ps where ps.prd_cd = final.prd_cd group by ps.prd_cd) as stock_qty,";
 
