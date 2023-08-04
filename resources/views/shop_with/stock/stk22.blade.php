@@ -241,7 +241,7 @@
         {field: "goods_nm",	headerName: "상품명", width: 150, aggFunc: "first",
             cellRenderer: function (params) {
                 if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
-                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
                 } else {
                     let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
                     return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
@@ -253,8 +253,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}, aggFunc: "first"},
         {field: "color_nm", headerName: "컬러명", width: 70, aggFunc: "first"},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}, aggFunc: "first"},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60, aggFunc: "first"},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 60, aggFunc: "first"},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60, aggFunc: "first"},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 60, aggFunc: "first"},
         {width: "auto"},
     ];
 
@@ -320,7 +320,7 @@
         {field: "goods_nm",	headerName: "상품명", width: 150,
             cellRenderer: function (params) {
                 if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
-                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
                 } else {
                     let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
                     return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
@@ -332,8 +332,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 60},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 60},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 60},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 60},
         {field: "comment", headerName: "메모", width: 200},
     ];
 </script>
@@ -464,7 +464,7 @@
             if(rows.filter(row => row.prd_cd === final.prd_cd && row.store_cd === final.store_cd && row.dep_store_cd === final.dep_store_cd).length > 0) return true;
             return false;
         });
-        if(same_item_rows.length > 0) return alert(`이미 등록된 항목입니다.\n[보내는 매장] ${same_item_rows[0].dep_store_nm}\n[상품번호] ${same_item_rows[0].prd_cd}`);
+        if(same_item_rows.length > 0) return alert(`이미 등록된 항목입니다.\n[보내는 매장] ${same_item_rows[0].dep_store_nm}\n[온라인코드] ${same_item_rows[0].prd_cd}`);
 
         rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
         gx3.gridOptions.api.updateRowData({ add: rows });

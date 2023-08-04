@@ -109,8 +109,8 @@
 									<select name="ord_field" class="form-control form-control-sm">
 										<option value="prd_cd_p">등록일(품번별)</option>
 										<option value="pc.rt">등록일</option>
-										<option value="pc.prd_cd">상품코드</option>
-										<option value="pc.goods_no">상품번호</option>
+										<option value="pc.prd_cd">바코드</option>
+										<option value="pc.goods_no">온라인코드</option>
 										<option value="g.goods_nm">상품명</option>
 									</select>
 								</div>
@@ -290,7 +290,7 @@
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "plan_category", headerName: "상품운영구분", width: 100, cellStyle: StyleLineHeight},
 		{field: "goods_sh", headerName: "정상가", type: 'currencyType', width: 100, aggFunc: 'first'},
-		{field: "price", headerName: "판매가", type: 'currencyType', width: 100, aggFunc: 'first'},
+		{field: "price", headerName: "현재가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "sale_rate", headerName: "할인율", width: 70, cellStyle:{'text-align':'right'}},
 		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
@@ -367,7 +367,7 @@
 	});
 
 	function blank_goods_no() {
-		alert('상품번호가 비어있는 상품입니다.');
+		alert('온라인코드가 비어있는 상품입니다.');
 	}
 
 	function onCellValueChanged(e) {

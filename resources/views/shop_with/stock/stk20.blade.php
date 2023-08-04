@@ -123,7 +123,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품번호</label>
+                            <label for="style_no">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -142,7 +142,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품코드</label>
+                            <label for="prd_cd">바코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -179,8 +179,8 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
                                         <option value="psr.req_rt">RT요청일</option>
-                                        <option value="g.goods_no">상품번호</option>
-                                        <option value="psr.prd_cd">상품코드</option>
+                                        <option value="g.goods_no">온라인코드</option>
+                                        <option value="psr.prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -329,7 +329,7 @@
         {field: "goods_nm",	headerName: "상품명", width: 150,
             cellRenderer: function (params) {
                 if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
-                    return '<a href="javascript:void(0);" onclick="return alert(`상품번호가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
+                    return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 비어있는 상품입니다.`);">' + (params.value || '') + '</a>';
                 } else {
                     let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
                     return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
@@ -341,8 +341,8 @@
         {field: "color",	headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size",	headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
+        {field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType"},
+        {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
         {field: "qty", headerName: "수량", type: "currencyType", width: 60, cellStyle: {"font-weight": "700"},
             cellRenderer: function(params) {
                     if (params.value !== undefined) {

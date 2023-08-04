@@ -192,7 +192,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>상품코드</label>
+                            <label>바코드</label>
                             <div class="flex_box">
                                 <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -256,7 +256,7 @@
                                         <option value="o.ord_no">주문번호</option>
                                         <option value="om.user_nm">주문자명</option>
                                         <option value="om.r_nm">수령자</option>
-                                        <option value="p.prd_cd">상품코드</option>
+                                        <option value="p.prd_cd">바코드</option>
                                         <option value="g.goods_nm">상품명</option>
                                     </select>
                                 </div>
@@ -391,7 +391,7 @@
         {field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
         {field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: {'text-align': 'center'}},
+        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "goods_no", headerName: "상품번호", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
@@ -405,7 +405,7 @@
             }
         },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "코드일련", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "opt_val", headerName: "옵션", width: 130},
@@ -419,9 +419,9 @@
         },
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
+        {field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType"},
         {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
+        {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
         {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
         {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
         {field: "sale_kind", headerName: "판매유형", hide:true},
