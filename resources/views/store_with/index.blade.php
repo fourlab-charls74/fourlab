@@ -273,9 +273,13 @@
 
     let sum_amt_datas = [];
     let sum_wonga_datas = [];
-    for (let i=0;i<chartData.length;i++) {
-        sum_amt_datas.push(chartData[i].sum_amt);
-        sum_wonga_datas.push(chartData[i].sum_wonga);
+
+    for (let i=0; i<chartData.length; i++) {
+        const sum_amt = chartData[i]?.sum_amt ?? 0;
+        const sum_wonga = chartData[i]?.sum_wonga ?? 0;
+
+        sum_amt_datas.push(sum_amt);
+        sum_wonga_datas.push(sum_wonga);
     }
 
     new Chart(ctx, {
@@ -348,8 +352,11 @@
     let store_nm_pie_labels = [];
     let sum_amt_pie_datas = [];
     for (let i=0;i<10;i++) {
-        store_nm_pie_labels.push(pieChartData[i].store_nm);
-        sum_amt_pie_datas.push(pieChartData[i].sum_amt);
+        const store_nm = pieChartData[i]?.store_nm ?? '';
+        const sum_amt = pieChartData[i]?.sum_amt ?? 0;
+
+        store_nm_pie_labels.push(store_nm);
+        sum_amt_pie_datas.push(sum_amt);
     }
 
     const ctx2 = document.getElementById('myChart2');
@@ -406,9 +413,13 @@
     let recv_amt_datas = [];
     let wonga_datas = [];
     for (let i=0;i<chartData2.length;i++) {
-        prd_nm_labels.push(chartData2[i].prd_nm);
-        recv_amt_datas.push(chartData2[i].recv_amt);
-        wonga_datas.push(chartData2[i].wonga);
+        const prd_nm = chartData2[i]?.prd_nm ?? '';
+        const recv_amt = chartData2[i]?.recv_amt ?? 0;
+        const wonga = chartData2[i]?.wonga ?? 0;
+
+        prd_nm_labels.push(prd_nm);
+        recv_amt_datas.push(recv_amt);
+        wonga_datas.push(wonga);
     }
 
     new Chart(ctx3, {
@@ -468,8 +479,11 @@
     let prd_nm_chart3_labels = [];
     let qty_datas = [];
     for (let i=0;i<chartData3.length;i++) {
-        prd_nm_chart3_labels.push(chartData3[i].prd_nm);
-        qty_datas.push(chartData3[i].qty);
+        const prd_nm = chartData3[i]?.prd_nm ?? '';
+        const qty = chartData3[i]?.qty ?? 0;
+
+        prd_nm_chart3_labels.push(prd_nm);
+        qty_datas.push(qty);
     }
 
     new Chart(ctx4, {
