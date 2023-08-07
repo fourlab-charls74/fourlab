@@ -505,25 +505,25 @@
         //     type: 'percentType',
         //     aggregation: true
         // },
-        {
-            headerName: '이익',
-            children: [
-                {
-                    headerName: "세전",
-                    field: "biz_profit",
-                    type: 'currencyType',
-                    aggregation: true,
-                    width:80
-                },
-                {
-                    headerName: "세후",
-                    field: "biz_profit_after",
-                    type: 'currencyType',
-                    aggregation: true,
-                    width:80
-                },
-            ]
-        },
+        // {
+        //     headerName: '이익',
+        //     children: [
+        //         {
+        //             headerName: "세전",
+        //             field: "biz_profit",
+        //             type: 'currencyType',
+        //             aggregation: true,
+        //             width:80
+        //         },
+        //         {
+        //             headerName: "세후",
+        //             field: "biz_profit_after",
+        //             type: 'currencyType',
+        //             aggregation: true,
+        //             width:80
+        //         },
+        //     ]
+        // },
         // {
         //     headerName: '판매',
         //     children: [{
