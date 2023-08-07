@@ -58,6 +58,43 @@ class StoreController extends Controller {
         ]);
     }
 
+    public function searchBaebun(Request $request)
+    {
+        $sdate = $request->input('sdate');
+        $edate = $request->input('edate');
+
+        $sql = "
+            select
+                storage.storage_cd
+                , storage.storage_nm
+                , store.store_cd
+                , store.store_nm
+                , date_format(psr.exp_dlv_day,'%Y-%m-%d') as baebun_date
+                , psr.rel_order as rel_baebun
+                , concat(psr.exp_dlv_day, '_', psr.rel_order) as rel_order
+                , sum(psr.qty) as baebun_qty
+                , psr.state as state
+                , count(*) as store_cnt
+            from product_stock_release psr
+                inner join storage storage on storage.storage_cd = psr.storage_cd
+                inner join store store on store.store_cd = psr.store_cd
+            where 1=1
+            group by rel_order
+            order by psr.exp_dlv_day desc
+        
+          
+        ";
+        $rows = DB::select($sql);
+
+        return response()->json([
+            "code" => 200,
+            "head" => array(
+                "total" => count($rows)
+            ),
+            "body" => $rows
+        ]);
+    }
+
     /**
      * 판매채널 목록조회
      */

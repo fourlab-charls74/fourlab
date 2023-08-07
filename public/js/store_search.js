@@ -1433,6 +1433,130 @@ ControlOption.prototype.Delete = async function() {
 let controlOption2 = new ControlOption();
 
 
+// 배분일자차수조회API
+function SearchBaebun(){
+    this.grid = null;
+}
+
+SearchBaebun.prototype.Open = async function(callback = null){
+    if(this.grid === null){
+        this.SetGrid("#div-gd-baebun");
+        $("#SearchBaebunModal").draggable();
+        this.callback = callback;
+    }
+    $('#SearchBaebunModal').modal({
+        keyboard: false
+    });
+};
+
+SearchBaebun.prototype.SetGrid = function(divId){
+    let columns = [];
+
+    if(this.isMultiple) {
+        columns.push({ field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null });
+    }
+
+    columns.push(
+        {headerName: '#', width:40, pinned: 'left', valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: { "text-align": "center" }},
+        { field:"storage_cd", headerName:"창고코드", width:100, cellStyle: { "text-align": "center" }, hide:true},
+        { field:"storage_nm", headerName:"창고명", pinned: 'left', width:100, cellStyle: { "text-align": "center" }},
+        { field:"baebun_date", headerName:"배분일자", pinned: 'left',width:100, cellStyle: { "text-align": "center" }},
+        { field:"rel_baebun", headerName:"배분차수", width:70, cellStyle: { "text-align": "center" }},
+        { field:"rel_order", headerName:"배분차수", width:70, cellStyle: { "text-align": "center" }, hide:true},
+        { field:"store_cnt", headerName:"매장수", width:50, cellStyle: { "text-align": "right" }},
+        { field:"store_cd", headerName:"매장코드", width:100, cellStyle: { "text-align": "center" }, hide:true},
+        { field:"store_nm", headerName:"매장명", width:130, cellStyle: { "text-align": "center" },
+            cellRenderer:function(params) {
+                if(params.data.store_cnt == '1') {
+                    return params.data.store_nm;
+                } else {
+                    return "";
+                }
+            }
+        },
+        { field:"baebun_qty", headerName:"배분수량", width:60, cellStyle: { "text-align": "right" }},
+        { field:"state", headerName:"출고상태", width:100, cellStyle: {"text-align" : "center"},
+            cellRenderer:function(params){
+                if (params.data.state == '10') {
+                    return '출고요청'
+                } else if (params.data.state == '20') {
+                    return '출고처리중'
+                } else if (params.data.state == '30') {
+                    return '출고완료'
+                } else if (params.data.state == '40') {
+                    return '매장입고'
+                }
+            }
+        }
+    );
+
+    this.grid = new HDGrid(document.querySelector( divId ), columns, {
+        getRowStyle: (params) => { // 고정된 row styling
+            if (params.data.state == '30' || params.data.state == '40')  return {'background': '#eee', 'border': 'none'};
+        },
+    });
+};
+
+SearchBaebun.prototype.Search = function(e) {
+    const event_type = e?.type;
+    if (event_type == 'keypress') {
+        if (e.key && e.key == 'Enter') {
+            let data = $('form[name="search_baebun"]').serialize();
+            this.grid.Request('/store/api/stores/searchBaebun', data);
+        } else {
+            return false;
+        }
+    } else {
+        let data = $('form[name="search_baebun"]').serialize();
+        this.grid.Request('/store/api/stores/searchBaebun', data);
+    }
+};
+
+SearchBaebun.prototype.Choice = function(code,name){
+    if(this.callback !== null){
+        this.callback(code, name);
+    } else {
+        if($('#store_no.select2-store').length > 0){
+            $('#store_no').val(null);
+            const option = new Option(name, code, true, true);
+            $('#store_no').append(option).trigger('change');
+        } else {
+            if($('#store_no').length > 0){
+                $('#store_no').val(code);
+            }
+            if($('#store_nm').length > 0){
+                $('#store_nm').val(name);
+            }
+        }
+        if($('#store_cd.select2-store').length > 0){
+            $('#store_cd').val(null);
+            const option = new Option(name, code, true, true);
+            $('#store_cd').append(option).trigger('change');
+        } else {
+            if($('#store_cd').length > 0){
+                $('#store_cd').val(code);
+            }
+            if($('#store_nm').length > 0){
+                $('#store_nm').val(name);
+            }
+        }
+    }
+    this.InitValue();
+    $('#SearchBaebunModal').modal('toggle');
+};
+
+
+
+SearchBaebun.prototype.InitValue = () => {
+    document.search_baebun.reset();
+    searchBaebun.grid.setRows([]);
+    $('#gd-baebun-total').html(0);
+};
+
+
+let searchBaebun = new SearchBaebun();
+
+
 
 
 $( document ).ready(function() {
@@ -1493,6 +1617,10 @@ $( document ).ready(function() {
         searchPrCode.Open();
     });
     
+    //배분일자 검색
+    $( ".sch-baebun" ).on("click", function() {
+        searchBaebun.Open();
+    });
 });
 
 /**

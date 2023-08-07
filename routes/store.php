@@ -61,6 +61,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 매장명 조회
         Route::get('stores', 'StoreController@show');
         Route::get('stores/search', 'StoreController@search');
+        Route::get('stores/searchBaebun', 'StoreController@searchBaebun');
         Route::get('stores/search-storechannel', 'StoreController@search_storeChannel');
         Route::get('stores/search-storechannelkind', 'StoreController@search_storeChannelKind');
         Route::post('stores/search-storenm', 'StoreController@search_storenm');
@@ -845,6 +846,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		//창고일자별 수불현황
 		Route::get('sal28', 'sal28Controller@index');
 		Route::get('sal28/search', 'sal28Controller@search');
+		
+        //배분현황
+		Route::get('sal29', 'sal29Controller@index');
+		Route::get('sal29/search', 'sal29Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
