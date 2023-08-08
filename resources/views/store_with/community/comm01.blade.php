@@ -246,7 +246,10 @@
         Search();
 
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
-        load_store_channel();
+		const notice_type = $('#store_notice_type').val();
+		if(notice_type === 'notice') {
+			load_store_channel();
+		}
     });
 
     function Search() {
