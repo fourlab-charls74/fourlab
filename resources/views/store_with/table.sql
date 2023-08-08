@@ -1401,3 +1401,23 @@ VALUES(72, 'comm01', 2, 2, 'VMD 게시판', 'VMD 게시판', 'M', 'sm_dh', null,
 --
 -- 테이블 데이터 추가 종료
 --
+
+
+CREATE TABLE `indivisualization_columns_log` (
+	 `seq` int(11) NOT NULL AUTO_INCREMENT COMMENT 'seq 번호',
+	 `type` varchar(1) NOT NULL COMMENT '타입(C: 생성, D: 삭제)',
+	 `user_id` varchar(30) DEFAULT NULL COMMENT '사용자 번호',
+	 `pid` varchar(30) DEFAULT NULL COMMENT 'menu pid',
+	 `indiv_columns` text COMMENT '개인화 컬럼',
+	 `rt` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '등록일자',
+	 PRIMARY KEY (`seq`)
+) COMMENT='메뉴별 개인화 컬럼 로그 테이블';
+
+
+CREATE TABLE `indivisualization_columns` (
+	 `seq` int(11) NOT NULL COMMENT 'seq 번호',
+	 `user_id` varchar(30) NOT NULL COMMENT '사용자 번호',
+	 `pid` varchar(30) NOT NULL COMMENT 'menu pid',
+	 `indiv_columns` text COMMENT '개인화 컬럼',
+	 PRIMARY KEY (`user_id`,`pid`)
+) COMMENT='메뉴별 개인화 컬럼 테이블';
