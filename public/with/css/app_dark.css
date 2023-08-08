@@ -289,6 +289,7 @@ body.sidebar-enable nav .side_menu > ul > li > ul > li > ul > li > a{padding-lef
 .date-switch-wrap .date-switch-pos {position: absolute;height:26px;right: 0px;top:50%;transform: translateY(-50%);}
 
 .docs-datepicker input{width:1% !important;}
+.datepicker-container {z-index: 1051 !important;}
 
 .filter_wrap {font-size:14px;line-height:30px;color:#a8b1c2;font-weight:400;}
 .filter_wrap:after{content:""; display:block; float:none; clear:both;}
