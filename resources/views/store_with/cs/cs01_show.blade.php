@@ -28,23 +28,25 @@
                         @if (@$super_admin == 'true' || (@$state > 0 && @$state < 40))
                             @if(Auth('head')->user()->logistics_group_yn == 'Y')
                                 @if(@$state != 30)
-                                    <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>
+                                    <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-save mr-1"></i>저장</a>
                                 @endif
                             @else
-                                <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx bx-save mr-1"></i>저장</a>   
+                                <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-save mr-1"></i>저장</a>   
                             @endif
                             @if (@$stock_no != "" && @$state < 30)
-                            <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고삭제</a>
+                            <a href="javascript:void(0);" onclick="cmder('delcmd')" class="btn btn-sm btn-primary shadow-sm">입고삭제</a>
                             @endif
                             @if ($state == 30)
                                 @if(Auth('head')->user()->logistics_group_yn == 'N')
-                                <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">추가입고</a>
-                                <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고취소</a>
+                                <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm">추가입고</a>
+                                <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm">입고취소</a>
                                 @endif
+							@elseif (@$super_admin === 'true')
+	                            <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm">추가입고</a>
                             @endif
                         @endif
-                        <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
-                        <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm pl-2">도움말</a>
+                        <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+                        <a href="javascript:void(0);" onclick="return displayHelp();" class="btn btn-sm btn-outline-primary shadow-sm">도움말</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -278,6 +280,8 @@
                     @if ($state == 30)
                     <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">추가입고</a>
                     <a href="javascript:void(0);" onclick="cmder('cancelcmd')" class="btn btn-sm btn-primary shadow-sm pl-2">입고취소</a>
+		            @elseif (@$super_admin === 'true')
+		            <a href="javascript:void(0);" onclick="cmder('addstockcmd')" class="btn btn-sm btn-primary shadow-sm">추가입고</a>
                     @endif
                 @endif
                 <a href="javascript:void(0);" onclick="return gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
@@ -307,7 +311,10 @@
                     @endif
                 </div>
                 @elseif (@$super_admin == 'true' && @$state == 40)
-                <p style="color:red;" class="fs-14">* 가장 최근에 입고된 상품만 입고정보 수정이 가능합니다.</p>
+				<div class="d-flex align-items-center">
+	                <p class="fs-14 text-danger mr-2">* 가장 최근에 입고된 상품만 입고정보 수정이 가능합니다.</p>
+		            <a href="javascript:void(0);" onclick="return getSearchGoods();" class="btn-sm btn btn-primary" onfocus="this.blur();"><i class="fa fa-plus fa-sm mr-1"></i> 상품 추가</a>
+				</div>
                 @endif
             </div>
             <div class="card-body pt-3 pt-lg-1">
@@ -399,6 +406,10 @@
         {field: "price", headerName: "현재가", width: 70, type: "currencyType"},
         {field: "recent_stock_date", headerName: "최근입고일자", width: 90, cellClass: 'hd-grid-code'},
         {field: "stock_cnt", headerName: "(품번)입고순번", width: 90, type: 'currencyType'},
+        {field: "comment", headerName: "메모", width: 200,
+			editable: params => checkIsEditable(params),
+			cellStyle: params => ({backgroundColor: checkIsEditable(params) ? '#ffff99' : 'none'}),
+        },
         {width: "auto"}
     ];
 
@@ -438,7 +449,7 @@
 
     /** 수정가능한 셀인지 판단 */
     function checkIsEditable(params) {
-        const cols = ['unit_cost', 'prd_tariff_rate'];
+        const cols = ['unit_cost', 'prd_tariff_rate', 'comment'];
         const super_admin = '{{ @$super_admin }}';
 
         // 슈퍼관리자 권한설정

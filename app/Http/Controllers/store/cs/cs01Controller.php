@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Exception;
 
 const KRW = 'KRW';
-const SUPER_ADMIN_ID = 'sm_yh'; // test용 관리자 (최유현)
+const SUPER_ADMIN_ID = 'super_admin'; // 슈퍼권한
 
 class cs01Controller extends Controller {
 
@@ -739,7 +739,7 @@ class cs01Controller extends Controller {
 		$cur_state = DB::table('product_stock_order')->where('stock_no', $stock_no)->value('state');
 
 		try {
-			if ($cur_state == 30) { // 입고완료 시에만 추가입고 가능
+			if ($cur_state == 30 || $id === SUPER_ADMIN_ID) { // 입고완료 시 or 슈퍼권한일 때만 추가입고 가능
 				DB::beginTransaction();
 	
 				if ($currency_unit != KRW) {
@@ -840,6 +840,7 @@ class cs01Controller extends Controller {
 					where state > 30 and prd_cd = s.prd_cd 
 					order by stock_no desc limit 1
 				  ), 0) = s.stock_prd_no as is_last
+				, s.comment
 			from product_stock_order_product s
 				inner join product_code pc on pc.prd_cd = s.prd_cd
 				inner join product p on p.prd_cd = s.prd_cd
@@ -951,15 +952,21 @@ class cs01Controller extends Controller {
 							'total_cost' => $total_cost,
 							'state' => $state,
 							'stock_date' => $values['stock_date'] ?? '',
+							'comment' => $row['comment'] ?? '',
 							'id' => $id,
 							'rt' => now(),
 							'ut' => now(),
 						];
 						DB::table('product_stock_order_product')->insert($params);
 
-						if ($state == 30 && ($cur_state < $state || $type == 'A')) {
+						if (($state == 30 && ($cur_state < $state || $type == 'A')) || ($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID)) {
 							// 최초 입고완료인 경우
 							$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+
+							// 최초 원가확정인 경우 (슈퍼권한)
+							if ($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID) {
+								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
+							}
 						} else if ($state >= 30 && $state <= 40) {
 							// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
 							$ori_product_stock = [];
@@ -1012,6 +1019,7 @@ class cs01Controller extends Controller {
 							'cost_notax' => $cost_notax,	
 							'total_cost' => $total_cost,
 							'cost' => $cost,
+							'comment' => $row['comment'] ?? '',
 							'ut' => now(),
 						];
 						DB::table('product_stock_order_product')->where('stock_prd_no', $stock_prd_no)->update($params);

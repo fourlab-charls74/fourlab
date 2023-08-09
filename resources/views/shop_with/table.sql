@@ -113,6 +113,7 @@ CREATE TABLE `product_stock_order_product` (
   `cost` decimal(10,0) DEFAULT NULL COMMENT '원가',
   `state` int(11) DEFAULT NULL COMMENT '상태(입고대기(10)/입고처리중(20)/입고완료(30)/원가확정(40)/입고취소(-10)',
   `stock_date` varchar(8) DEFAULT NULL COMMENT '입고일자',
+  `comment` varchar(255) DEFAULT NULL COMMENT '메모',
   `id` varchar(8) DEFAULT NULL COMMENT '작성자',
   `rt` datetime DEFAULT NULL COMMENT '등록일',
   `ut` datetime DEFAULT NULL COMMENT '최근수정일',
