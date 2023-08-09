@@ -63,14 +63,30 @@
                             </div>
                         </div>
 					</div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="ord_no">주문번호</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='ord_no' id="ord_no" value=''>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="good_types">판매채널/매장구분</label>
+							<div class="d-flex align-items-center">
+								<div class="flex_box w-100">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<option value=''>전체</option>
+										@foreach ($store_channel as $sc)
+											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+										@endforeach
+									</select>
+								</div>
+								<span class="mr-2 ml-2">/</span>
+								<div class="flex_box w-100">
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<option value=''>전체</option>
+										@foreach ($store_kind as $sk)
+											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="store_no">주문매장</label>
@@ -384,6 +400,14 @@
                             </div>
                         </div>
                     </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="ord_no">주문번호</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='ord_no' id="ord_no" value=''>
+							</div>
+						</div>
+					</div>
                 </div>
             </div>
 		</div>
@@ -520,6 +544,9 @@
         @endif
 
         Search();
+
+		// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
+		load_store_channel();
     });
 
 	function Search() {

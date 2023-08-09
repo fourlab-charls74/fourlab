@@ -131,7 +131,9 @@ class ord01Controller extends Controller
             'on_off_yn'         => $on_off_yn,
             's_item'            => $item,
             'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
-			'pr_codes'		=> SLib::getCodes('PR_CODE')
+			'pr_codes'		=> SLib::getCodes('PR_CODE'),
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
         return view(Config::get('shop.store.view') . '/order/ord01', $values);
@@ -239,6 +241,8 @@ class ord01Controller extends Controller
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sale_form      = $request->input('sale_form', '');
         $sell_type      = $request->input('sell_type');
+		$store_channel		= $request->input("store_channel");
+		$store_channel_kind	= $request->input("store_channel_kind");
 
         if ($page < 1 or $page == '') $page = 1;
 
@@ -396,6 +400,10 @@ class ord01Controller extends Controller
 			$where	.= ")";
 		}
 
+		// 판매채널/매장구분 검색
+		if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+
         // ordreby
         $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
@@ -518,6 +526,7 @@ class ord01Controller extends Controller
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                     left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+					inner join store store on store.store_cd = o.store_cd
                 where 1=1 $where
                 $orderby
                 $limit
@@ -569,6 +578,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+                	inner join store store on store.store_cd = o.store_cd
                 where 1=1 $where
             ";
 
