@@ -207,7 +207,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>정상가</th>
+											<th class="required">정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
@@ -549,6 +549,12 @@
 		if (f1.wonga.value.trim() === '') {
 			f1.wonga.focus();
 			return alert("원가를 입력해주세요.");
+		}
+
+		// 정상가 입력여부
+		if (f1.price.value.trim() === '') {
+			f1.price.focus();
+			return alert("정상가를 입력해주세요.");
 		}
 
 		return true;

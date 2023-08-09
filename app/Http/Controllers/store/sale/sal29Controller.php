@@ -115,6 +115,12 @@ class sal29Controller extends Controller
 				, psr.prd_cd as prd_cd
 				, pc.color
 				, c.code_val as color_nm
+			    , (
+                    select s.size_cd from size s
+                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                        and s.size_cd = pc.size
+                        and use_yn = 'Y'
+                ) as size
 				, date_format(psr.exp_dlv_day,'%Y-%m-%d') as baebun_date
 				, psr.rel_order as rel_baebun
 				, concat(psr.exp_dlv_day, '_', psr.rel_order) as rel_order
@@ -133,20 +139,31 @@ class sal29Controller extends Controller
             ";
 
 		$rows = DB::select($sql);
-
+		
+		
+//		$sql = "
+//			select 
+//				distinct(s.size_cd)
+//				, s.size_kind_cd
+//			from size s
+//				inner join product_code pc on pc.size = s.size_cd
+//				left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd
+//			where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+//				and s.size_cd = pc.size
+//				and use_yn = 'Y'
+//			order by s.size_seq
+//		";
+		
 		$sql = "
-			select 
-				s.size_cd
-				, s.size_nm
-			from size s
-				inner join product_code pc on pc.size = s.size_cd
-			where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-				and s.size_cd = pc.size
-				and use_yn = 'Y'
+			select
+				size_kind_cd
+				, size_cd
+				, size_seq
+			from size
+			where use_yn = 'Y'
 		";
 
 		$sizes = DB::select($sql);
-			
 		
 
 		return response()->json([

@@ -200,30 +200,30 @@
                         <div class="form-group">
                             <label>주문구분</label>
                             <div class="form-inline form-check-box">
-                                <!-- <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5" checked>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5">
                                     <label class="custom-control-label" for="ord_type_5">교환</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4">
                                     <label class="custom-control-label" for="ord_type_4">예약</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3">
                                     <label class="custom-control-label" for="ord_type_3">특별주문</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13">
                                     <label class="custom-control-label" for="ord_type_13">도매주문</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12">
                                     <label class="custom-control-label" for="ord_type_12">서비스</label>
                                 </div>
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17" checked>
+                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17">
                                     <label class="custom-control-label" for="ord_type_17">기관납품</label>
-                                </div> -->
+                                </div>
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input ord_type" name="ord_type[7]" id="ord_type_15" value="15" checked>
                                     <label class="custom-control-label" for="ord_type_15">정상</label>
@@ -458,126 +458,126 @@
         //         },
         //     ]
         // },
-        // {
-        //     headerName: '판매',
-        //     children: [{
-        //             headerName: "수량",
-        //             field: "qty_30",
-        //             type: 'numberType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "적립금",
-        //             field: "point_amt_30",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "할인",
-        //             field: "dc_amt_30",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "쿠폰",
-        //             field: "coupon_amt_30",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "수수료",
-        //             field: "fee_amt_30",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "결제금액",
-        //             field: "recv_amt_30",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //     ]
-        // },
-        // {
-        //     headerName: '교환',
-        //     children: [{
-        //             headerName: "수량",
-        //             field: "qty_60",
-        //             type: 'numberType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "적립금",
-        //             field: "point_amt_60",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "할인",
-        //             field: "dc_amt_60",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "쿠폰",
-        //             field: "coupon_amt_60",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "수수료",
-        //             field: "fee_amt_60",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "결제금액",
-        //             field: "recv_amt_60",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //     ]
-        // },
-        // {
-        //     headerName: '환불',
-        //     children: [{
-        //             headerName: "수량",
-        //             field: "qty_61",
-        //             type: 'numberType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "적립금",
-        //             field: "point_amt_61",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "할인",
-        //             field: "dc_amt_61",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "쿠폰",
-        //             field: "coupon_amt_61",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "수수료",
-        //             field: "fee_amt_61",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //         {
-        //             headerName: "결제금액",
-        //             field: "recv_amt_61",
-        //             type: 'currencyType',
-        //             aggregation: true
-        //         },
-        //     ]
-        // },
+        {
+            headerName: '판매',
+            children: [{
+                    headerName: "수량",
+                    field: "qty_30",
+                    type: 'numberType',
+                    aggregation: true
+                },
+                // {
+                //     headerName: "적립금",
+                //     field: "point_amt_30",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "할인",
+                //     field: "dc_amt_30",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "쿠폰",
+                //     field: "coupon_amt_30",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "수수료",
+                //     field: "fee_amt_30",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                {
+                    headerName: "결제금액",
+                    field: "recv_amt_30",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
+        {
+            headerName: '교환',
+            children: [{
+                    headerName: "수량",
+                    field: "qty_60",
+                    type: 'numberType',
+                    aggregation: true
+                },
+                // {
+                //     headerName: "적립금",
+                //     field: "point_amt_60",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "할인",
+                //     field: "dc_amt_60",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "쿠폰",
+                //     field: "coupon_amt_60",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "수수료",
+                //     field: "fee_amt_60",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                {
+                    headerName: "결제금액",
+                    field: "recv_amt_60",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
+        {
+            headerName: '환불',
+            children: [{
+                    headerName: "수량",
+                    field: "qty_61",
+                    type: 'numberType',
+                    aggregation: true
+                },
+                // {
+                //     headerName: "적립금",
+                //     field: "point_amt_61",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "할인",
+                //     field: "dc_amt_61",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "쿠폰",
+                //     field: "coupon_amt_61",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                // {
+                //     headerName: "수수료",
+                //     field: "fee_amt_61",
+                //     type: 'currencyType',
+                //     aggregation: true
+                // },
+                {
+                    headerName: "결제금액",
+                    field: "recv_amt_61",
+                    type: 'currencyType',
+                    aggregation: true
+                },
+            ]
+        },
         {
             width: "auto"
         }

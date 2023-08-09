@@ -435,11 +435,12 @@ class sal24Controller extends Controller
 			$sum_taxation	= $row->sum_taxation_amt;		//과세
 			$sum_tax		= $row->sum_tax_amt;			//세금
 
-			$sum_amt		= $sum_recv + $sum_point - $sum_fee;
-			$sum_taxfree	= $sum_amt -  $sum_taxation;
 
 			$sum_taxation_no_vat	= round($sum_taxation/1.1);		// 과세 부가세 별도
 			$vat = $sum_taxation - $sum_taxation_no_vat;			// 부가세
+			
+			$sum_amt		= $sum_recv + $sum_point - $sum_fee - $vat;
+			$sum_taxfree	= $sum_amt -  $sum_taxation;
 
 			$exp_pg_fee		= $row->exp_pg_fee;
 			$exp_point		= $sum_point;
@@ -484,21 +485,21 @@ class sal24Controller extends Controller
 				"dc_amt_30"		=> ($dc_amt_30) ? $dc_amt_30:0,
 				"coupon_amt_30"	=> ($coupon_amt_30) ? $coupon_amt_30:0,
 				"fee_amt_30"	=> ($fee_amt_30) ? $fee_amt_30:0,
-				"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30:0,
+				"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30 - $fee_amt_30:0,
 
 				"qty_60"		=> ($qty_60) ? $qty_60:0,
 				"point_amt_60"	=> ($point_amt_60) ? $point_amt_60:0,
 				"dc_amt_60"		=> ($dc_amt_60) ? $dc_amt_60:0,
 				"coupon_amt_60"	=> ($coupon_amt_60) ? $coupon_amt_60:0,
 				"fee_amt_60"	=> ($fee_amt_60) ? $fee_amt_60:0,
-				"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60:0,
+				"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60 - $fee_amt_60 :0,
 
 				"qty_61"		=> ($qty_61) ? $qty_61:0,
 				"point_amt_61"	=> ($point_amt_61) ? $point_amt_61:0,
 				"dc_amt_61"		=> ($dc_amt_61) ? $dc_amt_61:0,
 				"coupon_amt_61"	=> ($coupon_amt_61) ? $coupon_amt_61:0,
 				"fee_amt_61"	=> ($fee_amt_61) ? $fee_amt_61:0,
-				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61:0,
+				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61 - $fee_amt_61:0,
 			);
 
 			return $array;

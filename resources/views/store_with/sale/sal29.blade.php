@@ -195,6 +195,22 @@
 </style>
 
 <script>
+	class CustomHeader {
+		init(params) {
+			this.eGui = document.createElement('div');
+			this.eGui.classList.add('ag-cell-label-container');
+			this.eGui.classList.add('ag-header-cell-sorted-none');
+			this.eGui.innerHTML = `<span class="w-100 flex-center">${params.displayName.split(' ').join('<br/>')}</span>`;
+		}
+
+		getGui() {
+			return this.eGui;
+		}
+
+		refresh(params) {
+			return false;
+		}
+	}
 	const pinnedRowData = [{ store_cd : '합계', qty : 0 }];
 	const columns = [
 		{field: "baebun_type",	headerName: "배분구분", pinned:'left', width: 80, cellStyle: {'text-align' : 'center'},
@@ -226,8 +242,8 @@
 		},
 		{field: "color",	headerName: "컬러",	width: 80, cellStyle: {'text-align' : 'center'}},
 		{field: "color_nm",	headerName: "컬러명",	width: 100, cellStyle: {'text-align' : 'center'}},
+		{field: "size",	headerName: "사이즈",	width: 100, cellStyle: {'text-align' : 'center'}},
 		{field: "qty",	headerName: "수량",	width: 80, type: "currencyType", aggFunc : (params) => params.values.reduce((a,c) => a + (c * 1), 0)},
-		{field: "",	headerName: "",	width: "auto"}
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -250,6 +266,7 @@
 			suppressAggFuncInHeader: true,
 			enableRangeSelection: true,
 			animateRows: true,
+			headerHeight:300,
 		});
 	});
 
@@ -414,30 +431,27 @@
 
 
 	function setColumn(sizes) {
-		// if(!sizes) return;
-		// columns.splice(9);
+		if(!sizes) return;
+		columns.splice(9);
+		
+		let size_column = '';
 
-		// for(let i = 0; i < sizes.length; i++) {
-		// 	let size_cd = sizes[i].size_cd;
-		// 	let size_nm = sizes[i].size_nm;
-		// 	columns.push({
-		// 		field: size_cd,
-		// 		headerName: size_nm,
-		// 		children: [
-		// 			{field: cd + '_qty', headerName: '재고', type: "currencyType", width: 50,
-		// 				cellRenderer: function(params) {
-		// 					return params.data[cd + "_qty"] || 0;
-		// 				}
-		// 			},
-		// 			{field: cd + '_rel_qty', headerName: '배분수량', type: "currencyType", width: 80, valueFormatter: formatNumber,
-		// 				editable : (params) => params.node.rowPinned === 'top' ? false : true,
-		// 				cellStyle : (params) => params.node.rowPinned === 'top' ? {} : {'background-color' : '#ffff99'}
-		// 			},
-		// 		],
-		// 	});
-		// }
-		// columns.push({ width: "auto" });
-		// gx.gridOptions.api.setColumnDefs(columns);
+		for (let i = 0; i < sizes.length; i++) {
+			let size_cd = sizes[i].size_cd;
+			let size_kind_cd = sizes[i].size_kind_cd;
+			let size_seq = sizes[i].size_seq;
+			
+			size_column += size_cd + ' ';
+		}
+
+		if (size_column.length > 0) {
+			size_column = size_column.trim();
+		}
+		
+		columns.push({field:"" , headerName: size_column , width:100,  headerComponent: CustomHeader},);
+		columns.push({field:"" , headerName: size_column , width:100,  headerComponent: CustomHeader},);
+		columns.push({width: "auto"});
+		gx.gridOptions.api.setColumnDefs(columns);
 	}
 		
 
