@@ -196,8 +196,9 @@ class prd02Controller extends Controller
 						, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd1
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
-						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-						, (g.price-g.wonga) as margin_amt
+						-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+					    , ps.wonga
+						, (if(pc.goods_no = 0, p.price, g.price) - ps.wonga) as margin_amt
 						, ps.wqty
 						, (ps.qty - ps.wqty) as sqty
 					from product_code pc
@@ -252,9 +253,10 @@ class prd02Controller extends Controller
 				, (ps.qty - ps.wqty) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
-				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-				, (100/(g.price/(g.price-g.wonga))) as margin_rate
-				, (g.price-g.wonga) as margin_amt
+				-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+				, ps.wonga
+				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - g.wonga))) as margin_rate
+				, (if(pc.goods_no = 0, p.price, g.price) - ps.wonga) as margin_amt
 				, g.org_nm
 				, com.com_nm
 				, g.reg_dm
