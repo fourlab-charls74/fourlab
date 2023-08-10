@@ -259,7 +259,7 @@
         let sale_type = document.getElementById("sale_type");
         $(sale_type).find("option").remove();
         sale_types.forEach((type, key) => {
-            if((isJsGoods && type.sale_apply === 'tag') || (!isJsGoods && ((type.amt_kind == 'per' && type.sale_per >= 0) || (type.amt_kind == 'amt' && type.sale_amt >= 0)))) {
+            if(isJsGoods || (!isJsGoods && type.sale_apply === 'price' && ((type.amt_kind == 'per' && type.sale_per >= 0) || (type.amt_kind == 'amt' && type.sale_amt >= 0)))) {
 				if (!type.brands || (type.brands?.split(',') || []).includes(goods.brand)) {
                     sale_type[sale_type.options.length] = new Option(type.sale_type_nm, type.sale_kind);
 				}
@@ -383,7 +383,7 @@
         let list = gx.getRows();
 
         let goods_sh = list.reduce((a, c) => a + (c.goods_sh * c.qty), 0);
-		let dc_amt = list.reduce((a, c) => a + ((c.ori_price - c.price) * c.qty) + (c.coupon_discount_amt || 0), 0);
+		let dc_amt = list.reduce((a, c) => a + ((c.goods_sh - c.price) * c.qty) + (c.coupon_discount_amt || 0), 0);
         let order_price = list.reduce((a, c) => a + c.total, 0);
         let order_qty = list.reduce((a, c) => a + c.qty, 0);
         let card_amt = $("[name=card_amt]").val() * 1;
