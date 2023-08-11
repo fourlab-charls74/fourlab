@@ -72,12 +72,7 @@ class sal25Controller extends Controller
 
         // 매장검색
 		if ( $store_cd != "" ) {
-			$where	.= " and (1!=1";
-			foreach($store_cd as $store_cd) {
-				$where .= " or o.store_cd = '$store_cd' ";
-
-			}
-			$where	.= ")";
+			$where	.= " and o.store_cd = '$store_cd' ";
 		}
 
 		//판매유형 검색
@@ -254,6 +249,7 @@ class sal25Controller extends Controller
             $row["margin"] = $row["sum_amt"]? round((1 - $row["sum_wonga"]/$row["sum_amt"])*100, 2):0;
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
             $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
+            $row["sum_wonga"] = $row["sum_wonga"] * 1;
 
             $result[] = $row;
         }

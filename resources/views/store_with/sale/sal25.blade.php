@@ -96,7 +96,7 @@
                             <label>매장명</label>
                             <div class="form-inline inline_btn_box">
                                 <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
+                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
@@ -128,20 +128,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-inputCity">품목</label>
-                            <div class="flax_box">
-                                <select name='item' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($items as $item)
-                                    <option value='{{ $item->cd }}'>{{ $item->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row">
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="">온라인/오프라인</label>
+			                <div class="form-inline form-radio-box">
+				                <div class="custom-control custom-radio">
+					                <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" checked>
+					                <label class="custom-control-label" for="on_off_all" value="">전체</label>
+				                </div>
+				                <div class="custom-control custom-radio">
+					                <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
+					                <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
+				                </div>
+				                <div class="custom-control custom-radio">
+					                <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input">
+					                <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">브랜드</label>
@@ -161,6 +167,19 @@
                     </div>
                 </div>
                 <div class="search-area-ext d-none row">
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="formrow-inputCity">품목</label>
+			                <div class="flax_box">
+				                <select name='item' class="form-control form-control-sm">
+					                <option value=''>전체</option>
+					                @foreach ($items as $item)
+						                <option value='{{ $item->cd }}'>{{ $item->val }}</option>
+					                @endforeach
+				                </select>
+			                </div>
+		                </div>
+	                </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
@@ -196,85 +215,66 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>주문구분</label>
-                            <div class="form-inline form-check-box">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5">
-                                    <label class="custom-control-label" for="ord_type_5">교환</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4">
-                                    <label class="custom-control-label" for="ord_type_4">예약</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3">
-                                    <label class="custom-control-label" for="ord_type_3">특별주문</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13">
-                                    <label class="custom-control-label" for="ord_type_13">도매주문</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12">
-                                    <label class="custom-control-label" for="ord_type_12">서비스</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17">
-                                    <label class="custom-control-label" for="ord_type_17">기관납품</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[7]" id="ord_type_15" value="15" checked>
-                                    <label class="custom-control-label" for="ord_type_15">정상</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[6]" id="ord_type_14" value="14" checked>
-                                    <label class="custom-control-label" for="ord_type_14">수기</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input ord_type" name="ord_type[8]" id="ord_type_16" value="16" checked>
-                                    <label class="custom-control-label" for="ord_type_16">오픈마켓</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="">온라인/오프라인</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="on_off_all" value="">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
-                                    <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input">
-                                    <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="formrow-email-input">매출시점</label>
+			                <div class="form-inline form-radio-box">
+				                <div class="custom-control custom-radio">
+					                <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" checked />
+					                <label class="custom-control-label" for="ord_state10">출고요청</label>
+				                </div>
+				                <div class="custom-control custom-radio">
+					                <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" />
+					                <label class="custom-control-label" for="ord_state30">출고완료</label>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-email-input">매출시점</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" checked />
-                                    <label class="custom-control-label" for="ord_state10">출고요청</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" />
-                                    <label class="custom-control-label" for="ord_state30">출고완료</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label>주문구분</label>
+			                <div class="form-inline form-check-box">
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5">
+					                <label class="custom-control-label" for="ord_type_5">교환</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4">
+					                <label class="custom-control-label" for="ord_type_4">예약</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3">
+					                <label class="custom-control-label" for="ord_type_3">특별주문</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13">
+					                <label class="custom-control-label" for="ord_type_13">도매주문</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12">
+					                <label class="custom-control-label" for="ord_type_12">서비스</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17">
+					                <label class="custom-control-label" for="ord_type_17">기관납품</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[7]" id="ord_type_15" value="15" checked>
+					                <label class="custom-control-label" for="ord_type_15">정상</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[6]" id="ord_type_14" value="14" checked>
+					                <label class="custom-control-label" for="ord_type_14">수기</label>
+				                </div>
+				                <div class="custom-control custom-checkbox">
+					                <input type="checkbox" class="custom-control-input ord_type" name="ord_type[8]" id="ord_type_16" value="16" checked>
+					                <label class="custom-control-label" for="ord_type_16">오픈마켓</label>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
                 </div>
             </div>
         </div>
@@ -327,7 +327,7 @@
         </ul>
     </div>
 </div>
-<script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
+<script src="https://unpkg.com/ag-charts-community@8.0.6/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
     var columns = [{
             headerName: "일자",
@@ -336,21 +336,8 @@
             cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
                 if(params.value === '합계' || params.value === '평균') return params.value;
-                let s_ord_type = $(".ord_type:checked").map(function() {return this.value;}).get().join(",");
-                let s_ord_state = $('[name=ord_state]:checked').val();
-                let s_item = $("[name=item]").val();
-                let s_brand = $(".select2-brand").val()??'';
-                let s_prd_nm = $("[name=goods_nm]").val();
-                let s_stat_pay_type = $(".stat_pay_type:checked").map(function() {return this.value;}).get().join(",");
-                let store_cd = $('.select2-store').val();
-                let sell_type = $('#sell_type').val();
-                let pr_code = $('#pr_code').val();
-                let on_off_yn = $('[name=on_off_yn]:checked').val();
-                let store_channel = $('#store_channel').val()??'';
-                let store_channel_kind = $('#store_channel_kind').val()??'';
-                let prd_cd_range = $('#prd_cd_range').val()??'';
-
-				return '<a href="/store/sale/sal24?sdate='+ params.data.date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_prd_nm + '&stat_pay_type='+ s_stat_pay_type + '&store_cd=' + store_cd + '&sell_type=' + sell_type + '&pr_code=' + pr_code + '&on_off_yn='+ on_off_yn + '&store_channel=' + store_channel + '&store_channel_kind=' + store_channel_kind + '" target="_new">' + params.value+'</a>';
+				let form_data = $('form[name="search"]').serialize();
+				return `<a href="/store/sale/sal24?${form_data}&sdate=${params.data.date || ''}" target="_new">${params.value}</a>`;
 			},
             pinned: 'left',
             aggSum: "합계",
@@ -662,26 +649,38 @@
             row.chart_x_str = row.date;
         });
 
-        var options = {
+        const chart_options = {
             container: document.getElementById('opt_chart'),
-            title: {
-                text: "월별 매출 통계",
-            },
+            title: { text: "월별 매출 통계" },
             data: chart_data,
-            series: [{
-                type: 'column',
-                xKey: 'chart_x_str',
-                yKeys: ['sum_amt', 'sum_wonga'],
-                yNames: [' 매출액', '매출원가'],
-                grouped: true,
-                fills: ['#556ee6', '#2797f6'],
-                strokes: ['#556ee6', '#2797f6']
-                // highlightStyle : {
-                //   fill :
-                // }
-            }],
+			theme: {
+				palette: {
+					fills: ['#556ee6', '#2797f6'],
+					strokes: ['#556ee6', '#2797f6'],
+				},
+			},
+			legend: { position: 'right' },
+	        series: [
+				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_amt', yName: '매출액',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_wonga', yName: '매출원가',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+	        ],
+			axes: [
+				{ type: 'category', position: 'bottom' },
+				{ type: 'number', position: 'left', 
+					label: { formatter: (params) => Comma(params.value) },
+					tick: { maxSpacing: 20 }
+				},
+			],
         };
-        agCharts.AgChart.create(options);
+        agCharts.AgChart.create(chart_options);
     }
 
     function drawCanvasByTime() {
