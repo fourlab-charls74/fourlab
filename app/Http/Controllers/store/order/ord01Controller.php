@@ -23,121 +23,72 @@ class ord01Controller extends Controller
 {
     public function index(Request $request)
 	{
-        $date = $request->input('date');
-        $sell_type = $request->input('sell_type');
-        $store_cd = $request->input('store_cd', '');
-        $pr_code = $request->input('pr_code');
-        $goods_nm = $request->input('goods_nm');
-        $on_off_yn = $request->input('on_off_yn');
-        $item = $request->input('item');
+		$sdate = now()->sub(1, 'week')->format('Y-m-d');
+		$edate = date('Y-m-d');
 
+		$date = $request->input('date', '');
+		if ($date != '') {
+			$sdate = date('Y-m-d', strtotime($date));
+			$edate = date('Y-m-d', strtotime($date));
+		}
 
-        $pr_code_arr = explode(",", $pr_code);
-        $sell_type_arr = explode(",", $sell_type);
+		$pr_code 			= $request->input('pr_code', []);
+		$sell_type 			= $request->input('sell_type', []);
+		$stat_pay_type 		= $request->input('stat_pay_type', []);
+		$ord_type 			= $request->input('ord_type', []);
+		$ord_state 			= $request->input('ord_state', '');
+		$item 				= $request->input('item', '');
+		$brand_cd 			= $request->input('brand_cd', '');
+		$goods_nm 			= $request->input('goods_nm', '');
+		$store_cd 			= $request->input('store_no', '');
+		$on_off_yn 			= $request->input('on_off_yn', '');
+		$store_channel 		= $request->input('store_channel', '');
+		$store_channel_kind = $request->input('store_channel_kind', '');
+		$prd_cd_range_text 	= $request->query("prd_cd_range", '');
+		$prd_cd_range_nm 	= $request->query("prd_cd_range_nm", '');
+		parse_str($prd_cd_range_text, $prd_cd_range);
 
-        $conf = new Conf();
+		$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
+		$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());
+		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
+		$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
+		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
+		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+
+		$conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
 
-        $todate = strtotime($date);
-        $todate = date('Y-m-d', $todate);
-
-        if($date == '') {
-            $sdate = now()->sub(1, 'week')->format('Y-m-d');
-            $edate = date("Y-m-d");
-        } else {
-            $sdate = $todate;
-            $edate = $todate;
-        }
-
-        // 행사코드 쿼리스트링 받아온값을 보내주는 부분
-        $pr_code_str = "";
-        foreach($pr_code_arr as $pc) {
-            $pr_code_str .= "'$pc',";
-        }
-
-        $pr_code = substr($pr_code_str,0,-1);
-
-        $sql = "
-            select
-                code_id, code_val
-            from code
-            where code_kind_cd = 'PR_CODE'
-            and code_id in ( $pr_code )
-        ";
-
-        $result = DB::select($sql);
-
-        $str = "";
-        $str2 = "";
-        foreach($result as $r){
-            $str .= $r->code_id.",";
-            $str2 .= $r->code_val.",";
-        }
-
-        $str = substr($str,0,-1);
-        $str2 = substr($str2,0,-1);
-
-        //판매유형 쿼리스트링 받아온값을 보내주는 부분
-        $sell_type_str = "";
-        foreach($sell_type_arr as $st) {
-            $sell_type_str .= "'$st',";
-        }
-
-        $sell_type = substr($sell_type_str,0,-1);
-
-        $sql = "
-            select
-                code_id, code_val
-            from code
-            where code_kind_cd = 'sale_kind'
-            and code_id in ( $sell_type )
-        ";
-
-        $result = DB::select($sql);
-
-        $sell_str = "";
-        $sell_str2 = "";
-        foreach($result as $r){
-            $sell_str .= $r->code_id.",";
-            $sell_str2 .= $r->code_val.",";
-        }
-
-        $sell_str = substr($sell_str,0,-1);
-        $sell_str2 = substr($sell_str2,0,-1);
-
-        $brand = $request->input('brand');
-
 		$values = [
-            'sdate'             => $sdate,
-            'edate'             => $edate,
-            'style_no'          => '',
-            'domain'		    => $domain,
-            'ord_states'        => SLib::getordStates(), // 주문상태
-            'clm_states'        => SLib::getCodes('G_CLM_STATE'), // 클레임상태
-            'stat_pay_types'    => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
-            'ord_types'         => SLib::getCodes('G_ord_TYPE'), // 주문구분
-            'ord_kinds'         => SLib::getCodes('G_ord_KIND'), // 출고구분
-            'goods_stats'	    => SLib::getCodes('G_GOODS_STAT'), // 상품상태
-			'items'			    => SLib::getItems(), // 품목
-            'sale_kinds'        => SLib::getUsedSaleKinds(),
-            'store'             => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),
-            'sell_type'         => $sell_type,
-            'pr_code_id'        => $str,
-            'pr_code_val'       => $str2,
-            'sell_type_id'      => $sell_str,
-            'sell_type_val'     => $sell_str2,
-            'brand'             => $brand,
-            'goods_nm'          => $goods_nm,
-            'on_off_yn'         => $on_off_yn,
-            's_item'            => $item,
-            'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
+			'sdate' 		=> $sdate,
+			'edate' 		=> $edate,
+			'domain'		=> $domain,
+			'ord_states'    => SLib::getordStates(), // 주문상태
+			'clm_states'    => SLib::getCodes('G_CLM_STATE'), // 클레임상태
+			'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
+			'ord_types'     => SLib::getCodes('G_ORD_TYPE'), // 주문구분
+			'ord_kinds'     => SLib::getCodes('G_ORD_KIND'), // 출고구분
+			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
+			'items' 		=> SLib::getItems(),
+			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
+			'stat_pay_type'	=> $stat_pay_type,
+			'ord_type'		=> $ord_type,
+			'ord_state'		=> $ord_state,
+			'item'			=> $item,
+			'brand'			=> $brand,
+			'goods_nm'		=> $goods_nm,
+			'on_off_yn'		=> $on_off_yn,
+			'pr_code_ids'	=> $pr_code_ids,
+			'sell_type_ids'	=> $sell_type_ids,
+			'p_store_channel' => $store_channel,
+			'p_store_kind' 	=> $store_channel_kind,
+			'store'			=> $store,
+			'prd_cd_range'	=> $prd_cd_range,
+			'prd_cd_range_nm' => $prd_cd_range_nm,
 		];
-
-        return view(Config::get('shop.store.view') . '/order/ord01', $values);
-
+		return view(Config::get('shop.store.view') . '/order/ord01', $values);
 	}
 
 

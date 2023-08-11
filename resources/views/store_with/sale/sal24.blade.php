@@ -95,7 +95,7 @@
                         <div class="form-group">
                             <label>매장명</label>
                             <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
+                                <input type='hidden' id="store_nm" name="store_nm" value="{{ @$store->store_nm }}">
                                 <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 27px;"></i></a>
                             </div>
@@ -350,19 +350,9 @@
     const columns = [
 		{headerName: "일자", field: "date", width: 100, cellClass: 'hd-grid-code', pinned: 'left', aggSum: "합계", aggAvg: "평균",
             cellRenderer:function(params) {
-                let store_cd = $('.select2-store').val();
-                let sell_type = $('#sell_type').val();
-                let pr_code = $('#pr_code').val();
-                let brand = $('.select2-brand').val()??'';
-                let goods_nm = $('#goods_nm').val();
-                let on_off_yn = $('[name=on_off_yn]:checked').val();
-                let item = $('#item').val();
-
-                if (params.value != '합계' && params.value != '평균') {
-                    return "<a href='/store/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "&goods_nm=" + goods_nm + "&on_off_yn=" + on_off_yn + "&item=" + item + "'>"+ params.value +"</a>";
-                } else {
-                    return params.value;
-                }
+				if(params.value === '합계' || params.value === '평균') return params.value;
+				let form_data = $('form[name="search"]').serialize();
+				return `<a href="/store/order/ord01?${form_data}&date=${params.data.date || ''}" target="_blank">${params.value}</a>`;
             }
         },
         {headerName: '매출액구분',
@@ -465,16 +455,6 @@
 
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
         load_store_channel();
-
-        // 판매유형 다중검색
-        $( ".sch-sellType" ).on("click", function() {
-            searchSellType.Open(null, "multiple");
-        });
-      
-        // 행사코드 다중검색
-        $( ".sch-prcode" ).on("click", function() {
-            searchPrCode.Open(null, "multiple");
-        });
 
 		$("#date-tab").click(function() {
 			$("#chart-type").val('date');

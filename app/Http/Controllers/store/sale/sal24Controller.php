@@ -53,8 +53,6 @@ class sal24Controller extends Controller
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
-			'pr_code'		=> $pr_code,
-			'sell_type'		=> $sell_type,
 			'stat_pay_type'	=> $stat_pay_type,
 			'ord_type'		=> $ord_type,
 			'ord_state'		=> $ord_state,
