@@ -267,7 +267,7 @@
     let all_date = getDatesStartToLast(sdate, edate);
 
     let labels = [];
-    for (let i=0;i<all_date.length;i++) {
+    for (let i=1;i<all_date.length;i++) {
         labels.push(all_date[i]);
     }
 

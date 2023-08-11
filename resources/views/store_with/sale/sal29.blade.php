@@ -231,8 +231,8 @@
 		},
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
 		{field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
-		{field: "prd_cd",	headerName: "바코드",	width: 150, cellStyle: {'text-align' : 'center'}},
-		{field: "goods_nm",	headerName: "상품명", width: 200,
+		{field: "prd_cd",	headerName: "바코드", width: 150, pinned:'left', cellStyle: {'text-align' : 'center'}},
+		{field: "goods_nm",	headerName: "상품명", width: 200, pinned:'left',
 			cellRenderer: function (params) {
 				if (params.value !== undefined) {
 					if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
@@ -240,10 +240,11 @@
 				}
 			}
 		},
-		{field: "color",	headerName: "컬러",	width: 80, cellStyle: {'text-align' : 'center'}},
-		{field: "color_nm",	headerName: "컬러명",	width: 100, cellStyle: {'text-align' : 'center'}},
-		{field: "size",	headerName: "사이즈",	width: 100, cellStyle: {'text-align' : 'center'}},
-		{field: "qty",	headerName: "수량",	width: 80, type: "currencyType", aggFunc : (params) => params.values.reduce((a,c) => a + (c * 1), 0)},
+		{field: "color",	headerName: "컬러", pinned:'left', width: 80, cellStyle: {'text-align' : 'center'}},
+		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100, cellStyle: {'text-align' : 'center'}},
+		{field: "size",	headerName: "사이즈", pinned:'left', width: 100, cellStyle: {'text-align' : 'center'}},
+		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc : (params) => params.values.reduce((a,c) => a + (c * 1), 0)},
+		{ width : 'auto'}
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -266,7 +267,7 @@
 			suppressAggFuncInHeader: true,
 			enableRangeSelection: true,
 			animateRows: true,
-			headerHeight:300,
+			headerHeight:100,
 		});
 	});
 
@@ -322,8 +323,6 @@
 	function openApi() {
         document.getElementsByClassName('sch-baebun')[0].click();
     }
-
-
 
 
 
@@ -432,27 +431,45 @@
 
 	function setColumn(sizes) {
 		if(!sizes) return;
-		columns.splice(9);
-		
-		let size_column = '';
+		columns.splice(10);
 
+		let last_seq = sizes[sizes.length -1].size_seq;
+		let size_column = '';
+		
 		for (let i = 0; i < sizes.length; i++) {
-			let size_cd = sizes[i].size_cd;
-			let size_kind_cd = sizes[i].size_kind_cd;
+
+			let size = sizes[i].size;
 			let size_seq = sizes[i].size_seq;
-			
-			size_column += size_cd + ' ';
+
+			if (i > 0 && size_seq !== sizes[i - 1].size_seq) {
+				size_column += '/ ';
+			}
+			size_column += size + ' ';
 		}
+		
+		let col_size = size_column.split(' / ')
+		
+		let seq = 1;
+		for ( let i=0; i<col_size.length;i++) {
+			columns.push({field: col_size[i].trim(), headerName: col_size[i] , type: "currencyType" ,width:40,  headerComponent: CustomHeader});
+			seq++;
+		}
+		
+			columns.push({width: 'auto'});
 
 		if (size_column.length > 0) {
 			size_column = size_column.trim();
 		}
 		
-		columns.push({field:"" , headerName: size_column , width:100,  headerComponent: CustomHeader},);
-		columns.push({field:"" , headerName: size_column , width:100,  headerComponent: CustomHeader},);
-		columns.push({width: "auto"});
+		// getColumnNames();
+		
 		gx.gridOptions.api.setColumnDefs(columns);
 	}
+
+	
+	// const getColumnNames = () => {
+	// 	const columnNames = columns.map(column => column.headerName);
+	// }
 		
 
 </script>

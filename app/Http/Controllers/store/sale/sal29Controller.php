@@ -35,8 +35,8 @@ class sal29Controller extends Controller
 		$where = "";
 		$where2 = "";
 
-		if ($rel != "") $where .= " and psr.rel_order= '" .Lib::quote($rel) . "'";
-		if ($baebun_date != "") $where .= " and psr.exp_dlv_day='$baebun_date'";
+		if ($rel != "") $where .= " and psr.rel_order = '" .Lib::quote($rel) . "'";
+		if ($baebun_date != "") $where .= " and psr.exp_dlv_day ='$baebun_date'";
 
 		if( $baebun_type != "" ){
 			$baebun_type_where	= "";
@@ -53,6 +53,38 @@ class sal29Controller extends Controller
 		} else {
 			$where2	.= " and ( psr.type < 0 ) ";
 		}
+		
+		$sql = "
+			select 
+				distinct psr.prd_cd
+				, psr.qty
+				, s.size_cd
+				, psr.store_cd
+				, s.size_seq
+			from product_stock_release psr
+				inner join product_code pc on pc.prd_cd = psr.prd_cd
+				inner join size s on s.size_cd = pc.size
+			where 1=1 $where
+			order by s.size_seq, psr.store_cd
+		";
+		
+		$size_val = DB::select($sql);
+		
+		
+		$size_sql = "";
+		for ($i=0; $i<count($size_val); $i++) {
+			$prd_cd = $size_val[$i]->prd_cd;
+			$store_cd = $size_val[$i]->store_cd;
+			$qty = $size_val[$i]->qty;
+			$size_cd = $size_val[$i]->size_cd;
+			$size_seq = $size_val[$i]->size_seq;
+
+			$size_sql .= ", if(psr.prd_cd = '$prd_cd' and psr.store_cd = '$store_cd', $qty, '') as `$size_cd`";
+			
+		}
+		
+		
+		
 
 		$limit	= 100;
 		$page	= $request->input("page", 1);
@@ -116,7 +148,9 @@ class sal29Controller extends Controller
 				, pc.color
 				, c.code_val as color_nm
 			    , (
-                    select s.size_cd from size s
+                    select 
+						s.size_cd 
+                    from size s
                     where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
                         and s.size_cd = pc.size
                         and use_yn = 'Y'
@@ -127,6 +161,7 @@ class sal29Controller extends Controller
 				, psr.qty as qty
 				, g.goods_nm
 				, g.goods_no
+				$size_sql
 			from product_stock_release psr
 				inner join storage storage on storage.storage_cd = psr.storage_cd
 				inner join store store on store.store_cd = psr.store_cd
@@ -137,7 +172,7 @@ class sal29Controller extends Controller
 			where 1=1 $where $where2
 			order by store.store_cd desc, psr.prd_cd desc
             ";
-
+		
 		$rows = DB::select($sql);
 		
 		
@@ -156,16 +191,25 @@ class sal29Controller extends Controller
 		
 		$sql = "
 			select
-				size_kind_cd
-				, size_cd
-				, size_seq
-			from size
-			where use_yn = 'Y'
+				(
+					select
+						s.size_cd
+					from size s
+					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+					and s.size_cd = pc.size
+					and use_yn = 'Y'
+				) as size
+				, s.size_seq
+			from product_stock_release psr
+				inner join product_code pc on pc.prd_cd = psr.prd_cd
+				inner join size s on s.size_cd = pc.size
+			where 1=1 $where
+			group by size
+			order by s.size_seq asc
 		";
-
+		
 		$sizes = DB::select($sql);
 		
-
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
@@ -202,7 +246,7 @@ class sal29Controller extends Controller
                 , concat(psr.exp_dlv_day, '_', psr.rel_order) as rel_order
                 , sum(psr.qty) as baebun_qty
                 , psr.state as state
-                , count(*) as store_cnt
+                , count(distinct store.store_cd) as store_cnt
                 , '선택' as select_rows
             from product_stock_release psr
                 inner join storage storage on storage.storage_cd = psr.storage_cd
