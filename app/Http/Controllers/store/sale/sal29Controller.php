@@ -54,6 +54,117 @@ class sal29Controller extends Controller
 			$where2	.= " and ( psr.type < 0 ) ";
 		}
 		
+		// 해당사이즈 조회 (FREE + 해당사이즈)
+		$sql = "
+			select s.size_kind_cd, s.size_cd, s.size_seq
+			from product_stock_release psr
+				inner join product_code pc on pc.prd_cd = psr.prd_cd
+				left outer join size s on s.size_kind_cd = if(
+				    pc.size_kind <> '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', '')))
+				) and s.size_cd = pc.size
+			where s.size_cd <> '99' $where $where2
+			group by s.size_kind_cd, s.size_cd
+			order by s.size_kind_cd, s.size_seq
+		";
+		$free_size = DB::select(
+			"select size_kind_cd, size_cd, size_seq from size where size_kind_cd = :size_kind_cd and size_cd = :size_cd", 
+			[ 'size_kind_cd' => 'FREE', 'size_cd' => '99' ],
+		);
+		$size_list = array_merge($free_size, DB::select($sql));
+		
+		$size_sql = "";
+		$size_sum_sql = "";
+		$size_group = [];
+
+		foreach ($size_list as $size) {
+			if ($size->size_kind_cd === 'FREE') {
+				$size_sql .= ", if(pc.size = '$size->size_cd', psr.qty, 0) as '" . $size->size_kind_cd . "^" . $size->size_cd . "'";
+				$size_group[$size->size_kind_cd] = [$size];
+			} else {
+				$size_sql .= ", if(pc.size_kind = '$size->size_kind_cd' and pc.size = '$size->size_cd', psr.qty, 0) as '" . $size->size_kind_cd . "^" . $size->size_cd . "'";
+				if (is_array($size_group[$size->size_kind_cd] ?? '')) array_push($size_group[$size->size_kind_cd], $size);
+				else $size_group[$size->size_kind_cd] = [$size];
+			}
+			$size_sum_sql .= ", sum(p.`" . $size->size_kind_cd . "^" . $size->size_cd . "`) as 'SIZE^" . $size->size_kind_cd . "^" . $size->size_cd . "'";
+		}
+
+		$max_group_length = max(array_map(function ($c) { return count($c); }, $size_group));
+		$size_group = array_map(function ($c) use ($max_group_length) {
+			return array_pad($c, $max_group_length, 0);
+		}, $size_group);
+
+		$size_cols = [];
+		foreach ($size_group as $key => $value) {
+			$cnt = 1;
+			foreach ($value as $k => $val) {
+				if ($key === 'FREE') {
+					if ($k >= count($size_group) - 1) continue;
+					if (!is_array($size_cols[0] ?? '')) $size_cols[0] = [$val];
+					else array_push($size_cols[0], $val);
+				} else {
+					if (is_array($size_cols[$cnt] ?? '')) array_push($size_cols[$cnt], $val);
+					else $size_cols[$cnt] = [$val];
+				}
+				$cnt++;
+			}
+		}
+
+		$sql = "
+			select a.*
+				, type.code_val as baebun_type
+			    , color.code_val as color_nm
+				, s.store_nm
+				, g.goods_nm
+			from (
+				select p.type, p.store_cd, p.prd_cd, p.prd_cd_p, p.goods_no, p.color, p.size_kind
+					, sum(p.qty) as qty
+					$size_sum_sql
+				from (
+					select psr.type, psr.store_cd, psr.prd_cd, psr.goods_no, psr.qty
+						, if(pc.prd_cd_p <> '', pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
+						, pc.color, pc.size, pc.size_kind
+						$size_sql
+					from product_stock_release psr
+						inner join product_code pc on pc.prd_cd = psr.prd_cd
+					where 1=1 $where $where2
+				) p
+					group by p.store_cd, p.prd_cd_p, p.color
+			) a
+				inner join store s on s.store_cd = a.store_cd
+				inner join code type on type.code_kind_cd = 'REL_TYPE' and type.code_id = a.type
+				left outer join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = a.color
+				left outer join goods g on g.goods_no = a.goods_no
+		";
+		$rows = DB::select($sql);
+
+		foreach ($rows as $row) {
+			$arr = array_filter((array) $row, function ($v, $k) use ($row) {
+				return str_contains($k, 'FREE') || str_contains($k, $row->size_kind);
+			}, ARRAY_FILTER_USE_BOTH);
+			
+			foreach ($size_cols as $index => $col) {
+				if ($index < 1 || in_array($row->size_kind, array_column($col, 'size_kind_cd'))) {
+					$key_object = array_values(array_filter($col, function ($c) use ($row) { 
+						return (($c->size_cd ?? '') === '99') || (($c->size_kind_cd ?? '') === $row->size_kind); 
+					}));
+					$key_object = $key_object[0] ?? [];
+					$row->{'SIZE_' . $index} = $arr['SIZE^' . ($key_object->size_kind_cd ?? '') . '^' . ($key_object->size_cd ?? '') ];
+				}
+			}
+		}
+
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total"	=> count($rows),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+				"sizes"	=> $size_cols,
+			],
+			"body" => $rows,
+		]);
+		
 		$sql = "
 			select 
 				distinct psr.prd_cd
@@ -252,7 +363,7 @@ class sal29Controller extends Controller
                 inner join storage storage on storage.storage_cd = psr.storage_cd
                 inner join store store on store.store_cd = psr.store_cd
             where 1=1 $where
-            group by rel_order
+            group by psr.exp_dlv_day, rel_order
             order by psr.exp_dlv_day desc, rel_baebun desc
         ";
 

@@ -200,7 +200,7 @@
 			this.eGui = document.createElement('div');
 			this.eGui.classList.add('ag-cell-label-container');
 			this.eGui.classList.add('ag-header-cell-sorted-none');
-			this.eGui.innerHTML = `<span class="w-100 flex-center">${params.displayName.split(' ').join('<br/>')}</span>`;
+			this.eGui.innerHTML = `<span class="w-100 d-flex flex-column align-items-center">${params.displayName.split(' / ').map(p => '<span style="height: 15px;">' + (p === 'empty' ? '' : p) + '</span>').join('')}</span>`;
 		}
 
 		getGui() {
@@ -212,12 +212,14 @@
 		}
 	}
 	const pinnedRowData = [{ store_cd : '합계', qty : 0 }];
+	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+
 	const columns = [
-		{field: "baebun_type",	headerName: "배분구분", pinned:'left', width: 80, cellStyle: {'text-align' : 'center'},
+		{field: "baebun_type",	headerName: "배분구분", pinned:'left', width: 80, cellClass: 'hd-grid-code',
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
 		},
-		{field: "store_cd",	headerName: "매장코드",	width: 80, pinned:'left', cellStyle: {'text-align' : 'center'},
+		{field: "store_cd",	headerName: "매장코드",	width: 80, pinned:'left', cellClass: 'hd-grid-code',
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: function(params) {
 				if (params.node.level == 0) {
@@ -229,9 +231,9 @@
 				}
 			}
 		},
+		{field: "store_nm", headerName: "매장명", rowGroup: true, hide: true},
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
-		{field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
-		{field: "prd_cd",	headerName: "바코드", width: 150, pinned:'left', cellStyle: {'text-align' : 'center'}},
+		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left', cellClass: 'hd-grid-code'},
 		{field: "goods_nm",	headerName: "상품명", width: 200, pinned:'left',
 			cellRenderer: function (params) {
 				if (params.value !== undefined) {
@@ -240,11 +242,9 @@
 				}
 			}
 		},
-		{field: "color",	headerName: "컬러", pinned:'left', width: 80, cellStyle: {'text-align' : 'center'}},
-		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100, cellStyle: {'text-align' : 'center'}},
-		{field: "size",	headerName: "사이즈", pinned:'left', width: 100, cellStyle: {'text-align' : 'center'}},
-		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc : (params) => params.values.reduce((a,c) => a + (c * 1), 0)},
-		{ width : 'auto'}
+		{field: "color", headerName: "컬러", pinned:'left', width: 80, cellClass: 'hd-grid-code'},
+		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100, cellClass: 'hd-grid-code'},
+		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc: sumValuesFunc},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -258,6 +258,12 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+			defaultColDef: {
+				suppressMenu: true,
+				resizable: true,
+				autoHeight: true,
+				sortable: true,
+			},
 			pinnedTopRowData: pinnedRowData,
 			getRowStyle: (params) => {
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
@@ -274,16 +280,71 @@
 	function Search() {
 		if(!validation()) return;
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal29/search', data, 1, function(e) {
+		gx.Request('/store/sale/sal29/search', data, -1, function(e) {
 			setColumn(e.head.sizes);
 			setAllRowGroupExpanded($("#grid_expand").is(":checked"));
-			const t = e.head.total_row;
-			gx.gridOptions.api.setPinnedTopRowData([{ 
-				store_cd : '합계',
-				qty: Comma(t.total_qty),
-			}]);
 		});
 	}
+
+	function setColumn(sizes) {
+		if(!sizes) return;
+		columns.splice(9);
+		
+		let size_cols = sizes.map(size => size.map(s => s === 0 ? ({ empty_tag: 'empty' }) : s));
+
+		for (let i = 0; i < size_cols.length; i++) {
+			let field_cds = size_cols[i].map(c => (c.size_kind_cd || '') + (c.size_kind_cd ? '^' : '') + (c.size_cd || ''));
+			columns.push({ 
+				field: 'SIZE_' + i,
+				headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join(' / '),
+				type: 'currencyType', 
+				width: 80, 
+				headerComponent: CustomHeader,
+				aggFunc: sumValuesFunc,
+				cellRenderer: (params) => {
+					if (params.node.rowPinned === 'top') return params.data?.['SIZE_' + i] || 0;
+					if (params.data === undefined) return params.node?.aggData?.['SIZE_' + i] || 0;
+
+					let size_set = Object.keys(params.data)
+						.filter(key => key.includes('SIZE^'))
+						.reduce((a, key) => {
+							if (a[key.split('SIZE^')[1]]) a[key.split('SIZE^')[1]] += params.data[key] * 1;
+							else a[key.split('SIZE^')[1]] = params.data[key] * 1;
+							return a;
+						}, {});
+					let col = field_cds.filter(c => Object.keys(size_set).includes(c) && size_set[c] > 0);
+
+					return col.length > 1 ? '중복오류' : col.length < 1 ? 0 : size_set[col[0]];
+				}
+			});
+		}
+		columns.push({ width: 'auto' });
+		gx.gridOptions.api.setColumnDefs(columns);
+		updatePinnedRow();
+	}
+
+	const updatePinnedRow = () => {
+		const keys = gx.gridOptions.api.getColumnDefs()
+			.reduce((a, c) => (!!c.children && Array.isArray(c.children)) ? a.concat(c.children.concat(c)) : a.concat(c), [])
+			.filter(col => col.type === 'currencyType')
+			.map(col => col.field);
+		const totals = {};
+
+		const rows = gx.getRows();
+		if (rows && Array.isArray(rows) && rows.length > 0) {
+			rows.forEach(row => {
+				for (let i = 0; i < keys.length; i++) {
+					totals[keys[i]] = (totals[keys[i]] ? totals[keys[i]] : 0) + parseInt(row?.[keys[i]] || 0);
+				}
+			});
+		}
+
+		let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+		gx.gridOptions.api.setPinnedTopRowData([{
+			...pinnedRow.data,
+			...totals,
+		}]);
+	};
 
     function changeBaebunType() {
 		let baebun_type_0 = $("input[name='baebun_type[0]']");
@@ -312,7 +373,6 @@
 	}
 
 	const validation = () => {
-
 		if($('#baebun_date').val() == "") {
 			openApi();
 			return alert("배분일자를 선택해주세요.");
@@ -323,8 +383,6 @@
 	function openApi() {
         document.getElementsByClassName('sch-baebun')[0].click();
     }
-
-
 
 	// 배분일자차수조회API
 	function SearchBaebun(){
@@ -427,51 +485,6 @@
 	};
 
 	let searchBaebun = new SearchBaebun();
-
-
-	function setColumn(sizes) {
-		if(!sizes) return;
-		columns.splice(10);
-
-		let last_seq = sizes[sizes.length -1].size_seq;
-		let size_column = '';
-		
-		for (let i = 0; i < sizes.length; i++) {
-
-			let size = sizes[i].size;
-			let size_seq = sizes[i].size_seq;
-
-			if (i > 0 && size_seq !== sizes[i - 1].size_seq) {
-				size_column += '/ ';
-			}
-			size_column += size + ' ';
-		}
-		
-		let col_size = size_column.split(' / ')
-		
-		let seq = 1;
-		for ( let i=0; i<col_size.length;i++) {
-			columns.push({field: col_size[i].trim(), headerName: col_size[i] , type: "currencyType" ,width:40,  headerComponent: CustomHeader});
-			seq++;
-		}
-		
-			columns.push({width: 'auto'});
-
-		if (size_column.length > 0) {
-			size_column = size_column.trim();
-		}
-		
-		// getColumnNames();
-		
-		gx.gridOptions.api.setColumnDefs(columns);
-	}
-
-	
-	// const getColumnNames = () => {
-	// 	const columnNames = columns.map(column => column.headerName);
-	// }
-		
-
 </script>
 	
 @stop
