@@ -266,16 +266,7 @@
 				}
 			}
 		},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 270, aggFunc: "first",
-			cellRenderer: function (params) {
-				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
-					return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
-				} else {
-					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-					return '<a href="#" onclick="return openShopProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
-				}
-			}
-		},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 270, aggFunc: "first"},
 		{field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: StyleLineHeight, rowGroup: true, hide: true,
 			cellRenderer: function (params) {
 				if(params.value === undefined) return "";

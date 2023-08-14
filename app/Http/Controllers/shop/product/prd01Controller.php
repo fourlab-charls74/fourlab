@@ -1035,7 +1035,7 @@ class prd01Controller extends Controller
 					a.head_desc, a.goods_nm, a.goods_nm_eng, a.ad_desc, a.opt_kind_cd, a.goods_sub
 					, a.brand, br.brand_nm, a.sale_stat_cl, a.style_no, a.goods_type, ifnull( type.code_val, 'N/A') as goods_type_nm
 					, a.com_id, c.com_nm, c.com_type, c.pay_fee, a.make, a.org_nm, a.goods_memo
-					, ifnull(a.price,0), a.goods_sh, a.wonga, a.delv_area, a.dlv_pay_type, a.dlv_fee_cfg
+					, ifnull(a.price,0) as price, a.goods_sh, a.wonga, a.delv_area, a.dlv_pay_type, a.dlv_fee_cfg
 					, a.bae_yn, a.baesong_price, a.baesong_kind, a.baesong_info
 					, a.goods_location, a.point_cfg, a.point_yn, a.point, a.tax_yn, a.md_id
 					, a.reg_dm, date_format(a.reg_dm,'%Y%m%d') as reg_dm_ymd	, a.upd_dm
