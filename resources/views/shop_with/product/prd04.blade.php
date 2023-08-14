@@ -249,7 +249,7 @@
 				}
 			}
 		},
-		// {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
+		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first", hide:true},
 		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}",
