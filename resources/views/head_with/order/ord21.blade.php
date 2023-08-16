@@ -304,6 +304,10 @@
 					<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
 				</div>
 				<div class="fr_box flax_box">
+					<div class="custom-control custom-checkbox form-check-box mr-2" style="display:inline-block;">
+						<input type="checkbox" name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input">
+						<label class="custom-control-label text-left" for="chk_to_class">이미지출력</label>
+					</div>
 					<div class="custom-control custom-checkbox form-check-box">
 						<input type="checkbox" name="chk_ord_no" id="chk_ord_no" class="custom-control-input" checked="">
 						<label class="custom-control-label text-left" for="chk_ord_no" style="line-height:30px;justify-content:left">주문단위로 품절검사, </label>
@@ -418,7 +422,7 @@
 		{
 			field: "img",
 			headerName: "이미지",
-			width: 80,
+			width: 60,
 			hide: true,
 			type: "GoodsImageType"
 		},
@@ -568,6 +572,10 @@
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		Search();
+
+		$("#chk_to_class").click(function() {
+			gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
+		});
 	});
 
 	function Search() {

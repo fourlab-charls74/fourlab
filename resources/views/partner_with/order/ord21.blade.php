@@ -234,6 +234,10 @@
                         <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                     </div>
                     <div class="fr_box flax_box">
+						<div class="custom-control custom-checkbox form-check-box" style="display:inline-block;">
+							<input type="checkbox" name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input">
+							<label class="custom-control-label text-left" for="chk_to_class">이미지출력</label>
+						</div>
                         <div class="custom-control custom-checkbox form-check-box">
                             <input type="checkbox" name="chk_ord_no" id="chk_ord_no" class="custom-control-input" checked="">
                             <label class="custom-control-label text-left" for="chk_ord_no" style="line-height:30px;justify-content:left">주문단위로 품절검사, </label>
@@ -285,16 +289,7 @@
             {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsTypeNM, width: 60},
             {field: "style_no", headerName: "스타일넘버", width: 70, cellClass: 'hd-grid-code'},
             {field: "goods_nm", headerName: "상품명", type: "GoodsNameType", width: 200},
-            {
-              field:"img" ,
-              headerName:"이미지", width:80,
-              hide: true,
-              cellRenderer: function(params) {
-                  if (params.value !== undefined) {
-                      return '<img src="{{config('shop.image_svr')}}/' + params.data.img + '"/>';
-                  }
-              }
-            },
+			{field: "img", headerName:"이미지", type:'GoodsImageType', width: 60, hide: true},
             {field: "opt_val", headerName: "옵션", width: 150},
             {field: "sale_qty", headerName: "주문수량", type: "numberType", width: 60},
             {field: "qty", headerName: "온라인재고", width: 70, type: "numberType",
