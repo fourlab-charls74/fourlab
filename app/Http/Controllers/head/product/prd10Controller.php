@@ -46,6 +46,7 @@ class prd10Controller extends Controller
 					from category
 					where cat_type = '$cat_type' and p_d_cat_cd = c.d_cat_cd limit 0,1
 				) as mx_len
+				, (select count(d_cat_cd) from category where cat_type = '$cat_type' and p_d_cat_cd = c.d_cat_cd) as child_cnt
 			from category c
 				left outer join (
 					select
@@ -269,6 +270,24 @@ class prd10Controller extends Controller
                             'seq' => 0,
                         ];
                         DB::table('category_goods')->insert($section_goods);
+
+						// 상위카테고리에 해당 상품 함께 등록
+						$p_d_cat_cd = $d_cat_cd;
+						while($p_d_cat_cd = DB::table('category')->where('cat_type', $cat_type)->where('d_cat_cd', $p_d_cat_cd)->value('p_d_cat_cd')) {
+
+							$section_goods = [
+								'cat_type' => $cat_type,
+								'd_cat_cd' => $p_d_cat_cd,
+								'goods_no' => $goods_nos[$i],
+								'goods_sub' => 0,
+								'disp_yn' => 'Y',
+								'admin_id' => $id,
+								'admin_nm' => $name,
+								'regi_date' => DB::raw('now()'),
+								'seq' => 0,
+							];
+							DB::table('category_goods')->insert($section_goods);
+						}
                     }
                 }
             });
@@ -295,6 +314,24 @@ class prd10Controller extends Controller
                         ->where('d_cat_cd','=',$d_cat_cd)
                         ->where('goods_no','=',$goods_nos[$i])
                         ->delete();
+
+					// 하위카테고리의 해당 상품 모두 삭제
+					DB::table('category_goods')
+						->where('cat_type','=',$cat_type)
+						->where('d_cat_cd','like', Lib::quote($d_cat_cd) . '%')
+						->where('goods_no','=',$goods_nos[$i])
+						->delete();
+
+					// 상위카테고리의 해당 상품 모두 삭제
+					$p_d_cat_cd = $d_cat_cd;
+					while($p_d_cat_cd = DB::table('category')->where('cat_type', $cat_type)->where('d_cat_cd', $p_d_cat_cd)->value('p_d_cat_cd')) {
+
+						DB::table('category_goods')
+							->where('cat_type','=',$cat_type)
+							->where('d_cat_cd','=',$p_d_cat_cd)
+							->where('goods_no','=',$goods_nos[$i])
+							->delete();
+					}
                 }
             });
             $code = 200;

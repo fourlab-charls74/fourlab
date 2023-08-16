@@ -224,7 +224,7 @@
                                     <span class="d-none d-sm-inline">로</span>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return ChangeDisp();"><span class="fs-12">상태변경</span></a>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return openChangeSeqPopup();"><span class="fs-12">순서변경</span></a>
-                                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return AddGoods();"><span class="fs-12">상품추가</span></a>
+									<button type="button" id="add_goods_btn" class="btn btn-sm btn-primary shadow-sm" onclick="return AddGoods();"><span class="fs-12">상품추가</span></button>
                                     <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DelGoods();"><span class="fs-12">상품삭제</span></a>
 
                                 </div>
@@ -261,31 +261,32 @@
                 } else if (d_cat_cd.length > 9) {
                     lvl = 'ml-4';
                 }
-                return '<a href="#" class="' + lvl + '" data-code="' + params.data.d_cat_cd + '" onClick="ClickCategory(this)">' + params.value + '</a>'
+				return '<a href="#" class="' + lvl + '" data-code="' + params.data.d_cat_cd + '" data-child-cnt="' + params.data.child_cnt + '" onClick="ClickCategory(this)">' + params.value + '</a>'
             }
         },
         {
             field: "cnt",
             headerName: "전체",
-            width: 75,
+            width: 65,
             type: 'numberType'
         },
         {
             field: "30_cnt",
             headerName: "품절",
-            width: 75,
+            width: 65,
             type: 'numberType'
         },
         {
             field: "40_cnt",
             headerName: "판매중",
-            width: 75,
+            width: 65,
             type: 'numberType'
         },
         {
             field: "sort_opt",
             headerName: "정렬",
-            width: 75
+			width: 55,
+			cellClass: 'hd-grid-code'
         },
         { width: "auto" }
     ];
@@ -567,6 +568,7 @@
     function ClickCategory(a) {
 
         $('input[name="d_cat_cd"]').val($(a).attr('data-code'));
+		$('#add_goods_btn').prop('disabled', $(a).attr('data-child-cnt') * 1 > 0);
         SearchGoods2();
     }
 

@@ -277,6 +277,10 @@
 						<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
 					</div>
 					<div class="fr_box flax_box">
+						<div class="custom-control custom-checkbox form-check-box mr-2">
+							<input type="checkbox" name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input">
+							<label class="custom-control-label text-left" for="chk_to_class" style="line-height:27px;justify-content:left">이미지출력</label>
+						</div>
 						<div class="custom-control custom-checkbox form-check-box">
 							<input type="checkbox" name="send_sms_yn" id="send_sms_yn" class="custom-control-input" checked="" value="Y">
 							<label class="custom-control-label text-left" for="send_sms_yn" style="line-height:27px;justify-content:left">배송 문자 발송</label>
@@ -339,7 +343,7 @@
 			{field:"clm_state_nm" , headerName:"클레임상태", width:72, cellStyle:StyleClmState  },
 			{field:"goods_type_nm" , headerName:"상품구분", width:72, cellStyle: {...StyleGoodsType, 'text-align': 'center'}  },
 			{field:"style_no" , headerName:"스타일넘버"  },
-			{field:"img" , headerName:"이미지", type:"GoodsImageType", hide: true},
+			{field:"img" , headerName:"이미지", type:"GoodsImageType", width: 60, hide: true},
 			{field:"goods_nm" , headerName:"상품명",type:"GoodsNameType"},
 			{field:"opt_val" , headerName:"옵션"  },
 			{field:"sale_qty" , headerName:"주문수량", width:72, type: 'currencyType' },
@@ -399,6 +403,9 @@
 				date_use_check();
 			});
 
+			$("#chk_to_class").click(function() {
+				gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
+			});
 		});
 
 		function Search() {

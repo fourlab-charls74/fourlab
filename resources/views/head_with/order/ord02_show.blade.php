@@ -290,8 +290,9 @@
                             <a href="#" class="m-0 font-weight-bold">상품정보</a>
                         </div>
                         <div class="fr_box">
-                            <button type="button" id="add_goods" class="btn-sm btn btn-secondary sms-send-btn fs-12" onclick="return AddGoods();">상품추가</button>
-                            <button type="button" class="btn-sm btn btn-secondary sms-list-btn fs-12" onclick="return DelGoods();">상품삭제</button>
+							<button type="button" id="add_goods" class="btn-sm btn btn-secondary fs-12" onclick="return AddGoods();">상품추가</button>
+							<button type="button" id="add_selected_goods" class="btn-sm btn btn-secondary fs-12" onclick="return AddSelectedGoods();">선택상품추가</button>
+							<button type="button" class="btn-sm btn btn-secondary fs-12" onclick="return DelGoods();">상품삭제</button>
                         </div>
                     </div>
                 </div>
@@ -464,6 +465,7 @@
             cellClass: ['hd-grid-edit'],
             cellEditor: 'agRichSelectCellEditor',
             cellEditorParams: cellOpionsParams,
+			onCellValueChanged:EditAmt,
         },
         {field:"qty" , headerName:"수량", width: 60,type: 'numberType',
             editable: function(params) {
@@ -493,7 +495,8 @@
     let gx;
     let _goods_options = {};
     let _goods_list_of_com_type = {etc:[]};
-
+	let _goods_idx_cnt = 0;
+	
     const base_dlv_fee = parseInt('{{ @$dlv_fee[base_dlv_fee] }}');
     const add_dlv_fee = parseInt('{{ @$dlv_fee[add_dlv_fee] }}');
     const free_dlv_amt = parseInt('{{ @$dlv_fee[free_dlv_amt] }}');
@@ -508,6 +511,7 @@
                         return !params.data.goods_no;
                     },
                 },
+				isRowSelectable: (params) => !params.data.deselect
             });
         }
     });

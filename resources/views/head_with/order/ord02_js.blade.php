@@ -192,6 +192,10 @@
             params.data.recv_amt = recv_amt;
             gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
 
+			_goods_list_of_com_type[params.data.com_type === 2 ? params.data.com_id : 'etc'].find(g => g.idx === params.data.idx).chg_qty = qty;
+			_goods_list_of_com_type[params.data.com_type === 2 ? params.data.com_id : 'etc'].find(g => g.idx === params.data.idx).chg_price = price;
+			_goods_list_of_com_type[params.data.com_type === 2 ? params.data.com_id : 'etc'].find(g => g.idx === params.data.idx).chg_opt_val = params.data.opt_val;
+			
             if ($("input[name=dlv_apply]:checked").val() === "Y") {
                 setDlvFeeOfComType();
             } else {
@@ -200,11 +204,10 @@
                 gx.gridOptions.api.setRowData(list);
                 gx.setFocusedWorkingCell();
             }
-            
-            $("#add_goods").attr("disabled", true);
+			
         }
     }
-
+	
     // com_type별 배송비합계 세팅
     function setDlvFeeOfComType(direct_dlv = '', direct_com_id = '') {
         let rows = gx.getRows();
@@ -749,13 +752,18 @@
         });
     }
 
+	function AddGoods(){
+		var url = '/head/product/prd01/choice';
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
+	}
+	
     /**
      * @return {boolean}
      */
-    function AddGoods(){
-        var url = '/head/product/prd01/choice';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
-    }
+	function AddSelectedGoods() {
+		const rows = gx.getSelectedRows();
+		ChoiceGoodsNo(rows.map(row => row.goods_no));
+	}
 
     /**
      * @return {boolean}
@@ -784,9 +792,9 @@
 
     // 선택한 상품 정보 목록 세팅
     function setGoodsGrid(goods_list) {
-        let count = gx.getRowCount();
+
         goods_list.forEach(goods => {
-            let item = {...goods, idx: count++};
+            let item = {...goods, idx: _goods_idx_cnt++};
             if(goods.goods_info.com_type === 2) {
                 let com_id = goods.goods_info.com_id;
                 if(_goods_list_of_com_type[com_id]) {
@@ -813,6 +821,7 @@
                         ord_opt_no: key === "etc" ? "매입상품" : _goods_list_of_com_type[key][0].goods_info.com_nm,
                         dc_amt: "배송비 : ",
                         dlv_amt: 0,
+						deselect: true,
                     }]);
                 }
             }
@@ -823,7 +832,7 @@
     }
 
     function setGoodsRow(res) {
-        var qty = 1;
+		var qty = res.chg_qty || 1;
         gx.addRows([{
             "idx":res.idx,
             "goods_no":res.goods_no,
@@ -832,9 +841,9 @@
             "ord_opt_no":res.goods_no,
             "goods_nm":res.goods_info.goods_nm,
             "style_no" : res.goods_info.style_no,
-            "opt_val" : res.goods_info.opt_val,
+            "opt_val" : res.chg_opt_val || res.goods_info.opt_val,
             "qty" : qty,
-            "price" : res.goods_info.price,
+            "price" : res.chg_price || res.goods_info.price,
             "ord_amt" : res.goods_info.price * qty,
             "recv_amt" : res.goods_info.price * qty + parseInt(res.goods_info.baesong_price),
             "point_amt" : 0,
@@ -859,7 +868,7 @@
         delrow.forEach((d,i) => {
             if(d.goods_no) {
                 const type = d.com_type == 2 ? d.com_id : "etc";
-                _goods_list_of_com_type[type] = _goods_list_of_com_type[type].filter(item => item.goods_no !== d.goods_no || item.idx !== d.idx);
+				_goods_list_of_com_type[type] = _goods_list_of_com_type[type]?.filter(item => item.goods_no !== d.goods_no || item.idx !== d.idx) || [];
                 if(_goods_list_of_com_type[type].length < 1) {
                     _goods_list_of_com_type[type] = null;
                     gx.gridOptions.api.forEachNode(node => {
@@ -870,10 +879,19 @@
         })
 
         gx.delSelectedRows();
+
+		Object.keys(_goods_list_of_com_type).forEach(key => {
+			if (_goods_list_of_com_type[key] === null) {
+				gx.gridOptions.api.forEachNode(node => {
+					if (!node.data.goods_no && node.data.com_id === key) gx.gridOptions.api.applyTransaction({ remove: [node.data] });
+				});
+			}
+		});
+		
         setDlvFeeOfComType();
         if(gx.getRowCount() === 0) {
             $("#amt_table").css("display", "none");
-            $("#add_goods").attr("disabled", false);
+            // $("#add_goods").attr("disabled", false);
         }
     }
 

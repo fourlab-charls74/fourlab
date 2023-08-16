@@ -3108,4 +3108,49 @@ class ord01Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg], $code);
     }
+
+	public function add_account_etc(Request $request)
+	{
+		$code = 200;
+		$msg = "";
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+
+		$ord_no = $request->input('ord_no');
+		$ord_opt_no = $request->input('ord_opt_no');
+		$com_id = $request->input('com_id');
+		$etc_day = $request->input('etc_day', '');
+		$etc_day = str_replace('-', '', $etc_day);
+		$etc_amt = $request->input('etc_amt', '');
+		$etc_memo = $request->input('etc_memo', '');
+
+		$rows = [];
+
+		try {
+			DB::beginTransaction();
+
+			DB::table('account_etc')->insert([
+				'etc_day'   => $etc_day,
+				'com_id'    => $com_id,
+				'ord_no'    => $ord_no,
+				'ord_opt_no' => $ord_opt_no,
+				'etc_amt'   => $etc_amt,
+				'etc_memo'  => $etc_memo,
+				'admin_id'  => $admin_id,
+				'admin_nm'  => $admin_nm,
+				'regi_date' => now(),
+			]);
+
+			$rows = DB::table('account_etc')->where('ord_opt_no', $ord_opt_no)->get();
+
+			DB::commit();
+			$msg = "입점업체 기타정산정보가 정상적으로 등록되었습니다.";
+		} catch(Exception $e){
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json([ 'code' => $code, 'msg' => $msg, 'account_etcs' => $rows ], $code);
+	}
 }
