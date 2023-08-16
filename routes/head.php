@@ -586,7 +586,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
             Route::get('{ord_no}/cash/list', $cont . '@search_cash_receipt_list');
             Route::get('{ord_no}/{ord_opt_no}/tax', $cont . '@show_tax');
             Route::get('{ord_no}/tax/list', $cont . '@search_tax_receipt_list');
-
+			Route::post('add-account-etc', $cont . '@add_account_etc');
             Route::put('dlv-info-save/{ord_no}', $cont . '@dlv_info_save');
             Route::put('refund-save/{ord_opt_no}', $cont . '@refund_save');
             Route::put('claim-save', $cont . '@claim_save');

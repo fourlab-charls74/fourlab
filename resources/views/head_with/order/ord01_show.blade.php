@@ -925,6 +925,93 @@
                             <div class="mt-2">
                                 <button type="button" style="width:100%" class="btn btn-sm btn-secondary claim-msg-btn">클레임 내용 등록</button>
                             </div>
+						@if (@$ord->com_type === 2)
+							<div class="card shadow">
+								<div class="card-header mb-0">
+									<a href="#" class="m-0 font-weight-bold">입점업체 기타 정산 정보</a>
+								</div>
+								<div class="card-body">
+									<div class="row_wrap">
+										<div class="row">
+											<div class="col-12">
+												<div class="table-responsive">
+													<table class="table table-bordered th_border_none">
+														<colgroup>
+															<col width="13%">
+															<col width="48%">
+															<col width="13%">
+															<col width="13%">
+															<col width="13%">
+														</colgroup>
+														<thead>
+														<tr>
+															<th>정산일자</th>
+															<th>정산내용</th>
+															<th>정산금액</th>
+															<th>처리자</th>
+															<th>등록일</th>
+														</tr>
+														</thead>
+														<tbody id="account_etc_list">
+														@if(!empty($account_etcs) && count($account_etcs) > 0)
+															@foreach($account_etcs as $account_etc)
+																<tr>
+																	<td>{{ date('Y-m-d', strtotime($account_etc->etc_day)) }}</td>
+																	<td>{{ $account_etc->etc_memo }}</td>
+																	<td>{{ number_format($account_etc->etc_amt) }}원</td>
+																	<td>{{ $account_etc->admin_nm }}</td>
+																	<td>{{ $account_etc->regi_date }}</td>
+																</tr>
+															@endforeach
+														@else
+															<tr>
+																<td colspan="5" class="text-center text-secondary">
+																	<strong>기타 정산 내역이 없습니다.</strong>
+																</td>
+															</tr>
+														@endif
+														<tr class="add-account-etc">
+															<td colspan="5" class="fs-12 font-weight-bold py-1" style="background-color: #f5f5f5">
+																<div class="d-flex justify-content-between align-items-center">
+																	<p>기타정산등록</p>
+																	<button type="button" id="add_account_etc_btn" class="btn btn-sm btn-outline-primary shadow-sm my-1"><i class="fas fa-plus fa-sm mr-1"></i> 등록</button>
+																</div>
+															</td>
+														</tr>
+														<tr class="add-account-etc">
+															<td colspan="5">
+																<div class="d-flex">
+																	<div class="d-flex flex-column mr-2">
+																		<p class="fs-13 mb-1"><i class="fas fa-calendar fa-sm mr-1"></i> 정산일자</p>
+																		<div class="docs-datepicker form-inline-inner input_box" style="width:200px;">
+																			<div class="input-group">
+																				<input type="text" class="form-control form-control-sm docs-date" id="etc_day" name="etc_day" value="{{ @$etc_day }}" autocomplete="off">
+																				<div class="input-group-append">
+																					<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+																						<i class="fa fa-calendar" aria-hidden="true"></i>
+																					</button>
+																				</div>
+																			</div>
+																			<div class="docs-datepicker-container"></div>
+																		</div>
+																	</div>
+																	<div class="d-flex flex-column mr-2">
+																		<p class="fs-13 mb-1"><i class="fas fa-dollar-sign fa-sm mr-1"></i> 정산금액</p>
+																		<input type="text" name="etc_amt" id="etc_amt" class="form-control form-control-sm text-right" style="width:150px;" placeholder="0">
+																	</div>
+																	<textarea type="text" name="etc_memo" id="etc_memo" rows="1" class="form-control px-2" style="resize: none;" placeholder="정산내용을 입력하세요."></textarea>
+																</div>
+															</td>
+														</tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						@endif
                         </div>
                     </div>
                 </div>
@@ -1439,6 +1526,46 @@
         SaveClaimMsg();
     }
 
+	// 입점업체 기타정산정보 등록 add_account_etc_btn
+	if ($("#add_account_etc_btn")) {
+		$("#add_account_etc_btn").on("click", function (e) {
+			const data = {
+				etc_day: $("#etc_day").val(),
+				etc_amt: unComma($("#etc_amt").val()),
+				etc_memo: $("#etc_memo").val(),
+				com_id: "{{ @$ord->com_id }}"
+			};
+			$.ajax({
+				async: true,
+				type: 'post',
+				url: '/head/order/ord01/add-account-etc',
+				data: { ...data, ord_no, ord_opt_no },
+				success: function(res) {
+					$("#account_etc_list > tr:not(.add-account-etc)").remove();
+					$("#account_etc_list").prepend(res.account_etcs.map(acc => `
+                            <tr>
+                                <td>${acc.etc_day?.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3') || ''}</td>
+                                <td>${acc.etc_memo}</td>
+                                <td>${Comma(acc.etc_amt)}원</td>
+                                <td>${acc.admin_nm}</td>
+                                <td>${acc.regi_date}</td>
+                            </tr>
+                        `));
+
+					$("#etc_amt").val('');
+					$("#etc_memo").val('');
+				},
+				error: function(request, status, error) {
+					console.log(request.responseText);
+				}
+			});
+		});
+
+		$("#etc_amt").on("change", function (e) {
+			e.target.value = Comma(unComma(e.target.value));
+		});
+	}
+	
     /*
         주문상태 변경 (출고요청->출고처리 / 출고처리중->출고완료)
         -------------------------------
