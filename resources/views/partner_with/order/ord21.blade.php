@@ -290,7 +290,7 @@
             {field: "goods_type_nm", headerName: "상품구분", cellStyle: StyleGoodsTypeNM, width: 60},
             {field: "style_no", headerName: "스타일넘버", width: 70, cellClass: 'hd-grid-code'},
             {field: "goods_nm", headerName: "상품명", type: "GoodsNameType", width: 200},
-			{field: "img", headerName:"이미지", type:'GoodsImageType', width: 60, hide: true},
+			{field: "img", headerName:"이미지", type:'GoodsImageType', width: 65, hide: true},
             {field: "opt_val", headerName: "옵션", width: 150},
             {field: "sale_qty", headerName: "주문수량", type: "numberType", width: 60},
             {field: "qty", headerName: "온라인재고", width: 70, type: "numberType",

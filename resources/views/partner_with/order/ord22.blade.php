@@ -323,7 +323,7 @@
 			{field:"clm_state_nm", headerName:"클레임상태", cellStyle: StyleClmState},
 			{field:"goods_type_nm", headerName:"상품구분", cellStyle: StyleGoodsTypeNM},
 			{field:"style_no", headerName:"스타일넘버", width: 80, cellClass: 'hd-grid-code'},
-			{field:"img", headerName:"이미지", type:"GoodsImageType", width:60, hide: true},
+			{field:"img", headerName:"이미지", type:"GoodsImageType", width: 65, hide: true},
 			{field:"goods_nm", headerName:"상품명",type:"GoodsNameType", width: 200},
 			{field:"opt_val", headerName:"옵션", width: 150},
 			{field:"sale_qty", headerName:"주문수량", type: 'currencyType', width: 70},

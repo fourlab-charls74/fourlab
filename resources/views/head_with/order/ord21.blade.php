@@ -422,7 +422,7 @@
 		{
 			field: "img",
 			headerName: "이미지",
-			width: 60,
+			width: 65,
 			hide: true,
 			type: "GoodsImageType"
 		},
