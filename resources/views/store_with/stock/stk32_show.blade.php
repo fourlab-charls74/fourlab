@@ -258,6 +258,11 @@
         let data2 = $('form[name="search"]').serialize();
         gx2.Request('/store/stock/stk32/search-groupstore', data2);
     }
+	
+	function Search3() {
+        let data3 = $('form[name="search"]').serialize();
+        gx3.Request('/store/stock/stk32/search-hq-user-id', data3);
+    }
 
 </script>
 
