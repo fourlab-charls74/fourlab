@@ -96,7 +96,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post('claim/insert', 'claim@store');
 
         //상품검색
-        Route::get('goods', 'goods@search');
+        Route::post('goods', 'goods@search');
         Route::get('goods/show', 'goods@show');
         Route::get('goods/show/file/search', 'goods@file_search');
 
@@ -281,7 +281,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         // 상품관리
         Route::get('prd01', 'prd01Controller@index');
         Route::get('prd01/choice', 'prd01Controller@index_choice');
-        Route::get('prd01/search', 'prd01Controller@search');
+        Route::post('prd01/search', 'prd01Controller@search');
         Route::get('prd01/create', 'prd01Controller@create');
         Route::post('prd01/cleanup-trash', 'prd01Controller@cleanup_trash');
 

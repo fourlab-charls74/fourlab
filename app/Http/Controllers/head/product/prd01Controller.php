@@ -113,7 +113,6 @@ class prd01Controller extends Controller
 		$goods_nm_eng = $request->input("goods_nm_eng");
         $cat_type = $request->input("cat_type");
         $cat_cd = $request->input("cat_cd");
-        $is_unlimited = $request->input("is_unlimited");
 
 		$com_id = $request->input("com_cd");
 		$com_type = $request->input("com_type");
@@ -122,7 +121,6 @@ class prd01Controller extends Controller
 		$ad_desc = $request->input("ad_desc");
 
         $is_unlimited = $request->input("is_unlimited");
-        $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
 		// $type = $request->input("type");
@@ -183,7 +181,7 @@ class prd01Controller extends Controller
         if( $goods_no != "" ){
             $goods_nos = explode(",",$goods_no);
             if(count($goods_nos) > 1){
-                if(count($goods_nos) > 500) array_splice($goods_nos,500);
+                //if(count($goods_nos) > 500) array_splice($goods_nos,500);
                 $in_goods_nos = join(",",$goods_nos);
                 $where .= " and g.goods_no in ( $in_goods_nos ) ";
             } else {
@@ -201,9 +199,16 @@ class prd01Controller extends Controller
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
+		
+		if ($limit == -1) {
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
+		} else {
+			$limit = " limit $startno, $page_size ";
+		}
 
-        $total = 0;
+
+		$total = 0;
         $page_cnt = 0;
 
         if ($page == 1) {

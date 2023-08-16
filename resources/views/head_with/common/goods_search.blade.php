@@ -368,7 +368,7 @@
     const Search = () => {
         if (isOpenerCallback('beforeSearchCallback')) opener.beforeSearchCallback(document);
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/api/goods', data, 1);
+		gx.Request('/head/api/goods', data, 1, null, 'post');
     };
 
     const openFileSearch = () => {
@@ -387,7 +387,7 @@
 
         const data = "goods_nos="+goods_nos.join(',');
 
-        gx.Request('/head/api/goods', data, 1);
+		gx.Request('/head/api/goods', data, 1, null, 'post');
     }
 
     Search();

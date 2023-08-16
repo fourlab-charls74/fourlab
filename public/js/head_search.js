@@ -1168,7 +1168,7 @@ SearchGoodsNos.prototype.Init = function () { // 검색조건 초기화 기능 �
 SearchGoodsNos.prototype.Open = function(id = 'goods_no',callback = null){
     if(this.grid === null){
         this.SetGrid("#div-gd-goods_nos");
-        $("#SearchGoodsNosModal").draggable();
+        //$("#SearchGoodsNosModal").draggable();
         this.id = id;
         this.callback = callback;
     }
@@ -1183,14 +1183,17 @@ SearchGoodsNos.prototype.Open = function(id = 'goods_no',callback = null){
 
 SearchGoodsNos.prototype.SetGrid = function(divId){
     const columns = [
-        {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, pinned: 'left', sort: null},
-        {field: "goods_no", headerName: "온라인코드", width: 70, pinned: 'left'},
-        {field: "style_no", headerName: "스타일넘버", width: 70, pinned: 'left'},
-        {field: "img", headerName: "이미지", type:'GoodsImageType',width: 50},
+		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
+		{field: "goods_no", headerName: "상품번호", width: 70, cellClass: 'hd-grid-code', pinned: 'left'},
+		{field: "style_no", headerName: "스타일넘버", width: 100, pinned: 'left'},
+		{field: "img", headerName: "이미지", width: 50, cellClass: 'hd-grid-code',
+			cellRenderer: (params) => {
+				return '<a href="#" onClick="return openSitePop(\'' + params.data.goods_no + '\');"><img src="' + params.data.img + '" class="img" alt="" style="width: 25px;height: 100%;" onerror="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/></a>';
+			}
+		},
         {field: "img", headerName: "이미지_url", hide: true},
         {field: "sale_stat_cl", headerName: "상품상태", type:'GoodsStateType',width: 80},
-        {field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType'},
-        {field:"nvl" , headerName:""},
+		{field: "goods_nm", headerName: "상품명",type:'HeadGoodsNameType', width: "auto"},
     ];
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
@@ -1198,32 +1201,27 @@ SearchGoodsNos.prototype.SetGrid = function(divId){
 
 SearchGoodsNos.prototype.Search = function(){
     // let data = $('form[name="search_goods_nos"]').serialize();
-    let data = "";
-    data += "sch_goods_nos=" + $("#sch_goods_nos").val().split("\n").filter(v => v).join(",");
-    data += "&sch_style_nos=" + $("#sch_style_nos").val().split("\n").filter(v => v).join(",");
-    data += "&cmd=modal";
-    this.grid.Request('/head/api/goods', data,-1);
+	let data = $('form[name="search_goods_nos"]').serialize();
+	data += "&limit=-1";
+	
+	this.grid.Request('/head/api/goods', data,-1, null, 'post');
 };
 
 SearchGoodsNos.prototype.Choice = function(){
 
-    let checkRows = this.grid.getSelectedRows();
-    let style_nos = checkRows.map(function(row) {
-        return row.style_no;
-    });
-    let goods_nos = checkRows.map(function(row) {
-        return row.goods_no;
-    });
-    let goods_no = document.getElementById('sch_goods_nos').value;
-    let style_no = document.getElementById('sch_style_nos').value;
+	let checkRows = this.grid.getSelectedRows();
+	let goods_nos = checkRows.map(function(row) {
+		return row.goods_no;
+	});
 
-    if(goods_no == "" || style_no != "") {
-        $('#style_no').val(style_nos);
-    } else if (goods_no != "" || style_no == "") {
-        $('#goods_no').val(goods_nos);
-    }
-
-    $('#SearchGoodsNosModal').modal('toggle');
+	if(this.callback !== null){
+		this.callback();
+	} else {
+		if($('#' + this.id).length > 0){
+			$('#' + this.id).val(goods_nos.join(",")).trigger('change');
+		}
+	}
+	$('#SearchGoodsNosModal').modal('toggle');
 };
 let searchGoodsNos = new SearchGoodsNos();
 
@@ -1274,7 +1272,7 @@ SearchGoodsNo.prototype.SetGrid = function(divId){
 SearchGoodsNo.prototype.Search = function(){
     let data = $('form[name="search_goods_no"]').serialize();
     //console.log(data);
-    this.grid.Request('/head/api/goods', data,1);
+	this.grid.Request('/head/api/goods', data,1, null, 'post');
 };
 
 SearchGoodsNo.prototype.Choice = function(){

@@ -277,7 +277,14 @@ class goods extends Controller
 
         $page_size = $limit;
         $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
+		
+		if ($limit == -1) {
+			if ($page > 1) $limit = "limit 0";
+			else $limit = "";
+		} else {
+			$limit = " limit $startno, $page_size ";
+		}
+		
         if ($cmd === 'modal') $limit = '';
 
         $total = 0;
