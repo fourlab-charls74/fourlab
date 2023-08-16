@@ -40,7 +40,7 @@
             <div id="search-btn-collapse" class="btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
     </div-->
-<form method="get" name="search" id="search">
+<form method="post" name="search" id="search">
     @csrf
     <input type='hidden' name='goods_nos' value=''>
     <div id="search-area" class="search_cum_form">
@@ -129,6 +129,7 @@
 										<option value="500">500</option>
 										<option value="1000">1000</option>
 										<option value="2000">2000</option>
+										<option value="-1">모두</option>
 									</select>
 								</div>
 								<span class="text_line">/</span>
@@ -457,7 +458,7 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/product/prd01/search', data, 1);
+		gx.Request('/head/product/prd01/search', data, 1, null, 'post');
     }
 
     const initSearchInputs = () => {

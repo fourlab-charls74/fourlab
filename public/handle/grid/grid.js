@@ -497,7 +497,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
     this.loading = false;
 }
 
-HDGrid.prototype.Request = function(url,data = '', page = -1, callback){
+HDGrid.prototype.Request = function(url,data = '', page = -1, callback , http_method = 'get'){
     if(this.loading === false) {
         this.loading = true;
 
@@ -530,7 +530,7 @@ HDGrid.prototype.Request = function(url,data = '', page = -1, callback){
                             //console.log('getLastDisplayedRow :' + _gx.gridOptions.api.getLastDisplayedRow());
                             //console.log('rowtotal :' + rowtotal);
                             var rollup_callback = (data) => $("#grid_expand").length > 0 ? setAllRowGroupExpanded($("#grid_expand").is(":checked")) : '';
-                            _gx._Request(this.rollup ? rollup_callback : undefined);
+                            _gx._Request(this.rollup ? rollup_callback : undefined, http_method);
                         }
                         // var rowtotal = gridOptions.api.getDisplayedRowCount();
                         // var rowHeight = 25;
@@ -552,11 +552,11 @@ HDGrid.prototype.Request = function(url,data = '', page = -1, callback){
             };
         }
         //console.log('page : ' + _page);
-        this._Request(callback);
+		this._Request(callback, http_method);
     }
 };
 
-HDGrid.prototype._Request = function(callback) {
+HDGrid.prototype._Request = function(callback, http_method) {
     this.loading = true;
     if(this.page > 1){
         this.ShowLoadingLayer();
@@ -566,12 +566,19 @@ HDGrid.prototype._Request = function(callback) {
     }
 
     let _gx = this;
-
+	this.requst_data += '&page=' + this.page + '&total=' + _gx.total;
+	if (http_method === 'post') {
+		let params_data = this.requst_data;
+		params_data.split('&').forEach(data => {
+			this.requst_data[data.split('=')[0]] = encodeURI(data.split('=')[1]);
+		});
+	}
+	
     $.ajax({
         //async: true,
-        type: 'get',
+        type: http_method,
         url: this.request_url,
-        data: this.requst_data + '&page=' + this.page + '&total=' + _gx.total,
+        data: this.requst_data,
         success: function (data) {
             //console.log(data);
             //const res = jQuery.parseJSON(data);
@@ -620,6 +627,7 @@ HDGrid.prototype._Request = function(callback) {
         },
         error: function(xhr, status, error) {
             console.log(xhr.responseText);
+			if (xhr.status === 500) alert('조회 시 오류가 발생했습니다.\n검색조건을 확인하신 후 다시 시도해주세요');
         }
     });
 };

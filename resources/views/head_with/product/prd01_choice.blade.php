@@ -258,7 +258,7 @@
 
         function Search(){
             let data = $('form[name="search"]').serialize();
-            gx.Request('/head/product/prd01/search', data,1);
+			gx.Request('/head/product/prd01/search', data,1, null, 'post');
         }
 
         function Choice(){
