@@ -723,6 +723,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         Route::delete('mem01/user/{id}', 'mem01Controller@delete_user');
         Route::delete('mem01/user/group/{id}', 'mem01Controller@del_group');
+		Route::post('mem01/user/counsel/{id}', 'mem01Controller@add_counsel');
         //
         //휴면회원
         Route::get('mem02', 'mem02Controller@index');

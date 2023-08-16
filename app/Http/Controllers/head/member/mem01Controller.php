@@ -1113,4 +1113,40 @@ class mem01Controller extends Controller
         Header("Pragma: no-cache");
         Header("Expires: 0");
     }
+	
+	/** 회원 상담내용 등록 */
+	public function add_counsel($user_id = '', Request $request)
+	{
+		$code = 200;
+		$msg = "";
+		$ord_no = $request->input('ord_no', '');
+		$content = $request->input('content', '');
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
+
+		try{
+			DB::beginTransaction();
+
+			$user_nm = DB::table('member')->where('user_id', $user_id)->value('name');
+
+			DB::table('member_cousel')->insert([
+				'user_id' => $user_id,
+				'name' => $user_nm,
+				'contents' => $content,
+				'ord_no' => $ord_no ?? '',
+				'admin_id' => $admin_id,
+				'admin_nm' => $admin_nm,
+				'regi_date' => now(),
+			]);
+
+			DB::commit();
+			$msg = "상담내용이 정상적으로 등록되었습니다.";
+		}catch(Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json([ 'code' => $code, 'msg' => $msg ], $code);
+	}
 }

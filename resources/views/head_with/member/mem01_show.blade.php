@@ -11,6 +11,10 @@
     let id_chk = false;
 </script>
 
+<style>
+	#counsel-box table tr th {background : #f5f5f5;min-width: 120px;max-width: 120px;}
+</style>
+
 <div class="container-fluid show_layout py-3">
     <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
         <div>
@@ -577,23 +581,46 @@
                         </li>
                     </ul>
                 </div>
-                <div class="card-body brtn mt-0 pt-2">
-                    <div class="tab-pane show active" id="tab-1" role="tabpanel" aria-labelledby="send-tab">
-                        <div class="card-title">
-                            <div class="filter_wrap">
-                                <div class="fl_box">
-                                    <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
-                                </div>
-                                <div class="fr_box flax_box grid-show-text">
+				<div class="card-body brtn mt-0 pt-2">
+					<div id="counsel-box" class="text-center">
+						<div class="table-box mobile text-left mb-2">
+							<table class="table incont table-bordered">
+								<tr>
+									<th>주문번호</th>
+									<td>
+										<div class="form-inline">
+											<input type="text" class="form-control form-control-sm w-100" name="counsel_ord_no" id="counsel_ord_no" />
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<th>상담내용</th>
+									<td>
+										<div class="form-inline">
+											<textarea name="counsel_content" id="counsel_content" class="form-control p-2 w-100" rows="2" style="resize: none;"></textarea>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<button type="button" class="btn btn-sm btn-outline-primary shadow-sm add-counsel-btn"><i class="fas fa-plus fa-sm mr-1"></i> 상담내용 등록</button>
+					</div>
+					<div class="tab-pane show active" id="tab-1" role="tabpanel" aria-labelledby="send-tab">
+						<div class="card-title">
+							<div class="filter_wrap">
+								<div class="fl_box">
+									<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+								</div>
+								<div class="fr_box flax_box grid-show-text">
 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
-                    </div>
-                </div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="table-responsive">
+						<div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
+					</div>
+				</div>
             </div>
         </div>
     </form>
@@ -605,10 +632,12 @@
 <script>
     // 상담 탭 컬럼
     const column1 = [
-        {field: "regi_date", headerName: "상담일자"},
-        {field: "ord_no", headerName: "주문번호"},
-        {field: "contents", headerName: "상담내용"},
-        {field: "admin_nm", headerName: "처리자"}
+		{field: "regi_date", headerName: "상담일자", type: "DateTimeType"},
+		{field: "ord_no", headerName: "주문번호", width: 140, cellClass: 'hd-grid-code'},
+		{field: "contents", headerName: "상담내용", width: 369, wrapText: true, autoHeight: true,
+			cellRenderer: (params) => params.value?.split("\n").join("<br>") || '',
+		},
+		{field: "admin_nm", headerName: "처리자", width: 90, cellClass: 'hd-grid-code'},
     ];
 
     // 주문 탭 컬럼
@@ -729,9 +758,28 @@
     const urls = ['claim_msg', 'buylist', 'point', 'claim', 'qa', 'estimate', 'claim_list', 'coupon_list'];
 
     const app = new App('', {gridId: "#div-gd"});
-    const gridDiv = document.querySelector(app.options.gridId);
-    const gx = new HDGrid(gridDiv, column1);
+	let gx;
+	
+	$(document).ready(function() {
+		const gridDiv = document.querySelector(app.options.gridId);
+		gx = new HDGrid(gridDiv, columns[0], {
+			defaultColDef: {
+				suppressMenu: true,
+				resizable: true,
+				sortable: true,
+			},
+		});
 
+		$('.nav-link').click(function(){
+			const num = this.id.split('-')[2] - 1;
+			if (num === 0) $("#counsel-box").removeClass('d-none');
+			else $("#counsel-box").addClass('d-none');
+			Search(num);
+		});
+		
+		Search(0);
+	});
+	
     $('input[name="black_yn"]').change(function() {
         let value = $(this).val();   
 
@@ -742,9 +790,9 @@
         }
     });
 
-    $('.nav-link').click(function(){
-        const num = this.id.split('-')[2] - 1;
-        gx.gridOptions.api.setColumnDefs(columns[num]);
+	function Search(num) {
+		gx.gridOptions.api.setColumnDefs([]);
+		gx.gridOptions.api.setColumnDefs(columns[num]);
 
         // const data = $('form[name="user"]').serialize();
         gx.Request(`/head/member/mem01/show/search/${urls[num]}/${user_id}`, '', -1, function(res){
@@ -764,9 +812,8 @@
             } else {
                 $('.grid-show-text').html('');
             }
-            console.log(res);
         });
-    });
+    };
 
     function openClaimList(user_id, date) {
         date = date.substr(0, 10).replace(/[.]/g, '-');
@@ -786,6 +833,29 @@
 		var url = "/head/member/mem22/"+no;
 		const product=window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=810");
 	}
+
+	// 상담내용등록
+	$(".add-counsel-btn").on('click', function (e) {
+		e.preventDefault();
+
+		const ord_no = $("#counsel_ord_no").val();
+		const content = $("#counsel_content").val();
+
+		if (content.length < 1) return alert("상담내용을 입력해주세요.");
+		$.ajax({
+			async: true,
+			type: 'post',
+			url: `/head/member/mem01/user/counsel/${user_id}`,
+			data: { ord_no, content },
+			success: function (res) {
+				if (res.code == 200) Search(0);
+				else alert("상담내용 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+			},
+			error: function(request, status, error) {
+				console.log(request.responseText);
+			}
+		});
+	});
 </script>
 @endif
 
