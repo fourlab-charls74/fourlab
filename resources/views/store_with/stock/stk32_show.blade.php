@@ -36,6 +36,10 @@
                                         <input type="radio" name="store" value="G" id="groupStore" class="custom-control-input">
                                         <label class="custom-control-label" for="groupStore">그룹매장</label>
                                     </div>
+									<div class="custom-control custom-radio">
+                                        <input type="radio" name="store" value="H" id="hq_user_id" class="custom-control-input">
+                                        <label class="custom-control-label" for="hq_user_id">본사</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -116,6 +120,21 @@
                 </div>
             </div>
         </div>
+		<div class="show_layout py-0 px-sm-0" id="div_grid3">
+            <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+                <div class="card-title">
+                    <div class="filter_wrap">
+                        <div class="fl_box">
+                            <h6 class="m-0 font-weight-bold">총 <span id="gd-head-total" class="text-primary">0</span> 건</h6>
+                        </div>
+                        <a href="#" onclick="openSendMsgPopup()" id="send_msg_btn" class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;"> 알림 보내기</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <div id="div-gd-head" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 
@@ -138,17 +157,28 @@
             {headerName: "구분", field: "store", hide:true},
             {width: 'auto'}
         ];
+		
+		let hq_columns = [
+			{headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
+			{headerName: "부서", field: "part",width:100, cellStyle: {'text-align':'center' }},
+			{headerName: "직책", field: "posi",width:100, cellStyle: {'text-align':'center' }},
+			{headerName: "ID", field: "id",width:100, cellStyle: {'text-align':'center' }},
+			{headerName: "이름", field: "name",width:100, cellStyle: {'text-align':'center' }},
+		];
 
 </script>
 
 <script type="text/javascript" charset="utf-8">
     let gx;
     let gx2;
+	let gx3;
     const pApp = new App('',{ gridId:"#div-gd" });
     const pApp2 = new App('',{ gridId:"#div-gd-group" });
+    const pApp3 = new App('',{ gridId:"#div-gd-head" });
 
     $(document).ready(function(){
         $('#div_grid2').hide();
+        $('#div_grid3').hide();
         $('#search_sbtn2').hide();
         $('#div_group_nm').hide();
 
@@ -156,6 +186,7 @@
             if($("input[name='store']:checked").val() == 'O') {
                 $('#div_grid2').hide();
                 $('#div_grid').show();
+                $('#div_grid3').hide();
                 $('#search_sbtn2').hide();
                 $('#search_sbtn').show();
                 $('#div_store_nm').show();
@@ -163,11 +194,16 @@
             } else if ($("input[name='store']:checked").val() == 'G') {
                 $('#div_grid2').show();
                 $('#div_grid').hide(); 
+                $('#div_grid3').hide(); 
                 $('#search_sbtn2').show();
                 $('#search_sbtn').hide();
                 $('#div_store_nm').hide();
                 $('#div_group_nm').show();
-            }
+            } else if ($("input[name='store']:checked").val() == 'H') {
+				$('#div_grid').hide();
+				$('#div_grid2').hide();
+				$('#div_grid3').show();
+			}
         });
 
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
@@ -193,6 +229,19 @@
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, g_columns);
         gx2.gridOptions.defaultColDef = {
+            suppressMenu: true,
+            resizable: false,
+            sortable: true,
+        };
+        // Search2();
+    });
+	
+	$(document).ready(function() {
+        pApp3.ResizeGrid(185);
+        pApp3.BindSearchEnter();
+        let gridDiv3 = document.querySelector(pApp3.options.gridId);
+        gx3 = new HDGrid(gridDiv3, hq_columns);
+        gx3.gridOptions.defaultColDef = {
             suppressMenu: true,
             resizable: false,
             sortable: true,

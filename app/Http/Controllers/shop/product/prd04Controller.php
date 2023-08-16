@@ -520,7 +520,7 @@ class prd04Controller extends Controller
 					) w on w.prd_cd = ps.prd_cd and w.store_cd = ps.store_cd
 					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
 				where ps.prd_cd like '$prd_cd_p%' $where
-				group by ps.store_cd, ps.prd_cd, pc.color
+				group by ps.store_cd, pc.color
 				order by pc.color, s.store_nm
 			";
 			$store_rows = DB::select($sql);

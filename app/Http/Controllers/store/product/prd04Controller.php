@@ -205,7 +205,6 @@ class prd04Controller extends Controller
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id
-
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
