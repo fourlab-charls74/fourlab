@@ -127,8 +127,8 @@
                                                     <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
                                                     <label class="custom-file-label" for="file"></label>
                                                 </div>
-                                                <a href="/sample/sample_extra_acc.xlsx" class="mt-2" id="sample_file_link" style="text-decoration: underline !important;">일괄등록양식 다운로드</a>
-                                                <a href="/sample/sample_extra_acc_one.xlsx" class="mt-2" id="sample_file_link2" style="text-decoration: underline !important;" hidden>(원부자재포함) 일괄등록양식 다운로드</a>
+                                                <a href="/sample/sample_extra_acc.xlsx" download="기타재반자료일괄등록_샘플" class="mt-2" id="sample_file_link" style="text-decoration: underline !important;">일괄등록양식 다운로드</a>
+                                                <a href="/sample/sample_extra_acc_one.xlsx" download="기타재반자료일괄등록(원부자재포함)_샘플" class="mt-2" id="sample_file_link2" style="text-decoration: underline !important;" hidden>(원부자재포함) 일괄등록양식 다운로드</a>
                                                 {{-- file_type: G(기본) / S(원부자재포함) --}}
                                                 <input type="hidden" id="file_type" value="G">
                                             </div>
@@ -200,7 +200,7 @@
 						@endforeach
 						@if (!in_array($entry_cd, ['M', 'O']))
 						{ headerName: "소계", field: "{{ $entry_cd }}_sum", type: 'currencyType', width: 100,
-                            cellRenderer: (params) => params.value !== null ? Comma(params.value) : (CMD === 'add' ? '' : 0),
+                            cellRenderer: (params) => params.value !== null ? Comma(Math.round(params.value)) : (CMD === 'add' ? '' : 0),
                         },
 						@endif
 					]
@@ -432,7 +432,7 @@
         }
 
         cols = cols.reduce((a,c) => {
-            a[c.field] = c.value;
+            a[c.field] = Math.round(c.value);
             return a;
         }, {});
 
@@ -519,14 +519,14 @@
 
 		let excel_columns = {
 			'B': 'store_nm',
-			'C': 'M1_amt',
-			'F': 'P1_amt', 'G': 'P2_amt', 'I': 'P4_amt', 'J': 'P5_amt', 'K': 'P6_amt',
-			'M': 'S1_amt', 'N': 'S2_amt', 'O': 'S3_amt', 'Q': 'S4_amt',
-			'R': 'O1_amt', 'S': 'O2_amt', 'T': 'O3_amt'
+			'E': 'M1_amt',
+			'J': 'P1_amt', 'K': 'P2_amt', 'M': 'P4_amt', 'N': 'P5_amt', 'O': 'P6_amt',
+			'Q': 'S1_amt', 'R': 'S2_amt', 'S': 'S3_amt', 'U': 'S4_amt',
+			'V': 'O1_amt', 'W': 'O2_amt', 'X': 'O3_amt'
         };
 
-        let g_types = ['V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'];
-        let e_types = ['AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP'];
+        let g_types = ['Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI'];
+        let e_types = ['AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT'];
 
         if (file_type === 'S') {
             g_types.forEach(col => { excel_columns[col] = 'G' });
@@ -570,9 +570,14 @@
 			});
 
             let c_store_cd = stores.find(st => st[1] === row.store_nm)?.[0] || '';
-            if (rows.find(r => r.store_cd === c_store_cd) !== undefined) {
-                rowIndex++;
-                continue;
+			// 해당 매장명이 중복되어 입력된 경우, 같은 매장명을 가진 열의 합계로 등록 (해당 월의 매니저가 2명 이상일 경우)
+			let prev_store_row = rows.find(r => r.store_cd === c_store_cd);
+            if (prev_store_row !== undefined) {
+				Object.keys(row).forEach(col => {
+					if (!col.includes('_amt')) return;
+					row[col] = (row[col] * 1) + ((prev_store_row[col] || 0) * 1);
+				});
+				rows.splice(rows.indexOf(prev_store_row), 1);
             }
 
             // 온라인항목 처리
@@ -589,7 +594,7 @@
                     = Object.keys(row).reduce((a,c) => (
                         (c.split("")[0] === group_cd && c.split("_").slice(-1)[0] === "amt" && !EXCLUED_TOTAL.split(",").includes(c.split("_")[0]))
                             ? EXCEPT_VAT.split(",").includes(c.split("_")[0])
-                                ? Math.round(row[c] * 1 / 1.1)
+                                ? row[c] * 1 / 1.1
                                 : (row[c] * 1)
                             : 0
                     ) + a, 0);
