@@ -238,6 +238,7 @@
 							<input type="checkbox" name="chk_to_class" id="chk_to_class" value="Y" class="custom-control-input">
 							<label class="custom-control-label text-left" for="chk_to_class">이미지출력</label>
 						</div>
+						&nbsp;&nbsp;
                         <div class="custom-control custom-checkbox form-check-box">
                             <input type="checkbox" name="chk_ord_no" id="chk_ord_no" class="custom-control-input" checked="">
                             <label class="custom-control-label text-left" for="chk_ord_no" style="line-height:30px;justify-content:left">주문단위로 품절검사, </label>
@@ -366,12 +367,16 @@
             pApp.ResizeGrid(265);
 			pApp.BindSearchEnter();
             Search();
+
+			$("#chk_to_class").click(function() {
+				gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
+			});
         });
 
         function Search() {
             let data = $('form[name="search"]').serialize();
             gx.Request('/partner/order/ord21/search', data, -1, searchCallback);
-    }
+    	}
 
     function searchCallback(data) {}
 
