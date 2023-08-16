@@ -273,10 +273,10 @@
         </div>
         <ul class="mb-0">
             <li>매출액 = 과세 + 비과세</li>
-            <li>매출원가 = 실제판매원가</li>
+{{--            <li>매출원가 = 실제판매원가</li>--}}
             <li>부가세 = 과세 - ( 과세 / 1.1 )</li>
-            <li>세전 매출이익 = 매출액 - 매출원가</li>
-            <li>세후 매출이익 = 매출액 - 매출원가 - 부가세</li>
+{{--            <li>세전 매출이익 = 매출액 - 매출원가</li>--}}
+{{--            <li>세후 매출이익 = 매출액 - 매출원가 - 부가세</li>--}}
         </ul>
     </div>
 </div>
@@ -381,6 +381,7 @@
             headerName: "마진율(%)",
             field: "margin",
             type: 'percentType',
+			hide:true,
             valueGetter: function(params) {
                 if (params.data.date === "합계" || params.data.date === "평균") {
                     const data = params.data;
@@ -441,7 +442,8 @@
             headerName: "이익율(%)",
             field: "biz_margin",
             type: 'percentType',
-            aggregation: true
+            aggregation: true,
+			hide:true
         },
         {
             headerName: '이익',
@@ -450,13 +452,15 @@
                     headerName: "세전",
                     field: "biz_profit",
                     type: 'currencyType',
-                    aggregation: true
+                    aggregation: true,
+					hide:true
                 },
                 {
                     headerName: "세후",
                     field: "biz_profit_after",
                     type: 'currencyType',
-                    aggregation: true
+                    aggregation: true,
+					hide:true
                 },
             ]
         },

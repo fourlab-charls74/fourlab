@@ -20,6 +20,7 @@
                     <div>
                         <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                         <a href="#" id="search_sbtn2" onclick="Search2();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                        <a href="#" id="search_sbtn3" onclick="Search3();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -43,31 +44,31 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
-                                <div class="form-group">
-                                    <label for="good_types">판매채널/매장구분</label>
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex_box w-100">
-                                            <select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
-                                                <option value=''>전체</option>
-                                            @foreach ($store_channel as $sc)
-                                                <option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
-                                            @endforeach
-                                            </select>
-                                        </div>
-                                        <span class="mr-2 ml-2">/</span>
-                                        <div class="flex_box w-100">
-                                            <select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
-                                                <option value=''>전체</option>
-                                            @foreach ($store_kind as $sk)
-                                                <option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
-                                            @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <div class="col-lg-4 inner-td">
+                        <div class="col-lg-4 inner-td search_no_hq" >
+							<div class="form-group">
+								<label for="good_types">판매채널/매장구분</label>
+								<div class="d-flex align-items-center">
+									<div class="flex_box w-100">
+										<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+											<option value=''>전체</option>
+										@foreach ($store_channel as $sc)
+											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+										@endforeach
+										</select>
+									</div>
+									<span class="mr-2 ml-2">/</span>
+									<div class="flex_box w-100">
+										<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+											<option value=''>전체</option>
+										@foreach ($store_kind as $sk)
+											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+										@endforeach
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+                        <div class="col-lg-4 inner-td search_no_hq" >
                             <div class="form-group" id="div_store_nm">
                                 <label for="store_nm">매장명</label>
                                 <div class="flax_box">
@@ -81,12 +82,29 @@
                                 </div>
                             </div>
                         </div>
+						<div class="col-lg-4 inner-td search_hq">
+							<div class="form-group" id="div_user_id">
+								<label for="">아이디</label>
+								<div class="flax_box">
+									<input type='text' class="form-control form-control-sm search-enter" id="user_id" name='user_id' value=''>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td search_hq">
+							<div class="form-group" id="div_user_name">
+								<label for="">이름</label>
+								<div class="flax_box">
+									<input type='text' class="form-control form-control-sm search-enter" id="user_name" name='user_name' value=''>
+								</div>
+							</div>
+						</div>
                     </div>
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                 <a href="#" id="search_sbtn2" onclick="Search2();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+                <a href="#" id="search_sbtn3" onclick="Search3();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             </div>
         </div>
         <div class="show_layout py-0 px-sm-0" id="div_grid">
@@ -164,6 +182,7 @@
 			{headerName: "직책", field: "posi",width:100, cellStyle: {'text-align':'center' }},
 			{headerName: "ID", field: "id",width:100, cellStyle: {'text-align':'center' }},
 			{headerName: "이름", field: "name",width:100, cellStyle: {'text-align':'center' }},
+			{width: 'auto'}
 		];
 
 </script>
@@ -180,7 +199,9 @@
         $('#div_grid2').hide();
         $('#div_grid3').hide();
         $('#search_sbtn2').hide();
+        $('#search_sbtn3').hide();
         $('#div_group_nm').hide();
+        $('.search_hq').hide();
 
         $("input[name='store']").change(function() {
             if($("input[name='store']:checked").val() == 'O') {
@@ -188,21 +209,32 @@
                 $('#div_grid').show();
                 $('#div_grid3').hide();
                 $('#search_sbtn2').hide();
+                $('#search_sbtn3').hide();
                 $('#search_sbtn').show();
                 $('#div_store_nm').show();
                 $('#div_group_nm').hide();
+				$('.search_hq').hide();
+				$('.search_no_hq').show();
             } else if ($("input[name='store']:checked").val() == 'G') {
                 $('#div_grid2').show();
                 $('#div_grid').hide(); 
                 $('#div_grid3').hide(); 
                 $('#search_sbtn2').show();
+                $('#search_sbtn3').hide();
                 $('#search_sbtn').hide();
                 $('#div_store_nm').hide();
                 $('#div_group_nm').show();
+				$('.search_hq').hide();
+				$('.search_no_hq').show();
             } else if ($("input[name='store']:checked").val() == 'H') {
 				$('#div_grid').hide();
 				$('#div_grid2').hide();
 				$('#div_grid3').show();
+				$('#search_sbtn').hide();
+				$('#search_sbtn2').hide();
+				$('#search_sbtn3').show();
+				$('.search_no_hq').hide();
+				$('.search_hq').show();
 			}
         });
 
@@ -276,6 +308,11 @@
         
         const rows3 = gx2.getSelectedRows();
         let group_cd = "";
+		
+		const rows4 = gx3.getSelectedRows();
+		let user_id = "";
+
+		console.log(rows4);
 
         let check_radio = $('input[name=store]:checked').val();
 
@@ -293,13 +330,18 @@
             group_cd += rows2[i].group_cd + ',';
         }
         const sc3 = group_cd.replace(/,\s*$/, "");
+		
+		for (let i=0; i<rows4.length; i++) {
+            user_id += rows4[i].id + ',';
+        }
+        const user_info = user_id.replace(/,\s*$/, "");
 
-        if(rows.length < 1 && rows2.length < 1) {
-            alert('적어도 한 개 이상의 매장을 선택해주세요');
-        } else if (rows2.length > 1) {  
-            alert('그룹알림전송은 1개의 그룹만 선택해주세요')
+        if(rows.length < 1 && rows2.length < 1 && rows4.length < 1) {
+            alert('알리미를 보내려면 1개 이상의 매장이나 사용자를 선택해주세요.');
+        } else if (rows2.length > 1) {
+			alert('그룹알림전송은 1개의 그룹만 선택해주세요.');
         } else {
-            const url = '/store/stock/stk32/sendMsg?store_cd=' + sc + '&group_nm=' + sc2 + '&group_cd=' + sc3 + '&check=' + check_radio;
+            const url = '/store/stock/stk32/sendMsg?store_cd=' + sc + '&group_nm=' + sc2 + '&group_cd=' + sc3 + '&user_id=' + user_info +'&check=' + check_radio;
             const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
         }
     }
@@ -311,12 +353,28 @@
     }
 
     // 그룹매장으로 변경 시 search-enter가 먹히지 않아서 JS로 대체
-    var input = document.getElementById("group_nm");
+    let input = document.getElementById("group_nm");
+	let user_id = document.getElementById("user_id");
+	let user_name = document.getElementById("user_name");
 
     input.addEventListener("keyup", function (event) {
       if (event.keyCode === 13) {
         event.preventDefault();
         document.getElementById("search_sbtn2").click();
+      }
+    });
+	
+	user_id.addEventListener("keyup", function (event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById("search_sbtn3").click();
+      }
+    });
+	
+	user_name.addEventListener("keyup", function (event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById("search_sbtn3").click();
       }
     });
 
