@@ -97,6 +97,8 @@ class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings, WithTit
 		$sheet->getPageSetup()->setVerticalCentered(true);
 		$sheet->getPageSetup()->setFitToPage(true);
 		$sheet->getPageSetup()->setPaperSize(9);
+
+		if (isset($this->keys['freeze_row'])) $sheet->freezePane($this->keys['freeze_row'] ?? '');
 		
 		return $this->style;
 	}

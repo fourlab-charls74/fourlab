@@ -420,7 +420,7 @@ class stk13Controller extends Controller
 						'store_cd' => $store_cd,
 						'storage_cd' => $storage_cd,
 						'state' => $state,
-						'exp_dlv_day' => str_replace("-", "", $exp_dlv_day),
+						'exp_dlv_day' => str_replace("-", "", $exp_dlv_day_data),
 						'rel_order' => $rel_order,
 						'req_id' => $admin_id,
 						'req_rt' => now(),

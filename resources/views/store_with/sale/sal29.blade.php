@@ -17,7 +17,8 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div>
-					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+					<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -81,11 +82,26 @@
                         </div>
                     </div>
 				</div>
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">정렬</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box w-100">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value="store">매장 - 상품별</option>
+										<option value="product">상품 - 매장별</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="#" onclick="gx.Download();" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+			<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+			<a href="javascript:void(0);" class="export-excel btn btn-sm btn-outline-primary shadow-sm"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</form>
@@ -200,7 +216,7 @@
 			this.eGui = document.createElement('div');
 			this.eGui.classList.add('ag-cell-label-container');
 			this.eGui.classList.add('ag-header-cell-sorted-none');
-			this.eGui.innerHTML = `<span class="w-100 d-flex flex-column align-items-center">${params.displayName.split(' / ').map(p => '<span style="height: 15px;">' + (p === 'empty' ? '' : p) + '</span>').join('')}</span>`;
+			this.eGui.innerHTML = `<span class="w-100 d-flex flex-column align-items-center">${params.displayName.split('\n').map(p => '<span style="height: 15px;">' + (p === ' ' ? '' : p) + '</span>').join('')}</span>`;
 		}
 
 		getGui() {
@@ -211,10 +227,10 @@
 			return false;
 		}
 	}
-	const pinnedRowData = [{ store_cd : '합계', qty : 0 }];
-	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+	const pinnedRowData = [{ qty : 0 }];
+	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + ((c || 0) * 1), 0);
 
-	const columns = [
+	const columns_store = [
 		{field: "baebun_type",	headerName: "배분구분", pinned:'left', width: 80, cellClass: 'hd-grid-code',
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
@@ -243,9 +259,41 @@
 			}
 		},
 		{field: "color", headerName: "컬러", pinned:'left', width: 80, cellClass: 'hd-grid-code'},
-		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100, cellClass: 'hd-grid-code'},
+		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100},
 		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc: sumValuesFunc},
 	];
+	
+	const columns_product = [
+		{field: "baebun_type",	headerName: "배분구분", pinned:'left', width: 80, cellClass: 'hd-grid-code', aggFunc: 'first',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+		},
+		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left', cellClass: 'hd-grid-code', aggFunc: 'first',
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : params.node.level == 0 ? params.value : '',
+		},
+		{field: "goods_nm",	headerName: "상품명", width: 200, pinned:'left', aggFunc: 'first',
+			cellRenderer: function (params) {
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return '존재하지 않는 상품입니다.';
+				} else if (params.node?.level !== 0) {
+					return '';
+				} else {
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="#" onclick="return openStoreProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+		},
+		{field: "color", headerName: "컬러", rowGroup: true, hide: true},
+		{headerName: '컬러', showRowGroup: 'color', cellRenderer: 'agGroupCellRenderer', minWidth: 80, maxWidth: 100, pinned: 'left'},
+		{field: "color_nm", headerName: "컬러명", pinned:'left', width: 100, aggFunc: 'first',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+		},
+		{field: "store_cd",	headerName: "매장코드",	width: 80, pinned:'left', cellClass: 'hd-grid-code'},
+		{field: 'store_nm', headerName: '매장명', width: 120, pinned: 'left'},
+		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+	];
+
+	const getCurrentColumn = () => $("[name=ord_field]").val() === 'store' ? columns_store : columns_product;
+
 </script>
 <script type="text/javascript" charset="utf-8">
 	const pApp = new App('', {
@@ -257,7 +305,7 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns, {
+		gx = new HDGrid(gridDiv, getCurrentColumn(), {
 			defaultColDef: {
 				suppressMenu: true,
 				resizable: true,
@@ -275,6 +323,13 @@
 			animateRows: true,
 			headerHeight:100,
 		});
+
+		// 엑셀다운로드
+		$(".export-excel").on("click", function (e) {
+			if(!validation()) return; 
+			let data = $('form[name="search"]').serialize();
+			location.href = '/store/sale/sal29/download?' + data;
+		});
 	});
 
 	function Search() {
@@ -288,15 +343,16 @@
 
 	function setColumn(sizes) {
 		if(!sizes) return;
+		const columns = getCurrentColumn();
 		columns.splice(9);
 		
-		let size_cols = sizes.map(size => size.map(s => s === 0 ? ({ empty_tag: 'empty' }) : s));
+		let size_cols = sizes.map(size => size.map(s => s === 0 ? ({ empty_tag: ' ' }) : s));
 
 		for (let i = 0; i < size_cols.length; i++) {
 			let field_cds = size_cols[i].map(c => (c.size_kind_cd || '') + (c.size_kind_cd ? '^' : '') + (c.size_cd || ''));
 			columns.push({ 
 				field: 'SIZE_' + i,
-				headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join(' / '),
+				headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join('\n'),
 				type: 'currencyType', 
 				width: 80, 
 				headerComponent: CustomHeader,
@@ -319,7 +375,10 @@
 			});
 		}
 		columns.push({ width: 'auto' });
+
+		gx.gridOptions.api.setColumnDefs([]);
 		gx.gridOptions.api.setColumnDefs(columns);
+
 		updatePinnedRow();
 	}
 

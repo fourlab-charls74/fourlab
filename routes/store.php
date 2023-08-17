@@ -851,6 +851,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::get('sal29', 'sal29Controller@index');
 		Route::get('sal29/search', 'sal29Controller@search');
         Route::get('sal29/searchBaebun', 'sal29Controller@searchBaebun');
+        Route::get('sal29/download', 'sal29Controller@download');
 
     });
 

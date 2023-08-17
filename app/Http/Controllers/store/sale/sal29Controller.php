@@ -5,9 +5,11 @@ namespace App\Http\Controllers\store\sale;
 use App\Http\Controllers\Controller;
 use App\Components\Lib;
 use App\Components\SLib;
+use App\Exports\ExcelViewExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use PDO;
 
@@ -27,10 +29,30 @@ class sal29Controller extends Controller
 	
 	public function search(Request $request)
 	{
+		$values = $this->_get($request);
+		$rows = $values['result'];
+		$size_cols = $values['sizes'];
+
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total"	=> count($rows),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+				"sizes"	=> $size_cols,
+			],
+			"body" => $rows,
+		]);
+	}
+	
+	public function _get(Request $request) 
+	{
 		$rel 			= $request->input('rel');
 		$baebun_date 	= $request->input('baebun_date');
 		$baebun_date	= Carbon::parse($baebun_date)->format('ymd');
 		$baebun_type 	= $request->input("baebun_type", "");
+		$ord_field		= $request->input('ord_field', 'store');
 
 		$where = "";
 		$where2 = "";
@@ -53,7 +75,15 @@ class sal29Controller extends Controller
 		} else {
 			$where2	.= " and ( psr.type < 0 ) ";
 		}
-		
+
+		$groupby = "";
+
+		if ($ord_field === 'store') {
+			$groupby .= "group by p.store_cd, p.prd_cd_p, p.color";
+		} else if ($ord_field === 'product') {
+			$groupby .= "group by p.prd_cd_p, p.color, p.store_cd";
+		}
+
 		// 해당사이즈 조회 (FREE + 해당사이즈)
 		$sql = "
 			select s.size_kind_cd, s.size_cd, s.size_seq
@@ -67,11 +97,11 @@ class sal29Controller extends Controller
 			order by s.size_kind_cd, s.size_seq
 		";
 		$free_size = DB::select(
-			"select size_kind_cd, size_cd, size_seq from size where size_kind_cd = :size_kind_cd and size_cd = :size_cd", 
+			"select size_kind_cd, size_cd, size_seq from size where size_kind_cd = :size_kind_cd and size_cd = :size_cd",
 			[ 'size_kind_cd' => 'FREE', 'size_cd' => '99' ],
 		);
 		$size_list = array_merge($free_size, DB::select($sql));
-		
+
 		$size_sql = "";
 		$size_sum_sql = "";
 		$size_group = [];
@@ -128,7 +158,7 @@ class sal29Controller extends Controller
 						inner join product_code pc on pc.prd_cd = psr.prd_cd
 					where 1=1 $where $where2
 				) p
-					group by p.store_cd, p.prd_cd_p, p.color
+					$groupby
 			) a
 				inner join store s on s.store_cd = a.store_cd
 				inner join code type on type.code_kind_cd = 'REL_TYPE' and type.code_id = a.type
@@ -153,187 +183,7 @@ class sal29Controller extends Controller
 			}
 		}
 
-		return response()->json([
-			"code" => 200,
-			"head" => [
-				"total"	=> count($rows),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1,
-				"sizes"	=> $size_cols,
-			],
-			"body" => $rows,
-		]);
-		
-		$sql = "
-			select 
-				distinct psr.prd_cd
-				, psr.qty
-				, s.size_cd
-				, psr.store_cd
-				, s.size_seq
-			from product_stock_release psr
-				inner join product_code pc on pc.prd_cd = psr.prd_cd
-				inner join size s on s.size_cd = pc.size
-			where 1=1 $where
-			order by s.size_seq, psr.store_cd
-		";
-		
-		$size_val = DB::select($sql);
-		
-		
-		$size_sql = "";
-		for ($i=0; $i<count($size_val); $i++) {
-			$prd_cd = $size_val[$i]->prd_cd;
-			$store_cd = $size_val[$i]->store_cd;
-			$qty = $size_val[$i]->qty;
-			$size_cd = $size_val[$i]->size_cd;
-			$size_seq = $size_val[$i]->size_seq;
-
-			$size_sql .= ", if(psr.prd_cd = '$prd_cd' and psr.store_cd = '$store_cd', $qty, '') as `$size_cd`";
-			
-		}
-		
-		
-		
-
-		$limit	= 100;
-		$page	= $request->input("page", 1);
-		if ($page < 1 or $page == "") $page = 1;
-		$page_size	= $limit;
-		$startno	= ($page - 1) * $page_size;
-
-		$total		= 0;
-		$page_cnt	= 0;
-
-		$total_row = [];
-		if ($page == 1) {
-
-			$sql = "
-				select 
-					count(prd_cd) as total
-					, sum(a.qty) as total_qty
-				from  (
-					select
-						d.code_val as baebun_type
-						, storage.storage_cd
-						, storage.storage_nm
-						, store.store_cd
-						, store.store_nm
-						, psr.prd_cd as prd_cd
-						, pc.color
-						, c.code_val as color_nm
-						, date_format(psr.exp_dlv_day,'%Y-%m-%d') as baebun_date
-						, psr.rel_order as rel_baebun
-						, concat(psr.exp_dlv_day, '_', psr.rel_order) as rel_order
-						, psr.qty as qty
-						, g.goods_nm
-						, g.goods_no
-					from product_stock_release psr
-						inner join storage storage on storage.storage_cd = psr.storage_cd
-						inner join store store on store.store_cd = psr.store_cd
-						inner join product_code pc on pc.prd_cd = psr.prd_cd
-						left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
-						left outer join code d on d.code_id = psr.type and d.code_kind_cd = 'REL_TYPE'
-						left outer join goods g on g.goods_no = psr.goods_no
-					where 1=1 $where $where2
-					order by store.store_cd desc, psr.prd_cd desc
-				) as a
-
-			";
-
-			$row = DB::select($sql);
-				$total	= $row[0]->total;
-				$total_row = $row[0];
-				$page_cnt = (int)(($total - 1) / $page_size) + 1;
-		}
-	
-		$sql = "
-			select
-				d.code_val as baebun_type
-				, storage.storage_cd
-				, storage.storage_nm
-				, store.store_cd
-				, store.store_nm
-				, psr.prd_cd as prd_cd
-				, pc.color
-				, c.code_val as color_nm
-			    , (
-                    select 
-						s.size_cd 
-                    from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
-				, date_format(psr.exp_dlv_day,'%Y-%m-%d') as baebun_date
-				, psr.rel_order as rel_baebun
-				, concat(psr.exp_dlv_day, '_', psr.rel_order) as rel_order
-				, psr.qty as qty
-				, g.goods_nm
-				, g.goods_no
-				$size_sql
-			from product_stock_release psr
-				inner join storage storage on storage.storage_cd = psr.storage_cd
-				inner join store store on store.store_cd = psr.store_cd
-				inner join product_code pc on pc.prd_cd = psr.prd_cd
-				left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
-				left outer join code d on d.code_id = psr.type and d.code_kind_cd = 'REL_TYPE'
-				left outer join goods g on g.goods_no = psr.goods_no
-			where 1=1 $where $where2
-			order by store.store_cd desc, psr.prd_cd desc
-            ";
-		
-		$rows = DB::select($sql);
-		
-		
-//		$sql = "
-//			select 
-//				distinct(s.size_cd)
-//				, s.size_kind_cd
-//			from size s
-//				inner join product_code pc on pc.size = s.size_cd
-//				left outer join product_stock_release psr on psr.prd_cd = pc.prd_cd
-//			where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-//				and s.size_cd = pc.size
-//				and use_yn = 'Y'
-//			order by s.size_seq
-//		";
-		
-		$sql = "
-			select
-				(
-					select
-						s.size_cd
-					from size s
-					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-					and s.size_cd = pc.size
-					and use_yn = 'Y'
-				) as size
-				, s.size_seq
-			from product_stock_release psr
-				inner join product_code pc on pc.prd_cd = psr.prd_cd
-				inner join size s on s.size_cd = pc.size
-			where 1=1 $where
-			group by size
-			order by s.size_seq asc
-		";
-		
-		$sizes = DB::select($sql);
-		
-		return response()->json([
-			"code"	=> 200,
-			"head"	=> array(
-				"total"		=> $total,
-				"page"		=> $page,
-				"page_cnt"	=> $page_cnt,
-				"page_total"=> count($rows),
-				"total_row" => $total_row,
-				"sizes"		=> $sizes,
-			),
-			"body" => $rows
-		]);
-		
+		return [ 'result' => $rows, 'sizes' => $size_cols ];
 	}
 
 	public function searchBaebun(Request $request)
@@ -377,4 +227,71 @@ class sal29Controller extends Controller
             "body" => $rows
         ]);
     }
+
+	public function download(Request $request)
+	{
+		$rel 			= $request->input('rel');
+		$baebun_date 	= $request->input('baebun_date');
+		$baebun_date	= Carbon::parse($baebun_date)->format('ymd');
+		$ord_field		= $request->input('ord_field', 'store');
+
+		$values = $this->_get($request);
+		$rows = $values['result'];
+		$size_cols = $values['sizes'];
+		
+		$headers = [];
+		if ($ord_field === 'store') {
+			$headers = [['배분구분', 'baebun_type'], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2], ['수량', 'qty']];
+		} else if ($ord_field === 'product') {
+			$headers = [['배분구분', 'baebun_type'], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['수량', 'qty']];
+		}
+
+		$group_key = $ord_field === 'store' ? 'store_cd' : 'color';
+		$rows = array_reduce($rows, function ($a, $c) use ($group_key) {
+			if (isset($a[$c->{$group_key}])) array_push($a[$c->{$group_key}], $c);
+			else $a[$c->{$group_key}] = [$c];
+			return $a;
+		}, []);
+		
+		$total_rows = [];
+		$rows = array_reduce($rows, function ($a, $c) use (&$total_rows) {
+			$a = array_merge($a, $c);
+			$sum_row = array_reduce($c, function ($aa, $cc) {
+				$keys = array_filter(array_keys((array) $cc), function ($ft) { return str_contains($ft, 'SIZE_') || $ft === 'qty'; });
+				foreach ($keys as $key) {
+					$aa[$key] = ($aa[$key] ?? 0) + ($cc->{$key} ?? 0);
+				}
+				return $aa;
+			}, []);
+			$sum_row['sum'] = true;
+			array_push($a, (object) array_merge((array) $c[0], $sum_row));
+			array_push($total_rows, (object) $sum_row);
+			return $a;
+		}, []);
+		$total_row = array_reduce($total_rows, function ($aa, $cc) {
+			$keys = array_filter(array_keys((array) $cc), function ($ft) { return $ft !== 'sum'; });
+			foreach ($keys as $key) {
+				$aa[$key] = ($aa[$key] ?? 0) + ($cc->{$key} ?? 0);
+			}
+			return $aa;
+		}, []);
+		$total_row['total'] = true;
+		$rows = array_merge([(object) $total_row], $rows);
+
+		$data = [
+			'one_sheet_count' => -1,
+			'exp_dlv_date' => $baebun_date,
+			'rel_order' => $rel,
+			'groupby' => $ord_field,
+			'group_key' => $group_key,
+			'headers' => $headers,
+			'size_columns' => $size_cols,
+			'list' => $rows
+		];
+
+		$view_url = Config::get('shop.store.view') . '/sale/sal29_excel';
+		$keys = [ 'list_key' => 'list', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 11, 'cell_height' => 25, 'freeze_row' => 'A13', 'sheet_name' => '배분현황' ];
+
+		return Excel::download(new ExcelViewExport($view_url, $data, [], null, $keys), '배분현황_' . $baebun_date . '_' . $rel . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 }
