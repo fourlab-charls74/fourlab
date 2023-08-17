@@ -378,6 +378,7 @@
                             </div>
                             <div class="table-responsive">
                                 <div id="div-gd-option" style="width:100%;height:300px;" class="ag-theme-balham"></div>
+								<p class="text-danger font-weight-semibold mt-1">* 옵션명이 변경되면 해당 옵션의 기존정보가 삭제되고 새로운 옵션이 등록됩니다.</p>
                             </div>
                         </div>
                     </div>
