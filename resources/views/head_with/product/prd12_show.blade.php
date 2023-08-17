@@ -377,13 +377,23 @@
                                             <tr>
                                                 <th>세일</th>
                                                 <td>
+													<div class="form-inline form-radio-box flax_box txt_box">
+														<div class="custom-control custom-radio">
+															<input type="radio" name="sale_yn" value="Y" id="sale_yn_y" class="custom-control-input" />
+															<label class="custom-control-label" for="sale_yn_y">사용</label>
+														</div>
+														<div class="custom-control custom-radio">
+															<input type="radio" name="sale_yn" value="N" id="sale_yn_n" class="custom-control-input" />
+															<label class="custom-control-label" for="sale_yn_n">미사용</label>
+														</div>
+													</div>
                                                     <div class="form-inline form-box">
                                                         <div class="input_box mr-1">
                                                             <input type='text' class="form-control form-control-sm" name='sale_amt' id='sale_amt' value='{{@$category->sale_amt}}'>
                                                         </div>
                                                         <div class="input_box">
-                                                            <select name="sale_kind" id="sale_kind" class="form-control form-control-sm wd100">
-                                                                <option value="P" @if(@$category->sale_kind == "P") selected @endif>%</option>
+															<select name="sale_kind" id="sale_kind" class="form-control form-control-sm wd100" style="width: 80px;">
+																<option value="P" @if(@$category->sale_kind != "W") selected @endif>%</option>
                                                                 <option value="W" @if(@$category->sale_kind == "W") selected @endif>원</option>
                                                             </select>
                                                         </div>
@@ -454,9 +464,8 @@
     </style>
     <script>
         const folder_columns = [
-            {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null, cellStyle: {"background":"#F5F7F7"}},
-            {field: "d_cat_cd", headerName: "코드",width:100},
-            {field: "d_cat_nm", headerName: "폴더명",width:200,rowDrag: true, editable: true, cellStyle: {'background' : '#ffff99'},
+			{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null},
+			{field: "d_cat_cd", headerName: "코드",width: 80, cellClass: 'hd-grid-code',
                 // editable: function(params){ return (params.data !== undefined && params.data.editable === 'Y')? true:false; },
                 cellClass:function(params){ return (params.data !== undefined && params.data.editable == 'Y')? ['hd-grid-edit']: [];},
                 cellRenderer: function (params) {
@@ -471,24 +480,25 @@
                     return `<a href="javascript:void(0);" onclick="return SearchCategoryGoods('${params.data.d_cat_cd}');">${params.value}</a>`;
                 }
             },
-            {field: "use_yn", headerName: "사용여부",width:72, editable: true, cellStyle: {'background' : '#ffff99'},
-                cellEditorSelector: function(params) {
-                    addEventListener('click', function(event) {
-                        params.node.data.editable = 'Y';
-                    });
-                    return {
-                        component: 'agRichSelectCellEditor',
-                        params: { 
-                            values: ['Y', 'N']
-                        },
-                    };
-                },
-            },
-            {field: "tpl_kind", headerName: "템플릿",width:60},
-            {field: "sale_yn", headerName: "세일",width:60},
-            {field: "reg_dm", headerName: "헤더",width:60},
-            {field: "goods_cnt", headerName: "상품수", width:60,type:'numberType'},
-            {field: "editable",hide:true}
+            {field: "editable",hide:true},
+			{field: "d_cat_nm", headerName: "폴더명",width:200,rowDrag: true,
+				editable: function(params){ return params.data !== undefined; },
+				cellClass:function(params){ return params.data !== undefined ? ['hd-grid-edit'] : []; },
+			},
+			{field: "goods_cnt", headerName: "상품수", width: 70,type:'numberType'},
+			{field: "use_yn", headerName: "사용여부",width:70, cellClass: (params) => ['hd-grid-code'].concat(params.data.d_cat_cd !== '' ? ['hd-grid-edit'] : []),
+				cellRenderer: (params) => params.data.d_cat_cd ? `<a href="javascript:void(0);" onclick="return setCategoryDetail('${params.data.d_cat_cd}', 'use_yn');">${params.value}</a>` : params.value,
+			},
+			{field: "tpl_kind", headerName: "템플릿",width:70, cellClass: 'hd-grid-code',
+				cellRenderer: (params) => params.data.d_cat_cd ? `<a href="javascript:void(0);" onclick="return setCategoryDetail('${params.data.d_cat_cd}', 'tpl_kind');">${params.value}</a>` : params.value,
+			},
+			{field: "sale_yn", headerName: "세일",width:70, cellClass: 'hd-grid-code',
+				cellRenderer: (params) => params.data.d_cat_cd ? `<a href="javascript:void(0);" onclick="return setCategoryDetail('${params.data.d_cat_cd}', 'sale_yn');">${params.value}</a>` : params.value,
+			},
+			{field: "header", headerName: "헤더",width:70, cellClass: 'hd-grid-code',
+				cellRenderer: (params) => params.data.d_cat_cd ? `<a href="javascript:void(0);" onclick="return setCategoryDetail('${params.data.d_cat_cd}', 'header');">보기</a>` : '',
+			},
+			{width: "auto"}
         ];
 
         const columns = [
@@ -552,7 +562,15 @@
 				gx.gridOptions.rowSelection	= 'multiple';
 
                 SearchCategoryGoods();
+				if ($("#folder_cnt").is(":checked")) {
+					SearchCategoryGoods();
 
+					$("[name=sale_yn]").on("change", function (e) {
+						$("#sale_amt").attr('readonly', e.target.value === 'N');
+						$("#sale_kind").attr('disabled', e.target.value === 'N');
+					});
+				}
+				
                  // 이미지 출력 설정
                 $("#chk_to_class").click(function() {
                     gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
@@ -562,7 +580,11 @@
             const gridFolderDiv = document.querySelector("#div-gd_folder");
 
             if(gridFolderDiv !== null) {
-                gxFolder = new HDGrid(gridFolderDiv, folder_columns);
+				gxFolder = new HDGrid(gridFolderDiv, folder_columns, {
+					onCellValueChanged: (params) => {
+						params.node.setSelected(true);
+					}
+				});
                 gxFolder.gridOptions.rowDragManaged = true;
                 gxFolder.gridOptions.animateRows = true;
 

@@ -626,7 +626,7 @@ class prd12Controller extends Controller
         $sql = /** @lang text */
             "
             select
-                c.d_cat_cd, c.d_cat_nm,c.use_yn,c.tpl_kind,
+                c.d_cat_cd, c.d_cat_nm,c.use_yn,c.tpl_kind, c.sale_yn,
                 ( select count(*) from category_goods cg where cat_type = c.cat_type and d_cat_cd = c.d_cat_cd ) as goods_cnt
             from category c
             where c.cat_type = 'PLAN' and c.p_d_cat_cd = :p_d_cat_cd
@@ -662,50 +662,39 @@ class prd12Controller extends Controller
 
                 for($i=0;$i<count($folders);$i++){
 
-                    //존재여부 확인
-                    $sql = "
-                        select exists 
-                            (select * from category where (d_cat_cd = :d_cat_cd)) as 'exists'
-                    ";
-                    $result = DB::selectOne($sql, ["d_cat_cd" => $folders[$i]->d_cat_cd])->exists;
+					if ($folders[$i]->d_cat_cd !== '') {
+						$category = [
+							'd_cat_nm' => $folders[$i]->d_cat_nm,
+							'use_yn' => $folders[$i]->use_yn,
+							'admin_id' => $id,
+							'admin_nm' => $name,
+							'upd_date' => DB::raw('now()'),
+						];
 
-                        //기존데이터 update
-                    if ($result != 0) {
-                        $d_cat_cd = $folders[$i]->d_cat_cd;
+						DB::table('category')->where('d_cat_cd', $folders[$i]->d_cat_cd)->update($category);
+					} else {
+						$d_cat_cd = DB::table('category')
+							->where('cat_type','=',$cat_type)
+							->where('p_d_cat_cd','=',$p_d_cat_cd)
+							->select(DB::raw('ifnull(max(right(d_cat_cd,3)),0)+1 as next_d_cat_cd'))
+							->value('next_d_cat_cd');
 
-                        $sql = "
-                            update category set
-                                d_cat_nm = :d_cat_nm, use_yn = :use_yn, upd_date = now()
-                            where cat_type = 'PLAN' and d_cat_cd = :d_cat_cd
-                        ";
-                        DB::update($sql, ['d_cat_nm' => $folders[$i]->d_cat_nm, 'use_yn' => $folders[$i]->use_yn, 'd_cat_cd' => $d_cat_cd]);
+						$d_cat_cd = sprintf("%03d%03d", $p_d_cat_cd, $d_cat_cd);
 
-                        //신규데이터 insert
-                    } else if ( $folders[$i]->d_cat_cd == null ) {
-                        $d_cat_cd = DB::table('category')
-                            ->where('cat_type','=',$cat_type)
-                            ->where('p_d_cat_cd','=',$p_d_cat_cd)
-                            ->select(DB::raw('ifnull(max(right(d_cat_cd,3)),0)+1 as next_d_cat_cd'))
-                            ->value('next_d_cat_cd');
-
-                        $d_cat_cd = sprintf("%03d%03d", $p_d_cat_cd, $d_cat_cd);
-
-                        $category = [
-                            'cat_type' => $cat_type,
-                            'd_cat_cd' => $d_cat_cd,
-                            'd_cat_nm' => $folders[$i]->d_cat_nm,
-                            'p_d_cat_cd' => $p_d_cat_cd,
-                            // 'use_yn' => 'Y',
-                            'use_yn' => $folders[$i]->use_yn,
-                            'admin_id' => $id,
-                            'admin_nm' => $name,
-                            'regi_date' => DB::raw('now()'),
-                            'upd_date' => DB::raw('now()'),
-                            'seq' => 0,
-                        ];
-
-                        DB::table('category')->insert($category);
-                    }
+						$category = [
+							'cat_type' => $cat_type,
+							'd_cat_cd' => $d_cat_cd,
+							'd_cat_nm' => $folders[$i]->d_cat_nm,
+							'p_d_cat_cd' => $p_d_cat_cd,
+							'use_yn' => 'Y',
+							'admin_id' => $id,
+							'admin_nm' => $name,
+							'regi_date' => DB::raw('now()'),
+							'upd_date' => DB::raw('now()'),
+							'seq' => 0,
+						];
+						DB::table('category')->insert($category);
+					}
                 }
             });
             $code = 200;
@@ -802,13 +791,10 @@ class prd12Controller extends Controller
         $sale_amt = $request->input('sale_amt');
         $sale_kind = $request->input('sale_kind','P');
 
+		$sale_yn = $request->input('sale_yn','N');
 
-        if($sale_amt > 0){
-            $sale_yn = 'Y';
-        } else {
-            $sale_yn = 'N';
-        }
-
+		if ($sale_yn === 'N') $sale_amt = 0;
+		
         $cat_type = 'PLAN';
 
         $id = Auth::guard('head')->user()->id;
