@@ -1,8 +1,14 @@
 @extends('head_with.layouts.layout-nav')
 @section('title','회원관리')
 @section('content')
+	
+<style>
+	.table tr th input {
+		margin-left: 10px;
+	}
+</style>
 <div class="container-fluid show_layout py-3">
-    <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
+	<div class="page_tit mb-3 pr-0 d-flex align-items-center justify-content-between">
         <div>
             <h3 class="d-inline-flex">회원관리 다운로드</h3>
             <div class="d-inline-flex location">
@@ -12,13 +18,14 @@
             </div>
         </div>
         <div>
-			<a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary download-btn">다운로드</a>
+			<a href="javascript:void(0);" class="d-none d-sm-inline-block btn btn-sm btn-primary download-btn">다운로드</a>
         </div>
     </div>
 
 	<div class="card shadow">
-		<div class="card-header">
+		<div class="card-header d-flex justify-content-between align-items-center">
 			<a href="">필터</a>
+			<p class="fs-14">검색인원 <b id="total_count" class="text-primary font-weight-bold"></b>명</p>
 		</div>
 		<div class="card-body brtn mt-0 pt-2">
 			<form method="get" name="search">
@@ -127,12 +134,17 @@
 			</form>
 		</div>
 	</div>
-	<div class="text-center mb-3">
+	<div class="text-center mt-3">
 		<a href="#" class="btn btn-sm btn-primary download-btn">다운로드</a>
 	</div>
 </div>
 <script>
 let feilds = null;
+
+$(document).ready(function (e) {
+	let total = opener.getSearchTotalCount();
+	$("#total_count").text(Comma(total));
+})
 
 $("#all_check").click(function(){
 	$('[name=field]').prop("checked", this.checked);

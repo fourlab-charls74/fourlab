@@ -201,6 +201,7 @@ class mem01Controller extends Controller
 
     public function download(Request $req)
     {
+		ini_set('memory_limit', '512M');
         $this->set_excel_download("usr01_%s.xls");
 
         /** method : get_condition
@@ -211,8 +212,9 @@ class mem01Controller extends Controller
          */
         $cond = $this->get_condition($req);
 
-        $sql = $this->get_user_sql($cond[0], $cond[1], $cond[2], 0, 200000, true);
-
+        $sql = $this->get_user_sql($cond[0], $cond[1], $cond[2], 0, 0, true);
+		$rows = DB::select($sql);
+		
         $fields = [];
         $_fields = explode(',',Request('fields', ''));
 
@@ -225,10 +227,16 @@ class mem01Controller extends Controller
             ];
         }
 
-        return view( Config::get('shop.head.view') . '/member/mem01_download', [
-            'fields' => $fields,
-            'rows' => DB::select($sql)
-        ]);
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total"=> count($rows),
+				"page_cnt"=> 1,
+				"page"=> 1,
+				"fields" => $fields,
+			],
+			"body" => $rows,
+		]);
     }
 
     public function search(Request $req)
@@ -921,10 +929,14 @@ class mem01Controller extends Controller
 
     private function get_user_sql($where, $order_by, $join, $startno = 0, $page_size = 0, $use_group = false) {
 
-        $group_sql = "";
+		$limit = '';
+		$group_sql = "";
 
-        if ($use_group) {
-            $group_sql = "
+		if ($startno != 0 || $page_size != 0) {
+			$limit = "limit $startno, $page_size";
+		}
+		if ($use_group) {
+			$group_sql = "
                 ,(
                     select group_concat(ug.group_nm order by ug.point_ratio desc separator ',')
                     from user_group_member ugm
@@ -932,9 +944,9 @@ class mem01Controller extends Controller
                     where ugm.user_id = a.user_id
                 ) as `group`
             ";
-        }
-
-        $sql = "
+		}
+		
+		$sql = "
 			select
 				'' as chkbox, a.user_id, a.name,
 				d.code_val as sex, concat(ifnull(a.yyyy, ''),ifnull(a.mm, ''),ifnull(a.dd, '')) as birth_day,
@@ -957,7 +969,7 @@ class mem01Controller extends Controller
 			where 1=1 and out_yn <> 'I'
 				$where
 				$order_by
-			limit $startno, $page_size
+			$limit
 		";
 
         return $sql;
