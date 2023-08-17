@@ -719,7 +719,7 @@ class mem01Controller extends Controller
             case "claim_msg" :
                 $sql ="
                     select
-                        date_format(regi_date,'%Y.%m.%d %H:%i:%s') regi_date, ord_no, contents, admin_nm
+                        date_format(regi_date,'%Y.%m.%d %H:%i:%s') regi_date, ord_no, contents, admin_nm, '' as ord_opt_no
                     from member_cousel
                     where user_id = '$user_id'
                     order by idx desc
