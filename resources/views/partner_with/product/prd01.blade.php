@@ -330,7 +330,9 @@
     const gridDiv = document.querySelector(pApp.options.gridId);
     let gx;
     $(document).ready(function() {
-        gx = new HDGrid(gridDiv, columnDefs);
+		gx = new HDGrid(gridDiv, columnDefs, {
+			...getCopyFocusedCellToClipboardObject()
+		});
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         Search();

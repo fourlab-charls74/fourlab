@@ -2363,7 +2363,7 @@
                                     goodsClassSearch();
                                     // window.close();
                                     // location.reload();
-                                    opener.Search();
+									opener?.Search();
                                 }
                             },
                             error: function(request, status, error) {
