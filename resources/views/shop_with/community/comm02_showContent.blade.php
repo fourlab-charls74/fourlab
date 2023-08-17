@@ -83,14 +83,18 @@
             @if ($msg_type == 'pop')
             <div class="resul_btn_wrap mt-1 d-block">
                 <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : '매장알림')) }} 바로 가기</a>
-            </div>
-            @endif
+				<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+				<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
+			</div>
+			@else
+				<div class="resul_btn_wrap mt-3 d-block">
+					<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+					<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
+				</div>
+			@endif
         </div>
     </div>
-	<div class="resul_btn_wrap mt-3 d-block">
-		<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
-		<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
-	</div>
+	
 </div>
 <script type="text/javascript" charset="utf-8">
 

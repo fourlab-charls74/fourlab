@@ -103,7 +103,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name,'')) as sender_nm,
+                    ifnull(if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name,if(m.sender_type = 'H', '본사', ''))), mu.name) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -277,7 +277,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, '')) as sender_nm,
+                    ifnull(if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', ''))),mu.name) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -294,7 +294,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, '')) as sender_nm,
+                    ifnull(if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', ''))), mu.name) as sender_nm,
                     m.reservation_yn,
                     m.reservation_date,
                     s.phone as mobile,
