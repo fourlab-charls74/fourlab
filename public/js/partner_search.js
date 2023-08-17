@@ -442,10 +442,10 @@ SearchCategory.prototype.Open = function(type = 'DISPLAY',callback = null){
 
 SearchCategory.prototype.SetGrid = function(divId){
     const columns = [
-        {field:"d_cat_cd" , headerName:"코드",width:100},
-        {field:"d_cat_nm" , headerName:"카테고리명",hide:true},
-        {field:"full_nm" , headerName:"카테고리명",width:200},
-        {field:"choice" , headerName:"선택",width:100,cellClass:'hd-grid-code',
+		{field: "d_cat_cd", headerName: "코드", width: 80},
+		{field: "d_cat_nm", headerName: "카테고리명", hide: true},
+		{field: "full_nm", headerName: "카테고리명", width: "auto"},
+		{field: "choice", headerName: "선택", width: 70, cellClass: 'hd-grid-code',
             cellRenderer: function (params) {
                 if (params.data.d_cat_cd !== undefined) {
                     return '<a href="javascript:void(0);" onclick="return searchCategory.Choice(\'' + params.data.d_cat_cd + '\',\'' + params.data.d_cat_nm + '\',\'' + params.data.full_nm + '\',\'' + params.data.mx_len + '\');">선택</a>';
@@ -453,7 +453,6 @@ SearchCategory.prototype.SetGrid = function(divId){
             }
         },
         {field:"mx_len" , headerName:"코드길이",hide:true},
-        {field:"", headerName:"", width: "auto"},
     ];
 
     this.grid = new HDGrid(document.querySelector( divId ), columns);
