@@ -700,6 +700,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk32/update', 'stk32Controller@update');
         Route::post('stk32/del_group', 'stk32Controller@del_group');
         Route::post('stk32/del_store', 'stk32Controller@del_store');
+		Route::post('stk32/reply', 'stk32Controller@reply');
 
         //일별동종업계매출관리
         Route::get('stk33','stk33Controller@index');

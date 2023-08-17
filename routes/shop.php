@@ -364,6 +364,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::post('comm02/update', 'comm02Controller@update');
         Route::post('comm02/del_group', 'comm02Controller@del_group');
         Route::post('comm02/del_store', 'comm02Controller@del_store');
+        Route::post('comm02/reply', 'comm02Controller@reply');
 
     });
     //매장관리

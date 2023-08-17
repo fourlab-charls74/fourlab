@@ -64,7 +64,7 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                          <label for="">{{ @$cmd == 'send' ? '수신' : '발신' }}처</label>
+                          <label for="">{{ @$cmd == 'send' ? '받는 사람' : '보내는 사람' }}</label>
                           <div class="flax_box">
                             <input type='text' class="form-control form-control-sm search-all search-enter" name='sender' value=''>
                           </div>
@@ -174,7 +174,7 @@
                 pinned:'left'
             },
             {field: "receiver_cd", hide: true},
-            {headerName: "수신처", field: "receiver_nm", width:200,
+            {headerName: "받는 사람", field: "receiver_nm", width:200,
                 cellRenderer: (params) => 
                         params.data.receiver_nm
             },
@@ -199,7 +199,7 @@
                 pinned:'left'
             },
             {field: "sender_cd", hide: true},
-            {headerName: "발신처", field: "sender_nm", width:150},
+            {headerName: "보내는 사람", field: "sender_nm", width:150},
             {headerName: "연락처", field: "mobile", width: 80, cellClass: 'hd-grid-code'},
             {headerName: "내용", field: "content", width: 300, cellStyle: {'text-overflow': 'ellipsis'},
                 cellRenderer: params => {
@@ -274,6 +274,7 @@
             success: function(data) {
                 if (data.code == '200') {
                     alert('선택한 알림이 읽음 처리 되었습니다.');
+					Search();
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }

@@ -28,7 +28,7 @@
                             <label for="formrow-email-input">구분</label>
                                 <div class="form-inline form-radio-box">
                                     <div class="custom-control custom-radio">
-                                        <input type="radio" name="store" value="O" id="oneStore" class="custom-control-input" checked>
+                                        <input type="radio" name="store" value="S" id="oneStore" class="custom-control-input" checked>
                                         <label class="custom-control-label" for="oneStore">개별매장</label>
                                     </div>
                                     <div class="custom-control custom-radio">

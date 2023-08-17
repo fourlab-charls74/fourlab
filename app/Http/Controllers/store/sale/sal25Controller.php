@@ -166,7 +166,7 @@ class sal25Controller extends Controller
 			from (
 				select date_format(d,'%Y%m') as sale_date
 				from mdate	
-				where d >='$sdate' and d <= '$edate'
+				where d >= concat('$sdate', '01') and d <= concat('$edate', '31')
 				group by sale_date
 				order by sale_date desc
 			) a left outer join (
@@ -223,8 +223,8 @@ class sal25Controller extends Controller
 						inner join store store on store.store_cd = o.store_cd
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
-						w.ord_state_date >= '$sdate' 
-						and w.ord_state_date <= '$edate' 
+						w.ord_state_date >= concat('$sdate', '01') 
+						and w.ord_state_date <= concat('$edate', '31') 
 						and w.ord_state in ('$ord_state',60,61)
 						and o.ord_state >= '$ord_state'
 						$inner_where2 $inner_where $where
@@ -232,7 +232,7 @@ class sal25Controller extends Controller
 				) b group by b.sale_date
 			) t on a.sale_date = t.sale_date
         ";
-
+			
         //echo "<pre>$sql</pre>";exit;
 
         //$result = DB::select($sql);

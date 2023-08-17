@@ -30,15 +30,15 @@
                             <label for="formrow-email-input">구분</label>
                                 <div class="form-inline form-radio-box">
                                     <div class="custom-control custom-radio">
-                                        <input type="radio" name="store" value="O" id="oneStore" class="custom-control-input" checked>
-                                        <label class="custom-control-label" for="oneStore">개별매장</label>
+                                        <input type="radio" name="store" value="S" id="oneStore" class="custom-control-input" checked>
+                                        <label class="custom-control-label" for="oneStore">매장</label>
                                     </div>
                                     <div class="custom-control custom-radio">
                                         <input type="radio" name="store" value="G" id="groupStore" class="custom-control-input">
-                                        <label class="custom-control-label" for="groupStore">그룹매장</label>
+                                        <label class="custom-control-label" for="groupStore">그룹</label>
                                     </div>
 									<div class="custom-control custom-radio">
-                                        <input type="radio" name="store" value="H" id="hq_user_id" class="custom-control-input">
+                                        <input type="radio" name="store" value="U" id="hq_user_id" class="custom-control-input">
                                         <label class="custom-control-label" for="hq_user_id">본사</label>
                                     </div>
                                 </div>
@@ -204,7 +204,7 @@
         $('.search_hq').hide();
 
         $("input[name='store']").change(function() {
-            if($("input[name='store']:checked").val() == 'O') {
+            if($("input[name='store']:checked").val() == 'S') {
                 $('#div_grid2').hide();
                 $('#div_grid').show();
                 $('#div_grid3').hide();
@@ -226,7 +226,7 @@
                 $('#div_group_nm').show();
 				$('.search_hq').hide();
 				$('.search_no_hq').show();
-            } else if ($("input[name='store']:checked").val() == 'H') {
+            } else if ($("input[name='store']:checked").val() == 'U') {
 				$('#div_grid').hide();
 				$('#div_grid2').hide();
 				$('#div_grid3').show();

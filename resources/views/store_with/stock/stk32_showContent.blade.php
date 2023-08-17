@@ -22,7 +22,7 @@
         <div class="card_wrap aco_card_wrap">
             <div class="card shadow">
                 <div class="card-header mb-0" style="display:inline-block"> 
-                        <a>{{ @$msg_type == 'send' ? '수신처' : '발신처' }}</a>
+                        <a>{{ @$msg_type == 'send' ? '받는 사람' : '보내는 사람' }}</a>
                 </div>
                 <div style="display:inline-block;"></div>
                 <div class="card-body mt-1">
@@ -36,7 +36,7 @@
                                         </colgroup>
                                         <tbody>
                                             <tr>
-                                                <th>{{ @$msg_type == 'send' ? '수신처' : '발신처' }}</th>
+                                                <th>{{ @$msg_type == 'send' ? '받는 사람' : '보내는 사람' }}</th>
                                                 <td>
                                                     <div class="d-inline-block" name="sd" id="sd">
                                                         @if($msg_type == 'send')
@@ -60,9 +60,9 @@
                                                     <td>
                                                         @foreach ($store as $s)
                                                             @if ($s->check_yn == 'Y') 
-                                                                <span style="color:green;">{{ $s->store_nm }}( {{ $s->check_yn }} )     </span>
+                                                                <span style="color:green;">{{ $s->stores }}( {{ $s->check_yn }} )     </span>
                                                             @else
-                                                                <span style="color:red;">{{ $s->store_nm }}( {{ $s->check_yn }} )     </span>
+                                                                <span style="color:red;">{{ $s->stores }}( {{ $s->check_yn }} )     </span>
                                                             @endif
                                                         @endforeach
                                                     </td>
@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" readonly >{{@$content}}</textarea>
+                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" >{{@$content}}</textarea>
                 </div><br>
                 @if ($msg_type == 'pop')
                 <div class="resul_btn_wrap mt-1 d-block">
@@ -109,12 +109,28 @@
                 @endif
             </div>
         </div>
+		<div class="resul_btn_wrap mt-3 d-block">
+			<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+			<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
+		</div>
     </div>
 
 <script>
 
     $(document).ready(function(){
         $('#showStore').hide();
+
+		const textarea = document.getElementById('content');
+		const sender_cd = '{{ @$admin_id  }}'
+		const sender_nm = '{{ @$admin_nm  }}'
+		const separator = '\n-------------------------------------------------------------------';
+		const content = textarea.value;
+		if (content.length > 0) {
+			textarea.value = sender_nm + '(' + sender_cd + ')' + '\n' + separator + '\n' + content;
+		} else {
+			textarea.value = separator;
+		}
+		
     }); 
 
     let cnt = 0;
@@ -188,5 +204,52 @@
             console.log(err);
         });
     }
+	
+	//답장 기능
+	function reply() {
+
+		let content = $('#content').val();
+		let msg_cd = "{{$msg_cd}}";
+		let separator = '-------------------------------------------------------------------';
+		let lines = content.split('\n');
+		let lineNumber = -1;
+		let data = "";
+
+		for (let i = 0; i < lines.length; i++) {
+			if (lines[i].includes(separator)) {
+				lineNumber = i + 1;
+				break;
+			}
+		}
+		if (lines.length >= lineNumber) {
+			data = lines.slice(1, lineNumber-1).join('\n');
+		}
+
+		$.ajax({
+			method: 'post',
+			url: '/store/stock/stk32/reply',
+			data: {
+				data : data,
+				msg_cd : msg_cd,
+				content : content
+			},
+			success: function(data) {
+				if (data.code == '200') {
+					alert('해당 알리미에 답장하였습니다.');
+					window.close();
+					opener.Search()
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
+	}
+	
+
+	
+	
 </script>
 @stop
