@@ -113,7 +113,7 @@
 				},
 				{
 					headerName: '#',
-					width:50,
+					width:40,
 					maxWidth: 100,
 					valueGetter: 'node.id',
 					cellRenderer: 'loadingRenderer',
@@ -125,7 +125,7 @@
 				{field:"ord_opt_no" , headerName:"주문일련번호", width: 80, cellClass: 'hd-grid-code'},
 				{field:"dlv_cd_nm" , headerName:"택배사"  },
 				{field:"dlv_no" , headerName:"송장번호"  },
-				{field:"ord_no" , headerName:"주문번호", width: 130},
+				{field:"ord_no" , headerName:"주문번호", width: 120},
 				{field:"ord_state_nm" , headerName:"주문상태", cellStyle: StyleOrdState, width: 60},
 				{field:"clm_state_nm" , headerName:"클레임상태", cellStyle: StyleClmState, width: 65},
 				{field:"ord_kind_nm" , headerName:"출고구분", cellStyle: StyleOrdKind, cellClass: 'hd-grid-code', width: 60},

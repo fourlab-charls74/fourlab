@@ -136,7 +136,7 @@
         {field: "ord_opt_no", headerName: "주문일련번호", hide: true},
         {field: "out_ord_no", headerName: "판매처 주문번호", width: 100, pinned: 'left', cellClass: 'hd-grid-code'},
         {field: "ord_date", headerName: "주문일", width: 80, cellClass: 'hd-grid-code'},
-        {field: "style_no", headerName: "스타일넘버", editable: true, cellClass: ['hd-grid-edit', 'hd-grid-code']},
+        {field: "style_no", headerName: "스타일넘버", width: 140, editable: true, cellClass: ['hd-grid-edit', 'hd-grid-code']},
         {field: "goods_no", headerName: "온라인코드", editable: true, cellClass: ['hd-grid-edit', 'hd-grid-code']},
         {field: "goods_opt", headerName: "옵션", width: 100, editable: true, cellClass: ['hd-grid-edit']},
         {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType"},
