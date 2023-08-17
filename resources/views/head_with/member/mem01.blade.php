@@ -448,9 +448,13 @@ var columns = [
     {field:"ord_date" , headerName:"최근주문일", width:125},
     {field:"ord_cnt" , headerName:"구매수", type: 'currencyType', width:60},
     {field:"ord_amt" , headerName:"구입금액", type: 'currencyType', width:75},
+	{field:"name_chk", headerName:"실명확인", hide: true},
     {field:"email_chk", headerName:"메일수신", width:75},
     {field:"mobile_chk", headerName:"SMS수신", width:75},
     {field:"yn" , headerName:"승인", width:50},
+	{field:"zip", headerName:"우편번호", hide: true},
+	{field:"addr", headerName:"주소", hide: true},
+	{field:"group", headerName:"회원그룹", hide: true},
     {field:"site" , headerName:"판매처", width:70},
     { width: "auto" }
 
@@ -458,6 +462,7 @@ var columns = [
 
 const pApp = new App('', { gridId:"#div-gd", height: 275 });
 let gx;
+let total_count = 0;
 
 $(document).ready(function() {
     pApp.ResizeGrid(220);
@@ -469,19 +474,23 @@ $(document).ready(function() {
 function Search() {
     let data = $('form[name="search"]').serialize();
     let user_group_data = "&user_group=" + $("[name='user_group']").val().join(",");
-    gx.Request('/head/member/mem01/search', data+user_group_data, 1);
+	gx.Request('/head/member/mem01/search', data+user_group_data, 1, function (e) {
+		total_count = e.head.total;
+	});
 }
 
 function Download(fields) {
     $('[name=fields]').val(fields);
     let data = $('form[name="search"]').serialize();
-    location.href = '/head/member/mem01/download?' + data;
+	gx.Request('/head/member/mem01/download', data, -1, function (e) {
+		gx.Download('회원목록.xlsx', { type: 'excel', columns: e.head.fields.map(f => f.value) });
+	});
 }
 
 $('.download-btn').click(function(){
     const data = $('form[name="search"]').serialize();
     const url='/head/member/mem01/download/show?' + data;
-    window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=800");
+	window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=200,left=200,width=600,height=800");
 });
 
 $('.sms-btn').click(function(){
@@ -540,6 +549,10 @@ if ($('.confirm-btn').length > 0){
 function getToday()
 {
 	$('[name="mmdd"]').val('{{ $today }}');
+}
+
+function getSearchTotalCount() {
+	return total_count;
 }
 
 //openSmsSend

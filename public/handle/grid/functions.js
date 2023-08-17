@@ -548,6 +548,26 @@ function getDeleteCellColumnObject() {
 	}
 }
 
+/** 포커스된 셀 중 column이 1개 이하일 때는 header 제외, 2개 이상일 때는 header 포함하여 클립보드에 복사하기 */
+function getCopyFocusedCellToClipboardObject(hdGridName = 'gx') {
+	return {
+		sendToClipboard: function (params) {
+			let headers = "";
+			const focused_cells = eval(hdGridName).gridOptions.api.getCellRanges();
+			if (focused_cells.length < 1) return;
+			if (focused_cells[0].columns.length > 1) {
+				focused_cells[0].columns.forEach((cell, i) => {
+					headers += `${cell.colDef.headerName}`;
+					if (i < focused_cells[0].columns.length - 1) headers += "\t";
+				});
+				headers += "\r\n";
+			}
+			window.navigator.clipboard.writeText(headers + params.data);
+		},
+		suppressCopyRowsToClipboard: true,
+	}
+}
+
 //멀티 셀렉트 박스2
 $(document).ready(function() {
     $('.multi_select').select2({

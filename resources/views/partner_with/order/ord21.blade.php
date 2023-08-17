@@ -270,6 +270,12 @@
             </div>
         </div>
     </div>
+	<style>
+		/* 전시카테고리 상품 이미지 사이즈 픽스 */
+		.img {
+			height:30px;
+		}
+	</style>
     <script language="javascript">
         var columns = [
             {headerName: '#', width: 40, maxWidth: 100, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellClass: 'hd-grid-code', pinned: 'left'},

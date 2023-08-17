@@ -558,7 +558,12 @@
         </div>
     </div>
 </div>
-<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:20px; } </style>
+<style>
+	/* 전시카테고리 상품 이미지 사이즈 픽스 */
+	.img {
+		height:30px;
+	}
+</style>
 <script>
     const editCellStyle = {
         'background' : '#ffff99',
@@ -574,7 +579,7 @@
             pinned: 'left',
         },
         {field: "ord_no", headerName: "주문번호", width: 130, cellStyle: StyleOrdNo, type: 'HeadOrderNoType', pinned: 'left'},
-        {field:"ord_opt_no" , headerName:"일련번호", width:58,sortable:"ture", pinned: 'left', type:'HeadOrderNoType'},
+        {field:"ord_opt_no" , headerName:"일련번호", width:58,sortable:"true", pinned: 'left', type:'HeadOrderNoType'},
         {field:"ord_state_nm" , headerName:"주문상태", width:70,cellStyle:StyleOrdState, pinned: 'left'  },
         {field:"clm_state" , headerName:"클레임상태", width:70,cellStyle:StyleClmState, pinned: 'left'  },
         {field:"clm_stock_check_yn", headerName:"창고처리상태", width:80, cellClass: 'hd-grid-code',

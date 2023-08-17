@@ -633,7 +633,7 @@
     // 상담 탭 컬럼
     const column1 = [
 		{field: "regi_date", headerName: "상담일자", type: "DateTimeType"},
-		{field: "ord_no", headerName: "주문번호", width: 140, cellClass: 'hd-grid-code'},
+		{field: "ord_no", headerName: "주문번호", width: 140, type: 'HeadOrderNoType' },
 		{field: "contents", headerName: "상담내용", width: 369, wrapText: true, autoHeight: true,
 			cellRenderer: (params) => params.value?.split("\n").join("<br>") || '',
 		},

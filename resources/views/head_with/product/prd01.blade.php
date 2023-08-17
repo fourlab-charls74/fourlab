@@ -446,7 +446,10 @@
     const gridDiv = document.querySelector(pApp.options.gridId);
     let gx;
     $(document).ready(function() {
-        gx = new HDGrid(gridDiv, columns, {onCellValueChanged: onCellValueChanged});
+		gx = new HDGrid(gridDiv, columns, {
+			onCellValueChanged: onCellValueChanged,
+			...getCopyFocusedCellToClipboardObject()
+		});
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         Search();
@@ -526,7 +529,7 @@
 
     function AddProducts() {
         var url = '/head/product/prd07';
-        var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1650,height=960");
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1700,height=1200");
     }
 
     const EditProducts = () => {

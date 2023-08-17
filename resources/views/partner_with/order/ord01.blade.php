@@ -462,7 +462,12 @@
         </div>
     </div>
 </div>
-<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:20px; } </style>
+<style>
+	/* 전시카테고리 상품 이미지 사이즈 픽스 */
+	.img {
+		height:30px;
+	}
+</style>
 <script type="text/javascript" charset="utf-8">
     const columns = [
         {headerName: '#', width: 40, maxWidth: 100, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellClass: 'hd-grid-code', pinned: 'left'},

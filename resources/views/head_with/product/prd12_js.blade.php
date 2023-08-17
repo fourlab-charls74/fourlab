@@ -129,7 +129,7 @@
             window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=400,left=550,width=1024,height=900");
         }
 
-        function SearchCategoryGoods(d_cat_cd = '') {
+        function SearchCategoryGoods(d_cat_cd = '', click_tab_id = '#tab-goods') {
             if(d_cat_cd !== ''){
                 $('#d_cat_cd').val(d_cat_cd);
             }
@@ -137,6 +137,7 @@
             let data = 'd_cat_cd=' + $("#d_cat_cd").val();
             gx.Request('/head/product/prd12/' + code + '/search', data);
 
+			$(click_tab_id).click();
             CategorySearch();
         }
 
@@ -156,6 +157,7 @@
                 dataType: 'json',
                 success: function (res) {
                     if(res.code == '200'){
+						FolderSearch();
                         SearchCategoryGoods();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
@@ -269,7 +271,9 @@
                 addIndex: 0,
             });
 
-            return false;
+			$("#gd_folder-total").text(gxFolder.getRows().length);
+
+			return false;
             //gx.gridOptions.defaultColDef.editable = true;
         }
 
@@ -281,9 +285,7 @@
             let folders = [];
             let checkRows = gxFolder.getSelectedRows();
             checkRows.map(function(row) {
-                if(row.editable === 'Y'){
-                    folders.push(row);
-                }
+				folders.push(row);
             });
 
             if(folders.length > 0){
@@ -399,6 +401,8 @@
                         // $('#sale_amt').val(res.body.sale_amt);
                         // $('#sale_kind').val(res.body.sale_kind);
                         // $('#tpl_kind').val(res.body.tpl_kind);
+						$('[name=sale_yn][value=' + res.body.sale_yn || 'N' + ']').prop('checked', true).trigger('change');
+						$('#sale_kind').val(res.body.sale_kind || 'P');
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
@@ -415,9 +419,11 @@
          * @return {boolean}
          */
         function CategorySave() {
-
+			if ($("[name=sale_yn]").val() === 'Y' && (isNaN($("[name=sale_amt]").val()) || $("[name=sale_amt]").val() <= 0)) {
+				return alert("세일값을 올바르게 입력해주세요.");
+			}
+			
             var frm = $('form[name="category"]');
-            console.log(frm.serialize());
 
             $.ajax({
                 method: 'post',
@@ -428,8 +434,8 @@
                     // console.log(res);
                     if(res.code == '200'){
                         alert("정상적으로 변경 되었습니다.");
-                        window.close();
-                        opener.Search();
+						FolderSearch();
+						CategorySearch();
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
@@ -449,6 +455,19 @@
             frm[0].reset();
             return false;
         }
+
+		function setCategoryDetail(d_cat_cd, key) {
+			let node;
+			gxFolder.gridOptions.api.forEachNode(n => {
+				if (n.data.d_cat_cd === d_cat_cd) node = n;
+			});
+
+			if (key === 'use_yn') {
+				node.setDataValue('use_yn', node.data.use_yn === 'Y' ? 'N' : 'Y');
+			} else if (['tpl_kind', 'sale_yn', 'header'].includes(key)) {
+				SearchCategoryGoods(node.data.d_cat_cd, '#tab-category');
+			}
+		}
 
         function validatePhoto(files) {
             if (files === null || files.length === 0) {

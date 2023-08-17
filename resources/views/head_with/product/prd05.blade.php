@@ -540,11 +540,11 @@
     $(document).ready(function() {
         pApp.ResizeGrid(275);
         let gridDiv = document.querySelector(pApp.options.gridId);
-        let styleObj = getDeleteCellColumnObject();
+		let style = { ...getDeleteCellColumnObject(), ...getCopyFocusedCellToClipboardObject() };
         pApp.BindSearchEnter();
         // style['suppressColumnVirtualisation'] = true;
         // style['skipHeaderOnAutoSize'] = true;
-        let options = cloneObject(styleObj);
+        let options = cloneObject(style);
         gx = new HDGrid(gridDiv, columns, options);
         Search(1);
 

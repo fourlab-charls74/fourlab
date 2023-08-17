@@ -514,9 +514,9 @@ class prd01Controller extends Controller
 			$goods_no 		= Lib::Rq($row['goods_no']);
 			$goods_sub 		= Lib::Rq($row['goods_sub']);
 			$goods_nm 		= Lib::Rq($row['goods_nm']);
-			$goods_nm_eng 		= Lib::Rq($row['goods_nm_eng']);
-			$head_desc 		= Lib::Rq($row['head_desc']);
-			$ad_desc 		= Lib::Rq($row['ad_desc']);
+			$goods_nm_eng 	= $row['goods_nm_eng'];
+			$head_desc 		= $row['head_desc'];
+			$ad_desc 		= $row['ad_desc'];
 
 			$normal_price		= Lib::Rq($row['normal_price']);
 			$price			= Lib::Rq($row['price']);
@@ -1678,10 +1678,10 @@ class prd01Controller extends Controller
 
 		$goods_no			= $request->input('goods_no');
 		$goods_sub			= $request->input('goods_sub');
-		$head_desc			= $request->input('head_desc');
+		$head_desc			= $request->input('head_desc', '');
 		$goods_nm			= $request->input('goods_nm');
-		$goods_nm_eng		= $request->input('goods_nm_eng');
-		$ad_desc			= $request->input('ad_desc');
+		$goods_nm_eng		= $request->input('goods_nm_eng', '');
+		$ad_desc			= $request->input('ad_desc', '');
 		$brand				= $request->input('brand_cd');
 		$sale_stat_cl		= $request->input('sale_stat_cl');
 		$style_no			= $request->input('style_no');
@@ -1813,10 +1813,10 @@ class prd01Controller extends Controller
 				"
 					update goods
 						set
-							head_desc			= '".$head_desc."',
+							head_desc			= '". Lib::quote($head_desc) ."',
 							goods_nm			= '".$goods_nm."',
-							goods_nm_eng		= '".$goods_nm_eng."',
-							ad_desc				= '".$ad_desc."',
+							goods_nm_eng		= '". Lib::quote($goods_nm_eng) ."',
+							ad_desc				= '". Lib::quote($ad_desc) ."',
 							brand				= '".$brand."',
 							sale_stat_cl		= '".$sale_stat_cl."',
 							style_no			= '".$style_no."',
@@ -1876,10 +1876,10 @@ class prd01Controller extends Controller
 					, head_desc, memo, id, regi_date
 				) values (
 					'$goods_no', '$goods_sub', '$style_no', now(), '$sale_stat_cl', '$price', '$margin', '$wonga'
-					, '$head_desc', '상품정보수정', '$id', now()
+					, :head_desc, '상품정보수정', '$id', now()
 				)
 			";
-			DB::insert($sql);
+			DB::insert($sql, [ 'head_desc' => Lib::quote($head_desc) ]);
 
 
 			// 재고 수정
@@ -2626,21 +2626,62 @@ class prd01Controller extends Controller
 			 */
 			try {
 				DB::beginTransaction();
-				$sql = "
-					delete from `goods_summary`
-					where goods_no = :goods_no
-					and opt_name = :opt_name
-				";
-				DB::delete($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
-				for ($i=0; $i<count($goods_opts); $i++) {
-					$goods_opt = $goods_opts[$i];
+				$sql = " select goods_opt, seq from goods_summary where goods_no = :goods_no and opt_name = :opt_name ";
+				$rows = DB::select($sql, [ 'goods_no' => $goods_no, 'opt_name' => $opt_name ]);
+				$opts = (object) [ 'ori' => [], 'new' => [], 'del' => [] ];
+
+				for ($i = 0; $i < count($goods_opts); $i++) {
+					$ori = array_reduce($rows, function ($a, $row) use ($goods_opts, $i) {
+						return $row->goods_opt === $goods_opts[$i] ? [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ] : $a;
+					}, '');
+					if ($ori !== '') array_push($opts->ori, $ori);
+					else array_push($opts->new, [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ]);
+				}
+
+				for ($i = 0; $i < count($rows); $i++) {
+					$del = array_search($rows[$i]->goods_opt, $goods_opts);
+					if ($del === false) array_push($opts->del, $rows[$i]->goods_opt);
+				}
+
+				// 새로운 옵션 등록
+				for ($i = 0; $i < count($opts->new); $i++) {
+					$seq = $opts->new[$i]['seq'];
+					$goods_opt = $opts->new[$i]['goods_opt'];
 					$sql = "
 						insert into goods_summary
 							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
-						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $i)
+						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq)
 					";
 					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
+
+				// 기존 옵션 순서변경
+				for ($i = 0; $i < count($opts->ori); $i++) {
+					$seq = $opts->ori[$i]['seq'];
+					$goods_opt = $opts->ori[$i]['goods_opt'];
+					$sql = "
+                        update goods_summary set
+                            seq = :seq,
+                            ut = NOW(),
+                            last_date = DATE_FORMAT(NOW(),'%Y-%m-%d')
+                        where goods_no = :goods_no
+                            and goods_sub = :goods_sub
+                            and goods_opt = :goods_opt
+                            and opt_name = :opt_name
+					";
+					DB::update($sql, [ 'seq' => $seq, 'goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name ]);
+				}
+
+				// 기존 옵션 삭제
+				for ($i = 0; $i < count($opts->del); $i++) {
+					$goods_opt = $opts->del[$i];
+					$sql = "
+                    	delete from goods_summary
+                    	where goods_no = :goods_no and goods_sub = :goods_sub and goods_opt = :goods_opt and opt_name = :opt_name
+                    ";
+					DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+				}
+				
 				DB::commit();
 				$msg = "저장되었습니다.";
 			} catch (Exception $e) {
@@ -2687,21 +2728,63 @@ class prd01Controller extends Controller
 			 */
 			try {
 				DB::beginTransaction();
-				$sql = "
-					delete from `goods_summary`
-					where goods_no = :goods_no
-					and opt_name = :opt_name
-				";
-				DB::delete($sql, ['goods_no' => $goods_no, 'opt_name' => $opt_name]);
-				for ($i=0; $i<count($goods_opts); $i++) {
-					$goods_opt = $goods_opts[$i];
+
+				$sql = " select goods_opt, seq from goods_summary where goods_no = :goods_no and opt_name = :opt_name ";
+				$rows = DB::select($sql, [ 'goods_no' => $goods_no, 'opt_name' => $opt_name ]);
+				$opts = (object) [ 'ori' => [], 'new' => [], 'del' => [] ];
+
+				for ($i = 0; $i < count($goods_opts); $i++) {
+					$ori = array_reduce($rows, function ($a, $row) use ($goods_opts, $i) {
+						return $row->goods_opt === $goods_opts[$i] ? [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ] : $a;
+					}, '');
+					if ($ori !== '') array_push($opts->ori, $ori);
+					else array_push($opts->new, [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ]);
+				}
+
+				for ($i = 0; $i < count($rows); $i++) {
+					$del = array_search($rows[$i]->goods_opt, $goods_opts);
+					if ($del === false) array_push($opts->del, $rows[$i]->goods_opt);
+				}
+
+				// 새로운 옵션 등록
+				for ($i = 0; $i < count($opts->new); $i++) {
+					$seq = $opts->new[$i]['seq'];
+					$goods_opt = $opts->new[$i]['goods_opt'];
 					$sql = "
 						insert into goods_summary
 							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
-						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $i)
+						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq)
 					";
 					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
+
+				// 기존 옵션 순서변경
+				for ($i = 0; $i < count($opts->ori); $i++) {
+					$seq = $opts->ori[$i]['seq'];
+					$goods_opt = $opts->ori[$i]['goods_opt'];
+					$sql = "
+                        update goods_summary set
+                            seq = :seq,
+                            ut = NOW(),
+                            last_date = DATE_FORMAT(NOW(),'%Y-%m-%d')
+                        where goods_no = :goods_no
+                            and goods_sub = :goods_sub
+                            and goods_opt = :goods_opt
+                            and opt_name = :opt_name
+					";
+					DB::update($sql, [ 'seq' => $seq, 'goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name ]);
+				}
+
+				// 기존 옵션 삭제
+				for ($i = 0; $i < count($opts->del); $i++) {
+					$goods_opt = $opts->del[$i];
+					$sql = "
+                    	delete from goods_summary
+                    	where goods_no = :goods_no and goods_sub = :goods_sub and goods_opt = :goods_opt and opt_name = :opt_name
+                    ";
+					DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+				}
+
 				DB::commit();
 				$msg = "저장되었습니다.";
 			} catch (Exception $e) {
