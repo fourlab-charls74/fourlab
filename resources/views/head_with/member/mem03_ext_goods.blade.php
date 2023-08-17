@@ -1,5 +1,5 @@
 @extends('head_with.layouts.layout-nav')
-@section('title','회원계급')
+@section('title','할인율제외상품')
 @section('content')
 
 <div class="container-fluid py-3">
@@ -203,7 +203,7 @@
                 </div>
             </div>
             <div class="table-responsive">
-                <div id="div-gd" style="height:calc(100vh - 50vh); width:100%;" class="ag-theme-balham"></div>
+				<div id="div-gd" class="ag-theme-balham"></div>
             </div>
         </div>
     </div>
@@ -237,11 +237,11 @@ var columns = [
     { width: "auto" }
 ];
 
-const pApp = new App('', {gridId: "#div-gd"});
+const pApp = new App('', {gridId: "#div-gd", height: 200});
 const gridDiv = document.querySelector(pApp.options.gridId);
 const gx = new HDGrid(gridDiv, columns);
 
-pApp.ResizeGrid();
+pApp.ResizeGrid(200);
 
 function Search() {
     let data = $('form[name="search"]').serialize();

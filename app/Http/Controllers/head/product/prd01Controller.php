@@ -514,9 +514,9 @@ class prd01Controller extends Controller
 			$goods_no 		= Lib::Rq($row['goods_no']);
 			$goods_sub 		= Lib::Rq($row['goods_sub']);
 			$goods_nm 		= Lib::Rq($row['goods_nm']);
-			$goods_nm_eng 		= Lib::Rq($row['goods_nm_eng']);
-			$head_desc 		= Lib::Rq($row['head_desc']);
-			$ad_desc 		= Lib::Rq($row['ad_desc']);
+			$goods_nm_eng 	= $row['goods_nm_eng'];
+			$head_desc 		= $row['head_desc'];
+			$ad_desc 		= $row['ad_desc'];
 
 			$normal_price		= Lib::Rq($row['normal_price']);
 			$price			= Lib::Rq($row['price']);
@@ -1678,10 +1678,10 @@ class prd01Controller extends Controller
 
 		$goods_no			= $request->input('goods_no');
 		$goods_sub			= $request->input('goods_sub');
-		$head_desc			= $request->input('head_desc');
+		$head_desc			= $request->input('head_desc', '');
 		$goods_nm			= $request->input('goods_nm');
-		$goods_nm_eng		= $request->input('goods_nm_eng');
-		$ad_desc			= $request->input('ad_desc');
+		$goods_nm_eng		= $request->input('goods_nm_eng', '');
+		$ad_desc			= $request->input('ad_desc', '');
 		$brand				= $request->input('brand_cd');
 		$sale_stat_cl		= $request->input('sale_stat_cl');
 		$style_no			= $request->input('style_no');
@@ -1813,10 +1813,10 @@ class prd01Controller extends Controller
 				"
 					update goods
 						set
-							head_desc			= '".$head_desc."',
+							head_desc			= '". Lib::quote($head_desc) ."',
 							goods_nm			= '".$goods_nm."',
-							goods_nm_eng		= '".$goods_nm_eng."',
-							ad_desc				= '".$ad_desc."',
+							goods_nm_eng		= '". Lib::quote($goods_nm_eng) ."',
+							ad_desc				= '". Lib::quote($ad_desc) ."',
 							brand				= '".$brand."',
 							sale_stat_cl		= '".$sale_stat_cl."',
 							style_no			= '".$style_no."',
@@ -1876,10 +1876,10 @@ class prd01Controller extends Controller
 					, head_desc, memo, id, regi_date
 				) values (
 					'$goods_no', '$goods_sub', '$style_no', now(), '$sale_stat_cl', '$price', '$margin', '$wonga'
-					, '$head_desc', '상품정보수정', '$id', now()
+					, :head_desc, '상품정보수정', '$id', now()
 				)
 			";
-			DB::insert($sql);
+			DB::insert($sql, [ 'head_desc' => Lib::quote($head_desc) ]);
 
 
 			// 재고 수정

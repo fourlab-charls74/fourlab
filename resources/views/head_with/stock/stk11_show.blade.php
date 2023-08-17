@@ -568,6 +568,8 @@
         const [ search_form, api_search_form ] = [ document.search, api_document.search ];
         api_search_form.com_nm.value = search_form.com_nm.value;
         api_search_form.com_id.value = search_form.com_id.value;
+		const option = new Option(search_form.com_nm.value, search_form.com_id.value, true, true);
+		$(api_search_form.com_id).append(option).trigger('change');
     };
 
     /**

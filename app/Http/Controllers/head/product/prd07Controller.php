@@ -90,7 +90,7 @@ class prd07Controller extends Controller
 
 		// 데이터의 각각 키 이름들로 변수 할당
 		foreach ($row as $key => $value) {
-			$$key = is_string($value) ? Lib::Rq($value) : $value;
+			$$key = is_string($value) && !in_array($key, ['goods_nm_eng', 'head_desc', 'ad_desc']) ? Lib::Rq($value) : $value;
 		}
 		// 상수 값 할당
 		$conf = new Conf();

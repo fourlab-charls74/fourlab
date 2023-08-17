@@ -108,8 +108,9 @@
                                     </div>
                                     <div class="form-inline-inner input-box w-75">
                                         <div class="form-inline inline_btn_box">
-                                            <input type="hidden" id="com_id" name="com_id">
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company sch-company">
+											<input type="hidden" id="com_nm" name="com_nm" />
+											<select id="com_id" name="com_id" class="form-control form-control-sm select2-company" style="width:100%;"></select>
+											<input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm sch-company">
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
@@ -337,7 +338,7 @@
             headerName: "선택",
             cellStyle: {'text-align': 'center'},
             cellRenderer: function(params) {
-                return "<a href='#' onclick='selectGoods("+JSON.stringify(params.data)+")'>선택</a>";
+				return "<a href='#' onclick='selectGoods(" + params.rowIndex + ")'>선택</a>";
             }
         },
         {field: "", headerName: "", width: "auto"}
@@ -351,9 +352,12 @@
         return window.hasOwnProperty('opener') && opener.hasOwnProperty(name) && typeof opener[name] === 'function';
     };
 
-    function selectGoods(row) {
+    function selectGoods(rowIndex) {
         if (confirm("상품을 추가하시겠습니까?") === false) return;
-        if (opener.goodsCallback) opener.goodsCallback(row);
+		if (opener.goodsCallback) {
+			let node = gx.getRowNode(rowIndex);
+			opener.goodsCallback(node.data);
+		}
         window.close();
     };
 

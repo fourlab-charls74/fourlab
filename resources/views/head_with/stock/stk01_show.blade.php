@@ -145,7 +145,7 @@
                             <tbody>
                             <tr>
                                 <td rowspan="3" class="img_box brln">
-                                    <img id="goods_img" class="goods_img" src="{{@$goods_info->img}}" alt="이미지" style="min-width: 120px; min-height: 120px;" />
+									<img id="goods_img" class="goods_img" src="{{@$goods_info->img}}" alt="이미지" style="min-width: 120px; max-width: 120px; min-height: 120px; max-height: 120px;" />
                                 </td>
                                 <th>스타일 넘버</th>
                                 <td><span id="style_no"></span></td>
