@@ -558,7 +558,12 @@
         </div>
     </div>
 </div>
-<style> /* 상품 이미지 사이즈 강제 픽스 */ .img { height:20px; } </style>
+<style>
+	/* 전시카테고리 상품 이미지 사이즈 픽스 */
+	.img {
+		height:30px;
+	}
+</style>
 <script>
     const editCellStyle = {
         'background' : '#ffff99',
