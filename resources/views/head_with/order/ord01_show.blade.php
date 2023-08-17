@@ -769,7 +769,7 @@
                                             </td>
                                             <td>
                                                 <select name="clm_qty" id="clm_qty" class="form-control form-control-sm">
-                                                    <option value="">선택</option>
+													<option value="0">선택</option>
                                                     @for($i = 1; $i <= $order_opt->qty; $i++ )
                                                         <option value="{{$i}}" @if($order_opt->clm_qty == $i) selected @endif>
                                                             {{$i}}
@@ -1221,11 +1221,6 @@
         let jaego_yn = "y";
 
         if (ord_state != "9") {
-            if (ord_state != 1 && $('#clm_qty').val() === '') {
-                alert("클레임 수량을 선택해주세요.");
-                return;
-            }
-
             if ($('#jaego_yn:checked').length > 0) {
                 jaego_yn = "n";
                 if ($('#jaego_reason').val() === '') {

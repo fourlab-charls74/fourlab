@@ -1120,7 +1120,8 @@ class ord02Controller extends Controller
                 #####################################################
                 $order->SetOrdOptNo($ord_opt_no);
                 $order->CompleteOrderSugi("", $ord_state);
-
+				$order->CompleteOrderSugi($ord_opt_no, $ord_state);
+				
                 if ($ord_state == "10" || $ord_state == "30") {
 
                     // 상품배송완료인경우 상태 변경
