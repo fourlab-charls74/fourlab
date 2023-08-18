@@ -299,7 +299,6 @@
 
 	const pApp = new App('', { gridId:"#div-gd", height: 265 });
 	let gx;
-	const columns_default = [ ...columns ];
 
 	$(document).ready(function() {
 		pApp.ResizeGrid(265);
@@ -347,7 +346,8 @@
 	}
 	
 	function setMonthSaleColumn(sale_month) {
-		const cols = columns_default.concat(sale_month.map(mon => ({ field: mon.key, headerName: mon.kor_nm, width: 100, type: "currencyType", aggFunc: sumValuesFunc })));
+		columns.splice(30);
+		const cols = columns.concat(sale_month.map(mon => ({ field: mon.key, headerName: mon.kor_nm, width: 100, type: "currencyType", aggFunc: sumValuesFunc })));
 		gx.gridOptions.api.setColumnDefs([]);
 		gx.gridOptions.api.setColumnDefs(cols);
 		setAllRowGroupExpandedBySelectedItem($("#grid_expand_select").val());
