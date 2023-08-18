@@ -100,17 +100,17 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" >{{@$content}}</textarea>
+                    <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" readonly>{{@$content}}</textarea>
                 </div><br>
                 @if ($msg_type == 'pop')
                 <div class="resul_btn_wrap mt-1 d-block">
                     <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : '매장알림')) }} 바로 가기</a>
-					<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+					<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
 					<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
 				</div>
 				@else
 					<div class="resul_btn_wrap mt-3 d-block">
-						<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+						<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
 						<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
 					</div>
                 @endif
@@ -121,7 +121,7 @@
 
 <script>
 
-    $(document).ready(function(){
+    /*$(document).ready(function(){
         $('#showStore').hide();
 
 		const textarea = document.getElementById('content');
@@ -135,7 +135,7 @@
 			textarea.value = separator;
 		}
 		
-    }); 
+    }); */
 
     let cnt = 0;
     function showStore() {
@@ -160,6 +160,7 @@
                 if (data.code == '200') {
                     alert('읽음 처리 되었습니다.');
                     window.close();
+					opener.Search();
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }
@@ -208,52 +209,12 @@
             console.log(err);
         });
     }
-	
-	//답장 기능
-	function reply() {
 
-		let content = $('#content').val();
-		let msg_cd = "{{$msg_cd}}";
-		let separator = '-------------------------------------------------------------------';
-		let lines = content.split('\n');
-		let lineNumber = -1;
-		let data = "";
-
-		for (let i = 0; i < lines.length; i++) {
-			if (lines[i].includes(separator)) {
-				lineNumber = i + 1;
-				break;
-			}
-		}
-		if (lines.length >= lineNumber) {
-			data = lines.slice(1, lineNumber-1).join('\n');
-		}
-
-		$.ajax({
-			method: 'post',
-			url: '/store/stock/stk32/reply',
-			data: {
-				data : data,
-				msg_cd : msg_cd,
-				content : content
-			},
-			success: function(data) {
-				if (data.code == '200') {
-					alert('해당 알리미에 답장하였습니다.');
-					window.close();
-					opener.Search()
-				} else {
-					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-				}
-			},
-			error: function(e) {
-				console.log(e.responseText)
-			}
-		});
+	function OpenReply() {
+		let msg_cd = "{{ $msg_cd }}"
+		const url = `/store/stock/stk32/reply-msg?msg_cd={{$msg_cd}}`;
+		const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
 	}
-	
-
-	
 	
 </script>
 @stop

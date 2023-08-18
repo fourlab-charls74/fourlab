@@ -78,17 +78,17 @@
                 </div>
             </div>
             <div class="form-group">
-                <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;">{{@$content}}</textarea>
+                <textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;background-color: transparent !important;" readonly>{{@$content}}</textarea>
             </div><br>
             @if ($msg_type == 'pop')
             <div class="resul_btn_wrap mt-1 d-block">
                 <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : '매장알림')) }} 바로 가기</a>
-				<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+				<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
 				<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
 			</div>
 			@else
 				<div class="resul_btn_wrap mt-3 d-block">
-					<a href="#" onclick="reply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+					<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
 					<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
 				</div>
 			@endif
@@ -98,7 +98,7 @@
 </div>
 <script type="text/javascript" charset="utf-8">
 
-	$(document).ready(function(){
+	/*$(document).ready(function(){
 		const textarea = document.getElementById('content');
 		const sender_cd = '{{ @$admin_id  }}'
 		const sender_nm = '{{ @$user_store_nm  }}'
@@ -109,7 +109,7 @@
 		} else {
 			textarea.value = separator;
 		}
-	});
+	});*/
 
 	function msgRead() {
         let msg_cd = "{{$msg_cd}}";
@@ -124,6 +124,7 @@
                 if (data.code == '200') {
                     alert('읽음 처리 되었습니다.');
                     window.close();
+					opener.Search();
                 } else {
                     alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                 }
@@ -174,9 +175,17 @@
     }
 
 	//답장 기능
-	function reply() {
+	function OpenReply() {
+		
+		let msg_cd = "{{ $msg_cd }}"
 
-		let content = $('#content').val();
+		const url = `/shop/community/comm02/reply-msg?msg_cd={{$msg_cd}}`;
+		const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+		
+		
+		
+		
+		/*let content = $('#content').val();
 		let msg_cd = "{{$msg_cd}}";
 		let separator = '-------------------------------------------------------------------';
 		let lines = content.split('\n');
@@ -213,7 +222,7 @@
 			error: function(e) {
 				console.log(e.responseText)
 			}
-		});
+		});*/
 	}
 </script>
 @stop

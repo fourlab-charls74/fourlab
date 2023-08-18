@@ -50,6 +50,7 @@ class comm02Controller extends Controller
 
         // 로그인한 계정 // 추후 수정
         $user_store = Auth('head')->user()->store_cd;
+        $user_id = Auth('head')->user()->id;
         if ($user_store == 'L0025') {
             $admin_type = 'H';
         } else {
@@ -76,7 +77,7 @@ class comm02Controller extends Controller
                     m.msg_cd
                     , msd.receiver_type
                     , group_concat(msd.receiver_cd separator ', ') as receiver_cd
-                    , group_concat(if(msd.receiver_type = 'S', s.store_nm, if(msd.receiver_type = 'U', mu.name, if(msd.receiver_type = 'H','본사',''))) separator ', ') as receiver_nm
+                    , group_concat(if(msd.receiver_type = 'S', s.store_nm, if(msd.receiver_type = 'U', mu.name, if(msd.receiver_type = 'H','본사',if(msd.receiver_type = 'G', s.store_nm,'')))) separator ', ') as receiver_nm
                     -- , if(msd.receiver_type = 'S', s.store_nm, '본사') as receiver
                     -- , count(msd.receiver_cd) as receiver_cnt
                     , s.store_nm
@@ -91,7 +92,7 @@ class comm02Controller extends Controller
                     left outer join msg_store_detail msd on msd.msg_cd = m.msg_cd
                     left outer join store s on s.store_cd = msd.receiver_cd
                 	left outer join mgr_user mu on mu.id = msd.receiver_cd
-                where m.sender_type = '$admin_type' and m.sender_cd = '$user_store'
+                where m.sender_cd = '$user_store'
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day) and m.del_yn = 'N'
                 $where
                 group by m.rt
@@ -103,7 +104,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    ifnull(if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name,if(m.sender_type = 'H', '본사', ''))), mu.name) as sender_nm,
+                    ifnull(if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name,if(m.sender_type = 'H', '본사', if(m.sender_type = 'G', s.store_nm, '')))), mu.name) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -112,7 +113,7 @@ class comm02Controller extends Controller
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
                 	left outer join mgr_user mu on mu.id = m.sender_cd
-                where md.receiver_type = '$admin_type' and md.receiver_cd = '$user_store'
+                where (md.receiver_cd = '$user_store' or md.receiver_cd = '$user_id')
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day) and m.del_yn = 'N'
                 $where
                 group by md.msg_cd
@@ -188,6 +189,44 @@ class comm02Controller extends Controller
 
     }
 
+	public function search_hq_user_id(Request $request)
+	{
+		$user_id = $request->input('user_id');
+		$user_name = $request->input('user_name');
+
+		// pagination
+		$page = $r['page'] ?? 1;
+		if ($page < 1 or $page == "") $page = 1;
+
+		$where = "";
+		if ($user_id != '') $where .= " and id like '%$user_id%'";
+		if ($user_name != '') $where .= "and name like '%$user_name%'";
+
+		$sql =
+			"
+               select
+               		id
+               		, name
+               		, grade
+               		, store_cd
+               		, store_nm
+               		, part
+               		, posi
+               from mgr_user
+               where 1=1 and use_yn = 'Y' $where
+                ";
+
+		$result = DB::select($sql);
+
+		return response()->json([
+			"code" => 200,
+			"head" => array(
+				"total" => count($result)
+			),
+			"body" => $result,
+		]);
+	}
+
     public function sendMsg(Request $request)
     {
         
@@ -195,6 +234,8 @@ class comm02Controller extends Controller
         $sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
         $store_cds = $request->input('store_cd','');
         $store_cd = explode(',',$store_cds);
+		$user_ids = $request->input('user_id');
+		$user_id = explode(',', $user_ids);
         $check = $request->input('check');
         
         $stores = [];
@@ -213,6 +254,21 @@ class comm02Controller extends Controller
             }
         }
 
+		$ids = [];
+		foreach ($user_id as $ui) {
+			$sql = "
+				select
+					id
+					, name
+				from mgr_user
+				where id = '$ui'
+			";
+			$id = DB::selectOne($sql);
+			if ($id != null) {
+				array_push($ids, $id);
+			}
+		}
+
        
           
         $values = [
@@ -221,6 +277,8 @@ class comm02Controller extends Controller
             'edate' => date("Y-m-d"),
             'stores' => $stores,
             'store_cds' => $store_cds,
+			'user_ids' => $user_ids,
+			'ids' => $ids,
             'check' => $check
 
         ];
@@ -260,8 +318,10 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     md.receiver_type,
-                    md.receiver_cd as receiver_cd,
-                    s.store_nm as receiver_nm,
+                    -- md.receiver_cd as receiver_cd,
+                    -- s.store_nm as receiver_nm,
+                    group_concat(md.receiver_cd separator ', ') as receiver_cd,
+                    group_concat(ifnull(if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',if(md.receiver_type = 'G', s.store_nm,'')))),mu.name) separator ', ') as receiver_nm,
                     m.reservation_yn,
                     m.reservation_date,
                     m.content,
@@ -269,7 +329,8 @@ class comm02Controller extends Controller
                 from msg_store m
                     inner join msg_store_detail md on md.msg_cd = m.msg_cd
                     left outer join store s on s.store_cd = md.receiver_cd
-                where m.sender_type = '$admin_type' and m.sender_cd = '$user_store' and m.msg_cd = '$msg_cd'
+                	left outer join mgr_user mu on mu.id = md.receiver_cd
+                where (md.receiver_cd = '$user_store' or md.receiver_cd = '$admin_id') and m.msg_cd = '$msg_cd'
                 group by m.msg_cd
                 ";
         } else if ($msg_type == 'receive') {
@@ -277,7 +338,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    ifnull(if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', ''))),mu.name) as sender_nm,
+                    ifnull(if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', if(m.sender_type = 'G', s.store_nm, '')))),mu.name) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -286,7 +347,7 @@ class comm02Controller extends Controller
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
                	 	left outer join mgr_user mu on mu.id = m.sender_cd
-                where md.receiver_type = '$admin_type' and md.receiver_cd = '$user_store' and m.msg_cd = '$msg_cd'
+                where  (md.receiver_cd = '$user_store' or md.receiver_cd = '$admin_id') and m.msg_cd = '$msg_cd'
                 group by md.msg_cd
             ";
         } else if ($msg_type == 'pop') {
@@ -294,7 +355,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    ifnull(if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', ''))), mu.name) as sender_nm,
+                    ifnull(if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', if(m.sender_type = 'G', s.store_nm,'')))), mu.name) as sender_nm,
                     m.reservation_yn,
                     m.reservation_date,
                     s.phone as mobile,
@@ -306,7 +367,7 @@ class comm02Controller extends Controller
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
                 	left outer join mgr_user mu on mu.id = m.sender_cd
-                where md.receiver_cd = '$user_store' and m.msg_cd = '$msg_cd'
+                where (md.receiver_cd = '$user_store' or md.receiver_cd = '$admin_id') and m.msg_cd = '$msg_cd'
                 group by md.msg_cd
             ";
         }
@@ -373,9 +434,13 @@ class comm02Controller extends Controller
         $group_nms = explode(',',$group_nms);
         $group_cds = $request->input('group_cds');
         $group_cds = explode(',',$group_cds);
+		$user_ids = $request->input('user_ids');
+		$user_ids = explode(',', $user_ids);
         $check = $request->input('check');
 
         $sender_cd = Auth('head')->user()->store_cd;
+
+		$admin_id = Auth('head')->user()->id;
 
         if($sender_cd == 'L0025') {
             $sender_type = "H";
@@ -402,9 +467,8 @@ class comm02Controller extends Controller
                 if($reservation_date > date("Y-m-d H:i:s")){
                     $res = DB::table('msg_store')
                     ->insertGetId([
-                        'msg_kind' => $check,
-                        'sender_type' => '',
-                        'sender_cd' => $sender_cd,
+                        'sender_type' => $check,
+                        'sender_cd' => $admin_id,
                         'reservation_yn' => $reservation_yn,
                         'reservation_date' => $reservation_date,
                         'content' => $content,
@@ -412,16 +476,27 @@ class comm02Controller extends Controller
                     ]);
     
                     if ($check == "S") {
-                        foreach ($store_cds as $sc) {
-                            DB::table('msg_store_detail')
-                                ->insert([
-                                    'msg_cd' => $res,
-                                    'receiver_type' => 'S',
-                                    'receiver_cd' => $sc ,
-                                    'check_yn' => 'N',
-                                    'rt' => now()
-                                ]);
-                            }
+						foreach ($store_cds as $sc) {
+							DB::table('msg_store_detail')
+								->insert([
+									'msg_cd' => $res,
+									'receiver_type' => 'S',
+									'receiver_cd' => $sc,
+									'check_yn' => 'N',
+									'rt' => now()
+								]);
+						}
+					}elseif ($check == "U") {
+						foreach ($user_ids as $id) {
+							DB::table('msg_store_detail')
+								->insert([
+									'msg_cd' => $res,
+									'receiver_type' => 'U',
+									'receiver_cd' => $id,
+									'check_yn' => 'N',
+									'rt' => now()
+								]);
+						}
                     } else {
                         $send = [];
                         foreach ($group_cds as $gc) {
@@ -458,9 +533,8 @@ class comm02Controller extends Controller
             } else {
                 $res = DB::table('msg_store')
                     ->insertGetId([
-                        'msg_kind' => 'S',
-                        'sender_type' => $sender_type,
-                        'sender_cd' => $sender_cd,
+                        'sender_type' => $check,
+                        'sender_cd' => $admin_id,
                         'reservation_yn' => $reservation_yn,
                         'reservation_date' => $reservation_date,
                         'content' => $content,
@@ -472,12 +546,23 @@ class comm02Controller extends Controller
                             DB::table('msg_store_detail')
                                 ->insert([
                                     'msg_cd' => $res,
-                                    'receiver_type' => $sender_type,
+                                    'receiver_type' => "S",
                                     'receiver_cd' => $sc ,
                                     'check_yn' => 'N',
                                     'rt' => now()
                                 ]);
                             }
+					}elseif ($check == "U") {
+						foreach ($user_ids as $id) {
+							DB::table('msg_store_detail')
+								->insert([
+									'msg_cd' => $res,
+									'receiver_type' => 'U',
+									'receiver_cd' => $id,
+									'check_yn' => 'N',
+									'rt' => now()
+								]);
+						}
                     } else {
                         $send = [];
                         foreach ($group_cds as $gc) {
@@ -667,6 +752,7 @@ class comm02Controller extends Controller
     public function popup_chk(Request $request)
     {
         $store_cd	= $request->input("store_cd");
+		$user_id = Auth('head')->user()->id;
 
         $sql = "
             select 
@@ -674,7 +760,7 @@ class comm02Controller extends Controller
             from msg_store_detail md
                 left outer join msg_store m on m.msg_cd = md.msg_cd
                 left outer join store s on s.store_cd = m.sender_cd
-            where md.receiver_cd = :store_cd and md.check_yn = 'N' and (m.reservation_yn = 'N' 
+            where (md.receiver_cd = :store_cd or md.receiver_cd = '$user_id' )and md.check_yn = 'N' and (m.reservation_yn = 'N' 
                 and (md.rt >= date_add(now(), interval -1 month)) or (m.reservation_yn = 'Y' and (m.reservation_date < now() and m.reservation_date >= date_add(now(), interval -1 month))))
             order by md.rt desc
         ";
@@ -686,44 +772,133 @@ class comm02Controller extends Controller
             "msgs"  => $msgs,
 		]);
     }
-
-	public function reply(Request $request)
+	
+	public function reply_msg(Request $request)
 	{
-		$data = $request->input('data');
+		$msg_cd = $request->input('msg_cd');
+		$mutable = Carbon::now();
+		$sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
+		
+		$sql = "
+			select
+				mu.name as sender_cd
+			    -- if(m.sender_type = 'S', s.store_nm, '') as sender_cd
+				, m.content
+			from msg_store m
+			    inner join msg_store_detail md on md.msg_cd = m.msg_cd
+				left outer join store s on s.store_cd = md.receiver_cd
+				left outer join mgr_user mu on mu.id = m.sender_cd
+			where m.msg_cd = :msg_cd
+		";
+		$msg = DB::selectOne($sql, ['msg_cd' => $msg_cd]);
+		
+		
+		$values = [
+			'sender_cd' => $msg->sender_cd,
+			'content' => $msg->content,
+			'msg_cd' => $msg_cd,
+			'sdate' => $sdate,
+			'edate' => date("Y-m-d"),
+		];
+		return view(Config::get('shop.shop.view') . '/community/comm02_reply', $values);
+	}
+	
+	public function reply (Request $request)
+	{
 		$msg_cd = $request->input('msg_cd');
 		$content = $request->input('content');
+		$reservation_msg = $request->input('reservation_msg');
+
+		$rm_date = $request->input('rm_date');
+		$rm_hour = $request->input('rm_hour');
+		$rm_min = $request->input('rm_min');
+
+		if ($reservation_msg == 'true') {
+			$reservation_yn = "Y";
+			$reservation_date = "$rm_date"." $rm_hour:"."$rm_min:00";
+		} elseif ($reservation_msg == 'false') {
+			$reservation_yn = "N";
+			$reservation_date = "";
+		}
+
+		$sender_cd = Auth('head')->user()->store_cd;
+		$admin_id = Auth('head')->user()->id;
+
+		if($sender_cd == 'L0025') {
+			$sender_type = "H";
+		} else {
+			$sender_type = "S";
+		}
 
 		try {
 			DB::beginTransaction();
-
-			DB::table('msg_store')
-				->where("msg_cd",$msg_cd)
-				->update([
-					'content' => $content,
-					'rt' => DB::raw('now()')
-
-				]);
 			
 			$sql = "
 				select
-					check_yn
-				from msg_store_detail
-				where msg_cd = :msg_cd
+					sender_cd
+				from msg_store
+				where msg_cd = '$msg_cd'
 			";
+			$receiver = DB::selectOne($sql);
 			
-			$check_yn = DB::selectOne($sql, ['msg_cd' => $msg_cd]);
-			
-			if ($check_yn->check_yn == 'N') {
-				DB::table('msg_store_detail')
-					->where('msg_cd',$msg_cd)
-					->update([
-						'check_yn' => 'Y'
-					]);
-			}
+			if ($reservation_msg == 'true'){
+				if($reservation_date > date("Y-m-d H:i:s")){
+					$res = DB::table('msg_store')
+						->insertGetId([
+							'sender_type' => 'U',
+							'sender_cd' => $admin_id,
+							'reservation_yn' => $reservation_yn,
+							'reservation_date' => $reservation_date,
+							'content' => $content,
+							'rt' => now()
+						]);
 
+					DB::table('msg_store_detail')
+						->insert([
+							'msg_cd' => $res,
+							'receiver_type' => 'U',
+							'receiver_cd' => $receiver->sender_cd,
+							'check_yn' => 'N',
+							'rt' => now()
+						]);
+						
+					$code = 200;
+					$msg = "알림 전송에 성공하였습니다.";
+				} else {
+					$code = 100;
+					$msg = "예약발송시간이 현재시간보다 이전입니다. 예약발송 시간을 변경해주세요.";
+				}
+			} else {
+				$res = DB::table('msg_store')
+					->insertGetId([
+						'sender_type' => 'U',
+						'sender_cd' => $admin_id,
+						'reservation_yn' => $reservation_yn,
+						'reservation_date' => $reservation_date,
+						'content' => $content,
+						'rt' => now()
+					]);
+
+				DB::table('msg_store_detail')
+					->insert([
+						'msg_cd' => $res,
+						'receiver_type' => "U",
+						'receiver_cd' => $receiver->sender_cd ,
+						'check_yn' => 'N',
+						'rt' => now()
+					]);
+				$code = 200;
+				$msg = "알림 전송에 성공하였습니다.";
+			}
+			
+			//답장보내면 check_yn을 Y로 바꾸는 부분
+			DB::table('msg_store_detail')
+				->where('msg_cd', $msg_cd)
+				->update([
+					'check_yn' => 'Y'
+				]);
+			
 			DB::commit();
-			$code = 200;
-			$msg = "";
 		} catch (Exception $e) {
 			DB::rollBack();
 			$code = 500;

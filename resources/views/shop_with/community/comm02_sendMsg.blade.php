@@ -44,9 +44,9 @@
                                                                     <span>{{$store->store_nm}}@if (!$loop->last),&nbsp; @endif</span>
                                                                 @endforeach
                                                             @else
-                                                                @foreach($groupName as $gp)
-                                                                    <span>{{$gp->group_nm}}@if (!$loop->last),&nbsp; @endif</span>
-                                                                @endforeach
+																@foreach($ids as $id)
+																	<span>{{$id->name}}@if (!$loop->last),&nbsp; @endif</span>
+																@endforeach
                                                             @endif
                                                         </div>
                                                     </td>
@@ -155,6 +155,7 @@
         
         frm += "&store_cds=" + "{{ @$store_cds }}";
         frm += "&group_cds=" + "{{ @$group_cds }}";
+		frm += "&user_ids=" + "{{ @$user_ids }}";
         frm += "&check=" + "{{ @$check }}";
         frm += "&reservation_msg=" + $('[name=reservation_msg]').is(":checked");
 

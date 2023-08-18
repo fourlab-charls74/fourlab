@@ -20,7 +20,7 @@
             <div class="card_wrap aco_card_wrap">
                 <div class="card shadow">
                     <div class="card-header mb-0" style="display:inline-block">
-                        <a>수신처</a>
+                        <a>받는 사람</a>
                     </div>
                     <div style="display:inline-block;"></div>
                     <div class="card-body mt-1">
@@ -34,7 +34,7 @@
                                             </colgroup>
                                             <tbody>
                                                 <tr>
-                                                    <th>수신처</th>
+                                                    <th>받는 사람</th>
                                                     <td>
                                                         <div class="flax_box" name="sd" id="sd">
                                                             @if($store_cds != "")
