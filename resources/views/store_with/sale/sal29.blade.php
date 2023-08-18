@@ -352,7 +352,10 @@
 			let field_cds = size_cols[i].map(c => (c.size_kind_cd || '') + (c.size_kind_cd ? '^' : '') + (c.size_cd || ''));
 			columns.push({ 
 				field: 'SIZE_' + i,
-				headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join('\n'),
+				// headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join('\n'),
+				headerName: size_cols[i].map(c => {
+					return (c.size_kind_nm_s ? c.size_kind_nm_s + '-' : '') + (c.size_cd || c.empty_tag);
+				}).join('\n'),
 				type: 'currencyType', 
 				width: 80, 
 				headerComponent: CustomHeader,

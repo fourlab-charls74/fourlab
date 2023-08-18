@@ -23,7 +23,7 @@
 		@foreach($size_columns as $size)
 			<td rowspan="6" style="text-align:center;vertical-align:center;font-size:12px;font-weight:bold;background-color:#e2e2e2;border:1px solid #000000;">
 			@foreach($size as $ss)
-				@if($ss !== 0 && isset($ss->size_cd)) {{ $ss->size_cd }} @endif <br/>
+				@if($ss !== 0 && isset($ss->size_cd)) {{ (isset($ss->size_kind_nm_s) ? $ss->size_kind_nm_s . '-' : '') . $ss->size_cd }} @endif <br/>
 			@endforeach
 			</td>
 		@endforeach

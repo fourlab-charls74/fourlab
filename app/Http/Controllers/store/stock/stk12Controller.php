@@ -586,6 +586,8 @@ class stk12Controller extends Controller
 			else $document_number = $document_number->document_number;
 
             foreach($data as $d) {
+				if ($d['qty'] < 1) continue;
+
                 $cnt = 0;
 
                 $sql = "
