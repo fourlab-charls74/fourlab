@@ -461,7 +461,7 @@ class mem01Controller extends Controller
         $anniv_date			= Request("anniv_date");
         $job				= Request("job");
         $interest			= Request("interest", "");
-        //$yn					= Request("yn");
+		$yn			        = Request("yn");
         $opt				= Request("opt");
         $memo				= Request("memo");
         $taxpayer_yn		= Request("taxpayer_yn","");            // 피엘라벤 사용안함
@@ -496,6 +496,7 @@ class mem01Controller extends Controller
                     , addr = '$addr'
                     , addr2 = '$addr2'
                     , email_chk = '$email_chk'
+                    , yn = '$yn'
                     , mobile_chk = '$mobile_chk'
                     , wsale_status = '$wsale_status'
                     -- , taxpayer_yn = '$taxpayer_yn'

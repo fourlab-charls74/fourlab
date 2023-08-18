@@ -380,9 +380,12 @@
                                         <tr>
                                             <th>승인</th>
                                             <td>
-                                                <div class="txt_box">
-                                                    {{@$user->yn}}
-                                                </div>
+											@if ($type == 'edit')
+												<select name="yn" id="yn" class="form-control form-control-sm" style="width:100px;">
+													<option value="Y" @if(@$user->yn == 'Y') selected @endif>Y</option>
+													<option value="N" @if(@$user->yn == 'N') selected @endif>N</option>
+												</select>
+											@endif
                                             </td>
                                         </tr>
                                         <tr>
