@@ -680,7 +680,7 @@ class stk11Controller extends Controller {
 				(s.unit_cost * qty) as unit_total_cost,
 				s.cost as cost,
 				(s.cost * qty) as total_cost,
-				(s.cost_notax * qty) as total_cost_novat,
+				round(s.cost * qty / 1.1) as total_cost_novat,
 				s.stock_date as stock_date
 			from stock_product s inner join goods g
 					on s.goods_no = g.goods_no and s.goods_sub = g.goods_sub
@@ -727,7 +727,7 @@ class stk11Controller extends Controller {
 								$cost = $unit_cost;
 								$cost_notax = round($cost / 1.1);
 							} else {
-								$cost = round($unit_cost * $exchange_rate * ( 1 + $custom_tax_rate / 100));
+								$cost = floor($unit_cost * $exchange_rate * ( 1 + $custom_tax_rate / 100));
 								$cost_notax = round($cost / 1.1);
 							}
 							

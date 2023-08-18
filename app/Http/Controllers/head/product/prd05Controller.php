@@ -173,11 +173,12 @@ class prd05Controller extends Controller
         //echo 'page_size'. $page_size;
         $page_size = $limit;
         $startno = ($page-1) * $page_size;
-        if($limit == -1) {
-			if ($page > 1) $sql_limit = "limit 0";
-			else $sql_limit = "";
+		
+		if ($limit == -1) {
+			$sql_limit = "";
+		} else {
+			$sql_limit = " limit $startno, $page_size ";
 		}
-       else $sql_limit = " limit ".$limit;
 
         $total = 0;
         $page_cnt = 0;
@@ -233,11 +234,8 @@ class prd05Controller extends Controller
             $order_field
 			$sql_limit
         ";
-        //echo $query;
-        //$result = DB::select($query,['com_id' => $com_id]);
+
         $result = DB::select($query);
-        //echo "<pre>$query</pre>";
-        //dd(array_keys ((array)$result[0]));
 
         $query = "select item, item_nm, field from code_class where class = '$class' order by item+0";
         $code_class_items = DB::select($query);

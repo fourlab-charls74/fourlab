@@ -1993,7 +1993,7 @@
         });
         $("#img-setting").click(function(){
 			//console.log('image');
-			@if( $type == 'create' )
+			@if( $type == 'create' || $type == 'copy')
 				alert('상품을 먼저 등록 하신 후 이미지를 등록할 수 있습니다.');
 			@else
 				window.open("/head/product/prd02/"+goods_no+"/image","_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=960");
@@ -2123,6 +2123,16 @@
 			@endif
 		});
 
+		// 상품이미지팝업에서 이미지정보 변경 시, 현재팝업의 이미지영역만 리로드
+		function reloadImageArea(res) {
+			$(".cum_slider_cont > img").attr('src', res.img);
+			$('.cum_slider_thum').html(res.goods_images.map((img, i) => `
+                <li>
+                    <a href="javascript:void(0);" class="${i < 1 ? 'active' : ''}"><img src="${img}" alt=""></a>
+                </li>
+            `));
+		}
+		
         function setOptionArea() {
             if( $('#is_option_use_n').is(":checked") == true ){
                 console.log('사용안함');

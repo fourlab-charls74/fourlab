@@ -233,6 +233,25 @@ class prd02Controller extends Controller
 							'img' => $save_file,
 							'img_update' => now()
 						]);
+
+					$sql = "
+						select replace(a.img, 'a_500', 'a_500') as img
+						from goods a
+						where a.goods_no = :goods_no
+					";
+					
+					$img = DB::selectOne($sql, [ 'goods_no' => $goods_no ]);
+					if ($img !== null) $img = $img->img;
+
+					$goods_images[0] = $img;
+
+					$images = DB::table("goods_image")
+						->select("type", "img")
+						->where("goods_no", "=", $goods_no)->get();
+
+					foreach ($images as $image) {
+						$goods_images[] = $image->img;
+					}
 				}else{
 					DB::table('goods')
 						->where('goods_no', $goods_no)
@@ -249,7 +268,14 @@ class prd02Controller extends Controller
             $msg = $e->getMessage();
         }
 
-        return response()->json(['code' => $code, 'msg' => $msg, 'img_type' => $img_type, 'img_type_alias' => $img_type_alias]);
+		return response()->json([
+			'code' => $code,
+			'msg' => $msg,
+			'img_type' => $img_type,
+			'img_type_alias' => $img_type_alias,
+			'img' => $img,
+			'goods_images' => $goods_images,
+		]);
     }
 
     public function resize($type, $effect, $src_img, $dstFile, $sw, $sh, $dw, $dh = 0)

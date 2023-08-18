@@ -267,9 +267,7 @@
                 if(res.code == "200"){
                     alert('선택영역을 서버의 이미지 파일에 저장했습니다.');
 					$('#img_loading').hide();
-                    document.location.reload();
-					opener.location.reload();
-					
+					window?.opener?.reloadImageArea(res);
 				} else {
                     console.log(res.msg);
 					$('#img_loading').hide();

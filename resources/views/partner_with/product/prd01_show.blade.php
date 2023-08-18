@@ -219,7 +219,7 @@
                             <div class="col-lg-12">
                                 @if( $type == '' )
                                 <div class="img_box cum_slider_cont p-4">
-                                    <img src="{{config('shop.image_svr')}}{{@$goods_info->img}}?{{@$goods_info->img_upate}}" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" alt="{{@$goods_info->goods_nm}}">
+									<img src="{{@$goods_info->img}}?{{@$goods_info->img_upate}}" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" alt="{{@$goods_info->goods_nm}}">
                                 </div>
                                 <div class="cum_slider_thum_wrap">
                                     <div class="sd_prev pop_sd_btn bg-secondary"><i class="bx bx-left-arrow"></i></div>
@@ -227,7 +227,7 @@
                                         <ul class="cum_slider_thum">
                                             <li>
                                                 <a href="#" class="active">
-                                                    <img src="{{config('shop.image_svr')}}{{@$goods_images[0]}}?{{@$goods_info->img_upate}}" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='">
+													<img src="{{@$goods_images[0]}}?{{@$goods_info->img_upate}}" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='">
                                                 </a>
                                             </li>
                                             @for ($i = 1; $i < count($goods_images); $i++)
@@ -1195,6 +1195,15 @@
             }
         });
 
+		function reloadImageArea(res) {
+			$(".cum_slider_cont > img").attr('src', res.img);
+			$('.cum_slider_thum').html(res.goods_images.map((img, i) => `
+				<li>
+					<a href="javascript:void(0);" class="${i < 1 ? 'active' : ''}"><img src="${img}" alt=""></a>
+				</li>
+			`));
+		}
+		
         function pop_prd_page() {
             url = "{{config('shop.front_url')}}/app/product/detail/"+goods_no+"/"+goods_sub;
             window.open(url);
@@ -1397,7 +1406,7 @@
 
 			//$("#category_select_"+cat_type+" option:selected").remove();
         }
-
+		
 		function SelectCompany()
 		{
 			searchCompany.Open(function(com_cd, com_nm, com_type, baesong_kind, baesong_info, margin_type, dlv_amt){
@@ -3518,7 +3527,7 @@
         });
 
     }
-
+	
 	function isMobile()
 	{
 		return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -3534,6 +3543,8 @@
 		
 		window.open(`https://${url}/app/product/detail/{{ @$goods_no }}`, '_blank');
 	}
+	
 	</script>
 
+	
 @stop

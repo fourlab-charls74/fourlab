@@ -415,7 +415,7 @@
     });
     $("#img-setting").click(function(){
         //console.log('image');
-        @if( $type == 'create' )
+        @if( $type == 'create' || $type == 'copy')
         alert('상품을 먼저 등록 하신 후 이미지를 등록할 수 있습니다.');
         @else
         window.open("/partner/product/prd02/"+goods_no+"/image","_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=960");
@@ -653,7 +653,6 @@
             }
         });
     });
-
 </script>
 
 
@@ -1268,5 +1267,6 @@
         });
 
     }
+	
 
 </script>
