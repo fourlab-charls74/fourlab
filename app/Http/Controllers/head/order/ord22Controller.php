@@ -27,7 +27,7 @@ class ord22Controller extends Controller
     public function index()
     {
         $mutable    = Carbon::now();
-        $sdate      = $mutable->sub(1, 'month')->format('Y-m-d');
+        $sdate      = $mutable->sub(2, 'month')->format('Y-m-d');
 
         $conf   = new Conf();
         $cfg_dlv_cd = $conf->getConfigValue("delivery","dlv_cd");
