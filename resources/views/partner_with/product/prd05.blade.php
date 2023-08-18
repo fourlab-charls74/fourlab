@@ -607,7 +607,7 @@
         }
 
 
-		function setColumn(_page, _reset) {
+		function setColumn(_page = 1, _reset) {
 			var frm = $('form[name="search"]');
 			var min_w = 100;
 			var setCol_style = [{

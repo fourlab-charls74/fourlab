@@ -636,7 +636,7 @@
     }
 
 
-    function setColumn(_page, _reset) {
+    function setColumn(_page = 1, _reset) {
         var frm = $('form[name="search"]');
         var min_w = 100;
         var setCol_style = [{
@@ -1078,7 +1078,7 @@
     }
 
     function importExcel(url) {
-        console.log("url : " + url);
+        //console.log("url : " + url);
         makeRequest('GET',
             //'https://www.ag-grid.com/example-excel-import/OlymicData.xlsx',
             url,
@@ -1132,7 +1132,7 @@
         // our data is in the first sheet
         var firstSheetName = workbook.SheetNames[0];
         var worksheet = workbook.Sheets[firstSheetName];
-        console.log(columns_arr);
+        //console.log(columns_arr);
         var columns = columns_arr;
 
         // start at the 2nd row - the first row are the headers
