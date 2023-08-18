@@ -316,6 +316,8 @@
                     let result = "";
                     if(res.code == "200"){
                         result = "[" + res.code + "] 성공";
+						rownode.setDataValue('ord_opt_no', res.ord_opt_no);
+						rownode.setDataValue('ord_no', res.ord_no);
                     } else {
                         if (out_order_errors.hasOwnProperty(res.code)) {
                             result = "[" + res.code + "] " + out_order_errors[res.code];
@@ -324,8 +326,6 @@
                         }
                     }
                     rownode.setDataValue('code',result);
-                    rownode.setDataValue('ord_opt_no', res.ord_opt_no);
-                    rownode.setDataValue('ord_no', res.ord_no);
                 },
                 error: function(e) {
                     console.log('error');
