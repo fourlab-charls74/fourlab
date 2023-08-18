@@ -249,7 +249,7 @@
 		},
 		{field: "store_nm", headerName: "매장명", rowGroup: true, hide: true},
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
-		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left', cellClass: 'hd-grid-code'},
+		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left'},
 		{field: "goods_nm",	headerName: "상품명", width: 200, pinned:'left',
 			cellRenderer: function (params) {
 				if (params.value !== undefined) {
@@ -267,7 +267,7 @@
 		{field: "baebun_type",	headerName: "배분구분", pinned:'left', width: 80, cellClass: 'hd-grid-code', aggFunc: 'first',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
 		},
-		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left', cellClass: 'hd-grid-code', aggFunc: 'first',
+		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left', aggFunc: 'first',
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : params.node.level == 0 ? params.value : '',
 		},
 		{field: "goods_nm",	headerName: "상품명", width: 200, pinned:'left', aggFunc: 'first',

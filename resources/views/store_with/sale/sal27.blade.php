@@ -30,7 +30,7 @@
 							<div class="form-inline">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -42,7 +42,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -170,7 +170,7 @@
 <script type="text/javascript" charset="utf-8">
 
     const pinnedRowData = [{ item: 'total' }];
-    const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+    const sumValuesFunc = (params) => params.values.reduce((a,c) => a + ((c || 0) * 1), 0);
 
     const columns = [
         { field: "item_nm", headerName: "품목명", rowGroup: true, hide: true },
@@ -189,7 +189,7 @@
         },
         { headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', width: 130, pinned: 'left' },
         { headerName: '품번', showRowGroup: 'prd_cd_p', cellRenderer: 'agGroupCellRenderer', width: 150, pinned: 'left' },
-        { field: "prd_cd", headerName: "바코드", width: 130, pinned: 'left', cellClass: 'hd-grid-code' },
+        { field: "prd_cd", headerName: "바코드", width: 130, pinned: 'left' },
         { field: "goods_no", headerName: "온라인코드", width: 70, cellClass: 'hd-grid-code',
             aggFunc: (params) => (params?.rowNode?.level || 0) > 1 ? params.values[0] : '',
         },
@@ -360,7 +360,6 @@
 		else {
 			gx.gridOptions.api.forEachNode(node => {
 				node.expanded = node.level !== value * 1;
-				// node.setExpanded(node.level !== value * 1);
 			});
 			gx.gridOptions.api.onGroupExpandedOrCollapsed();
 		}

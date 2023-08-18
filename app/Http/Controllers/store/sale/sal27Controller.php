@@ -14,8 +14,8 @@ class sal27Controller extends Controller
 {
 	public function index(Request $request)
 	{
-		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m"));
-		$edate = $request->input('edate', now()->format("Y-m"));
+		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m-d"));
+		$edate = $request->input('edate', now()->format("Y-m-d"));
 
 		$values = [
             'sdate' => $sdate,
@@ -28,12 +28,12 @@ class sal27Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m"));
-		$edate = $request->input('edate', now()->format("Y-m"));
-		$sdate_day = date('Ymd', strtotime($sdate . '-01'));
-		$edate_day = date('Ymd', strtotime($edate . '-' . date('t', strtotime($edate . '-01'))));
-		$sdate_time = date('Y-m-d 00:00:00', strtotime($sdate . '-01'));
-		$edate_time = date('Y-m-d 23:59:59', strtotime($edate . '-' . date('t', strtotime($edate . '-01'))));
+		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m-d"));
+		$edate = $request->input('edate', now()->format("Y-m-d"));
+		$sdate_day = date('Ymd', strtotime($sdate));
+		$edate_day = date('Ymd', strtotime($edate));
+		// $sdate_time = date('Y-m-d 00:00:00', strtotime($sdate));
+		$edate_time = date('Y-m-d 23:59:59', strtotime($edate));
 		$today_day = date('Ymd');
 		$next_edate_day = date('Ymd', strtotime($edate_day . '+1 day'));
 
@@ -50,10 +50,6 @@ class sal27Controller extends Controller
 		// $page = $request->input('page', 1);
 		
 		// 일자검색
-		// $date_where1 = " and ord_state_date >= '" . $sdate_day . "' and ord_state_date <= '" . $edate_day . "'";
-		// $date_where2 = " and stock_state_date >= '" . $sdate_day . "' and stock_state_date <= '" . $edate_day . "'";
-		// $date_where3 = " and replace(sr_date, '-', '') >= '" . $sdate_day . "' and replace(sr_date, '-', '') <= '" . $edate_day . "'";
-		// $date_where4 = " and rec_rt >= '" . $sdate_time . "' and rec_rt <= '" . $edate_time . "'";
 		$date_where1 = " and ord_state_date <= '" . $edate_day . "'";
 		$date_where2 = " and stock_state_date <= '" . $edate_day . "'";
 		$date_where3 = " and replace(sr_date, '-', '') <= '" . $edate_day . "'";
@@ -108,10 +104,14 @@ class sal27Controller extends Controller
 		// 월별판매내역검색
 		$month_sale_sql = "";
 		$month_sale_cols = [];
-		$interval = date_diff(date_create($sdate_day), date_create($next_edate_day));
-		for ($i = 0; $i < $interval->m; $i++) {
-			$from = date('Ymd', strtotime($sdate_time . '+' . $i . ' month'));
+		$sdate_month = date('Ym01', strtotime($sdate));
+		$edate_month = date('Ym01', strtotime($edate));
+		$interval = date_diff(date_create($sdate_month), date_create($edate_month));
+		for ($i = 0; $i <= $interval->m; $i++) {
+			$from = date('Ymd', strtotime($sdate_month . '+' . $i . ' month'));
 			$to = date('Ymd', strtotime(date('Y-m', strtotime($from)) . '-' . date('t', strtotime($from))));
+			if ($from < $sdate_day) $from = $sdate_day;
+			if ($to > $edate_day) $to = $edate_day;
 
 			$month_sale_sql .= "
 				, (
