@@ -2,6 +2,11 @@
 @section('title','환경관리')
 @section('content')
 
+<style>
+	.sms_msg { color: gray; cursor: pointer; }
+	.sms_msg:hover { color: blue; text-decoration: underline; }
+</style>
+
 <div class="page_tit">
     <h3 class="d-inline-flex">환경관리</h3>
     <div class="d-inline-flex location">
@@ -192,7 +197,9 @@
                                                                 <div class="flax_box">
                                                                     <select name="sale_place" class="form-control form-control-sm" style="width: 200px;">
                                                                         <option value=''>선택</option>
-                                                                        <option value='{{@$sale_place}}' selected>{{@$sale_place}}</option>
+																		@foreach($sale_place_list as $sp)
+																			<option value='{{@$sp->id}}' @if($sp->id == $sale_place) selected @endif>{{@$sp->name}}</option>
+																		@endforeach
                                                                     </select>
                                                                 </div>
                                                                 <div style="color:gray;">* 판매처를 선택해주십시오.</div>
@@ -299,24 +306,14 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr style="text-align:center">
-                                                            <th><input type="text" id="bank_nm" name="bank_nm" class="form-control form-control-sm w-100" value="{{@$bank_nm}}"></th>
-                                                            <td><input type="text" id="account_no" name="account_no" class="form-control form-control-sm w-100" value="{{@$account_no}}"></td>
-                                                            <td><input type="text" id="account_holder" name="account_holder" class="form-control form-control-sm w-100" value="{{@$account_holder}}"></td>
-                                                            <td><button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="remove1()">지움</button></td>
-                                                        </tr>
-                                                        <tr style="text-align:center">
-                                                            <th><input type="text" class="form-control form-control-sm w-100"></th>
-                                                            <td><input type="text" class="form-control form-control-sm w-100"></td>
-                                                            <td><input type="text" class="form-control form-control-sm w-100"></td>
-                                                            <td><button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1">지움</button></td>
-                                                        </tr>
-                                                        <tr style="text-align:center">
-                                                            <th><input type="text" class="form-control form-control-sm w-100"></th>
-                                                            <td><input type="text" class="form-control form-control-sm w-100"></td>
-                                                            <td><input type="text" class="form-control form-control-sm w-100"></td>
-                                                            <td><button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1">지움</button></td>
-                                                        </tr>
+													@foreach (@$accounts as $acc)
+														<tr style="text-align:center">
+															<th><input type="text" name="account_{{ $acc[0] }}[]" class="form-control form-control-sm w-100" value="{{$acc[1]}}"></th>
+															<td><input type="text" name="account_{{ $acc[0] }}[]" class="form-control form-control-sm w-100" value="{{$acc[2] ?? ''}}"></td>
+															<td><input type="text" name="account_{{ $acc[0] }}[]" class="form-control form-control-sm w-100" value="{{$acc[3] ?? ''}}"></td>
+															<td><button type="button" class="btn btn-sm btn-primary shadow-sm remove-acccount-btn">지움</button></td>
+														</tr>
+													@endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -407,9 +404,11 @@
                                                             <th>주거래 택배업체</th>
                                                             <td>
                                                                 <div class="flax_box">
-                                                                    <select name="" class="form-control form-control-sm" style="width: 200px;">
+																	<select name="dlv_cd" class="form-control form-control-sm" style="width: 200px;">
                                                                         <option value=''>선택</option>
-                                                                        <option value='{{@$dlv_cd}}' selected>{{@$dlv_cd}}</option>
+																	@foreach($dlvs as $dlv)
+																		<option value='{{$dlv->code_id}}' @if ($dlv->code_id == @$dlv_cd) selected @endif>{{$dlv->code_val}}</option>
+																	@endforeach
                                                                     </select>
                                                                 </div>
                                                                 <div style="color:gray;">* 주거래 택배업체를 선택하여 주십시오.</div>
@@ -552,11 +551,11 @@
                                                             <td>
                                                                 <div class="flax_box">
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="p_give_type" id="p_give_type_g" class="custom-control-input" value="G"/>
+																		<input type="radio" name="p_give_type" id="p_give_type_g" class="custom-control-input" value="G" @if (@$p_give_type === "G") checked @endif />
                                                                         <label class="custom-control-label" for="p_give_type_g">상품가격 기준</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="p_give_type" id="p_give_type_r" class="custom-control-input" value="R"/>
+																		<input type="radio" name="p_give_type" id="p_give_type_r" class="custom-control-input" value="R" @if (@$p_give_type === "R") checked @endif />
                                                                         <label class="custom-control-label" for="p_give_type_r">구매금액 기준</label>
                                                                     </div>
                                                                 </div>
@@ -831,7 +830,7 @@
                                                                 <td >회원 가입 인증 SMS 발송 메시지 &nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="auth_msg" class="form-control form-control-sm" value="{{@$auth_msg}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('auth_msg','[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.');">[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('auth_msg','[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.');">[[SHOP_NAME]]인증번호 [[AUTH_NO]]를 입력해주세요.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -843,7 +842,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="join_msg" class="form-control form-control-sm" value="{{@$join_msg}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('join_msg','[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('join_msg','[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.');">[[SHOP_NAME]][USER_NAME] 회원님의 가입을 진심으로 축하드립니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -867,14 +866,14 @@
                                                                 <td>결제완료 상태</td>
                                                                 <td>
                                                                     <input type="text" name="order_msg_pay" class="form-control form-control-sm" value="{{@$order_msg_pay}}" style="width: 100%;"/>
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('order_msg_pay','[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])');">[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])</div>
+																	<div class="sms_msg" onclick="applySMSMsg('order_msg_pay','[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])');">[[SHOP_NAME]][USER_NAME] 고객님의 주문이 접수되었습니다.([ORDER_NO])</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>미결제 상태</td>
                                                                 <td>
                                                                     <input type="text" name="order_msg_not_pay" class="form-control form-control-sm" value="{{@$order_msg_not_pay}}" style="width: 100%;"/>
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('order_msg_not_pay','[[SHOP_NAME]]입금계좌:[BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원');">[[SHOP_NAME]]입금계좌: [BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원</div>
+																	<div class="sms_msg" onclick="applySMSMsg('order_msg_not_pay','[[SHOP_NAME]]입금계좌:[BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원');">[[SHOP_NAME]]입금계좌: [BANK] [ACCOUNT] 예금주:[DEPOSITOR] [ORDER_AMT]원</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -886,7 +885,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="payment_msg"  class="form-control form-control-sm" value="{{@$payment_msg}}" style="width: 100%;"/>
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('payment_msg','[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.');">[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('payment_msg','[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.');">[[SHOP_NAME]]입금이 확인되었습니다. 감사합니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -898,7 +897,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="delivery_msg" class="form-control form-control-sm" value="{{@$delivery_msg}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('delivery_msg','[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])');">[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])</div>
+																	<div class="sms_msg" onclick="applySMSMsg('delivery_msg','[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])');">[[SHOP_NAME]][GOODS_NAME]..발송완료 [DELIVERY_NAME]([DELIVERY_NO])</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -910,14 +909,14 @@
                                                                 <td>환불</td>
                                                                 <td>
                                                                     <input type="text" name="refund_msg_complete" class="form-control form-control-sm" value="{{@$refund_msg_complete}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_complete','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('refund_msg_complete','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 환불처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>승인취소</td>
                                                                 <td>
                                                                     <input type="text" name="refund_msg_cancel" class="form-control form-control-sm" value="{{@$refund_msg_cancel}}" style="width: 100%;"/>
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('refund_msg_cancel','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('refund_msg_cancel','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO] 주문건 승인취소되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -929,21 +928,21 @@
                                                                 <td>무통장&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="cancel_msg_bank"  class="form-control form-control-sm" value="{{@$cancel_msg_bank}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_bank','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('cancel_msg_bank','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 취소 처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>카드&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="cancel_msg_card" class="form-control form-control-sm" value="{{@$cancel_msg_card}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_card','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('cancel_msg_card','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 승인취소되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td>계좌이체&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="cancel_msg_transfer" class="form-control form-control-sm" value="{{@$cancel_msg_transfer}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('cancel_msg_transfer','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('cancel_msg_transfer','[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 [ORDER_NO]주문건 환불완료 처리되었습니다.</div>
                                                                 </td>
                                                             </tr>
 
@@ -966,7 +965,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="birth_msg" class="form-control form-control-sm" value="{{@$birth_msg}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('birth_msg','[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('birth_msg','[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님의 생일쿠폰이 발급되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -977,7 +976,7 @@
                                                                 <td>&nbsp;</td>
                                                                 <td>
                                                                     <input type="text" name="welcome_msg" class="form-control form-control-sm" value="{{@$welcome_msg}}" style="width: 100%;" />
-                                                                    <div style="color:gray;" style="cursor: pointer;" onclick="applySMSMsg('welcome_msg','[[SHOP_NAME]][USER_NAME] 고객님의 웰컴백쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 웰컴백쿠폰이 발급되었습니다.</div>
+																	<div class="sms_msg" onclick="applySMSMsg('welcome_msg','[[SHOP_NAME]][USER_NAME] 고객님의 웰컴백쿠폰이 발급되었습니다.');">[[SHOP_NAME]][USER_NAME] 고객님 웰컴백쿠폰이 발급되었습니다.</div>
                                                                 </td>
                                                             </tr>
                                                         </div>
@@ -1194,11 +1193,11 @@
                                                             <th>검색 상품 정렬</th>
                                                             <td>
                                                                 <select name="search_goods_sort" class="form-control form-control-sm"style="width:100px;">
-                                                                    <option value="pop">판매량순</option>
-                                                                    <option value="new">신상품순</option>/
-                                                                    <option value="name_low">상품명순</option>
-                                                                    <option value="price_low">낮은가격순</option>
-                                                                    <option value="emt_high">상품평수순</option>
+																	<option value="pop" @if($search_goods_sort == "pop") selected @endif>판매량순</option>
+																	<option value="new" @if($search_goods_sort == "new") selected @endif>신상품순</option>/
+																	<option value="name_low" @if($search_goods_sort == "name_low") selected @endif>상품명순</option>
+																	<option value="price_low" @if($search_goods_sort == "price_low") selected @endif>낮은가격순</option>
+																	<option value="emt_high" @if($search_goods_sort == "emt_high") selected @endif>상품평수순</option>
                                                                 </select>
                                                             </td>
                                                         </tr>
@@ -1289,7 +1288,7 @@
                                                                         <label class="custom-control-label" for="member_inactive_y">사용함</label>
                                                                     </div>&nbsp;&nbsp;&nbsp;
                                                                     <div class="custom-control custom-radio">
-                                                                        <input type="radio" name="member_inactive_yn" id="member_inactive_n" class="custom-control-input" value="N" @if ($member_inactive_yn == 'Y') checked @endif/>
+																		<input type="radio" name="member_inactive_yn" id="member_inactive_n" class="custom-control-input" value="N" @if ($member_inactive_yn == 'N') checked @endif/>
                                                                         <label class="custom-control-label" for="member_inactive_n">사용안함</label>
                                                                     </div>
                                                                 </div>
@@ -1331,7 +1330,7 @@
                                                     </colgroup>
                                                     <tbody>
                                                         <tr>
-                                                            <th >쇼핑몰 메인 공지사항</td>
+                                                            <th>쇼핑몰 메인 공지사항</th>
                                                             <td>
                                                                 <input type="text" class="form-control form-control-sm" name="main_notice" value="{{@$main_notice}}" maxlength="2" style="width: 100px;text-align:right;display:inline" />개
                                                             </td>
@@ -1850,15 +1849,14 @@
 
 <script>
 
-    function remove1(){
-       let bank_nm = document.getElementById('bank_nm');
-       let account_no = document.getElementById('account_no');
-       let account_holder = document.getElementById('account_holder');
+	function remove(event) {
+		const accounts = event.target.parentNode.parentNode.querySelectorAll('input');
+		accounts.forEach(acc => acc.value = '');
+	}
 
-       bank_nm.value = "";
-       account_holder.value = "";
-       account_no.value = "";
-    }
+	function applySMSMsg(key, value) {
+		$(`[name='${key}']`).val(value);
+	}
 
     $(document).ready(function(){
        if ($('#policy_g').is(':checked')) {
@@ -1871,6 +1869,8 @@
         $("#policy_g").on('click',function(){
             $("input[name='ratio']").attr('readonly', true);
         });
+
+		$(".remove-acccount-btn").on("click", remove);
     });
 
 
