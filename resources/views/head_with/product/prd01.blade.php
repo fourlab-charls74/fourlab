@@ -268,7 +268,7 @@
 							<label>상단홍보글/하단홍보글</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box" style="width: 47%">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
+									<input type='text' class="form-control form-control-sm search-enter" name='head_desc' value=''>
 								</div>
 								<span class="text_line" style="width: 6%">/</span>
 								<div class="form-inline-inner input-box" style="width: 47%">
@@ -453,6 +453,8 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         Search();
+
+		setTimeout(initSearch, 0);
     });
 
     function onCellValueChanged(e) {

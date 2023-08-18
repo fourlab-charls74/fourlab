@@ -24,7 +24,7 @@ class sys05Controller extends Controller
         $sql_code = "select * from conf where type = 'shop' and name = 'code'";
         $code = DB::selectOne($sql_code);
 
-        $sql_phone = "select * from conf where type = 'shop' and name = 'company_phone_number'";
+        $sql_phone = "select * from conf where type = 'shop' and name = 'phone'";
         $phone = DB::selectOne($sql_phone);
 
         $sql_store_domain = "select * from conf where type = 'shop' and name = 'domain'";
@@ -48,29 +48,31 @@ class sys05Controller extends Controller
         $sql_meta_tag = "select * from conf where type = 'shop' and name = 'meta_tag'";
         $meta_tag = DB::selectOne($sql_meta_tag);
 
-        $sql_add_script_content = "select * from conf where type = 'shop' and name = 'add_script_content'";
+        $sql_add_script_content = "select * from conf where type = 'shop' and name = 'add_script'";
         $add_script_content = DB::selectOne($sql_add_script_content);
 
         $sql_sale_place = "select * from conf where type = 'shop' and name = 'sale_place'";
         $sale_place = DB::selectOne($sql_sale_place);
-
+		
+		$sql_sale_place_list = "select com_id as id, com_nm as name from company where com_id = 'HEAD_OFFICE'";
+		$sale_place_list = DB::select($sql_sale_place_list);
+		
         //주문 탭
         $sql_cash_use_yn = "select * from conf where type = 'shop' and name = 'cash_use_yn'";
         $cash_use_yn = DB::selectOne($sql_cash_use_yn);
 
         $sql_bank = "select * from conf where type = 'bank' and name = 'info'";
-        $bank = DB::selectOne($sql_bank);
+		$bank = DB::select($sql_bank);
 
         $sql_cancel_period = "select * from conf where type = 'order' and name = 'cancel_period'";
         $cancel_period = DB::selectOne($sql_cancel_period);
 
-        $account = $bank->value;
-        $bank_arr = explode("|", $account);
-        $bank_nm = $bank_arr[0];
-        $account_no = $bank_arr[1];
-        $account_holder = $bank_arr[2];
+		$accounts = array_map(function ($acc) {
+			return array_merge([$acc->idx], explode("|", $acc->value));
+		}, $bank);
 
-        //배송 탭
+
+		//배송 탭
         $sql_base_delivery_fee = "select * from conf where type = 'delivery' and name = 'base_delivery_fee'";
         $base_delivery_fee = DB::selectOne($sql_base_delivery_fee);
 
@@ -102,7 +104,7 @@ class sys05Controller extends Controller
         $day_delivery_zone = DB::selectOne($sql_day_delivery_zone);
 
         $sql_dlv_cd = "select * from conf where type = 'delivery' and name = 'dlv_cd'";
-        $dlv_cd = DB::selectOne($sql_dlv_cd);
+		$dlvs = SLib::getCodes('DELIVERY');
 
         //적립금 탭
         $sql_estimate_point_yn = "select * from conf where type = 'point' and name = 'estimate_point_yn'";
@@ -174,10 +176,10 @@ class sys05Controller extends Controller
         $sql_refund_yn = "select * from conf where type = 'sms' and name = 'refund_yn'";
         $refund_yn = DB::selectOne($sql_refund_yn);
 
-        $sql_refund_msg_complete = "select * from conf where type = 'sms' and name = 'refund_msg_complete'";
+		$sql_refund_msg_complete = "select * from conf where type = 'sms' and name = 'refund_msg' and idx = 'complete'";
         $refund_msg_complete = DB::selectOne($sql_refund_msg_complete);
 
-        $sql_refund_msg_cancel = "select * from conf where type = 'sms' and name = 'refund_msg_cancel'";
+		$sql_refund_msg_cancel = "select * from conf where type = 'sms' and name = 'refund_msg' and idx = 'cancel'";
         $refund_msg_cancel = DB::selectOne($sql_refund_msg_cancel);
 
         $sql_out_of_stock_yn = "select * from conf where type = 'sms' and name = 'out_of_stock_yn'";
@@ -192,22 +194,22 @@ class sys05Controller extends Controller
         $sql_auth_msg = "select * from conf where type = 'sms' and name = 'auth_msg'";
         $auth_msg = DB::selectOne($sql_auth_msg);
 
-        $sql_order_msg_pay = "select * from conf where type = 'sms' and name = 'order_msg_pay'";
+		$sql_order_msg_pay = "select * from conf where type = 'sms' and name = 'order_msg' and idx = 'pay'";
         $order_msg_pay = DB::selectOne($sql_order_msg_pay);
 
-        $sql_order_msg_not_pay = "select * from conf where type = 'sms' and name = 'order_msg_not_pay'";
+		$sql_order_msg_not_pay = "select * from conf where type = 'sms' and name = 'order_msg' and idx = 'not_pay'";
         $order_msg_not_pay = DB::selectOne($sql_order_msg_not_pay);
 
         $sql_cancel_yn = "select * from conf where type = 'sms' and name = 'cancel_yn'";
         $cancel_yn = DB::selectOne($sql_cancel_yn);
 
-        $sql_cancel_msg_bank = "select * from conf where type = 'sms' and name = 'cancel_msg_bank'";
+		$sql_cancel_msg_bank = "select * from conf where type = 'sms' and name = 'cancel_msg' and idx = 'bank'";
         $cancel_msg_bank = DB::selectOne($sql_cancel_msg_bank);
 
-        $sql_cancel_msg_card = "select * from conf where type = 'sms' and name = 'cancel_msg_card'";
+		$sql_cancel_msg_card = "select * from conf where type = 'sms' and name = 'cancel_msg' and idx = 'card'";
         $cancel_msg_card = DB::selectOne($sql_cancel_msg_card);
 
-        $sql_cancel_msg_transfer = "select * from conf where type = 'sms' and name = 'cancel_msg_transfer'";
+		$sql_cancel_msg_transfer = "select * from conf where type = 'sms' and name = 'cancel_msg' and idx = 'transfer'";
         $cancel_msg_transfer = DB::selectOne($sql_cancel_msg_transfer);
 
         $sql_birth_yn = "select * from conf where type = 'sms' and name = 'birth_yn'";
@@ -270,10 +272,10 @@ class sys05Controller extends Controller
         $sql_goods_qa_yn = "select * from conf where type = 'email' and name = 'goods_qa_yn'";
         $goods_qa_yn = DB::selectOne($sql_goods_qa_yn);
 
-        $sql_init_url = "select * from conf where type = 'stock_reduction' and name = 'init_url'";
+		$sql_init_url = "select * from conf where type = 'shop' and name = 'init_url'";
         $init_url = DB::selectOne($sql_init_url);
 
-        $sql_member_inactive_yn = "select * from conf where type = 'stock_reduction' and name = 'member_inactive_yn'";
+		$sql_member_inactive_yn = "select * from conf where type = 'shop' and name = 'member_inactive_yn'";
         $member_inactive_yn = DB::selectOne($sql_member_inactive_yn);
 
 
@@ -312,57 +314,57 @@ class sys05Controller extends Controller
         $sql_sabangnet_key = "select * from conf where type = 'api' and name = 'sabangnet_key'";
         $sabangnet_key = DB::selectOne($sql_sabangnet_key);
 
-        $sql_ipin_site_cd = "select * from conf where type = 'admin' and name = 'ipin_site_cd'";
+		$sql_ipin_site_cd = "select * from conf where type = 'api' and name = 'ipin_site_cd'";
         $ipin_site_cd = DB::selectOne($sql_ipin_site_cd);
 
-        $sql_ipin_site_pw = "select * from conf where type = 'admin' and name = 'ipin_site_pw'";
+		$sql_ipin_site_pw = "select * from conf where type = 'api' and name = 'ipin_site_pw'";
         $ipin_site_pw = DB::selectOne($sql_ipin_site_pw);
 
-        $sql_ipin_site_seq = "select * from conf where type = 'admin' and name = 'ipin_site_seq'";
-        $ipin_site_seq = DB::selectOne($sql_ipin_site_seq);
+		$sql_ipin_site_req = "select * from conf where type = 'api' and name = 'ipin_site_req'";
+		$ipin_site_req = DB::selectOne($sql_ipin_site_req);
 
         //모바일 탭
-        $sql_m_domain = "select * from conf where type = 'mobile' and name = 'm_domain'";
+		$sql_m_domain = "select * from conf where type = 'shop' and name = 'domain'";
         $m_domain = DB::selectOne($sql_m_domain);
 
-        $sql_m_category_goods_cnt = "select * from conf where type = 'mobile' and name = 'm_category_goods_cnt'";
+		$sql_m_category_goods_cnt = "select * from conf where type = 'shop' and name = 'category_goods_cnt'";
         $m_category_goods_cnt = DB::selectOne($sql_m_category_goods_cnt);
 
-        $sql_m_newarrival_cnt = "select * from conf where type = 'mobile' and name = 'm_newarrival_cnt'";
+		$sql_m_newarrival_cnt = "select * from conf where type = 'shop' and name = 'newarrival_goods_cnt'";
         $m_newarrival_cnt = DB::selectOne($sql_m_newarrival_cnt);
 
-        $sql_m_onsale_goods_cnt = "select * from conf where type = 'mobile' and name = 'm_onsale_goods_cnt'";
+		$sql_m_onsale_goods_cnt = "select * from conf where type = 'shop' and name = 'onsale_goods_cnt'";
         $m_onsale_goods_cnt = DB::selectOne($sql_m_onsale_goods_cnt);
 
-        $sql_m_brandshop_goods_cnt = "select * from conf where type = 'mobile' and name = 'm_brandshop_goods_cnt'";
+		$sql_m_brandshop_goods_cnt = "select * from conf where type = 'shop' and name = 'brandshop_goods_cnt'";
         $m_brandshop_goods_cnt = DB::selectOne($sql_m_brandshop_goods_cnt);
 
-        $sql_m_best_rank_goods_cnt = "select * from conf where type = 'mobile' and name = 'm_best_rank_goods_cnt'";
+		$sql_m_best_rank_goods_cnt = "select * from conf where type = 'shop' and name = 'best_rank_goods_cnt'";
         $m_best_rank_goods_cnt = DB::selectOne($sql_m_best_rank_goods_cnt);
 
-        $sql_m_search_goods_cnt = "select * from conf where type = 'mobile' and name = 'm_search_goods_cnt'";
+		$sql_m_search_goods_cnt = "select * from conf where type = 'shop' and name = 'search_goods_cnt'";
         $m_search_goods_cnt = DB::selectOne($sql_m_search_goods_cnt);
 
-        $sql_app_main_banner_1 = "select * from conf where type = 'mobile' and name = 'app_main_banner_1'";
+        $sql_app_main_banner_1 = "select * from conf where type = 'shop' and name = 'app_main_banner_1'";
         $app_main_banner_1 = DB::selectOne($sql_app_main_banner_1);
 
-        $sql_app_main_banner_2 = "select * from conf where type = 'mobile' and name = 'app_main_banner_2'";
+        $sql_app_main_banner_2 = "select * from conf where type = 'shop' and name = 'app_main_banner_2'";
         $app_main_banner_2 = DB::selectOne($sql_app_main_banner_2);
 
-        $sql_app_main_section_1 = "select * from conf where type = 'mobile' and name = 'app_main_section_1'";
+        $sql_app_main_section_1 = "select * from conf where type = 'shop' and name = 'app_main_section_1'";
         $app_main_section_1 = DB::selectOne($sql_app_main_section_1);
 
-        $sql_app_main_section_2 = "select * from conf where type = 'mobile' and name = 'app_main_section_2'";
+        $sql_app_main_section_2 = "select * from conf where type = 'shop' and name = 'app_main_section_2'";
         $app_main_section_2 = DB::selectOne($sql_app_main_section_2);
 
-        $sql_app_main_section_3 = "select * from conf where type = 'mobile' and name = 'app_main_section_3'";
+        $sql_app_main_section_3 = "select * from conf where type = 'shop' and name = 'app_main_section_3'";
         $app_main_section_3 = DB::selectOne($sql_app_main_section_3);
 
         //이미지 탭
         $sql_image_yn = "select * from conf where type = 'image' and name = 'image_yn'";
         $image_yn = DB::selectOne($sql_image_yn);
 
-        $sql_i_domain = "select * from conf where type = 'image' and name = 'i_domain'";
+        $sql_i_domain = "select * from conf where type = 'image' and name = 'domain'";
         $i_domain = DB::selectOne($sql_i_domain);
 
         $sql_ftp_yn = "select * from conf where type = 'image' and name = 'ftp_yn'";
@@ -384,7 +386,7 @@ class sys05Controller extends Controller
             //상점 탭
             'name' => $name->value ?? '',
             'code'  => $code->value ?? '',
-            'phone' => $phone->value ?? '',
+			'phone' => $phone->mvalue ?? '',
             's_domain' => $s_domain->value ?? '',
             'a_domain' => $a_domain->value ?? '',
             'a_domain_handle' => $a_domain_handle->value ?? '',
@@ -394,11 +396,10 @@ class sys05Controller extends Controller
             'meta_tag' => $meta_tag->value ?? '',
             'add_script_content' => $add_script_content->value ?? '',
             'sale_place' => $sale_place->value ?? '',
+			'sale_place_list' => $sale_place_list,
             //주문 탭
             'cash_use_yn' => $cash_use_yn->value ?? '',
-            'bank_nm' => $bank_nm,
-            'account_no' => $account_no,
-            'account_holder' => $account_holder,
+			'accounts' => $accounts,
             'cancel_period' => $cancel_period->value ?? '',
             //배송 탭
             'base_delivery_fee' => $base_delivery_fee->value ?? '',
@@ -412,6 +413,7 @@ class sys05Controller extends Controller
             'day_delivery_type' => $day_delivery_type->value ?? '',
             'day_delivery_zone' => $day_delivery_zone->value ?? '',
             'dlv_cd' => $dlv_cd->value ?? '',
+			'dlvs' => $dlvs,
             //적립금 탭
             'estimate_point_yn' => $estimate_point_yn->value ?? '',
             'estimate_point' => $estimate_point->value ?? '',
@@ -427,19 +429,19 @@ class sys05Controller extends Controller
             //SMS 탭
             'sms_yn' => $sms_yn->value ?? '',
             'join_yn' => $join_yn->value ?? '',
-            'join_msg' => $join_msg->content ?? '',
+            'join_msg' => $join_msg->value  ?? '',
             'passwd_yn' => $passwd_yn->value ?? '',
-            'passwd_msg' => $passwd_msg->content ?? '',
+            'passwd_msg' => $passwd_msg->value  ?? '',
             'order_yn' => $order_yn->value ?? '',
             'payment_yn' => $payment_yn->value ?? '',
-            'payment_msg' => $payment_msg->content ?? '',
+            'payment_msg' => $payment_msg->value  ?? '',
             'delivery_yn' => $delivery_yn->value ?? '',
-            'delivery_msg' => $delivery_msg->content ?? '',
+            'delivery_msg' => $delivery_msg->value  ?? '',
             'refund_yn' => $refund_yn->value ?? '',
-            'refund_msg_complete' => $refund_msg_complete->content ?? '',
-            'refund_msg_cancel' => $refund_msg_cancel->content ?? '',
+            'refund_msg_complete' => $refund_msg_complete->value  ?? '',
+            'refund_msg_cancel' => $refund_msg_cancel->value  ?? '',
             'out_of_stock_yn' => $out_of_stock_yn->value ?? '',
-            'out_of_stock_msg' => $out_of_stock_msg->content ?? '',
+            'out_of_stock_msg' => $out_of_stock_msg->value  ?? '',
             'auth_yn' => $auth_yn->value ?? '',
             'auth_msg' => $auth_msg->value ?? '',
             'order_msg_pay' => $order_msg_pay->value ?? '',
@@ -486,21 +488,21 @@ class sys05Controller extends Controller
             'shoplinker_user_id' => $shoplinker_user_id->value ?? '',
             'ipin_site_cd' => $ipin_site_cd->value ?? '',
             'ipin_site_pw' => $ipin_site_pw->value ?? '',
-            'ipin_site_seq' => $ipin_site_seq->value ?? '',
+			'ipin_site_req' => $ipin_site_req->value ?? '',
 
             //모바일 탭
-            'm_domain' => $m_domain->value ?? '',
-            'm_category_goods_cnt' => $m_category_goods_cnt->value ?? '',
-            'm_newarrival_cnt' => $m_newarrival_cnt->value ?? '',
-            'm_onsale_goods_cnt' => $m_onsale_goods_cnt->value ?? '',
-            'm_brandshop_goods_cnt' => $m_brandshop_goods_cnt->value ?? '',
-            'm_best_rank_goods_cnt' => $m_best_rank_goods_cnt->value ?? '',
-            'm_search_goods_cnt' => $m_search_goods_cnt->value ?? '',
-            'app_main_banner_1' => $app_main_banner_1->value ?? '',
-            'app_main_banner_2' => $app_main_banner_2->value ?? '',
-            'app_main_section_1' => $app_main_section_1->value ?? '',
-            'app_main_section_2' => $app_main_section_2->value ?? '',
-            'app_main_section_3' => $app_main_section_3->value ?? '',
+			'm_domain' => $m_domain->mvalue ?? '',
+			'm_category_goods_cnt' => $m_category_goods_cnt->mvalue ?? '',
+			'm_newarrival_goods_cnt' => $m_newarrival_cnt->mvalue ?? '',
+			'm_onsale_goods_cnt' => $m_onsale_goods_cnt->mvalue ?? '',
+			'm_brandshop_goods_cnt' => $m_brandshop_goods_cnt->mvalue ?? '',
+			'm_best_rank_goods_cnt' => $m_best_rank_goods_cnt->mvalue ?? '',
+			'm_search_goods_cnt' => $m_search_goods_cnt->mvalue ?? '',
+			'app_main_banner_1' => $app_main_banner_1->mvalue ?? '',
+			'app_main_banner_2' => $app_main_banner_2->mvalue ?? '',
+			'app_main_section_1' => $app_main_section_1->mvalue ?? '',
+			'app_main_section_2' => $app_main_section_2->mvalue ?? '',
+			'app_main_section_3' => $app_main_section_3->mvalue ?? '',
 
             //이미지 탭
             'image_yn' => $image_yn->value ?? '',
@@ -537,9 +539,6 @@ class sys05Controller extends Controller
 
         //주문 탭
         $cash_use_yn = $request->input('cash_use_yn');
-        $bank_nm = $request->input('bank_nm');
-        $account_no = $request->input('account_no');
-        $account_holder = $request->input('account_holder');
         $cancel_period = $request->input('cancel_period');
 
 
@@ -550,6 +549,7 @@ class sys05Controller extends Controller
         $wholesale_free_delivery_amt = $request->input('wholesale_free_delivery_amt');
         $wholesale_base_delivery_fee = $request->input('wholesale_base_delivery_fee');
         $wholesale_add_delivery_fee = $request->input('wholesale_add_delivery_fee');
+		$dlv_cd = $request->input('dlv_cd');
         $day_delivery_yn = $request->input('day_delivery_yn');
         $day_delivery_type = $request->input('day_delivery_type');
         $day_delivery_amt = $request->input('day_delivery_amt');
@@ -563,7 +563,9 @@ class sys05Controller extends Controller
         $return_yn = $request->input('return_yn');
         $point_limit = $request->input('point_limit');
         $p_give_type = $request->input('p_give_type');
-
+		$estimate_point_yn = $request->input('estimate_point_yn');
+		$estimate_point = $request->input('estimate_point');
+		
         //카카오 탭
         $kakao_yn = $request->input('kakao_yn');
         $sender_key = $request->input('sender_key');
@@ -632,7 +634,7 @@ class sys05Controller extends Controller
         $shoplinker_user_id = $request->input('shoplinker_user_id');
         $ipin_site_cd = $request->input('ipin_site_cd');
         $ipin_site_pw = $request->input('ipin_site_pw');
-        $ipin_site_seq = $request->input('ipin_site_seq');
+		$ipin_site_req = $request->input('ipin_site_req');
 
 
         //모바일 탭
@@ -668,7 +670,7 @@ class sys05Controller extends Controller
                 $sql_code = "update conf set value='$s_code', ut = '$ut' where type='shop' and name='code'";
                 DB::update($sql_code);
 
-                $sql_phone = "update conf set value='$phone', ut = '$ut' where type='shop' and name='phone'";
+                $sql_phone = "update conf set mvalue='$phone', ut = '$ut' where type='shop' and name='phone'";
                 DB::update($sql_phone);
 
                 $sql_domain = "update conf set value='$domain', ut = '$ut' where type='shop' and name='domain'";
@@ -692,7 +694,7 @@ class sys05Controller extends Controller
                 $sql_meta_tag = "update conf set value='$meta_tag', ut = '$ut' where type='shop' and name='meta_tag'";
                 DB::update($sql_meta_tag);
 
-                $sql_add_script_content = "update conf set value='$add_script_content', ut = '$ut' where type='shop' and name='add_script_content'";
+				$sql_add_script_content = "update conf set value='$add_script_content', ut = '$ut' where type='shop' and name='add_script'";
                 DB::update($sql_add_script_content);
 
                 $sql_sale_place = "update conf set value='$sale_place', ut = '$ut' where type='shop' and name='sale_place'";
@@ -702,8 +704,13 @@ class sys05Controller extends Controller
                 $sql_cash_use_yn = "update conf set value='$cash_use_yn', ut = '$ut' where type='shop' and name='cash_use_yn'";
                 DB::update($sql_cash_use_yn);
 
-                $sql_bank = "update conf set value='$bank_nm|$account_no|$account_holder', ut = '$ut' where type='bank' and name='info'";
-                DB::update($sql_bank);
+				$banks = DB::select("select idx from conf where type = 'bank' and name = 'info'");
+				foreach ($banks as $bk) {
+					$acc = $request->input('account_' . $bk->idx);
+					$txt = $acc[0] . "|" . $acc[1] . "|" . $acc[2];
+					$sql_bank = "update conf set value='$txt', ut = '$ut' where type='bank' and name='info' and idx='$bk->idx'";
+					DB::update($sql_bank);
+				}
 
                 $sql_cancel_period = "update conf set value='$cancel_period', ut = '$ut' where type='order' and name='cancel_period'";
                 DB::update($sql_cancel_period);
@@ -728,6 +735,9 @@ class sys05Controller extends Controller
                 $sql_wholesale_add_delivery_fee = "update conf set value='$wholesale_add_delivery_fee', ut = '$ut' where type='delivery' and name='wholesale_add_delivery_fee'";
                 DB::update($sql_wholesale_add_delivery_fee);
 
+				$sql_dlv_cd = "update conf set value='$dlv_cd', ut = '$ut' where type='delivery' and name='dlv_cd'";
+				DB::update($sql_dlv_cd);
+				
                 $sql_day_delivery_yn = "update conf set value='$day_delivery_yn', ut = '$ut' where type='delivery' and name='day_delivery_yn'";
                 DB::update($sql_day_delivery_yn);
 
@@ -760,6 +770,11 @@ class sys05Controller extends Controller
                 $sql_p_give_type = "update conf set value='$p_give_type', ut = '$ut' where type='point' and name='p_give_type'";
                 DB::update($sql_p_give_type);
 
+				$sql_estimate_point_yn = "update conf set value='$estimate_point_yn', ut = '$ut' where type='point' and name='estimate_point_yn'";
+				DB::update($sql_estimate_point_yn);
+
+				$sql_estimate_point = "update conf set value='$estimate_point', ut = '$ut' where type='point' and name='estimate_point'";
+				DB::update($sql_estimate_point);
             } elseif ($type == 'kakao') {
                 //카카오 탭
                 $sql_kakao_yn = "update conf set value='$kakao_yn', ut = '$ut' where type='kakao' and name='kakao_yn'";
@@ -776,10 +791,10 @@ class sys05Controller extends Controller
                 $sql_join_yn = "update conf set value='$join_yn', ut='$ut' where type='sms' and name='join_yn'";
                 DB::update($sql_join_yn);
 
-                $sql_join_msg = "update conf set value='$join_yn', content='$join_msg', ut='$ut' where type='sms' and name='join_msg'";
+				$sql_join_msg = "update conf set value='$join_msg', ut='$ut' where type='sms' and name='join_msg'";
                 DB::update($sql_join_msg);
 
-                $sql_delivery_msg = "update conf set value='$delivery_yn', content='$delivery_msg', ut='$ut' where type='sms' and name='delivery_msg'";
+				$sql_delivery_msg = "update conf set value='$delivery_msg', ut='$ut' where type='sms' and name='delivery_msg'";
                 DB::update($sql_delivery_msg);
 
                 $sql_delivery_yn = "update conf set value='$delivery_yn', ut = '$ut' where type='sms' and name='delivery_yn'";
@@ -788,28 +803,28 @@ class sys05Controller extends Controller
                 $sql_out_of_stock_yn = "update conf set value='$out_of_stock_yn', ut = '$ut' where type='sms' and name='out_of_stock_yn'";
                 DB::update($sql_out_of_stock_yn);
 
-                $sql_out_of_stock_msg = "update conf set value='$out_of_stock_yn', content='$out_of_stock_msg', ut = '$ut' where type='sms' and name='out_of_stock_msg'";
+				$sql_out_of_stock_msg = "update conf set value='$out_of_stock_msg', ut = '$ut' where type='sms' and name='out_of_stock_msg'";
                 DB::update($sql_out_of_stock_msg);
 
                 $sql_passwd_yn = "update conf set value='$passwd_yn', ut = '$ut' where type='sms' and name='passwd_yn'";
                 DB::update($sql_passwd_yn);
 
-                $sql_passwd_msg = "update conf set value='$passwd_yn', content='$passwd_msg', ut = '$ut' where type='sms' and name='passwd_msg'";
+				$sql_passwd_msg = "update conf set value='$passwd_msg', ut = '$ut' where type='sms' and name='passwd_msg'";
                 DB::update($sql_passwd_msg);
 
                 $sql_payment_yn = "update conf set value='$payment_yn', ut = '$ut' where type='sms' and name='payment_yn'";
                 DB::update($sql_payment_yn);
 
-                $sql_payment_msg = "update conf set value='$payment_yn', content='$payment_msg', ut = '$ut' where type='sms' and name='payment_msg'";
+				$sql_payment_msg = "update conf set value='$payment_msg', ut = '$ut' where type='sms' and name='payment_msg'";
                 DB::update($sql_payment_msg);
 
                 $sql_refund_yn = "update conf set value='$refund_yn', ut = '$ut' where type='sms' and name='refund_yn'";
                 DB::update($sql_refund_yn);
 
-                $sql_refund_msg_complete = "update conf set value='$refund_yn', content='$refund_msg_complete', ut = '$ut' where type='sms' and name='refund_msg_complete'";
+				$sql_refund_msg_complete = "update conf set value='$refund_msg_complete', ut = '$ut' where type='sms' and name='refund_msg' and idx='complete'";
                 DB::update($sql_refund_msg_complete);
 
-                $sql_refund_msg_cancel = "update conf set value='$refund_yn', content='$refund_msg_cancel', ut = '$ut' where type='sms' and name='refund_msg_cancel'";
+				$sql_refund_msg_cancel = "update conf set value='$refund_msg_cancel', ut = '$ut' where type='sms' and name='refund_msg' and idx='cancel'";
                 DB::update($sql_refund_msg_cancel);
 
                 $sql_auth_yn = "update conf set value='$auth_yn', ut = '$ut' where type='sms' and name='auth_yn'";
@@ -818,10 +833,13 @@ class sys05Controller extends Controller
                 $sql_auth_msg = "update conf set value='$auth_msg', ut = '$ut' where type='sms' and name='auth_msg'";
                 DB::update($sql_auth_msg);
 
-                $sql_order_msg_pay = "update conf set value='$order_msg_pay', ut = '$ut' where type='sms' and name='order_msg_pay'";
+				$sql_order_yn = "update conf set value='$order_yn', ut = '$ut' where type='sms' and name='order_yn'";
+				DB::update($sql_order_yn);
+
+				$sql_order_msg_pay = "update conf set value='$order_msg_pay', ut = '$ut' where type='sms' and name='order_msg' and idx='pay'";
                 DB::update($sql_order_msg_pay);
 
-                $sql_order_msg_not_pay = "update conf set value='$order_msg_not_pay', ut = '$ut' where type='sms' and name='order_msg_not_pay'";
+				$sql_cancel_msg_bank = "update conf set value='$cancel_msg_bank', ut = '$ut' where type='sms' and name='cancel_msg' and idx='bank'";
                 DB::update($sql_order_msg_not_pay);
 
                 $sql_cancel_yn = "update conf set value='$cancel_yn', ut = '$ut' where type='sms' and name='cancel_yn'";
@@ -830,10 +848,10 @@ class sys05Controller extends Controller
                 $sql_cancel_msg_bank = "update conf set value='$cancel_msg_bank', ut = '$ut' where type='sms' and name='cancel_msg_bank'";
                 DB::update($sql_cancel_msg_bank);
 
-                $sql_cancel_msg_card = "update conf set value='$cancel_msg_card', ut = '$ut' where type='sms' and name='cancel_msg_card'";
+				$sql_cancel_msg_card = "update conf set value='$cancel_msg_card', ut = '$ut' where type='sms' and name='cancel_msg' and idx='card'";
                 DB::update($sql_cancel_msg_card);
 
-                $sql_cancel_msg_transfer = "update conf set value='$cancel_msg_transfer', ut = '$ut' where type='sms' and name='cancel_msg_transfer'";
+				$sql_cancel_msg_transfer = "update conf set value='$cancel_msg_transfer', ut = '$ut' where type='sms' and name='cancel_msg' and idx='transfer'";
                 DB::update($sql_cancel_msg_transfer);
 
                 $sql_birth_yn = "update conf set value='$birth_yn', ut = '$ut' where type='sms' and name='birth_yn'";
@@ -859,7 +877,7 @@ class sys05Controller extends Controller
                 $sql_wholesale_yn = "update conf set value='$wholesale_yn', ut = '$ut' where type='shop' and name='wholesale_yn'";
                 DB::update($sql_wholesale_yn);
 
-                $sql_new_goods_day = "update conf set value='$new_goods_day', ut = '$ut' where type='shop' and name='new_goods_day'";
+                $sql_new_goods_day = "update conf set value='$new_goods_day', ut = '$ut' where type='shop' and name='new_good_day'";
                 DB::update($sql_new_goods_day);
 
                 $sql_new_data_day = "update conf set value='$new_data_day', ut = '$ut' where type='shop' and name='new_data_day'";
@@ -895,10 +913,10 @@ class sys05Controller extends Controller
                 $sql_goods_qa_yn = "update conf set value='$goods_qa_yn', ut = '$ut' where type='email' and name='goods_qa_yn'";
                 DB::update($sql_goods_qa_yn);
 
-                $sql_init_url = "update conf set value='$init_url', ut = '$ut' where type='stock_reduction' and name='init_url'";
+                $sql_init_url = "update conf set value='$init_url', ut = '$ut' where type='shop' and name='init_url'";
                 DB::update($sql_init_url);
 
-                $sql_member_inactive_yn = "update conf set value='$member_inactive_yn', ut = '$ut' where type='stock_reduction' and name='member_inactive_yn'";
+                $sql_member_inactive_yn = "update conf set value='$member_inactive_yn', ut = '$ut' where type='shop' and name='member_inactive_yn'";
                 DB::update($sql_member_inactive_yn);
 
             } else if ($type == 'list_count') {
@@ -938,51 +956,51 @@ class sys05Controller extends Controller
                 $sql_shoplinker_user_id = "update conf set value='$shoplinker_user_id', ut = '$ut' where type='api' and name='shoplinker_user_id'";
                 DB::update($sql_shoplinker_user_id);
 
-                $sql_ipin_site_cd = "update conf set value='$ipin_site_cd', ut = '$ut' where type='admin' and name='ipin_site_cd'";
+                $sql_ipin_site_cd = "update conf set value='$ipin_site_cd', ut = '$ut' where type='api' and name='ipin_site_cd'";
                 DB::update($sql_ipin_site_cd);
 
                 $sql_ipin_site_pw = "update conf set value='$ipin_site_pw', ut = '$ut' where type='admin' and name='ipin_site_pw'";
                 DB::update($sql_ipin_site_pw);
 
-                $sql_ipin_site_seq = "update conf set value='$ipin_site_seq', ut = '$ut' where type='admin' and name='ipin_site_seq'";
-                DB::update($sql_ipin_site_seq);
+				$sql_ipin_site_req = "update conf set value='$ipin_site_req', ut = '$ut' where type='api' and name='ipin_site_req'";
+				DB::update($sql_ipin_site_req);
 
             } else if ($type == 'mobile') {
                 //모바일 탭
-                $sql_m_domain = "update conf set value='$m_domain', ut = '$ut' where type='mobile' and name='m_domain'";
+				$sql_m_domain = "update conf set mvalue='$m_domain', ut = '$ut' where type='shop' and name='domain'";
                 DB::update($sql_m_domain);
 
-                $sql_m_category_goods_cnt = "update conf set value='$m_category_goods_cnt', ut = '$ut' where type='mobile' and name='m_category_goods_cnt'";
+				$sql_m_category_goods_cnt = "update conf set mvalue='$m_category_goods_cnt', ut = '$ut' where type='shop' and name='category_goods_cnt'";
                 DB::update($sql_m_category_goods_cnt);
 
-                $sql_m_newarrival_cnt = "update conf set value='$m_newarrival_cnt', ut = '$ut' where type='mobile' and name='m_newarrival_cnt'";
+				$sql_m_newarrival_cnt = "update conf set mvalue='$m_newarrival_cnt', ut = '$ut' where type='shop' and name='newarrival_goods_cnt'";
                 DB::update($sql_m_newarrival_cnt);
 
-                $sql_m_onsale_goods_cnt = "update conf set value='$m_onsale_goods_cnt', ut = '$ut' where type='mobile' and name='m_onsale_goods_cnt'";
+				$sql_m_onsale_goods_cnt = "update conf set mvalue='$m_onsale_goods_cnt', ut = '$ut' where type='shop' and name='onsale_goods_cnt'";
                 DB::update($sql_m_onsale_goods_cnt);
 
-                $sql_m_brandshop_goods_cnt = "update conf set value='$m_brandshop_goods_cnt', ut = '$ut' where type='mobile' and name='m_brandshop_goods_cnt'";
+				$sql_m_brandshop_goods_cnt = "update conf set mvalue='$m_brandshop_goods_cnt', ut = '$ut' where type='shop' and name='brandshop_goods_cnt'";
                 DB::update($sql_m_brandshop_goods_cnt);
 
-                $sql_m_best_rank_goods_cnt = "update conf set value='$m_best_rank_goods_cnt', ut = '$ut' where type='mobile' and name='m_best_rank_goods_cnt'";
+				$sql_m_best_rank_goods_cnt = "update conf set mvalue='$m_best_rank_goods_cnt', ut = '$ut' where type='shop' and name='best_rank_goods_cnt'";
                 DB::update($sql_m_best_rank_goods_cnt);
 
-                $sql_m_search_goods_cnt = "update conf set value='$m_search_goods_cnt', ut = '$ut' where type='mobile' and name='m_search_goods_cnt'";
+				$sql_m_search_goods_cnt = "update conf set mvalue='$m_search_goods_cnt', ut = '$ut' where type='shop' and name='search_goods_cnt'";
                 DB::update($sql_m_search_goods_cnt);
 
-                $sql_app_main_banner_1 = "update conf set value='$app_main_banner_1', ut = '$ut' where type='mobile' and name='app_main_banner_1'";
+				$sql_app_main_banner_1 = "update conf set mvalue='$app_main_banner_1', ut = '$ut' where type='shop' and name='app_main_banner_1'";
                 DB::update($sql_app_main_banner_1);
 
-                $sql_app_main_banner_2 = "update conf set value='$app_main_banner_2', ut = '$ut' where type='mobile' and name='app_main_banner_2'";
+				$sql_app_main_banner_2 = "update conf set mvalue='$app_main_banner_2', ut = '$ut' where type='shop' and name='app_main_banner_2'";
                 DB::update($sql_app_main_banner_2);
 
-                $sql_app_main_section_1 = "update conf set value='$app_main_section_1', ut = '$ut' where type='mobile' and name='app_main_section_1'";
+				$sql_app_main_section_1 = "update conf set mvalue='$app_main_section_1', ut = '$ut' where type='shop' and name='app_main_section_1'";
                 DB::update($sql_app_main_section_1);
 
-                $sql_app_main_section_2 = "update conf set value='$app_main_section_2', ut = '$ut' where type='mobile' and name='app_main_section_2'";
+				$sql_app_main_section_2 = "update conf set mvalue='$app_main_section_2', ut = '$ut' where type='shop' and name='app_main_section_2'";
                 DB::update($sql_app_main_section_2);
 
-                $sql_app_main_section_3 = "update conf set value='$app_main_section_3', ut = '$ut' where type='mobile' and name='app_main_section_3'";
+				$sql_app_main_section_3 = "update conf set mvalue='$app_main_section_3', ut = '$ut' where type='shop' and name='app_main_section_3'";
                 DB::update($sql_app_main_section_3);
 
             } else if ($type == 'image') {
@@ -990,7 +1008,7 @@ class sys05Controller extends Controller
                 $sql_image_yn = "update conf set value='$image_yn', ut = '$ut' where type='image' and name='image_yn'";
                 DB::update($sql_image_yn);
 
-                $sql_i_domain = "update conf set value='$i_domain', ut = '$ut' where type='image' and name='i_domain'";
+				$sql_i_domain = "update conf set value='$i_domain', ut = '$ut' where type='image' and name='domain'";
                 DB::update($sql_i_domain);
 
                 $sql_ftp_yn = "update conf set value='$ftp_yn', ut = '$ut' where type='image' and name='ftp_yn'";

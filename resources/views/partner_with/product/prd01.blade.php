@@ -336,6 +336,8 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         Search();
+
+		setTimeout(function (e) { return document.search.reset(); }, 0);
     });
 
     const columnDefs = [
