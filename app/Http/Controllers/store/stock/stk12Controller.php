@@ -309,6 +309,8 @@ class stk12Controller extends Controller
             $rel_order = DB::selectOne($sql);
 
             foreach($rel_qty_values as $d) {
+				if ($d['rel_qty'] < 1) continue;
+
                 $cnt = 0;
 
                 $sql = "
@@ -430,7 +432,7 @@ class stk12Controller extends Controller
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
                     ]);
-                }
+			}
 
             DB::commit();
             $code = 200;
