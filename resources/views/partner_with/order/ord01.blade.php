@@ -534,7 +534,8 @@
         gx = new HDGrid(gridDiv, columns);
 		
         Search();
-	    
+
+		setTimeout(function (e) { return document.search.reset(); }, 0);
         $("#chk_to_class").click(function() {
             gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
         });

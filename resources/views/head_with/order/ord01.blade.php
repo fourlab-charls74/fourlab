@@ -668,6 +668,9 @@
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		Search();
+
+		setTimeout(initSearch, 0);
+		
         $("#chk_to_class").click(function() {
             gx.gridOptions.columnApi.setColumnVisible("img", $("#chk_to_class").is(":checked"));
         });
