@@ -189,14 +189,14 @@
                             <div class="form-group">
                                 <label for="f_sqty">파일</label>
                                 <div class="flex_box">
-                                    <div class="custom-file w-50">
+                                    <div class="custom-file w-75">
                                         <input name="excel_file" type="file" class="custom-file-input" id="excel_file">
                                         <label class="custom-file-label" for="file"></label>
                                     </div>
                                     <div class="btn-group ml-2">
                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                     </div>
-                                    <a href="/sample/sample_receiving.xlsx" class="ml-2" style="text-decoration: underline !important;">샘플파일</a>
+									<a href="/sample/sample_receiving.xlsx" class="ml-2" style="text-decoration: underline !important;" download="일괄입고_샘플">샘플파일</a>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +270,7 @@
     };
 
     var columns= [
-        {headerName: '#', pinned: 'left', type: 'NumType', width: 50,
+        {headerName: '#', pinned: 'left', type: 'NumType', width: 50, cellClass: 'hd-grid-code',
             cellRenderer: params => params.node.rowPinned == 'top' ? '' : params.data.count,
             sortingOrder: ['desc', 'asc', 'null'],
             comparator: (valueA, valueB, nodeA, nodeB, isInverted) => { // 번호순으로 정렬이 안되는 문제 수정
@@ -287,7 +287,7 @@
             },
             checkboxSelection: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? null : { display: 'none'},
-            width: 40, pinned:'left',
+			width: 28, pinned:'left'
             // hide: params => {
             //     const state = STATE; // 입고취소: -10, 입고대기: 10, 입고처리중: 20, 입고완료: 30
             //     // 입고 대기이거나 입고 처리중인 경우에만 체크박스 표시 -> 삭제 가능하게함
@@ -301,7 +301,7 @@
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
-        {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:110,
+        {field:"style_no" ,headerName:"스타일넘버",pinned:'left',width:120,
             // cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99'} : null ,
             // editable: params => checkIsEditable(params)
         },
@@ -332,15 +332,9 @@
         {headerName: "금액", field: "unit_total_cost", width: 72, cellStyle:{'text-align': 'right'}, 
             valueFormatter: numberFormatter
         },
-        {headerName: "원가(원, VAT포함)", field: "cost", width: 120, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
-        },
-        {headerName: "총원가(원)", field: "total_cost", width: 96, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
-        },
-        {headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 134, cellStyle:{'text-align': 'right'}, 
-            valueFormatter: numberFormatter
-        },
+		{headerName: "원가(원, VAT포함)", field: "cost", width: 120, type: 'currencyType'},
+		{headerName: "총원가(원)", field: "total_cost", width: 196, type: 'currencyType'},
+		{headerName: "총원가(원, VAT별도)", field: "total_cost_novat", width: 134, type: 'currencyType'},
         {headerName: "최근입고일자", field: "stock_date", width:96, cellStyle: {"text-align" : 'center'}},
         {headerName:"", field:"", width:"auto"}
     ];
@@ -784,7 +778,7 @@
         updatePinnedRow();
     };
 
-    const calProduct = async (row, unit, exchange_rate, custom_tax_rate) => {
+    const calProduct = async (row, unit, exchange_rate, custom_tax_rate, checked_row = {}) => {
 
         const qty = row.qty ? parseInt(row.qty) : 0;
         let unit_cost;
@@ -802,7 +796,8 @@
         total_cost = qty * cost;
         total_cost_novat = Math.round(total_cost/1.1,0); // 총원가 vat 별도
 
-        await gx.gridOptions.api.applyTransaction({ update: [{...row,
+        await gx.gridOptions.api.applyTransaction({ update: [{...row, 
+			...checked_row,
             unit_total_cost: qty * unit_cost, // 금액
             cost: cost, // 원가 (원, VAT 포함)
             total_cost: total_cost, // 총원가 (원)
@@ -1042,21 +1037,29 @@
             'E': 'unit_cost',
 		};
 
-		var rowIndex = 5; // 엑셀 5번째 줄부터 시작 (샘플데이터 참고)
+		var rowIndex = 2; // 엑셀 5번째 줄부터 시작 (샘플데이터 참고)
 
         alert('상품을 순차적으로 불러오고 스타일 넘버를 검사합니다. \n다소 시간이 소요될 수 있습니다.'); // progress
         let count = gx.gridOptions.api.getDisplayedRowCount();
-		while (worksheet['A' + rowIndex]) { // iterate over the worksheet pulling out the columns we're expecting
+		const ff = document.search;
+		const [ unit, exchange_rate, custom_tax_rate ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax_rate.value ];
+
+		while (rowIndex < 10 || worksheet['A' + rowIndex]) { // iterate over the worksheet pulling out the columns we're expecting
+			if (rowIndex < 10 && (!worksheet['A' + rowIndex] || worksheet['A' + rowIndex]?.v === '상품코드')) {
+				rowIndex++;
+				continue;
+			}
+			
 			let row = {};
 			Object.keys(columns).forEach((column) => {
 				if(worksheet[column + rowIndex] !== undefined) {
-					row[columns[column]] = worksheet[column + rowIndex].w;
+					row[columns[column]] = worksheet[column + rowIndex][column === 'E' ? 'v' : 'w'];
 				}
 			});
             
             row.qty = row.qty ? row.qty : 0; // 수량
             row.style_no = row.style_no ? row.style_no : "NONE";
-            row.unit_cost = row.unit_cost ? row.unit_cost : 0;  // 단가
+            row.unit_cost = row.unit_cost ? Number(Math.round(row.unit_cost + 'e' + 2) + 'e-' + 2) : 0;  // 단가
             row.unit_total_cost = row.unit_total_cost ? row.unit_total_cost : 0;  // 금액
             row.opt_kor = row.opt_kor ? row.opt_kor : "";
             row = { ...row, 
@@ -1066,11 +1069,7 @@
             gx.gridOptions.api.applyTransaction({add : [row]}); // 한 줄씩 import
             
             rowIndex++;
-            await getGood(row);
-
-            const ff = document.search;
-            const [ unit, exchange_rate, custom_tax_rate ] = [ ff.currency_unit.value, unComma(ff.exchange_rate.value), ff.custom_tax_rate.value ];
-            await calProduct(row, unit, exchange_rate, custom_tax_rate);
+			await getGood(row, unit, exchange_rate, custom_tax_rate, !worksheet['A' + rowIndex]);
 		}
 	};
 
@@ -1090,7 +1089,7 @@
 		);
 	};
 
-    const getGood = async (row) => {
+    const getGood = async (row, unit, exchange_rate, custom_tax_rate, is_last) => {
         const CMD = 'getgood';
         axios({
             cmd: CMD,
@@ -1110,7 +1109,8 @@
                 checked_row = {...row, goods_no: message};
             }
 
-            await gx.gridOptions.api.applyTransaction({update : [checked_row]});
+			await calProduct(row, unit, exchange_rate, custom_tax_rate, checked_row);
+			if (is_last) updatePinnedRow();
 
         }).catch((error) => {
             console.log(error);
