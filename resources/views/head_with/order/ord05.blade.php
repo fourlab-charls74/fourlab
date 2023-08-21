@@ -419,9 +419,9 @@
 			cellRenderer: function(params) {
 				if (params.value == "예정") {
 					if (params.data.confirm_amt != null && params.data.confirm_amt != "" && params.data.confirm_amt > 0 && changeAmt != params.data.confirm_amt) {
-						return "<input type='checkbox' name='check_ordNo' value='" + params.data.ord_no + "' checked/>" + params.value;
+						return "<input type='checkbox' id='check_ordNo_"+params.data.ord_no+"' name='check_ordNo' value='" + params.data.ord_no + "' checked/>" + params.value;
 					} else {
-						return "<input type='checkbox' name='check_ordNo' value='" + params.data.ord_no + "' onClick='chkState(" + params.node.id + ");' />" + params.value;
+						return "<input type='checkbox'  id='check_ordNo_"+params.data.ord_no+"' name='check_ordNo' value='" + params.data.ord_no + "' onClick='chkState(" + params.data.ord_no + ");' />" + params.value;
 					}
 				} else {
 					return params.value;
@@ -585,13 +585,14 @@
 	//
 	//
 	function Pay() {
-		data_cnt = $("[name=check_ordNo]").length;
+		grid_data = gx.getRows();
+		grid_data_cnt = grid_data.length;
 		chk_data = 0;
 		nodeid = "";
 		is_data = false;
 
-		for (i = 0; i < data_cnt; i++) {
-			if ($("[name=check_ordNo]").eq(i).is(":checked") == true) {
+		for (let i = 0; i < grid_data_cnt; i++) {
+			if ($(`#check_ordNo_${grid_data[i].ord_no}`).is(":checked") == true) {
 				var RowNode = gx.getRowNode(i);
 
 				if (RowNode.data.pay_stat == "예정") {
@@ -918,16 +919,19 @@
 
 	}
 
-	function chkState(id) {
-		var RowNode = gx.getRowNode(id);
+	function chkState(ord_no) {
+		const rows = gx.getRows();
+		let rowNode = null;
 
-		bank_number = RowNode.data.bank_number;
-		bank_inpnm = RowNode.data.bank_inpnm;
-		confirm_amt = RowNode.data.confirm_amt;
+		rows.forEach((row) => {
+			if(row.ord_no == ord_no) {
+				rowNode = row;
+			}
+		});
 
 		//if( bank_number == "" || bank_inpnm == "" || ( confirm_amt == 0 || confirm_amt == "" || confirm_amt == null ) )
-		if (bank_inpnm == "" || (confirm_amt == 0 || confirm_amt == "" || confirm_amt == null)) {
-			$("[name=check_ordNo]").eq(id).prop("checked", false);
+		if (rowNode.bank_inpnm == "" || (rowNode.confirm_amt == 0 || rowNode.confirm_amt == "" || rowNode.confirm_amt == null)) {
+			$(`#check_ordNo_${ord_no}`).prop("checked", false);
 		}
 	}
 

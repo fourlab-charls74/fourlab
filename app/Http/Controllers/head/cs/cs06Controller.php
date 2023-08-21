@@ -34,17 +34,27 @@ class cs06Controller extends Controller
 	public function search(Request $request){
 		$sdate = $request->input("sdate");
 		$edate = $request->input("edate");
+		$refund_state = $request->input("refund_state");
 		$pay_type = $request->input("pay_type");
 		$ord_no = $request->input("ord_no");
 		$clm_series_no = $request->input("clm_series_no");
-
+		$enddate = $request->input("enddate");
+		
 		$where = "";
 		$inner_where = '';
+		$inner_join = '';
 
 		if( $ord_no != ""){
 			$where .= " and b.ord_no = '$ord_no' ";
 		}
 
+		if($refund_state === 'E') {
+			$inner_where .= 'and a.clm_state = 51 and a.refund_yn = "y" and b.ord_opt_no = a.refund_no';
+		} else {
+			$inner_where .= 'and a.clm_state = 61 and a.refund_yn = "y" and b.ord_opt_no = a.refund_no';
+			$inner_join  .= " left outer join code rf on rf.code_kind_cd = 'G_REFUND_TYPE' and rf.code_id = a.refund_type";
+		}
+		
 		$sumpaytype = 0;
 		if($pay_type != ""){
 			//$as_pay_type = explode(",",$pay_type);
@@ -78,9 +88,9 @@ class cs06Controller extends Controller
                                 left outer join code cs on cs.code_kind_cd = 'G_CLM_STATE' and cs.code_id = a.clm_state
                                 left outer join code pay_type on pay_type.code_kind_cd = 'G_PAY_TYPE'  and e.pay_type = pay_type.code_id
 				left outer join code cd on cd.code_kind_cd = 'G_CLM_REASON' and cd.code_id = a.clm_reason
-			where a.proc_date >= '$sdate' and a.proc_date < date_add('$edate',interval 1 day)
+			    $inner_join
+            where a.proc_date >= '$enddate' and a.proc_date < date_add('$enddate',interval 1 day)
                                 $where $inner_where
-				and a.clm_state = 51 and a.refund_yn = 'y' and b.ord_opt_no = a.refund_no
 				and if((e.pay_type & 16) = 16 and substr(tno,1,8) = date_format(now(),'%Y%m%d'),0,1) = 1
 			order by ord_no desc
 		";

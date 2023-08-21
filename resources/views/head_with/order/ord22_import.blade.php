@@ -251,43 +251,47 @@ $(".out-complate-btn").click(function()
 			return [row.ord_no, row.ord_opt_no, row.dlv_no];
 		});
 
-		for (let i = 0; i < orderNos.length; i++) {
-			let order = orderNos[i];
-			
-			$.ajax({
-				type: 'put',
-				url: '/head/order/ord22/out-complete',
-				data: {
-					"order_nos[]": [order],
-					ord_state: 30,
-					dlv_cd: $("#dlv_cd").val(),
-					send_sms_yn: $("[name=snd_sms_yn]:checked").val()
-				},
-				success: function (data) {
-					// console.log(data);
-					
-					gx.gridOptions.api.forEachNode(node => {
-						if (node.data.ord_opt_no === order[1]) {
-							node.data.msg = data.code == "200" ? 'S' : 'F';
-							node.data.chk = data.code == "200" ? 2 : node.data.chk;
-							node.setSelected(false);
-							node.setRowSelectable(!data.code == "200");
-							gx.gridOptions.api.redrawRows({ rowNodes: [node] });
-							gx.gridOptions.api.ensureIndexVisible(node.rowIndex, 'bottom');
+		let call_cnt = 0;
+		(function (call_cnt) {
+			for (let i = 0; i < orderNos.length; i++) {
+				let order = orderNos[i];
+
+				$.ajax({
+					type: 'put',
+					url: '/head/order/ord22/out-complete',
+					data: {
+						"order_nos[]" : [order],
+						ord_state : 30,
+						dlv_cd : $("#dlv_cd").val(),
+						send_sms_yn : $("[name=snd_sms_yn]:checked").val()
+					},
+					success: function (data) {
+						gx.gridOptions.api.forEachNode(node => {
+							if (node.data.ord_opt_no === order[1]) {
+								node.data.msg = data.code == "200" ? '성공' : '실패';
+								node.data.chk = data.code == "200" ? 2 : node.data.chk;
+								node.setSelected(false);
+								node.setRowSelectable(!data.code == "200");
+								gx.gridOptions.api.redrawRows({ rowNodes: [node] });
+								gx.gridOptions.api.ensureIndexVisible(node.rowIndex, 'bottom');
+								call_cnt++;
+							}
+						});
+
+						if (call_cnt === orderNos.length) {
+							alert('택배송장 일괄입력이 완료되었습니다. "내용" 항목에서 성공여부를 확인해주세요.');
+							call_cnt = 0;
+							return;
 						}
-					});
-					if (i >= orderNos.length - 1) {
-						alert('택배송장 일괄입력이 완료되었습니다. "내용" 항목에서 성공여부를 확인해주세요.');
-						window.opener.Search();
+					},
+					error: function(request, status, error) {
+						const msg = request.responseJSON.msg;
+						const code = request.status;
+						alert(`${msg} (Code : ${code})`);
 					}
-				},
-				error: function (request, status, error) {
-					const msg = request.responseJSON.msg;
-					const code = request.status;
-					alert(`${msg} (Code : ${code})`);
-				}
-			});
-		}
+				})
+			}
+		}(call_cnt));
 	}
 });
 </script>

@@ -436,9 +436,8 @@ class prm06Controller extends Controller
 		Function: getGoods
 		사은품 적용 상품
 	*/
-	public function getGoods($gift_no = '', Request $request)
+	public function getGoods($gift_no, Request $request)
 	{
-		$gift_no = $request->input("gift_no");
 		$page	= $request->input("page");
 
 		$startNo = 0;

@@ -297,7 +297,7 @@ class prm10Controller extends Controller
     public function search_used($coupon_no, Request $req) {
 		// 검색 Request var
 		$user_id			= Request("user_id");
-		$user_nm			= Request("user_nm");
+		$user_nm			= Request("name");
 		$use_yn			    = Request("use_yn");
 		$style_no			= Request("style_no");
 		$goods_no			= Request("goods_no");
@@ -339,7 +339,7 @@ class prm10Controller extends Controller
         }
 
 		if ($use_yn != ""){
-			$where .= " and c.user_yn = '$use_yn' ";
+			$where .= " and c.use_yn = '$use_yn' ";
         }
 
 		if ($style_no != ""){

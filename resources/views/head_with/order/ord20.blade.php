@@ -335,15 +335,15 @@
                                                             @endif
                                                         @endforeach
                                                     </td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->qty)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->price)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->point_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->coupon_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->dc_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->dlv_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->pay_fee)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->recv_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->total_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->qty)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->price)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->point_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->coupon_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->dc_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->dlv_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->pay_fee)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->recv_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->total_amt)}}</td>
                                                 </tr>
                                             @endif
                                             </tbody>
@@ -426,6 +426,18 @@
                                                     </div>
                                                 </td>
                                             </tr>
+											<tr>
+												<th>쿠폰</th>
+												<td style="padding:0px 10px 0px 10px;">
+													<a href="#" onclick="return openCouponDetail('edit','{{$p_ord_opt->coupon_no}}');">{{$p_ord_opt->coupon_nm}}</a>
+												</td>
+												<th></th>
+												<td style="padding:0px 10px 0px 10px;">
+												</td>
+												<th></th>
+												<td style="padding:0px 10px 0px 10px;">
+												</td>
+											</tr>
                                             </tbody>
                                         </table>
                                     </div>
