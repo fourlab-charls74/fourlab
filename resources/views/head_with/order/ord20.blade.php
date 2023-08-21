@@ -335,15 +335,15 @@
                                                             @endif
                                                         @endforeach
                                                     </td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->qty)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->price)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->point_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->coupon_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->dc_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->dlv_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->pay_fee)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->recv_amt)}}</td>
-                                                    <td class="text-right">{{number_format($p_ord_opt->total_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->qty)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->price)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->point_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->coupon_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->dc_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->dlv_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->pay_fee)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->recv_amt)}}</td>
+													<td class="text-right">{{number_format($p_ord_opt->total_amt)}}</td>
                                                 </tr>
                                             @endif
                                             </tbody>
