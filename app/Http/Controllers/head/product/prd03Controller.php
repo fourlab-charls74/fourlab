@@ -99,7 +99,24 @@ class prd03Controller extends Controller
 
         if($goods_stat != "")		$where .= " and g.sale_stat_cl = '$goods_stat' ";
 		if($style_no != "")			$where .= " and g.style_no like '$style_no%' ";
-		if($goods_no != "")			$where .= " and g.goods_no = '$goods_no' ";
+		
+		$goods_no = preg_replace("/\s/",",",$goods_no);
+		$goods_no = preg_replace("/\t/",",",$goods_no);
+		$goods_no = preg_replace("/\n/",",",$goods_no);
+		$goods_no = preg_replace("/,,/",",",$goods_no);
+
+		if( $goods_no != "" ){
+			$goods_nos = explode(",",$goods_no);
+			if(count($goods_nos) > 1){
+				if(count($goods_nos) > 500) array_splice($goods_nos,500);
+				$in_goods_nos = join(",", array_filter($goods_nos, function($s) { return is_numeric($s); }));
+				$where .= " and g.goods_no in ( $in_goods_nos ) ";
+			} else {
+				if (is_numeric($goods_no)) $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+				else $where .= " and 1!=1 ";
+			}
+		}
+		
 		if($goods_nm != "")			$where .= " and g.goods_nm like '%$goods_nm%' ";
 		if($goods_type != "")		$where .= " and g.goods_type = '$goods_type' ";
 		if($opt_kind_cd != "")		$where .= " and g.opt_kind_cd = '$opt_kind_cd' ";
