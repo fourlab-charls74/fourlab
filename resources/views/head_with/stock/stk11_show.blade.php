@@ -53,7 +53,7 @@
                                 <div class="form-inline inline_select_box">
                                     <div class="form-inline-inner input-box w-75 pr-1">
                                         <div class="form-inline inline_btn_box">
-                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company sch-company" value="<?=$com_nm ? $com_nm : ""?>">
+                                            <input type="text" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company sch-sup-company" value="<?=$com_nm ? $com_nm : ""?>">
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>

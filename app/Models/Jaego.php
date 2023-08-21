@@ -495,16 +495,19 @@ class Jaego
         if ($qty <= 0) return 0;
 
         $sql = "
-      update goods_summary
-         set good_qty = good_qty - $qty
-           , ut = now()
-      where goods_no = '$goods_no'
-        and goods_sub = '$goods_sub'
-        and goods_opt = '$goods_opt'
-        and good_qty >= '$qty'
-    ";
+		  update goods_summary
+			 set good_qty = good_qty - $qty
+			   , ut = now()
+		  where goods_no = '$goods_no'
+			and goods_sub = '$goods_sub'
+			and goods_opt = '$goods_opt'
+			and good_qty >= '$qty'
+		";
 
-        return DB::update($sql);
+		$code = DB::update($sql);
+
+		$this->SetSoldOut($goods_no);
+		return $code;
     }
 
 
@@ -896,11 +899,14 @@ class Jaego
     {
         if ($qty < 0) $qty = 0;
 
-        return DB::table('goods_summary')
+		$code = DB::table('goods_summary')
             ->where('goods_no', $goods_no)
             ->where('goods_sub', $goods_sub)
             ->where('goods_opt', $goods_opt)
             ->update(['good_qty' => $qty, 'ut' => now()]);
+
+		if ($qty < 1) $this->SetSoldOut($goods_no);
+		return $code;
     }
 
     public function SetStockQty($goods_no, $goods_sub, $goods_opt, $qty, $etc = "")
@@ -909,7 +915,8 @@ class Jaego
 			select g.com_id, g.wonga,s.wqty
 			from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
 			where s.goods_no = '$goods_no' and s.goods_sub = '$goods_sub' and s.goods_opt = '$goods_opt'
-    ";
+					and g.goods_type in ('S', 'I')
+    	";
 
         $rows = DB::selectOne($sql);
 
@@ -1030,4 +1037,22 @@ class Jaego
         return DB::table('goods')
             ->where('goods_no','=',$goods_no)->value('is_unlimited');
     }
+
+	public function SetSoldOut($goods_no)
+	{
+		$zero_goods = DB::table('goods_summary')
+			->where('goods_no', $goods_no)
+			->where('goods_sub', 0)
+			->where('good_qty', '>', 0)
+			->get();
+
+		if (count($zero_goods) < 1) {
+			DB::table('goods')
+				->where('goods_no', $goods_no)
+				->where('sale_stat_cl', 40)
+				->update([
+					'sale_stat_cl' => 30, // 품절처리
+				]);
+		}
+	}
 }

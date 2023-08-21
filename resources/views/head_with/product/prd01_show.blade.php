@@ -2166,7 +2166,8 @@
                 //   location.reload();
               },
               error: function(request, status, error) {
-                  console.log("error")
+				  alert(request?.responseJSON?.msg || '재고수량 변경 중 오류가 발생했습니다.');
+				  console.log("error");
               }
           });
         });

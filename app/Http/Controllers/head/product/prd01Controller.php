@@ -859,16 +859,37 @@ class prd01Controller extends Controller
     }
 
     public function update_qty(Request $req) {
-        DB::table('goods_summary')
-            ->where([
-                'goods_no' => $req->goods_no,
-                'goods_sub' => $req->goods_sub,
-            ])
-            ->update([
-                'good_qty' => $req->qty
-            ]);
+		$goods_no = $req->input('goods_no');
+		$goods_sub = $req->input('goods_sub');
+		$qty = $req->input('qty');
 
-        return response()->json(null, 201);
+		try {
+			DB::beginTransaction();
+
+			DB::table('goods_summary')
+				->where('goods_no', $goods_no)
+				->where('goods_sub', $goods_sub)
+				->update([
+					'good_qty' => $qty,
+					'ut' => now()
+				]);
+
+			if ($qty < 1) {
+				$user = [
+					'id' => Auth('head')->user()->id,
+					'name' => Auth('head')->user()->name
+				];
+
+				$jaego = new Jaego($user);
+				$jaego->SetSoldOut($goods_no);
+			}
+
+			DB::commit();
+			return response()->json($goods_no, 201);
+		} catch(Exception $e){
+			DB::rollback();
+			return response()->json(['msg' => "재고수량 변경 중 오류가 발생했습니다."], 500);
+		}
     }
 
     public function update_state(Request $request)
@@ -2872,7 +2893,7 @@ class prd01Controller extends Controller
 
 			foreach ($data as $item) {
 				$opt_price = $item["opt_price"];
-				$opt_memo = $item["opt_memo"] ? $item["opt_memo"] : "";
+				$opt_memo = $item["opt_memo"] ?? "";
                 $wqty = $item["wqty"] ?? 0;
 				$good_qty = $item["good_qty"] ?? 0;
 				$goods_opt = $item["goods_opt"];
@@ -2881,25 +2902,38 @@ class prd01Controller extends Controller
                     $jaego->SetStockQty($goods_no, 0, $goods_opt, $wqty, '상품옵션재고수정');
                 }
 
+				$wqty_sql = "";
+				$values = [
+					'opt_price'     => $opt_price
+					, 'opt_memo'    => $opt_memo
+					, 'good_qty'    => $good_qty
+					, 'goods_no'    => $goods_no
+					, 'goods_opt'   => $goods_opt
+				];
+
+				$goods_type = DB::table('goods')
+					->where('goods_no', $goods_no)->where('goods_sub', 0)
+					->value('goods_type');
+				if ($goods_type === 'S' || $goods_type === 'I') {
+					$wqty_sql .= " , wqty = :wqty ";
+					$values['wqty'] = $wqty;
+				}
+				
 				$sql = "
 					update goods_summary set
                         opt_price = :opt_price
                         , opt_memo = :opt_memo
                         , good_qty = :good_qty
-                        , wqty = :wqty
+                        $wqty_sql
 					where goods_no = :goods_no
                         and goods_sub = '0'
                         and goods_opt = :goods_opt
                 ";
-				DB::update($sql, [
-					'opt_price'     => $opt_price
-                    , 'opt_memo'    => $opt_memo
-                    , 'wqty'        => $wqty
-                    , 'good_qty'    => $good_qty
-					, 'goods_no'    => $goods_no
-                    , 'goods_opt'   => $goods_opt
-				]);
+
+				DB::update($sql, $values);
 			}
+
+			$jaego->SetSoldOut($goods_no);
 			DB::commit();
 			return response()->json(['code' => 200, 'msg' => "저장되었습니다."]);
 		} catch (Exception $e) {
@@ -3041,7 +3075,7 @@ class prd01Controller extends Controller
 				$jaego->SetLoc($loc);
 
 				foreach ($data as $row) {
-					$qty = $row['qty'];
+					$qty = $row['qty'] ?? 0;
 					$opt = $row['opt'];
 					$sql = "
 						select distinct opt_name from goods_summary where goods_no = :goods_no and goods_sub = '0'

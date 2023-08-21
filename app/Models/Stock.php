@@ -787,6 +787,9 @@ class Stock
             ->where('prd_cd', $prd_cd)
             ->where('goods_opt', $goods_opt)
             ->update(['qty' => $qty, 'ut' => now()]);
+
+		if ($qty < 1) $this->__SetSoldOut($goods_no);
+		return $code;
     }
 
     public function SetPrdStockQty($goods_no, $prd_cd, $goods_opt, $qty, $etc = "")
@@ -902,4 +905,22 @@ class Stock
             return 0;
         }
     }
+
+	public function __SetSoldOut($goods_no)
+	{
+		$zero_goods = DB::table('goods_summary')
+			->where('goods_no', $goods_no)
+			->where('goods_sub', 0)
+			->where('good_qty', '>', 0)
+			->get();
+
+		if (count($zero_goods) < 1) {
+			DB::table('goods')
+				->where('goods_no', $goods_no)
+				->where('sale_stat_cl', 40)
+				->update([
+					'sale_stat_cl' => 30, // 품절처리
+				]);
+		}
+	}
 }
