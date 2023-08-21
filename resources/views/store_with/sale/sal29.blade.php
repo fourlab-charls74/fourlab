@@ -352,10 +352,7 @@
 			let field_cds = size_cols[i].map(c => (c.size_kind_cd || '') + (c.size_kind_cd ? '^' : '') + (c.size_cd || ''));
 			columns.push({ 
 				field: 'SIZE_' + i,
-				// headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join('\n'),
-				headerName: size_cols[i].map(c => {
-					return (c.size_kind_nm_s ? c.size_kind_nm_s + '-' : '') + (c.size_cd || c.empty_tag);
-				}).join('\n'),
+				headerName: size_cols[i].map(c => c.size_cd || c.empty_tag).join('\n'),
 				type: 'currencyType', 
 				width: 80, 
 				headerComponent: CustomHeader,
@@ -376,6 +373,15 @@
 					return col.length > 1 ? '중복오류' : col.length < 1 ? 0 : size_set[col[0]];
 				}
 			});
+			
+			if (i < 1 && size_cols.length > 1) {
+				columns.push({
+					field: 'size_kind_nm',
+					headerName: size_cols[1].map(c => c.size_kind_nm_s ? c.size_kind_nm_s : '').join('\n'),
+					width: 70,
+					headerComponent: CustomHeader,
+				});
+			}
 		}
 		columns.push({ width: 'auto' });
 

@@ -87,13 +87,11 @@ class sal29Controller extends Controller
 		// 해당사이즈 조회 (FREE + 해당사이즈)
 		$sql = "
 			select s.size_kind_cd, s.size_kind_nm, s.size_cd, s.size_seq
-				, if(s.size_kind_cd = 'PRD_CD_SIZE_MEN', '남',
-				    if(s.size_kind_cd = 'PRD_CD_SIZE_WOMEN', '여',
-					if(s.size_kind_cd = 'PRD_CD_SIZE_UNISEX', '공',
-					if(locate(s.size_kind_cd, 'MEN_BOTTOM') = 0, '남하',
-					if(locate(s.size_kind_cd, 'WOMEN_BOTTOM') = 0, '여하',
-					left(s.size_kind_nm, 1)
-				))))) as size_kind_nm_s
+				, if(s.size_kind_cd = 'PRD_CD_SIZE_MEN', '남성',
+				    if(s.size_kind_cd = 'PRD_CD_SIZE_WOMEN', '여성',
+					if(s.size_kind_cd = 'PRD_CD_SIZE_UNISEX', '공용',
+					s.size_kind_nm
+				))) as size_kind_nm_s
 			from product_stock_release psr
 				inner join product_code pc on pc.prd_cd = psr.prd_cd
 				left outer join (

@@ -20,12 +20,19 @@
 		@foreach($headers as $hd) 
 			<td rowspan="6" colspan="{{ $hd[2] ?? 1 }}" style="text-align:center;vertical-align:center;font-size:12px;font-weight:bold;background-color:#ffeeee;border:1px solid #000000;">{{ $hd[0] ?? '' }}</td>
 		@endforeach
-		@foreach($size_columns as $size)
+		@foreach($size_columns as $i => $size)
 			<td rowspan="6" style="text-align:center;vertical-align:center;font-size:12px;font-weight:bold;background-color:#e2e2e2;border:1px solid #000000;">
 			@foreach($size as $ss)
-				@if($ss !== 0 && isset($ss->size_cd)) {{ (isset($ss->size_kind_nm_s) ? $ss->size_kind_nm_s . '-' : '') . $ss->size_cd }} @endif <br/>
+				@if($ss !== 0 && isset($ss->size_cd)) {{ $ss->size_cd }} @endif <br/>
 			@endforeach
 			</td>
+		@if($i < 1 && count($size_columns) > 1)
+			<td rowspan="6" style="text-align:center;vertical-align:center;font-size:12px;font-weight:bold;background-color:#e2e2e2;border:1px solid #000000;">
+			@foreach($size_columns[1] as $ss)
+				@if($ss !== 0 && isset($ss->size_kind_nm_s)) {{ $ss->size_kind_nm_s }} @endif <br/>
+			@endforeach
+			</td>
+		@endif
 		@endforeach
 		</tr>
 	@foreach(range(1, 5) as $i)
@@ -53,6 +60,9 @@
 			<td style="height:30px;vertical-align:center;font-size:12px;border:1px solid #000000;@if(isset($row->sum)) background-color:#ffffdd;font-weight:bold; @endif @if(isset($row->total)) background-color:#eeeeee;font-weight:bold; @endif">
 				{{ $row->{'SIZE_' . $idx} ?? 0 }}
 			</td>
+		@if($idx < 1 && count($size_columns) > 1)
+			<td style="height:30px;vertical-align:center;font-size:12px;border:1px solid #000000;@if(isset($row->sum)) background-color:#ffffdd;font-weight:bold; @endif @if(isset($row->total)) background-color:#eeeeee;font-weight:bold; @endif"></td>
+		@endif
 		@endforeach
 		</tr>
 	@endforeach
