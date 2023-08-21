@@ -82,7 +82,7 @@
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
                                         <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -478,7 +478,7 @@
                 //     aggregation: true
                 // },
                 {
-                    headerName: "결제금액",
+                    headerName: "결제금액(VAT별도)",
                     field: "recv_amt_30",
                     type: 'currencyType',
                     aggregation: true
@@ -518,7 +518,7 @@
                 //     aggregation: true
                 // },
                 {
-                    headerName: "결제금액",
+                    headerName: "결제금액(VAT별도)",
                     field: "recv_amt_60",
                     type: 'currencyType',
                     aggregation: true
@@ -558,16 +558,14 @@
                 //     aggregation: true
                 // },
                 {
-                    headerName: "결제금액",
+                    headerName: "결제금액(VAT별도)",
                     field: "recv_amt_61",
                     type: 'currencyType',
                     aggregation: true
                 },
             ]
         },
-        {
-            width: "auto"
-        }
+        {width: 0}
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -593,16 +591,6 @@
 
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
         load_store_channel();
-    });
-
-    // 판매유형 다중검색
-    $( ".sch-sellType" ).on("click", function() {
-        searchSellType.Open(null, "multiple");
-    });
-      
-    // 행사코드 다중검색
-    $( ".sch-prcode" ).on("click", function() {
-        searchPrCode.Open(null, "multiple");
     });
 
     function Search() {
@@ -686,11 +674,5 @@
     function drawCanvasByTime() {
         $('#opt_chart').html('차트를 생성할 수 없습니다.');
     }
-
-    function openApi() {
-        document.getElementsByClassName('sch-prdcd-range')[0].click();
-    }
-
-
 </script>
 @stop

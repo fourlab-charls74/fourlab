@@ -51,179 +51,207 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>주문구분</label>
-                            <div class="form-inline form-check-box">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[0]" id="ord_type_5" value="5" @if($ord_type == '' or in_array('5', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_5">교환</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[1]" id="ord_type_4" value="4" @if($ord_type == '' or in_array('4', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_4">예약</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[2]" id="ord_type_3" value="3" @if($ord_type == '' or in_array('3', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_3">특별주문</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[3]" id="ord_type_13" value="13" @if($ord_type == '' or in_array('13', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_13">도매주문</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[4]" id="ord_type_12" value="12" @if($ord_type == '' or in_array('12', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_12">서비스</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[5]" id="ord_type_17" value="17" @if($ord_type == '' or in_array('17', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_17">기관납품</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[6]" id="ord_type_14" value="14" @if($ord_type == '' or in_array('14', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_14">수기</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[7]" id="ord_type_15" value="15" @if($ord_type == '' or in_array('15', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_15">정상</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="ord_type[8]" id="ord_type_16" value="16" @if($ord_type == '' or in_array('16', $ord_type)) checked @endif>
-                                    <label class="custom-control-label" for="ord_type_16">오픈마켓</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-email-input">매출시점</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" @if($ord_state == '10' or $ord_state == '') checked @endif>
-                                    <label class="custom-control-label" for="ord_state10" value="10">출고요청</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" @if($ord_state == '30') checked @endif>
-                                    <label class="custom-control-label" for="ord_state30" value="30">출고완료</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="prd_cd">상품검색조건</label>
+			                <div class="form-inline">
+				                <div class="form-inline-inner input-box w-100">
+					                <div class="form-inline inline_btn_box">
+						                <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+						                <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+						                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+					                </div>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="formrow-inputState">브랜드</label>
+			                <div class="form-inline inline_btn_box">
+				                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+				                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 26px;"></i></a>
+			                </div>
+		                </div>
+	                </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td" style="display:none" >
-                        <div class="form-group">
-                            <label>매장명</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 27px;"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="sell_type">판매유형</label>
-                            <div class="flax_box">
-                                <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_kinds as $sale_kind)
-                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="pr_code">행사코드</label>
-                            <div class="flax_box">
-                                <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach ($pr_codes as $pr_code)
-                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td" style="display:none">
-                        <div class="form-group">
-                            <label for="">온라인/오프라인</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="on_off_all" value="">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input">
-                                    <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input">
-                                    <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">판매처</label>
-                            <div class="flax_box">
-                                <select name='sale_place' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_places as $sale_place)
-                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label for="formrow-inputState">결제방법</label>
-                            <div class="form-inline form-check-box">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="stat_pay_type_16" value="16" @if($stat_pay_type != '' and in_array('16', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_16">계좌이체</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="stat_pay_type_32" value="32" @if($stat_pay_type != '' and in_array('32', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_32">핸드폰</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="stat_pay_type_1" value="1" @if($stat_pay_type != '' and in_array('1', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_1">현금</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="stat_pay_type_2" value="2" @if($stat_pay_type != '' and in_array('2', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_2">카드</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="stat_pay_type_4" value="4" @if($stat_pay_type != '' and in_array('4', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_4">포인트</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="stat_pay_type_8" value="8" @if($stat_pay_type != '' and in_array('8', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_8">쿠폰</label>
-                                </div>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="stat_pay_type_64" value="64" @if($stat_pay_type != '' and in_array('64', $stat_pay_type)) checked @endif>
-                                    <label class="custom-control-label" for="stat_pay_type_64">가상계좌</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label for="formrow-inputZip">상품명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm' value='{{ @$goods_nm }}'>
-                            </div>
-                        </div>
-                    </div>
+	            <div class="row">
+		            <div class="col-lg-4 inner-td" hidden>
+			            <div class="form-group">
+				            <label for="">온라인/오프라인</label>
+				            <div class="form-inline form-radio-box">
+					            <div class="custom-control custom-radio">
+						            <input type="radio" name="on_off_yn" id="on_off_all" value="" class="custom-control-input" @if($on_off_yn == '') checked @endif>
+						            <label class="custom-control-label" for="on_off_all" value="">전체</label>
+					            </div>
+					            <div class="custom-control custom-radio">
+						            <input type="radio" name="on_off_yn" id="on_off_on" value="ON" class="custom-control-input" @if($on_off_yn == 'ON') checked @endif>
+						            <label class="custom-control-label" for="on_off_on" value="ON">온라인</label>
+					            </div>
+					            <div class="custom-control custom-radio">
+						            <input type="radio" name="on_off_yn" id="on_off_off" value="OFF" class="custom-control-input" @if($on_off_yn == 'OFF') checked @endif>
+						            <label class="custom-control-label" for="on_off_off" value="OFF">오프라인</label>
+					            </div>
+				            </div>
+			            </div>
+		            </div>
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="formrow-email-input">매출시점</label>
+				            <div class="form-inline form-radio-box">
+					            <div class="custom-control custom-radio">
+						            <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" @if($ord_state == '10' or $ord_state == '') checked @endif>
+						            <label class="custom-control-label" for="ord_state10" value="10">출고요청</label>
+					            </div>
+					            <div class="custom-control custom-radio">
+						            <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" @if($ord_state == '30') checked @endif>
+						            <label class="custom-control-label" for="ord_state30" value="30">출고완료</label>
+					            </div>
+				            </div>
+			            </div>
+		            </div>
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="sell_type">판매유형</label>
+				            <div class="flax_box">
+					            <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+						            <option value=''>전체</option>
+						            @foreach ($sale_kinds as $sale_kind)
+							            <option value='{{ $sale_kind->code_id }}' @if(in_array($sale_kind->code_id, $sell_type_ids)) selected @endif>{{ $sale_kind->code_val }}</option>
+						            @endforeach
+					            </select>
+				            </div>
+			            </div>
+		            </div>
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="pr_code">판매처수수료</label>
+				            <div class="flax_box">
+					            <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+						            <option value=''>전체</option>
+						            @foreach ($pr_codes as $pr_code)
+							            <option value='{{ $pr_code->code_id }}' @if(in_array($pr_code->code_id, $pr_code_ids)) selected @endif>{{ $pr_code->code_val }}</option>
+						            @endforeach
+					            </select>
+				            </div>
+			            </div>
+		            </div>
+	            </div>
+	            <div class="row">
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="formrow-inputZip">상품명</label>
+				            <div class="flax_box">
+					            <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm' value='{{ @$goods_nm }}'>
+				            </div>
+			            </div>
+		            </div>
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="formrow-inputCity">품목</label>
+				            <div class="flax_box">
+					            <select id='item' name='item' class="form-control form-control-sm">
+						            <option value=''>전체</option>
+						            @foreach ($items as $t)
+							            <option value='{{ $t->cd }}' @if($item == $t->cd) selected @endif>{{ $t->val }}</option>
+						            @endforeach
+					            </select>
+				            </div>
+			            </div>
+		            </div>
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="name">온라인판매처</label>
+				            <div class="flax_box">
+					            <select name='sale_place' class="form-control form-control-sm">
+						            <option value=''>전체</option>
+						            @foreach ($sale_places as $sale_place)
+							            <option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
+						            @endforeach
+					            </select>
+				            </div>
+			            </div>
+		            </div>
+	            </div>
+	            <div class="row search-area-ext d-none">
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label>주문구분</label>
+				            <div class="form-inline form-check-box">
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[0]" id="ord_type_5" value="5" @if(in_array('5', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_5">교환</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[1]" id="ord_type_4" value="4" @if(in_array('4', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_4">예약</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[2]" id="ord_type_3" value="3" @if(in_array('3', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_3">특별주문</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[3]" id="ord_type_13" value="13" @if(in_array('13', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_13">도매주문</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[4]" id="ord_type_12" value="12" @if(in_array('12', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_12">서비스</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[5]" id="ord_type_17" value="17" @if(in_array('17', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_17">기관납품</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[7]" id="ord_type_15" value="15" @if(count($ord_type) < 1 || in_array('15', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_15">정상</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[6]" id="ord_type_14" value="14" @if(count($ord_type) < 1 || in_array('14', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_14">수기</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="ord_type[8]" id="ord_type_16" value="16" @if(count($ord_type) < 1 || in_array('16', $ord_type)) checked @endif>
+						            <label class="custom-control-label" for="ord_type_16">오픈마켓</label>
+					            </div>
+				            </div>
+			            </div>
+		            </div>
+		            <div class="col-lg-4 inner-td">
+			            <div class="form-group">
+				            <label for="formrow-inputState">결제방법</label>
+				            <div class="form-inline form-check-box">
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[0]" id="stat_pay_type_16" value="16" @if(in_array('16', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_16">계좌이체</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[1]" id="stat_pay_type_32" value="32" @if(in_array('32', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_32">핸드폰</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[2]" id="stat_pay_type_1" value="1" @if(in_array('1', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_1">현금</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[3]" id="stat_pay_type_2" value="2" @if(in_array('2', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_2">카드</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[4]" id="stat_pay_type_4" value="4" @if(in_array('4', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_4">포인트</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[5]" id="stat_pay_type_8" value="8" @if(in_array('8', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_8">쿠폰</label>
+					            </div>
+					            <div class="custom-control custom-checkbox">
+						            <input type="checkbox" class="custom-control-input" name="stat_pay_type[6]" id="stat_pay_type_64" value="64" @if(in_array('64', $stat_pay_type)) checked @endif>
+						            <label class="custom-control-label" for="stat_pay_type_64">가상계좌</label>
+					            </div>
+				            </div>
+			            </div>
+		            </div>
                 </div>
             </div>
         </div>
@@ -280,379 +308,164 @@
         </ul>
     </div>
 </div>
-<script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
+<script src="https://unpkg.com/ag-charts-community@8.0.6/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
-    var columns = [{
-            headerName: "일자",
-            field: "date",
-            width: 100,
-            cellClass: 'hd-grid-code',
-            pinned: 'left',
-            aggSum: "합계",
-            aggAvg: "평균",
-            cellRenderer:function(params) {
-                let store_cd = $('.select2-store').val();
-                let sell_type = $('#sell_type').val();
-                let pr_code = $('#pr_code').val();
-                let brand = $('.select2-brand').val()??'';
-                let goods_nm = $('#goods_nm').val();
-                let on_off_yn = $('[name=on_off_yn]:checked').val();
-                let item = $('#item').val();
-
-                if (params.value != '합계' && params.value != '평균') {
-                    return "<a href='/shop/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "&goods_nm=" + goods_nm + "&on_off_yn=" + on_off_yn + "&item=" + item + "'>"+ params.value +"</a>";
-                } else {
-                    return params.value;
-                }
-            }
+    const columns = [
+		{headerName: "일자", field: "date", width: 100, cellClass: 'hd-grid-code', pinned: 'left', aggSum: "합계", aggAvg: "평균",
+			cellRenderer:function(params) {
+				if(params.value === '합계' || params.value === '평균') return params.value;
+				let form_data = $('form[name="search"]').serialize();
+				return `<a href="/shop/order/ord01?${form_data}&date=${params.data.date || ''}" target="_blank">${params.value}</a>`;
+			}
+            // cellRenderer:function(params) {
+            //     let store_cd = $('.select2-store').val();
+            //     let sell_type = $('#sell_type').val();
+            //     let pr_code = $('#pr_code').val();
+            //     let brand = $('.select2-brand').val()??'';
+            //     let goods_nm = $('#goods_nm').val();
+            //     let on_off_yn = $('[name=on_off_yn]:checked').val();
+            //     let item = $('#item').val();
+			//
+            //     if (params.value != '합계' && params.value != '평균') {
+            //         return "<a href='/shop/order/ord01?date=" + params.value + "&store_cd=" + store_cd + "&sell_type=" + sell_type + "&pr_code=" + pr_code + "&brand=" + brand + "&goods_nm=" + goods_nm + "&on_off_yn=" + on_off_yn + "&item=" + item + "'>"+ params.value +"</a>";
+            //     } else {
+            //         return params.value;
+            //     }
+            // }
         },
-        {
-            headerName: '매출액구분',
-            children: [{
-                    headerName: "수량",
-                    field: "sum_qty",
-                    type: 'numberType',
-                    aggregation: true
-                },
-                {
-                    headerName: "적립금",
-                    field: "sum_point",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "할인",
-                    field: "sum_dc",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "쿠폰",
-                    field: "sum_coupon",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "수수료",
-                    field: "sum_fee",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "결제금액",
-                    field: "sum_recv",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "과세",
-                    field: "sum_taxation",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "비과세",
-                    field: "sum_taxfree",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-            ]
-        },
-        {
-            headerName: "부가세",
-            field: "vat",
-            type: 'currencyType',
-            aggregation: true
-        },
-        {
-            headerName: "매출액",
-            field: "sum_amt",
-            type: 'currencyType',
-            aggregation: true
-        },
-        {
-            headerName: "매출원가",
-            field: "sum_wonga",
-            type: 'currencyType',
-            aggregation: true,
-            hide:true
-        },
-        {
-            headerName: "마진율(%)",
-            field: "margin",
-            type: 'percentType',
-			hide:true,
-            valueGetter: function(params) {
-                if (params.data.date === "합계" || params.data.date === "평균") {
-                    const data = params.data;
-                    return (1 - parseInt(data.sum_wonga) / (parseInt(data.sum_recv) + parseInt(data.sum_point) - parseInt(data.sum_fee))) * 100;
-                }
-                return params.data.margin;
-            }
-        },
-        {
-            headerName: '매출이익',
-            children: [{
-                    headerName: "세전",
-                    field: "margin1",
-                    type: 'currencyType',
-                    aggregation: true,
-                    hide: true,
-
-                },
-                {
-                    headerName: "세후",
-                    field: "margin2",
-                    type: 'currencyType',
-                    aggregation: true,
-                    hide:true
-                },
-            ]
-        },
-        {
-            headerName: '비용',
+        {headerName: '매출액구분',
             children: [
-                {
-                    headerName: "PG수수료",
-                    field: "exp_pg_fee",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "적립금",
-                    field: "exp_point",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "광고비",
-                    field: "exp_ad",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "소계",
-                    field: "exp_sum",
-                    type: 'currencyType',
-                    aggregation: true
-                },
+				{headerName: "수량", field: "sum_qty", type: 'numberType', aggregation: true},
+                {headerName: "적립금", field: "sum_point", type: 'currencyType', aggregation: true},
+                {headerName: "할인", field: "sum_dc", type: 'currencyType', aggregation: true, width: 80},
+                {headerName: "쿠폰", field: "sum_coupon", type: 'currencyType', aggregation: true},
+                {headerName: "수수료", field: "sum_fee", type: 'currencyType', aggregation: true},
+                {headerName: "결제금액", field: "sum_recv", type: 'currencyType', aggregation: true},
+                // {headerName: "과세", field: "sum_taxation", type: 'currencyType', aggregation: true},
+                // {headerName: "비과세", field: "sum_taxfree", type: 'currencyType', aggregation: true},
             ]
         },
-        {
-            headerName: "이익율(%)",
-            field: "biz_margin",
-            type: 'percentType',
-            aggregation: true,
-			hide:true
-        },
-        {
-            headerName: '이익',
+        {headerName: "부가세", field: "vat", type: 'currencyType', aggregation: true, width: 80},
+        {headerName: "매출액(VAT별도)", field: "sum_amt", type: 'currencyType', aggregation: true},
+        // {headerName: "매출원가", field: "sum_wonga", type: 'currencyType', aggregation: true, hide: true},
+        // {headerName: "마진율(%)", field: "margin", type: 'percentType', hide: true,
+        //     valueGetter: function(params) {
+        //         if (params.data.date === "합계" || params.data.date === "평균") {
+        //             const data = params.data;
+        //             return (1 - parseInt(data.sum_wonga) / (parseInt(data.sum_recv) + parseInt(data.sum_point) - parseInt(data.sum_fee))) * 100;
+        //         }
+        //         return params.data.margin;
+        //     }
+        // },
+        // {headerName: '매출이익',
+        //     children: [
+		// 		{headerName: "세전", field: "margin1", type: 'currencyType', aggregation: true, hide: true},
+        //         {headerName: "세후", field: "margin2", type: 'currencyType', aggregation: true, hide:true},
+        //     ]
+        // },
+        // {headerName: '비용',
+        //     children: [
+        //         {headerName: "PG수수료", field: "exp_pg_fee", type: 'currencyType', aggregation: true},
+        //         {headerName: "적립금", field: "exp_point", type: 'currencyType', aggregation: true},
+        //         {headerName: "광고비", field: "exp_ad", type: 'currencyType', aggregation: true},
+        //         {headerName: "소계", field: "exp_sum", type: 'currencyType', aggregation: true},
+        //     ]
+        // },
+        // {headerName: "이익율(%)", field: "biz_margin", type: 'percentType', aggregation: true, hide: true},
+        // {headerName: '이익',
+        //     children: [
+        //         {headerName: "세전", field: "biz_profit", type: 'currencyType', aggregation: true, hide: true},
+        //         {headerName: "세후", field: "biz_profit_after", type: 'currencyType', aggregation: true, hide: true},
+        //     ]
+        // },
+        {headerName: '판매',
             children: [
-                {
-                    headerName: "세전",
-                    field: "biz_profit",
-                    type: 'currencyType',
-                    aggregation: true,
-					hide:true
-                },
-                {
-                    headerName: "세후",
-                    field: "biz_profit_after",
-                    type: 'currencyType',
-                    aggregation: true,
-					hide:true
-                },
+				{headerName: "수량", field: "qty_30", type: 'numberType', aggregation: true},
+                // {headerName: "적립금", field: "point_amt_30", type: 'currencyType', aggregation: true},
+                // {headerName: "할인", field: "dc_amt_30", type: 'currencyType', aggregation: true},
+                // {headerName: "쿠폰", field: "coupon_amt_30", type: 'currencyType', aggregation: true},
+                // {headerName: "수수료", field: "fee_amt_30", type: 'currencyType', aggregation: true},
+                {headerName: "결제금액(VAT별도)", field: "recv_amt_30", type: 'currencyType', aggregation: true},
             ]
         },
-        {
-            headerName: '판매',
-            children: [{
-                    headerName: "수량",
-                    field: "qty_30",
-                    type: 'numberType',
-                    aggregation: true
-                },
-                {
-                    headerName: "적립금",
-                    field: "point_amt_30",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "할인",
-                    field: "dc_amt_30",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "쿠폰",
-                    field: "coupon_amt_30",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "수수료",
-                    field: "fee_amt_30",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "결제금액",
-                    field: "recv_amt_30",
-                    type: 'currencyType',
-                    aggregation: true
-                },
+        {headerName: '교환',
+            children: [
+				{headerName: "수량", field: "qty_60", type: 'numberType', aggregation: true},
+                // {headerName: "적립금", field: "point_amt_60", type: 'currencyType', aggregation: true},
+                // {headerName: "할인", field: "dc_amt_60", type: 'currencyType', aggregation: true},
+                // {headerName: "쿠폰", field: "coupon_amt_60", type: 'currencyType', aggregation: true},
+                // {headerName: "수수료", field: "fee_amt_60", type: 'currencyType', aggregation: true},
+                {headerName: "결제금액(VAT별도)", field: "recv_amt_60", type: 'currencyType', aggregation: true},
             ]
         },
-        {
-            headerName: '교환',
-            children: [{
-                    headerName: "수량",
-                    field: "qty_60",
-                    type: 'numberType',
-                    aggregation: true
-                },
-                {
-                    headerName: "적립금",
-                    field: "point_amt_60",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "할인",
-                    field: "dc_amt_60",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "쿠폰",
-                    field: "coupon_amt_60",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "수수료",
-                    field: "fee_amt_60",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "결제금액",
-                    field: "recv_amt_60",
-                    type: 'currencyType',
-                    aggregation: true
-                },
+        {headerName: '환불',
+            children: [
+				{
+	            headerName: "수량", field: "qty_61", type: 'numberType', aggregation: true},
+                // {headerName: "적립금", field: "point_amt_61", type: 'currencyType', aggregation: true},
+                // {headerName: "할인", field: "dc_amt_61", type: 'currencyType', aggregation: true},
+                // {headerName: "쿠폰", field: "coupon_amt_61", type: 'currencyType', aggregation: true},
+                // {headerName: "수수료", field: "fee_amt_61", type: 'currencyType', aggregation: true},
+                {headerName: "결제금액(VAT별도)", field: "recv_amt_61", type: 'currencyType', aggregation: true},
             ]
         },
-        {
-            headerName: '환불',
-            children: [{
-                    headerName: "수량",
-                    field: "qty_61",
-                    type: 'numberType',
-                    aggregation: true
-                },
-                {
-                    headerName: "적립금",
-                    field: "point_amt_61",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "할인",
-                    field: "dc_amt_61",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "쿠폰",
-                    field: "coupon_amt_61",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "수수료",
-                    field: "fee_amt_61",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-                {
-                    headerName: "결제금액",
-                    field: "recv_amt_61",
-                    type: 'currencyType',
-                    aggregation: true
-                },
-            ]
-        },
-        {
-            width: "auto"
-        }
+		{width: 0}
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
+    const pApp = new App('', { gridId: "#div-gd" });
+    let gx;
     let chart_data = null;
 
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
-    let gx;
     $(document).ready(function() {
-        @if($brand != '')
-            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
-        @endif
-
-        @if($user_store != '')
-            $("#store_no").select2({data:['{{ @$user_store }}']??'', tags: true});
-        @endif
-
         pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        let options = {
-            getRowStyle: (params) => {
-                if (params.node.rowPinned === 'top') {
-                    return { 'background': '#eee' }
-                }
-            }
-        };
-        gx = new HDGrid(gridDiv, columns, options);
+        gx = new HDGrid(gridDiv, columns, {
+			getRowStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return { 'background': '#eee' }
+				}
+			}
+		});
 
-        
-        initStore();
-        initPrCode();
-        initSellType()
-        onoffyn()
-        
-        Search();
+		$("#date-tab").click(function() {
+			$("#chart-type").val('date');
+			drawCanvasByDate();
+		});
 
-        // // 매장 다중검색
-        // $( ".sch-store" ).on("click", function() {
-        //     searchStore.Open(null, "multiple");
-        // });
+		$("#yoil-tab").click(function() {
+			$("#chart-type").val('yoil');
+			drawCanvasByYoil();
+		});
 
-        // 판매유형 다중검색
-        $( ".sch-sellType" ).on("click", function() {
-            searchSellType.Open(null, "multiple");
-        });
-      
-        // 행사코드 다중검색
-        $( ".sch-prcode" ).on("click", function() {
-            searchPrCode.Open(null, "multiple");
-        });
+		initSearchTab();
+		Search();
     });
 
+	function initSearchTab() {
+		let brand_cd = "{{ @$brand->brand }}";
+		let brand_nm = "{{ @$brand->brand_nm }}";
+
+		if (brand_cd != '') {
+			const option = new Option(brand_nm, brand_cd, true, true);
+			$('#brand_cd').append(option).trigger('change');
+		}
+
+		let prd_cd_range = <?= json_encode(@$prd_cd_range) ?>;
+		let prd_cd_range_nm = "{{ @$prd_cd_range_nm }}";
+		prd_cd_range = Object.keys(prd_cd_range).reduce((a, c) => {
+			if (c.includes('_contain') || c === 'match') return a;
+			return a + prd_cd_range[c].map(rg => '&' + c +'[]=' + rg).join('');
+		}, '');
+
+		$('#prd_cd_range').val(prd_cd_range);
+		$('#prd_cd_range_nm').val(prd_cd_range_nm);
+	}
+
     function Search() {
-        //$('[name=ord_state]').val(10);
-
         let data = $('form[name="search"]').serialize();
-
-        // console.log(data);
-
-        gx.Aggregation({
-            "sum": "top",
-            "avg": "top"
-        });
-
+        gx.Aggregation({ "sum": "top", "avg": "top" });
         gx.Request('/shop/sale/sal24/search', data, -1, function(data) {
             chart_data = data.body;
             drawCanvas();
@@ -660,7 +473,6 @@
     }
 
     function drawCanvas() {
-        // console.log($("#chart-type").val());
         switch ($("#chart-type").val()) {
             case "date":
                 drawCanvasByDate();
@@ -689,34 +501,47 @@
 
         chart_data.forEach(function(row) {
             if (beforeRowMonth !== row.month || beforeRowMonth === null) {
-                row.chart_x_str = row.month + "." + row.day;
+                // row.chart_x_str = row.month + "." + row.day;
+				row.chart_x_str = row.day + "일";
                 beforeRowMonth = row.month;
                 return;
             }
 
-            row.chart_x_str = row.day;
+            row.chart_x_str = row.day + '일';
         });
 
-        var options = {
+        const chart_options = {
             container: document.getElementById('opt_chart'),
-            title: {
-                text: "일별 매출 통계",
-            },
+            title: { text: "일별 매출 통계" },
             data: chart_data,
-            series: [{
-                type: 'column',
-                xKey: 'chart_x_str',
-                yKeys: ['sum_amt'],
-                yNames: [' 매출액'],
-                grouped: true,
-                fills: ['#556ee6'],
-                strokes: ['#556ee6']
-                // highlightStyle : {
-                //   fill :
-                // }
-            }],
+			theme: {
+				palette: {
+					fills: ['#556ee6', '#2797f6'],
+					strokes: ['#556ee6', '#2797f6'],
+				},
+			},
+			legend: { position: 'right' },
+			series: [
+				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_amt', yName: '매출액',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_wonga', yName: '매출원가',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+			],
+			axes: [
+				{ type: 'category', position: 'bottom', },
+				{ type: 'number', position: 'left',
+					label: { formatter: (params) => Comma(params.value) },
+					tick: { maxSpacing: 20 }
+				},
+			],
         };
-        agCharts.AgChart.create(options);
+        agCharts.AgChart.create(chart_options);
     }
 
     function drawCanvasByTime() {
@@ -726,146 +551,54 @@
     function drawCanvasByYoil() {
         $('#opt_chart').html('');
 
-        let data = [{
-                name: '일요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '월요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '화요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '수요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '목요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '금요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '토요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            }
+        let data = [
+			{name: '일요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '월요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '화요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '수요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '목요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '금요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '토요일', sum_amt: 0, sum_wonga: 0, margin: 0}
         ];
 
         chart_data.forEach(function(c_data) {
             data[c_data.yoil - 1].sum_amt += Number(c_data.sum_amt);
             data[c_data.yoil - 1].sum_wonga += Number(c_data.sum_wonga);
         });
-        // console.log(data);
-        var options = {
+
+        const chart_options = {
             container: document.getElementById('opt_chart'),
-            title: {
-                text: "요일별 매출 통계",
-            },
+            title: { text: "요일별 매출 통계" },
             data: data,
-            series: [{
-                type: 'column',
-                xKey: 'name',
-                yKeys: ['sum_amt'],
-                yNames: [' 매출액'],
-                grouped: true,
-                fills: ['#556ee6'],
-                strokes: ['#556ee6']
-            }],
+			theme: {
+				palette: {
+					fills: ['#556ee6', '#2797f6'],
+					strokes: ['#556ee6', '#2797f6'],
+				},
+			},
+			legend: { position: 'right' },
+			series: [
+				{ type: 'column', xKey: 'name', yKey: 'sum_amt', yName: '매출액',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+				{ type: 'column', xKey: 'name', yKey: 'sum_wonga', yName: '매출원가',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+			],
+			axes: [
+				{ type: 'category', position: 'bottom' },
+				{ type: 'number', position: 'left',
+					label: { formatter: (params) => Comma(params.value) },
+					tick: { maxSpacing: 20 }
+				},
+			],
         };
 
-        agCharts.AgChart.create(options);
-    }
-    $("#date-tab").click(function() {
-        $("#chart-type").val('date');
-        drawCanvasByDate();
-    });
-
-    $("#yoil-tab").click(function() {
-        $("#chart-type").val('yoil');
-        drawCanvasByYoil();
-    });
-
-    @if( $pop_search == "Y" )
-        Search();
-    @endif
-
-    //월별매출통계에서 가져온 매장값을 바로 검색하는 기능
-    function initStore() {
-        const store_cd = '{{ @$store->store_cd }}';
-        const store_nm = '{{ @$store->store_nm }}';
-
-        if(store_cd != '') {
-            const option = new Option(store_nm, store_cd, true, true);
-            $('#store_no').append(option).trigger('change');
-        }
-    }
-    
-    //월별매출통계에서 가져온 행사코드값을 바로 검색하는 기능
-    function initPrCode() {
-        let pr_code_id = '{{ @$pr_code_id}}';
-        let pr_code_val = '{{ @$pr_code_val}}';
-
-        let pr_code = pr_code_id.split(",");
-        let pr_code_nm = pr_code_val.split(",");
-
-
-        if (pr_code_id != '') {
-            for(let i = 0; i<pr_code.length;i++) {
-                if($("#pr_code").val().includes(pr_code[i])) continue;
-                const option = new Option(pr_code_nm[i], pr_code[i], true, true);
-                $('#pr_code').append(option).trigger('change');
-            }
-        }
-    }
-
-    //월별매출통계에서 가져온 판매유형값을 바로 검색하는 기능
-    function initSellType() {
-        let sell_type_id = '{{ @$sell_type_id}}';
-        let sell_type_val = '{{ @$sell_type_val}}';
-
-        let sell_type = sell_type_id.split(",");
-        let sell_type_nm = sell_type_val.split(",");
-
-
-        if (sell_type_id != '') {
-            for(let i = 0; i<sell_type.length;i++) {
-                if($("#sell_type").val().includes(sell_type[i])) continue;
-                const option = new Option(sell_type_nm[i], sell_type[i], true, true);
-                $('#sell_type').append(option).trigger('change');
-            }
-        }
-    }
-
-    function onoffyn() {
-        let on_off_yn = '{{ @$on_off_yn }}';
-
-        if (on_off_yn == 'ON') {
-            $(":radio[name='on_off_yn'][value='ON']").attr('checked', true);
-        }else if (on_off_yn == 'OFF') {
-            $(":radio[name='on_off_yn'][value='OFF']").attr('checked', true);
-        } else {
-            $(":radio[name='on_off_yn'][value='']").attr('checked', true);
-        }
-
+        agCharts.AgChart.create(chart_options);
     }
 </script>
 @stop

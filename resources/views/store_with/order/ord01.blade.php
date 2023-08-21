@@ -372,7 +372,7 @@
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="pr_code">행사코드</label>
+                            <label for="pr_code">판매처수수료</label>
                             <div class="flax_box">
                                 <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
@@ -465,7 +465,7 @@
         {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
         {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
         {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "pr_code_nm", headerName: "판매처수수료", width: 60, cellStyle: {"text-align": "center"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
         {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},

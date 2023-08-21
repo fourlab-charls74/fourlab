@@ -15,7 +15,8 @@ use DateTime;
 class sal24Controller extends Controller
 {
     // 일별 매출 통계
-    public function index(Request $req) {
+    public function index(Request $req) 
+	{
 		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(1, 'month')->format("Ym")) . '01');
 		$sdate = $date->format('Y-m-d');
 		$edate = $date->format('Y-m-t');
@@ -71,7 +72,8 @@ class sal24Controller extends Controller
 		return view(Config::get('shop.store.view') . '/sale/sal24', $values);
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+	{
 
         $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
         $edate = str_replace("-","",$request->input('edate',date("Ymd")));

@@ -14,7 +14,8 @@ use Carbon\Carbon;
 class sal25Controller extends Controller
 {
     // 월별 매출 통계
-    public function index() {
+    public function index() 
+	{
 
         $mutable = Carbon::now();
         $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m'));
@@ -32,7 +33,8 @@ class sal25Controller extends Controller
         return view( Config::get('shop.store.view') . '/sale/sal25',$values);
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+	{
 
         $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(12, 'month')->format('Ym')));
         $edate = str_replace("-","",$request->input('edate',date("Ym")));

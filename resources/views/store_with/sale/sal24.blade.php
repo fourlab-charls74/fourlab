@@ -419,7 +419,7 @@
                 // {headerName: "할인", field: "dc_amt_60", type: 'currencyType', aggregation: true},
                 // {headerName: "쿠폰", field: "coupon_amt_60", type: 'currencyType', aggregation: true},
                 // {headerName: "수수료", field: "fee_amt_60", type: 'currencyType', aggregation: true},
-                {headerName: "결제금액(VAT별도))", field: "recv_amt_60", type: 'currencyType', aggregation: true},
+                {headerName: "결제금액(VAT별도)", field: "recv_amt_60", type: 'currencyType', aggregation: true},
             ]
         },
         {

@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use PDO;
 use Carbon\Carbon;
 use DateTime;
@@ -17,149 +16,59 @@ use DateTime;
 class sal24Controller extends Controller
 {
     // 일별 매출 통계
-    public function index(Request $req) {
-		
-		//로그인한 아이디의 매칭된 매장을 불러옴
-		$user_store	= Auth('head')->user()->store_cd;
+    public function index(Request $req) 
+	{
+		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(1, 'month')->format("Ym")) . '01');
+		$sdate = $date->format('Y-m-d');
+		$edate = $date->format('Y-m-t');
 
-        //return '일별매출통계';
-        $mutable = Carbon::now();
-        $sdate	 = $mutable->sub(1, 'month')->format('Y-m-d');
-		$edate	 = date("Y-m-d");
+		$pr_code 			= $req->input('pr_code', []);
+		$sell_type 			= $req->input('sell_type', []);
+		$stat_pay_type 		= $req->input('stat_pay_type', []);
+		$ord_type 			= $req->input('ord_type', []);
+		$ord_state 			= $req->input('ord_state', '');
+		$item 				= $req->input('item', '');
+		$brand_cd 			= $req->input('brand_cd', '');
+		$goods_nm 			= $req->input('goods_nm', '');
+		$store_cd 			= Auth('head')->user()->store_cd;
+		$on_off_yn 			= $req->input('on_off_yn', '');
+		$prd_cd_range_text 	= $req->query("prd_cd_range", '');
+		$prd_cd_range_nm 	= $req->query("prd_cd_range_nm", '');
+		parse_str($prd_cd_range_text, $prd_cd_range);
 
-		$sell_type = $req->input('sell_type');
-        $store_cd = $req->input('store_cd', '');
-        $pr_code = $req->input('pr_code');
-		$on_off_yn = $req->input('on_off_yn');
-		$store_nm = $req->input('store_nm');
-		$goods_nm = $req->input('goods_nm');
+		$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
+		$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());
+		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
+		$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
+		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
+		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
 
-		$pr_code_arr = explode(",", $pr_code);
-        $sell_type_arr = explode(",", $sell_type);
-
-		// 행사코드 쿼리스트링 받아온값을 보내주는 부분
-        $pr_code_str = "";
-        foreach($pr_code_arr as $pc) {
-            $pr_code_str .= "'$pc',";
-        }
-
-        $pr_code = substr($pr_code_str,0,-1);
-        
-        $sql = "
-            select 
-                code_id, code_val
-            from code
-            where code_kind_cd = 'PR_CODE'
-            and code_id in ( $pr_code )
-        ";
-
-        $result = DB::select($sql);
-
-        $str = "";
-        $str2 = "";
-        foreach($result as $r){
-            $str .= $r->code_id.",";
-            $str2 .= $r->code_val.",";
-        }
-
-        $str = substr($str,0,-1);
-        $str2 = substr($str2,0,-1);
-
-        //판매유형 쿼리스트링 받아온값을 보내주는 부분
-        $sell_type_str = "";
-        foreach($sell_type_arr as $st) {
-            $sell_type_str .= "'$st',";
-        }
-
-        $sell_type = substr($sell_type_str,0,-1);
-        
-        $sql = "
-            select 
-                code_id, code_val
-            from code
-            where code_kind_cd = 'sale_kind'
-            and code_id in ( $sell_type )
-        ";
-
-        $result = DB::select($sql);
-
-        $sell_str = "";
-        $sell_str2 = "";
-        foreach($result as $r){
-            $sell_str .= $r->code_id.",";
-            $sell_str2 .= $r->code_val.",";
-        }
-
-        $sell_str = substr($sell_str,0,-1);
-        $sell_str2 = substr($sell_str2,0,-1);
-
-
-		$req_sdate = $req->query("sdate");
-		$req_edate = $req->query("edate");
-		if($req_sdate != '') {
-			if($req_edate != '') {
-				$sdate = $req_sdate;
-				$edate = $req_edate;
-			} else {
-				$sdate = new DateTime($req_sdate . "01");
-				$edate = $sdate->format('Y-m-t');
-				$sdate = $sdate->format('Y-m-d');
-			}
-		}
-
-		$ord_state	= $req->input('ord_state');
-		$ord_type	= $req->input('ord_type');
-
-		if($ord_type != '') {
-			$ord_type = explode(",", $ord_type);
-		}
-
-		if( $ord_state != "" || $ord_type != "" )
-			$pop_search	= "Y";
-		else
-			$pop_search = "N";
-
-		$item = $req->input("item");
-		$brand = $req->input("brand");
-
-		$stat_pay_type = $req->input("stat_pay_type");
-
-		if($stat_pay_type != '') {
-			$stat_pay_type = explode(",", $stat_pay_type);
-		}
-
-		$com_nm = $req->input("com_nm");
-
-        $values = [
-            'sdate' 		=> $sdate,
-            'edate' 		=> $edate,
-            'items' 		=> SLib::getItems(),
-			'item'			=> $item,
+		$values = [
+			'sdate' 		=> $sdate,
+			'edate' 		=> $edate,
+			'items' 		=> SLib::getItems(),
 			'sale_places'   => SLib::getSalePlaces(),
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
-			'ord_state'		=> $ord_state,
-			'ord_type'		=> $ord_type,
-			'pop_search'	=> $pop_search,
-			'brand'			=> $brand,
-			'goods_nm'		=> $goods_nm,
-			'stat_pay_type'	=> $stat_pay_type,
-			'com_nm'		=> $com_nm,
-			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   
-			'store_nm'      => DB::table('store')->select('store_cd', 'store_nm')->where('store_nm', '=', $store_nm)->first(),   
-			'sell_type'     => $sell_type,
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
-            'pr_code_id'    => $str,
-            'pr_code_val'   => $str2,
-            'sell_type_id'  => $sell_str,
-            'sell_type_val' => $sell_str2,
+			'stat_pay_type'	=> $stat_pay_type,
+			'ord_type'		=> $ord_type,
+			'ord_state'		=> $ord_state,
+			'item'			=> $item,
+			'brand'			=> $brand,
+			'goods_nm'		=> $goods_nm,
 			'on_off_yn'		=> $on_off_yn,
-			'user_store'	=> $user_store
-        ];
-        return view( Config::get('shop.shop.view') . '/sale/sal24',$values);
+			'pr_code_ids'	=> $pr_code_ids,
+			'sell_type_ids'	=> $sell_type_ids,
+			'store'			=> $store,
+			'prd_cd_range'	=> $prd_cd_range,
+			'prd_cd_range_nm' => $prd_cd_range_nm,
+		];
+		return view(Config::get('shop.shop.view') . '/sale/sal24', $values);
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+	{
 
         $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
         $edate = str_replace("-","",$request->input('edate',date("Ymd")));
@@ -171,25 +80,31 @@ class sal24Controller extends Controller
 		$ord_type 		= $request->input("ord_type", "");
 		$sale_place 	= $request->input("sale_place", "");
 		$stat_pay_type 	= $request->input("stat_pay_type");
-
-        $store_cd       = $request->input('store_no');
+		$store_cd 		= Auth('head')->user()->store_cd;
         $sell_type      = $request->input('sell_type');
         $pr_code        = $request->input('pr_code');
         $on_off_yn      = $request->input('on_off_yn');
+		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
 		$where = "";
 
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+
 
 		// 매장검색
 		if ( $store_cd != "" ) {
-			$where	.= " and (1!=1";
-			foreach($store_cd as $store_cd) {
-				$where .= " or o.store_cd = '$store_cd' ";
-
-			}
-			$where	.= ")";
+			$where	.= " and o.store_cd = '$store_cd' ";
 		}
 
 		//판매유형 검색
@@ -340,6 +255,7 @@ class sal24Controller extends Controller
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
@@ -362,6 +278,7 @@ class sal24Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
 						left outer join claim clm on w.ord_opt_no = clm.ord_opt_no
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
@@ -421,6 +338,9 @@ class sal24Controller extends Controller
 			$sum_taxation_no_vat	= round($sum_taxation/1.1);		// 과세 부가세 별도
 			$vat = $sum_taxation - $sum_taxation_no_vat;			// 부가세
 
+			$sum_amt		= $sum_recv + $sum_point - $sum_fee - $vat;
+			$sum_taxfree	= $sum_amt -  $sum_taxation;
+
 			$exp_pg_fee		= $row->exp_pg_fee;
 			$exp_point		= $sum_point;
 			$exp_sum		= $exp_point + $exp_pg_fee;
@@ -446,7 +366,7 @@ class sal24Controller extends Controller
 
 				"vat"			=> ($sum_tax) ? $sum_tax:0,
 				"sum_amt"		=> ($sum_amt) ? $sum_amt:0,
-				"sum_wonga"		=> ($sum_wonga) ? $sum_wonga:0,
+				"sum_wonga"		=> ($sum_wonga) ? $sum_wonga*1:0,
 				"margin"		=> ($sum_amt) ? round((1 - $sum_wonga/$sum_amt)*100,2) : 0,
 				"margin1"		=> ($sum_amt - $sum_wonga) ? ($sum_amt - $sum_wonga):0,
 				"margin2"		=> ($sum_amt - $sum_wonga - $sum_tax) ? ($sum_amt - $sum_wonga - $sum_tax):0,
@@ -464,21 +384,21 @@ class sal24Controller extends Controller
 				"dc_amt_30"		=> ($dc_amt_30) ? $dc_amt_30:0,
 				"coupon_amt_30"	=> ($coupon_amt_30) ? $coupon_amt_30:0,
 				"fee_amt_30"	=> ($fee_amt_30) ? $fee_amt_30:0,
-				"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30:0,
+				"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30 - $fee_amt_30:0,
 
 				"qty_60"		=> ($qty_60) ? $qty_60:0,
 				"point_amt_60"	=> ($point_amt_60) ? $point_amt_60:0,
 				"dc_amt_60"		=> ($dc_amt_60) ? $dc_amt_60:0,
 				"coupon_amt_60"	=> ($coupon_amt_60) ? $coupon_amt_60:0,
 				"fee_amt_60"	=> ($fee_amt_60) ? $fee_amt_60:0,
-				"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60:0,
+				"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60 - $fee_amt_60 :0,
 
 				"qty_61"		=> ($qty_61) ? $qty_61:0,
 				"point_amt_61"	=> ($point_amt_61) ? $point_amt_61:0,
 				"dc_amt_61"		=> ($dc_amt_61) ? $dc_amt_61:0,
 				"coupon_amt_61"	=> ($coupon_amt_61) ? $coupon_amt_61:0,
 				"fee_amt_61"	=> ($fee_amt_61) ? $fee_amt_61:0,
-				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61:0,
+				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61 - $fee_amt_61:0,
 			);
 
 			return $array;

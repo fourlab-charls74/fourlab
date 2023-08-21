@@ -5,7 +5,7 @@
 	<h3 class="d-inline-flex">주문내역조회</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>주문/배송처리</span>
+		<span>판매관리</span>
 		<span>/ 주문내역조회</span>
 	</div>
 </div>
@@ -34,7 +34,7 @@
                             <div class="date-switch-wrap form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off" disable>
+                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -46,7 +46,7 @@
                                 <span class="text_line">~</span>
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ @$edate }}" autocomplete="off">
+                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
                                             <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -202,10 +202,10 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="style_no">스타일넘버/상품번호</label>
+                            <label for="style_no">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ @$style_no }}">
+                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
                                 </div>
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input-box" style="width:47%">
@@ -224,20 +224,36 @@
                             <label>온/오프라인 주문</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" checked />
+                                    <input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" @if($on_off_yn == '') checked @endif />
                                     <label class="custom-control-label" for="sale_form_A">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" />
+                                    <input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="On" @if($on_off_yn == 'ON') checked @endif />
                                     <label class="custom-control-label" for="sale_form_On">온라인</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" />
+                                    <input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="Off" @if($on_off_yn == 'Off') checked @endif />
                                     <label class="custom-control-label" for="sale_form_Off">오프라인</label>
                                 </div>
                             </div>
                         </div>
                     </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="goods_nm">상품명</label>
+			                <div class="flex_box">
+				                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value='{{@$goods_nm}}'>
+			                </div>
+		                </div>
+	                </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="goods_nm_eng">상품명(영문)</label>
+			                <div class="flex_box">
+				                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+			                </div>
+		                </div>
+	                </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
@@ -276,12 +292,12 @@
                 <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="prd_cd">상품옵션 범위검색</label>
+                            <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
                                         <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>
@@ -290,43 +306,12 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="goods_nm">상품명</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value='{{@$goods_nm}}'>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_nm_eng">상품명(영문)</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                            </div>
-                        </div>
-                    </div>
-                    {{-- <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_stat">상품상태</label>
-                            <div class="flex_box">
-                                <select name="goods_stat[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach (@$goods_stats as $goods_stat)
-                                        <option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div> --}}
-                </div>
-                <div class="row search-area-ext d-none">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
                             <label for="pr_code">판매유형</label>
                             <div class="flax_box">
                                 <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
                                     @foreach ($sale_kinds as $sale_kind)
-                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+                                    <option value='{{ $sale_kind->code_id }}' @if(in_array($sale_kind->code_id, $sell_type_ids)) selected @endif>{{ $sale_kind->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -334,12 +319,12 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="pr_code">행사코드</label>
+                            <label for="pr_code">판매처수수료</label>
                             <div class="flax_box">
                                 <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
                                     <option value=''>전체</option>
                                     @foreach ($pr_codes as $pr_code)
-                                    <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+                                    <option value='{{ $pr_code->code_id }}' @if(in_array($pr_code->code_id, $pr_code_ids)) selected @endif>{{ $pr_code->code_val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -426,7 +411,7 @@
         {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
         {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
         {field: "sale_kind", headerName: "판매유형", hide:true},
-        {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "pr_code_nm", headerName: "판매처수수료", width: 60, cellStyle: {"text-align": "center"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
         {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
@@ -477,18 +462,30 @@
                 return node.data.ord_state_cd < 30;
             }
         });
-        
-        initStore();
-        initPrCode();
-        initSellType();
-        onoffyn();
 
-        @if($brand != '')
-            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
-        @endif
-
+		initSearchTab();
         Search();
     });
+
+	function initSearchTab() {
+		let brand_cd = "{{ @$brand->brand }}";
+		let brand_nm = "{{ @$brand->brand_nm }}";
+
+		if (brand_cd != '') {
+			const option = new Option(brand_nm, brand_cd, true, true);
+			$('#brand_cd').append(option).trigger('change');
+		}
+
+		let prd_cd_range = <?= json_encode(@$prd_cd_range) ?>;
+		let prd_cd_range_nm = "{{ @$prd_cd_range_nm }}";
+		prd_cd_range = Object.keys(prd_cd_range).reduce((a, c) => {
+			if (c.includes('_contain') || c === 'match') return a;
+			return a + prd_cd_range[c].map(rg => '&' + c +'[]=' + rg).join('');
+		}, '');
+
+		$('#prd_cd_range').val(prd_cd_range);
+		$('#prd_cd_range_nm').val(prd_cd_range_nm);
+	}
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
@@ -541,80 +538,6 @@
                 console.log(xhr.responseText);
             }
         });
-    }
-
-    function openApi() {
-        document.getElementsByClassName('sch-prdcd-range')[0].click();
-    }
-
-    // 행사코드 다중검색
-    $( ".sch-prcode" ).on("click", function() {
-        searchPrCode.Open(null, "multiple");
-    });
-
-     // 판매유형 다중검색
-     $( ".sch-sellType" ).on("click", function() {
-        searchSellType.Open(null, "multiple");
-    });
-
-    //일별매출통계에서 가져온 매장값을 바로 검색하는 기능
-    function initStore() {
-        const store_cd = '{{ @$store->store_cd }}';
-        const store_nm = '{{ @$store->store_nm }}';
-
-        if(store_cd != '') {
-            const option = new Option(store_nm, store_cd, true, true);
-            $('#store_no').append(option).trigger('change');
-        }
-    }
-    
-    //일별매출통계에서 가져온 행사코드값을 바로 검색하는 기능
-    function initPrCode() {
-        let pr_code_id = '{{ @$pr_code_id}}';
-        let pr_code_val = '{{ @$pr_code_val}}';
-
-        let pr_code = pr_code_id.split(",");
-        let pr_code_nm = pr_code_val.split(",");
-
-
-        if (pr_code_id != '') {
-            for(let i = 0; i<pr_code.length;i++) {
-                if($("#pr_code").val().includes(pr_code[i])) continue;
-                const option = new Option(pr_code_nm[i], pr_code[i], true, true);
-                $('#pr_code').append(option).trigger('change');
-            }
-        }
-    }
-
-    //일별매출통계에서 가져온 판매유형값을 바로 검색하는 기능
-    function initSellType() {
-        let sell_type_id = '{{ @$sell_type_id}}';
-        let sell_type_val = '{{ @$sell_type_val}}';
-
-        let sell_type = sell_type_id.split(",");
-        let sell_type_nm = sell_type_val.split(",");
-
-
-        if (sell_type_id != '') {
-            for(let i = 0; i<sell_type.length;i++) {
-                if($("#sell_type").val().includes(sell_type[i])) continue;
-                const option = new Option(sell_type_nm[i], sell_type[i], true, true);
-                $('#sell_type').append(option).trigger('change');
-            }
-        }
-    }
-
-    function onoffyn() {
-        let on_off_yn = '{{ @$on_off_yn }}';
-
-        if (on_off_yn == 'ON') {
-            $(":radio[name='sale_form'][value='On']").attr('checked', true);
-        }else if (on_off_yn == 'OFF') {
-            $(":radio[name='sale_form'][value='Off']").attr('checked', true);
-        } else {
-            $(":radio[name='sale_form'][value='']").attr('checked', true);
-        }
-
     }
 
     function openShopProduct(prd_no){

@@ -8,17 +8,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use PDO;
 use Carbon\Carbon;
 
 class sal25Controller extends Controller
 {
     // 월별 매출 통계
-    public function index() {
-
-		//로그인한 아이디의 매칭된 매장을 불러옴
-		$user_store	= Auth('head')->user()->store_cd;
+    public function index() 
+	{
 
         $mutable = Carbon::now();
         $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m'));
@@ -30,12 +27,12 @@ class sal25Controller extends Controller
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
-			'user_store'	=> $user_store
         ];
         return view( Config::get('shop.shop.view') . '/sale/sal25',$values);
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+	{
 
         $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(12, 'month')->format('Ym')));
         $edate = str_replace("-","",$request->input('edate',date("Ym")));
@@ -46,23 +43,30 @@ class sal25Controller extends Controller
 		$ord_type = $request->input("ord_type", "");
         $ord_state	= $request->input("ord_state");
         $stat_pay_type	= $request->input("stat_pay_type");
-        $store_cd       = $request->input('store_no');
+		$store_cd 		= Auth('head')->user()->store_cd;
         $sell_type      = $request->input('sell_type');
         $pr_code        = $request->input('pr_code');
         $on_off_yn      = $request->input('on_off_yn');
+		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
         $inner_where = "";
 		$inner_where2	= "";	//매출
         $where = "";
 
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+
         // 매장검색
 		if ( $store_cd != "" ) {
-			$where	.= " and (1!=1";
-			foreach($store_cd as $store_cd) {
-				$where .= " or o.store_cd = '$store_cd' ";
-
-			}
-			$where	.= ")";
+			$where	.= " and o.store_cd = '$store_cd' ";
 		}
 
 		//판매유형 검색
@@ -156,7 +160,7 @@ class sal25Controller extends Controller
 			from (
 				select date_format(d,'%Y%m') as sale_date
 				from mdate	
-				where d >='$sdate' and d <= '$edate'
+				where d >= concat('$sdate', '01') and d <= concat('$edate', '31')
 				group by sale_date
 				order by sale_date desc
 			) a left outer join (
@@ -210,9 +214,10 @@ class sal25Controller extends Controller
 					from order_opt o
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
-						w.ord_state_date >= '$sdate' 
-						and w.ord_state_date <= '$edate' 
+						w.ord_state_date >= concat('$sdate', '01') 
+						and w.ord_state_date <= concat('$edate', '31') 
 						and w.ord_state in ('$ord_state',60,61)
 						and o.ord_state >= '$ord_state'
 						$inner_where2 $inner_where $where
@@ -230,13 +235,14 @@ class sal25Controller extends Controller
         $result = [];
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
-            $row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"];
-            $row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
             $row["sum_taxation_no_vat"]	= round($row["sum_taxation_amt"]/1.1);		// 과세 부가세 별도
             $row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
+			$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
+			$row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
             $row["margin"] = $row["sum_amt"]? round((1 - $row["sum_wonga"]/$row["sum_amt"])*100, 2):0;
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
             $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
+			$row["sum_wonga"] = $row["sum_wonga"] * 1;
 
             $result[] = $row;
         }
