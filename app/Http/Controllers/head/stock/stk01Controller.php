@@ -261,7 +261,9 @@ class stk01Controller extends Controller
         $page_cnt = 0;
         $goods_info = (object)[];
         $options = [];
-
+		$release_cnt = 0;
+		$input_cnt = 0;
+		
         if ($page == 1) {
 
             $sql = "
@@ -368,7 +370,10 @@ class stk01Controller extends Controller
             }
 
             $sql = "
-                select count(*) as total
+                select 
+                    count(*) as total,
+					sum(if(a.qty < 0, a.qty, 0)) as release_stock_cnt,
+					sum(if(a.qty >= 0, a.qty, 0)) as input_stock_cnt
                 from goods_history a
                   left outer join order_opt oo on a.ord_opt_no = oo.ord_opt_no and a.goods_no = oo.goods_no and a.goods_sub = oo.goods_sub
                   left outer join code cd on cd.code_kind_cd = 'G_JAEGO_TYPE' and cd.code_id = a.type
@@ -383,6 +388,9 @@ class stk01Controller extends Controller
             if($total > 0){
                 $page_cnt = (int)(($total-1)/$page_size) + 1;
             }
+
+			$release_cnt = $row->release_stock_cnt;
+			$input_cnt = $row->input_stock_cnt;
         }
 
         $sql = /** @lang text */
@@ -419,7 +427,9 @@ class stk01Controller extends Controller
             "qty" => $a_jaego_qty ?? [],
             "wqty" => $a_jaego_wqty ?? [],
             "sale" => $stock_sale,
-            "body" => $rows
+            "body" => $rows,
+			"release_total" => $release_cnt,
+			"input_total" => $input_cnt,
         ]);
     }
 }

@@ -370,19 +370,9 @@
     }
 
     function ViewQtys(qty_list) {
-        const import_tot = qty_list.reduce((a,c) => c.io_gubun === "입고" ? a + c.qty : a, 0);
-        const export_tot = qty_list.reduce((a,c) => c.io_gubun === "출고" ? a + c.qty : a, 0);
-        $("#imp_tot").text(import_tot.toLocaleString('ko-KR'));
-        $("#exp_tot").text(export_tot.toLocaleString('ko-KR'));
-        $("#minus_qty").text((import_tot+export_tot).toLocaleString("ko-KR"));
-    }
-
-    function ViewQtys(qty_list) {
-        const import_tot = qty_list.reduce((a,c) => c.io_gubun === "입고" ? a + c.qty : a, 0);
-        const export_tot = qty_list.reduce((a,c) => c.io_gubun === "출고" ? a + c.qty : a, 0);
-        $("#imp_tot").text(import_tot.toLocaleString('ko-KR'));
-        $("#exp_tot").text(export_tot.toLocaleString('ko-KR'));
-        $("#minus_qty").text((import_tot+export_tot).toLocaleString("ko-KR"));
+		$("#imp_tot").text(qty_list.input_total === null ? 0 : qty_list.input_total);
+		$("#exp_tot").text(qty_list.release_total === null ? 0 : qty_list.release_total);
+		$("#minus_qty").text((parseInt(qty_list.input_total === null ? 0 : qty_list.input_total) + parseInt(qty_list.release_total === null ? 0 : qty_list.release_total)));
     }
 
     function Search() {
@@ -391,7 +381,7 @@
         gx.Request('/head/stock/stk01/option/search/' + goods_no, data, 1, function (d) {
             ViewGoods(d.info);
             ViewOptions(d.options,d.qty,d.wqty,d.sale);
-            ViewQtys(d.body);
+			ViewQtys(d);
         });
 
         // gx_n.Request('/head/stock/stk01/option/search/' + goods_no, data, 1);
