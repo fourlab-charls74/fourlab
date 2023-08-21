@@ -73,10 +73,8 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd
                     , md.receiver_type
-                    , group_concat(md.receiver_cd separator ', ') as receiver_cd
-                    , group_concat(if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',if(md.receiver_type = 'G', s.store_nm, '')))) separator ', ') as receiver_nm
-                    -- , if(msd.receiver_type = 'S', s.store_nm, '본사') as receiver
-                    -- , count(msd.receiver_cd) as receiver_cnt
+                   	, group_concat(if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',''))) separator ', ') as receiver_nm
+                    , if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name,if(md.receiver_type = 'G', s.store_nm, ''))) as first_receiver
                     , s.store_nm
                     , md.receiver_type
                     , m.reservation_yn
@@ -101,7 +99,8 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H','본사',''))) as sender_nm,
+                    -- if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H','본사',''))) as sender_nm,
+                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -388,7 +387,7 @@ class stk32Controller extends Controller
                     md.receiver_type,
                     group_concat(md.receiver_cd separator ', ') as receiver_cd,
                     group_concat(if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',''))) separator ', ') as receiver_nm,
-                    if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',if(md.receiver_type = 'G', s.store_nm, '')))) as first_receiver,
+                    if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name,if(md.receiver_type = 'G', s.store_nm, ''))) as first_receiver,
                     count(md.receiver_cd) as receiver_cnt,
                     m.reservation_yn,
                     m.reservation_date,
@@ -410,7 +409,7 @@ class stk32Controller extends Controller
                     m.msg_cd,
                     m.sender_cd,
                     -- if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
-                    if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', ''))) as sender_nm,
+                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -427,7 +426,7 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                   	if (m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', '본사', ''))) as sender_nm,
+                   	if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
                     m.reservation_yn,
                     m.reservation_date,
                     s.phone as mobile,
@@ -455,7 +454,7 @@ class stk32Controller extends Controller
                 m.msg_cd,
                 md.receiver_type,
                 md.check_yn,
-                if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',if(md.receiver_type = 'G', s.store_nm, '')))) as stores
+            	if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'G', s.store_nm, ''))) as stores
             from msg_store m
                 inner join msg_store_detail md on md.msg_cd = m.msg_cd
                 left outer join store s on s.store_cd = md.receiver_cd
@@ -518,30 +517,23 @@ class stk32Controller extends Controller
 
     public function store(Request $request)
     {
-       
         $content = $request->input('content');
         $reservation_yn = $request->input('reservation_yn');
         $store_cds = $request->input('store_cds');
         $store_cds = explode(',',$store_cds);
-
         $reservation_msg = $request->input('reservation_msg');
         $group_nms = $request->input('group_nms');
         $group_nms = explode(',',$group_nms);
         $group_cds = $request->input('group_cds');
         $group_cds = explode(',',$group_cds);
-		
 		$user_ids = $request->input('user_ids');
 		$user_ids = explode(',', $user_ids);
-		
         $check = $request->input('check');
-
 		$admin_id = Auth('head')->user()->id;
-		
-        $sender_type = "H";
-        $sender_cd = "HEAD";
         $rm_date = $request->input('rm_date');
         $rm_hour = $request->input('rm_hour');
         $rm_min = $request->input('rm_min');
+		$msg_cd = $request->input('msg_cd','');
         
         if ($reservation_msg == 'true') {
             $reservation_yn = "Y";
@@ -558,7 +550,7 @@ class stk32Controller extends Controller
                 if($reservation_date > date("Y-m-d H:i:s")){
                     $res = DB::table('msg_store')
                     ->insertGetId([
-                        'sender_type' => $check,
+                        'sender_type' => 'H', //본사 : H , 매장 : S
                         'sender_cd' => $admin_id,
                         'reservation_yn' => $reservation_yn,
                         'reservation_date' => $reservation_date,
@@ -624,7 +616,7 @@ class stk32Controller extends Controller
             } else {
                 $res = DB::table('msg_store')
                     ->insertGetId([
-                        'sender_type' => $check,
+                        'sender_type' => 'H', // 본사 : H 매장 : S
                         'sender_cd' => $admin_id,
                         'reservation_yn' => $reservation_yn,
                         'reservation_date' => $reservation_date,
@@ -642,8 +634,9 @@ class stk32Controller extends Controller
 									'check_yn' => 'N',
 									'rt' => now()
 								]);
+							
 						}
-					} elseif ($check == "U") {
+					} elseif ($check == "U" || $check == 'H') {
 						foreach ($user_ids as $id) {
 							DB::table('msg_store_detail')
 								->insert([
@@ -1139,12 +1132,15 @@ class stk32Controller extends Controller
 		$msg_cd = $request->input('msg_cd');
 		$mutable = Carbon::now();
 		$sdate	= $mutable->sub(1, 'month')->format('Y-m-d');
-
+		$sender_cd = Auth('head')->user()->id;
+		//$sender_type = 'H';
+		$store_cds = "";
+		$group_cds = "";
+		$user_ids = "";
+		
 		$sql = "
 			select
-				mu.name as sender_cd
-			    -- if(m.sender_type = 'S', s.store_nm, '') as sender_cd
-				, m.content
+				m.sender_cd as receiver_cd, mu.name as user_nm, m.sender_type as receiver_type, m.content
 			from msg_store m
 			    inner join msg_store_detail md on md.msg_cd = m.msg_cd
 				left outer join store s on s.store_cd = md.receiver_cd
@@ -1152,113 +1148,52 @@ class stk32Controller extends Controller
 			where m.msg_cd = :msg_cd
 		";
 		$msg = DB::selectOne($sql, ['msg_cd' => $msg_cd]);
-
+		
+		if ($msg->receiver_type == 'H') {
+			$user_ids = $msg->receiver_cd;
+		} else {
+			$store_cds = $msg->receiver_cd;
+		}
 
 		$values = [
-			'sender_cd' => $msg->sender_cd,
-			'content' => $msg->content,
-			'msg_cd' => $msg_cd,
-			'sdate' => $sdate,
-			'edate' => date("Y-m-d"),
+			'sender_cd' => $sender_cd,
+			'content' 	=> $msg->content,
+			'msg_cd' 	=> $msg_cd,
+			'sdate' 	=> $sdate,
+			'edate'		=> date("Y-m-d"),
+			'store_cds' => $store_cds,
+			'group_cds' => $group_cds,
+			'user_ids'	=> $user_ids,
+			'user_nm'	=> $msg->user_nm,
+			'check' 	=> $msg->receiver_type,
+			'content'	=> $msg->content
+			
 		];
 		return view(Config::get('shop.store.view') . '/stock/stk32_reply', $values);
 	}
 
-	public function reply (Request $request)
+	// 알리미 재전송을 했을 때 check_yn값이 Y로 업데이트되는 부분
+	public function update_check_yn(Request $request)
 	{
 		$msg_cd = $request->input('msg_cd');
-		$content = $request->input('content');
-		$reservation_msg = $request->input('reservation_msg');
-
-		$rm_date = $request->input('rm_date');
-		$rm_hour = $request->input('rm_hour');
-		$rm_min = $request->input('rm_min');
-
-		if ($reservation_msg == 'true') {
-			$reservation_yn = "Y";
-			$reservation_date = "$rm_date"." $rm_hour:"."$rm_min:00";
-		} elseif ($reservation_msg == 'false') {
-			$reservation_yn = "N";
-			$reservation_date = "";
-		}
-
-		$sender_cd = Auth('head')->user()->store_cd;
-		$admin_id = Auth('head')->user()->id;
-
-		if($sender_cd == 'L0025') {
-			$sender_type = "H";
-		} else {
-			$sender_type = "S";
-		}
+		$user_store = Auth('head')->user()->store_nm;
+		$user_id = Auth('head')->user()->id;
 
 		try {
 			DB::beginTransaction();
 
-			$sql = "
-				select
-					sender_cd
-				from msg_store
-				where msg_cd = '$msg_cd'
-			";
-			$receiver = DB::selectOne($sql);
-
-			if ($reservation_msg == 'true'){
-				if($reservation_date > date("Y-m-d H:i:s")){
-					$res = DB::table('msg_store')
-						->insertGetId([
-							'sender_type' => 'U',
-							'sender_cd' => $admin_id,
-							'reservation_yn' => $reservation_yn,
-							'reservation_date' => $reservation_date,
-							'content' => $content,
-							'rt' => now()
-						]);
-
-					DB::table('msg_store_detail')
-						->insert([
-							'msg_cd' => $res,
-							'receiver_type' => 'U',
-							'receiver_cd' => $receiver->sender_cd,
-							'check_yn' => 'N',
-							'rt' => now()
-						]);
-
-					$code = 200;
-					$msg = "알림 전송에 성공하였습니다.";
-				} else {
-					$code = 100;
-					$msg = "예약발송시간이 현재시간보다 이전입니다. 예약발송 시간을 변경해주세요.";
-				}
-			} else {
-				$res = DB::table('msg_store')
-					->insertGetId([
-						'sender_type' => 'U',
-						'sender_cd' => $admin_id,
-						'reservation_yn' => $reservation_yn,
-						'reservation_date' => $reservation_date,
-						'content' => $content,
-						'rt' => now()
-					]);
-
-				DB::table('msg_store_detail')
-					->insert([
-						'msg_cd' => $res,
-						'receiver_type' => "U",
-						'receiver_cd' => $receiver->sender_cd ,
-						'check_yn' => 'N',
-						'rt' => now()
-					]);
-				$code = 200;
-				$msg = "알림 전송에 성공하였습니다.";
-			}
-
-			//답장보내면 check_yn을 Y로 바꾸는 부분
+			//그룹명 변경 쿼리문
 			DB::table('msg_store_detail')
-				->where('msg_cd', $msg_cd)
+				->where('msg_cd', '=', $msg_cd)
+				->where('receiver_cd', '=', $user_store)
+				->orWhere('receiver_cd', '=', $user_id)
 				->update([
 					'check_yn' => 'Y'
 				]);
+
 			DB::commit();
+			$code = 200;
+			$msg = "";
 		} catch (Exception $e) {
 			DB::rollBack();
 			$code = 500;
@@ -1268,5 +1203,7 @@ class stk32Controller extends Controller
 			"code" => $code,
 			"msg" => $msg
 		]);
+
+
 	}
 }

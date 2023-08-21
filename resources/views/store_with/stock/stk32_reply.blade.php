@@ -7,8 +7,6 @@
 				<h3 class="d-inline-flex">알림</h3>
 				<div class="d-inline-flex location">
 					<span class="home"></span>
-					<span>/ 게시판</span>
-					<span>/ 알림</span>
 					<span>/ 알림전송</span>
 				</div>
 			</div>
@@ -39,7 +37,7 @@
 												<th>받는 사람</th>
 												<td>
 													<div class="flax_box" name="sd" id="sd">
-														<span>{{$sender_cd}}</span>
+														<span>{{$user_nm}}</span>
 													</div>
 												</td>
 											</tr>
@@ -63,7 +61,13 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;"></textarea>
+						<textarea class="form-control" id="content" name="content" rows="10" style="margin:auto;resize: none;">
+
+
+
+--------------------------------------------------
+{{ $content }}
+						</textarea>
 						<div id="test_cnt" style="text-align:right;">(0 / 20000)</div>
 					</div>
 					<br>
@@ -130,6 +134,79 @@
 			});
 		});
 
+	</script>
+
+	<script>
+		function Send() {
+
+			let frm = $('form[name=store]').serialize();
+
+			if ($('#content').val() === '') {
+				$('#content').focus();
+				alert('내용을 입력해 주세요.');
+				return false;
+			}
+
+			frm += "&msg_cd=" + "{{ @$msg_cd }}";
+			frm += "&store_cds=" + "{{ @$store_cds }}";
+			frm += "&group_cds=" + "{{ @$group_cds }}";
+			frm += "&user_ids=" + "{{ @$user_ids }}";
+			frm += "&check=" + "{{ @$check }}";
+			frm += "&reservation_msg=" + $('[name=reservation_msg]').is(":checked");
+
+			$.ajax({
+				method: 'post',
+				url: '/store/stock/stk32/store',
+				data: frm,
+				dataType: 'json',
+				success: function(data) {
+					if (data.code == 200) {
+						updateCheckYn();
+						alert(data.msg);
+						window.close();
+						opener.close();
+						opener.opener.Search();
+					} else if (data.code == 100) {
+						alert(data.msg);
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function(e) {
+					console.log(e.responseText)
+				}
+			});
+		}
+
+		//알림 재전송에 성공했을 때 읽음 여부를 Y로 변경
+		function updateCheckYn() {
+
+			let msg_cd = "{{$msg_cd}}";
+
+			$.ajax({
+				method: 'put',
+				url: '/store/stock/stk32/update-check-yn',
+				data: {
+					msg_cd : msg_cd
+				},
+				dataType: 'json',
+				success: function(data) {
+					if (data.code == 200) {
+						alert(data.msg);
+						Search();
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function(e) {
+					console.log(e.responseText)
+				}
+			});
+		}
+
+	</script>
+
+	<script>
 		$(document).ready(function() {
 			$('#content').on('keyup', function() {
 				$('#test_cnt').html("("+$(this).val().length+" / 20000)");
@@ -140,45 +217,5 @@
 				}
 			});
 		});
-	</script>
-	<script type="text/javascript" charset="utf-8">
-
-		function Send () {
-			let msg_cd = "{{$msg_cd}}";
-			let frm = $('form[name=store]').serialize();
-
-			if ($('#content').val() === '') {
-				$('#content').focus();
-				alert('내용을 입력해 주세요.');
-				return false;
-			}
-
-			frm += "&msg_cd=" + msg_cd;
-			frm += "&reservation_msg=" + $('[name=reservation_msg]').is(":checked");
-
-
-			$.ajax({
-				method: 'post',
-				url: '/store/stock/stk32/reply',
-				data: frm,
-				success: function(data) {
-					if (data.code == '200') {
-						alert('알리미를 전송하였습니다.');
-						window.close();
-						opener.Search();
-						opener.opener.Search();
-					} else if (data.code == 100) {
-						alert(data.msg);
-					} else {
-						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-					}
-				},
-				error: function(e) {
-					// console.log(e.responseText)
-				}
-			});
-
-		}
-
 	</script>
 @stop

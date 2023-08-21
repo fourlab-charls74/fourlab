@@ -181,48 +181,8 @@
 
 		const url = `/shop/community/comm02/reply-msg?msg_cd={{$msg_cd}}`;
 		const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+		self.close();
 		
-		
-		
-		
-		/*let content = $('#content').val();
-		let msg_cd = "{{$msg_cd}}";
-		let separator = '-------------------------------------------------------------------';
-		let lines = content.split('\n');
-		let lineNumber = -1;
-		let data = "";
-
-		for (let i = 0; i < lines.length; i++) {
-			if (lines[i].includes(separator)) {
-				lineNumber = i + 1;
-				break;
-			}
-		}
-		if (lines.length >= lineNumber) {
-			data = lines.slice(1, lineNumber-1).join('\n');
-		}
-
-		$.ajax({
-			method: 'post',
-			url: '/shop/community/comm02/reply',
-			data: {
-				data : data,
-				msg_cd : msg_cd,
-				content : content
-			},
-			success: function(data) {
-				if (data.code == '200') {
-					alert('해당 알리미에 답장하였습니다.');
-					window.close();
-					opener.Search();
-				} else {
-					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-				}
-			},
-			error: function(e) {
-				console.log(e.responseText)
-			}
-		});*/
 	}
 </script>
 @stop

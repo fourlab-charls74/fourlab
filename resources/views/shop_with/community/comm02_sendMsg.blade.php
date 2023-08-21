@@ -144,8 +144,6 @@
     function Send() {
 
         let frm = $('form[name=store]').serialize();
-        let ds = "";
-        let check = document.querySelector('input[name="reservation_msg"]').checked;
     
         if ($('#content').val() === '') {
             $('#content').focus();

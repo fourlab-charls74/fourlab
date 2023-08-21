@@ -366,8 +366,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::post('comm02/del_store', 'comm02Controller@del_store');
 		Route::get('comm02/search-hq-user-id', 'comm02Controller@search_hq_user_id');
 		Route::get('comm02/reply-msg/{msg_cd?}', 'comm02Controller@reply_msg');
-		Route::post('comm02/reply', 'comm02Controller@reply');
-
+		Route::put('comm02/update-check-yn', 'comm02Controller@update_check_yn');
+	
     });
     //매장관리
     Route::prefix("stock")->namespace('stock')->group(function () {

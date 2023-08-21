@@ -844,6 +844,8 @@ CREATE TABLE `notice_store_detail` (
 -- 알림
 CREATE TABLE `msg_store` (
 	`msg_cd` int(11) NOT NULL AUTO_INCREMENT COMMENT '알림번호',
+	`msg_cd_p` varchar(10) COMMENT '부모알리미',
+	`msg_kind` varchar(20) COMMENT '알림 종류 (S: 매장알림, RT: RT알림, AS: 수선알림)',
 	`sender_type` char(1) NOT NULL COMMENT '발신처 타입 (매장 - S / 본사 - H)',
 	`sender_cd` varchar(30) NOT NULL COMMENT '발신처코드',
 	`reservation_yn` char(1) NOT NULL COMMENT '예약발송여부',

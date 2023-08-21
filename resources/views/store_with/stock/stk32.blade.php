@@ -166,13 +166,7 @@
     if('{{ @$cmd }}' == 'send') {
 
         columns = [
-            {
-                headerName: '',
-                headerCheckboxSelection: true,
-                checkboxSelection: true,
-                width:28,
-                pinned:'left'
-            },
+            {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
             {field: "receiver_cd", hide: true},
             {headerName: "받는 사람", field: "receiver_nm", width:200,
                 cellRenderer: (params) => 
@@ -191,13 +185,12 @@
     } else {
     
         columns = [
-            {
-                headerName: '',
-                headerCheckboxSelection: true,
-                checkboxSelection: true,
-                width:28,
-                pinned:'left'
-            },
+            {headerName: '', headerCheckboxSelection: true, width:28, pinned:'left',
+				checkboxSelection: (params) => {
+					const check_yn = params.data.check_yn;
+					return check_yn != 'Y'? true : false;
+				},
+			},
             {field: "sender_cd", hide: true},
             {headerName: "보내는 사람", field: "sender_nm", width:150},
             {headerName: "연락처", field: "mobile", width: 80, cellClass: 'hd-grid-code'},
