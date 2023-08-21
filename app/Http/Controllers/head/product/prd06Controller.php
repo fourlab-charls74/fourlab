@@ -68,6 +68,12 @@ class prd06Controller extends Controller
             }
         }
 
+
+		$goods_no = preg_replace("/\s/",",",$goods_no);
+		$goods_no = preg_replace("/\t/",",",$goods_no);
+		$goods_no = preg_replace("/\n/",",",$goods_no);
+		$goods_no = preg_replace("/,,/",",",$goods_no);
+		
         if( $goods_no != "" ){
             $goods_nos = explode(",", $goods_no);
             if (count($goods_nos) > 1) {
@@ -75,7 +81,8 @@ class prd06Controller extends Controller
                 $in_goods_no = join(",", $goods_nos);
                 $where .= " and g.goods_no in ( $in_goods_no ) ";
             } else {
-                $where .= " and g.goods_no = '$goods_no' ";
+				if (is_numeric($goods_no)) $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+				else $where .= " and 1!=1 ";
             }
         }
 
@@ -278,7 +285,7 @@ class prd06Controller extends Controller
             $goods = new Product($user);
             try {
                 DB::beginTransaction();
-                collect($data)->unique()->map(function($item) use ($goods, $sale_type, $sale_rate) {
+                collect($data)->unique('goods_no')->map(function($item) use ($goods, $sale_type, $sale_rate) {
                     $goods_no = trim($item["goods_no"]);
                     if (!empty($goods_no) ) {
                         $goods->SetGoodsNo($goods_no);
