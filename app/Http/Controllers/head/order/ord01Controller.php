@@ -23,13 +23,25 @@ class ord01Controller extends Controller
     public function index(Request $req) {
         $mutable = now();
         $sdate	= $mutable->sub(1, 'week')->format('Y-m-d');
+		$edate	= date("Y-m-d");
 
-		$o = $req->input('o');
-		$ismt= $req->input('ismt');
+		$date = $req->input('date', '');
+		if ($date != '') {
+			$sdate = date('Y-m-d', strtotime($date));
+			$edate = date('Y-m-d', strtotime($date));
+		}
+
+		$item 		= $req->input('item', '');
+		$brand_cd 	= $req->input('brand_cd', '');
+		$goods_nm 	= $req->input('goods_nm', '');
+		$o 			= $req->input('o');
+		$ismt		= $req->input('ismt');
+
+		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
 
         $values = [
             'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
+            'edate'         => $edate,
             'ord_states'    => SLib::getOrdStates(),
             'com_types'     => SLib::getCodes('G_COM_TYPE'),
             'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
@@ -41,7 +53,10 @@ class ord01Controller extends Controller
             'clm_states'     => SLib::getCodes('G_CLM_STATE'),
             'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE'),
 			'o'				=> $o,
-			'ismt'			=> $ismt
+			'ismt'			=> $ismt,
+			'item'			=> $item,
+			'brand'			=> $brand,
+			'goods_nm'		=> $goods_nm,
         ];
 
         return $o == 'pop'

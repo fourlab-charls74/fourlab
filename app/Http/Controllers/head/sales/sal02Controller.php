@@ -48,7 +48,9 @@ class sal02Controller extends Controller
 			$pop_search = "N";
 
 		$item = $req->input("item");
-		$brand = $req->input("brand");
+		$brand_cd = $req->input("brand");
+		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		
 		$goods_nm = $req->input("goods_nm");
 		$stat_pay_type = $req->input("stat_pay_type");
 
@@ -316,7 +318,7 @@ class sal02Controller extends Controller
 
 				"vat"			=> ($sum_tax) ? $sum_tax:0,
 				"sum_amt"		=> ($sum_amt) ? $sum_amt:0,
-				"sum_wonga"		=> ($sum_wonga) ? $sum_wonga:0,
+				"sum_wonga"		=> ($sum_wonga) ? $sum_wonga*1:0,
 				"margin"		=> ($sum_amt) ? round((1 - $sum_wonga/$sum_amt)*100,2) : 0,
 				"margin1"		=> ($sum_amt - $sum_wonga) ? ($sum_amt - $sum_wonga):0,
 				"margin2"		=> ($sum_amt - $sum_wonga - $sum_tax) ? ($sum_amt - $sum_wonga - $sum_tax):0,

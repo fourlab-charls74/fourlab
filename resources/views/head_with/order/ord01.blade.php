@@ -406,8 +406,8 @@
                             <div class="flax_box">
                                 <select name="item" class="form-control form-control-sm">
                                     <option value="">전체</option>
-                                    @foreach ($items as $item)
-                                        <option value="{{ $item->cd }}">{{ $item->val }}</option>
+                                    @foreach ($items as $t)
+                                        <option value="{{ $t->cd }}" @if($item == $t->cd) selected @endif>{{ $t->val }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -428,7 +428,7 @@
                         <div class="form-group">
                             <label for="name">상품명</label>
                             <div class="flax_box">
-                                <input type="text" class="form-control form-control-sm ac-goods-nm search-enter" name="goods_nm" value="">
+                                <input type="text" class="form-control form-control-sm ac-goods-nm search-enter" name="goods_nm" value="{{ @$goods_nm }}">
                             </div>
                         </div>
                     </div>
@@ -664,6 +664,13 @@
     // }
 	let gx;
 	$(document).ready(function() {
+		let brand_cd = "{{ @$brand->brand }}";
+		let brand_nm = "{{ @$brand->brand_nm }}";
+		if (brand_cd != '') {
+			const option = new Option(brand_nm, brand_cd, true, true);
+			$('#s_brand_cd').append(option).trigger('change');
+		}
+
 		gx = new HDGrid(gridDiv, columns);
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();

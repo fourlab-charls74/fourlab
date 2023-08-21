@@ -255,16 +255,21 @@
         </ul>
     </div>
 </div>
-<script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
+<script src="https://unpkg.com/ag-charts-community@8.0.6/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
-    var columns = [{
+    const columns = [{
             headerName: "일자",
             field: "date",
             width: 100,
             cellClass: 'hd-grid-code',
             pinned: 'left',
             aggSum: "합계",
-            aggAvg: "평균"
+            aggAvg: "평균",
+			cellRenderer: function(params) {
+				if (params.value === '합계' || params.value === '평균') return params.value;
+				let form_data = $('form[name="search"]').serialize();
+				return `<a href="/head/order/ord01?${form_data}&date=${params.data.date || ''}" target="_blank">${params.value}</a>`;
+			}
         },
         {
             headerName: '매출액구분',
@@ -549,9 +554,12 @@
     });
     let gx;
     $(document).ready(function() {
-        @if($brand != '')
-            $("#brand_cd").select2({data:['{{ @$brand }}']??'', tags: true});
-        @endif
+		let brand_cd = "{{ @$brand->brand }}";
+		let brand_nm = "{{ @$brand->brand_nm }}";
+		if (brand_cd != '') {
+			const option = new Option(brand_nm, brand_cd, true, true);
+			$('#brand_cd').append(option).trigger('change');
+		}
 
         pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
@@ -568,11 +576,8 @@
     });
 
     function Search() {
-        //$('[name=ord_state]').val(10);
-
+	    if (!gx) return;
         let data = $('form[name="search"]').serialize();
-
-        // console.log(data);
 
         gx.Aggregation({
             "sum": "top",
@@ -615,34 +620,47 @@
 
         chart_data.forEach(function(row) {
             if (beforeRowMonth !== row.month || beforeRowMonth === null) {
-                row.chart_x_str = row.month + "." + row.day;
+                // row.chart_x_str = row.month + "." + row.day;
+				row.chart_x_str = row.day + "일";
                 beforeRowMonth = row.month;
                 return;
             }
 
-            row.chart_x_str = row.day;
+            row.chart_x_str = row.day + '일';
         });
 
-        var options = {
-            container: document.getElementById('opt_chart'),
-            title: {
-                text: "일별 매출 통계",
-            },
-            data: chart_data,
-            series: [{
-                type: 'column',
-                xKey: 'chart_x_str',
-                yKeys: ['sum_amt', 'sum_wonga'],
-                yNames: [' 매출액', '매출원가'],
-                grouped: true,
-                fills: ['#556ee6', '#2797f6'],
-                strokes: ['#556ee6', '#2797f6']
-                // highlightStyle : {
-                //   fill :
-                // }
-            }],
-        };
-        agCharts.AgChart.create(options);
+		const chart_options = {
+			container: document.getElementById('opt_chart'),
+			title: { text: "일별 매출 통계" },
+			data: chart_data,
+			theme: {
+				palette: {
+					fills: ['#556ee6', '#2797f6'],
+					strokes: ['#556ee6', '#2797f6'],
+				},
+			},
+			legend: { position: 'right' },
+			series: [
+				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_amt', yName: '매출액',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_wonga', yName: '매출원가',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+			],
+			axes: [
+				{ type: 'category', position: 'bottom', },
+				{ type: 'number', position: 'left',
+					label: { formatter: (params) => Comma(params.value) },
+					tick: { maxSpacing: 20 }
+				},
+			],
+		};
+        agCharts.AgChart.create(chart_options);
     }
 
     function drawCanvasByTime() {
@@ -652,73 +670,53 @@
     function drawCanvasByYoil() {
         $('#opt_chart').html('');
 
-        let data = [{
-                name: '일요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '월요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '화요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '수요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '목요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '금요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            },
-            {
-                name: '토요일',
-                sum_amt: 0,
-                sum_wonga: 0,
-                margin: 0
-            }
-        ];
+		let data = [
+			{name: '일요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '월요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '화요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '수요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '목요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '금요일', sum_amt: 0, sum_wonga: 0, margin: 0},
+			{name: '토요일', sum_amt: 0, sum_wonga: 0, margin: 0}
+		];
 
         chart_data.forEach(function(c_data) {
             data[c_data.yoil - 1].sum_amt += Number(c_data.sum_amt);
             data[c_data.yoil - 1].sum_wonga += Number(c_data.sum_wonga);
         });
-        // console.log(data);
-        var options = {
-            container: document.getElementById('opt_chart'),
-            title: {
-                text: "요일별 매출 통계",
-            },
-            data: data,
-            series: [{
-                type: 'column',
-                xKey: 'name',
-                yKeys: ['sum_amt', 'sum_wonga'],
-                yNames: [' 매출액', '매출원가'],
-                grouped: true,
-                fills: ['#556ee6', '#2797f6'],
-                strokes: ['#556ee6', '#2797f6']
-            }],
-        };
 
-        agCharts.AgChart.create(options);
+		const chart_options = {
+			container: document.getElementById('opt_chart'),
+			title: { text: "요일별 매출 통계" },
+			data: data,
+			theme: {
+				palette: {
+					fills: ['#556ee6', '#2797f6'],
+					strokes: ['#556ee6', '#2797f6'],
+				},
+			},
+			legend: { position: 'right' },
+			series: [
+				{ type: 'column', xKey: 'name', yKey: 'sum_amt', yName: '매출액',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+				{ type: 'column', xKey: 'name', yKey: 'sum_wonga', yName: '매출원가',
+					tooltip: {
+						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
+					}
+				},
+			],
+			axes: [
+				{ type: 'category', position: 'bottom' },
+				{ type: 'number', position: 'left',
+					label: { formatter: (params) => Comma(params.value) },
+					tick: { maxSpacing: 20 }
+				},
+			],
+		};
+		agCharts.AgChart.create(chart_options);
     }
     $("#date-tab").click(function() {
         $("#chart-type").val('date');
