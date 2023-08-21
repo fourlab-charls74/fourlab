@@ -426,6 +426,18 @@
                                                     </div>
                                                 </td>
                                             </tr>
+											<tr>
+												<th>쿠폰</th>
+												<td style="padding:0px 10px 0px 10px;">
+													<a href="#" onclick="return openCouponDetail('edit','{{$p_ord_opt->coupon_no}}');">{{$p_ord_opt->coupon_nm}}</a>
+												</td>
+												<th></th>
+												<td style="padding:0px 10px 0px 10px;">
+												</td>
+												<th></th>
+												<td style="padding:0px 10px 0px 10px;">
+												</td>
+											</tr>
                                             </tbody>
                                         </table>
                                     </div>

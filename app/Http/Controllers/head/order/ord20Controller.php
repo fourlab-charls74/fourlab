@@ -26,6 +26,7 @@ class ord20Controller extends Controller
                 a.ord_no,a.ord_opt_no,a.goods_no,a.head_desc, a.goods_nm, replace(a.goods_opt, '^', ' : ') as opt_val
                 , a.qty, a.price, a.point_amt, a.coupon_amt, a.recv_amt, a.dlv_amt
                 , a.dc_amt, a.opt_amt, 0 as pay_fee
+				, a.dc_amt, a.opt_amt, 0 as pay_fee, a.coupon_no, (select coupon_nm from coupon where coupon_no = a.coupon_no) as coupon_nm
                 , substr(IFNULL(a.head_desc, ''), 0, 12 ) as old_head_desc
                 , substr(a.goods_nm, 0, 30) as old_goods_nm
                 , a.dlv_amt + a.recv_amt + 0 as total_amt
