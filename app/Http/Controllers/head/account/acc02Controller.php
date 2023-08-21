@@ -300,7 +300,7 @@ class acc02Controller extends Controller
 				w.dlv_amt,  w.etc_amt as fee_etc_amt,
 				( sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_taxation_amt,
 				'0' as sale_net_taxfree_amt,
-				( w.sale_net_amt + w.dlv_amt + w.etc_amt ) as sale_net_amt,
+				( w.sale_net_amt + w.dlv_amt + w.etc_amt - w.coupon_apply_amt - w.clm_amt) as sale_net_amt,
 				floor(( w.sale_net_amt + w.dlv_amt )/11) as tax_amt,
 
 				/* 본사 수수료 */
