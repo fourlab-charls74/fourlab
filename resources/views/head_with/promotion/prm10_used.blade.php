@@ -23,7 +23,7 @@
             <div class="d-flex card-header justify-content-between">
                 <h4>검색</h4>
                 <div class="flax_box">
-                    <button type="button" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</button>
+					<button id="search_sbtn" onclick="Search(); return false;" class="btn btn-search btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</button>
                     <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                     <!-- 아이디 -->
                     <div class="col-lg-6 inner-td">
                         <div class="form-group">
-                            <label for="">이름</label>
+                            <label for="">아이디</label>
                             <div class="flax_box">
                                 <input type="text" name="user_id" id="user_id" class="form-control form-control-sm">
                             </div>
@@ -134,12 +134,8 @@ pApp.ResizeGrid();
 
 function Search() {
     let data = $('form[name="search"]').serialize();
-    gx.Request(`/head/promotion/prm10/search/used/${coupon_no}`, data, 1, searchCallback);
-    }
-
-    function searchCallback(data) {
-        
-    }
+    gx.Request(`/head/promotion/prm10/search/used/${coupon_no}`, data, 1);
+}
 
 $('.gift-btn').click(() => {
     openCoupon('', coupon_no);
