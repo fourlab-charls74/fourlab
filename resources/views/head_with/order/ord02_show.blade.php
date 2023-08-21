@@ -30,6 +30,7 @@
 
 		<!-- FAQ 세부 정보 -->
 		<form name="f1">
+			<input type="hidden" name="type" id="type" value="A"/>
 			<div class="card_wrap aco_card_wrap">
 				<div class="card shadow">
 					<div class="card-header mb-0">

@@ -738,6 +738,9 @@ class ord02Controller extends Controller
         $ord_state = $req->input("ord_state", "");
         $sale_place = $req->input("sale_place", "");
 
+		$point_amt_val = Lib::uncm($req->input("point_amt", ''));
+		$ord_amt_val =  Lib::uncm($req->input("ord_amt", ""));
+		$type = $req->input("type", "");
         $cart = $req->input("cart", []);
 
         $ord_amt = 0;
@@ -861,6 +864,8 @@ class ord02Controller extends Controller
 
             for ($i=0; $i < count($cart); $i++) {
 
+				$ord_opt_point_amt = 0;
+				
                 $goods_no = $cart[$i]["goods_no"];
                 $goods_sub = Lib::getValue($cart[$i],"goods_sub",0);
                 if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
@@ -947,11 +952,17 @@ class ord02Controller extends Controller
                     }
                 }
                 $add_point += $ord_opt_add_point;
-                $ord_opt_point_amt = Lib::getValue($cart[$i],"point_amt",0);
                 $ord_opt_coupon_amt = Lib::getValue($cart[$i],"coupon_amt",0);
                 $ord_opt_dc_amt = Lib::getValue($cart[$i],"dc_amt",0);
                 $ord_opt_dlv_amt = Lib::getValue($cart[$i],"dlv_amt",0);
 
+				if($type == 'A') {
+					$ord_amt = $qty * $cart[$i]["price"];
+					$ord_opt_point_amt = $point_amt_val * ( $ord_amt / $ord_amt_val);
+				} else {
+					$ord_opt_point_amt = Lib::getValue($cart[$i],"point_amt",0);
+				}
+				
                 array_push($order_opt,[
                         'goods_no' => $goods_no,
                         'goods_sub' => $goods_sub,
@@ -1017,7 +1028,7 @@ class ord02Controller extends Controller
                 'email' => $email,
                 'ord_amt' => $ord_amt,
                 'recv_amt' => $recv_amt + $dlv_amt,
-                'point_amt' => $point_amt,
+				'point_amt' => $type == 'A' ? $point_amt_val : $point_amt,
                 'coupon_amt' => $coupon_amt,
                 'dc_amt' => $dc_amt,
                 'dlv_amt' => $dlv_amt,
@@ -1043,7 +1054,7 @@ class ord02Controller extends Controller
 
             $pay_stat = 0;
             $tno = '';
-            $pay_amt = $recv_amt + $dlv_amt;
+			$pay_amt = ($type == 'A') ? $recv_amt + $dlv_amt - $point_amt_val : $recv_amt + $dlv_amt;
 
             if($p_ord_opt_no > 0){
 
@@ -1080,7 +1091,7 @@ class ord02Controller extends Controller
                 "bank_number" 	=> $bank_number,
                 "card_msg"      => $card_msg,
                 "pay_ypoint"    => 0,
-                "pay_point"     => $point_amt,
+				"pay_point"     => $type == 'A' ? $point_amt_val : $point_amt,
                 "pay_baesong"   => $dlv_amt,
                 "coupon_amt"    => $coupon_amt,
                 "dc_amt"        => $dc_amt,

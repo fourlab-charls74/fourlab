@@ -7,6 +7,7 @@
         <input type="hidden" name="ord_no" value="{{@$ord_no}}">
         <input type="hidden" name="ord_opt_no" value="{{@$ord_opt_no}}">
         <input type="hidden" name="p_ord_opt_no" id="p_ord_opt_no" value="{{@$p_ord_opt_no}}">
+		<input type="hidden" name="type" id="type" value="B"/>
         <div class="container-fluid show_layout py-3">
             <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
                 <div>
