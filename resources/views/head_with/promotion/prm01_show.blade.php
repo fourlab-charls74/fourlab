@@ -59,12 +59,12 @@
                                         <td>
                                             <div class="form-inline form-radio-box">
                                                 <div class="custom-control custom-radio">
-                                                    <input type="radio" name="use_yn" id="use_yn1" class="custom-control-input" value="Y" @if ($user->use_yn == 'Y') checked @endif>
-                                                    <label class="custom-control-label" for="use_yn1">예</label>
+													<input type="radio" name="use_yn" id="use_yn_y" class="custom-control-input" value = 'Y' @if ($user->use_yn == 'Y') checked @endif>
+													<label class="custom-control-label" for="use_yn_y">예</label>
                                                 </div>
                                                 <div class="custom-control custom-radio">
-                                                    <input type="radio" name="use_yn" id="use_yn2" class="custom-control-input" value="N" @if ($user->use_yn == 'N') checked @endif>
-                                                    <label class="custom-control-label" for="use_yn2">아니요</label>
+													<input type="radio" name="use_yn" id="use_yn_n" class="custom-control-input" value = 'N' @if ($user->use_yn == 'N') checked @endif>
+													<label class="custom-control-label" for="use_yn_n">아니요</label>
                                                 </div>
                                             </div>
                                         </td>
@@ -235,7 +235,7 @@
     }
 
     function Update(no) {
-        var frm = $('form');
+		var frm = $('form[name=store]');
         //console.log(frm.serialize());
 
         // editor value
