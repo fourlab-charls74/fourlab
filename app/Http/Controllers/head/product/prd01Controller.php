@@ -1295,7 +1295,7 @@ class prd01Controller extends Controller
 			}
 
 			// 적립금 계산 - 쇼핑몰
-			if( $point_cfg = "S" ){
+			if( $point_cfg == "S" ){
 				$point_yn	= "Y";
 				$point		= $price * $cfg_order_point_ratio / 100;
 			}
@@ -1808,7 +1808,7 @@ class prd01Controller extends Controller
 			}
 
 			// 적립금 계산 - 쇼핑몰
-			if( $point_cfg = "S" ){
+			if( $point_cfg == "S" ){
 				$point_yn	= "Y";
 				$point		= $price * $cfg_order_point_ratio / 100;
 			}
