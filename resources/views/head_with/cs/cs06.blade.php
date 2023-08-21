@@ -72,6 +72,17 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="state">환불상태</label>
+							<div class="form-inline select-box">
+								<select name='refund_state' id="refund_state" class="form-control form-control-sm w-100">
+									<option value='E'>환불대상</option>
+									<option value='F'>환불완료</option>
+								</select>
+							</div>
+						</div>
+					</div>
 				</div>
 			
 				<!-- 결제수단/주문번호-->
