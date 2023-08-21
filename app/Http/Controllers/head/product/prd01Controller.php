@@ -518,6 +518,7 @@ class prd01Controller extends Controller
 			$head_desc 		= $row['head_desc'];
 			$ad_desc 		= $row['ad_desc'];
 
+			$style_no        = Lib::Rq($row['style_no']);
 			$normal_price		= Lib::Rq($row['normal_price']);
 			$price			= Lib::Rq($row['price']);
 			$sale_price		= Lib::Rq($row['sale_price']);
@@ -662,12 +663,25 @@ class prd01Controller extends Controller
 
 				$goods = new Product($user);
 
-
+				$mod_id = $user['id'];
 				$test = DB::table('goods')->where('goods_no','=',$goods_no);
 
 				// $goods->SetGoodsNo( $goods_no );
 				$result = $goods->Edit( $goods_no, $param );
 
+				//상품 변경 로그 등록
+				$sql    = "
+                    insert into goods_modify_hist (
+                        goods_no, goods_sub, style_no, upd_date, sale_stat_cl, price, margin, wonga
+                        , head_desc, memo, id, regi_date
+                    ) values (
+                        '$goods_no', '$goods_sub', '$style_no', now(), '$sale_stat_cl', '$price', '$ed_margin_rate', '$wonga'
+                        , :head_desc, '상품정보수정', '$mod_id', now()
+                    )
+                ";
+
+				DB::insert($sql, [ 'head_desc' => Lib::quote($head_desc) ]);
+				
 				// 전시카테고리에도 반영
 				$category = new Category($user, "DISPLAY"); // user 설정 및 초기화
 				$category->SetGoodsNoSub( $goods_no, $goods_sub ); // 상품번호 설정
@@ -1295,7 +1309,7 @@ class prd01Controller extends Controller
 			}
 
 			// 적립금 계산 - 쇼핑몰
-			if( $point_cfg = "S" ){
+			if( $point_cfg == "S" ){
 				$point_yn	= "Y";
 				$point		= $price * $cfg_order_point_ratio / 100;
 			}
@@ -1808,7 +1822,7 @@ class prd01Controller extends Controller
 			}
 
 			// 적립금 계산 - 쇼핑몰
-			if( $point_cfg = "S" ){
+			if( $point_cfg == "S" ){
 				$point_yn	= "Y";
 				$point		= $price * $cfg_order_point_ratio / 100;
 			}
@@ -2027,9 +2041,9 @@ class prd01Controller extends Controller
 		$query = "
 			select
 				date_format(a.upd_date,'%y.%m.%d %h:%i:%s') as upd_date,
-				a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+				                a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, ifnull(b.name, a.id) as name
 			from goods_modify_hist a
-				inner join mgr_user b on a.id = b.id
+				left outer join mgr_user b on a.id = b.id
 			where a.goods_no = $goods_no
 			order by a.hist_no desc
 		";

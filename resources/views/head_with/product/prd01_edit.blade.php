@@ -1311,7 +1311,7 @@
                 point_cfg = "G";
             }
 
-            var point_yn		= _("#point_yn").value;
+			var point_yn        = $("#point_yn option:selected").val();
             var point_unit		= _("#point_unit").value;
             var point			= _("#point").value;
             var point_shop_rate = _("#point_shop_ratio").value;
