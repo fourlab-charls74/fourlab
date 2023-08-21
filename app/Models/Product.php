@@ -62,7 +62,7 @@ class Product
 			'admin_nm' => $this->user['name'],
 			'com_id' => $data['com_id'],
 			'ord_no' => $data['ord_no'],
-			'stock_state_date' => now(),
+			'stock_state_date' => DB::raw("date_format(now(),'%Y%m%d')"),
 			'regi_date' => now()
 		]);
 	}
@@ -964,7 +964,7 @@ class Product
 	{
 		if ($qty <= 0) return 0;
 
-		return DB::table('goods_summary')
+		$code = DB::table('goods_summary')
 			->where('goods_no', $goods_no)
 			->where('goods_sub', $goods_sub)
 			->where('goods_opt', $goods_opt)
@@ -973,6 +973,9 @@ class Product
 				'good_qty' => DB::raw("good_qty - $qty"),
 				'ut' => now()
 			]);
+
+		$this->SetSoldOut($goods_no);
+		return $code;
 	}
 
 	/*
@@ -1445,5 +1448,23 @@ class Product
 		DB::delete($sql);
 
 		return true;
+	}
+
+	public function SetSoldOut($goods_no)
+	{
+		$zero_goods = DB::table('goods_summary')
+			->where('goods_no', $goods_no)
+			->where('goods_sub', 0)
+			->where('good_qty', '>', 0)
+			->get();
+
+		if (count($zero_goods) < 1) {
+			DB::table('goods')
+				->where('goods_no', $goods_no)
+				->where('sale_stat_cl', 40)
+				->update([
+					'sale_stat_cl' => 30, // 품절처리
+				]);
+		}
 	}
 }

@@ -506,10 +506,10 @@
         {field:"dlv_no" , headerName:"송장번호", width:72  },
         {field:"state" , headerName:"처리현황", editable: true, cellStyle: editCellStyle  },
         {field:"memo" , headerName:"메모", editable: true, cellStyle: editCellStyle  },
-        {field:"ord_date" , headerName:"주문일시", width:110 },
-        {field:"pay_date" , headerName:"입금일시", width:110 },
-        {field:"dlv_end_date" , headerName:"배송일시", width:110},
-        {field:"last_up_date" , headerName:"클레임일시", width:110}
+        {field:"ord_date" , headerName:"주문일시", width:110, type: 'DateTimeType' },
+        {field:"pay_date" , headerName:"입금일시", width:110, type: 'DateTimeType' },
+        {field:"dlv_end_date" , headerName:"배송일시", width:110, type: 'DateTimeType'},
+        {field:"last_up_date" , headerName:"클레임일시", width:110, type: 'DateTimeType'}
     ];
 
 

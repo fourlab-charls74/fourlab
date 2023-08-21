@@ -861,16 +861,39 @@ class prd01Controller extends Controller
     }
 
     public function update_qty(Request $req) {
-        DB::table('goods_summary')
-            ->where([
-                'goods_no' => $req->goods_no,
-                'goods_sub' => $req->goods_sub,
-            ])
-            ->update([
-                'good_qty' => $req->qty
-            ]);
+		
+		$goods_no = $req->input('goods_no');
+		$goods_sub = $req->input('goods_sub');
+		$qty = $req->input('qty');
 
-        return response()->json(null, 201);
+		try {
+			DB::beginTransaction();
+
+			DB::table('goods_summary')
+				->where('goods_no', $goods_no)
+				->where('goods_sub', $goods_sub)
+				->update([
+					'good_qty' => $qty,
+					'ut' => now()
+				]);
+
+			if ($qty < 1) {
+				$user = [
+					'id' => Auth('head')->user()->id,
+					'name' => Auth('head')->user()->name
+				];
+
+				$jaego = new Jaego($user);
+				$jaego->SetSoldOut($goods_no);
+			}
+
+			DB::commit();
+			return response()->json($goods_no, 201);
+		} catch(Exception $e){
+			DB::rollback();
+			return response()->json(['msg' => "재고수량 변경 중 오류가 발생했습니다."], 500);
+		}
+		
     }
 
     public function update_state(Request $request)
@@ -2895,6 +2918,11 @@ class prd01Controller extends Controller
 	public function updateBasicOptsData(Request $request, $goods_no)
 	{
 		$data = $request->input("data", []);
+		$user = [
+			'id' => Auth('partner')->user()->id,
+			'name' => Auth('partner')->user()->name
+		];
+		
 		try {
 			foreach ($data as $item) {
 				$opt_price = $item["opt_price"];
@@ -2914,6 +2942,10 @@ class prd01Controller extends Controller
 					'goods_no' => $goods_no, 'goods_opt' => $goods_opt
 				]);
 			}
+
+			$jaego = new Jaego($user);
+			$jaego->SetSoldOut($goods_no);
+			
 			DB::commit();
 			return response()->json(['code' => 200, 'msg' => "저장되었습니다."]);
 		} catch (Exception $e) {
