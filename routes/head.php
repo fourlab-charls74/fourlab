@@ -848,8 +848,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
 
         Route::get('prm06', 'prm06Controller@index');
         Route::get('prm06/search', 'prm06Controller@search');
-        Route::get('prm06/search_goods/{gift_no?}', 'prm06Controller@getGoods');
-        Route::get('prm06/search_exgoods/{gift_no?}', 'prm06Controller@getExGoods');
+        Route::get('prm06/search_goods/{gift_no}', 'prm06Controller@getGoods');
+        Route::get('prm06/search_exgoods/{gift_no}', 'prm06Controller@getExGoods');
         Route::get('prm06/create', 'prm06Controller@create');
 
         Route::get('prm06/{gift_no?}', 'prm06Controller@show');

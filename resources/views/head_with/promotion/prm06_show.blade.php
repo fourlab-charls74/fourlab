@@ -391,7 +391,9 @@
 			}
 		}
 
-		Search("{{ $gift_info->apply_product }}");
+		if($("[name=gift_no]").val() !== '') {
+			Search("{{ $gift_info->apply_product }}");
+		}
 
 		$("#unlimited_yn").change(() => {
 			var chk = $('#unlimited_yn').is(":checked");
