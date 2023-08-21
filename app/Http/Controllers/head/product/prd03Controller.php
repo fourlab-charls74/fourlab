@@ -98,7 +98,17 @@ class prd03Controller extends Controller
 		$having = "";
 
         if($goods_stat != "")		$where .= " and g.sale_stat_cl = '$goods_stat' ";
-		if($style_no != "")			$where .= " and g.style_no like '$style_no%' ";
+		if( is_array($goods_stat)) {
+			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+			} else if (count($goods_stat) > 1) {
+				$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+			}
+		} else if($goods_stat != ""){
+			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+		}
+
+		if($style_no != "")            $where .= " and g.style_no like '$style_no%' ";
 		
 		$goods_no = preg_replace("/\s/",",",$goods_no);
 		$goods_no = preg_replace("/\t/",",",$goods_no);

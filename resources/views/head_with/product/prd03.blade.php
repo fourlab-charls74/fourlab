@@ -23,19 +23,15 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">상품상태</label>
-                            <div class="flax_box">
-                                <select name='goods_stat' class="form-control form-control-sm">
-                                <option value=''>전체</option>
-                                <?php
-                                    collect($goods_stats)->map(function($goods_stat) {
-                                        $selected = "";
-                                        // if ($goods_stat->code_id == 40) $selected = 'selected';
-                                        echo "<option value='" . $goods_stat->code_id . "' ${selected}>" . $goods_stat->code_val .  "</option>";
-                                    });
-                                ?>
-                                </select>
-                            </div>
+							<label for="goods_stat">상품상태</label>
+							<div class="d-flex justify-content-between align-items-center">
+								<select id="goods_stat" name='goods_stat' class="form-control form-control-sm multi_select w-100" multiple >
+									<option value=''>전체</option>
+									@foreach ($goods_stats as $goods_stat)
+										<option value='{{ $goods_stat->code_id }}'>{{ $goods_stat->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
@@ -450,5 +446,15 @@
         const url = "/head/product/prd03/wonga?goods_no=" + goods_no + "&goods_sub=" + goods_sub;
         window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=200,width=1024,height=900");
     }
+	
+		//멀티 셀렉트 박스2
+	$(document).ready(function() {
+		$('.multi_select').select2({
+			placeholder :'전체',
+			multiple: true,
+			width : "100%",
+			closeOnSelect: false,
+		});
+	});
 </script>
 @stop
