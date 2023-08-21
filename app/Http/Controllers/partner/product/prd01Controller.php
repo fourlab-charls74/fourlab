@@ -3697,9 +3697,9 @@ class prd01Controller extends Controller
 	    $query = /** @lang text */
             "
             select
-                a.upd_date, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, b.name
+                a.upd_date, a.memo, a.head_desc, a.price, a.wonga, a.margin, a.id, ifnull(b.name, a.id) as name
             from goods_modify_hist a
-                inner join mgr_user b on a.id = b.id
+				left outer join mgr_user b on a.id = b.id
             where a.goods_no = :goods_no
             order by a.hist_no desc
         ";

@@ -483,6 +483,10 @@
     }
 
     function EditProducts() {
+		if(gx.gridOptions.api.getSelectedRows().length === 0) {
+			alert('수정하실 상품을 선택해주세요.');
+			return;
+		}
         // getSelectedRows  gridOptions.api.setRowData
         var goods_nos = gx.gridOptions.api.getSelectedRows().map(function(row) {
             return row.goods_no + "_" + row.goods_sub;
