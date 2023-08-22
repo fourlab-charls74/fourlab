@@ -3739,5 +3739,30 @@ class prd01Controller extends Controller
         ]);
 	}
 
+	public function update_option_status($no, Request $request)
+	{
+		$seq = $no;
+		$required_yn = $request->input('required_yn');
+		$use_yn = $request->input('use_yn');
+		$type = $request->input('type');
+
+		try {
+			$sql = "
+                update goods_option 
+                set  required_yn = '$required_yn', use_yn = '$use_yn'
+                where 
+                    no = '$no' and type = '$type'
+            ";
+
+			$code = 200;
+			$msg = "업데이트에 성공하였습니다.";
+			DB::update($sql);
+		} catch(Exception $e){
+			$code = 500;
+			$msg = "업데이트 중 에러가 발생했습니다. 잠시 후 다시 시도 해주세요.";
+		}
+
+		return response()->json(['code' => $code, 'msg' => $msg]);
+	}
 
 }

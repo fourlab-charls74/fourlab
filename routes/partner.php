@@ -132,6 +132,7 @@ Route::group(['middleware' => 'partner', 'as' => 'partner.', 'namespace' => 'par
         Route::post('prd01/edit/save', 'prd01Controller@edit_save');
 
         Route::get('prd01/{no}', 'prd01Controller@show');
+		Route::put('prd01/{no}/update-opt-status', 'prd01Controller@update_option_status');
         Route::get('prd01/{no}/get', 'prd01Controller@get');
         Route::get('prd01/{no}/get-addinfo', 'prd01Controller@get_addinfo');
         Route::get('prd01/{no}/in-qty', 'prd01Controller@show_in_qty');

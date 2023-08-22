@@ -2624,8 +2624,18 @@
                 return "<a href='javascript:void(0)' onclick='getOptionStock("+JSON.stringify(params.data)+")'>" + params.value +"</a>";
             }
         },
-        { field: "required_yn", headerName: "필수", width:70, cellStyle:{"text-align":"center"} },
-        { field: "use_yn", headerName: "사용", width:70, cellStyle:{"text-align":"center"} },
+		{ field: "required_yn", headerName: "필수", width:70, cellStyle:{"text-align":"center"},
+			cellRenderer: (params) => {
+				params.data.status_type = 'required';
+				return "<a href='javascript:void(0)' onclick='setOptionStatus("+JSON.stringify(params.data)+")'>" + params.value +"</a>";
+			}
+		},
+		{ field: "use_yn", headerName: "사용", width:70, cellStyle:{"text-align":"center"},
+			cellRenderer: (params) => {
+				params.data.status_type = 'use';
+				return "<a href='javascript:void(0)' onclick='setOptionStatus("+JSON.stringify(params.data)+")'>" + params.value +"</a>";
+			}
+		},
         { field: "no", headerName: "no", hide:true }
     ];
 
@@ -3865,7 +3875,36 @@
 
 		window.open(`https://${url}/app/product/detail/<?php echo e(@$goods_no); ?>`, '_blank');
 	}
-	
+
+	const setOptionStatus = (param) => {
+		let data = null;
+
+		if(param.type === '기본') {
+			return;
+		}
+
+		if(param.status_type === 'required') {
+			data = { type: 'extra', 'required_yn' : param.required_yn === 'Y' ? 'N' : 'Y', 'use_yn': param.use_yn }
+		} else {
+			data = { type: 'extra', 'required_yn' : param.required_yn, 'use_yn':  param.use_yn === 'Y' ? 'N' : 'Y' }
+		}
+
+		$.ajax({
+			type: "put",
+			url: '/head/product/prd01/' + param.no + '/update-opt-status',
+			dataType: 'json',
+			data: data,
+			success: function (res) {
+				if(res.code === 200) {
+					alert('업데이트에 성공하였습니다.');
+					window.location.reload();
+				}
+			},
+			error: function(xhr, status, error) {
+				console.log(xhr.responseText);
+			}
+		});
+	}
 	</script>
 
 	<link rel="stylesheet" href="/handle/editor/summernote/summernote-lite.min.css" >
