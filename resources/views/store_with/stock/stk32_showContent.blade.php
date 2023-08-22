@@ -12,7 +12,7 @@
                     <span>/ 알림 보기</span>
                 </div>
             </div>
-            @if ($msg_type == 'pop')
+            @if ($msg_type == 'pop' || $msg_type == 'receive')
             <div class="flax_box">
                 <button type="button" onclick="msgRead()" class="btn btn-sm btn-primary shadow-sm mr-1">읽음</button>
                 <button type="button" onclick="window.close()" class="btn btn-sm btn-outline-primary shadow-sm mr-1">닫기</button>
@@ -67,7 +67,7 @@
                                                         @endforeach
                                                     </td>
                                                 </tr>
-                                            @elseif ($msg_type == 'pop')
+                                            @elseif ($msg_type == 'pop' || $msg_type == 'receive')
                                                 <tr>
                                                     <th>발신일</th>
                                                     <td>
@@ -75,7 +75,7 @@
                                                             @if($reservation_yn == 'Y')
                                                                 <span>{{@$reservation_date}}</span>
                                                             @else
-                                                                <span>{{@$rt}}</span>
+                                                                <span>{{$rt}}</span>
                                                             @endif
                                                         </div>
                                                     </td>

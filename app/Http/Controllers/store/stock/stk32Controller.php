@@ -110,6 +110,7 @@ class stk32Controller extends Controller
                     left outer join store s on s.store_cd = m.sender_cd
                 	left outer join mgr_user mu on mu.id = m.sender_cd
                 where 1=1 and md.receiver_cd = '$admin_id'
+                   and (m.reservation_yn <> 'Y' or m.reservation_date <= now())
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
                 $where
                 group by md.msg_cd
@@ -387,7 +388,7 @@ class stk32Controller extends Controller
                     md.receiver_type,
                     group_concat(md.receiver_cd separator ', ') as receiver_cd,
                     group_concat(if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name, if(md.receiver_type = 'H','본사',''))) separator ', ') as receiver_nm,
-                    if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', mu.name,if(md.receiver_type = 'G', s.store_nm, ''))) as first_receiver,
+                    if(md.receiver_type = 'S', s.store_nm, if(md.receiver_type = 'U', concat(mu.name,'(본사)'),if(md.receiver_type = 'G', s.store_nm, ''))) as first_receiver,
                     count(md.receiver_cd) as receiver_cnt,
                     m.reservation_yn,
                     m.reservation_date,
@@ -408,12 +409,13 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    -- if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
-                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
+                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', concat(mu.name,'(본사)'),'')) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
-                    md.check_yn
+                    md.check_yn,
+                    m.reservation_yn,
+                    m.reservation_date
                 from msg_store_detail md
                     left outer join msg_store m on m.msg_cd = md.msg_cd
                     left outer join store s on s.store_cd = m.sender_cd
@@ -426,7 +428,7 @@ class stk32Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                   	if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
+                   	if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', concat(mu.name,'(본사)'),'')) as sender_nm,
                     m.reservation_yn,
                     m.reservation_date,
                     s.phone as mobile,
@@ -490,6 +492,9 @@ class stk32Controller extends Controller
                 'msg_cd' => $msg_cd,
                 'content' => $res->content,
                 'sender_nm' => $result->sender_nm,
+				'reservation_yn' => $result->reservation_yn,
+				'reservation_date' => $result->reservation_date,
+				'rt' => $result->rt,
                 'store' => $store,
 				'admin_id' => $admin_id,
 				'admin_nm' => $admin_nm
@@ -534,6 +539,12 @@ class stk32Controller extends Controller
         $rm_hour = $request->input('rm_hour');
         $rm_min = $request->input('rm_min');
 		$msg_cd = $request->input('msg_cd','');
+		$reply_type = $request->input('reply_type', '');
+		
+		$msg_cd_p = "";
+		if ($reply_type != 'reply') {
+			$msg_cd_p = $msg_cd;
+		}
         
         if ($reservation_msg == 'true') {
             $reservation_yn = "Y";
@@ -550,6 +561,7 @@ class stk32Controller extends Controller
                 if($reservation_date > date("Y-m-d H:i:s")){
                     $res = DB::table('msg_store')
                     ->insertGetId([
+						'msg_cd_p' => ($reply_type != 'reply') ? '' : $msg_cd_p[0],
                         'sender_type' => 'H', //본사 : H , 매장 : S
                         'sender_cd' => $admin_id,
                         'reservation_yn' => $reservation_yn,
@@ -557,6 +569,11 @@ class stk32Controller extends Controller
                         'content' => $content,
                         'rt' => now()
                     ]);
+
+					DB::table('msg_store')
+						->insert([
+							'msg_cd_p' => $res,
+						]);
     
                     if ($check == "S") {
 						foreach ($store_cds as $sc) {
@@ -616,6 +633,7 @@ class stk32Controller extends Controller
             } else {
                 $res = DB::table('msg_store')
                     ->insertGetId([
+						'msg_cd_p' => ($reply_type != 'reply') ? '' : $msg_cd_p[0],
                         'sender_type' => 'H', // 본사 : H 매장 : S
                         'sender_cd' => $admin_id,
                         'reservation_yn' => $reservation_yn,
@@ -1139,13 +1157,23 @@ class stk32Controller extends Controller
 		$user_ids = "";
 		
 		$sql = "
-			select
-				m.sender_cd as receiver_cd, mu.name as user_nm, m.sender_type as receiver_type, m.content
-			from msg_store m
-			    inner join msg_store_detail md on md.msg_cd = m.msg_cd
-				left outer join store s on s.store_cd = md.receiver_cd
-				left outer join mgr_user mu on mu.id = m.sender_cd
-			where m.msg_cd = :msg_cd
+			 select 
+                    m.msg_cd,
+                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', concat(mu.name,'(본사)'),'')) as user_nm,
+                    s.phone as mobile,
+                    m.content,
+                    md.rt,
+                	m.sender_type as receiver_type,
+                	m.sender_cd as receiver_cd,
+                    md.check_yn,
+                    m.reservation_yn,
+                    m.reservation_date
+                from msg_store_detail md
+                    left outer join msg_store m on m.msg_cd = md.msg_cd
+                    left outer join store s on s.store_cd = m.sender_cd
+                	left outer join mgr_user mu on mu.id = m.sender_cd
+                where m.msg_cd = '$msg_cd'
+                group by md.msg_cd
 		";
 		$msg = DB::selectOne($sql, ['msg_cd' => $msg_cd]);
 		

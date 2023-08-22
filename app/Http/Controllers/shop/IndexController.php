@@ -365,6 +365,7 @@ class IndexController extends Controller
                 left outer join store s on s.store_cd = m.sender_cd
             	left outer join mgr_user mu on mu.id = m.sender_cd
             where (md.receiver_cd = '$user_store' or md.receiver_cd = '$user_id')
+              and (m.reservation_yn <> 'Y' or m.reservation_date <= now())
             and m.rt >= '$sdate' and m.rt < date_add('$edate', interval 1 day) and m.del_yn = 'N'
             group by md.msg_cd
             order by m.rt desc
