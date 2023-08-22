@@ -846,10 +846,12 @@ class prd12Controller extends Controller
             Storage::disk('public')->makeDirectory($base_path);
         }
 
+		$ext = 'jpg';
+		
         if($plan_img_url != ""){
             $image = preg_replace('/data:image\/(.*?);base64,/', '', $plan_img_url);
             preg_match('/data:image\/(.*?);base64,/', $plan_img_url, $matches, PREG_OFFSET_CAPTURE);
-            $ext = $matches[1][0];
+            //$ext = $matches[1][0];
 
             $file_name = sprintf("%s.%s", sprintf("img_%s",$plan_no),$ext);
             $save_file = sprintf("%s/%s", $base_path, $file_name);
@@ -861,7 +863,7 @@ class prd12Controller extends Controller
         if($plan_top_img_url != ""){
             $image = preg_replace('/data:image\/(.*?);base64,/', '', $plan_top_img_url);
             preg_match('/data:image\/(.*?);base64,/', $plan_top_img_url, $matches, PREG_OFFSET_CAPTURE);
-            $ext = $matches[1][0];
+            //$ext = $matches[1][0];
 
             $file_name = sprintf("%s.%s", sprintf("top_%s",$plan_no),$ext);
             $save_file = sprintf("%s/%s", $base_path, $file_name);
@@ -873,7 +875,7 @@ class prd12Controller extends Controller
         if($plan_preview_img_url != ""){
             $image = preg_replace('/data:image\/(.*?);base64,/', '', $plan_preview_img_url);
             preg_match('/data:image\/(.*?);base64,/', $plan_preview_img_url, $matches, PREG_OFFSET_CAPTURE);
-            $ext = $matches[1][0];
+            //$ext = $matches[1][0];
 
             $file_name = sprintf("%s.%s", sprintf("preview_%s",$plan_no),$ext);
             $save_file = sprintf("%s/%s", $base_path, $file_name);
