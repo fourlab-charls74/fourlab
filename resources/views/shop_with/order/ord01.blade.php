@@ -400,7 +400,7 @@
         {field: "goods_sh", headerName: "정상가", width: 85, type: "currencyType"},
         {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
         {field: "price", headerName: "현재가", width: 85, type: "currencyType"},
-        {field: "sale_kind_dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
+        {field: "sale_dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
         {field: "sale_kind_nm", headerName: "판매유형", width: 100},
         {field: "sale_kind", headerName: "판매유형", hide:true},
 		{field: "sale_price", headerName: "판매단가", width: 80, type: "currencyType"},
@@ -500,6 +500,12 @@
 				goods_sh: t.total_goods_sh,
 				goods_price: t.total_goods_price,
 				price: t.total_price,
+				wonga: t.total_wonga,
+				sale_dc_rate: t.avg_sale_dc_rate,
+				sale_price: t.total_sale_price,
+				dc_rate: t.avg_dc_rate,
+				ord_amt: t.total_ord_amt,
+				recv_amt: t.total_recv_amt,
 				dlv_amt: t.total_dlv_amt
 			}]);
 		});

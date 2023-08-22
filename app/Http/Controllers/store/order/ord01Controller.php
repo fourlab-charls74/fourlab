@@ -392,6 +392,7 @@ class ord01Controller extends Controller
                 a.price,
                 a.goods_sh,
                 a.wonga,
+				a.recv_amt,
                 a.dlv_amt,
                 a.sales_com_fee,
                 pay_type.code_val as pay_type,
@@ -406,7 +407,11 @@ class ord01Controller extends Controller
                 a.memo,
                 a.ord_date,
                 a.sale_kind,
+                (a.price - a.sale_kind_amt) as sale_price,
+                (a.qty * (a.price - a.sale_kind_amt)) as ord_amt,
                 sale_kind.code_val as sale_kind_nm,
+                a.sale_dc_rate,
+				round((1 - ((a.price - a.sale_kind_amt) / a.goods_sh)) * 100) as dc_rate,
                 a.pr_code,
                 pr_code.code_val as pr_code_nm,
                 a.pay_date,
@@ -449,6 +454,7 @@ class ord01Controller extends Controller
                     g.goods_sh,
                     g.wonga,
                     o.price,
+                    o.recv_amt,
                     o.dlv_amt,
                     o.sales_com_fee,
                     pay.pay_type,
@@ -468,7 +474,8 @@ class ord01Controller extends Controller
                     c.last_up_date,
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
-                    round((1 - (o.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / g.goods_sh) * 100) as dc_rate
+                    if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
+                    round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -521,6 +528,12 @@ class ord01Controller extends Controller
                     sum(o.qty * g.price) as total_goods_price,
                     sum(o.qty * o.price) as total_price,
                     sum(o.qty * g.goods_sh) as total_goods_sh,
+                    sum(o.qty * o.wonga) as total_wonga,
+                    round((1 - (sum(o.price) / sum(g.goods_sh))) * 100) as avg_sale_dc_rate,
+                    sum(o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) as total_sale_price,
+                    round((1 - (sum(o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) / sum(g.goods_sh))) * 100) as avg_dc_rate,
+                    sum(o.qty * (o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt))) as total_ord_amt,
+                    sum(o.recv_amt) as total_recv_amt,
                     sum(o.dlv_amt) as total_dlv_amt
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
@@ -529,6 +542,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
                 	inner join store store on store.store_cd = o.store_cd
                 where 1=1 $where
             ";
@@ -1760,7 +1774,8 @@ class ord01Controller extends Controller
                         where goods_no = g.goods_no and goods_opt = o.goods_opt
                     ), 0
                  ) as stock_qty
-                 , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+                , o.point_amt, o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+			 	, if(st.amt_kind = 'per', round(o.price * o.qty * st.sale_per / 100), st.sale_amt) * -1 as sale_kind_amt
                 , c.refund_amt, o.add_point
                 , g.is_unlimited, g.goods_type
                 , o.opt_amt, o.addopt_amt, o.dlv_comment
@@ -1777,6 +1792,7 @@ class ord01Controller extends Controller
                 left outer join code ord_kind on ord_kind.code_kind_cd = 'G_ORD_KIND' and o.ord_kind = ord_kind.code_id
                 left outer join order_opt_memo om on o.ord_opt_no = om.ord_opt_no
                 left outer join code dlv on dlv.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv.code_id
+                left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
             where o.ord_no = '$ord_no' and g.goods_type <> 'O'
             order by com_id, o.ord_opt_no desc
         ";

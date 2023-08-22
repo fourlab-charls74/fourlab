@@ -336,7 +336,7 @@ class ord01Controller extends Controller
                 (a.price - a.sale_kind_amt) as sale_price,
                 (a.qty * (a.price - a.sale_kind_amt)) as ord_amt,
                 sale_kind.code_val as sale_kind_nm,
-                a.sale_kind_dc_rate,
+                a.sale_dc_rate,
 				round((1 - ((a.price - a.sale_kind_amt) / a.goods_sh)) * 100) as dc_rate,
                 a.pr_code,
                 pr_code.code_val as pr_code_nm,
@@ -401,7 +401,7 @@ class ord01Controller extends Controller
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
                     if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
-                    round((1 - (o.price / g.goods_sh)) * 100) as sale_kind_dc_rate
+                    round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -453,6 +453,12 @@ class ord01Controller extends Controller
                     sum(o.qty * g.price) as total_goods_price,
                     sum(o.qty * o.price) as total_price,
                     sum(o.qty * g.goods_sh) as total_goods_sh,
+					sum(o.qty * o.wonga) as total_wonga,
+                    round((1 - (sum(o.price) / sum(g.goods_sh))) * 100) as avg_sale_dc_rate,
+                    sum(o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) as total_sale_price,
+                    round((1 - (sum(o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) / sum(g.goods_sh))) * 100) as avg_dc_rate,
+                    sum(o.qty * (o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt))) as total_ord_amt,
+                    sum(o.recv_amt) as total_recv_amt,
                     sum(o.dlv_amt) as total_dlv_amt
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
@@ -461,6 +467,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
+                	left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
                 where 1=1 $where
             ";
 
