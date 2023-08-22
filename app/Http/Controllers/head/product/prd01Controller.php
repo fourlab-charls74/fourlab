@@ -73,8 +73,11 @@ class prd01Controller extends Controller
 		$cfg_point_ratio = $conf->getConfigValue("point", "ratio", "0");
 
 		$sql = "select id id, name val from mgr_user where md_yn = 'Y' and use_yn = 'Y' order by name";
+		$new_product_info = "select new_product_type, new_product_day from goods where goods_no = '$goods_nos'";
 		$md_names = DB::select($sql);
 
+		$new_info = DB::selectOne($new_product_info);
+		
 		$values = [
 			'goods_nos' => $goods_nos,
 			'items' => SLib::getItems(),
@@ -86,6 +89,7 @@ class prd01Controller extends Controller
 			'dlv_fee_yn' => ['' => "==유료/무료==", 'Y' => "유료", 'N' => "무료"],
 			'point_yn' => ['' => "==지급여부==", 'Y' => "지급함", 'N' => "지급안함"],
 			'point_unit' => [''=> "단위", 'W' => "원", 'P' => "%"],
+			'new_product_info' => $new_info,
 			'dlv_due_types' => SLib::getCodes("G_DLV_DUE_TYPE"),
 			'dlv_fee' => Lib::cm($cfg_dlv_fee),
 			'free_dlv_fee_limit' => Lib::cm($cfg_free_dlv_fee_limit),
@@ -575,7 +579,7 @@ class prd01Controller extends Controller
 			$goods_location		= Lib::Rq($row['goods_location']);
 			$tags			= Lib::Rq($row['tags']);
 			$new_product_type 	= Lib::Rq($row['new_product_type']);
-			$new_product_day	= Lib::Rq($row['new_product_day']);
+			$new_product_day	= str_replace("-", "", Lib::Rq($row['new_product_day']));
 			$limited_qty_yn		= Lib::Rq($row['limited_qty_yn']);
 			$limited_min_qty	= Lib::Rq($row['limited_min_qty']);
 			$limited_max_qty	= Lib::Rq($row['limited_max_qty']);
@@ -600,6 +604,20 @@ class prd01Controller extends Controller
 				// $wonga = round($price * (1-($margin_rate/100)));
 				$wonga = $ed_wonga;
 			}
+
+			if($new_product_type === 'R') {
+				$sql = "
+                    select  
+                        date_format(reg_dm, '%Y%m%d') as reg_dm
+                    from 
+                        goods
+                    where 
+                        goods_no = '$goods_no'
+                ";
+				$result = DB::selectOne($sql);
+				$new_product_day = $result->reg_dm;
+			}
+			
 
 			$param = array(
 				"goods_nm"		=> $goods_nm,

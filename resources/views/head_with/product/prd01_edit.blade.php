@@ -532,12 +532,12 @@
                                 <label for="tags">신상품 적용일</label>
                                 <div class="form-inline form-radio-box">
                                     <div class="custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="new_product_type_y" name="new_product_type" value="R" onchange="changeNewProductType(this)"/>
-                                        <label class="custom-control-label" for="new_product_type_y" style="justify-content:left">사용함</label>
+										<input class="custom-control-input" type="radio" id="new_product_type_y" name="new_product_type" value="R" onchange="changeNewProductType(this)" {{$new_product_info->new_product_type === 'R'?  'checked': ''}}/>
+                                        <label class="custom-control-label" for="new_product_type_y" style="justify-content:left">상품 등록일</label>
                                     </div>                                        
                                     <div class="custom-control custom-radio">
-                                        <input class="custom-control-input" type="radio" id="new_product_type_n" name="new_product_type" value="M" onchange="changeNewProductType(this)"/>
-                                        <label class="custom-control-label" for="new_product_type_n">사용안함</label>
+										<input class="custom-control-input" type="radio" id="new_product_type_n" name="new_product_type" value="M" onchange="changeNewProductType(this)" {{$new_product_info->new_product_type === 'M'?  'checked': ''}}/>
+                                        <label class="custom-control-label" for="new_product_type_n">직접입력</label>
                                     </div>
                                     <div id="new_product_date" class="form-inline" style="display: none;">
                                         <div class="docs-datepicker form-inline-inner input_box" style="width: 150px">
@@ -1360,7 +1360,7 @@
             var tax_yn			 = _("#tax_yn").value;
             var goods_location	 = _("#goods_location").value;
             var tags			 = _("#tags").value;
-            var new_product_type = document.f1.new_product_type.value;
+			var new_product_type = $("input[name='new_product_type']:checked").val();
             var new_product_day	 = _("#new_product_day").value;
             var colors			 = _("#colors").value;
 
@@ -1509,10 +1509,10 @@
                 if (tags != "") row.tags = tags;
 
                 // 신상품 적용구분 & 신상품 적용일
-                if (new_product_type == "M" && new_product_day != "") {
+                //if (new_product_type == "M" && new_product_day != "") {
                     row.new_product_type = new_product_type;	// 적용구분
                     row.new_product_day = new_product_day;		// 적용일
-                }
+                //}
 
                 // 회원전용상품 - 가격적용 init
                 let apply_price;
@@ -1736,6 +1736,14 @@
 
         };
 
+		$("input[name='new_product_type']").change((e) => {
+			if(e.target.value == 'R') {
+				document.getElementById('new_product_date').style = 'display:none';
+			} else {
+				document.getElementById('new_product_date').style = 'display:block';
+			}
+		})
+		
 </script>
 
 @stop

@@ -648,11 +648,11 @@
                                                     <td>
                                                         <div class="form-inline form-radio-box flax_box txt_box">
                                                             <div class="custom-control custom-radio">
-                                                                <input type="radio" name="new_product_type" value="M" id="new_product_type1" onclick="display_new_prd_day('n')" class="custom-control-input" {{ (@$goods_info->new_product_type=="M")? "checked" : "" }} />
+																<input type="radio" name="new_product_type" value="R" id="new_product_type1" onclick="display_new_prd_day('n')" class="custom-control-input" {{ (@$goods_info->new_product_type=="R" && @$type !== 'create')? "checked" : "" }} />
                                                                 <label class="custom-control-label" for="new_product_type1">등록일 기준</label>
                                                             </div>
                                                             <div class="custom-control custom-radio mr-2">
-                                                                <input type="radio" name="new_product_type" value="R" onclick="display_new_prd_day('y')" id="new_product_type2" class="custom-control-input" {{ (@$goods_info->new_product_type=="R")? "checked" : "" }}/>
+																<input type="radio" name="new_product_type" value="M" onclick="display_new_prd_day('y')" id="new_product_type2" class="custom-control-input" {{ (@$goods_info->new_product_type=="M"  && $type !== 'create')? "checked" : "" }}/>
                                                                 <label class="custom-control-label" for="new_product_type2">직접입력</label>
                                                             </div>
                                                         </div>
@@ -1464,6 +1464,8 @@
 		@if( $type != 'create')
 			get_category_by_goods_no("display", goods_no, {{@$goods_info->goods_sub}});
 			get_category_by_goods_no("item", goods_no, {{@$goods_info->goods_sub}});
+		@else
+			$('#new_product_type1').attr('checked', 'true');
 		@endif
 
         $("#search_brand_nm").keyup(function(e){
