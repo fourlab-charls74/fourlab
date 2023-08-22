@@ -666,7 +666,13 @@
         {field: "point", headerName: "결제금액", type:"currencyType"},
         {field: "regi_date", headerName: "지급일자"},
         {field: "expire_day", headerName: "유효기간"},
-        {field: "admin_nm", headerName: "처리자"}
+		{field: "admin_nm", headerName: "처리자",
+			cellRenderer: function (params) {
+				if (params.value !== undefined) {
+					return params.data.admin_nm + ' (' + params.data.admin_id + ')';
+				}
+			}
+		}
     ];
 
     // 고객문의 탭 컬럼
