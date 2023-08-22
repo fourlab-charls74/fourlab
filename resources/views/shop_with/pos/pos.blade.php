@@ -1000,7 +1000,9 @@
 
 		pApp2.ResizeGrid(275, 400);
 		let gridDiv2 = document.querySelector(pApp2.options.gridId);
-		gx2 = new HDGrid(gridDiv2, product_columns);
+		gx2 = new HDGrid(gridDiv2, product_columns, {
+			getRowHeight: params => 50,
+		});
 
 		pApp3.ResizeGrid(275, 400);
 		let gridDiv3 = document.querySelector(pApp3.options.gridId);
@@ -1032,6 +1034,8 @@
 
         getClock();
         setInterval(getClock, 1000);
+
+		$("#search_prd_keyword_out").trigger("focus"); // 포스화면 진입 시, 검색어입력칸 포커싱
 
         // ELEMENT EVENT
         $("#search_prd_keyword_out").on("keypress", function (e) {
