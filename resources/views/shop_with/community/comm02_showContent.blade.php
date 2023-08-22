@@ -183,7 +183,7 @@
 
 		const url = `/shop/community/comm02/reply-msg?msg_cd={{$msg_cd}}`;
 		const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
-		// self.close();
+		self.close();
 		
 	}
 </script>

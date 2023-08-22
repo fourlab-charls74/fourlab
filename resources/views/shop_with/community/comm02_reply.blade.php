@@ -156,7 +156,6 @@
 			frm += "&user_ids=" + "{{ @$user_ids }}";
 			frm += "&check=" + "{{ @$check }}";
 			frm += "&reservation_msg=" + $('[name=reservation_msg]').is(":checked");
-			frm += "&reply_type=reply";
 
 			$.ajax({
 				method: 'post',
