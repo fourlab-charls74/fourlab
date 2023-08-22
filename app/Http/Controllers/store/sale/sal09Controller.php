@@ -204,9 +204,12 @@ class sal09Controller extends Controller
 		$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
 
 
-		$sql = /** @lang text */
+		$sql = 
             "
-			select s.store_nm,c.code_val as store_type_nm,a.*, b.*, p.*, ifnull(p.amt,0) as proj_amt
+			select s.store_nm,c.code_val as store_type_nm,a.*, b.*, p.*
+				, ifnull(p.amt,0) as proj_amt
+				, ifnull(a.recv_amt,0) as recv_amt
+				, (a.recv_amt / p.amt) * 100 as progress_rate
 			from store s 
 			left outer join (
 				select m.store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
@@ -241,7 +244,7 @@ class sal09Controller extends Controller
 		";
 
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
-
+		
 		return response()->json([
             "code" => 200,
             "head" => array(

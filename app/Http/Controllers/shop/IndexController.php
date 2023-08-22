@@ -343,6 +343,7 @@ class IndexController extends Controller
         $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
         $edate = date("Y-m-d");
         $user_store = Auth('head')->user()->store_cd;
+		$user_id = Auth('head')->user()->id;
 
         if ($user_store == 'L0025') {
             $receiver_type = 'H';
@@ -353,18 +354,20 @@ class IndexController extends Controller
         $sql = "
             select 
                 m.msg_cd,
-                m.sender_cd,
-                s.store_nm as sender_nm,
-                s.phone as mobile,
-                m.content,
-                md.rt,
-                md.check_yn
+				m.sender_cd,
+				if(m.sender_type = 'S', mu.name, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', mu.name,''))) as sender_nm,
+				s.phone as mobile,
+				m.content,
+				md.rt,
+				md.check_yn
             from msg_store_detail md
                 left outer join msg_store m on m.msg_cd = md.msg_cd
                 left outer join store s on s.store_cd = m.sender_cd
-            where md.receiver_type = '$receiver_type' and md.receiver_cd = '$user_store'
+            	left outer join mgr_user mu on mu.id = m.sender_cd
+            where (md.receiver_cd = '$user_store' or md.receiver_cd = '$user_id')
             and m.rt >= '$sdate' and m.rt < date_add('$edate', interval 1 day) and m.del_yn = 'N'
             group by md.msg_cd
+            order by m.rt desc
             limit 0, 10
         
         ";

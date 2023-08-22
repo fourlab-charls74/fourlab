@@ -213,10 +213,15 @@
 		{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
 		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 250 },
 		{ field: "proj_amt", headerName: "목표매출", pinned:'left', width:85, type: 'currencyType', aggregation:true },
-        { field: "progress_proj_amt", headerName: "달성율(%)", pinned:'left', width:85, type: 'percentType',
+        { field: "progress_proj_amt", headerName: "달성율(%)", pinned:'left', width:85, type: 'percentType', aggregation:true,
 			cellRenderer: function (params) {
 				if (params.node.rowPinned === 'top') {
-					return "";
+					let recv_amt = params.data.recv_amt;
+					let proj_amt = params.data.proj_amt;
+
+					let progress_rate = Math.round((recv_amt/proj_amt) * 100);
+					
+					return progress_rate;
 				} else {
 					let { proj_amt, recv_amt } = params.data;
 					/**
@@ -297,7 +302,7 @@
 		let options = {
 			getRowStyle: (params) => {
 				if (params.node.rowPinned === 'top') {
-					return { 'background': '#eee' }
+					return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
 				}
 			}
 		}

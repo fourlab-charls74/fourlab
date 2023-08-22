@@ -248,20 +248,23 @@ class IndexController extends Controller
 
 
     public function main_alarm () {
+		$user_store = Auth('head')->user()->store_cd;
+		$user_id = Auth('head')->user()->id;
 
         $sql = "
             select 
-                m.msg_cd,
-                m.sender_cd,
-                if(m.sender_type = 'S', s.store_nm, '본사') as sender_nm,
-                s.phone as mobile,
-                m.content,
-                md.rt,
-                md.check_yn
-            from msg_store_detail md
-                left outer join msg_store m on m.msg_cd = md.msg_cd
-                left outer join store s on s.store_cd = m.sender_cd
-            where md.receiver_type = 'H' and md.receiver_cd = 'HEAD' 
+				 m.msg_cd,
+				m.sender_cd,
+				if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
+				s.phone as mobile,
+				m.content,
+				md.rt,
+				md.check_yn
+			from msg_store_detail md
+				left outer join msg_store m on m.msg_cd = md.msg_cd
+				left outer join store s on s.store_cd = m.sender_cd
+				left outer join mgr_user mu on mu.id = m.sender_cd
+            where (md.receiver_cd = '$user_store' or md.receiver_cd = '$user_id')
             group by md.msg_cd
             order by md.rt desc
             limit 0, 10

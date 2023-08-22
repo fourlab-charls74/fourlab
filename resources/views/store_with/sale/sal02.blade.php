@@ -203,7 +203,7 @@
 		codes: [],
 		format: ["일", "월", "화", "수", "목", "금", "토"],
 	};
-	const pinnedRowData = [{ store_cd: '합계', offline : 0, online: 0}];
+	const pinnedRowData = [{ store_cd: '합계', progress_proj_amt : 0, offline : 0, online: 0}];
 	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0)??0;
 	var columns = [
 		{headerName: '판매채널', showRowGroup: 'store_channel', cellRenderer: 'agGroupCellRenderer', minWidth: 130, pinned: 'left'},
@@ -221,39 +221,10 @@
 		},
 		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', minWidth: 120 },
 		{ field: "proj_amt", headerName: "목표매출", pinned:'left', width:85, type: 'currencyType', aggFunc: sumValuesFunc},
-        // { field: "progress_proj_amt", headerName: "달성율(%)", pinned:'left', width:85, type: 'percentType',
-		// 	cellRenderer: function (params) {
-		// 		if (params.node.rowPinned === 'top') {
-		// 			return "";
-		// 		} else {
-		// 			let { proj_amt, recv_amt } = params.data;
-		// 			/**
-		// 			 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
-		// 			 */
-		// 			let progress = 0;
-		// 			proj_amt = toInt(proj_amt);
-		// 			recv_amt = toInt(recv_amt);
-
-		// 			// if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
-		// 			// if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
-
-		// 			progress = ( recv_amt / proj_amt ) * 100;
-		// 			progress = Comma(Math.round(progress * 1)); // 소수점 첫째짜리까지 반올림 처리
-
-		// 			if (params.data.proj_amt == 0) {
-		// 				return 0;
-		// 			}
-
-		// 			if (progress == -Infinity) progress = 0;
-
-		// 			return progress;
-		// 		}
-		// 	}
-		// },
 		{ field : "progress_proj_amt", headerName: "달성율(%)", pinned: "left", width: 85, type: "percentType",
 			cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') {
-					return "";
+					return params.data.progress_proj_amt;
 				} else if (params.data != undefined && params.node.level == 2) {
 					let proj_amt = params.data.proj_amt;
 					let recv_amt = params.data.recv_amt;
@@ -371,7 +342,6 @@
 			setAllRowGroupExpanded($("#grid_expand").is(":checked"));
 			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = d.head.total_data;
-            console.log(total_data);
 			if(pinnedRow && total_data != '') {
 				gx.gridOptions.api.setPinnedTopRowData([
 					{ ...pinnedRow.data, ...total_data }

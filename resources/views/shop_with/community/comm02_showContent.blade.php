@@ -88,7 +88,9 @@
 			</div>
 			@else
 				<div class="resul_btn_wrap mt-3 d-block">
-					<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+					@if($msg_type == 'receive')
+						<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
+					@endif
 					<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
 				</div>
 			@endif
