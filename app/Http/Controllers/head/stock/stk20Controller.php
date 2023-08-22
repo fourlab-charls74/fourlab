@@ -101,7 +101,7 @@ class stk20Controller extends Controller
         if( $qty_l != "" )		    $where .= " and s.good_qty >= '" . Lib::quote($qty_l) . "' ";
         if( $qty_h != "" )		    $where .= " and s.good_qty <= '" . Lib::quote($qty_h) . "' ";
         if( $ex_trash == "1")       $where .= " and g.sale_stat_cl <> -90";
-        if( $ex_soldout == "1")     $where .= " and s.good_qty > 0";
+		if( $ex_soldout == "1")     $where .= " and g.sale_stat_cl <> 30";
         if( is_array($goods_stat)) {
             if (count($goods_stat) == 1 && $goods_stat[0] != "") {
                 $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
@@ -118,18 +118,27 @@ class stk20Controller extends Controller
         $limit = " limit $startno, $page_size ";
 
         $page_cnt = 0;
-
+		$total_good_qty_cnt = 0;
+		$total_wonga = 0;
+		
         if($page == 1){
-            $query = /** @lang text */
-                "
-                select count(*) as total
-                from goods g 
-                    inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
+			$query = /** @lang text */
+				"
+                select 
+                    count(g.goods_no) as total,
+                    sum(ifnull(if(g.is_unlimited = 'Y', '∞', s.good_qty), 0)) as good_qty,
+                    sum(gs2.totalWonga) as total_wonga
+                from 
+                    goods g 
+                    inner join goods_summary s ON s.goods_no = g.goods_no AND s.goods_sub = g.goods_sub
+                    left outer join goods_stock gs2 ON  gs2.goods_no = s.goods_no AND gs2.goods_sub = s.goods_sub and gs2.goods_opt = s.goods_opt 
                 where 1=1 $where
 			";
             $row = DB::select($query);
             $total = $row[0]->total;
             $page_cnt=(int)(($total-1)/$page_size) + 1;
+			$total_good_qty_cnt = $row[0]->good_qty;
+			$total_wonga = $row[0]->total_wonga;
         }
 
         $goods_img_url = '';
@@ -174,7 +183,7 @@ class stk20Controller extends Controller
             from goods g inner join goods_summary s on g.goods_no = s.goods_no and g.goods_sub = s.goods_sub
                 inner join company c on c.com_id = g.com_id
                 left outer join goods_sale_recent gsr on ( s.goods_no = gsr.goods_no AND s.goods_sub = gsr.goods_sub AND s.goods_opt = gsr.goods_opt )     
-                left outer join goods_stock gs ON ( gs.goods_no = s.goods_no AND gs.goods_sub = s.goods_sub and gs.goods_opt = s.goods_opt)                          
+                inner join goods_stock gs ON ( gs.goods_no = s.goods_no AND gs.goods_sub = s.goods_sub and gs.goods_opt = s.goods_opt)                          
             where 1=1 $where
             order by $str_order_by
             $limit
@@ -297,8 +306,10 @@ class stk20Controller extends Controller
             "head" => array(
                 "total" => $total,
                 "page" => $page,
+				"total_good_qty_cnt" => $total_good_qty_cnt,
+				"total_wonga" =>  $total_wonga,
                 "page_cnt" => $page_cnt,
-                "page_total" => count($result)
+                "page_total" => count($result),
             ),
             "body" => $result
         ]);

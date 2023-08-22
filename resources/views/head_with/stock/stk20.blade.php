@@ -186,7 +186,7 @@
                                         <select name="limit" class="form-control form-control-sm">
                                             <option value="100">100</option>
                                             <option value="500">500</option>
-                                            <option value="1000">1000</option>
+											<option value="1000" selected>1000</option>
                                             <option value="2000">2000</option>
                                         </select>
                                     </div>
@@ -234,7 +234,9 @@
                 <div class="card-title mb-3">
                     <div class="filter_wrap">
                         <div class="fl_box">
-                            <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
+							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건, </h6>
+							<h6 class="m-0 font-weight-bold">총 재고수 : <span id="gd_total_qty" class="text-primary">0</span> 건, </h6>
+							<h6 class="m-0 font-weight-bold">총 원가금액 : <span id="gd_total_wonga" class="text-primary">0</span> 건</h6>
                         </div>
                         <div class="fr_box">
                             <div class="fl_inner_box">
@@ -433,7 +435,8 @@
         let options = {
             autoHeight:false,
             rowHeight:CELL_DIMENSION_SIZE,
-            getRowHeight:100
+			getRowHeight:100,
+			rollup: true
         };
         gx = new HDGrid(gridDiv, columns,options);
         //console.log(gx.gridOptions);
@@ -449,7 +452,12 @@
     function Search() {
         $('[name=search]').val(10);
         let data = $('form[name="search"]').serialize();
-        gx.Request('/head/stock/stk20/search', data, 1, function(data) {});
+		gx.Request('/head/stock/stk20/search', data, 1, function(data) {
+
+			$('#gd_total_qty').text(Comma(data.head.total_good_qty_cnt));
+			$('#gd_total_wonga').text(Comma(data.head.total_wonga));
+
+		});
         // console.log(data);
     }
 
