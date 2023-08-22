@@ -21,6 +21,11 @@ function openHeadProduct(prd_no) {
     );
 }
 
+function stockHistoryPop (url, param) {
+	const directUrl = `/head/stock/stk01/${url}?goods_opt=${param}`;
+	window.open(directUrl, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=768");
+}
+
 function openOrder(ord_no, ord_opt_no) {
     var url = "/head/order/ord01/" + ord_no;
     var order = window.open(

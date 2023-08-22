@@ -353,9 +353,13 @@
 			{field:"goods_nm" , headerName:"상품명",type:"GoodsNameType"},
 			{field:"opt_val" , headerName:"옵션"  },
 			{field:"sale_qty" , headerName:"주문수량", width:72, type: 'currencyType' },
-			{field:"qty" , headerName:"온라인재고", width:72, type: 'currencyType'},
+			{field:"qty" , headerName:"온라인재고"  , type: 'currencyType', cellRenderer: function(params) {
+					return '<a href="#" onClick="stockHistoryPop(\''+ params.data.goods_no +'\', \''+ params.data.opt_val +'\')">'+ params.value+'</a>'
+				}},
 			// 보유재고 확인요망
-			{field:"wqty" , headerName:"보유재고", width:72, type: 'currencyType'},
+			{field:"wqty" , headerName:"보유재고"  , type: 'currencyType', cellRenderer: function(params) {
+					return '<a href="#" onClick="stockHistoryPop(\''+ params.data.goods_no +'\', \''+ params.data.opt_val +'\')">'+ params.value+'</a>'
+			}},
 			{field:"price" , headerName:"판매가", width:60, type: 'currencyType'  },
 			{field:"sale_amt" , headerName:"쿠폰할인", width:72, type: 'currencyType'  },
 			{field:"gift" , headerName:"사은품", width:60  },
