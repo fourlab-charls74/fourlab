@@ -182,13 +182,21 @@ function Calc()
 			opts.push(ff["prds"]);
 		}
 		var opt_nos = "";
+		const ord_pay_type = "{{ $ord->pay_type }}";
 
-		for(var i=0;i<opts.length;i++){
-
+		for(let i=0;i<opts.length;i++){
+			let ref_amt_opt = 0;
 			var order_opt_no = opts[i].value;
 
 			if(opts[i].checked){
 
+				if(ord_pay_type == 4 && i !== 0) {
+					ref_amt_opt = 0;
+				} else {
+					let point_amt = "{{$ord->pay_point}}";
+					ref_amt_opt = -1 * point_amt;
+				}
+				
 				var amt_opt = prds[order_opt_no].price * prds[order_opt_no].qty;
 
 				// coupon_amt = dc_amt + coupon_amt
@@ -203,7 +211,7 @@ function Calc()
 				var dlv_enc_amt_opt = unComma(ff['DLV_ENC_AMT_' + order_opt_no].value);
 				var dlv_pay_amt_opt = unComma(ff['DLV_PAY_AMT_' + order_opt_no].value);
 
-				var ref_amt_opt = amt_opt - coupon_opt + dlv_amt_opt - dlv_ret_amt_opt - dlv_add_amt_opt + dlv_enc_amt_opt + dlv_pay_amt_opt;
+				ref_amt_opt += amt_opt - coupon_opt + dlv_amt_opt - dlv_ret_amt_opt - dlv_add_amt_opt + dlv_enc_amt_opt + dlv_pay_amt_opt;
 
 				refund_price += amt_opt;
 				refund_coupon += coupon_opt;
@@ -231,7 +239,8 @@ function Calc()
 
 	// 포인트
 	//var refund_point = unComma(getRadioValue(ff.refund_point));
-	var refund_point = unComma(ff.refund_point.value);
+	let refunded_amt = $("#refunded_amt").val();
+	let refund_point = refunded_amt > 0 ? 0 : unComma(ff.pay_point.value);
 
 	// 기타 금액
 	var refund_etc_gubun = getRadioValue(ff.refund_etc_gubun);
@@ -266,7 +275,7 @@ function Calc()
 	}
 
 	// 환불금액 계산
-	var refund_amt = refund_price - refund_coupon + dlv_amt - dlv_ret_amt - dlv_add_amt + dlv_enc_amt + dlv_pay_amt - refund_point - refund_etc - refund_gift;
+	let refund_amt = refund_price - refund_coupon + dlv_amt - dlv_ret_amt - dlv_add_amt + dlv_enc_amt + dlv_pay_amt - refund_point - refund_etc - refund_gift;
 
 	// 값 대입
 	ff.refund_dlv_amt.value		= Comma(dlv_amt);
@@ -783,8 +792,8 @@ function CheckGift(prd_obj, ord_opt_no)
 										<th>포인트 +</th>
 										<td>
 											<div class="form-inline inline_input_box">
-												<span>{{@$refund->refund_point_amt ? $refund->refund_point_amt : 0}}원 (포인트는 수기환원 해야 합니다.)</span>
-												<input type="hidden" name="refund_point" value="@if( $ord->pay_type == 4 )0@else{{ $refund->refund_point_amt }}@endif">
+												<span>{{@$ord->pay_point ? $ord->pay_point : 0}}원 (포인트는 수기환원 해야 합니다.)</span>
+												<input type="hidden" name="refund_point" value="@if( $ord->pay_type == 4 )0@else{{ $ord->pay_point }}@endif">
 											</div>
 										</td>
 										<th>결제 수수료 +</th>
@@ -1149,7 +1158,7 @@ function cbSave()
 
 		var refund_dlv		= unComma(ff.refund_dlv_ret_amt.value) - unComma(ff.refund_dlv_enc_amt.value) - unComma(ff.refund_dlv_pay_amt.value) - unComma(ff.refund_dlv_amt.value);
 		//var refund_point	= getRadioValue(ff.refund_point);
-		var refund_point	= unComma(ff.refund_point.value);
+		var refund_point    = unComma(ff.pay_point.value);
 
 		msg = "환불액 (" + ff.refund_amt.value + ") = ";
 		msg += " 판매가 (" + refund_price + ") ";
