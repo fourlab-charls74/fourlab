@@ -156,6 +156,7 @@ class acc05Controller extends Controller
         $cmd = $request->input('cmd', 'add');
         $store_cd = $request->input('store_cd', '');
         $sdate = $request->input('sdate', Carbon::now()->startOfMonth()->subMonth()->format("Y-m"));
+		$temp_search = $request->input('temp_search', '');
 
         // 유효성 검사
         $sql = "
@@ -197,15 +198,18 @@ class acc05Controller extends Controller
         $rows = DB::select($sql, ['sdate' => $sdate]);
 
         if (count($rows) > 0) {
-            // 이전에 등록한 자료에 원부자재정보가 포함되어 있을 경우
-            $gifts = array_reduce($rows, function($a, $c) {
-                if ($c->type === 'G') return array_merge($a, [$c]);
-                else return $a;
-            }, []); // 사은품
-            $expandables = array_reduce($rows, function($a, $c) {
-                if ($c->type === 'E') return array_merge($a, [$c]);
-                else return $a;
-            }, []); // 소모품
+			// 새로운 데이터 업로드하기 전, 임시로 조회하는 경우는 제외
+			if ($temp_search === '') {
+				// 이전에 등록한 자료에 원부자재정보가 포함되어 있을 경우
+				$gifts = array_reduce($rows, function($a, $c) {
+					if ($c->type === 'G') return array_merge($a, [$c]);
+					else return $a;
+				}, []); // 사은품
+				$expandables = array_reduce($rows, function($a, $c) {
+					if ($c->type === 'E') return array_merge($a, [$c]);
+					else return $a;
+				}, []); // 소모품
+			}
         } else {
             $sql = "
                 select r.prd_cd, p.prd_nm, p.type
@@ -325,6 +329,15 @@ class acc05Controller extends Controller
 		try {
 			DB::beginTransaction();
 
+			// 기존정보가 있을경우 삭제
+			$originals = DB::table('store_account_extra')->where('ymonth', $sdate);
+			if ($originals->count() > 0) {
+				$del_idxs = $originals->select('idx')->get();
+				$del_idxs = join(',', array_map(function ($obj) { return $obj->idx; }, $del_idxs->toArray()));
+				$originals->delete();
+				DB::table('store_account_extra_list')->where('ext_idx', $del_idxs)->delete();
+			}
+
             foreach ($data as $extra) {
                 $store_cd = $extra['store_cd'];
                 $store_info = DB::table('store')->where('store_cd', $store_cd)->where('account_yn', 'Y')->first();
@@ -355,14 +368,6 @@ class acc05Controller extends Controller
                         'prd_nm' => $prd_nm,
                         'extra_amt' => $value ?? 0,
                     ]);
-                }
-
-                // 기존정보가 있을경우 삭제
-                $originals = DB::table('store_account_extra')->where('ymonth', $ymonth)->where('store_cd', $store_cd);
-                if ($originals->count() > 0) {
-                    $del_idx = $originals->first()->idx;
-                    $originals->delete();
-                    DB::table('store_account_extra_list')->where('ext_idx', $del_idx)->delete();
                 }
 
                 // 등록

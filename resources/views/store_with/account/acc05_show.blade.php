@@ -294,7 +294,7 @@
         });
     });
 
-    function Search(applied = false, callback = null) {
+    function Search(applied = false, callback = null, temp_search = false) {
         if (applied && gx.getRows().length > 0) {
             if (!confirm("적용 시, 기존에 작성되었던 정보는 저장되지 않습니다.\n해당 판매기간을 적용하시겠습니까?")) return;
         }
@@ -303,6 +303,7 @@
         data += "&cmd=" + CMD;
 
         if (applied_store_cd !== '') data += "&store_cd=" + applied_store_cd;
+		if (!!temp_search) data += "&temp_search=true";
 
 		gx.Request('/store/account/acc05/show-search', data, -1, function(e) {
             if (e.code === 200) {
@@ -493,7 +494,7 @@
                 alert("에러가 발생했습니다. 관리자에게 문의해주세요.");
                 console.log(error);
             });
-        });
+        }, true);
     }
 
     const populateGrid = async (workbook) => {
@@ -549,24 +550,22 @@
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
-				if (item !== undefined) {
-                    let val = item.v;
-                    if (column !== 'B' && (isNaN(item.v) || item.v == '')) val = 0;
+                let val = item?.v || 0;
+                if (column !== 'B' && (isNaN(val) || val == '')) val = 0;
 
-                    if (file_type === 'S') {
-                        if (excel_columns[column] === 'G') {
-                            let p = g_types.filter(g => g.colId === column)?.[0];
-                            if (p) row[`G_${p.prd_cd}_amt`] = val;
-                        } else if (excel_columns[column] === 'E') {
-                            let p = e_types.filter(s => s.colId === column)?.[0];
-                            if (p) row[`E_${p.prd_cd}_amt`] = val;
-                        } else {
-                            row[excel_columns[column]] = val;
-                        }
+                if (file_type === 'S') {
+                    if (excel_columns[column] === 'G') {
+                        let p = g_types.filter(g => g.colId === column)?.[0];
+                        if (p) row[`G_${p.prd_cd}_amt`] = val;
+                    } else if (excel_columns[column] === 'E') {
+                        let p = e_types.filter(s => s.colId === column)?.[0];
+                        if (p) row[`E_${p.prd_cd}_amt`] = val;
                     } else {
                         row[excel_columns[column]] = val;
                     }
-				}
+                } else {
+                    row[excel_columns[column]] = val;
+                }
 			});
 
             let c_store_cd = stores.find(st => st[1] === row.store_nm)?.[0] || '';
