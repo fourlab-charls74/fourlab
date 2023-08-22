@@ -1424,3 +1424,6 @@ CREATE TABLE `indivisualization_columns` (
 	 `indiv_columns` text COMMENT '개인화 컬럼',
 	 PRIMARY KEY (`user_id`,`pid`)
 ) COMMENT='메뉴별 개인화 컬럼 테이블';
+
+alter table point_list add column `expire_day` varchar(8) DEFAULT NULL COMMENT '적립금유효기간';
+alter table point_list add column `expire_yn` varchar(1) DEFAULT NULL COMMENT '적립금유효기간여부';
