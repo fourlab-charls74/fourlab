@@ -493,11 +493,13 @@
 
 		$('.point-btn').click(function(e) {
 			var user_id = $('[name=user_id]').val();
+			var no = $('[name=no]').val();
+			var ord_no = $('[name=ord_no]').val();
+			
 			const user_ids = [];
-			user_ids.push(user_id);
+			user_ids.push(user_id + '|' + no + '|' + ord_no);
 
-			//console.log(user_ids);
-			openAddPoint(user_ids.join(','), 11);
+			openAddPoint(user_ids.join(','), 11, 'pparent');
 		});
 
 	});

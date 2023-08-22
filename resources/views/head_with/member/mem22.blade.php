@@ -388,20 +388,31 @@
 		});
 
 
-		$('.point-btn').click(function(e){
+		$('.point-btn').click( async function(e){
 			const rows = gx.getSelectedRows();
 
+			let modal_open_tnf = true;
+			
 			if (rows.length === 0) {
 				alert("메시지 보낼 유저를 선택해주세요.");
 				return;
 			}
-			const user_ids = [];
 
-			rows.forEach(function(data){
-				user_ids.push(data.user_id);
+			let user_ids = [];
+
+			await rows.forEach(function(data){
+				if(data.point_yn == 'Y') {
+					modal_open_tnf = false;
+				}
+				user_ids.push(data.user_id + '|' + data.no + '|' + data.ord_no );
 			});
-			//console.log(user_ids);
-			openAddPoint(user_ids.join(','), 11);
+			
+			if(modal_open_tnf) {
+				openAddPoint(user_ids.join(','), 11, 'parent');
+			} else {
+				alert('적립금 지급 대상 상품평을 선택해주세요.');
+				return;
+			}
 		});
 	});
 

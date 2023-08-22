@@ -11,6 +11,7 @@
     <form action="" name="search">
         <input type="hidden" name="data" value="{{$data}}">
 	    <input type="hidden" name="point_kinds" value="{{$point_kinds}}" />
+		<input type="hidden" name="open_window" value="{{$open_window}}" />
     </form>
     <div id="send-area" class="card shadow mb-3 search_cum_form">
         <div class="card-body">
@@ -67,7 +68,6 @@
                 </div>
             </div>
             <!-- 유효기간 -->
-			<!--
             <div class="row">
                 <div class="col inner-td">
                     <div class="form-group">
@@ -88,7 +88,6 @@
                     </div>
                 </div>
             </div>
-			//-->
             <!-- 주문번호 -->
             <div class="row">
                 <div class="col inner-td">
@@ -138,6 +137,7 @@ const column = [
         checkboxSelection: true,
         width:28
     },
+	{field: "no", headerName: "상품번호", hide: true},
     {field: "user_id", headerName: "아이디"},
     {field: "name", headerName: "이름"},
     {field: "point", headerName: "금액", type: 'currencyType'},
@@ -204,7 +204,7 @@ $('.apply-btn').click((e) => {
         data.point = point;
         data.comment = comment;
         data.ord_no = ord_no;
-        //data.expire_day = $("#expire_day").val().replace(/-/g, '');
+        data.expire_day = $("#expire_day").val().replace(/-/g, '');
 
         nodeRow.setData(data);
 
@@ -259,7 +259,15 @@ $('.save-btn').click(function(e){
          },
         success: function (data) {
             alert("적립되었습니다.");
-            // window.close();
+			if($('[name=open_window]').val() === 'pparent') {
+				opener.opener.Search();
+			} else if(String(parent.window.opener.location.pathname).includes('/head/member/mem01/show')) {
+				parent.window.opener.location.reload();
+			} else {
+				opener.Search();
+			}
+			
+			window.close();
         },
         error: function(request, status, error) {
             console.log("error")

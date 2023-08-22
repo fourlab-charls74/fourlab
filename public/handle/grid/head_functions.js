@@ -125,8 +125,8 @@ function openSitePop(surl, goods_no) {
  *      ex)user_id|no|ord_no,user_id|no|ord_no
  * @param {*} point_kinds
  */
-function openAddPoint(data = "", point_kinds = 1) {
-    var url = "/head/api/point?data=" + data + "&point_kinds=" + point_kinds;
+function openAddPoint(data = "", point_kinds = 1, open_window = "") {
+	var url = "/head/api/point?data=" + data + "&point_kinds=" + point_kinds + "&open_window=" + open_window;
     window.open(
         url,
         "_blank",

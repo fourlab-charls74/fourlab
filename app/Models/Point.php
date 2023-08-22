@@ -185,8 +185,8 @@ class Point
                     'point_st' => $state,
                     'point_kind' => $kind,
                     'point_status' => $point_status,
-                    //'expire_day' => $expire_day,		사용안함
-                    //'expire_yn' => $expire_yn,		사용안함
+                    'expire_day' => $expire_day,
+                    'expire_yn' => $expire_yn,
                     'regi_date' => DB::raw('now()'),
                     'point_date' => DB::raw('now()')
                 ]);

@@ -20,24 +20,25 @@ class PointController extends Controller
 		$kind = $point_kinds;
 
 		//상품후기 관련 적립금 지급
-		if ($kind === "ESTIMATE") $kind = 11;
+		//if ($kind === "ESTIMATE") $kind = 11;
 
 		//커뮤니티 관련 적립금 지급
-		if ($kind === "BBS") $kind = 12;
+		//if ($kind === "BBS") $kind = 12;
 
 		$values = [
 			'states' => SLib::getCodes('G_POINT_ST'),
 			'types' => SLib::getCodes('G_POINT_TYPE'),
 			'kind' => $kind,
 			'point_kinds' => $point_kinds,
-			'data' => $req->input('data', '')
+			'data' => $req->input('data', ''),
+			'open_window' => $req->input('open_window', '')
 		];
 
         return view( Config::get('shop.head.view') . "/common/point", $values);
     }
 
     public function search(Request $req) {
-		$kind = Request("kind", 1);
+		$kind = Request("point_kinds", 1);
 		$data = Request("data", "");
 		$datas = explode(',', $data);
 
@@ -49,7 +50,7 @@ class PointController extends Controller
 		$conf = new Conf();
 
 		// 상품 후기 관련
-		if( $kind == "ESTIMATE" ){
+		if( $kind == 11 ){
 			$point_yn = $conf->getConfigValue("point","estimate_point_yn");
 			if( $point_yn == "Y"){
 				$point = $conf->getConfigValue("point","estimate_point");
@@ -59,7 +60,7 @@ class PointController extends Controller
 		}
 
 		// 커뮤니티 관련
-		if( $kind == "BBS" ){
+		if( $kind == 12 ){
 			$comment = "커뮤니티 게시물 작성으로 인한 적립금 지급";
 		}
 
@@ -107,9 +108,9 @@ class PointController extends Controller
 			DB::beginTransaction();
 
 			foreach($datas as $data) {
-				echo 1;
+
 				list($user_id, $user_nm, $point_amt, $point_nm, $ord_no, $expire_day, $no) = explode('|', $data);
-				echo 2;
+
 				
 				$point->SetUserId($user_id);
 				if($ord_no != "") $point->SetOrdNo($ord_no);
@@ -118,7 +119,7 @@ class PointController extends Controller
 				$point->Admin( $point_amt, $point_nm, $type, $state, $expire_day);
 
 				// 상품평 적립금 지급 처리 시
-				if( $point_kinds == "ESTIMATE" ){
+				if( $point_kinds == 11 ){
 					//상품평 적립금 여부 변경
 					$sql = "
 						update goods_estimate set
@@ -130,7 +131,7 @@ class PointController extends Controller
 				}
 
 				// 커뮤니티 적립금 지급 처리 시
-				if( $point_kinds == "BBS" ){	
+				if( $point_kinds == 12 ){
 					// 커뮤니티 적립금 여부 변경
 					$sql = "
 						update board set
