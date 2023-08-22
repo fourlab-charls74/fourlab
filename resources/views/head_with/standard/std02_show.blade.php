@@ -61,7 +61,7 @@
 													<div class="txt_box flax_box">
 														<input type="password" id="pwd" name="pwd" class="mwidth form-control form-control-sm" style="width:29%; display:inline" @if ($cmd === 'addcmd') autocomplete="new-password" @elseif ($cmd == 'editcmd') value="{{ $company['pwd'] }}" @endif">
 														<div class="custom-control custom-checkbox form-check-box ml-1">
-															<input type="checkbox" id="change_pwd" name="change_pwd" class="custom-control-input" value="Y">
+															<input type="checkbox" id="change_pwd" name="change_pwd" class="custom-control-input" value="Y" @if(empty($company['com_id'])) checked @endif>
 															<label class="custom-control-label" for="change_pwd">비밀번호 변경</label>
 														</div>
 													</div>
