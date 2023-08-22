@@ -318,6 +318,7 @@ class ord01Controller extends Controller
                 a.price,
                 a.goods_sh,
                 a.wonga,
+				a.recv_amt,
                 a.dlv_amt,
                 a.sales_com_fee,
                 pay_type.code_val as pay_type,
@@ -332,7 +333,11 @@ class ord01Controller extends Controller
                 a.memo,
                 a.ord_date,
                 a.sale_kind,
+                (a.price - a.sale_kind_amt) as sale_price,
+                (a.qty * (a.price - a.sale_kind_amt)) as ord_amt,
                 sale_kind.code_val as sale_kind_nm,
+                a.sale_kind_dc_rate,
+				round((1 - ((a.price - a.sale_kind_amt) / a.goods_sh)) * 100) as dc_rate,
                 a.pr_code,
                 pr_code.code_val as pr_code_nm,
                 a.pay_date,
@@ -375,6 +380,7 @@ class ord01Controller extends Controller
                     g.goods_sh,
                     g.wonga,
                     o.price,
+                    o.recv_amt,
                     o.dlv_amt,
                     o.sales_com_fee,
                     pay.pay_type,
@@ -394,7 +400,8 @@ class ord01Controller extends Controller
                     c.last_up_date,
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
-                    round((1 - (o.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / g.goods_sh) * 100) as dc_rate
+                    if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
+                    round((1 - (o.price / g.goods_sh)) * 100) as sale_kind_dc_rate
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -1700,7 +1707,8 @@ class ord01Controller extends Controller
                         where goods_no = g.goods_no and goods_opt = o.goods_opt and store_cd = '$user_store'
                     ), 0
                  ) as stock_qty
-                 , o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+                , o.point_amt, o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+			 	, if(st.amt_kind = 'per', round(o.price * o.qty * st.sale_per / 100), st.sale_amt) * -1 as sale_kind_amt
                 , c.refund_amt, o.add_point
                 , g.is_unlimited, g.goods_type
                 , o.opt_amt, o.addopt_amt, o.dlv_comment
@@ -1717,6 +1725,7 @@ class ord01Controller extends Controller
                 left outer join code ord_kind on ord_kind.code_kind_cd = 'G_ORD_KIND' and o.ord_kind = ord_kind.code_id
                 left outer join order_opt_memo om on o.ord_opt_no = om.ord_opt_no
                 left outer join code dlv on dlv.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv.code_id
+				left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
             where o.ord_no = '$ord_no' and g.goods_type <> 'O'
             order by com_id, o.ord_opt_no desc
         ";

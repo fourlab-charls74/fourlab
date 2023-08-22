@@ -610,17 +610,23 @@
                                             $t_qty = 0;
                                             $t_price = 0;
                                             $t_coupon = 0;
+                                            $t_sale_kind = 0;
+                                            $t_use_point = 0;
                                             $t_refund_amt = 0;
                                             $t_dlv_amt = 0;
+											$t_recv_amt = 0;
                                             ?>
                                             @foreach($ord_lists as $key => $ord_list)
                                             <?php
                                             $t_point += $ord_list->add_point;
                                             $t_qty += $ord_list->wqty;
                                             $t_price += $ord_list->price * $ord_list->qty;
-                                            $t_coupon += $ord_list->coupon_amt;
+                                            $t_coupon += $ord_list->coupon_amt ?? 0;
+                                            $t_sale_kind += $ord_list->sale_kind_amt ?? 0;
+                                            $t_use_point += $ord_list->point_amt ?? 0;
                                             $t_refund_amt += $ord_list->refund_amt;
                                             $t_dlv_amt += $ord_list->dlv_amt;
+											$t_recv_amt += $ord_list->recv_amt;
                                             ?>
                                             <tr @if ($ord_list->ord_opt_no == $ord_opt_no) class="checked-goods" @endif >
                                                 <td>
@@ -659,7 +665,14 @@
                                                     <a href="#" onClick="OpenShopStockPopup('{{$ord_list->prd_cd}}', '{{$today}}' );return false;">({{@$ord_list->jaego_qty}}/{{@$ord_list->stock_qty}})</a>
                                                 </td>
                                                 <td style="text-align:right">{{number_format(@$ord_list->price)}}</td>
-                                                <td style="text-align:right">{{number_format(@$ord_list->dc_amt)}}</td>
+                                                <td style="text-align:right">
+	                                                <div class="d-flex flex-column align-items-end">
+		                                                <span>(판매유형)</span>
+		                                                <span>{{number_format(@$ord_list->sale_kind_amt ?? 0)}}</span>
+		                                                <span class="mt-3">(쿠폰)</span>
+		                                                <span>{{number_format((@$ord_list->coupon_amt ?? 0) * -1)}}</span>
+	                                                </div>
+                                                </td>
                                                 <td style="text-align:right; vertical-align:middle">{{number_format(@$ord_list->dlv_amt)}}</td>
                                                 <td style="text-align:right">{{number_format(@$ord_list->refund_amt)}}</td>
                                             </tr>
@@ -669,19 +682,19 @@
                                                 <th colspan="5"> 적립금 지급액 : {{ number_format($t_point) }}원 </th>
                                                 <th>{{number_format($t_qty)}}</th>
                                                 <th>{{number_format($t_price) }}</th>
-                                                <th>{{number_format($t_coupon) }}</th>
+                                                <th>{{number_format($t_coupon + $t_sale_kind) }}</th>
                                                 <th>{{number_format($t_dlv_amt)}}</th>
                                                 <th>{{number_format($t_refund_amt) }}</th>
                                             </tr>
                                             <tr>
                                                 <th colspan="10">
-                                                    결제금액 ({{ number_format(@$pay->pay_amt) }}) =
+                                                    결제금액 ({{ number_format($t_recv_amt) }}) =
                                                     주문금액 ({{ number_format($t_price) }}) +
                                                     결제수수료 ({{ number_format(@$pay->pay_fee) }}) +
-                                                    배송비 ({{ number_format(@$pay->pay_baesong) }}) +
-                                                    적립금사용 ({{ number_format(@$pay->pay_point)}}) +
-                                                    쿠폰사용 ({{ number_format(@$pay->coupon_amt)}}) +
-                                                    할인금액 ({{ number_format(@$pay->dc_amt) }}) +
+                                                    배송비 ({{ number_format($t_dlv_amt) }}) +
+                                                    적립금사용 ({{ number_format($t_use_point * -1)}}) +
+                                                    쿠폰사용 ({{ number_format($t_coupon * -1)}}) +
+                                                    판매할인금액 ({{ number_format($t_sale_kind) }}) +
                                                     환불금액 ({{ number_format($t_refund_amt) }}) +
                                                     할인금액 ({{ number_format($ord->tax) }})
                                                 </th>

@@ -395,23 +395,27 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "opt_val", headerName: "옵션", width: 130},
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType" ,
-            cellRenderer: function(params) {
-                    if (params.node.rowPinned === 'top') return params.value;
-                    else if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                    }
-            }
-        },
-        {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType"},
+        {field: "user_nm", headerName: "주문자(아이디)", width: 100},
+        {field: "r_nm", headerName: "수령자", width: 70},
+        {field: "goods_sh", headerName: "정상가", width: 85, type: "currencyType"},
         {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
-        {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
-        {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
-        {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "price", headerName: "현재가", width: 85, type: "currencyType"},
+        {field: "sale_kind_dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
+        {field: "sale_kind_nm", headerName: "판매유형", width: 100},
         {field: "sale_kind", headerName: "판매유형", hide:true},
-        {field: "pr_code_nm", headerName: "판매처수수료", width: 60, cellStyle: {"text-align": "center"}},
+		{field: "sale_price", headerName: "판매단가", width: 80, type: "currencyType"},
+		{field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
+		{field: "qty", headerName: "판매수량", width: 60, type: "currencyType" ,
+			cellRenderer: function(params) {
+				if (params.node.rowPinned === 'top') return params.value;
+				else if (params.value !== undefined) {
+					return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+				}
+			}
+		},
+		{field: "ord_amt", headerName: "판매금액", width: 80, type: "currencyType"},
+		{field: "recv_amt", headerName: "실결제금액", width: 80, type: "currencyType"},
+        {field: "pr_code_nm", headerName: "판매처수수료", width: 80},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
         {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
@@ -439,10 +443,10 @@
                 }
             }
         },
-        {field: "ord_date", headerName: "주문일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "pay_date", headerName: "입금일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "dlv_end_date", headerName: "배송일시", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "last_up_date", headerName: "클레임일시", width: 120, cellStyle: {'text-align': 'center'}},
+        {field: "ord_date", headerName: "주문일시", type: "DateTimeType"},
+        {field: "pay_date", headerName: "입금일시", type: "DateTimeType"},
+        {field: "dlv_end_date", headerName: "배송일시", type: "DateTimeType"},
+        {field: "last_up_date", headerName: "클레임일시", type: "DateTimeType"},
    ];
 </script>
 <script type="text/javascript" charset="utf-8">
