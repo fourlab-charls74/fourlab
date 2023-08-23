@@ -309,6 +309,7 @@
                         $('#r_zip_code').val(user.zip);
                         $('#r_addr1').val(user.addr);
                         $('#r_addr2').val(user.addr2);
+						$('#user_group').val(user.group_nm);
                         $('#give_point_y').attr("checked", true);;
 
                     } else {
@@ -486,7 +487,8 @@
                 let ord = res.ord;
                 let pay = res.pay;
                 let ord_lists = res.ord_lists;
-
+				const group = res.group;
+				
                 $("#p_ord_no").html("<a href='javascript:void(0);' onclick='return PopOrder(this);'>" + res.ord_no + "</a>");
 
                 $('#user_id').val(ord.user_id);
@@ -507,6 +509,11 @@
                 // $('#bank_code').val(pay.bank_code);
                 $('#bank_number').val(pay.bank_number);
                 $('#sale_place').val(ord.com_id);
+				$('#user_group').text(group.group_nm);
+
+				if(group.group_no === 0) {
+					$('#group_section').attr('style', 'display:none;');
+				}
                 $('#bank_inpnm').val(pay.bank_inpnm);
                 $('#bank_code').val(pay.bank_code + '_' + pay.bank_number).prop("selected",true);
                 if($('#ord_type_' +  ord.ord_type)){
@@ -639,45 +646,42 @@
      * @return {boolean}
      */
     function ChoiceGoodsNo(goods_nos){
-        for(var i=0;i<goods_nos.length;i++){
+		gx.deleteRows();
+
+		goods_nos.forEach(function(row, index) {
+			row.qty = 1;
+			row.recv_amt = row.price;
+			row.ord_amt = row.price;
+			row.dlv_amt = 0;
+			row.point_amt = 0;
+			row.coupon_amt = 0;
+			row.dc_amt = 0;
+			
             $.ajax({
                 type: "get",
-                url: '/head/product/prd01/' + goods_nos[i] + '/get',
+				url: '/head/product/prd01/' + row.goods_no + '/get',
                 contentType: "application/x-www-form-urlencoded; charset=utf-8",
                 dataType: 'json',
                 // data: {},
                 success: function(res) {
-                    qty = 1;
-                    gx.addRows([{
-                        "goods_no":res.goods_no,
-                        "goods_nm":res.goods_info.goods_nm,
-                        "style_no" : res.goods_info.style_no,
-                        "opt_val" : res.goods_info.opt_val,
-                        "qty" : qty,
-                        "price" : res.goods_info.price,
-                        "ord_amt" : res.goods_info.price * qty,
-                        "recv_amt" : res.goods_info.price * qty + res.goods_info.baesong_price,
-                        "point_amt" : 0,
-                        "coupon_amt" : 0,
-                        "dc_amt" : 0,
-                        "dlv_amt" : res.goods_info.baesong_price,
-                    }]);
-                    
                     var options = [];
-                    for(var j = 0; j < res.options.length;j++){
-                        if(res.options[j].qty > 0){
+					for (let j = 0; j < res.options.length; j++) {
+						if (res.options[j].qty > 0) {
                             options.push(res.options[j].goods_opt);
                         }
                     }
-                    _goods_options[goods_no] = options;
+					_goods_options[row.goods_no] = options;
                 },
 
                 error: function(e){
                     console.log(e.responseText);
                 }
             });
-        }
-        return true;
+			
+			gx.gridOptions.api.updateRowData({
+				'add': [row]
+			});
+		});
     }
 
     /**

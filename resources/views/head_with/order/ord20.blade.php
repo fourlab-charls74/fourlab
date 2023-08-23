@@ -169,7 +169,7 @@
                                                 <td style="padding:0px 10px 0px 10px;">
                                                     <div class="form-inline form-radio-box">
                                                         <div class="custom-control custom-radio" onclick="CheckPoint(this);">
-                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" checked class="custom-control-input">
+                                                            <input type="radio" name="give_point" id="give_point_y" value="Y" checked class="custom-control-input" checked>
                                                             <label class="custom-control-label" for="give_point_y">지급함</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
@@ -179,6 +179,27 @@
                                                     </div>
                                                 </td>
                                             </tr>
+											<tr id = "group_section">
+												<th>그룹명</th>
+												<td colspan="3" style="padding:0px 10px 0px 10px;">
+													<div class="flax_box">
+														<span name="user_group" id="user_group"></span>
+													</div>
+												</td>
+												<th>적용</th>
+												<td style="padding:0px 10px 0px 10px;">
+													<div class="form-inline form-radio-box">
+														<div class="custom-control custom-radio">
+															<input type="radio" name="group_apply" id="group_apply_y" value="Y" class="custom-control-input">
+															<label class="custom-control-label" for="group_apply_y">적용함</label>
+														</div>
+														<div class="custom-control custom-radio">
+															<input type="radio" name="group_apply" id="group_apply_n" value="N" class="custom-control-input" checked>
+															<label class="custom-control-label" for="group_apply_n">적용안함</label>
+														</div>
+													</div>
+												</td>
+											</tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -361,8 +382,9 @@
                             <div class="fl_box">
                                 <a href="#" class="m-0 font-weight-bold">상품정보</a>
                             </div>
-                            <div class="fr_box">
-                            </div>
+							<div class="fr_box">
+								<button class="btn-sm btn btn-primary change-goods-btn fs-12" onClick='window.open(`/head/product/prd01/choice?goodsCnt=${gx.getRowCount()}`, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1300,height=900"); return false;'>상품변경</button>
+							</div>
                         </div>
                     </div>
                     <div class="card-body">
