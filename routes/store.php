@@ -97,6 +97,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         
         //행사코드검색
         Route::get('sale/search_prcode', 'goods@search_prcode');
+		
+		// 사이즈코드표
+		Route::get('sizecode', 'goods@show_size_code');
+		Route::get('sizecode/download', 'goods@download_size_code');
     });
 
     // 포스

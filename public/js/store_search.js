@@ -1495,6 +1495,12 @@ $( document ).ready(function() {
     $( ".sch-baebun" ).on("click", function() {
         searchBaebun.Open();
     });
+
+	// 사이즈코드표 팝업오픈
+	$( ".top_link_btn .sizecode" ).on("click", function() {
+		let url = "/store/api/sizecode";
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=730");
+	});
 });
 
 /**

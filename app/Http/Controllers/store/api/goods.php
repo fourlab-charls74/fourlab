@@ -5,6 +5,7 @@ namespace App\Http\Controllers\store\api;
 use App\Components\SLib;
 use App\Components\Lib;
 use App\Http\Controllers\Controller;
+use App\Exports\ExcelViewExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
@@ -1220,4 +1221,43 @@ class goods extends Controller
             "body" => $result
         ]);
     }
+	
+	/** 사이즈코드표 팝업 오픈 */
+	public function show_size_code()
+	{
+		$values = $this->_get_size_code();
+		return view(Config::get('shop.store.view') . '/common/sizecode', $values);
+	}
+	
+	private function _get_size_code()
+	{
+		$size_kinds = DB::table('size_kind')->where('use_yn', 'Y')->orderBy('seq')->get();
+		$sql = "
+			select size_kind_cd, size_cd, size_seq
+				, SUBSTRING_INDEX(size_nm, '(', 1) as size_nm
+			from size
+			where use_yn = 'Y'
+			order by size_kind_cd, size_seq
+		";
+		$sizes = DB::select($sql);
+
+		for ($i = 0; $i < count($size_kinds); $i++) {
+			$kind_cd = $size_kinds[$i]->size_kind_cd;
+			$ss = array_filter($sizes, function ($s) use ($kind_cd) { return $s->size_kind_cd === $kind_cd; });
+			$size_kinds[$i]->sizes = $ss;
+		}
+
+		$max_size_cnt = array_reduce($size_kinds->toArray(), function ($a, $c) { return $a < count($c->sizes) ? count($c->sizes) : $a; }, 0);
+		return [ 'size_kinds' => $size_kinds, 'max_size_cnt' => $max_size_cnt ];
+	}
+
+	/** 사이즈코드표 다운로드 */
+	public function download_size_code()
+	{
+		$data = array_merge([ 'one_sheet_count' => -1 ], $this->_get_size_code());
+		$view_url = Config::get('shop.store.view') . '/common/sizecode_excel';
+		$keys = [ 'list_key' => 'size_kinds', 'one_sheet_count' => $data['one_sheet_count'] ];
+
+		return \Maatwebsite\Excel\Facades\Excel::download(new ExcelViewExport($view_url, $data, [], [], $keys), '사이즈코드표.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 }

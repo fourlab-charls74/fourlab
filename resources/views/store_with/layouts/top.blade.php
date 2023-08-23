@@ -13,6 +13,7 @@
                 {{--<!-- <li><a href="javascript:void(0);" class="pos" onclick="return window.open('/store/pos', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=0,left=0,width=1920,height=980');"></a></li> -->--}}
                 <li><a href="" class="history"></a></li>
                 {{--<!-- <li><a href="" class="cart"></a></li> -->--}}
+	            <li><a href="javascript:void(0);" class="sizecode"><i class="bx bx-font-size"></i></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail"></a></li>
                 <li><a href="stk31" class="notice act"></a></li>
                 <li>

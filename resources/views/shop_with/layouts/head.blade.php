@@ -18,8 +18,8 @@
         <link href="{{ URL::asset('/skin/libs/select2/select2.min.css')}}" type="text/css" rel="stylesheet" />
         <link href="{{ URL::asset('/with/css/datepicker.css')}}" type="text/css" rel="stylesheet" />
 
-        <link href="{{ URL::asset('/with/css/app.css')}}" id="app-light" rel="stylesheet" type="text/css" />
-        <link href="{{ URL::asset('/with/css/app_dark.css')}}" id="app-dark" rel="stylesheet" type="text/css" disabled />
+        <link href="{{ URL::asset('/with/css/app.css')}}?v=2023082312" id="app-light" rel="stylesheet" type="text/css" />
+        <link href="{{ URL::asset('/with/css/app_dark.css')}}?v=2023082312" id="app-dark" rel="stylesheet" type="text/css" disabled />
 
         @if (env('GRID_LICENSE') != "")
             <script src="/handle/grid/ag-grid/enterprise/dist/ag-grid-enterprise.min.js"></script>
