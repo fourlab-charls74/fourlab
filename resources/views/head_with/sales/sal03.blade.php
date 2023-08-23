@@ -248,6 +248,19 @@
     </div>
 </form>
 
+<!-- 차트 -->
+<div class="card shadow mb-1" id="chart_area">
+	<div class="card-body">
+		<input type="hidden" id="chart-type" value="date">
+		<ul class="nav nav-tabs" id="myTab" role="tablist">
+			<li class="nav-item" role="presentation">
+				<a class="nav-link active" id="date-tab" data-toggle="tab" href="#home" role="tab" aria-controls="date" aria-selected="true">월별</a>
+			</li>
+		</ul>
+		<div id="opt_chart" style="height: 100%; min-height:300px;"></div>
+	</div>
+</div>
+
 <!-- DataTales Example -->
 <div id="filter-area" class="card shadow-none mb-4 ty2 last-card">
     <div class="card-body shadow">
@@ -256,8 +269,14 @@
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
-                <div class="fr_box flax_box">
-                </div>
+				<div class="fr_box flax_box">
+					<div class="fr_box flax_box">
+						<div class="custom-control custom-checkbox form-check-box">
+							<input type="checkbox" class="custom-control-input" name="view_chart" id="view_chart" checked>
+							<label class="custom-control-label" for="view_chart">차트보기</label>
+						</div>
+					</div>
+				</div>
             </div>
         </div>
         <div class="table-responsive">
@@ -279,6 +298,7 @@
         </ul>
     </div>
 </div>
+<script src="https://unpkg.com/ag-charts-community@8.0.3/dist/ag-charts-community.min.js"></script>
 <script language="javascript">
     var columns = [{
             headerName: "일자",
@@ -397,7 +417,7 @@
                 },
             ]
         },
-        {
+       /* {
             headerName: '비용',
             children: [
                 {
@@ -448,7 +468,7 @@
                     aggregation: true
                 },
             ]
-        },
+        },*/
         {
             headerName: '판매',
             children: [{
@@ -575,6 +595,7 @@
     const pApp = new App('', {
         gridId: "#div-gd",
     });
+	let gx;
 
     $(document).ready(function() {
         pApp.ResizeGrid(300);
@@ -607,7 +628,103 @@
             "sum": "top",
             "avg": "top"
         });
-        gx.Request('/head/sales/sal03/search', data);
+		
+		gx.Request('/head/sales/sal03/search', data, -1, function(data) {
+			drawCanvasByMonth();
+		});
     }
+
+
+	function drawCanvasByMonth() {
+
+		$.ajax({
+			method: 'get',
+			url: '/head/sales/sal03/chart-data/search',
+			data: $('form[name="search"]').serialize(),
+			success: function (res) {
+				$('#opt_chart').html('');
+				chart_data = res.chart_data;
+
+				chart_data.forEach(function(element, index) {
+					element.wonga = Number(element.wonga);
+					element.swonga = Number(element.swonga);
+					element.profit = Number(element.profit);
+				});
+
+				const chartOption = {
+					container: document.getElementById('opt_chart'),
+					autoSize: true,
+					data: chart_data.sort(function(a, b) {
+						if (a.month < b.month) {
+							return -1;
+						}
+						if (a.month > b.month) {
+							return 1;
+						}
+
+						return 0;
+					}),
+					theme: {
+						palette: {
+							fills: ['#c16068', '#a2bf8a', '#80a0c3'],
+							strokes: ['#c16068', '#a2bf8a', '#80a0c3'],
+						},
+						overrides: {
+							column: { series: { strokeWidth: 5 } },
+							line: { series: { strokeWidth: 5, marker: { enabled: false } } },
+						},
+					},
+					title: {
+						text: '월별 매출 통계',
+					},
+					series: [
+						{
+							type: 'column',
+							xKey: 'month',
+							yKey: 'swonga',
+							yName: '매출액',
+						},
+						{
+							type: 'column',
+							xKey: 'month',
+							yKey: 'wonga',
+							yName: '매출원가',
+						},
+						{
+							type: 'line',
+							xKey: 'month',
+							yKey: 'profit',
+							yName: '매출이익',
+						},
+					],
+					legend: {
+						item: {
+							marker: {
+								shape: 'square',
+								strokeWidth: 0,
+							},
+						},
+					},
+					axes: [
+						{ type: 'category', position: 'bottom' },
+						{ type: 'number', position: 'left',
+							label: { formatter: (params) => Comma(params.value) },
+							tick: { maxSpacing: 30 }
+						},
+					],
+				};
+
+				var chart = agCharts.AgChart.create(chartOption);
+			},
+			error: function(request, status, error) {
+				console.log("error")
+			}
+		});
+	}
+
+	$('#view_chart').change(() => {
+		$('#chart_area').toggle();
+		//drawCanvasByMonth();
+	});
 </script>
 @stop

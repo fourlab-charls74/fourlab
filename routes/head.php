@@ -1003,7 +1003,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         //월별 매출 통계
         Route::get('sal03', 'sal03Controller@index');
         Route::get('sal03/search', 'sal03Controller@search');
-
+		Route::get('sal03/chart-data/search', 'sal03Controller@search_chart');
+		
         //상품별 매출 통계
         Route::get('sal04', 'sal04Controller@index');
         Route::get('sal04/search', 'sal04Controller@search');
