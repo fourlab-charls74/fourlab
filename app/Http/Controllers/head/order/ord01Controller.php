@@ -3170,4 +3170,40 @@ class ord01Controller extends Controller
 
 		return response()->json([ 'code' => $code, 'msg' => $msg, 'account_etcs' => $rows ], $code);
 	}
+
+	function copy_parent_tno(Request $request){
+		$ord_no = $request->input("ord_no", '');
+		$ord_opt_no = $request->input("ord_opt_no", 0);
+		$pay_type = $request->input("pay_type", 0);
+		$tno = $request->input("tno");
+
+		if($tno == ""){
+			$sql = "
+                select p.tno,p.pay_type,p.pay_stat,p.pay_amt
+                from order_opt o inner join payment p on o.ord_no = p.ord_no
+                where ord_opt_no = (
+                    select p_ord_opt_no
+                    from order_opt
+                    where ord_opt_no = '$ord_opt_no'
+                )
+            ";
+
+			$rows = DB::select($sql);
+
+			foreach($rows as $row){
+				$ptno = $row->tno;
+				$ppay_type = $row->pay_type;
+				$ppay_stat = $row->pay_stat;
+				$ppay_amt = $row->pay_amt;
+
+				if(((int)$pay_type & (int)$ppay_type) == $pay_type || ((int)$pay_type & (int)$ppay_type) == $ppay_type){
+					$sql = "
+                        update payment set tno = '$ptno', pay_stat = '$ppay_stat', pay_amt = '$ppay_amt'
+                        where ord_no = '$ord_no'
+                    ";
+					DB::update($sql);
+				}
+			}
+		}
+	}
 }
