@@ -212,21 +212,29 @@
     // grid 내 값 변경 시 각종금액 수정
     function EditAmt(params) {
         if (params.oldValue !== params.newValue) {
-            let rowNode = params.node;
-            let qty = params.data.qty;
-            let price = parseInt(params.data.price);
+			let data = params.data;
+            let qty = data.qty;
+            let price = parseInt(data.price);
+			
+			if (params.column.colId === 'sale_type' && data.sale_type !== '') {
+				let goods_price = parseInt(data.goods_price);
+				let sale_type = sale_types.filter(st => st.sale_type_nm === data.sale_type)[0] || {};
+				let sale_type_dc_amt = sale_type.amt_kind === 'per' ? (goods_price * sale_type.sale_per / 100) : (sale_type.sale_amt || 0) * 1;
+				price = goods_price - sale_type_dc_amt;
+			}
 
             let ord_amt = qty * price;
-            let point_amt = params.data.point_amt;
-            let coupon_amt = params.data.coupon_amt;
-            let dc_amt = params.data.dc_amt;
-            let dlv_amt = params.data.dlv_amt;
+            let point_amt = data.point_amt;
+            let coupon_amt = data.coupon_amt;
+            let dc_amt = data.dc_amt;
+            let dlv_amt = data.dlv_amt;
             let pay_fee = 0;
             let recv_amt = ord_amt - point_amt - coupon_amt - dc_amt + pay_fee;
 
+			params.data.price = price;
             params.data.ord_amt = ord_amt;
             params.data.recv_amt = recv_amt;
-            gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
+            gx.gridOptions.api.redrawRows({ rowNodes: [ params.node ] });
 
             EditAmtTable();
         }
@@ -287,6 +295,11 @@
             coupon_amt: 0,
             dc_amt: 0,
             dlv_amt: 0,
+	        sale_type: '',
+	        sale_kind_cd: '',
+	        pr_code: '',
+	        pr_code_cd: '',
+	        memo: '',
         }));
         gx.addRows(goods_list);
         EditAmtTable();

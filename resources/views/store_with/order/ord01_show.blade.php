@@ -432,21 +432,60 @@
     </form>
 </div>
 
+<script type="text/javascript">
+	const sale_types = <?= json_encode(@$sale_kinds) ?>;
+	const pr_codes = <?= json_encode(@$pr_codes) ?>;
+</script>
+
 <!-- script -->
 @include('store_with.order.ord01_js')
-<script language="javascript">
+<script type="text/javascript">
     let columns = [
         {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},
         {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 400, wrapText: true, autoHeight: true},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 200, wrapText: true, autoHeight: true},
         {field: "goods_opt", headerName: "옵션", width: 130},
-        {field: "goods_price", headerName: "판매단가", width: 60, type: 'currencyType'},
-        {field: "price", headerName: "판매가", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
         {field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType'},
         {field: "store_wqty", headerName: "매장재고", width: 60, type: 'currencyType'},
+		{field: "goods_price", headerName: "현재가", width: 60, type: 'currencyType'},
         {field: "qty", headerName: "수량", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
-        {field: "ord_amt", headerName: "주문액", width: 60, type: 'currencyType'},
+		{field: "pr_code", headerName: "판매처수수료", width: 80, editable: true, cellClass: 'hd-grid-edit',
+			onCellValueChanged: function (params) {
+				if (params.oldValue !== params.newValue) {
+					let pr_code = pr_codes.filter(st => st.code_val === params.newValue)[0];
+					params.data.pr_code_cd = pr_code?.code_id || '';
+				}
+			},
+			cellEditorSelector: function(params) {
+				return {
+					component: 'agRichSelectCellEditor',
+					params: {
+						values: pr_codes.map(s => s.code_val)
+					},
+				};
+			},
+		},
+		{field: "sale_type", headerName: "판매유형", width: 120, editable: true, cellClass: 'hd-grid-edit',
+			onCellValueChanged: function (params) {
+				if (params.oldValue !== params.newValue) {
+					let sale_type = sale_types.filter(st => st.sale_type_nm === params.newValue)[0];
+					params.data.sale_kind_cd = sale_type?.code_id || '';
+				}
+				EditAmt(params);
+			},
+			cellEditorSelector: function(params) {
+				return {
+					component: 'agRichSelectCellEditor',
+					params: {
+						values: sale_types.map(s => s.sale_type_nm)
+					},
+				};
+			},
+		},
+		{field: "price", headerName: "판매단가", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
+        {field: "ord_amt", headerName: "판매금액", width: 60, type: 'currencyType'},
+		{field: "memo", headerName: "메모", width: 200, editable: true, cellClass: 'hd-grid-edit'},
         {field: "point_amt", headerName: "(-)적립금", width: 60, type: 'currencyType', hide:true
             // editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt
         },
@@ -480,6 +519,14 @@
                 },
             });
         }
+
+		let store_cd = "{{ @$head_store->store_cd }}";
+		let store_nm = "{{ @$head_store->store_nm }}";
+
+		if (store_cd != '') {
+			const option = new Option(store_nm, store_cd, true, true);
+			$('#store_no').append(option).trigger('change');
+		}
     });
 </script>
 @stop

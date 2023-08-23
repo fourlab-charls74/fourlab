@@ -11,7 +11,7 @@
 		<tr>
 			<th style="vertical-align: middle; font-size: 15px; font-weight: bold; width: 120px; height: 35px; border: 1px solid lightgrey; background-color: #f2f2f2;">{{ $kind->size_kind_nm }}</th>
 			@foreach($kind->sizes as $size)
-				<td style="text-align: center; vertical-align: middle; font-size: {{ strlen($size->size_nm) > 4 ? '14px' : '18px' }}; width: 70px; height: 35px; border: 1px solid lightgrey; text-align: center;">{{ $size->size_nm }}</td>
+				<td style="text-align: center; vertical-align: middle; font-size: {{ strlen($size->size_nm) > 6 ? '14px' : '18px' }}; width: 70px; height: 35px; border: 1px solid lightgrey; text-align: center;">{{ $size->size_nm }}</td>
 			@endforeach
 			@if ($max_size_cnt - count($kind->sizes) > 0)
 				@foreach(range(1, $max_size_cnt - count($kind->sizes)) as $i)
