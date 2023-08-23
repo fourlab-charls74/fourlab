@@ -32,6 +32,7 @@ class sal04Controller extends Controller
 
     public function search(Request $request)
     {
+		set_time_limit(0);
 
         $sdate = str_replace("-", "", $request->input('sdate', Carbon::now()->sub(1, 'month')->format('Ymd')));
         $edate = str_replace("-", "", $request->input('edate', date("Ymd")));
