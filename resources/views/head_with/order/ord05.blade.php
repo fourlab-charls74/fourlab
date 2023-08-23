@@ -415,7 +415,6 @@
 			headerName: "결제상태",
 			width: 72,
 			cellStyle: StyleFontOrdState,
-
 			cellRenderer: function(params) {
 				if (params.value == "예정") {
 					if (params.data.confirm_amt != null && params.data.confirm_amt != "" && params.data.confirm_amt > 0 && changeAmt != params.data.confirm_amt) {
@@ -427,10 +426,7 @@
 					return params.value;
 				}
 			}
-
 		},
-
-
 		{
 			field: "user_nm",
 			headerName: "주문자(아이디)",
@@ -453,6 +449,7 @@
 			headerName: "입금자",
 			width: 60,
 			cellStyle: StyleBgOrdState,
+			onCellValueChanged: editEvent,
 			editable: true,
 		},
 		{
@@ -462,7 +459,7 @@
 			cellStyle: StyleBgOrdState,
 			editable: true,
 			type: 'currencyType',
-			onCellValueChanged: EditAmt
+			onCellValueChanged: editEvent
 		},
 		{
 			field: "card_msg",
@@ -555,20 +552,36 @@
 	});
 
 
-	function EditAmt(params) {
-		/*
-		신규 기능으로 주석처리
-
+	function editEvent(params) {
 		if (params.oldValue !== params.newValue) {
-			changeAmt = params.oldValue;
-			var rowNode = params.node;
-			rowNode.setSelected(true);
+			row = params.data;
+			const column_name = params.column.colId;
 
-			gx.gridOptions.api.redrawRows({rowNodes:[rowNode]});
-			gx.gridOptions.api.refreshCells({rowNodes:[rowNode]});
-			gx.gridOptions.api.setFocusedCell(rowNode.rowIndex, params.colDef.field);
+			switch (column_name) {
+				case "confirm_amt":
+					if (isNaN(params.newValue) == true) {
+						alert("숫자만 입력가능합니다.");
+						params.node.setDataValue('confirm_amt', 0);
+						return;
+					}
+
+					if ((Number(params.newValue) != 0 && params.newValue !== "" && params.newValue !== null)) {
+						$(`#check_ordNo_${row.ord_no}`).prop("checked", true);
+					} else {
+						$(`#check_ordNo_${row.ord_no}`).prop("checked", false);
+					}
+					break;
+				case "bank_inpnm":
+					if (String(params.newValue) !== "" && ((Number(row.confirm_amt) != 0 && row.confirm_amt !== "" && row.confirm_amt !== null))) {
+						$(`#check_ordNo_${row.ord_no}`).prop("checked", true);
+					} else {
+						$(`#check_ordNo_${row.ord_no}`).prop("checked", false);
+					}
+					break;
+				default:
+					break;
+			}
 		}
-		*/
 	}
 
 	function isNumber(s) {
@@ -929,9 +942,8 @@
 			}
 		});
 
-		//if( bank_number == "" || bank_inpnm == "" || ( confirm_amt == 0 || confirm_amt == "" || confirm_amt == null ) )
-		if (rowNode.bank_inpnm == "" || (rowNode.confirm_amt == 0 || rowNode.confirm_amt == "" || rowNode.confirm_amt == null)) {
-			$(`#check_ordNo_${ord_no}`).prop("checked", false);
+		if (String(rowNode.bank_inpnm) === "" || (Number(rowNode.confirm_amt) === 0 || rowNode.confirm_amt === "" || rowNode.confirm_amt === null)) {
+			$(`#check_ordNo_${rowNode.ord_no}`).prop("checked", false);
 		}
 	}
 
