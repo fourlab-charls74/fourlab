@@ -23,7 +23,7 @@
     <div class="card_wrap aco_card_wrap">
         <div class="card shadow">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
-                <a href="#">매장마진정보 변경내역 ({{ @$pr_code->pr_code_cd }}-{{ @$pr_code->pr_code_nm }})</a>
+                <a href="#">판매처수수료 변경내역 ({{ @$pr_code->pr_code_cd }}-{{ @$pr_code->pr_code_nm }})</a>
                 <div>
                     <button type="button" onclick="addData();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 추가</button>
                     <button type="button" onclick="removeData();" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bx bx-trash"></i> 삭제</button>
@@ -67,7 +67,7 @@
                 return params.data.use_yn === "A" ? `<input type="date" class="grid-date" value="${params.value ?? ''}" readonly />` : params.data.edate;
             }
         },
-        {field: "store_fee", headerName: "매장수수료(%)", width: 120, type: "percentType", 
+        {field: "store_fee", headerName: "수수료(%)", width: 120, type: "percentType", 
             cellStyle: function(params) {
                 return {"background-color": params.data.use_yn === "A" ? "#ffff99" : ""};
             }, 

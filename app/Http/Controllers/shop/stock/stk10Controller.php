@@ -64,11 +64,13 @@ class stk10Controller extends Controller
 
     public function search(Request $request)
     {
-        $r = $request->all();
-
-		$code = 200;
-		$where = "";
-        $orderby = "";
+		$r	= $request->all();
+		
+		//로그인한 아이디의 매칭된 매장을 불러옴
+		$user_store	= Auth('head')->user()->store_cd;
+		$code		= 200;
+		$where		= " and psr.store_cd = '" . Lib::quote($user_store) . "' ";
+		$orderby	= "";
 
         // where
         $sdate = str_replace("-", "", $r['sdate'] ?? now()->sub(1, 'week')->format('Ymd'));
