@@ -151,7 +151,58 @@
                     </div>
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-12 inner-td">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">판매유형</label>
+							<div class="form-inline inline_select_box">
+<!--								<div class="form-inline-inner input-box w-75">
+									<div class="flax_box">
+										<select name='sale_place' class="form-control form-control-sm" style="width: 95%">
+											<option value=''>전체</option>
+											@foreach ($sale_places as $sale_place)
+												<option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
+											@endforeach
+										</select>
+									</div>
+								</div>-->
+								<div class="form-inline-inner input-box w-25">
+									<div class="form-inline form-check-box">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" name="mobile_yn" id="mobile_yn" value = "">
+											<label class="custom-control-label" for="mobile_yn">모바일</label>
+										</div>
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" name="app_yn" id="app_yn" value = "">
+											<label class="custom-control-label" for="app_yn">앱</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">업체</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner input-box w-25 pr-1">
+									<select id="com_type" name="com_type" class="form-control form-control-sm w-100">
+										<option value="">전체</option>
+										@foreach ($com_types as $com_type)
+											<option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+								<div class="form-inline-inner input-box w-75">
+									<div class="form-inline inline_btn_box">
+										<input type="hidden" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%">
+										<select id="com_cd" name="com_cd" class="form-control form-control-sm select2-company" style="width:100%;"></select>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
@@ -542,6 +593,16 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
+		if($('#mobile_yn').is(':checked')) {
+			$('#mobile_yn').val('Y');
+
+		}
+
+		if($('#app_yn').is(':checked')) {
+			$('#app_yn').val('Y');
+
+		}
+		
         gx.Aggregation({
             "sum": "top",
             "avg": "top"
