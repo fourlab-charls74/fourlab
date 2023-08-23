@@ -441,12 +441,6 @@ class comm02Controller extends Controller
         $rm_hour = $request->input('rm_hour');
         $rm_min = $request->input('rm_min');
 		$msg_cd = $request->input('msg_cd','');
-		$reply_type = $request->input('reply_type', '');
-		
-		$msg_cd_p = "";
-		if ($reply_type != 'reply') {
-			$msg_cd_p = $msg_cd;
-		}
 		
         if ($reservation_msg == 'true') {
             $reservation_yn = "Y";
@@ -459,11 +453,31 @@ class comm02Controller extends Controller
         try {
             DB::beginTransaction();
 
+			if ($msg_cd != '') {
+				$sql = "
+					select
+						msg_cd
+						, msg_cd_p
+					from msg_store
+					where msg_cd = $msg_cd
+				";
+				$res = DB::selectOne($sql);
+				
+				if ($res->msg_cd_p == '') {
+					$msg_cd_p = $res->msg_cd;
+				} else {
+					$msg_cd_p = $res->msg_cd_p;
+				}
+				
+			} else {
+				$msg_cd_p = '';
+			}
+			
             if ($reservation_msg == 'true'){
                 if($reservation_date > date("Y-m-d H:i:s")){
                     $res = DB::table('msg_store')
                     ->insertGetId([
-						'msg_cd_p' => ($reply_type != 'reply') ? '' : $msg_cd_p[0],
+						'msg_cd_p' => $msg_cd_p,
                         'sender_type' => 'S', //본사 : H , 매장 : S
                         'sender_cd' => $sender_cd??$admin_id,
                         'reservation_yn' => $reservation_yn,
@@ -530,7 +544,7 @@ class comm02Controller extends Controller
             } else {
                 $res = DB::table('msg_store')
                     ->insertGetId([
-						'msg_cd_p' => ($reply_type != 'reply') ? '' : $msg_cd_p[0],
+						'msg_cd_p' => $msg_cd_p,
                         'sender_type' => 'S', //본사 : H, 매장 : S
                         'sender_cd' => $sender_cd,
                         'reservation_yn' => $reservation_yn,
