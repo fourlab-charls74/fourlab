@@ -30,7 +30,7 @@
                         초
                     </div>
                     <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm pl-2 mx-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    <a href="#" onclick="formReset()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
+					<a href="#" onclick="initSearch()" class="d-none search-area-ext d-sm-inline-block btn btn-sm btn-outline-primary mr-1 shadow-sm">검색조건 초기화</a>
                     <div class="btn-group dropleftbtm mr-1">
                         <button type="button" class="btn btn-primary waves-light waves-effect dropdown-toggle btn-sm pr-1" data-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
@@ -414,15 +414,16 @@
                         </div>
                     </div>
                     <!-- end col -->
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="name">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="s_brand_cd" name="s_brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">브랜드</label>
+							<div class="form-inline inline_btn_box">
+								<input type="hidden" class="form-control form-control-sm search-all sch-brand" name="brand" id="brand_nm" value="" style="width:100%;">
+								<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
                     <!-- end col -->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
