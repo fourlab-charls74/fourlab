@@ -731,6 +731,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('ord01/search', 'ord01Controller@search');
         Route::delete('ord01', 'ord01Controller@del_order'); // 출고 전 주문삭제
         Route::get('ord01/create', 'ord01Controller@create');
+        Route::get('ord01/store/{store_cd?}', 'ord01Controller@search_store_info');
         Route::get('ord01/view', 'ord01Controller@view');
         Route::post('ord01/save', 'ord01Controller@save');
         Route::get('ord01/batch-create', 'ord01Controller@batch_create');
