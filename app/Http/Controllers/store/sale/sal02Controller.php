@@ -171,7 +171,7 @@ class sal02Controller extends Controller
 					count(t.store_nm) as total
 					, sum(t.proj_amt) as proj_amt
 					, sum(t.recv_amt) as recv_amt
-			     	, round(sum(t.proj_amt) / sum(t.recv_amt) * 100, 0) as progress_proj_amt
+			     	, round(sum(t.recv_amt) / sum(t.proj_amt) * 100, 0) as progress_proj_amt
 					, sum(t.qty) as qty
 					, sum(t.ord_amt) as ord_amt
 					${total_sum}
