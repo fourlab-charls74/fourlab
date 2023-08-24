@@ -422,9 +422,9 @@ class stk30Controller extends Controller
                 ) as size
                 , if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1 as qty
                 , g.price
-                , (g.price * srp.return_qty * -1) as total_price
+                , (g.price * if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1) as total_price
 			 	, round(g.price / 1.1) as return_price
-			 	, round(g.price / 1.1 * srp.return_qty * -1) as total_return_price
+			 	, round(g.price / 1.1 * if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1) as total_return_price
 				, s.store_nm
 				, s.addr1
 				, s.addr2
