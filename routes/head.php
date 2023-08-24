@@ -1011,15 +1011,18 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         //상품별 매출 통계
         Route::get('sal04', 'sal04Controller@index');
         Route::get('sal04/search', 'sal04Controller@search');
-
+		Route::get('sal04/chart-data/search', 'sal04Controller@search_chart');
+		
         //업체별 매출 통계
         Route::get('sal05', 'sal05Controller@index');
         Route::get('sal05/search', 'sal05Controller@search');
-
-        //업체별 매출 통계
+		Route::get('sal05/chart-data/search', 'sal05Controller@search_chart');
+		
+        //판매처별 매출 통계
         Route::get('sal06', 'sal06Controller@index');
         Route::get('sal06/search', 'sal06Controller@search');
-
+		Route::get('sal06/chart-data/search', 'sal06Controller@search_chart');
+		
         //일별 주문 통계
         Route::get('sal22', 'sal22Controller@index');
         Route::get('sal22/search', 'sal22Controller@search');

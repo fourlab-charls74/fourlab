@@ -54,22 +54,28 @@ class sal04Controller extends Controller
 		$com_cd         = $request->input("com_cd", "");
 		$mobile_yn      = $request->input("mobile_yn", "");
 		$app_yn         = $request->input("app_yn", "");
+
+		$inner_join = "";
+
+		if($mobile_yn != "" || $app_yn != ""){
+			$inner_join .=  " inner join order_mst m on m.ord_no = o.ord_no";
+		}
 		
         $inner_where = "";
         $inner_where2 = "";    //매출
 		$inner_where3 = "";
 
+		if($mobile_yn === 'Y' && $app_yn === "") {
+			$inner_where .= " and m.mobile_yn = 'Y'";
+		} else if ($mobile_yn === '' && $app_yn === "Y") {
+			$inner_where .= " and m.app_yn = 'Y'";
+		} else if($mobile_yn === 'Y' && $app_yn === "Y"){
+			$inner_where .= " and (m.app_yn = 'Y' or m.mobile_yn = 'Y')";
+		}
+		
 		if( $sale_place != "" )    $inner_where3 .= " and o.sale_place = '$sale_place' ";
 
 		if( $com_cd != "" )    $inner_where .= " and g.com_id = '$com_cd' ";
-
-		if($mobile_yn === 'Y' && $app_yn === "") {
-			$inner_where3 .= " and om.mobile_yn = 'Y'";
-		} else if ($mobile_yn === '' && $app_yn === "Y") {
-			$inner_where3 .= " and om.app_yn = 'Y'";
-		} else if($mobile_yn === 'Y' && $app_yn === "Y"){
-			$inner_where3 .= " and (om.app_yn = 'Y' or om.mobile_yn = 'Y')";
-		}
 		
         if ($m_cat_all != "") {
             $inner_where .= " and g.rep_cat_cd like '" . Lib::quote($m_cat_all) . "%' ";
@@ -198,7 +204,7 @@ class sal04Controller extends Controller
 							order_opt o
 							inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 							inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
-							inner join order_mst om on o.ord_no = om.ord_no
+							$inner_join
 						where
 							w.ord_state_date >= '$sdate' 
 							and w.ord_state_date <= '$edate' and w.ord_state in ('$ord_state',60,61)
@@ -247,4 +253,181 @@ class sal04Controller extends Controller
             ]
         );
     }
+
+	public function search_chart(Request $request)
+	{
+
+		set_time_limit(0);
+
+		$sdate = str_replace("-", "", $request->input('sdate', Carbon::now()->sub(1, 'month')->format('Ymd')));
+		$edate = str_replace("-", "", $request->input('edate', date("Ymd")));
+
+		$m_cat_all        = $request->input("m_cat_all");
+		$stat_pay_type    = $request->input("stat_pay_type");
+		$goods_nm        = $request->input("goods_nm");
+		$ord_state        = $request->input("ord_state");
+		$not_sale        = $request->input("not_sale");
+		$cat_type        = $request->input("cat_type");
+		$cat_cd            = $request->input("cat_cd");
+		$brand_cd        = $request->input("brand_cd");
+		$item            = $request->input("item");
+		$sale_place        = $request->input("sale_place", "");
+		$goods_stat        = $request->input("goods_stat");
+		$ord_type        = $request->input("ord_type");
+
+		$com_cd         = $request->input("com_cd", "");
+		$mobile_yn      = $request->input("mobile_yn", "");
+		$app_yn         = $request->input("app_yn", "");
+		$goods_nos      = $request->input("goods_nos", "");
+
+		$inner_join = "";
+
+		if($mobile_yn != "" || $app_yn != ""){
+			$inner_join .=  " inner join order_mst m on m.ord_no = o.ord_no";
+		}
+
+		$inner_where = "";
+		$inner_where2 = "";    //매출
+		$inner_where3 = "";
+
+		if( $sale_place != "" )    $inner_where3 .= " and o.sale_place = '$sale_place' ";
+
+		if( $com_cd != "" )    $inner_where .= " and g.com_id = '$com_cd' ";
+
+		if($mobile_yn === 'Y' && $app_yn === "") {
+			$inner_where3 .= " and om.mobile_yn = 'Y'";
+		} else if ($mobile_yn === '' && $app_yn === "Y") {
+			$inner_where3 .= " and om.app_yn = 'Y'";
+		} else if($mobile_yn === 'Y' && $app_yn === "Y"){
+			$inner_where3 .= " and (om.app_yn = 'Y' or om.mobile_yn = 'Y')";
+		}
+
+		if ($m_cat_all != "") {
+			$inner_where .= " and g.rep_cat_cd like '" . Lib::quote($m_cat_all) . "%' ";
+		}
+
+		if($brand_cd != "") {
+			$inner_where .= " and g.brand = '$brand_cd' ";
+		}
+
+		if($goods_nm != ""){
+			$inner_where .= " and g.goods_nm like '%$goods_nm%' ";
+		}
+
+		if ($cat_cd != "") {
+			if ($cat_type === "DISPLAY") {
+				$inner_where .= " and g.rep_cat_cd = '" . Lib::quote($cat_cd) . "' ";
+			} else if ($cat_type === "ITEM") {
+				$inner_where .= " and g.item_cat_cd = '" . Lib::quote($cat_cd) . "' ";
+			}
+		}
+
+		if ($not_sale != "") {
+			$join = " left outer join ";
+		}
+
+		if ($item != ""){
+			$inner_where .= " and g.opt_kind_cd = '$item' ";
+		}
+
+		if ($goods_stat != "")    $inner_where .= " and a.goods_stat = '$goods_stat' ";
+
+		if($goods_nos != "") {
+			$inner_where .= " and g.goods_no in ( $goods_nos ) ";
+		}
+
+		if( $ord_type != "" ){
+			$ord_type_where    = "";
+			for( $i = 0; $i < 9; $i++ ){
+				if( !empty($ord_type[$i]) ){
+					if( $ord_type_where != "" )    $ord_type_where    .= " or ";
+					$ord_type_where    .= " o.ord_type = '" . $ord_type[$i] . "' ";
+					if($ord_type[$i] == '15') $ord_type_where .= " or o.ord_type = '0' ";
+				}
+			}
+
+			if( $ord_type_where != "" ){
+				$inner_where2    .= " and ( $ord_type_where ) ";
+			}
+		} else {
+			$inner_where2    .= " and ( o.ord_type >= 0 ) ";
+		}
+
+		// 결제조건
+		if( $stat_pay_type != "" ){
+			$stat_pay_type_where    = "";
+			for( $i = 0; $i < 7; $i++ ){
+				if( !empty($stat_pay_type[$i]) ){
+					if($stat_pay_type_where != "" )    $stat_pay_type_where    .= " or ";
+					$stat_pay_type_where    .= " ( o.pay_type & " . $stat_pay_type[$i] . " ) = " . $stat_pay_type[$i];
+				}
+			}
+
+			if( $stat_pay_type_where != "" ){
+				$inner_where2    .= " and ( $stat_pay_type_where ) ";
+			}
+		}
+
+		$chart_sql = " /* admin : account/acc04_list.php ( 2 ) */
+            select
+                goods_nm,goods_no,goods_sub,sale_date
+                , (qty_10 + qty_60 + qty_61) as sum_qty
+                , (
+                    (t.point_amt_10 + t.point_amt_60 + t.point_amt_61)
+                    + (t.recv_amt_10 + t.recv_amt_60 + t.recv_amt_61)
+                    - (t.fee_amt_10 + t.fee_amt_60 + t.fee_amt_61)
+                  ) as sum_amt
+            from (
+                select
+                    b.goods_nm,b.goods_no,b.goods_sub,b.sale_date
+                    , sum(if(ord_state = '$ord_state', ifnull(b.qty,0),0)) as qty_10
+                    , sum(if(ord_state = '$ord_state', ifnull(b.recv_amt,0),0)) as recv_amt_10
+                    , sum(if(ord_state = '$ord_state', ifnull(b.wonga,0),0)) as wonga_10
+                    , sum(if(ord_state = '$ord_state', ifnull(b.point_amt,0),0)) as point_amt_10
+                    , sum(if(ord_state = '$ord_state', ifnull(b.fee_amt,0),0)) as fee_amt_10
+
+                    , sum(if(ord_state = 60, ifnull(b.qty,0),0)) * -1 as qty_60
+                    , sum(if(ord_state = 60, ifnull(b.recv_amt,0),0)) * -1 as recv_amt_60
+                    , sum(if(ord_state = 60, ifnull(b.wonga,0),0)) as wonga_60
+                    , sum(if(ord_state = 60, ifnull(b.point_amt,0),0)) * -1 as point_amt_60
+                    , sum(if(ord_state = 60, ifnull(b.fee_amt,0),0)) * 1 as fee_amt_60
+
+                    , sum(if(ord_state = 61, ifnull(b.qty,0),0)) * -1 as qty_61
+                    , sum(if(ord_state = 61, ifnull(b.recv_amt,0),0)) * -1 as recv_amt_61
+                    , sum(if(ord_state = 61, ifnull(b.wonga,0),0)) as wonga_61
+                    , sum(if(ord_state = 61, ifnull(b.point_amt,0),0)) * -1 as point_amt_61
+                    , sum(if(ord_state = 61, ifnull(b.fee_amt,0),0)) * 1 as fee_amt_61
+                from (
+                    select
+                        g.goods_nm,g.goods_no,g.goods_sub,w.ord_state_date as sale_date,w.ord_state
+                        , sum(w.qty)as qty
+                        , sum(w.recv_amt) as recv_amt
+                        , sum(w.point_apply_amt) as point_amt
+                        , sum(w.wonga * w.qty) as wonga
+                        , sum(w.coupon_apply_amt) as coupon_amt
+                        , sum(w.sales_com_fee) as fee_amt
+                    from order_opt o
+                        inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+                        inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+                        left outer join company c on o.sale_place = c.com_id
+                        $inner_join
+                    where
+                        w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
+                        and w.ord_state in ('$ord_state',60,61)
+                        and o.ord_state >= '$ord_state'
+                        $inner_where2 $inner_where
+                    group by g.goods_no, g.goods_sub, sale_date, w.ord_state
+                ) b group by b.goods_no, b.goods_sub, b.sale_date
+            ) t
+        ";
+
+		$chart_data = DB::select($chart_sql);
+
+		return response()->json(
+			[
+				"code" => 200,
+				"chart_data" => $chart_data
+			]
+		);
+	}
 }
