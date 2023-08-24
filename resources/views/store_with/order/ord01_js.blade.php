@@ -199,10 +199,20 @@
     */
 
     // 매장변경 시 선택상품 초기화
-    $("[name=store_no]").on("change", function(e) {
+    $("[name=store_no]").on("change", async function(e) {
         gx.gridOptions.api.setRowData([]);
         EditAmtTable();
         $("#amt_table").css("display", "none");
+
+		// 해당매장 (or 창고) 의 사용중인 판매처수수료목록 조회
+		let res = await axios({ method: 'get', url: '/store/order/ord01/store/' + this.value });
+		if (res.status === 200) {
+			pr_codes = res.data.pr_codes;
+			$("#ord_state_30").attr('disabled', res.data.is_online > 0);
+			if (res.data.is_online > 0 && $("#ord_state_30").is(':checked')) {
+				$("#ord_state_10").prop('checked', true);
+			}
+		}
     });
 
     /**

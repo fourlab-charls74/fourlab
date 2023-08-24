@@ -642,10 +642,54 @@ class ord01Controller extends Controller
             ],
 			'head_store' => $head_store,
 			'sale_kinds' => SLib::getUsedSaleKinds(),
-			'pr_codes' => SLib::getCodes('PR_CODE'),
         ];
         return view(Config::get('shop.store.view') . '/order/ord01_show', $values);
     }
+	
+	// 수기판매 주문매장정보 변경 시, 해당매장에서 사용중인 판매처수수료목록 조회
+	public function search_store_info($store_cd = '')
+	{
+		$date = date('Y-m-d');
+		$is_online = 0;
+
+	 	if ($store_cd !== '') {
+			$sql = "
+				select f.store_cd, f.pr_code, p.code_val as pr_code_nm, f.store_fee, f.sdate, f.edate, f.use_yn
+				from store_fee f
+					inner join code p on p.code_kind_cd = 'PR_CODE' and p.code_id = f.pr_code
+				where f.store_cd = :store_cd and f.use_yn = 'Y' and f.sdate <= :date1 and f.edate >= :date2
+				group by f.pr_code
+			";
+			$pr_codes = DB::select($sql, [ 'store_cd' => $store_cd, 'date1' => $date, 'date2' => $date ]);
+			
+			$sql = "
+				select count(*) as cnt
+				from store
+				where store_cd = :store_cd and store_cd in (
+					select store_cd
+					from store
+					where store_channel = 'EC' or store_channel = 'CE' or store_cd = 'A0003'
+				)
+			";
+			$is_online = DB::selectOne($sql, [ 'store_cd' => $store_cd ])->cnt;
+		} else {
+			$sql = "
+				select f.store_cd, f.pr_code, p.code_val as pr_code_nm, f.store_fee, f.sdate, f.edate, f.use_yn
+				from store_fee f
+					inner join code p on p.code_kind_cd = 'PR_CODE' and p.code_id = f.pr_code
+				where f.use_yn = 'Y' and f.sdate <= :date1 and f.edate >= :date2
+				group by f.pr_code
+			";
+			$pr_codes = DB::select($sql, [ 'date1' => $date, 'date2' => $date ]);
+		}
+
+		return response()->json([ 
+			'code' => 200, 
+			'msg' => '판매처수수료목록이 정상적으로 조회되었습니다.', 
+			'pr_codes' => $pr_codes,
+			'is_online' => $is_online,
+		]);
+	}
 
     // 수기판매 등록
     public function save(Request $req)

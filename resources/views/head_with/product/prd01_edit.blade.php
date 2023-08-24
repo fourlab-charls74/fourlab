@@ -295,7 +295,6 @@
                                                         <option value="원">원</option>
                                                     </select>
                                                 </span>
-                                            </span>
                                             </div>
                                         </li>
                                         <li class="mt-1">
@@ -1176,9 +1175,9 @@
             }
 
             let sale_yn = "";
-            if(document.f1.sale_yn[0].checked){
+			if($('#sale_y').is(':checked')){
                 sale_yn = "Y";
-            } else if(document.f1.sale_yn[1].checked){
+			} else if($('#sale_n').is(':checked')){
                 sale_yn = "N";
             }
             
@@ -1212,16 +1211,17 @@
                             margin = parseFloat(((price - wonga) / price) * 100).toFixed(2);
                         }
                     }
-                    sale_price = row.ed_sale_price;
-                    sale_wonga = Math.round(sale_price * (1 - (margin/100)));
                 }
             }
+
+			sale_price = row.ed_sale_price;
+			sale_wonga = Math.round(sale_price * (1 - (margin/100)));
 
             if (sale_yn == "") {
                 row = {...row, ed_normal_price: price, ed_normal_wonga: wonga};
             }
 
-            row = {...row, ed_price: price, ed_margin_rate: margin, ed_wonga: wonga, ed_sale_wonga: sale_wonga }
+			row = {...row, ed_price: price, ed_margin_rate: Number(margin), ed_wonga: wonga, ed_sale_wonga: sale_wonga};
 
             return row;
         };
@@ -1382,9 +1382,9 @@
 
             // 세일 설정
             var sale_yn = "";
-            if (document.f1.sale_yn[0].checked == "Y") {
+			if ($('#sale_y').is(':checked')) {
                 sale_yn = "Y";
-            } else if (document.f1.sale_yn[1].checked == "N") {
+			} else if ($('#sale_n').is(':checked')) {
                 sale_yn = "N";
             }
             var sale_value			= _("#sale").value;
@@ -1560,10 +1560,10 @@
 
                         // 타임세일
                         if (sale_dt_yn == "Y") {
-                            calPrice(row, row.com_type, row.price, margin, fix_wonga, sale_yn);	// 기존 가격으로 원복
+							row = calPrice(row, row.com_type, row.price, margin, fix_wonga, sale_yn);    // 기존 가격으로 원복
                         } else {	
                             // 바로 세일로 판매가 수정
-                            calPrice(row, row.com_type, sale_price, margin, fix_wonga, sale_yn); // 판매가를 세일가로 변경
+							row = calPrice(row, row.com_type, sale_price, margin, fix_wonga, sale_yn); // 판매가를 세일가로 변경
                         }
                     }
 

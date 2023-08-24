@@ -652,7 +652,7 @@
                                                         <input type='text' name="goods_qty" id="goods_qty" class="form-control form-control-sm search-all" value="{{ $qty }}" onfocus="this.select()">
                                                     </div>
 													@if( $type != 'create' )
-                                                    <button type="button" class="btn-sm btn btn-secondary btn-change-qty" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">변경</button>
+													<button type="button" id="oqty_change_btn" class="btn-sm btn btn-secondary btn-change-qty" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">변경</button>
 													@endif
                                                 </div>
                                             </td>

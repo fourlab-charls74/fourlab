@@ -588,6 +588,7 @@
                         'ad_desc':rowNode.data.ad_desc,
                         'price':rowNode.data.price,
                         'goods_memo':rowNode.data.goods_memo,
+						'sale_yn' : rowNode.data.sale_yn
                     }
                 )
             }
