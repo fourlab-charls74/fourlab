@@ -594,7 +594,7 @@ class sal01Controller extends Controller
 		$order["price"] = Lib::uncm($order["price"]);
 		$order["wonga"] = Lib::uncm($order["wonga"]);
 
-		$order["ord_amt"] = @$order["ord_amt"] ? $order["ord_amt"] : $order['price'] * $order['qty']; // 주문금액(판매단가)은 없으면 판매가 * 수량 처리
+		$order["ord_amt"] = (@$order["ord_amt"] ? $order["ord_amt"] : $order['price']) * $order['qty']; // 주문금액(판매단가)은 없으면 판매가 처리
 		// $order['dc_amt'] = $order['ord_amt'] - $order['recv_amt'] - $order['point_amt']; // 결제금액 = 주문금액 - 할인... - (쿠폰, 적립금) 등등.
 		$order['dc_amt'] = abs($order['price'] * $order['qty']) - ($order['recv_amt'] * ($order['recv_amt'] < 0 ? -1 : 1)) - $order['point_amt'];
  
@@ -967,7 +967,7 @@ class sal01Controller extends Controller
 		$order["price"] = Lib::uncm($order["price"]);
 		$order["wonga"] = Lib::uncm($order["wonga"]);
 
-		$order["ord_amt"] = @$order["ord_amt"] ? $order["ord_amt"] : $order['price'] * $order['qty']; // 주문금액(판매단가)은 없으면 판매가 * 수량 처리
+		$order["ord_amt"] = (@$order["ord_amt"] ? $order["ord_amt"] : $order['price']) * $order['qty']; // 주문금액(판매단가)은 없으면 판매가 처리
 		// $order['dc_amt'] = $order['ord_amt'] - $order['recv_amt'] - $order['point_amt']; // 결제금액 = 주문금액 - 할인... - (쿠폰, 적립금) 등등.
 		$order['dc_amt'] = abs($order['price'] * $order['qty']) - ($order['recv_amt'] * ($order['recv_amt'] < 0 ? -1 : 1)) - $order['point_amt'];
 
