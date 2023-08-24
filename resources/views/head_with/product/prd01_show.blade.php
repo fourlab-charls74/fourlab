@@ -933,7 +933,7 @@
                                                         <input type='text' name="goods_qty" id="goods_qty" class="form-control form-control-sm search-all" value="{{ $qty ?? 0 }}" onfocus="this.select()">
                                                     </div>
 													@if( $type != 'create' )
-                                                    <button type="button" class="btn-sm btn btn-secondary btn-change-qty" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">변경</button>
+													<button type="button" id="oqty_change_btn" class="btn-sm btn btn-secondary btn-change-qty" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">변경</button>
 													@endif
                                                 </div>
                                             </td>
@@ -942,7 +942,7 @@
                                                 <div class="input_box flax_box">
                                                     <div class="wd200">{{ $wqty ?? 0 }}개</div>
 													@if( $type != 'create')
-                                                    <input type="button" class="btn-sm btn btn-secondary btn-qty-in" value="입고" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">
+														<input type="button" id="wqty_change_btn" class="btn-sm btn btn-secondary btn-qty-in" value="입고" style="max-width:80px;width:19%;margin-left:1%;padding:0.22rem 0;">
 													@endif
                                                 </div>
                                             </td>
@@ -1435,6 +1435,18 @@
         let gxc; // 상품정보고시 테이블
 
         $(document).ready(function() {
+			const url_params = new URLSearchParams(location.search);
+
+			if(url_params.get('type') === 'copy') {
+				$('#is_option_use2').attr('checked', 'true');
+				$('[name=is_option_use]').attr('disabled', 'true');
+				$('#goods_qty').val(0);
+				$('.wd200').text('0');
+				$('#oqty_change_btn').attr('disabled', 'true');
+				$('#wqty_change_btn').attr('disabled', 'true');
+				setOptionArea();
+			}
+			
             $('#main-tab').trigger("click");
             
             var editorToolbar = [

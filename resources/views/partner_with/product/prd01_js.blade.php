@@ -5,7 +5,19 @@
     var ed;
 
     $(document).ready(function() {
-        var editorToolbar = [
+		const url_params = new URLSearchParams(location.search);
+
+		if(url_params.get('type') === 'copy') {
+			$('#is_option_use2').attr('checked', 'true');
+			$('[name=is_option_use]').attr('disabled', 'true');
+			$('#goods_qty').val(0);
+			$('.wd200').text('0');
+			$('#oqty_change_btn').attr('disabled', 'true');
+			$('#wqty_change_btn').attr('disabled', 'true');
+			setOptionArea();
+		}
+
+		var editorToolbar = [
             ['font', ['bold', 'underline', 'clear']],
             ['color', ['color']],
             ['para', ['paragraph']],
