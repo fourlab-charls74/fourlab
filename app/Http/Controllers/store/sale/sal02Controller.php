@@ -64,7 +64,6 @@ class sal02Controller extends Controller
 		$goods_nm = $request->input('goods_nm', "");
 		$brand_cd = $request->input('brand_cd', "");
 		$style_no = $request->input('style_no', "");
-		$sale_yn = $request->input('sale_yn','Y');
 		// 판매 유형은 추후 반영 예정
 		$sell_type = $request->input('sell_type');
 		$store_channel	= $request->input("store_channel", '');
@@ -98,7 +97,6 @@ class sal02Controller extends Controller
 		if ($sell_type != "") $where .= "and o.sale_kind = '$sell_type'";
 
         $where2 = "";
-        if ($sale_yn == "Y") $where2 .= " and qty is not null";
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
 		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
@@ -141,8 +139,9 @@ class sal02Controller extends Controller
 		$sql = /** @lang text */
             "
 			select 
-				s.store_nm
-				, a.*
+				a.*
+				, s.store_cd
+				, s.store_nm
 				, ifnull(p.amt,0) as proj_amt
 				, sc.store_channel as store_channel
 				, sc2.store_kind as store_channel_kind
@@ -153,15 +152,13 @@ class sal02Controller extends Controller
 						${sum}
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
-						inner join goods g on o.goods_no = g.goods_no
-						left outer join brand b on g.brand = b.brand
 					where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
 					group by m.store_cd
 				) a on s.store_cd = a.store_cd
                 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
-            where 1=1 $where2
+            where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null or a.recv_amt <> '0') $where2
 		";
 
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
@@ -197,7 +194,7 @@ class sal02Controller extends Controller
 					left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
 					left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 					left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
-				where 1=1 $where2
+				where 1=1 and s.use_yn = 'Y' $where2
 			) t
 		";
 
