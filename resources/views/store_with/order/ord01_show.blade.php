@@ -434,7 +434,7 @@
 
 <script type="text/javascript">
 	const sale_types = <?= json_encode(@$sale_kinds) ?>;
-	const pr_codes = <?= json_encode(@$pr_codes) ?>;
+	let pr_codes = [];
 </script>
 
 <!-- script -->
@@ -453,15 +453,15 @@
 		{field: "pr_code", headerName: "판매처수수료", width: 80, editable: true, cellClass: 'hd-grid-edit',
 			onCellValueChanged: function (params) {
 				if (params.oldValue !== params.newValue) {
-					let pr_code = pr_codes.filter(st => st.code_val === params.newValue)[0];
-					params.data.pr_code_cd = pr_code?.code_id || '';
+					let pr_code = pr_codes.filter(pc => pc.pr_code_nm === params.newValue)[0];
+					params.data.pr_code_cd = pr_code?.pr_code || '';
 				}
 			},
 			cellEditorSelector: function(params) {
 				return {
 					component: 'agRichSelectCellEditor',
 					params: {
-						values: pr_codes.map(s => s.code_val)
+						values: pr_codes.map(s => s.pr_code_nm)
 					},
 				};
 			},
