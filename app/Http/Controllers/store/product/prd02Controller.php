@@ -229,18 +229,18 @@ class prd02Controller extends Controller
 				, '' as img_view
 				, opt.opt_kind_nm
 				, pc.color
-				, (
+				, ifnull((
 					select s.size_cd from size s 
-					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+					where s.size_kind_cd = pc.size_kind 
 						and s.size_cd = pc.size
 						and use_yn = 'Y'
-				) as size
-				, (
+				),'') as size
+				, ifnull((
 					select s.size_nm from size s 
-					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+					where s.size_kind_cd = pc.size_kind 
 						and s.size_cd = pc.size
 						and use_yn = 'Y'
-				) as size_nm
+				), '') as size_nm
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
