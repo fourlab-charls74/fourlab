@@ -655,14 +655,14 @@ class prd01Controller extends Controller
 				"restock_yn"		=> $restock_yn,
 				"com_type"		=> $com_type,
 				"goods_type"		=> $goods_type,
-				"normal_price"		=> $ed_normal_price,
-				"sale_price"		=> $ed_sale_price,
+				"normal_price"        => $sale_yn !== "Y" ? $price : $ed_normal_price,
+				"sale_price"        => $sale_yn !== "Y" ? 0 : $ed_sale_price,
 				"normal_wonga"		=> $ed_normal_wonga,
-				"sale_wonga"		=> $ed_sale_wonga,
+				"sale_wonga"    => $ed_sale_wonga,
 				"sale_yn"		=> $sale_yn,
-				"sale_dt_yn"		=> $sale_dt_yn,
-				"sale_s_dt"		=> $sale_s_dt,
-				"sale_e_dt"		=> $sale_e_dt,
+				"sale_dt_yn"        => $sale_yn !== "Y" ? 'N' : $sale_dt_yn,
+				"sale_s_dt"        =>   $sale_yn !== "Y" ? '0000-00-00 00:00:00' :  $sale_s_dt,
+				"sale_e_dt"        =>   $sale_yn !== "Y" ? '0000-00-00 00:00:00' : $sale_e_dt,
 
 				"goods_location"	=> $goods_location,
 				"tax_yn"		=> $tax_yn,
@@ -676,6 +676,14 @@ class prd01Controller extends Controller
 				"upd_dm"		    => now(),
 			);
 
+			if($sale_yn !== "Y") {
+				array_diff($param, array("sale_wonga"));
+			}
+
+			if ($goods_type !== 'P') {
+				array_diff($param, array("wonga"));
+			}
+			
 			try {
 				DB::beginTransaction();
 

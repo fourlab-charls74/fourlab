@@ -49,8 +49,10 @@ function setArrowKeyboardEvent(e) {
 				e.api.stopEditing();
 			}
 		} else if (key == 'ArrowRight') {
-			if (e.event.target.selectionStart >= e.event.target.value.length) {
-				e.api.stopEditing();
+			if(e.event.target.value !== undefined) {
+				if (e.event.target.selectionStart >= e.event.target.value.length) {
+					e.api.stopEditing();
+				}
 			}
 		}
 	}
