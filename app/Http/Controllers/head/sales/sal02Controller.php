@@ -67,6 +67,7 @@ class sal02Controller extends Controller
 			'item'			=> $item,
 			'sale_places'   => SLib::getSalePlaces(),
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
+			'com_types'        => SLib::getCodes('G_COM_TYPE'),
 			'ord_state'		=> $ord_state,
 			'ord_type'		=> $ord_type,
 			'pop_search'	=> $pop_search,
@@ -92,10 +93,32 @@ class sal02Controller extends Controller
 		$sale_place 	= $request->input("sale_place", "");
 		$stat_pay_type 	= $request->input("stat_pay_type");
 
+		$com_cd         = $request->input("com_cd", "");
+		$mobile_yn      = $request->input("mobile_yn", "");
+		$app_yn         = $request->input("app_yn", "");
+		
         $inner_where = "";
 		$inner_where2	= "";	//매출
 
-        if($goods_nm != ""){
+		$inner_where3 = "";
+		$inner_where4 = "";
+
+		if( $sale_place != "" )    $inner_where .= " and o.sale_place = '$sale_place' ";
+
+		if( $com_cd != "" )    $inner_where .= " and g.com_id = '$com_cd' ";
+
+		if($mobile_yn === 'Y' && $app_yn === "") {
+			$inner_where4 .= " and om.mobile_yn = 'Y'";
+			$inner_where3 .= " and m.mobile_yn = 'Y'";
+		} else if ($mobile_yn === '' && $app_yn === "Y") {
+			$inner_where4 .= " and om.app_yn = 'Y'";
+			$inner_where3 .= " and m.app_yn = 'Y'";
+		} else if($mobile_yn === 'Y' && $app_yn === "Y"){
+			$inner_where4 .= " and (om.app_yn = 'Y' or om.mobile_yn = 'Y')";
+			$inner_where3 .= " and (m.app_yn = 'Y' or m.mobile_yn = 'Y')";
+		}
+		
+		if($goods_nm != ""){
             $inner_where .= " and g.goods_nm like '%$goods_nm%' ";
         }
 
@@ -212,11 +235,12 @@ class sal02Controller extends Controller
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
+						inner join order_mst om on o.ord_no = om.ord_no
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
 						and o.ord_state >= '$ord_state'
-						$inner_where2 $inner_where
+						$inner_where2 $inner_where $inner_where4
 					group by w.ord_state_date, w.ord_state
 				) b group by b.sale_date
 			) t on a.sale_date = t.sale_date left outer join (
@@ -241,7 +265,7 @@ class sal02Controller extends Controller
 					group by o.ord_no,w.ord_state,ord_state_date
 				) a inner join order_mst m on a.ord_no = m.ord_no
 					inner join payment p on m.ord_no = p.ord_no
-				where m.ord_type = 0 && m.sale_place = 'HEAD_OFFICE'  && p.tno <> ''
+				where m.ord_type = 0 && p.tno <> '' $inner_where3
 				group by a.ord_state_date
 			) p on a.sale_date = p.ord_state_date
 			order by a.sale_date desc

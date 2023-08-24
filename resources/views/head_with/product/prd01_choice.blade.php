@@ -264,21 +264,34 @@
         function Choice(){
             let goods_nos = [];
             let goods = [];
+			let selectedGoodsInfos = [];
             gx.getSelectedRows().forEach((selectedRow, index) => {
+				selectedGoodsInfos.push(selectedRow);
                 goods_nos.push(selectedRow.goods_no);
                 goods.push(`${selectedRow.goods_no}||${selectedRow.goods_sub}`);
             });
 
             try{
-                if(parent.window.opener != null && !parent.window.opener.closed)
-                {
-                    parent.window.opener.focus();
-                    parent.window.opener.ChoiceGoodsNo(goods_nos, goods);
-                    if($("input:checkbox[name='chk_close']").is(":checked") == true){
-                        self.close();
-                    }
-                }
+				if(String(parent.window.opener.location.pathname).includes('/head/product/prd12')) {
+					parent.window.opener.ChoiceGoodsNo(selectedGoodsInfos, goods);
+				} else if(String(parent.window.opener.location.pathname).includes('/head/order/ord20/show')) {
+					const urlParams = new URL(location.href).searchParams;
+					const goodsCnt = urlParams.get('goodsCnt');
 
+					if(selectedGoodsInfos.length !== Number(goodsCnt)) {
+						alert('선택한 상품 개수가 동일하지 않습니다.');
+						return;
+					}
+
+					parent.window.opener.ChoiceGoodsNo(selectedGoodsInfos);
+				} else {
+					parent.window.opener.ChoiceGoodsNo(goods_nos, goods);
+				}
+				
+				if($("input:checkbox[name='chk_close']").is(":checked") == true){
+					self.close();
+				}
+				
             }catch(e){ alert(e.description);}
 
         }

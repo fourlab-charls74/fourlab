@@ -1958,6 +1958,10 @@ class Order
                     ->where("ord_opt_no", $ord_opt_no)
                     ->delete();
 
+				DB::table("order_opt_memo")
+					->where("ord_opt_no", $ord_opt_no)
+					->delete();
+				
                 DB::table("order_state")
                     ->where("ord_opt_no", $ord_opt_no)
                     ->delete();

@@ -587,6 +587,9 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
             Route::get('{ord_no}/cash/list', $cont . '@search_cash_receipt_list');
             Route::get('{ord_no}/{ord_opt_no}/tax', $cont . '@show_tax');
             Route::get('{ord_no}/tax/list', $cont . '@search_tax_receipt_list');
+
+			Route::put('copy/parent/tno', $cont . '@copy_parent_tno');
+			
 			Route::post('add-account-etc', $cont . '@add_account_etc');
             Route::put('dlv-info-save/{ord_no}', $cont . '@dlv_info_save');
             Route::put('refund-save/{ord_opt_no}', $cont . '@refund_save');
@@ -1003,7 +1006,8 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         //월별 매출 통계
         Route::get('sal03', 'sal03Controller@index');
         Route::get('sal03/search', 'sal03Controller@search');
-
+		Route::get('sal03/chart-data/search', 'sal03Controller@search_chart');
+		
         //상품별 매출 통계
         Route::get('sal04', 'sal04Controller@index');
         Route::get('sal04/search', 'sal04Controller@search');

@@ -153,15 +153,53 @@
                 <div class="search-area-ext d-none row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">판매처</label>
-                            <div class="flax_box">
-                                <select name='sale_place' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_places as $sale_place)
-                                    <option value='{{ $sale_place->com_id }}' @if($com_nm == $sale_place->com_nm) selected @endif>{{ $sale_place->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <label for="name">판매유형</label>
+							<div class="form-inline inline_select_box">
+<!--								<div class="form-inline-inner input-box w-75">
+									<div class="flax_box">
+										<select name='sale_place' class="form-control form-control-sm" style="width: 95%">
+											<option value=''>전체</option>
+											@foreach ($sale_places as $sale_place)
+												<option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
+											@endforeach
+										</select>
+									</div>
+								</div>-->
+								<div class="form-inline-inner input-box w-25">
+									<div class="form-inline form-check-box">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" name="mobile_yn" id="mobile_yn" value = "">
+											<label class="custom-control-label" for="mobile_yn">모바일</label>
+										</div>
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" name="app_yn" id="app_yn" value = "">
+											<label class="custom-control-label" for="app_yn">앱</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">업체</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner input-box w-25 pr-1">
+									<select id="com_type" name="com_type" class="form-control form-control-sm w-100">
+										<option value="">전체</option>
+										@foreach ($com_types as $com_type)
+											<option value="{{ $com_type->code_id }}">{{ $com_type->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+								<div class="form-inline-inner input-box w-75">
+									<div class="form-inline inline_btn_box">
+										<input type="hidden" id="com_nm" name="com_nm" class="form-control form-control-sm ac-company" style="width:100%">
+										<select id="com_cd" name="com_cd" class="form-control form-control-sm select2-company" style="width:100%;"></select>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
@@ -210,7 +248,7 @@
     </div>
 </form>
 <!-- 차트 -->
-<div class="card shadow mb-1">
+<div class="card shadow mb-1" id="chart_area">
     <div class="card-body">
         <input type="hidden" id="chart-type" value="date">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -233,6 +271,10 @@
                     <h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box flax_box">
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input" name="view_chart" id="view_chart" checked>
+						<label class="custom-control-label" for="view_chart">차트보기</label>
+					</div>
                 </div>
             </div>
         </div>
@@ -577,6 +619,13 @@
 
     function Search() {
 	    if (!gx) return;
+		if($('#mobile_yn').is(':checked')) {
+			$('#mobile_yn').val('Y');
+		}
+
+		if($('#app_yn').is(':checked')) {
+			$('#app_yn').val('Y');
+		}
         let data = $('form[name="search"]').serialize();
 
         gx.Aggregation({
@@ -728,6 +777,11 @@
         drawCanvasByYoil();
     });
 
+	$('#view_chart').change(() => {
+		$('#chart_area').toggle();
+		drawCanvas();
+	});
+	
     @if( $pop_search == "Y" )
         Search();
     @endif

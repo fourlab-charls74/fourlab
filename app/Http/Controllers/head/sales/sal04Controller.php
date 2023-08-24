@@ -25,6 +25,7 @@ class sal04Controller extends Controller
             'edate' => date("Y-m-d"),
             'items' => SLib::getItems(),
             'sale_places'   => SLib::getSalePlaces(),
+			'com_types'        => SLib::getCodes('G_COM_TYPE'),
             "goods_stats"	=> $goods_stats
         ];
         return view(Config::get('shop.head.view') . '/sales/sal04', $values);
@@ -50,10 +51,26 @@ class sal04Controller extends Controller
 		$ord_type		= $request->input("ord_type");
 		$brand_cd		= $request->input("brand_cd");
 
+		$com_cd         = $request->input("com_cd", "");
+		$mobile_yn      = $request->input("mobile_yn", "");
+		$app_yn         = $request->input("app_yn", "");
+		
         $inner_where = "";
-        $inner_where1 = "";    //재고조정
         $inner_where2 = "";    //매출
+		$inner_where3 = "";
 
+		if( $sale_place != "" )    $inner_where3 .= " and o.sale_place = '$sale_place' ";
+
+		if( $com_cd != "" )    $inner_where .= " and g.com_id = '$com_cd' ";
+
+		if($mobile_yn === 'Y' && $app_yn === "") {
+			$inner_where3 .= " and om.mobile_yn = 'Y'";
+		} else if ($mobile_yn === '' && $app_yn === "Y") {
+			$inner_where3 .= " and om.app_yn = 'Y'";
+		} else if($mobile_yn === 'Y' && $app_yn === "Y"){
+			$inner_where3 .= " and (om.app_yn = 'Y' or om.mobile_yn = 'Y')";
+		}
+		
         if ($m_cat_all != "") {
             $inner_where .= " and g.rep_cat_cd like '" . Lib::quote($m_cat_all) . "%' ";
         }
@@ -181,11 +198,12 @@ class sal04Controller extends Controller
 							order_opt o
 							inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 							inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
+							inner join order_mst om on o.ord_no = om.ord_no
 						where
 							w.ord_state_date >= '$sdate' 
 							and w.ord_state_date <= '$edate' and w.ord_state in ('$ord_state',60,61)
 							and o.ord_state >= '$ord_state'
-							$inner_where2
+							$inner_where2 $inner_where $inner_where3
 						group by g.goods_no,g.goods_sub,ord_state
 				) b group by b.goods_no,b.goods_sub
 			) t on g.goods_no = t.goods_no and g.goods_sub = t.goods_sub 
@@ -199,8 +217,7 @@ class sal04Controller extends Controller
 							(t.fee_amt_10 + t.fee_amt_60 + t.fee_amt_61)
 						),0) desc
         ";
-
-        //echo "<pre>$sql</pre>";exit;
+			
         $result = DB::select($sql);
 		$total_sum_amt = 0;
 

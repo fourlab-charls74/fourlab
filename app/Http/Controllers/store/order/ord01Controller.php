@@ -626,6 +626,9 @@ class ord01Controller extends Controller
         $pay_types = DB::select($sql);
 
         $conf = new Conf();
+		
+		// 본사 Default 매장 
+		$head_store = DB::table('store')->where('store_cd', 'A0003')->first();
 
         $values = [
             'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
@@ -637,6 +640,9 @@ class ord01Controller extends Controller
                 'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'),
                 'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
             ],
+			'head_store' => $head_store,
+			'sale_kinds' => SLib::getUsedSaleKinds(),
+			'pr_codes' => SLib::getCodes('PR_CODE'),
         ];
         return view(Config::get('shop.store.view') . '/order/ord01_show', $values);
     }
@@ -821,8 +827,8 @@ class ord01Controller extends Controller
         $dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
         $dlv_no = $data['dlv_no']; // 출고완료시 송장번호
 
-        $sale_kind = "01"; // 판매유형 (01: 일반판매)
-        $pr_code = "JS"; // 행사구분 (JS: 정상)
+        $sale_kind = "00"; // 판매유형 (00: 일반판매_실)
+        $pr_code = "01"; // 행사구분 (01: 정상_실)
         $user = $data['user'];
 
         $out_ord_no = $data['out_ord_no'] ?? '';
@@ -993,7 +999,8 @@ class ord01Controller extends Controller
             $add_point += $ord_opt_add_point;
             $ord_opt_point_amt = Lib::getValue($cart[$i], "point_amt", 0);
             $ord_opt_coupon_amt = Lib::getValue($cart[$i], "coupon_amt", 0);
-            $ord_opt_dc_amt = Lib::getValue($cart[$i], "dc_amt", 0);
+            // $ord_opt_dc_amt = Lib::getValue($cart[$i], "dc_amt", 0);
+			$ord_opt_dc_amt = ($goods->price - ($cart[$i]['price'] ?? 0)) * $qty;
             $ord_opt_dlv_amt = Lib::getValue($cart[$i], "dlv_amt", 0);
 
             $a_ord_amt = $cart[$i]["ord_amt"] ?? 0;
@@ -1012,7 +1019,7 @@ class ord01Controller extends Controller
                     'goods_opt' => $goods_opt,
                     'qty' => $qty,
                     'wonga' => $goods->wonga,
-                    'price' => $cart[$i]["price"] ?? 0,
+                    'price' => $goods->price,
                     'dlv_amt' => $ord_opt_dlv_amt,
                     'pay_type' => $pay_type,
                     'point_amt' => $ord_opt_point_amt,
@@ -1048,8 +1055,8 @@ class ord01Controller extends Controller
                     'out_ord_opt_no' => $out_ord_no,
                     'prd_cd' => $prd_cd,
                     'store_cd' => $store_cd,
-                    'sale_kind' => $sale_kind,
-                    'pr_code' => $pr_code,
+                    'sale_kind' => $cart[$i]["sale_kind_cd"] ?? $sale_kind,
+                    'pr_code' => $cart[$i]["pr_code_cd"] ?? $pr_code,
             ]);
             $ord_amt += $order_opt[$i]["price"] * $order_opt[$i]["qty"];
             $point_amt += $ord_opt_point_amt;
@@ -1155,6 +1162,19 @@ class ord01Controller extends Controller
             $order_opt[$i]["ord_no"] = $ord_no;
             DB::table('order_opt')->insert($order_opt[$i]);
             $ord_opt_no = DB::getPdo()->lastInsertId();
+			
+			// 수기판매 시, 판매상품별 메모등록
+			$order_memo = $cart[$i]['memo'] ?? '';
+			if ($order_memo !== '') {
+				DB::table('order_opt_memo')->insert([
+					'ord_opt_no' => $ord_opt_no,
+					'ord_no' => $ord_no,
+					'memo' => $order_memo,
+					'admin_id' => $c_admin_id,
+					'admin_nm' => $c_admin_name,
+					'ut' => now(),
+				]);
+			}
 
             $goods_addopt = Lib::getValue($cart[$i], "goods_addopt", "");
             $a_goods_addopts = explode("^", $goods_addopt);
@@ -1774,7 +1794,7 @@ class ord01Controller extends Controller
                         where goods_no = g.goods_no and goods_opt = o.goods_opt
                     ), 0
                  ) as stock_qty
-                , o.point_amt, o.coupon_amt,o.dc_amt, o.dlv_amt, o.recv_amt
+                , o.point_amt, o.coupon_amt,o.dc_amt * -1 as dc_amt, o.dlv_amt, o.recv_amt
 			 	, if(st.amt_kind = 'per', round(o.price * o.qty * st.sale_per / 100), st.sale_amt) * -1 as sale_kind_amt
                 , c.refund_amt, o.add_point
                 , g.is_unlimited, g.goods_type

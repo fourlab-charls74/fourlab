@@ -78,15 +78,31 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">판매처</label>
-                            <div class="flax_box">
-                                <select name='sale_place' class="form-control form-control-sm">
-                                    <option value=''>전체</option>
-                                    @foreach ($sale_places as $sale_place)
-                                    <option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <label for="name">판매유형</label>
+							<div class="form-inline inline_select_box">
+<!--								<div class="form-inline-inner input-box w-75">
+									<div class="flax_box">
+										<select name='sale_place' class="form-control form-control-sm" style="width: 95%">
+											<option value=''>전체</option>
+											@foreach ($sale_places as $sale_place)
+												<option value='{{ $sale_place->com_id }}'>{{ $sale_place->com_nm }}</option>
+											@endforeach
+										</select>
+									</div>
+								</div>-->
+								<div class="form-inline-inner input-box w-25">
+									<div class="form-inline form-check-box">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" name="mobile_yn" id="mobile_yn" value = "">
+											<label class="custom-control-label" for="mobile_yn">모바일</label>
+										</div>
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" name="app_yn" id="app_yn" value = "">
+											<label class="custom-control-label" for="app_yn">앱</label>
+										</div>
+									</div>
+								</div>
+							</div>
                         </div>
                     </div>
                     <div class="col-lg-8 inner-td">
@@ -482,6 +498,14 @@
     function Search() {
         let data = $('form[name="search"]').serialize();
 
+		if($('#mobile_yn').is(':checked')) {
+			$('#mobile_yn').val('Y');
+		}
+
+		if($('#app_yn').is(':checked')) {
+			$('#app_yn').val('Y');
+		}
+		
         gx.Aggregation({
             "sum": "top",
             "avg": "top"

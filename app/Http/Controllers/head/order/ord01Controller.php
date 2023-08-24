@@ -211,6 +211,7 @@ class ord01Controller extends Controller
         ###################################################################
         #	회원그룹 정보
         ###################################################################
+		$values['group'] = ['group_no' => 0, 'group_nm' => '비회원'];
         if (isset($values['ord']) && !empty($values['ord']->user_id) ) {
             $user_id = $values['ord']->user_id;
 
@@ -224,7 +225,8 @@ class ord01Controller extends Controller
                 order by b.dc_ratio desc, b.point_ratio desc
                 limit 0,1
             ";
-            $values['group'] = DB::selectOne($sql);
+			$result = DB::selectOne($sql);
+			$values['group'] = $result;
         }
 
         ###################################################################
@@ -272,7 +274,7 @@ class ord01Controller extends Controller
                 , o.head_desc, o.goods_nm, g.goods_no, g.goods_sub, g.style_no, replace(g.img,'$cfg_img_size_real','$cfg_img_size_detail') as img
                 , o.goods_opt
                 , replace(o.goods_opt,'^',' : ') as opt_val
-                , o.qty,o.price
+                , 1 as qty,g.price
                 , ifnull(
                     if( o.ord_state < 10, o.qty, (
                             select sum(qty) from order_opt_wonga where ord_opt_no = o.ord_opt_no and ord_state = 10
@@ -289,7 +291,7 @@ class ord01Controller extends Controller
                         where goods_no = g.goods_no and goods_sub = g.goods_sub and goods_opt = o.goods_opt
                     ), 0
                  ) as stock_qty
-                , o.point_amt, o.coupon_amt, o.dc_amt, o.dlv_amt, o.recv_amt
+				, o.point_amt, o.coupon_amt, o.dc_amt, o.dlv_amt, g.price as recv_amt
                 , c.refund_amt, o.add_point
                 , g.is_unlimited, g.goods_type
                 , o.opt_amt, o.addopt_amt, o.dlv_comment
@@ -3167,5 +3169,41 @@ class ord01Controller extends Controller
 		}
 
 		return response()->json([ 'code' => $code, 'msg' => $msg, 'account_etcs' => $rows ], $code);
+	}
+
+	function copy_parent_tno(Request $request){
+		$ord_no = $request->input("ord_no", '');
+		$ord_opt_no = $request->input("ord_opt_no", 0);
+		$pay_type = $request->input("pay_type", 0);
+		$tno = $request->input("tno");
+
+		if($tno == ""){
+			$sql = "
+                select p.tno,p.pay_type,p.pay_stat,p.pay_amt
+                from order_opt o inner join payment p on o.ord_no = p.ord_no
+                where ord_opt_no = (
+                    select p_ord_opt_no
+                    from order_opt
+                    where ord_opt_no = '$ord_opt_no'
+                )
+            ";
+
+			$rows = DB::select($sql);
+
+			foreach($rows as $row){
+				$ptno = $row->tno;
+				$ppay_type = $row->pay_type;
+				$ppay_stat = $row->pay_stat;
+				$ppay_amt = $row->pay_amt;
+
+				if(((int)$pay_type & (int)$ppay_type) == $pay_type || ((int)$pay_type & (int)$ppay_type) == $ppay_type){
+					$sql = "
+                        update payment set tno = '$ptno', pay_stat = '$ppay_stat', pay_amt = '$ppay_amt'
+                        where ord_no = '$ord_no'
+                    ";
+					DB::update($sql);
+				}
+			}
+		}
 	}
 }

@@ -1181,6 +1181,24 @@ function cbSave()
 	self.close();
 }
 
+$('#copy_parent_tno').click(function() {
+	var frm = $('form[name="f1"]');
+
+	$.ajax({
+		async: true,
+		type: 'put',
+		url: '/head/order/ord01/copy/parent/tno',
+		data: frm.serialize(),
+		success: function (data) {
+			alert("저장되었습니다.");
+			window.location.reload();
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+});
+
 </script>
 
 
