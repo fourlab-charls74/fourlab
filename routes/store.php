@@ -762,6 +762,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::get('ord04','ord04Controller@index');
 		Route::get('ord04/search','ord04Controller@search');
 		Route::post('ord04/complete-check','ord04Controller@completeStockCheck'); // 재고검수완료처리
+		
+		// 주문내역관리 (주문수정)
+		Route::get('ord05', 'ord05Controller@index');
     });
 
     // 고객관리
