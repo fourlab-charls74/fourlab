@@ -566,6 +566,12 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::put('stk35/show', 'stk35Controller@update');
         Route::put('stk35/delete', 'stk35Controller@delete');
         Route::post('stk35/upload', 'stk35Controller@upload');
+
+		//재고현황
+		Route::get('stk36', 'stk36Controller@index');
+		Route::get('stk36/company/search', 'stk36Controller@SearchCompany');
+		Route::get('stk36/goods-by-com/search', 'stk36Controller@SearchGoodsByCom');
+		Route::get('stk36/item-n-brand/search', 'stk36Controller@SearchItemnBrand');
     });
 
     //[배송 / 주문]
