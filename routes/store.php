@@ -765,6 +765,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		
 		// 주문내역관리 (주문수정)
 		Route::get('ord05', 'ord05Controller@index');
+		Route::get('ord05/search/{ord_no?}', 'ord05Controller@search_command');
     });
 
     // 고객관리
