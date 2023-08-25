@@ -8,7 +8,7 @@
 	.size_code_table td { padding: 0 3px; min-width: 65px; height: 35px; border: 1px solid lightgrey; text-align: center; }
 </style>
 
-<div class="py-3 px-sm-3">
+<div class="pt-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between pb-2">
 		<h3 class="d-inline-flex">사이즈코드표</h3>
 		<div>
@@ -18,7 +18,7 @@
 	</div>
 	<div class="show_layout py-0 px-sm-0" id="div_grid">
 		<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-			<div class="table-responsive">
+			<div class="table-responsive d-flex justify-content-center">
 				<table class="size_code_table">
 					<tbody>
 					@foreach($size_kinds as $kind)

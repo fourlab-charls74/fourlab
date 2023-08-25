@@ -72,7 +72,7 @@ class sal09Controller extends Controller
 	{
 		$sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
 		$edate = $request->input('edate', now()->format("Y-m"));
-
+		
 		$months_count = Carbon::parse($sdate)->diffInMonths(Carbon::parse($edate)->lastOfMonth());
 
 		$list_type = $request->input('list_type', "qty");
@@ -146,6 +146,7 @@ class sal09Controller extends Controller
 
 		$col_keys = [];
 		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Ym");
+		
 		$Ym = (int)str_replace("-", "", $sdate);
 		for ( $i = 0; $i <= $months_count; $i++ ) {
 			$comma = ($i == $months_count) ? "" : ",";
@@ -197,8 +198,8 @@ class sal09Controller extends Controller
 
 		$ym_s = str_replace("-", "", $sdate);
 		$ym_e = str_replace("-", "", $edate);
-		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Y-m");
-		$next_edate = Carbon::parse($edate)->addMonth()->format("Y-m");
+		$prev_sdate = Carbon::parse($sdate)->format("Y-m-01");
+		$next_edate = Carbon::parse($edate)->format("Y-m-31");
 
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format("Y-m");
 		$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
@@ -206,31 +207,26 @@ class sal09Controller extends Controller
 
 		$sql = 
             "
-			select s.store_nm,c.code_val as store_type_nm,a.*, b.*, p.*
+			select 
+			    a.*
+			    , s.store_nm
+			    , s.store_cd
 				, ifnull(p.amt,0) as proj_amt
-				, ifnull(a.recv_amt,0) as recv_amt
 				, (a.recv_amt / p.amt) * 100 as progress_rate
+				, sc.store_channel as store_channel
+				, sc2.store_kind as store_channel_kind
 			from store s 
 			left outer join (
-				select m.store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
-						${sum_month_prev}
-						${sum_month_others}
-					from order_mst m 
-						inner join order_opt o on m.ord_no = o.ord_no 
-					where m.ord_date >= '${prev_sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
-					group by m.store_cd
-			) a on s.store_cd = a.store_cd
-			left outer join 
-			(
 				select 
-					m.store_cd, sum(o.recv_amt) as last_recv_amt,
-					${sum_last_year}
+					m.store_cd, sum(o.recv_amt) as recv_amt, sum(o.qty) as qty,
+					${sum_month_prev}
+					${sum_month_others}
 				from order_mst m 
 					inner join order_opt o on m.ord_no = o.ord_no 
-				where m.ord_date >= '${last_year_sdate}' and m.ord_date < '${last_year_next_edate}' and m.store_cd <> ''
+				where m.ord_date >= '${prev_sdate}' and m.ord_date <= '${next_edate}' and m.store_cd <> ''
 				group by m.store_cd
-			) b on s.store_cd = b.store_cd 
-			inner join 
+			) a on s.store_cd = a.store_cd
+			left outer join 
 			(
 				select 
 					ssp.store_cd, sum(amt) as proj_amt, ssp.amt,
@@ -238,11 +234,12 @@ class sal09Controller extends Controller
 				from store_sales_projection ssp
 				where ym >= '${ym_s}' and ym <= '${ym_e}'
 				group by ssp.store_cd
-			) p on s.store_cd = p.store_cd 		
-			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
-            where 1=1 $where2
+			) p on s.store_cd = p.store_cd 
+			left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+			left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+            where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or a.qty is not null or a.recv_amt <> '0') $where2
 		";
-
+		
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
 		
 		return response()->json([

@@ -376,28 +376,48 @@ class stk30Controller extends Controller
 					$code = 501;
 					throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
 				}
-
-                DB::table('store_return_product')
-                    ->where('sr_prd_cd', '=', $product['sr_prd_cd'])
-                    ->update([
-                        'return_price' => $product['return_price'], // 반품단가
-                        'return_qty' => $product['return_qty'], // 요청수량
-						'return_p_qty' => $product['return_p_qty'], // 처리수량
-                        'reject_reason' => $product['reject_reason'] ?? '', // 반품거부사유
-                        'reject_comment' => $product['reject_comment'] ?? '', // 반품거부메모
-                        'fixed_return_price' => $product['fixed_return_price'], // 확정금액
-                        'fixed_return_qty' => $product['fixed_return_qty'], // 확정수량
-                        'fixed_comment' => $product['fixed_comment'] ?? '',
-                        'ut' => now(),
-                        'admin_id' => $admin_id,
-                    ]);
+				
+				$sr_prd_cd = $product['sr_prd_cd'] ?? '';
+				if ($sr_prd_cd !== '') {
+					DB::table('store_return_product')
+						->where('sr_prd_cd', '=', $sr_prd_cd)
+						->update([
+							'return_price' => $product['return_price'], // 반품단가
+							'return_qty' => $product['return_qty'], // 요청수량
+							'return_p_qty' => $product['return_p_qty'], // 처리수량
+							'reject_reason' => $product['reject_reason'] ?? '', // 반품거부사유
+							'reject_comment' => $product['reject_comment'] ?? '', // 반품거부메모
+							'fixed_return_price' => $product['fixed_return_price'], // 확정금액
+							'fixed_return_qty' => $product['fixed_return_qty'], // 확정수량
+							'fixed_comment' => $product['fixed_comment'] ?? '',
+							'ut' => now(),
+							'admin_id' => $admin_id,
+						]);
+				} else {
+					$sr_prd_cd = DB::table('store_return_product')
+						->insertGetId([
+							'sr_cd' => $sr_cd,
+							'prd_cd' => $product['prd_cd'],
+							'price' => $product['price'], // 판매가
+							'return_price' => $product['return_price'], // 반품단가
+							'return_qty' => $product['return_qty'], // 요청수량
+							'return_p_qty' => $product['return_p_qty'], // 처리수량
+							'reject_reason' => $product['reject_reason'] ?? '', // 반품거부사유
+							'reject_comment' => $product['reject_comment'] ?? '', // 반품거부메모
+							'fixed_return_price' => $product['fixed_return_price'], // 확정금액
+							'fixed_return_qty' => $product['fixed_return_qty'], // 확정수량
+							'fixed_comment' => $product['fixed_comment'] ?? '',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+						]);
+				}
 
 				if ($new_state == 30) {
 					// 반품처리중 재고처리
-					$this->_set_return_p_stock($product['sr_prd_cd'], $admin_id, $admin_nm);
+					$this->_set_return_p_stock($sr_prd_cd, $admin_id, $admin_nm);
 				} else if ($new_state == 40) {
 					// 반품완료 재고처리
-					$this->_set_return_stock($product['sr_prd_cd'], $admin_id, $admin_nm);
+					$this->_set_return_stock($sr_prd_cd, $admin_id, $admin_nm);
 				}
             }
 
@@ -860,9 +880,9 @@ class stk30Controller extends Controller
                 ) as size
                 , if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1 as qty
                 , g.price
-                , (g.price * srp.return_qty * -1) as total_price
+                , (g.price * if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1) as total_price
 			 	, round(g.price / 1.1) as return_price
-			 	, round(g.price / 1.1 * srp.return_qty * -1) as total_return_price
+			 	, round(g.price / 1.1 * if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1) as total_return_price
 				, s.store_nm
 				, s.addr1
 				, s.addr2

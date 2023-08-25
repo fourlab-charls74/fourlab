@@ -91,7 +91,8 @@
                                                     </div>
                                                     @else
                                                     <input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />
-                                                    <input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" class="form-control form-control-sm w-100" readonly />
+                                                    <input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" />
+                                                    <input type="hidden" name="store_no" id="store_no" value="{{ @$sr->store_cd }}" />
                                                     @endif
                                                 </div>
                                             </td>
@@ -155,10 +156,12 @@
 	                </div>
                 @endif
                 @if(@$sr->sr_state == '10')
-                    <button type="button" onclick="return setReturnQty('qty', 'return_p_qty');" class="btn btn-sm btn-outline-primary shadow-sm">요청수량 <i class="bx bx-right-arrow-alt"></i> 처리수량</button>
+                    <button type="button" onclick="return setReturnQty('qty', 'return_p_qty');" class="btn btn-sm btn-outline-primary shadow-sm mr-1">요청수량 <i class="bx bx-right-arrow-alt"></i> 처리수량</button>
+	                <button type="button" onclick="return addGoods();" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-plus"></i> 상품추가</button>
                 @endif
                 @if(@$sr->sr_state == '30')
-                    <button type="button" onclick="return setReturnQty('return_p_qty', 'fixed_return_qty');" class="btn btn-sm btn-outline-primary shadow-sm">처리수량 <i class="bx bx-right-arrow-alt"></i> 확정수량</button>
+                    <button type="button" onclick="return setReturnQty('return_p_qty', 'fixed_return_qty');" class="btn btn-sm btn-outline-primary shadow-sm mr-1">처리수량 <i class="bx bx-right-arrow-alt"></i> 확정수량</button>
+	                <button type="button" onclick="return addGoods();" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-plus"></i> 상품추가</button>
                 @endif
                 </div>
             </div>
@@ -486,6 +489,10 @@
             qty: 0, 
             return_price: row.price,
             return_amt: 0,
+			return_p_amt: 0,
+			return_p_qty: 0,
+			fixed_return_price: 0,
+			fixed_return_qty: 0,
             isEditable: true,
             count: count + 1,
         };

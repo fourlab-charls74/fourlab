@@ -86,24 +86,20 @@ class sal29Controller extends Controller
 
 		// 해당사이즈 조회 (FREE + 해당사이즈)
 		$sql = "
-			select s.size_kind_cd, s.size_kind_nm, s.size_cd, s.size_seq
-				, if(s.size_kind_cd = 'PRD_CD_SIZE_MEN', '남성',
-				    if(s.size_kind_cd = 'PRD_CD_SIZE_WOMEN', '여성',
-					if(s.size_kind_cd = 'PRD_CD_SIZE_UNISEX', '공용',
-					s.size_kind_nm
-				))) as size_kind_nm_s
-			from product_stock_release psr
-				inner join product_code pc on pc.prd_cd = psr.prd_cd
-				left outer join (
-				    select s.size_kind_cd, sk.size_kind_nm, s.size_cd, s.size_seq
-				    from size s
-						inner join size_kind sk on sk.size_kind_cd = s.size_kind_cd
-				) s on s.size_kind_cd = if(
-				    pc.size_kind <> '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', '')))
-				) and s.size_cd = pc.size
-			where s.size_cd <> '99' $where $where2
-			group by s.size_kind_cd, s.size_cd
-			order by s.size_kind_cd, s.size_seq
+			select s.size_kind_cd, s.size_kind_nm, s.size_kind_nm as size_kind_nm_s, s.size_cd, s.size_seq
+			from (
+				select s.size_kind_cd, sk.size_kind_nm, s.size_cd, s.size_seq, sk.seq as size_kind_seq
+				from size s
+					inner join size_kind sk on sk.size_kind_cd = s.size_kind_cd
+			) s
+			where s.size_cd <> '99' and s.size_kind_cd in (
+				select pc.size_kind
+				from product_stock_release psr
+					inner join product_code pc on pc.prd_cd = psr.prd_cd
+				where 1=1 $where $where2
+				group by pc.size_kind
+			)
+			order by s.size_kind_seq, s.size_seq
 		";
 		$free_size = DB::select(
 			"select size_kind_cd, size_cd, size_seq from size where size_kind_cd = :size_kind_cd and size_cd = :size_cd",
