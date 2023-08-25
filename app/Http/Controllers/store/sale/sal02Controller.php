@@ -14,8 +14,8 @@ class sal02Controller extends Controller
 {
 	public function index() 
 	{
-		// $sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
-		$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
+		$sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
+		//$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
 		// 매장구분
 		$sql = " 

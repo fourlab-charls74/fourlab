@@ -17,7 +17,7 @@ class sal24Controller extends Controller
     // 일별 매출 통계
     public function index(Request $req) 
 	{
-		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(1, 'month')->format("Ym")) . '01');
+		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(0, 'month')->format("Ym")) . '01');
 		$sdate = $date->format('Y-m-d');
 		$edate = $date->format('Y-m-t');
 
