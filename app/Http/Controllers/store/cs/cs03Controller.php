@@ -133,12 +133,12 @@ class cs03Controller extends Controller
 				i.img_url as img,
 				p1.prd_nm as prd_nm,
 				c1.code_val as color,
-				(
-                    select s.size_nm from size s
-                    where s.size_kind_cd = if(p4.size_kind != '', p4.size_kind, if(p4.gender = 'M', 'PRD_CD_SIZE_MEN', if(p4.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = p4.size
-                        and use_yn = 'Y'
-                ) as size,
+				ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = p4.size_kind
+					   and s.size_cd = p4.size
+					   and use_yn = 'Y'
+				),'') as size,
 				c3.code_val as unit,
 				ifnull(p1.qty, 0) as qty,
 				ifnull(p1.price, 0) as price,
@@ -630,12 +630,12 @@ class cs03Controller extends Controller
 				p.prd_nm as prd_nm,
 				i.img_url as img,
 				c7.code_val as color,
-				(
-                    select s.size_nm from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size,
+				ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size,
 				c9.code_val as unit,
 				ifnull(pss.wqty, 0) as stock_qty,
 				0 as in_qty,

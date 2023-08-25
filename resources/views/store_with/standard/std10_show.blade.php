@@ -130,7 +130,7 @@
                 return false;
             }
 
-            var frm = $('form');
+			let frm = $("form[name=detail]");
 
             if(code == ""){
                 $.ajax({
@@ -220,6 +220,7 @@
             {field: "rt", headerName: "작성일시", width: 130,cellClass: 'hd-grid-code'},
             {field: "ut", headerName: "수정일시", width: 130,cellClass: 'hd-grid-code'},
             {field: "editable",hide:true},
+			{width:"auto"}
         ];
     </script>
     <script type="text/javascript" charset="utf-8">

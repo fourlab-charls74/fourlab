@@ -199,12 +199,12 @@ class stk12Controller extends Controller
                 g.goods_nm_eng,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 pc.color,
-                (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size,
+                ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size,
                 c.code_val as color_nm,
                 p.qty as storage_qty,
                 p.wqty as storage_wqty,
@@ -523,12 +523,12 @@ class stk12Controller extends Controller
                     , s.prd_cd
                     , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.opt,pc.seq) as prd_cd_p
                     , pc.color
-                    , (
-                        select s.size_cd from size s
-                        where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                            and s.size_cd = pc.size
-                            and use_yn = 'Y'
-                    ) as size
+                   	, ifnull((
+						select s.size_cd from size s
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size
                     , s.goods_opt
                     , ps.wqty as storage_qty
                     , (select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = s.prd_cd) as store_qty

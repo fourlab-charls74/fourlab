@@ -70,7 +70,7 @@
                                                 <div class="form-inline inline_select_box">
                                                     @if(@$cmd == 'add')
                                                     <div class="d-flex w-100">
-                                                        <select name="target_type" id="target_type" class="form-control form-control-sm mr-1" style="min-width: 90px;" hidden>
+                                                        <select name="target_type" id="target_type" class="form-control form-control-sm mr-1" style="min-width: 90px;">
                                                             <option value="C">공급업체</option>
                                                             <option value="S">창고</option>
                                                         </select>
@@ -173,8 +173,8 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 153},
-        {field: "goods_sh", headerName: "TAG가", type: "currencyType", width: 65},
-        {field: "price", headerName: "판매가", type: "currencyType", width: 65},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 65},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
@@ -278,7 +278,8 @@
             if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
 
             let excess_qtys = rows.filter(r => (r.qty * 1) > (r.storage_wqty * 1));
-            if(excess_qtys.length > 0) return alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+            if (excess_qtys.length > 0) return alert("해당 창고의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+			if (target_cd == '') return alert('이동창고를 선택해주세요.');
 
             if(!confirm("등록하시겠습니까?")) return;
 

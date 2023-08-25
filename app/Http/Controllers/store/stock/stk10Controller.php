@@ -205,12 +205,12 @@ class stk10Controller extends Controller
                 brand.brand_nm as brand,
                 pc.color,
                 d.code_val as color_nm,
-                (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size,
+                ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size,
                 psr.prd_cd,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, 
                 psr.qty,
@@ -801,12 +801,12 @@ class stk10Controller extends Controller
 			     , type.code_val as type_nm
 			     , g.goods_nm
 			     , pc.color
-			     , (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
+			     , ifnull((
+					 select s.size_cd from size s
+					 where s.size_kind_cd = pc.size_kind
+					    and s.size_cd = pc.size
+					    and use_yn = 'Y'
+				 ),'') as size
 			     , p.qty
 			     , g.price
 			     , (g.price * p.qty) as total_price

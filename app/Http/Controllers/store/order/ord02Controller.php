@@ -265,18 +265,18 @@ class ord02Controller extends Controller
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join (
 						select p.prd_cd, p.goods_no, p.goods_opt, p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt, p.color, c.code_val as color_nm
-								, (
+								, ifnull((
 									select s.size_cd from size s
-									where s.size_kind_cd = if(p.size_kind != '', p.size_kind, if(p.gender = 'M', 'PRD_CD_SIZE_MEN', if(p.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-										and s.size_cd = p.size
-										and use_yn = 'Y'
-								) as size
-								, (
-									select s.size_nm from size s 
-									where size_kind_cd = if(p.size_kind != '', p.size_kind, if(p.gender = 'M', 'PRD_CD_SIZE_MEN', if(p.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
-										and s.size_cd = p.size
-										and use_yn = 'Y'
-								) as size_nm
+									where s.size_kind_cd = p.size_kind
+									   and s.size_cd = p.size
+									   and use_yn = 'Y'
+								),'') as size
+								, ifnull((
+									select s.size_nm from size s
+									where s.size_kind_cd = p.size_kind
+									   and s.size_cd = p.size
+									   and use_yn = 'Y'
+								),'') as size_nm
 						from product_code p
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 					) pc on pc.goods_no = o.goods_no and lower(pc.color_nm) = lower(substring_index(o.goods_opt, '^', 1)) and lower(replace(pc.size_nm, ' ', '')) = lower(replace(substring_index(o.goods_opt, '^', -1), ' ', ''))
@@ -313,12 +313,12 @@ class ord02Controller extends Controller
 							inner join order_mst om on om.ord_no = o.ord_no
 							left outer join (
 							    select pc.prd_cd, pc.prd_cd_p, pc.goods_no, pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt, pc.color
-								, (
+								, ifnull((
 									select s.size_cd from size s
-									where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-										and s.size_cd = pc.size
-										and use_yn = 'Y'
-								) as size
+									where s.size_kind_cd = pc.size_kind
+									   and s.size_cd = pc.size
+									   and use_yn = 'Y'
+								),'') as size
 								, p.match_yn
 							    from product_code pc
 							    	inner join product p on p.prd_cd = pc.prd_cd

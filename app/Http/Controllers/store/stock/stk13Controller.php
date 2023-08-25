@@ -182,12 +182,12 @@ class stk13Controller extends Controller
 					o.prd_cd,
 					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 					pc.color,
-					(
+					ifnull((
 						select s.size_cd from size s
-						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-							and s.size_cd = pc.size
-							and use_yn = 'Y'
-					) as size,
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size,
 					o.goods_no,
 					op.opt_kind_nm,
 					b.brand_nm, 
@@ -236,12 +236,12 @@ class stk13Controller extends Controller
 				concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 				pc.color,
 				c.code_val as color_nm,
-				(
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size,
+				ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size,
 				o.goods_no,
 				op.opt_kind_nm,
 				b.brand_nm, 

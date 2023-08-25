@@ -274,7 +274,7 @@
     let sum_amt_datas = [];
     let sum_wonga_datas = [];
 
-    for (let i=0; i<chartData.length; i++) {
+    for (let i=1; i<chartData.length; i++) {
         const sum_amt = chartData[i]?.sum_amt ?? 0;
         const sum_wonga = chartData[i]?.sum_wonga ?? 0;
 

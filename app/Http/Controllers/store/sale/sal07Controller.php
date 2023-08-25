@@ -183,12 +183,12 @@ class sal07Controller extends Controller
 				(sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
 				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
 				opt.opt_kind_nm, pc.color, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
-				, (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
 			from order_mst m 
 				inner join order_opt o on m.ord_no = o.ord_no 
 				inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no

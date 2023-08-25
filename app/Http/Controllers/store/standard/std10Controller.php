@@ -120,7 +120,7 @@ class std10Controller extends Controller
 
         $size_kind_cd = $request->input('size_kind_cd');
         $size_kind_nm = $request->input('size_kind_nm');
-        $use_yn = $request->input('use_yn','Y');
+        $use_yn = $request->input('use_yn');
         //$admin_nm = $request->input('admin_nm');
 
         $id = Auth::guard('head')->user()->id;

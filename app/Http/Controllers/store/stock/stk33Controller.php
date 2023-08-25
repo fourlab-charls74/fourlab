@@ -18,7 +18,7 @@ class stk33Controller extends Controller
         $sdate = $mutable->sub(1, 'month')->format('Y-m-d');
         $edate = date("Y-m-d");
 
-        $req_date = $request->query('date');
+        $req_date = $request->input('date');
         $lastDay = DATE('t', strtotime($req_date));
 
         if ($req_date != '') {
@@ -114,7 +114,7 @@ class stk33Controller extends Controller
         $total_data = '';
         $page_cnt = 0;
         if($page == 1) {
-            $query =
+            $sql =
                 "
                 select
                     count(a.store_nm) as total
@@ -144,11 +144,11 @@ class stk33Controller extends Controller
                     group by cs.sale_date, cs.store_cd
                 ) a
             ";
+			$row = DB::selectOne($sql);
+			$total_data = $row;
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
-        $row = DB::selectOne($query);
-        $total_data = $row;
-        $total = $row->total;
-        $page_cnt = (int)(($total - 1) / $page_size) + 1;
             
         return response()->json([
             "code" => 200,

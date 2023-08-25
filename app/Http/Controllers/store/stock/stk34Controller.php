@@ -105,13 +105,11 @@ class stk34Controller extends Controller
                         group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd, cs.competitor_cd
                     ) a
                 ";
+				$row = DB::selectOne($query);
+				$total_data = $row;
+				$total = $row->total;
+				$page_cnt = (int)(($total - 1) / $page_size) + 1;
             }
-            $row = DB::selectOne($query);
-
-            $total_data = $row;
-            $total = $row->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
-
 
             $sql = "
                 select 

@@ -129,12 +129,12 @@ class stk22Controller extends Controller
                 , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                 , pc.color
                 , color.code_val as color_nm
-                , (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
+                , ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
                 , pc.goods_opt
                 , if(pc.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
                 , if(pc.goods_no <> '0', g.price, p.price) as price

@@ -154,12 +154,12 @@ class stk20Controller extends Controller
                 if(psr.goods_no > 0, g.goods_nm_eng, p.prd_nm_eng) as goods_nm_eng,
                 psr.prd_cd, 
                 pc.color,
-                (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size,
+                ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 if(psr.goods_no > 0, psr.goods_opt, pc.goods_opt) as goods_opt,
                 if(psr.goods_no > 0, g.price, p.price) as price,
@@ -569,12 +569,12 @@ class stk20Controller extends Controller
 			select p.prd_cd
 			     , g.goods_nm
 			     , pc.color
-			     , (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
+			     , ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				 ),'') as size
 			     , p.qty
 			     , p.rec_comment
 			     , if(p.type = 'R', '요청RT', if(p.type = 'G', '일반RT', '')) as type

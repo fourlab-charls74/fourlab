@@ -196,12 +196,12 @@ class ord04Controller extends Controller
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, g.goods_nm, g.goods_nm_eng, g.style_no, g.price as goods_price, g.goods_sh
 					, ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p, pc.color
-					, (
+					, ifnull((
 						select s.size_cd from size s
-						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-							and s.size_cd = pc.size
-							and use_yn = 'Y'
-					) as size
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size
 					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no

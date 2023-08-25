@@ -75,12 +75,12 @@ class prd05Controller extends Controller
 						, g.goods_nm_eng as goods_nm_eng
 						, pc.prd_cd_p as prd_cd_p
 						, pc.color as color
-						, (
+						, ifnull((
 							select s.size_cd from size s
-							where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-								and s.size_cd = pc.size
-								and use_yn = 'Y'
-						) as size
+							where s.size_kind_cd = pc.size_kind
+							   and s.size_cd = pc.size
+							   and use_yn = 'Y'
+						),'') as size
 						, pc.goods_opt as goods_opt
 						, p.tag_price as goods_sh
 						, p.price as price
@@ -134,12 +134,12 @@ class prd05Controller extends Controller
 					, g.goods_nm_eng as goods_nm_eng
 					, pc.prd_cd_p as prd_cd_p
 					, pc.color as color
-					, (
+					, ifnull((
 						select s.size_cd from size s
-						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-							and s.size_cd = pc.size
-							and use_yn = 'Y'
-					) as size
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size
 					, pc.goods_opt as goods_opt
 					, p.tag_price as goods_sh
 					, p.price as price
@@ -233,12 +233,12 @@ class prd05Controller extends Controller
 				, g.goods_nm
 				, g.goods_nm_eng
 				, c.code_val as color
-				, (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
 				, g.price
 				, g.goods_sh
 			from product_price_list ppl
@@ -310,12 +310,12 @@ class prd05Controller extends Controller
 				, g.goods_nm_eng as goods_nm_eng
 				, pc.prd_cd_p as prd_cd_p
 				, pc.color as color
-				, (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
 				, pc.goods_opt as goods_opt
 				, p.tag_price as goods_sh
 				, p.price as price
