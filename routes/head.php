@@ -587,6 +587,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
             Route::get('search/{cmd}', $cont . '@search');
             Route::get('order-list/{ord_no}', $cont . '@order_list');
             Route::get('order-goods/{ord_no}/{ord_opt_no}', $cont . '@order_goods');
+			Route::post('give-gift', $cont . '@give_gift');
             Route::get('{ord_no}/{ord_opt_no?}', $cont . '@show');
             Route::get('get/{ord_no}/{ord_opt_no?}', $cont . '@get');
             Route::get('{ord_no}/{ord_opt_no}/cash', $cont . '@show_cash');

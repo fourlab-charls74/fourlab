@@ -584,7 +584,7 @@ class ord01Controller extends Controller
         #	사은품 정보
         ###################################################################
         $sql = "
-            select a.no, a.ord_no, a.ord_opt_no,
+			select a.no as order_gift_no, a.ord_no, a.ord_opt_no,
                 ifnull(a.give_yn, 'N') as give_yn,
                 ifnull(a.give_date, '') as give_date,
                 ifnull(a.refund_no, '0') as refund_no,
@@ -3205,5 +3205,35 @@ class ord01Controller extends Controller
 				}
 			}
 		}
+	}
+
+	function give_gift(Request $request)
+	{
+
+		$gift_info = $request->input("gift_info");
+		$a_gift_info = explode(",", $gift_info);
+
+		try {
+			DB::beginTransaction();
+
+			$gift = new Gift();
+
+			for($i=0; $i<count($a_gift_info); $i++) {
+				if(isset($a_gift_info[$i]) && $a_gift_info[$i] != "") {
+					$gift->GiveGift($a_gift_info[$i]);
+				}
+			}
+
+			DB::commit();
+
+			$code = 200;
+			$msg = "정상적으로 등록되었습니다.";
+		} catch(Exception $e){
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json([ 'code' => $code, 'msg' => $msg ]);
 	}
 }

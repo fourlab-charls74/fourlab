@@ -522,7 +522,7 @@
                     </div>
                 @endif
             </div>
-            <div class="card-body">
+            <div id = "goods" class="card-body">
                 <div class="row_wrap">
                     <div class="row">
                         <div class="col-12">
@@ -587,7 +587,7 @@
 													[[확정]]
 												@endif
                                             </td>
-                                            <td><a href="/head/order/ord01/{{$ord_no}}/{{$ord_list->ord_opt_no}}">{{@$ord_list->order_state}}</a></td>
+											<td><a href="/head/order/ord01/{{$ord_no}}/{{$ord_list->ord_opt_no}}#goods">{{@$ord_list->order_state}}</a></td>
                                             <td>
                                                 <a href="#" onClick="PopOrderGoods('{{$ord_no}}','{{$ord_list->ord_opt_no}}');return false;">{{@$ord_list->ord_kind_nm}}</a>/<br />
                                                 {{@$ord_list->ord_kind_nm}}
@@ -650,6 +650,114 @@
             </div>
         </div>
 
+		@if (count($gifts) > 0)
+			<div class="card shadow">
+				<div class="card-header mb-0 d-flex justify-content-between">
+					<a href="#" class="m-0 font-weight-bold">사은품</a>
+					<div>
+						<table cellpadding=0 cellspacing=1 border=0 style="width:100%">
+							<tr>
+								<td style="text-align:right">
+									선택한 사은품&nbsp;
+									<button onclick="giveGift();" class="btn-sm btn btn-secondary fs-12">사은품 지급</button>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="card-body">
+					<div class="row_wrap">
+						<div class="row">
+							<div class="col-12">
+								<div class="table-responsive">
+									<table class="table table-bordered th_border_none custm_tb2">
+										<colgroup>
+											<col width="1%">
+											<col width="1%">
+											<col width="34%">
+											<col width="5%">
+											<col width="34%">
+											<col width="6%">
+											<col width="7%">
+											<col width="6%">
+											<col width="6%">
+										</colgroup>
+										<thead>
+										<tr>
+											<th style="text-align:center;"><input type="checkbox" id="gift-all"></th>
+											<th style="text-align:center;">이미지</th>
+											<th>사은품명</th>
+											<th>분류</th>
+											<th>증정구분</th>
+											<th>지급여부</th>
+											<th>지급일시</th>
+											<th>환불상태</th>
+											<th>환불일시</th>
+										</tr>
+										</thead>
+										<tbody id = "gift_list_body">
+										@if (count($gifts) > 0)
+											@foreach($gifts as $row)
+												<tr id = "gift_{{$row->ord_opt_no}}" @if(@$row->ord_opt_no == @$ord_opt_no) style="background-color: yellow;" @else '' @endif>
+													<td style="text-align:center;">
+														@if (@$row->give_yn === 'Y' && @$row->refund_yn === 'Y')
+														@else
+															<input type="checkbox" id="gift_info" name="gift_info" value="{{@$row->order_gift_no}}|{{@$row->gift_no}}|{{@$row->give_yn}}|{{@$row->refund_yn}}" @if(@$row->refund_no !== '0' && @$row->refund_no !== @$ord_opt_no) @endif/>
+														@endif
+													</td>
+													<td style="text-align:center;">
+														@if (@$row->img !== '')
+															<img src="{{config('shop.image_svr')}}{{@$row->img}}" style="width:50px;height:50px;" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='" align="middle" alt="" />
+														@else
+														@endif
+													</td>
+													<td class="txt">
+														<a href="#" onclick="openPopupGift({{@$row->gift_no}}); return false;">{{@$row->name}}</a>
+													</td>
+													<td class="txt">{{@$row->type_val}}&nbsp;</td>
+													<td class="txt">
+														{{@$row->kind_val}}
+														@if(@$row->kind == 'P')
+															(<a href="#" onclick="openProduct('{{@$row->goods_no}}','{{@$row->goods_sub}}'); return false;" title="{{@$row->goods_nm}}">{{@$row->goods_nm}}</a>)
+														@elseif(@$row->type == 'W')
+															({{@$row->apply_amt}}원 이상)
+														@endif
+														&nbsp;
+													</td>
+													<td>
+														@if(@$row->give_yn === 'Y')
+															지급
+														@else
+															미지급
+														@endif
+														&nbsp;
+													</td>
+													<td>{{@$row->give_date}}</td>
+													<td>
+														@if(@$row->refund_yn === 'Y')
+															환불완료
+														@else
+															@if(@$row->refund_no !== '0')
+																환불대기
+															@else
+																-
+															@endif
+														@endif
+														&nbsp;
+													</td>
+													<td>{{@$row->refund_date}}</td>
+												</tr>
+											@endforeach
+										@endif
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		@endif
         <div class="card shadow">
             <div class="card-header mb-0">
                 <div class="filter_wrap">
@@ -1275,6 +1383,19 @@
         location.reload();
     }
 
+	$("#gift-all").click(function() {
+		if($("#gift-all").is(":checked")) $("input[name=gift_info]").prop("checked", true);
+		else $("input[name=gift_info]").prop("checked", false);
+	});
+
+	$("input[name=gift_info]").click(function() {
+		var total = $("input[name=gift_info]").length;
+		var checked = $("input[name=gift_info]:checked").length;
+
+		if(total != checked) $("#gift-all").prop("checked", false);
+		else $("#gift-all").prop("checked", true);
+	});
+	
     $('.ord-no-btn').click((e) => {
         e.preventDefault();
         const url = '/head/api/order';
@@ -1763,7 +1884,74 @@
             +''+today.getDate()
             +''+(today.getHours() < 10 ? '0' : '')
             +''+today.getHours();
-    }   
+    }
+
+	function giveGift() {
+		let gift =  $("input[name=gift_info]");
+		let gift_info = "";
+
+		if(gift) {
+			if (gift.length > 1) {
+				for(let i = 0; i < gift.length; i++) {
+					if (gift[i].checked) {
+						let a_gift_info = gift[i].value.split("|");        // 사은품정보 - 사은품주문일련번호|사은품번호|지급여부|환불여부
+						let order_gift_no = (a_gift_info[0]) ? a_gift_info[0] : "";
+						let gift_no = (a_gift_info[1]) ? a_gift_info[1] : "";
+						let give_yn = (a_gift_info[2]) ? a_gift_info[2] : "";
+						let refund_yn = (a_gift_info[3]) ? a_gift_info[3] : "";
+
+						if(give_yn === 'N') {
+							gift_info += (gift_info == "") ? order_gift_no : "," + order_gift_no;
+						} else {
+							alert("이미 지급한 사은품입니다.");
+							return false;
+						}
+					}
+				}
+			} else {
+				if (gift[0].checked) {
+					let a_gift_info = gift[0].value.split("|");        // 사은품정보 - 사은품주문일련번호|사은품번호|지급여부|환불여부
+					let order_gift_no = (a_gift_info[0]) ? a_gift_info[0] : "";
+					let gift_no = (a_gift_info[1]) ? a_gift_info[1] : "";
+					let give_yn = (a_gift_info[2]) ? a_gift_info[2] : "";
+					let refund_yn = (a_gift_info[3]) ? a_gift_info[3] : "";
+
+					if(give_yn === 'N') {
+						gift_info += (gift_info == "") ? order_gift_no : "," + order_gift_no;
+					} else {
+						alert("이미 지급한 사은품입니다.");
+						return false;
+					}
+				}
+			}
+		}
+
+		if(gift_info == "") {
+			alert("지급할 사은품을 선택해주세요.");
+			return false;
+		} else {
+			$.ajax({
+				type: 'post',
+				url: '/head/order/ord01/give-gift',
+				data: {
+					'gift_info' : gift_info
+				},
+				success: function(data) {
+					alert("사은품이 지급 되었습니다.");
+					window.location.reload();
+				},
+				error: function(request, status, error) {
+					console.log("error")
+				}
+			});
+		}
+	}
+
+	function selectGiftByNo(ord_opt_no) {
+		$('#gift_list_body').children( 'tr' ).css( 'background-color', 'white');
+		$(`#gift_${ord_opt_no}`).attr('style', 'background-color: yellow');
+	}
+	
 </script>
 <style>
     .checked-goods td:not([rowspan='{{count($ord_lists)}}']) {

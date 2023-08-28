@@ -12,6 +12,11 @@ function openProduct(prd_no) {
     );
 }
 
+function openPopupGift(gift_no){
+	let url = `/head/promotion/prm06/${gift_no}`;
+	window.open(url, "_blank", "resizable=yes,scrollbars=yes", 1000, 700);
+}
+
 function openHeadProduct(prd_no) {
     var url = "/head/product/prd01/" + prd_no;
     var product = window.open(
