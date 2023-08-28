@@ -43,6 +43,7 @@ class ord05Controller extends Controller
 		}
 	}
 
+	/** 주문내역조회 */
 	public function search(Request $request)
 	{
 		$sdate = $request->input('sdate', now()->sub(3, 'month')->format('Ymd'));
@@ -141,37 +142,44 @@ class ord05Controller extends Controller
 		]);
 	}
 	
+	/** 특정주문의 상품내역조회 */
 	public function searchOrderOpts($ord_no, Request $request)
 	{
+		$first_of_the_current_month = now()->firstOfMonth()->format('Y-m-d 00:00:00');
+
 		$sql = "
 			select b.*
 				, (b.price - b.sale_kind_amt) as sale_price
 				, round((1 - ((b.price - b.sale_kind_amt) / b.goods_sh)) * 100) as dc_rate
 				, (b.qty * (b.price - b.sale_kind_amt)) as ord_amt
+				, if(b.ord_date >= :first_date and ((
+				    select count(c.idx)
+				    from store_account_closed_list c
+				    where c.ord_opt_no = b.ord_opt_no
+				) < 1), 'Y', 'N') as is_editable
 			from (
 				select a.*
-					, sale_kind.code_val as sale_kind_nm
+					, st.sale_type_nm as sale_kind_nm
 					, pr_code.code_val as pr_code_nm
 					, memo.memo
 					, if(st.amt_kind = 'per', round(a.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt
 				from (
-					select o.ord_no, o.ord_opt_no, o.prd_cd, o.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng
-						, pc.prd_cd_p, pc.color, pc.size, o.goods_opt as opt_val, o.sale_kind, o.pr_code, o.recv_amt
-						, o.qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.store_cd
+					select o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng
+						, pc.prd_cd_p, pc.color, pc.size, o.goods_opt as opt_val, o.sale_kind as sale_kind_cd, o.pr_code as pr_code_cd
+						, o.qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.recv_amt, o.store_cd
 						, round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
 					from order_opt o
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 						inner join goods g on g.goods_no = o.goods_no
 					where o.ord_no = :ord_no
 				) a
-					left outer join code sale_kind on (sale_kind.code_id = a.sale_kind and sale_kind.code_kind_cd = 'SALE_KIND')
-					left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
-					left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
+					left outer join sale_type st on st.sale_kind = a.sale_kind_cd and st.use_yn = 'Y'
+					left outer join code pr_code on (pr_code.code_id = a.pr_code_cd and pr_code.code_kind_cd = 'PR_CODE')
 					left outer join order_opt_memo memo on memo.ord_opt_no = a.ord_opt_no
 				order by a.ord_opt_no desc
 			) b
 		";
-		$rows = DB::select($sql, [ 'ord_no' => $ord_no ]);
+		$rows = DB::select($sql, [ 'ord_no' => $ord_no, 'first_date' => $first_of_the_current_month ]);
 
 		$pr_codes = [];
 		if (count($rows) > 0) {
@@ -198,5 +206,66 @@ class ord05Controller extends Controller
 			],
 			"body" => $rows,
 		]);
+	}
+	
+	/** 상품내역 수정 */
+	public function update(Request $request)
+	{
+		$code = 200;
+		$msg = "";
+		$orders = $request->input('data', []);
+
+		try {
+			DB::beginTransaction();
+			
+			foreach ($orders as $order) {
+				$ord_opt_no = $order['ord_opt_no'];
+				$new_qty = $order['qty'] ?? 0;
+				$new_sale_kind_cd = $order['sale_kind_cd'] ?? '';
+				$prev_sale_price = $order['ori_sale_price'] ?? 0;
+				$new_sale_price = $order['sale_price'] ?? 0;
+				$new_pr_code_cd = $order['pr_code_cd'] ?? '';
+				$new_memo = $order['memo'] ?? '';
+				
+				// order_opt
+				$values = [];
+				$order_opt_collection = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no);
+				$prev_order_opt = $order_opt_collection->first();
+				if ($prev_order_opt === null) throw new Exception("해당 주문건이 존재하지 않습니다.");
+
+				if ($prev_order_opt->qty != $new_qty) $values['qty'] = $new_qty;
+				if ($prev_order_opt->sale_kind != $new_sale_kind_cd) $values['sale_kind'] = $new_sale_kind_cd;
+				if ($prev_order_opt->pr_code != $new_pr_code_cd) $values['pr_code'] = $new_pr_code_cd;
+				if ($prev_order_opt->qty != $new_qty || $prev_sale_price != $new_sale_price) {
+					$values['dc_amt'] = ($prev_order_opt->price - $new_sale_price) * $new_qty;
+					$values['recv_amt'] = ($prev_order_opt->price * $new_qty) - $prev_order_opt->coupon_amt - $prev_order_opt->point_amt - $values['dc_amt'];
+				}
+				// $order_opt_collection->update($values);
+				
+				// order_mst
+				$values = [];
+				// $test = DB::table('order_mst')->where('ord_no', $prev_order_opt->ord_no)->first();
+				// DB::table('order_mst')->where('ord_no', $prev_order_opt->ord_no)->update($values);
+
+				// order_opt_wonga
+				// order_state
+				// payment
+				// order_opt_memo
+				// point_list
+				// member
+				// product_stock
+				// product_stock_store
+				// product_stock_storage
+				// product_stock_hst
+			}
+
+			DB::commit();
+			$msg = "주문내역이 정상적으로 저장되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+		return response()->json(['code' => $code, 'msg' => $msg], $code);
 	}
 }
