@@ -275,7 +275,15 @@ class prd01Controller extends Controller
 				, g.goods_no , g.goods_sub
 				, ifnull( type.code_val, 'N/A') as goods_type
 				, com.com_nm
-				, d.code_val as opt_kind_nm
+				, ifnull(
+					(
+						select d.code_val from product_code pc
+						inner join code d on d.code_id = pc.item and d.code_kind_cd = 'prd_cd_item'
+						where pc.goods_no = g.goods_no
+						limit 1
+					), opt.opt_kind_nm				
+				) as opt_kind_nm
+				-- , d.code_val as opt_kind_nm
 				, brand.brand_nm
 				, cat.full_nm
 				, g.style_no
@@ -327,8 +335,6 @@ class prd01Controller extends Controller
 				g.sale_dt_yn,g.sale_s_dt,g.sale_e_dt
 				, c.code_id as com_type
 			from goods g
-				inner join product_code pc on pc.goods_no = g.goods_no
-				left outer join code d on d.code_id = pc.item and d.code_kind_cd = 'prd_cd_item'
 				left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
 				left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
