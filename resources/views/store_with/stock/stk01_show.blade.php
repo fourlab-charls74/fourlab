@@ -65,7 +65,7 @@
                                 <td>{{ @$prd->color_cd == '00' ? '단일색상' : @$prd->color }} / {{ @$prd->size }}</td>
                             </tr>
                             <tr>
-                                <th>TAG가/판매가</th>
+                                <th>정상가/현재가</th>
                                 <td>{{ number_format(@$prd->goods_sh) }}원 / {{ number_format(@$prd->price) }}원</td>
                                 <th>원가</th>
                                 <td>{{ number_format(@$prd->wonga) }}원</td>

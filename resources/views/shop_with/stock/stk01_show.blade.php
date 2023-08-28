@@ -7,7 +7,7 @@
             <h3 class="d-inline-flex">재고현황</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 상품코드 - {{ @$prd->prd_cd }}</span>
+                <span>/ 바코드 - {{ @$prd->prd_cd }}</span>
             </div>
         </div>
     </div>
@@ -27,29 +27,29 @@
                         <table class="table incont table-bordered" width="100%" cellspacing="0">
                             <colgroup>
                                 <col width="120px"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
-                                <col width="20%"/>
-                                <col width="30%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
+                                <col width="15%"/>
+                                <col width="35%"/>
                             </colgroup>
                             <tbody>
                             <tr>
-                                <td rowspan="3" class="img_box brln">
+                                <td rowspan="5" class="img_box brln">
                                     @if (@$prd->img !== null)
                                     <img class="goods_img" src="{{config('shop.image_svr')}}/{{@$prd->img}}" alt="이미지" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;" />
                                     @else
                                     <p class="d-flex align-items-center justify-content-center" style="min-width: 120px;max-width:120px; min-height: 120px;max-height:120px;">이미지 없음</p>
                                     @endif
                                 </td>
-                                <th>상품코드</th>
+                                <th>바코드</th>
                                 <td>{{ @$prd->prd_cd }}</td>
-                                <th>상품번호</th>
+                                <th>온라인코드</th>
                                 <td>{{ @$prd->goods_no }}</td>
                             </tr>
                             <tr>
                                 <th>스타일넘버</th>
                                 <td>{{ @$prd->style_no }}</td>
-                                <th>공급처</th>
+                                <th>공급업체명</th>
                                 <td>{{ @$prd->com_nm }}</td>
                             </tr>
                             <tr>
@@ -60,13 +60,13 @@
                             </tr>
                             <tr>
                                 <th>상품명</th>
-                                <td colspan="2">{{ @$prd->goods_nm }}</td>
+                                <td>{{ @$prd->goods_nm }}</td>
                                 <th>컬러/사이즈</th>
                                 <td>{{ @$prd->color_cd == '00' ? '단일색상' : @$prd->color }} / {{ @$prd->size }}</td>
                             </tr>
                             <tr>
-                                <th>TAG가/판매가</th>
-                                <td colspan="2">{{ number_format(@$prd->goods_sh) }}원 / {{ number_format(@$prd->price) }}원</td>
+                                <th>정상가/현재가</th>
+                                <td>{{ number_format(@$prd->goods_sh) }}원 / {{ number_format(@$prd->price) }}원</td>
                                 <th>원가</th>
                                 <td>{{ number_format(@$prd->wonga) }}원</td>
                             </tr>
@@ -76,68 +76,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    {{-- 검색 --}}
-    <div id="search-area" class="search_cum_form mb-4">
-        <form name="search" method="get">
-            <input type="hidden" name="prd_cd" value="{{ @$prd->prd_cd }}">
-            <div class="card">
-                <div class="d-flex card-header justify-content-between">
-                    <h4>검색</h4>
-                    <div class="flax_box">
-                        <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-12 inner-td">
-                            <div class="form-group">
-                                <div class="form-group">
-                                    <label>조회일자</label>
-                                    <div class="form-inline date-select-inbox">
-                                        <div class="docs-datepicker form-inline-inner input_box">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off" disable>
-                                                <div class="input-group-append">
-                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="docs-datepicker-container"></div>
-                                        </div>
-                                        <span class="text_line">~</span>
-                                        <div class="docs-datepicker form-inline-inner input_box">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ @$edate }}" autocomplete="off">
-                                                <div class="input-group-append">
-                                                    <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="docs-datepicker-container"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" style="display:none">
-                        <div class="col-lg-12 inner-td">
-                            <div class="form-group">
-                                <label for="store_cd">매장명</label>
-                                <div class="form-inline inline_btn_box">
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
     </div>
     {{-- 창고/매장 재고현황 --}}
     <div class="show_layout">
@@ -165,14 +103,64 @@
                     <div id="div-gd-store-stock" class="ag-theme-balham"></div>
                 </div>
                 @endif
-                <h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영, 보유재고 기준</span></h6>
-                <div class="table-responsive">
-                    <div id="div-gd-store-stock-detail" class="ag-theme-balham"></div>
-                </div>
                 <p class="mt-1" style="color:red;">* 매장에 입고된 적이 없는 상품의 경우 재고가 표시되지 않습니다.</p>
             </div>
         </div>
     </div>
+		<div id="search-area" class="search_cum_form mb-4">
+			<form name="search" method="get">
+				<input type="hidden" name="prd_cd" value="{{ @$prd->prd_cd }}">
+				<div class="card">
+					<div class="d-flex card-header justify-content-between">
+						<h4>매장기간재고 검색</h4>
+						<div class="flax_box">
+							<a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-12 inner-td">
+								<div class="form-group">
+									<div class="form-group">
+										<label>조회일자</label>
+										<div class="form-inline date-select-inbox">
+											<div class="docs-datepicker form-inline-inner input_box">
+												<div class="input-group">
+													<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off" disable>
+													<div class="input-group-append">
+														<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+															<i class="fa fa-calendar" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+												<div class="docs-datepicker-container"></div>
+											</div>
+											<span class="text_line">~</span>
+											<div class="docs-datepicker form-inline-inner input_box">
+												<div class="input-group">
+													<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ @$edate }}" autocomplete="off">
+													<div class="input-group-append">
+														<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+															<i class="fa fa-calendar" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+												<div class="docs-datepicker-container"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<h6 class="fs-16 mt-3">[ 매장 기간 재고 ] <span style="font-size: 12px;"> - 조회일자 반영, 보유재고 기준</span></h6>
+						<div class="table-responsive">
+							<div id="div-gd-store-stock-detail" class="ag-theme-balham"></div>
+						</div>
+						<p class="mt-1" style="color:red;">* 매장에 입고된 적이 없는 상품의 경우 재고가 표시되지 않습니다.</p>
+					</div>
+				</div>
+			</form>
+		</div>
     @endif
 </div>
 
