@@ -626,7 +626,7 @@
 											$t_use_point += $ord_list->point_amt ?? 0;
                                             $t_refund_amt += $ord_list->refund_amt;
                                             $t_dlv_amt += $ord_list->dlv_amt;
-											$t_recv_amt += $ord_list->recv_amt;
+											$t_recv_amt += $ord_list->recv_amt - $ord_list->refund_amt;
                                             ?>
                                             <tr @if ($ord_list->ord_opt_no == $ord_opt_no) class="checked-goods" @endif >
                                                 <td>
@@ -682,7 +682,7 @@
 		                                            </div>
 	                                            </td>
                                                 <td style="text-align:right; vertical-align:middle">{{number_format(@$ord_list->dlv_amt)}}</td>
-                                                <td style="text-align:right">{{number_format(@$ord_list->refund_amt)}}</td>
+                                                <td style="text-align:right">{{number_format(@$ord_list->refund_amt * -1)}}</td>
                                             </tr>
                                             @endforeach
                                             <tr>
@@ -692,7 +692,7 @@
                                                 <th>{{number_format($t_price) }}</th>
                                                 <th>{{number_format($t_coupon + $t_dc_amt) }}</th>
                                                 <th>{{number_format($t_dlv_amt)}}</th>
-                                                <th>{{number_format($t_refund_amt) }}</th>
+                                                <th>{{number_format($t_refund_amt * -1) }}</th>
                                             </tr>
                                             <tr>
                                                 <th colspan="10">
@@ -703,7 +703,7 @@
 	                                                적립금사용 ({{ number_format($t_use_point * -1)}}) +
 	                                                쿠폰사용 ({{ number_format($t_coupon * -1)}}) +
 	                                                판매할인금액 ({{ number_format($t_dc_amt) }}) +
-                                                    환불금액 ({{ number_format($t_refund_amt) }}) +
+                                                    환불금액 ({{ number_format($t_refund_amt * -1) }}) +
                                                     할인금액 ({{ number_format($ord->tax) }})
                                                 </th>
                                             </tr>

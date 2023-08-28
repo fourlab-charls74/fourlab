@@ -2199,7 +2199,7 @@ class ord01Controller extends Controller
                     , o.coupon_amt, o.com_id, c.pay_fee as com_rate, o.ord_kind, o.ord_type
                     , o.com_coupon_ratio, o.coupon_no, o.sales_com_fee, o.dlv_amt, o.store_cd
                     , o.recv_amt as ref_amt, o.point_amt as refund_point_amt, o.add_point
-                    , (o.price * o.qty) as refund_price, m.ord_amt as refund_amt
+                    , (o.price * o.qty) as refund_price, o.recv_amt as refund_amt
                     , m.user_id
                 from order_opt o
                     inner join order_mst m on m.ord_no = o.ord_no

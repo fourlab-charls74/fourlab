@@ -1585,13 +1585,28 @@ class Order
 
 				// 재고차감
 				if ($store_cd != '') {				
-					DB::table('product_stock_store')
+					$ps_store_collection = DB::table('product_stock_store')
 						->where('prd_cd', '=', $prd_cd)
-						->where('store_cd', '=', $store_cd) 
-						->update([
+						->where('store_cd', '=', $store_cd);
+					$prev_ps_store = $ps_store_collection->first();
+					if ($prev_ps_store === null) {
+						// 마이너스재고 판매일 경우
+						DB::table('product_stock_store')->insert([
+							'goods_no' => $goods_no,
+							'prd_cd' => $prd_cd,
+							'store_cd' => $store_cd,
+							'qty' => 0,
+							'wqty' => $ord_qty * -1,
+							'goods_opt' => $goods_opt,
+							'use_yn' => 'Y',
+							'rt' => now(),
+						]);
+					} else {
+						$ps_store_collection->update([
 							'wqty' => DB::raw('wqty - ' . $ord_qty),
 							'ut' => now(),
 						]);
+					}
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
@@ -1710,14 +1725,29 @@ class Order
 
 				// 재고차감
 				if ($store_cd != '') {
-					DB::table('product_stock_store')
+					$ps_store_collection = DB::table('product_stock_store')
 						->where('prd_cd', '=', $prd_cd)
-						->where('store_cd', '=', $store_cd) 
-						->update([
+						->where('store_cd', '=', $store_cd);
+					$prev_ps_store = $ps_store_collection->first();
+					if ($prev_ps_store === null) {
+						// 마이너스재고 판매일 경우
+						DB::table('product_stock_store')->insert([
+							'goods_no' => $goods_no,
+							'prd_cd' => $prd_cd,
+							'store_cd' => $store_cd,
+							'qty' => $ord_qty * -1,
+							'wqty' => $ord_qty * -1,
+							'goods_opt' => $goods_opt,
+							'use_yn' => 'Y',
+							'rt' => now(),
+						]);
+					} else {
+						$ps_store_collection->update([
 							'qty' => DB::raw('qty - ' . $ord_qty),
 							'wqty' => DB::raw('wqty - ' . $ord_qty),
 							'ut' => now(),
 						]);
+					}
 					DB::table('product_stock')
 						->where('prd_cd', '=', $prd_cd)
 						->update([
