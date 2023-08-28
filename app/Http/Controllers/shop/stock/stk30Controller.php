@@ -379,7 +379,7 @@ class stk30Controller extends Controller
 					'goods_no' => $row->goods_no,
 					'prd_cd' => $row->prd_cd,
 					'goods_opt' => $row->goods_opt,
-					'location_cd' => $row->store_cd,
+					'location_cd' => $row->storage_cd,
 					'location_type' => 'STORAGE',
 					'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
 					'price' => $row->price,
