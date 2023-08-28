@@ -175,6 +175,12 @@ class PosController extends Controller
 
         $cfg_img_size_real = "a_500";
         $cfg_img_size_list = "a_500";
+		
+		// product_code > plan_category 에 따른 상품조회
+		// (01) 정상매장 	- 백화점매장 (store_kind = 01)
+		// (02) 전매장 		- 모든매장
+		// (03) 이월취급점 	- 모든매장 (이월상품취급매장 작업 이후, 아울렛매장 or 이월상품취급매장 으로 수정필요)
+		// (04) 아울렛전용 	- 아울렛매장 (store_kind = 03)
 
         $sql = "
             select pc.prd_cd, pc.prd_cd_p as prd_cd_sm
@@ -202,13 +208,17 @@ class PosController extends Controller
                 inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
                 -- left outer join (select prd_cd, store_cd from product_stock_release where type = 'F' and state >= 30 group by prd_cd) psr on psr.prd_cd = pc.prd_cd and psr.store_cd = ps.store_cd   -- 해당매장에 초도출고된적이 있는 상품만 검색가능하도록 설정
             where 1=1 $where
+            	and if(pc.plan_category = '01', (select store_kind from store where store_cd = :store_cd2) = '01',
+					if(pc.plan_category = '03', 1=1,
+					if(pc.plan_category = '04', (select store_kind from store where store_cd = :store_cd3) = '03', 
+				1=1)))
               -- and if(ps.wqty > 0, 1=1, psr.prd_cd is not null) 
             order by (case when pc.year = '99' then 0 else 1 end) desc
                 , (case when pc.brand = 'F' then 0 else 1 end) asc
                 , pc.prd_cd desc
             $limit
         ";
-        $rows = DB::select($sql, [ 'store_cd' => $store_cd ]);
+        $rows = DB::select($sql, [ 'store_cd' => $store_cd, 'store_cd2' => $store_cd, 'store_cd3' => $store_cd ]);
 
         if ($page == 1) {
             $sql = "
@@ -219,8 +229,12 @@ class PosController extends Controller
                     inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
                     -- inner join code size on size.code_kind_cd = if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', if(pc.gender = 'U', 'PRD_CD_SIZE_UNISEX', 'PRD_CD_SIZE_MATCH'))) and size.code_id = pc.size
                 where 1=1 $where
+					and if(pc.plan_category = '01', (select store_kind from store where store_cd = :store_cd2) = '01',
+						if(pc.plan_category = '03', 1=1,
+						if(pc.plan_category = '04', (select store_kind from store where store_cd = :store_cd3) = '03', 
+					1=1)))
 			";
-            $row = DB::selectOne($sql);
+            $row = DB::selectOne($sql, [ 'store_cd2' => $store_cd, 'store_cd3' => $store_cd ]);
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
