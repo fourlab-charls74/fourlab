@@ -248,7 +248,7 @@ class sal25Controller extends Controller
             $row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
             $row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
             $row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
-            $row["margin"] = $row["sum_amt"]? round((1 - $row["sum_wonga"]/$row["sum_amt"])*100, 2):0;
+            $row["margin"] = $row["sum_amt"]? round(($row["sum_amt"] - $row["sum_wonga"]) / $row["sum_amt"] * 100,2) : 0;
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
             $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
             $row["sum_wonga"] = $row["sum_wonga"] * 1;

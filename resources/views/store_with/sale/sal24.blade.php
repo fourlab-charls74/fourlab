@@ -374,7 +374,7 @@
 	        valueGetter: function(params) {
                 if (params.data.date === "합계" || params.data.date === "평균") {
                     const data = params.data;
-                    return (1 - parseInt(data.sum_wonga) / (parseInt(data.sum_recv) + parseInt(data.sum_point) - parseInt(data.sum_fee))) * 100;
+                    return (parseInt(data.sum_amt) - parseInt(data.sum_wonga)) / parseInt(data.sum_amt) * 100;
                 }
                 return params.data.margin;
             }

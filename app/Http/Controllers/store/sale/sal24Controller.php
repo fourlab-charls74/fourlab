@@ -378,7 +378,8 @@ class sal24Controller extends Controller
 				"vat"			=> ($sum_tax) ? $sum_tax:0,
 				"sum_amt"		=> ($sum_amt) ? $sum_amt:0,
 				"sum_wonga"		=> ($sum_wonga) ? $sum_wonga*1:0,
-				"margin"		=> ($sum_amt) ? round((1 - $sum_wonga/$sum_amt)*100,2) : 0,
+//				"margin"		=> ($sum_amt) ? round((1 - $sum_wonga/$sum_amt)*100,2) : 0,
+				"margin"		=> ($sum_amt) ? round(($sum_amt - $sum_wonga) / $sum_amt * 100,2) : 0,
 				"margin1"		=> ($sum_amt - $sum_wonga) ? ($sum_amt - $sum_wonga):0,
 				"margin2"		=> ($sum_amt - $sum_wonga - $sum_tax) ? ($sum_amt - $sum_wonga - $sum_tax):0,
 
