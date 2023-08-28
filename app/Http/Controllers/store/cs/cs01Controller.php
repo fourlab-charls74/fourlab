@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Exception;
 
 const KRW = 'KRW';
-const SUPER_ADMIN_ID = 'super_admin'; // 슈퍼권한
+const SUPER_ADMIN_ID = 'pklpkl'; // 슈퍼권한 (본사_정연수)
 
 class cs01Controller extends Controller {
 
