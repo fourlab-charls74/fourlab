@@ -389,7 +389,8 @@ class sal01Controller extends Controller
 			'comment'			=> Lib::quote($comment),
 			'barcode'			=> $barcode,
 			'admin_nm'			=> Lib::quote($admin_nm),
-			'reg_date'			=> $reg_date
+			'reg_date'			=> $reg_date,
+			'add_date'			=> now(),
 		];
 
 		$query	= " select count(*) as cnt from __tmp_order where ord_no = :ord_no ";
@@ -397,8 +398,8 @@ class sal01Controller extends Controller
 
 		if ( $rows->cnt == 0 ) {
 			$sql	= "
-				insert into __tmp_order( ord_no, ord_date, com_type, com_id, com_nm, receipt_no, seq, style_no, opt_kind, brand, goods_code, goods_nm, color, color_nm, size, size_nm, stat_pay_type, goods_sh, price, wonga, sell_type, ord_amt, qty, recv_amt, act_amt, event_cd, pay_fee, store_pay_fee, user_id, ord_nm, ord_nm2, comment, barcode, admin_nm, reg_date )
-				values ( :ord_no, :ord_date, :com_type, :com_id, :com_nm, :receipt_no, :seq, :style_no, :opt_kind, :brand, :goods_code, :goods_nm, :color, :color_nm, :size, :size_nm, :stat_pay_type, :goods_sh, :price, :wonga, :sell_type, :ord_amt, :qty, :recv_amt, :act_amt, :event_kind, :pay_fee, :store_pay_fee, :user_id, :ord_nm, :ord_nm2, :comment, :barcode, :admin_nm, :reg_date )
+				insert into __tmp_order( ord_no, ord_date, com_type, com_id, com_nm, receipt_no, seq, style_no, opt_kind, brand, goods_code, goods_nm, color, color_nm, size, size_nm, stat_pay_type, goods_sh, price, wonga, sell_type, ord_amt, qty, recv_amt, act_amt, event_cd, pay_fee, store_pay_fee, user_id, ord_nm, ord_nm2, comment, barcode, admin_nm, reg_date, add_date )
+				values ( :ord_no, :ord_date, :com_type, :com_id, :com_nm, :receipt_no, :seq, :style_no, :opt_kind, :brand, :goods_code, :goods_nm, :color, :color_nm, :size, :size_nm, :stat_pay_type, :goods_sh, :price, :wonga, :sell_type, :ord_amt, :qty, :recv_amt, :act_amt, :event_kind, :pay_fee, :store_pay_fee, :user_id, :ord_nm, :ord_nm2, :comment, :barcode, :admin_nm, :reg_date, :add_date )
 			";
 			DB::insert($sql, $sql_data);
 			$saved_type = "insert";
