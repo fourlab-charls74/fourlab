@@ -29,7 +29,7 @@
                         <div class="form-group">
                             <label for="name">그룹명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter w-50" name='group_nm' value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='group_nm' value=''>
                             </div>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                         <div class="form-group">
                             <label for="name">영문명</label>
                             <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter w-50" name='group_nm_eng' value=''>
+                                <input type='text' class="form-control form-control-sm search-enter" name='group_nm_eng' value=''>
                             </div>
                         </div>
                     </div>
@@ -70,38 +70,17 @@
 </div>
 
 <script>
-    const columns = [{
-            field: "group_no",
-            headerName: "그룹 번호",
-            width: 100
-        },
-        {
-            field: "group_nm",
-            headerName: "그룹명",
-            width: 150,
+    const columns = [
+		{field: "group_no", headerName: "그룹 번호", width: 100, cellClass: 'hd-grid-code'},
+        {field: "group_nm", headerName: "그룹명", width: 150,
             cellRenderer: function(params) {
                 return '<a href="#" data-code="' + params.data.group_no + '" onClick="openCodePopup(this)">' + params.value + '</a>'
             }
         },
-        {
-            field: "group_nm_eng",
-            headerName: "영문명",
-            width: 150
-        },
-        {
-            field: "id",
-            headerName: "아이디",
-            width: 100
-        },
-        {
-            field: "regi_date",
-            headerName: "등록일",
-            width: 150,
-            cellClass: 'hd-grid-code'
-        },
-        {
-            width: 'auto'
-        }
+        {field: "group_nm_eng", headerName: "영문명", width: 150},
+        {field: "id", headerName: "관리자아이디", width: 100},
+        {field: "regi_date", headerName: "등록일", type: "DateTimeType"},
+        {width: 0}
     ];
 </script>
 

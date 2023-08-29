@@ -193,7 +193,7 @@
 </div>
 <script language="javascript">
     let columns = [
-        {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
+        {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code', width: 40},
         {headerName: "제목", field: "subject", width: 400,
             cellRenderer: function(params) {
                 return '<a href="/store/community/comm01/show/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ params.value+`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
@@ -201,7 +201,7 @@
         },
         {headerName: "ID", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
-        {headerName: "이메일", field: "admin_email", width: 130, cellClass: 'hd-grid-code'},
+        {headerName: "이메일", field: "admin_email", width: 150, cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
         {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
             cellStyle: params => {
@@ -219,7 +219,7 @@
                 }
             }
         },
-        {headerName: "공지매장", field: "store_nm", width: 340, cellClass: 'hd-grid-code',
+        {headerName: "공지매장", field: "store_nm", width: 340, cellStyle: {'white-space': 'normal'},
             cellRenderer: function(params) {
                 return params.data.stores;
             }
@@ -233,9 +233,7 @@
 </script>
 
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('',{
-        gridId:"#div-gd",
-    });
+    const pApp = new App('', { gridId:"#div-gd", height: 265 });
     let gx;
 
     $(document).ready(function() {
