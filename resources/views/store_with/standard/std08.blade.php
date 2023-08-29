@@ -60,22 +60,23 @@
 
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
     <div class="card-body shadow">
-        <div class="card-title mb-3">
+        <div class="card-title">
             <div class="filter_wrap">
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataAdd();"><span class="fs-12">등록</span></a>
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><span class="fs-12">저장</span></a>
-                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataDel();"><span class="fs-12">선택삭제</span></a>
+                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm" onclick="return DataAdd();"><i class="bx bx-plus"></i> 추가</a>
+                    <a href="#" class="btn btn-sm btn-outline-primary shadow-sm" onclick="return DataDel();"><i class="bx bx-trash"></i> 선택삭제</a>
+	                <span class="mx-2">|</span>
+                    <a href="#" class="btn btn-sm btn-primary shadow-sm" onclick="return DataSave();"><i class="bx bx-save text-white-50 mr-1"></i> 저장</a>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
             <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
         </div>
-        <div class="help-area mt-4 mb-4">
+        <div class="help-area mt-4">
             <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
             <ul class="help-list">
                 <li>- 기본수수료 : 설정 금액까지의 판매금액</li>
@@ -90,15 +91,15 @@
     const CENTER = {'text-align': "center"};
     const YELLOW = {'background-color': "#ffff99"};
     let columns = [
-        { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 40, pinned: 'left', sort: null },
+        { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, pinned: 'left', sort: null },
         { field: "idx", hide: true },
         { field: "seq", hide: true },
         { field: "grade_cd", headerName: "수수료코드", width: 120, rowDrag: true, editable: (params) => isAdded(params), 
             cellStyle: (params) => isAdded(params) ? YELLOW : {}
         },
         { field: "name", headerName: "수수료명", width: 100, cellStyle: CENTER, editable: true, cellStyle: YELLOW },
-        { field: "sdate", headerName: "시작월", width: 100, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
-        { field: "edate", headerName: "종료월", width: 100, cellStyle: CENTER,
+        { field: "sdate", headerName: "시작월", width: 80, cellStyle: CENTER, editable: true, cellStyle: {...YELLOW, ...CENTER} },
+        { field: "edate", headerName: "종료월", width: 80, cellStyle: CENTER,
             cellRenderer: (params) => params.data?.edate != "9999-99" && params.data?.edate ? params.data.edate : "-"
         },
         { field: "g1", headerName: "기본수수료",
@@ -150,10 +151,10 @@
     const isAdded = (params) => params?.data.added ? true : false;
 
     let gx;
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 365 });
     
     $(document).ready(function() {
-        pApp.ResizeGrid(410);
+        pApp.ResizeGrid(365);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {

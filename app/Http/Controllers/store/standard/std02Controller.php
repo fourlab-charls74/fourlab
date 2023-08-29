@@ -109,7 +109,7 @@ class std02Controller extends Controller
 
 		foreach($result as $row){
 			//주소 전체 나오게 처리
-			$row->addr1	= $row->addr1 . $row->addr2;
+			$row->addr1	= $row->addr1 . ' ' . $row->addr2;
 			/*
 			$row->manager_deposit	= Lib::cm($row->manager_deposit);
 			$row->manager_fee		= Lib::cm($row->manager_fee);

@@ -134,7 +134,7 @@
 <script type="text/javascript" charset="utf-8">
     let gx, gx2;
 
-    const pApp = new App('', { gridId: "#div-gd" });
+    const pApp = new App('', { gridId: "#div-gd", height: 284 });
     const pApp2 = new App('', { gridId: "#div-gd-type" });
 
     $(document).ready(function() {

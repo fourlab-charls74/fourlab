@@ -160,22 +160,22 @@
 <script language="javascript">
 	var columns = [
 		{headerName: "#",			field: "num",			filter:true,width:40,valueGetter: function(params) {return params.node.rowIndex+1;}, cellStyle:{"text-align":"center"},pinned:'left'},
-		{headerName:"매장코드",		field:"store_cd",			width:60, cellStyle:{"text-align":"center"}},
+		{headerName:"매장코드",		field:"store_cd",			width:80, cellStyle:{"text-align":"center"}},
 		// {headerName:"매장구분(구)",		field:"store_type_nm",	width:90, cellStyle:{"text-align":"center"}},
 		// {headerName:"매장종류",		field:"store_kind_nm",	width:100, cellStyle:{"text-align":"center"}},
 		{headerName:"판매채널",		field:"store_channel",	width:90, cellStyle:{"text-align":"center"}},
 		{headerName:"매장구분",		field:"store_channel_kind",	width:90, cellStyle:{"text-align":"center"}},
-		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType'},
-		{headerName:"지역",			field:"store_area_nm",	width:72, cellStyle:{"text-align":"center"}},
+		{headerName:"매장명",		field:"store_nm", type: 'StoreNameType', width: 150},
+		{headerName:"지역",			field:"store_area_nm",	width:60, cellStyle:{"text-align":"center"}},
 		{headerName:"주소",			field:"addr1",			width:240},
 		{headerName:"전화",			field:"phone",			width:100},
 		{headerName:"모바일",		field:"mobile",			width:100},
 		{headerName:"FAX",			field:"fax",			width:100},
-		{headerName:"개점일",		field:"sdate",			width:65},
-		{headerName:"폐점일",		field:"edate",			width:65},
+		{headerName:"개점일",		field:"sdate",			width:75, cellClass: 'hd-grid-code'},
+		{headerName:"폐점일",		field:"edate",			width:75, cellClass: 'hd-grid-code'},
 		{headerName:"매니저",		children:[
-			{headerName:"매니저명",	field:"manager_nm",		width:100},
-			{headerName:"연락처",	field:"manager_mobile",	width:100},
+			{headerName:"매니저명",	field:"manager_nm",		width:60, cellClass: 'hd-grid-code'},
+			{headerName:"연락처",	field:"manager_mobile",	width:100, cellClass: 'hd-grid-code'},
 		]},
 		{headerName:"매니저수수료등급",		field:"grade_nm",	width:110, cellStyle:{"text-align":"center"}},
 		{headerName:"보증금",		children:[
@@ -217,9 +217,7 @@
 
 </script>
 <script type="text/javascript" charset="utf-8">
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
+	const pApp = new App('', { gridId:"#div-gd", height: 265 });
 	let gx;
 
 	$(document).ready(function() {

@@ -87,51 +87,20 @@
     </div>
 </div>
 
-</div>
 <script>
-    const columns = [{
-            field: "code_kind_cd",
-            headerName: "구분",
-            width: 120
-        },
-        {
-            field: "code_kind_nm",
-            headerName: "코드명",
-            width: 150,
+    const columns = [
+		{field: "code_kind_cd", headerName: "구분", width: 150},
+        {field: "code_kind_nm", headerName: "코드명", width: 170,
             cellRenderer: function(params) {
                 return '<a href="#" data-code="' + params.data.code_kind_cd + '" onClick="openCodePopup(this)">' + params.value + '</a>'
             }
         },
-        {
-            field: "code_kind_nm_eng",
-            headerName: "영문명",
-            width: 150
-        },
-        {
-            field: "use_yn",
-            headerName: "사용여부",
-            width: 100
-        },
-        {
-            field: "admin_nm",
-            headerName: "작성자",
-            width: 100
-        },
-        {
-            field: "rt",
-            headerName: "작성일시",
-            width: 130
-        },
-        {
-            field: "ut",
-            headerName: "수정일시",
-            width: 130
-        },
-        {
-            field: "",
-            headerName: "",
-            width: 0
-        },
+        {field: "code_kind_nm_eng", headerName: "영문명", width: 150},
+        {field: "use_yn", headerName: "사용여부", width: 60, cellClass: 'hd-grid-code'},
+        {field: "admin_nm", headerName: "작성자", width: 80, cellClass: 'hd-grid-code'},
+        {field: "rt", headerName: "작성일시", type: 'DateTimeType'},
+        {field: "ut", headerName: "수정일시", type: 'DateTimeType'},
+        {width: 0},
     ];
 </script>
 <script type="text/javascript" charset="utf-8">

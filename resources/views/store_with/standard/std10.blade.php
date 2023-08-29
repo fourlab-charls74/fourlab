@@ -71,13 +71,13 @@
 
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
     <div class="card-body shadow">
-        <div class="card-title mb-3">
+        <div class="card-title">
             <div class="filter_wrap">
                 <div class="fl_box">
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-					<button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeq()" >순서변경</a>
+					<button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="changeSeq()">순서변경</button>
                 </div>
             </div>
         </div>
@@ -140,13 +140,11 @@
     ];
 </script>
 <script type="text/javascript" charset="utf-8">
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
+    const pApp = new App('', { gridId: "#div-gd", height: 265 });
     let gx;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(275);
+        pApp.ResizeGrid(265);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);

@@ -117,7 +117,7 @@
     <div class="col-lg-8">
         <div class="card shadow-none mb-0">
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
-                <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>동종업계 세부정보</h5>
+                <h5 class="m-0 mb-3 mb-sm-0">동종업계 세부정보<span id="select_store_nm" class="text-primary"></span></h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
                     <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="updateCompetitors()"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
                     <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="downlaodExcel()"><i class="fas fa-download fa-sm text-white-50 mr-1"></i> 엑셀다운로드</button>
@@ -235,7 +235,7 @@
 		gx2.gridOptions.columnApi.applyColumnState({ defaultState: { sort: null } });	// 컬럼 정렬 리셋
 		
         gx2.Request("/store/standard/std04/search-competitor/" + store_cd, "", -1, function(d) {
-            $("#select_store_nm").text(`${store_nm} - `);
+            $("#select_store_nm").text(` - ${store_nm}`);
         })
     }
 
@@ -279,7 +279,7 @@
 
     // 동종업계 세부정보 전체 초기화
     function resetCompetitors() {
-        if(!confirm(cur_store_nm + "의 동종업계 세부정보를 초기화하시겠습니까?")) return;
+        // if(!confirm(cur_store_nm + "의 동종업계 세부정보를 초기화하시겠습니까?")) return;
 
         const rows = gx2.getRows();
         gx2.gridOptions.api.setRowData(
