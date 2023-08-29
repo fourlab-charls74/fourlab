@@ -242,7 +242,7 @@
 
 
 		// start at the 2nd row - the first row are the headers
-		var rowIndex = 4;
+		var rowIndex = 7;
 
 		var rowData = [];
 

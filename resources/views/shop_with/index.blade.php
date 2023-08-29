@@ -292,34 +292,27 @@
   let sdate = '{{$sdate}}';
 
   let chartData = <?= json_encode($result)?>;
-
   let all_date = getDatesStartToLast(sdate, edate);
+  
+  let labels = [];
+  for (let i=1;i<all_date.length;i++) {
+	  labels.push(all_date[i]);
+  }
+  
+  let sum_amt_datas = [];
+  
+  for (let i=1;i<chartData.length;i++) {
+	  const sum_amt = chartData[i]?.sum_amt ?? 0;
+	  sum_amt_datas.push(sum_amt);
+  }
 
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: [
-            all_date[0],
-            all_date[1],
-            all_date[2],
-            all_date[3],
-            all_date[4],
-            all_date[5],
-            all_date[6],
-            all_date[7],
-      ],
+      labels: labels,
       datasets: [{
         label: '매출액',
-        data: [
-            chartData[0].sum_amt,
-            chartData[1].sum_amt,
-            chartData[2].sum_amt,
-            chartData[3].sum_amt,
-            chartData[4].sum_amt,
-            chartData[5].sum_amt,
-            chartData[6].sum_amt,
-            chartData[7].sum_amt,
-        ],
+        data: sum_amt_datas,
         borderColor: '#36A2EB',
         backgroundColor: '#9BD0F5',
         borderWidth: 1
@@ -373,38 +366,26 @@
 
     const ctx3 = document.getElementById('myChart3');
 
-let chartData2 = <?= json_encode($chart2Result)?>;
+	let chartData2 = <?= json_encode($chart2Result)?>;
+
+  let prd_nm_labels = [];
+  let recv_amt_datas = [];
+  for (let i=0;i<chartData2.length;i++) {
+	  const prd_nm = chartData2[i]?.prd_nm ?? '';
+	  const recv_amt = chartData2[i]?.recv_amt ?? 0;
+
+	  prd_nm_labels.push(prd_nm);
+	  recv_amt_datas.push(recv_amt);
+  }
 
   new Chart(ctx3, {
     type: 'bar',
     data: {
-      labels: [
-            chartData2[0].prd_nm,
-            chartData2[1].prd_nm,
-            chartData2[2].prd_nm,
-            chartData2[3].prd_nm,
-            chartData2[4].prd_nm,
-            chartData2[5].prd_nm,
-            chartData2[6].prd_nm,
-            chartData2[7].prd_nm,
-            chartData2[8].prd_nm,
-            chartData2[9].prd_nm,
-      ],
+      labels: prd_nm_labels,
       datasets: [
         {
         label: '매출액',
-        data: [
-            chartData2[0].recv_amt,
-            chartData2[1].recv_amt,
-            chartData2[2].recv_amt,
-            chartData2[3].recv_amt,
-            chartData2[4].recv_amt,
-            chartData2[5].recv_amt,
-            chartData2[6].recv_amt,
-            chartData2[7].recv_amt,
-            chartData2[8].recv_amt,
-            chartData2[9].recv_amt,
-        ],
+        data: recv_amt_datas,
         borderColor: '#36A2EB',
         backgroundColor: '#9BD0F5',
         borderWidth: 1
@@ -446,39 +427,27 @@ let chartData2 = <?= json_encode($chart2Result)?>;
 
   const ctx4 = document.getElementById('myChart4');
 
-let chartData3 = <?= json_encode($chart3Result)?>;
+  let chartData3 = <?= json_encode($chart3Result)?>;
+
+  let prd_nm_chart3_labels = [];
+  let qty_datas = [];
+  for (let i=0;i<chartData3.length;i++) {
+	  const prd_nm = chartData3[i]?.prd_nm ?? '';
+	  const qty = chartData3[i]?.qty ?? 0;
+
+	  prd_nm_chart3_labels.push(prd_nm);
+	  qty_datas.push(qty);
+  }
 
 
   new Chart(ctx4, {
     type: 'bar',
     data: {
-      labels: [
-            chartData3[0].prd_nm,
-            chartData3[1].prd_nm,
-            chartData3[2].prd_nm,
-            chartData3[3].prd_nm,
-            chartData3[4].prd_nm,
-            chartData3[5].prd_nm,
-            chartData3[6].prd_nm,
-            chartData3[7].prd_nm,
-            chartData3[8].prd_nm,
-            chartData3[9].prd_nm,
-      ],
+      labels: prd_nm_chart3_labels,
       datasets: [
         {
         label: '주문수량',
-        data: [
-            chartData3[0].qty,
-            chartData3[1].qty,
-            chartData3[2].qty,
-            chartData3[3].qty,
-            chartData3[4].qty,
-            chartData3[5].qty,
-            chartData3[6].qty,
-            chartData3[7].qty,
-            chartData3[8].qty,
-            chartData3[9].qty,
-        ],
+        data: qty_datas,
         borderColor: '#36A2EB',
         backgroundColor: '#9BD0F5',
         borderWidth: 1
