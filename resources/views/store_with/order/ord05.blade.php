@@ -229,8 +229,11 @@
 	const columns = [
 		// {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellClass: 'hd-grid-code'},
 		{field: "ord_date", headerName: "판매일자", pinned: 'left', width: 80, cellClass: 'hd-grid-code'},
+		{field: "ord_state_nm", headerName: "판매구분", pinned: 'left', width: 60, cellClass: 'hd-grid-code',
+			cellStyle: (params) => ({ color: params.value === '판매' ? '#4444ff' : '#ff4444' }),
+		},
 		{field: "ord_no", headerName: "주문번호", pinned: 'left', width: 140, cellStyle: { color: "blue" },
-			cellRenderer: (params) => `<a href="javascript:setDetailOrder('${params.value}');">${params.value}</a>`,
+			cellRenderer: (params) => `<a href="javascript:setDetailOrder('${params.value}', '${params.data.ord_state}');">${params.value}</a>`,
 		},
 		{field: "store_nm", headerName: "주문매장", width: 90},
 		{field: "user_nm", headerName: "주문자(아이디)", width: 90},
@@ -281,6 +284,8 @@
 		{field: "sale_price", headerName: "판매단가", width: 80, type: "currencyType", editable: getEditableYn, cellClass: (params) => ([ getEditableYn(params) ? 'hd-grid-edit' : '', 'hd-grid-number' ]), onCellValueChanged: setProductRow},
 		{field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
 		{field: "ord_amt", headerName: "판매금액", width: 80, type: "currencyType"},
+		{field: "coupon_amt", headerName: "쿠폰할인", width: 65, type: "currencyType"},
+		{field: "point_amt", headerName: "적립금사용", width: 65, type: "currencyType"},
 		{field: "recv_amt", headerName: "실결제금액", width: 80, type: "currencyType"},
 		{field: "pr_code_nm", headerName: "판매처수수료", width: 80, editable: getEditableYn, cellClass: (params) => getEditableYn(params) ? 'hd-grid-edit' : '',
 			onCellValueChanged: function (params) {
@@ -301,18 +306,18 @@
 		{field: "memo", headerName: "메모", width: 150, editable: getEditableYn, cellClass: (params) => getEditableYn(params) ? 'hd-grid-edit' : '', onCellValueChanged: setProductRow},
 	];
 
-	const pApp = new App('', { gridId: "#div-gd", height: 265 });
-	const pApp2 = new App('', { gridId: "#div-gd-product", height: 265 });
+	const pApp = new App('', { gridId: "#div-gd", height: 275 });
+	const pApp2 = new App('', { gridId: "#div-gd-product", height: 275 });
 	let gx;
 	let gx2;
 
 	$(document).ready(function() {
-		pApp.ResizeGrid(265);
+		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
 
-		pApp2.ResizeGrid(265);
+		pApp2.ResizeGrid(275);
 		let gridDiv2 = document.querySelector(pApp2.options.gridId);
 		gx2 = new HDGrid(gridDiv2, product_columns);
 
@@ -334,9 +339,10 @@
 	}
 	
 	// 주문상품내역 조회
-	function setDetailOrder(ord_no) {
+	function setDetailOrder(ord_no, ord_state) {
 		$("#select_ord_no").text(ord_no);
-		gx2.Request('/store/order/ord05/search/' + ord_no, '', 1, function (e) {
+		let data = 'ord_state=' + (ord_state || '');
+		gx2.Request('/store/order/ord05/search/' + ord_no, data, 1, function (e) {
 			let nodes = [];
 			gx2.gridOptions.api.forEachNode(node => {
 				node.data.pr_codes = e.head.pr_codes;
@@ -372,6 +378,7 @@
 			
 			params.data.dc_rate = (1 - (params.data.sale_price / params.data.goods_sh)) * 100;
 			params.data.ord_amt = params.data.qty * params.data.sale_price;
+			params.data.recv_amt = params.data.ord_amt + (params.data.coupon_amt || 0) + (params.data.point_amt || 0);
 			gx2.gridOptions.api.redrawRows({ rowNodes: [ params.node ] });
 			gx2.setFocusedWorkingCell();
 		}
