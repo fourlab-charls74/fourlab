@@ -1868,11 +1868,13 @@
 				$('#tax_yn').focus();
 				return false;
 			}
+			
 			if( $('#sale_stat_cl').val() == "" ){
-				alert("상품상태를 선택해 주십시오.");
+				alert("전시상태를 선택해 주십시오.");
 				$('#sale_stat_cl').focus();
 				return false;
 			}
+			
             if( $("#md_id").val() == "" ){
 				alert("MD를 선택해 주십시오.");
 				$("#md_id").focus();
@@ -1975,6 +1977,8 @@
             const save_method = type === '' ? 'put' : 'post';
             
             let save_data = frm.serialize();
+
+			console.log(save_data);
             if ($("#create_to_class").val() !== '') {
                 save_data += "&goods_class=" + JSON.stringify(gxc.getRows()?.[0]);
             }

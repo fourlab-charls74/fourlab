@@ -59,7 +59,7 @@ class std07Controller extends Controller
 			from store s
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind
-			where 1=1 and s.use_yn = 'Y' $where
+			where 1=1 $where
 			group by store_cd
 			order by store_cd
 		";

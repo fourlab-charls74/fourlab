@@ -383,7 +383,7 @@ class prd05Controller extends Controller
 		$admin_id			= Auth('head')->user()->id;
 		$price_kind			= $request->input('price_kind');
 		$plan_category		= $request->input('plan_category');
-
+		
 		$change_date	= '';
 		$change_type	= '';
 		$apply_yn		= '';

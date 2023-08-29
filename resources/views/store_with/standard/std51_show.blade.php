@@ -144,8 +144,7 @@
                 return false;
             }
 
-            var frm = $('form');
-            //console.log(frm.serialize());
+			let frm = $("form[name=detail]");
 
             if(code == ""){
                 $.ajax({

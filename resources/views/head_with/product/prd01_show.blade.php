@@ -1861,7 +1861,7 @@
 				return false;
 			}
 			if( $('#sale_stat_cl').val() == "" ){
-				alert("상품상태를 선택해 주십시오.");
+				alert("전시상태를 선택해 주십시오.");
 				$('#sale_stat_cl').focus();
 				return false;
 			}
