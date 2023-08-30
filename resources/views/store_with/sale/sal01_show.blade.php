@@ -220,7 +220,7 @@
 						if (out_order_errors.hasOwnProperty(code)) {
                             result = "[" + code + "] " + out_order_errors[code];
                         } else {
-                            result = "[" + code + "] ";
+                            result = "[" + code + "]1 ";
                         }
 						rowNode.setDataValue('result', result);
 					}
