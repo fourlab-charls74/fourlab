@@ -8,10 +8,12 @@ use App\Components\SLib;
 use App\Models\S_Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
 use App\Exports\ExcelViewExport;
+use App\Exports\ExcelSheetViewExport;
 use App\Models\Conf;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -667,8 +669,42 @@ class stk16Controller extends Controller
 	public function download(Request $request)
 	{
 		$release_no = $request->input('release_no');
+		$export = $this->_getDocumentFile($release_no);
+		return Excel::download($export, '원부자재출고거래명세서_' . $release_no . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
 
-        $sql = "
+	/** 원부자재출고 거래명세서 일괄출력 (엑셀파일 형식) */
+	public function downloadMulti(Request $request)
+	{
+		$data = $request->input('data', []);
+		$data = array_reduce($data, function($a, $c) {
+			$is_already = in_array($c['release_no'], array_map(function($item) { return $item['release_no']; }, $a));
+			if (!$is_already) return array_merge($a, [$c]);
+			return $a;
+		}, []);
+
+		$save_path = "data/store/stk16/";
+		$file_name = "원부자재출고거래명세서_일괄출력_" . date('YmdHis') . '.xlsx';
+
+		if (!Storage::disk('public')->exists($save_path)) {
+			Storage::disk('public')->makeDirectory($save_path);
+		}
+
+		$exports = [];
+		foreach ($data as $row) {
+			$release_no = $row['release_no'] ?? '';
+			$export = $this->_getDocumentFile($release_no);
+			foreach ($export->sheets() as $sht) {
+				$exports[] = $sht;
+			}
+		}
+
+		Excel::store(new ExcelSheetViewExport($exports), sprintf("%s%s%s", "public/", $save_path, $file_name));
+		return response()->json([ 'file_path' => sprintf("%s%s%s", "", $save_path, $file_name) ]);
+	}
+
+	public function _getDocumentFile($release_no) {
+		$sql = "
             select
                 ssr.release_no
                 , ssr.type
@@ -802,9 +838,9 @@ class stk16Controller extends Controller
 		];
 
 		$view_url = Config::get('shop.store.view') . '/stock/stk16_document';
-		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
+		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48, 'sheet_name' => ($data['store_nm'] ?? '') . '_' . $release_no ];
 		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 150 ]];
 
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '원부자재출고_명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return new ExcelViewExport($view_url, $data, $style, $images, $keys);
 	}
 }

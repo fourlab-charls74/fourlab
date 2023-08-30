@@ -149,13 +149,24 @@ class stk17Controller extends Controller
         
         $sql = "select storage_cd from storage where default_yn = 'Y'";
         $storage_cd = DB::selectOne($sql)->storage_cd;
+		$rel_date = date("Ymd");
 
         try {
             DB::beginTransaction();
+
+			$last_rel_no = DB::table('sproduct_stock_release')->orderByDesc('idx')->value('release_no');
+			$seq = 1;
+			if ($last_rel_no != null) {
+				$seq = explode('_', $last_rel_no);
+				$seq = ($seq[count($seq) - 1] * 1) + 1;
+			}
+			$release_no = $release_type . '_' . $rel_date . '_' . $seq;
+
 			foreach($data as $row) {
                 DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
+						'release_no' => $release_no,
                         'prd_cd' => $row['prd_cd'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],

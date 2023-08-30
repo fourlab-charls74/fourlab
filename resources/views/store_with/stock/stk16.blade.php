@@ -274,6 +274,8 @@
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         @endif
+                        <a href="javascript:printSelectedDocuments();" class="btn btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download mr-1"></i>명세서 일괄출력</a>
+                        <span class="d-none d-lg-block ml-1 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">출고</a>
                         @if(Auth('head')->user()->logistics_group_yn == 'N')
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">매장입고</a>
@@ -317,11 +319,7 @@
         {field: "idx", hide: true},
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellClass: 'hd-grid-code'},
         {field: "release_no", headerName: "출고번호",pinned:'left', hide:true},
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 29,
-            checkboxSelection: function(params) {
-                return params.data.state < 40 && params.data.state > 0;
-            },
-        },
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
         {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellClass: 'hd-grid-code', 
             cellRenderer: function(params) {
@@ -596,6 +594,24 @@
     // 원부자재출고 명세서 출력
 	function printDocument(release_no) {
 		location.href = `/store/stock/stk16/download?release_no=${release_no}`;
+	}
+
+	// 원부자재출고 명세서 일괄출력
+	function printSelectedDocuments() {
+		let rows = gx.getSelectedRows();
+		if (rows.length < 1) return alert("일괄출력할 명세서를 선택해주세요.");
+
+		alert("명세서를 일괄출력하고 있습니다. 잠시만 기다려주세요.");
+
+		axios({
+			url: '/store/stock/stk16/download-multi',
+			method: 'post',
+			data: { data: rows.map(row => ({ release_no: row.release_no, idx: row.idx })) },
+		}).then(function (res) {
+			window.location = '/' + res.data.file_path;
+		}).catch(function (err) {
+			console.log(err);
+		});
 	}
 
 </script>
