@@ -222,8 +222,9 @@ class prd02Controller extends Controller
 		$query = "
 			select 
 				pc.prd_cd
-				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd1
-				, if(pc.goods_no = 0, '' , ps.goods_no) as goods_no
+				-- , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd1
+				, pc.prd_cd_p as prd_cd1
+			    , if(pc.goods_no = 0, '' , ps.goods_no) as goods_no
 				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
 				, '' as img_view
@@ -235,12 +236,6 @@ class prd02Controller extends Controller
 						and s.size_cd = pc.size
 						and use_yn = 'Y'
 				),'') as size
-				-- , ifnull((	사이즈명 쓰지마시오.
-				--	select s.size_nm from size s 
-				--	where s.size_kind_cd = pc.size_kind 
-				--		and s.size_cd = pc.size
-				--		and use_yn = 'Y'
-				-- ), '') as size_nm
 				, if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -253,10 +248,9 @@ class prd02Controller extends Controller
 				, (ps.qty - ps.wqty) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
-				-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-				, ps.wonga
-				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - g.wonga))) as margin_rate
-				, (if(pc.goods_no = 0, p.price, g.price) - ps.wonga) as margin_amt
+				, if(pc.goods_no = 0, p.wonga, p.wonga) as wonga
+				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - p.wonga))) as margin_rate
+				, (if(pc.goods_no = 0, p.price, g.price) - p.wonga) as margin_amt
 				, g.org_nm
 				, com.com_nm
 				, g.reg_dm
@@ -1160,6 +1154,7 @@ class prd02Controller extends Controller
 				$year 		= $row['year'];
 				$season		= $row['season'];
 				$gender		= $row['gender'];
+				$opt 		= $row['opt'];
 				$item 		= $row['item'];
 				$color 		= $row['color'];
 				$size_kind	= $row['size_kind'];
@@ -1179,6 +1174,7 @@ class prd02Controller extends Controller
 				$year 		= explode(' : ', $year);
 				$season 	= explode(' : ', $season);
 				$gender 	= explode(' : ', $gender);
+				$opt 		= explode(' : ', $opt);
 				$item 		= explode(' : ', $item);
 				$color 		= explode(' : ', $color);
 				$size_kind  = explode(' : ', $size_kind);
@@ -1237,6 +1233,7 @@ class prd02Controller extends Controller
 						'year'		=> $year[0],
 						'season'	=> $season[0],
 						'gender'	=> $gender[0],
+						'opt'		=> $opt[0],
 						'item'		=> $item[0],
 						'color'		=> $color[0],
 						'size_kind' => $size_kind[0],

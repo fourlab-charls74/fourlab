@@ -284,7 +284,7 @@
     function changeUseYnVal(e, rowIndex) {
         const node = gx.getRowNode(rowIndex);
         // node.data.use_yn = e.target.checked ? 'Y' : 'N';
-        e.node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
+        node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
         node.setSelected(e.target.checked);
     }
 
@@ -292,7 +292,7 @@
     function changeUseYnVal2(e, rowIndex) {
         const node = gx2.getRowNode(rowIndex);
         // node.data.use_yn = e.target.checked ? 'Y' : 'N';
-        e.node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
+        node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
         node.setSelected(e.target.checked);
     }
 
