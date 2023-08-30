@@ -192,9 +192,9 @@ class PosController extends Controller
                     from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
                 )) as img
                 , ifnull((select wqty from product_stock_store where store_cd = :store_cd and prd_cd = pc.prd_cd), 0) as wqty
-                , color.code_val as color
+                , concat('[', pc.color, '] ', color.code_val) as color
                 , (
-					select s.size_nm from size s 
+					select s.size_cd from size s 
 					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
 						and s.size_cd = pc.size
 						and use_yn = 'Y'
@@ -278,7 +278,8 @@ class PosController extends Controller
                 $where .= " and name like '%$search_keyword%' ";
             }
             if ($search_type == 'phone') {
-                $where .= " and mobile like '%$search_keyword' ";
+				$search_keyword = strrev(str_replace('-', '', $search_keyword));
+                $where .= " and replace(rmobile, '-', '') like '$search_keyword%' ";
             }
         }
 
@@ -931,9 +932,11 @@ class PosController extends Controller
         $sql = "
             select
                 o.ord_no, o.ord_date, o.user_id, o.user_nm, o.phone, o.mobile, o.ord_amt, o.recv_amt,
-                o.ord_state, o.ord_type, o.ord_kind, o.clm_type, pay.pay_type, pt.code_val as pay_type_nm
-            from order_mst o
-                inner join payment pay on pay.ord_no = o.ord_no
+                o.ord_state, o.ord_type, o.ord_kind, o.clm_type, pay.pay_type, pt.code_val as pay_type_nm,
+                oo.ord_opt_no, oo.clm_state
+            from order_opt oo
+                inner join order_mst o on o.ord_no = oo.ord_no
+                inner join payment pay on pay.ord_no = oo.ord_no
                 inner join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = pay.pay_type
             where o.store_cd = :store_cd and o.ord_state >= 30 $where
             $orderby
@@ -944,10 +947,11 @@ class PosController extends Controller
         if ($page == 1) {
             $sql = "
                 select count(*) as total
-                from order_mst o
-                    inner join payment pay on pay.ord_no = o.ord_no
+				from order_opt oo
+					inner join order_mst o on o.ord_no = oo.ord_no
+					inner join payment pay on pay.ord_no = oo.ord_no
                     inner join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = pay.pay_type
-                where o.store_cd = :store_cd $where
+                where o.store_cd = :store_cd and o.ord_state >= 30 $where
 			";
             $row = DB::selectOne($sql, ['store_cd' => $store_cd]);
             $total = $row->total;

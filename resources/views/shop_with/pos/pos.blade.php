@@ -62,11 +62,11 @@
 	                            <p class="text-right" id="cur_goods_nm" style="height: 40px;"></p>
 	                        </li>
 	                        <li class="d-flex justify-content-between mb-2">
-	                            <p class="fc-blue fw-b" style="min-width: 80px;">컬러명</p>
+	                            <p class="fc-blue fw-b" style="min-width: 80px;">컬러</p>
 	                            <p class="text-right" id="cur_goods_color"></p>
 	                        </li>
 	                        <li class="d-flex justify-content-between mb-2">
-	                            <p class="fc-blue fw-b" style="min-width: 80px;">사이즈명</p>
+	                            <p class="fc-blue fw-b" style="min-width: 80px;">사이즈</p>
 	                            <p class="text-right" id="cur_goods_size"></p>
 	                        </li>
 	                        <li class="d-flex justify-content-between">
@@ -631,7 +631,7 @@
                         <div class="card-body b-none mt-4">
                             <div class="d-flex align-items-center br-2 b-1-gray bg-white shadow-box p-2 mb-3">
                                 <select name="search_member_type" id="search_member_type" class="sel px-2 fs-10" style="width: 120px;">
-                                    <option value="phone">휴대폰뒷자리</option>
+                                    <option value="phone">휴대폰번호</option>
                                     <option value="user_nm">고객명</option>
                                 </select>
                                 <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_member_keyword" name="search_member_keyword" placeholder="검색어를 입력하세요">
@@ -877,9 +877,9 @@
 
     const columns = [
         {field: "prd_cd", headerName: "바코드", width: 130, cellStyle: LineHeight40Center},
-        {field: "goods_nm", headerName: "상품명", width: "auto", wrapText: true, cellStyle: LineHeight40},
-        {field: "color", headerName: "컬러", width: 80, wrapText: true, cellStyle: LineHeight40},
-        {field: "size", headerName: "사이즈", width: 80, wrapText: true, cellStyle: LineHeight40},
+        {field: "goods_nm", headerName: "상품명", width: "auto", minWidth: 100, wrapText: true, cellStyle: LineHeight40},
+        {field: "color", headerName: "컬러", width: 105, wrapText: true, cellStyle: LineHeight40},
+        {field: "size", headerName: "사이즈", width: 55, wrapText: true, cellStyle: LineHeight40Center},
         {field: "style_no", headerName: "스타일넘버", width: 75, cellStyle: LineHeight40Center},
         {field: "goods_sh", headerName: "정상가", width: 65, type: "currencyType", cellStyle: LineHeight40Right},
         {field: "ori_price", headerName: "판매가", width: 65, type: "currencyType", cellStyle: LineHeight40Right},
@@ -912,9 +912,9 @@
 
     const product_columns = [
         {field: "prd_cd" , headerName: "바코드", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "prd_cd_sm", headerName: "품번", width: 130, cellStyle: {...AlignCenter, ...LineHeight50}},
+        {field: "prd_cd_sm", headerName: "품번", width: 150, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "color", headerName: "컬러", width: 180, cellStyle: {...LineHeight50}},
-        {field: "size", headerName: "사이즈", width: 150, cellStyle: {...LineHeight50}},
+        {field: "size", headerName: "사이즈", width: 80, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {...AlignCenter, ...LineHeight50}},
         {field: "goods_nm",	headerName: "상품명", width: "auto", cellStyle: LineHeight50,
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return addProduct('${params.data.prd_cd}')">${params.value}</a>`,
@@ -943,21 +943,26 @@
 
     const order_columns = [
         {field: "ord_type", headerName: "주문타입", hide: true},
-        {field: "ord_date", headerName: "주문일자", width: 180, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "ord_no", headerName: "주문번호", width: 230, cellStyle: {...AlignCenter, ...LineHeight50},
+        {field: "ord_date", headerName: "주문일자", width: 170, cellStyle: {...AlignCenter, ...LineHeight50, 'font-size': '0.9rem'}},
+        {field: "ord_no", headerName: "주문번호", width: 220, cellStyle: {...AlignCenter, ...LineHeight50, 'font-size': '0.9rem'},
             cellRenderer: (params) => `${params.data.ord_type == '4' ? '<span class="text-danger">[예약]</span> ' : ''}${params.value}`,
         },
-        {field: "user_id", headerName: "고객명", width: 150, cellStyle: LineHeight50,
+		{field: "ord_opt_no", headerName: "일련번호", width: 100, cellStyle: {...AlignCenter, ...LineHeight50, 'font-size': '0.9rem'},
+			cellRenderer: (params) => params.value + (params.data.clm_state == 61
+				? `<div class="position-absolute d-flex justify-content-center align-items-center fc-red fw-b" style="font-size:12px;top:15%;left:10%;transform:rotate(-10deg);width:30px;height:20px;border:2px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">환불</div>`
+				: ''),
+		},
+        {field: "user_id", headerName: "고객명", width: 130, cellStyle: {...LineHeight50, 'font-size': '0.9rem'},
             cellRenderer: (params) => (!!params.data.user_nm ? params.data.user_nm : '비회원') + (params.data.user_id ? ' (' + params.data.user_id + ')' : ''),
         },
-        {field: "mobile", headerName: "고객연락처", width: 150, cellStyle: {...AlignCenter, ...LineHeight50}},
-        {field: "pay_type_nm", headerName: "결제수단", width: 100, cellStyle: {...AlignCenter, ...LineHeight50},
+        {field: "mobile", headerName: "고객연락처", width: 130, cellStyle: {...AlignCenter, ...LineHeight50, 'font-size': '0.9rem'}},
+        {field: "pay_type_nm", headerName: "결제수단", width: 100, cellStyle: {...AlignCenter, ...LineHeight50, 'font-size': '0.9rem'},
             cellRenderer: (params) => params.value.replaceAll("무통장", "현금"),
         },
-        {field: "recv_amt", headerName: "결제금액", width: 150, type: "currencyType", cellStyle: {"font-size": "1.1rem", "font-weight": "700", ...LineHeight50},
+        {field: "recv_amt", headerName: "결제금액", width: 130, type: "currencyType", cellStyle: {"font-size": "1rem", "font-weight": "700", ...LineHeight50},
             cellRenderer: (params) => Comma(params.value) + "원",
         },
-        {width: "auto"}
+        {width: 0}
     ];
 
     // 메인화면 - 대기내역

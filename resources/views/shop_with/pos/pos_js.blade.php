@@ -780,6 +780,7 @@
         if(res.status === 200) {
             let data = res.data.data;
             let ord = data[0];
+			if(!ord) return alert('해당 주문내역을 조회할 수 없습니다.');
 
             $("#od_ord_no").text(ord.ord_no);
             $("#od_ord_date").text(ord.ord_date);
@@ -803,11 +804,12 @@
                     <tr>
                         <td class="pt-2 pb-2 pl-1">
                             <div class="position-relative d-flex flex-column align-items-start fs-08 pr-2">
+                                <p class="fc-gray fs-08" style="text-decoration: underline;">No. ${o.ord_opt_no}</p>
                                 <p class="fw-sb fs-09">${o.goods_nm}</p>
                                 <p class="fc-white br-05 bg-gray pl-2 pr-2 mt-1 mb-1">${o.prd_cd || '-'}</p>
                                 ${o.goods_opt.split("^").map(opt => `<p class="fc-gray fw-sb pl-3">&#8735; ${opt}</p>`).join("")}
                                 ${o.clm_state == 61 ? `
-                                    <div class="position-absolute d-flex justify-content-center align-items-center fc-red fs-20 fw-b w-75" style="top:50%;left:50%;transform:translate(-50%, -50%);height:75px;border:3px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">환불완료</div>
+                                    <div class="position-absolute d-flex justify-content-center align-items-center fc-red fs-20 fw-b w-75" style="top:50%;left:50%;transform:translate(-50%, -50%) rotate(-2deg);height:75px;border:3px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">환불완료</div>
                                 ` : ''}
                             </div>
                         </td>
