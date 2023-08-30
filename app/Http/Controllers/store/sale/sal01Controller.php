@@ -464,7 +464,7 @@ class sal01Controller extends Controller
 		/**
 		 * prd_cd 설정 (자사바코드 있는 경우 자사바코드 사용, 없는 경우 상품코드 + 칼라 + 사이즈로 상품코드 설정)
 		 */
-		$prd_cd = $order['barcode'] ? $order['barcode'] : $order['goods_code'] . $order['color'] . $order['size'];
+		$prd_cd = $order['barcode'] ? $order['barcode'] : ($order['goods_code'] . $order['color'] . $order['size']);
 
 		/**
 		 * 매출구분 자료 변환 작업
@@ -550,8 +550,13 @@ class sal01Controller extends Controller
 		$result = DB::selectOne($sql, array("prd_cd" => $prd_cd));
 
 		// 임시방편 - 매칭이 안된 상품 0 처리
-		if ($result) {
-			$order['goods_no'] = @$result->goods_no;
+		if ($result !== null) {
+			if ($result->goods_no === 0) {
+				// 상품코드가 매칭되지 않은 상품은 '131767 - XMD 판매일보등록용 비매칭상품' 을 임시로 지정함
+				$order['goods_no'] = 131767;
+			} else {
+				$order['goods_no'] = @$result->goods_no;
+			}
 		} else {
 			$order['goods_no'] = 0;
 		}
@@ -921,8 +926,13 @@ class sal01Controller extends Controller
 		$result = DB::selectOne($sql, array("prd_cd" => $prd_cd));
 
 		// 임시방편 - 매칭이 안된 상품 0 처리
-		if ($result) {
-			$order['goods_no'] = @$result->goods_no;
+		if ($result !== null) {
+			if ($result->goods_no === 0) {
+				// 상품코드가 매칭되지 않은 상품은 '131767 - XMD 판매일보등록용 비매칭상품' 을 임시로 지정함
+				$order['goods_no'] = 131767;
+			} else {
+				$order['goods_no'] = @$result->goods_no;
+			}
 		} else {
 			$order['goods_no'] = 0;
 		}
