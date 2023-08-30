@@ -32,10 +32,21 @@ class stk16Controller extends Controller
 
     public function index()
     {
+		$sql = "
+			select code_id, code_val from code
+			where code_kind_cd = 'REL_ORDER' and code_id like :rel_type1
+
+			union all
+
+			select code_id, code_val from code
+			where code_kind_cd = 'REL_ORDER' and code_id like :rel_type2
+		";
+		$rel_orders = DB::select($sql, [ 'rel_type1' => 'R_%', 'rel_type2' => 'G_%' ]);
+
         $values = [
             'sdate' => now()->sub(1, 'week')->format('Y-m-d'),
             'edate' => date("Y-m-d"),
-            'rel_orders' => SLib::getCodes("REL_ORDER"), // 출고차수
+            'rel_orders' => $rel_orders, // 출고차수
             'rel_types' => SLib::getCodes("REL_TYPE"), // 출고구분
             'rel_states' => $this->rel_states, // 출고상태
             'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분

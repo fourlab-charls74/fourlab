@@ -586,7 +586,6 @@
                 alert(res.data.msg);
                 Search();
             } else {
-                console.log(res.data);
                 alert("삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
@@ -596,7 +595,6 @@
 
     // 원부자재출고 명세서 출력
 	function printDocument(release_no) {
-        console.log(release_no);
 		location.href = `/store/stock/stk16/download?release_no=${release_no}`;
 	}
 

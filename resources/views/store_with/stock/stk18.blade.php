@@ -229,7 +229,6 @@
             children: [
                 {field: 'storage_qty', headerName: '재고', type: "currencyType", width: 60,
                     cellRenderer: function(params) {
-                        console.log(params.data);
                         if (params.value !== undefined) {
                             return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.data.storage_qty[0].qty + '</a>';
                         }

@@ -195,7 +195,7 @@
             },
             {field: "amount", headerName: "합계", type: 'currencyType', width: 100, valueGetter: (params) => calAmount(params)},
             {field: "req_comment", headerName: "매장메모", width: 305, editable: true, cellClass: 'hd-grid-edit'},
-            {width: 0}
+            {width: "auto"}
         ];
 
         let gx;
@@ -208,7 +208,8 @@
             gx = new HDGrid(gridDiv, columns, {
 				defaultColDef: {
 					suppressMenu: true,
-					resizable: false,
+					resizable: true,
+					autoHeight: true,
 					sortable: true,
 				},
                 onCellValueChanged: (e) => {

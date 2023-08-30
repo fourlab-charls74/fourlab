@@ -23,13 +23,20 @@ class stk18Controller extends Controller
 	{
         $stores = DB::table('store')->where('use_yn', '=', 'Y')->select('store_cd', 'store_nm')->get();//전체매장
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
+		
+		$sql = "
+			select code_id, code_val
+			from code
+			where code_kind_cd = 'REL_ORDER' and code_id like :rel_type
+		";
+		$rel_orders = DB::select($sql, [ 'rel_type' => 'G_%' ]);
 
 		$values = [
             'today' => date("Y-m-d"),
             'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
             'types' => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
             'opts' => SLib::getCodes("PRD_MATERIAL_OPT"),
-            'rel_orders' => SLib::getCodes("REL_ORDER"), // 출고차수
+            'rel_orders' => $rel_orders, // 출고차수
             'stores' => $stores, // 전체 매장리스트
             'storages' => $storages, // 창고리스트
             'store_channel'	=> SLib::getStoreChannel(),
@@ -190,24 +197,20 @@ class stk18Controller extends Controller
         $store_cd = $request->input("store_cd", '');
         $exp_dlv_day = $request->input("exp_dlv_day", '');
         $rel_order = $request->input("rel_order", '');
-        $rel_date = date_format(date_create(now()), "Ymd");
+		$rel_date = date("Ymd");
 
         try {
             DB::beginTransaction();
 
 			$stock = new S_Stock($admin);
 
-            $sql = "
-                select
-                    release_no
-                from sproduct_stock_release
-                order by idx desc
-            ";
-
-            $last_seq = DB::selectOne($sql);
-            $seq = explode('_', $last_seq->release_no);
-            $no = (int)$seq[2] + 1;
-
+			$last_rel_no = DB::table('sproduct_stock_release')->orderByDesc('idx')->value('release_no');
+			$seq = 1;
+			if ($last_rel_no != null) {
+				$seq = explode('_', $last_rel_no);
+				$seq = ($seq[count($seq) - 1] * 1) + 1;
+			}
+			$release_no = $release_type . '_' . $rel_date . '_' . $seq;
 
 			foreach($data as $row) {
 				
@@ -228,7 +231,7 @@ class stk18Controller extends Controller
 				
 				$rel = [
 					'type' => $release_type,
-                    'release_no' => $release_type.'_'.$rel_date.'_'.$no,
+                    'release_no' => $release_no,
 					'prd_cd' => $row['prd_cd'],
 					'price' => $rel_price,
 					'wonga' => $row['wonga'],

@@ -19,7 +19,6 @@ class stk17Controller extends Controller
             'types'         => SLib::getCodes("PRD_MATERIAL_TYPE"), // 원부자재 구분
             'opts'          => SLib::getCodes("PRD_MATERIAL_OPT"), // 원부자재 품목
             'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
-            'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
 		];
 
         return view(Config::get('shop.store.view') . '/stock/stk17', $values);
@@ -148,33 +147,24 @@ class stk17Controller extends Controller
 
         $sql = "select storage_cd from storage where default_yn = 'Y'";
         $storage_cd = DB::selectOne($sql)->storage_cd;
-        $rel_date = date_format(date_create(now()), "Ymd");
+        $rel_date = date("Ymd");
        
         try {
             DB::beginTransaction();
-
-            $sql = "
-                select
-                    release_no
-                from sproduct_stock_release
-                order by idx desc
-            ";
-
-            $last_seq = DB::selectOne($sql);
-
-            if ($last_seq == null) {
-                $no = 1;
-            } else {
-                $seq = explode('_', $last_seq->release_no);
-                $no = (int)$seq[2] + 1;
-            }
-
+			
+			$last_rel_no = DB::table('sproduct_stock_release')->orderByDesc('idx')->value('release_no');
+			$seq = 1;
+			if ($last_rel_no != null) {
+				$seq = explode('_', $last_rel_no);
+				$seq = ($seq[count($seq) - 1] * 1) + 1;
+			}
+			$release_no = $release_type . '_' . $rel_date . '_' . $seq;
 
 			foreach($data as $row) {
                 DB::table('sproduct_stock_release')
                     ->insert([
                         'type' => $release_type,
-                        'release_no' => $release_type.'_'.$rel_date.'_'.$no,
+                        'release_no' => $release_no,
                         'prd_cd' => $row['prd_cd'],
                         'price' => $row['price'],
                         'wonga' => $row['wonga'],
