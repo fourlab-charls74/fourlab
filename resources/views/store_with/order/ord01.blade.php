@@ -407,7 +407,10 @@
 			<div class="filter_wrap">
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-                    <a href="#" onclick="delOrderBeforeRelease();" class="btn btn-sm btn-primary shadow-sm">출고 전 주문삭제</a>
+					<div class="d-flex">
+						<p class="text-danger fs-12 mr-2">* 상품코드가 맵핑되지 않은 상품의 주문건이 포함될 경우, '정상가', '자사몰판매가', '할인율'의 합계가 정확하지 않을 수 있습니다.</p>
+                        <a href="#" onclick="delOrderBeforeRelease();" class="btn btn-sm btn-primary shadow-sm">출고 전 주문삭제</a>
+					</div>
 				</div>
 			</div>
 		</div>

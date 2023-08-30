@@ -452,7 +452,7 @@ class ord01Controller extends Controller
                     om.sale_place,
                     g.price as goods_price,
                     g.goods_sh,
-                    g.wonga,
+                    o.wonga,
                     o.price,
                     o.recv_amt,
                     o.dlv_amt,
