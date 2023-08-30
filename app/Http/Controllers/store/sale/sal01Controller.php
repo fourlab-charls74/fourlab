@@ -552,8 +552,8 @@ class sal01Controller extends Controller
 		// 임시방편 - 매칭이 안된 상품 0 처리
 		if ($result !== null) {
 			if ($result->goods_no === 0) {
-				// 상품코드가 매칭되지 않은 상품은 '131767 - XMD 판매일보등록용 비매칭상품' 을 임시로 지정함
-				$order['goods_no'] = 131767;
+				// 상품코드가 매칭되지 않은 상품은 '106163 - XMD 판매일보등록용 비매칭상품' 을 임시로 지정함
+				$order['goods_no'] = 106163;
 			} else {
 				$order['goods_no'] = @$result->goods_no;
 			}
@@ -928,8 +928,8 @@ class sal01Controller extends Controller
 		// 임시방편 - 매칭이 안된 상품 0 처리
 		if ($result !== null) {
 			if ($result->goods_no === 0) {
-				// 상품코드가 매칭되지 않은 상품은 '131767 - XMD 판매일보등록용 비매칭상품' 을 임시로 지정함
-				$order['goods_no'] = 131767;
+				// 상품코드가 매칭되지 않은 상품은 '106163 - XMD 판매일보등록용 비매칭상품' 을 임시로 지정함
+				$order['goods_no'] = 106163;
 			} else {
 				$order['goods_no'] = @$result->goods_no;
 			}
