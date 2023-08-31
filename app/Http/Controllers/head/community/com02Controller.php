@@ -360,7 +360,7 @@ class com02Controller extends Controller
 
 		// 게시물
 		$type			= $request->input("type");
-		$b_no			= $request->input("b_no");
+		$b_no			= $request->input("b_no", '');
 		$board_id		= $request->input("board_id");
 		$subject		= $request->input("subject");
 		$content		= $request->input("content");
