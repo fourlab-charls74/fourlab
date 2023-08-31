@@ -95,14 +95,14 @@
 												</div>
 											</td>
 											<th>샘플파일</th>
-											<td><a href="/data/store/sample/product_price_sample.xlsx"> product_price_sample.xlsx</a></td>
+											<td><a href="/sample/sample_prd05.xlsx"> sample_prd05.xlsx</a></td>
 										</tr>
 										<tr>
 											<th class="required">파일</th>
 											<td colspan="3">
 												<div class="d-flex flex-column">
 													<div class="d-flex" style="width:100%;">
-														<input id="excelfile" type="file" name="excelfile" class="mr-2" />
+														<input id="excel_file" type="file" name="excel_file" class="mr-2" />
 														<button type="button" class="btn btn-outline-primary" onclick="Upload();"><i class="fas fa-sm"></i>자료 불러오기</button>
 													</div>
 												</div>
@@ -117,70 +117,70 @@
 				</div>
 			</div>
 			<div class="card shadow mt-3">
-
-				<!-- DataTales Example -->
-				<div class="card-body pt-2">
-					<div class="card-title">
-						<div class="filter_wrap">
-							<div class="fl_box">
-								<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
-							</div>
-						</div>
-					</div>
-					<div class="table-responsive">
-						<div id="div-gd" style="height:calc(100vh - 460px);width:100%;" class="ag-theme-balham"></div>
+				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
+					<a href="#">상품정보</a>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive mt-2">
+						<div id="div-gd" class="ag-theme-balham"></div>
 					</div>
 				</div>
-
-			</div>
 		</div>
 	</div>
 
 	<script language="javascript">
-		let columnDefs = [
-			{field: "num", headerName: "#", filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-			{field: "prd_cd_p", headerName: "품번", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
-			{field: "goods_sh", headerName: "정상가", type: "currencyType", width: 75},
-			{field: "price", headerName: "현재가", type: "currencyType", width: 75},
-			{field: "price_kind", headerName: "기준", width: 80},
-			{field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 120 ,editable:true, cellStyle: {'background' : '#ffff99'}},
-			{field: "change_kind", headerName: "율/액", width: 80 ,editable:true, cellStyle: {'background' : '#ffff99'}},
-			{field: "change_price", headerName: "변경가", type: "currencyType", width: 75},
-		];
-
-		// let the grid know which columns to use
-		var gridOptions = {
-			columnDefs: columnDefs,
-			defaultColDef: {
-				// set every column width
-				//flex: 1,
-				//width: 100,
-				// make every column editable
-				editable: true,
-				resizable: true,
-				autoHeight: true,
-				// make every column use 'text' filter by default
-				filter: 'agTextColumnFilter'
+		let columns = [
+			{headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
+			{field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+			{field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+			{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
+			{field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
+			{field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
+			{field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
+			{field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
+			{field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
+			{field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
+			{field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+			{field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+			{field: "goods_opt", headerName: "옵션", width: 153},
+			{field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
+			{field: "price", headerName: "현재가", type: "currencyType", width: 65},
+			{field: "price_kind", headerName: "가격기준", width: 65, cellStyle: {"text-align": "center"}},
+			{field: "change_kind", headerName: "변경기준", width: 65, cellStyle: {"text-align": "center"}},
+			{field: "change_val_rate", headerName: "변경금액(율)", width: 80, type: "currencyType", cellStyle: {"text-align": "center"},
+				cellRenderer : function(params) {
+					if (params.data.change_kind == '%') {
+						return params.data.change_val_rate + '%';
+					} else {
+						return Comma(params.data.change_val_rate);
+					}
+				}
 			},
-			rowSelection:'multiple',
-			rowHeight: 275,
-		};
+			{field: "change_val", headerName: "가격", type: "currencyType", width: 80, editable:true, cellStyle: {'background' : '#ffff99'}},
+			{width : 'auto'}
+		];
+	</script>
 
-		// lookup the container we want the Grid to use
-		var eGridDiv = document.querySelector('#div-gd');
+	<script type="text/javascript" charset="utf-8">
+		let add_product = [];
+		let gx;
+		const pApp = new App('', { gridId: "#div-gd" });
 
-		new agGrid.Grid(eGridDiv, gridOptions);
+		$(document).ready(function() {
+			pApp.ResizeGrid(430);
+			pApp.BindSearchEnter();
+			let gridDiv = document.querySelector(pApp.options.gridId);
+			gx = new HDGrid(gridDiv, columns);
+			$('#cur_date').hide();
+		});
 	</script>
 
 	<script type="text/javascript" charset="utf-8">
 
 		$(document).ready(function() {
-			gridOptions.api.setRowData([]);
-
+			gx.gridOptions.api.setRowData([]);
 			$('#cur_date').hide();
 		});
-
-		var GridData = [];
 
 		function Save() {
 
@@ -188,23 +188,22 @@
 			let change_date_now	= document.getElementById('change_date_now').innerText;
 			let type			= $("input[name='product_price_type']:checked").val();
 			let plan_category	= $('#plan_category').val();
-			let change_cnt		= GridData.length;
-			
-			if(GridData.length === 0){
-				alert('입력할 자료를 선택해 주십시오.');
-				return false;
-			}
+			let rows = gx.getSelectedRows();
 
-			if(!confirm("등록한 상품의 변경금액(율)을 저장하시겠습니까?")) return;
+			console.log(rows);
+
+			if(rows.length < 1)	return alert('가격을 변경할 상품을 선택해주세요.');
+
+			if(!confirm("등록한 상품의 가격을 변경하시겠습니까?")) return;
 
 			axios({
 				url: '/store/product/prd05/batch-update',
 				method: 'put',
 				data: {
-					data: JSON.stringify(GridData),
+					data: rows,
 					change_date_res : change_date_res,
 					change_date_now : change_date_now,
-					change_cnt : change_cnt,
+					change_cnt : rows.length,
 					type : type,
 					plan_category : plan_category
 
@@ -238,126 +237,135 @@
 		});
 
 		// read the raw data and convert it to a XLSX workbook
-		function convertDataToWorkbook(data) {
+		const convertDataToWorkbook = (data) => {
 			/* convert data to binary string */
-			var data = new Uint8Array(data);
-			var arr = new Array();
+			data = new Uint8Array(data);
+			const arr = new Array();
 
-			for (var i = 0; i !== data.length; ++i) {
+			for (let i = 0; i !== data.length; ++i) {
 				arr[i] = String.fromCharCode(data[i]);
 			}
 
-			var bstr = arr.join("");
+			const bstr = arr.join("");
 
 			return XLSX.read(bstr, {type: "binary"});
-		}
+		};
 
-		function makeRequest(method, url, success, error) {
-			var httpRequest = new XMLHttpRequest();
+		const makeRequest = (method, url, success, error) => {
+			let httpRequest = new XMLHttpRequest();
 			httpRequest.open("GET", url, true);
 			httpRequest.responseType = "arraybuffer";
 
 			httpRequest.open(method, url);
-			httpRequest.onload = function () {
+			httpRequest.onload = () => {
 				success(httpRequest.response);
 			};
-			httpRequest.onerror = function () {
+			httpRequest.onerror = () => {
 				error(httpRequest.response);
 			};
 			httpRequest.send();
-		}
+		};
 
-		function populateGrid(workbook) {
-			// our data is in the first sheet
-			var firstSheetName = workbook.SheetNames[0];
-			var worksheet = workbook.Sheets[firstSheetName];
+		const populateGrid = async (workbook) => {
+			let firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
+			let worksheet = workbook.Sheets[firstSheetName];
 
-			var columns	= {
-				'A': 'prd_cd_p',
-				'B': 'goods_sh',
-				'C': 'price',
-				'D': 'price_kind',
-				'E': 'change_val',
-				'F': 'change_kind',
-				'G': 'change_price',
+			let columns	= {
+				'A': 'prd_cd',
+				'B': 'price_kind',
+				'C': 'change_kind',
+				'D': 'change_val'
 			};
+			
+			let firstRowIndex = 6; // 엑셀 2행부터 시작 (샘플데이터 참고)
+			let rowIndex = firstRowIndex;
 
-
-			// start at the 2nd row - the first row are the headers
-			var rowIndex = 2;
-
-			var rowData = [];
-
-			// iterate over the worksheet pulling out the columns we're expecting
+			let count = gx.gridOptions.api.getDisplayedRowCount();
+			let rows = [];
 			while (worksheet['A' + rowIndex]) {
-				var row = {};
+				let row = {};
 				Object.keys(columns).forEach(function(column) {
-					if(worksheet[column + rowIndex] !== undefined){
-						row[columns[column]] = worksheet[column + rowIndex].w;
+					let item = worksheet[column + rowIndex];
+					if(item !== undefined && item.w) {
+						row[columns[column]] = item.w;
 					}
 				});
 
-				rowData.push(row);
-
+				rows.push(row);
+				row = { ...row,
+					count: ++count, isEditable: true,
+				};
 				rowIndex++;
 			}
-
-			GridData = rowData;
-
-			// finally, set the imported rowData into the grid
-			gridOptions.api.setRowData(rowData);
-
-			//토탈 갯수 보여주기
-			$("#gd-total").text(rowData.length);
+			if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
+			rows = rows.filter(r => r.prd_cd);
+			let values = { data: rows };
+			await getGood(values, firstRowIndex);
 		}
 
-		function Upload(){
-			var file_data = $('#excelfile').prop('files')[0];
-			var form_data = new FormData();
+		const Upload = () => {
+			const file_data = $('#excel_file').prop('files')[0];
+			if(!file_data) return alert("적용할 파일을 선택해주세요.");
+			
+			const form_data = new FormData();
 			form_data.append('file', file_data);
 			form_data.append('_token', "{{ csrf_token() }}");
-			$.ajax({
-				url: '/store/product/prd05/upload', // point to server-side PHP script
-				dataType: 'json',  // what to expect back from the PHP script, if anything
-				cache: false,
-				contentType: false,
-				processData: false,
+
+			alert("엑셀파일을 적용하고 있습니다. 잠시만 기다려주세요.");
+			
+			axios({
+				method: 'post',
+				url: '/store/product/prd05/upload',
 				data: form_data,
-				type: 'post',
-				success: function(res){
-					if(res.code == "200"){
-						file = res.file;
-						//alert(file);
-						importExcel("/" + file);
-					}else{
-						alert('엑셀 파일 업로드 오류 입니다[1].');
-						console.log(res.errmsg);
-					}
-				},
-				error: function(request, status, error) {
-					alert('엑셀 파일 업로드 오류 입니다[2].');
-					console.log(error)
+				headers: {
+					"Content-Type": "multipart/form-data",
 				}
+			}).then(async (res) => {
+				gx.gridOptions.api.setRowData([]);
+				if (res.data.code == 1) {
+					const file = res.data.file;
+					await importExcel("/" + file);
+				} else {
+					console.log(res.data.message);
+					console.log('실패');
+				}
+			}).catch((error) => {
+				console.log(error);
 			});
+			
 			return false;
 		}
 
-		function importExcel(url) {
+		const getGood = async (values, firstIndex) => {
+			axios({
+				url: '/store/product/prd05/batch-getgoods',
+				method: 'post',
+				data: values,
+			}).then(async (res) => {
+				if (res.data.code == 200) {
+					await gx.gridOptions.api.applyTransaction({add : res.data.body});
+				} else {
+					alert("상품정보조회 중 오류가 발생했습니다.\n다시 시도해주세요.");
+				}
+			}).catch((error) => {
+				console.log(error);
+			});
+		};
 
-			makeRequest('GET',
-				//'https://www.ag-grid.com/example-excel-import/OlymicData.xlsx',
+		const importExcel = async (url) => {
+			await makeRequest('GET',
 				url,
 				// success
-				function (data) {
-					var workbook = convertDataToWorkbook(data);
-					populateGrid(workbook);
+				async (data) => {
+					const workbook = convertDataToWorkbook(data);
+					await populateGrid(workbook);
 				},
 				// error
-				function (error) {
-					throw error;
+				(error) => {
+					console.log(error);
 				}
 			);
-		}
+		};
 		
 
 	</script>

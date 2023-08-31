@@ -202,7 +202,7 @@
         {field: "goods_opt", headerName: "옵션", width: 153},
         {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
         {field: "price", headerName: "현재가", type: "currencyType", width: 65},
-        {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 80 @if ($cmd == 'update' && $res->apply_yn == 'N') ,editable:true, cellStyle: {'background' : '#ffff99'} @elseif($cmd == 'add') ,editable:true, cellStyle: {'background' : '#ffff99'} @endif},
+        {field: "change_val", headerName: "가격", type: "currencyType", width: 80 @if ($cmd == 'update' && $res->apply_yn == 'N') ,editable:true, cellStyle: {'background' : '#ffff99'} @elseif($cmd == 'add') ,editable:true, cellStyle: {'background' : '#ffff99'} @endif},
 		{width : 'auto'}
     ];
 </script>
@@ -420,7 +420,7 @@
 		if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
 		if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
 
-        if(!confirm("선택한 상품의 변경금액(율)을 저장하시겠습니까?")) return;
+        if(!confirm("선택한 상품의 가격을 저장하시겠습니까?")) return;
 
         axios({
             url: '/store/product/prd05/change-price',

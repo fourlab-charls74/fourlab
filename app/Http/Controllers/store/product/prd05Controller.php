@@ -661,22 +661,29 @@ class prd05Controller extends Controller
 	// 엑셀업로드 
 	public function upload(Request $request)
 	{
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
 
-		if ( 0 < $_FILES['file']['error'] ) {
-			echo json_encode(array(
-				"code" => 500,
-				"errmsg" => 'Error: ' . $_FILES['file']['error']
-			));
-		}
-		else {
-			$file = sprintf("data/store/prd05/%s", $_FILES['file']['name']);
-			move_uploaded_file($_FILES['file']['tmp_name'], $file);
-			echo json_encode(array(
-				"code" => 200,
-				"file" => $file
-			));
-		}
+				$save_path = "data/store/prd05/";
+				$file_name = "${now}_${user_id}.${extension}";
 
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
 	}
 
 	public function batch_update(Request $request)
@@ -687,10 +694,11 @@ class prd05Controller extends Controller
 
 		$change_date_res	= $request->input('change_date_res');
 		$change_date_now	= $request->input('change_date_now');
-		$type				= $request->input('type');
 		$change_cnt			= $request->input('change_cnt');
-		$plan_category		= $request->input('plan_category');
-
+		$type				= $request->input('type');
+		$plan_category		= $request->input('plan_category', '');
+		$data				= $request->input('data', []);
+		
 		if ($type == 'reservation') {
 			$change_date = $change_date_res;
 			$change_type = 'R';
@@ -701,16 +709,9 @@ class prd05Controller extends Controller
 			$apply_yn = 'Y';
 		}
 
-		$datas = $request->input('data');
-		$datas = json_decode($datas);
-
-		if ($datas == "") {
-			$error_code = "400";
-		}
-
 		try {
 			DB::beginTransaction();
-	
+
 			$product_price_cd = DB::table('product_price')
 				->insertGetId([
 					'change_cnt'	=> $change_cnt,
@@ -719,67 +720,43 @@ class prd05Controller extends Controller
 					'rt' => now(),
 					'ut' => now()
 				]);
-			
-			for( $i = 0; $i < count($datas); $i++ ) {
-				$data = (array)$datas[$i];
-	
-				$prd_cd_p		= $data['prd_cd_p'];
-				$price			= Lib::uncm($data['price']);
-				$price_kind		= $data['price_kind'];
-				$change_val		= Lib::uncm($data['change_val']);
-				$change_kind	= $data['change_kind'];
-				$change_price	= Lib::uncm($data['change_price']);
 
-				$price_kind	= ($price_kind == "정상가")?"T":"P";
-				$change_kind	= ($change_kind == "%")?"P":"W";
-				
-				$sql	= " select prd_cd, goods_no from product_code where prd_cd_p = :prd_cd_p ";
-				$rows	= DB::select($sql,['prd_cd_p' => $prd_cd_p]);
-	
-				foreach ($rows as $row) {
-					$prd_cd		= $row->prd_cd;
-					$goods_no	= $row->goods_no;
-	
-					DB::table('product_price_list')
-						->insert([
-							'change_date'		=> $change_date,
-							'change_kind'		=> $change_kind,
-							'change_val'		=> $change_val,
-							'price_kind'		=> $price_kind,
-							'apply_yn'			=> $apply_yn,
-							'change_type'		=> $change_type,
-							'plan_category'		=> $plan_category,
-							'product_price_cd'	=> $product_price_cd,
-							'prd_cd'			=> $prd_cd,
-							'org_price'			=> $price,
-							'change_price'		=> $change_price,
-							'admin_id'			=> $admin_id,
-							'rt' => now(),
-							'ut' => now()
-						]);
-	
-					if ($type == 'now') {
-						//goods 테이블 price 가격변경
-						if($plan_category != '00') {
-							DB::table('goods')
-								->where('goods_no', '=', $goods_no)
-								->update(['price' => $change_price]);
-						}
-	
-						//product 테이블 price 가격변경
-						DB::table('product')
-							->where('prd_cd', '=', $prd_cd)
-							->update(['price'=> $change_price]);
-	
-						if($plan_category != '00'){
-							DB::table('product_code')
-								->where('prd_cd', '=', $prd_cd)
-								->update(['plan_category' => $plan_category]);
-						}
+			foreach ($data as $d) {
+				DB::table('product_price_list')
+					->insert([
+						'change_date'		=> $change_date,
+						'change_kind'		=> $d['change_kind'] == '금액'? 'W' : 'P',
+						'change_val'		=> $d['change_val_rate'],
+						'price_kind'		=> $d['price_kind'] == '정상가'? 'T': 'P',
+						'apply_yn'			=> $apply_yn,
+						'change_type'		=> $change_type,
+						'plan_category'		=> $plan_category,
+						'product_price_cd'	=> $product_price_cd,
+						'prd_cd'			=> $d['prd_cd'],
+						'org_price'			=> $d['price'],
+						'change_price'		=> $d['change_val'],
+						'admin_id'			=> $admin_id,
+						'rt' => now(),
+						'ut' => now()
+					]);
+
+				if ($type == 'now') {
+					//goods 테이블 price 가격변경
+					DB::table('goods')
+						->where('goods_no', '=', $d['goods_no'])
+						->update(['price' => $d['change_val']]);
+
+					//product 테이블 price 가격변경
+					DB::table('product')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->update(['price'=> $d['change_val']]);
+
+					if($plan_category != '00'){
+						DB::table('product_code')
+							->where('prd_cd', '=', $d['prd_cd'])
+							->update(['plan_category' => $plan_category]);
 					}
-					
-				}			
-			
+				}
 			}
 
 			DB::commit();
@@ -792,5 +769,101 @@ class prd05Controller extends Controller
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
-	}	
+	}
+
+	/** 일괄등록 상품 개별 조회 */
+	public function get_goods(Request $request) {
+		$data = $request->input('data', []);
+
+		$result = [];
+
+		foreach ($data as $key => $d) {
+			$prd_cd 			= $d['prd_cd'];
+			$price_kind 		= $d['price_kind'];
+			$change_kind 		= $d['change_kind'];
+			$change_val_rate 	= $d['change_val'];
+			
+			$sql = "select tag_price, price from product where prd_cd = :prd_cd";
+			$price = DB::selectOne($sql,['prd_cd' => $prd_cd]);
+			
+			$goods_sh = $price->tag_price;
+			$price = $price->price;
+
+
+			$change_val = "";
+			if ($change_kind == '금액') {
+				if ($price_kind == '정상가') {
+					$change_val = (int)$goods_sh + (int)$change_val_rate;
+				} else {
+					$change_val = (int)$price + (int)$change_val_rate;
+				}
+			} else if ($change_kind == '%') {
+				/**
+				 * 할인율  = 판매가 - (판매가 * 할인율)
+				 */
+				if ($change_val_rate >= 100) {
+					if ($price_kind == '정상가') {
+						$change_val = 0;
+					} else {
+						$change_val = 0;
+					}
+
+				} else if ($change_val_rate < 100) {
+					$sale = (int)$change_val_rate/100;
+					if ($price_kind == '정상가') {
+						$change_val = (int)$goods_sh - ((int)$goods_sh * $sale);
+					} else {
+						$change_val = (int)$price - ((int)$price * $sale);
+					}
+				}
+			}
+			
+			$sql = "
+                select
+                    pc.prd_cd
+                    , pc.goods_no
+                    , opt.opt_kind_nm
+                    , b.brand_nm as brand
+                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
+                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
+                    , pc.prd_cd_p as prd_cd_p
+                    , pc.color
+                    , ifnull((
+						select s.size_cd from size s
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size
+                    , pc.goods_opt
+                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                    , if(g.goods_no <> '0', g.price, p.price) as price
+                	, '$price_kind' as price_kind
+                	, '$change_kind' as change_kind
+                	, '$change_val_rate' as change_val_rate
+                	, $change_val as change_val
+                from product_code pc
+                    inner join product p on p.prd_cd = pc.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join brand b on b.br_cd = pc.brand
+                where pc.prd_cd = '$prd_cd'
+                limit 1
+            ";
+
+			$row = DB::selectOne($sql);
+			array_push($result, $row);
+		}
+
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+			],
+			"body" => $result,
+		]);
+	}
 }
