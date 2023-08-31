@@ -72,20 +72,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="">반품사유</label>
-                            <div class="flex_box">
-                                <select name='return_reason' class="form-control form-control-sm" style="width: 100%;">
-                                    <option value="">전체</option>
-                                    @foreach (@$return_reason as $rr)
-                                        <option value='{{ $rr->code_id }}'>{{ $rr->code_val }}</option>
-                                    @endforeach
-                                </select>
-                               
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                {{-- 반품이동처 --}}
+			                <label for="">반품업체</label>
+			                <div class="flex_box">
+				                <select name='target_com_cd' class="form-control form-control-sm" style="width: 100%;">
+					                <option value="">전체</option>
+					                @foreach (@$sup_coms as $sup_com)
+						                <option value='{{ $sup_com->com_id }}'>{{ $sup_com->com_nm }}</option>
+					                @endforeach
+				                </select>
+			                </div>
+		                </div>
+	                </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
@@ -143,28 +143,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            {{-- 반품이동처 --}}
-                            <label for="">반품업체</label>
-                            <div class="flex_box">
-                                <select name='target_com_cd' class="form-control form-control-sm" style="width: 100%;">
-                                    <option value="">전체</option>
-                                    @foreach (@$sup_coms as $sup_com)
-                                        <option value='{{ $sup_com->com_id }}'>{{ $sup_com->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                                <!-- <span class="text_line" style="width: 6%; text-align: center;">/</span>
-                                <select name='target_storage_cd' class="form-control form-control-sm" style="width: 47%;">
-                                    <option value="">창고 전체</option>
-                                    @foreach (@$storages as $storage)
-                                        <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
-                                    @endforeach
-                                </select> -->
-                            </div>
-                        </div>
-                    </div>
+                <div class="row">
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="">반품사유</label>
+			                <div class="flex_box">
+				                <select name='return_reason' class="form-control form-control-sm" style="width: 100%;">
+					                <option value="">전체</option>
+					                @foreach (@$return_reason as $rr)
+						                <option value='{{ $rr->code_id }}'>{{ $rr->code_val }}</option>
+					                @endforeach
+				                </select>
+			                </div>
+		                </div>
+	                </div>
                 </div>
             </div>
 		</div>
@@ -204,32 +196,32 @@
 
 <script language="javascript">
 	let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: false, sort: null, width: 28,
-            checkboxSelection: function(params) {
-                return params.data.sgr_state < 30;
-            },
-        },
-        {field: "sgr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
+        {field: "sgr_cd", headerName: "반품코드", width: 80, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
             }
         },        
-        {field: "sgr_date", headerName: "반품일자", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "storage_nm", headerName: "창고명", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "storage_cd", headerName: "창고코드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "target_nm", headerName: "반품업체", width: 120,
-            cellRenderer: (params) => (params.data.target_type == "C" ? " " : params.data.target_type == "S" ? " " : "") + params.value,
-        }, // 반품이동처
+        {field: "sgr_date", headerName: "반품일자", width: 80, cellClass: 'hd-grid-code'},
         {field: "sgr_type", hide: true},
         {field: "sgr_type_nm", headerName: "반품구분", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "#2aa876" : "none"})},
         {field: "sgr_state", hide: true},
         {field: "sgr_state_nm", headerName: "반품상태", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_state == "30" ? "#2aa876" : "#0000ff"})},
-        {field: "target_type", hide: true},
+		{headerName: "출고창고",
+			children: [
+				{field: "storage_cd", headerName: "창고코드", width: 60, cellClass: 'hd-grid-code'},
+				{field: "storage_nm", headerName: "창고명", width: 100},
+			]
+		},
         {field: "target_cd", hide: true},
-        {field: "sgr_qty", headerName: "반품수량", type: "currencyType", width: 60},
-        {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 60},
+        {field: "target_nm", headerName: "반품업체", width: 120,
+            cellRenderer: (params) => (params.data.target_type == "C" ? " " : params.data.target_type == "S" ? " " : "") + params.value,
+        }, // 반품이동처
+        {field: "target_type", hide: true},
+        {field: "sgr_qty", headerName: "반품수량", type: "currencyType", width: 80},
+        {field: "sgr_price", headerName: "반품금액", type: "currencyType", width: 80},
+        {field: "return_reason_nm", headerName: "반품사유", width: 150},
         {field: "comment", headerName: "메모", width: 300},
-        {field: "return_reason_nm", headerName: "반품사유", width: 200},
         {field: "print", headerName: "명세서 출력", cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
 			cellRenderer: function(params) {
 				if(params.data.sgr_state >= 10) {
@@ -250,7 +242,9 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+			isRowSelectable: (params) => params.data.sgr_state < 30,
+        });
         Search();
     });
 

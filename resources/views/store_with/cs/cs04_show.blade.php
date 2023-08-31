@@ -75,29 +75,29 @@
 			                                        </select>
 		                                        </div>
 	                                        </td>
-                                            <th class="required">이동창고</th>
-                                            <td>
-                                                <div class="form-inline inline_select_box">
-                                                    @if(@$cmd == 'add')
-                                                    <div class="d-flex w-100">
-                                                        <select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
-															<option value="">선택</option>
-														@foreach (@$storages as $storage)
-															<option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->target_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
-														@endforeach
-                                                        </select>
-                                                    </div>
-                                                    @else
-                                                    <input type="text" name="target_nm" id="target_nm" value="{{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
 	                                        <th>이동코드</th>
 	                                        <td>
 		                                        <div class="form-inline">
 			                                        <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
+		                                        </div>
+	                                        </td>
+                                        </tr>
+                                        <tr>
+	                                        <th class="required">이동창고</th>
+	                                        <td>
+		                                        <div class="form-inline inline_select_box">
+			                                        @if(@$cmd == 'add')
+				                                        <div class="d-flex w-100">
+					                                        <select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
+						                                        <option value="">선택</option>
+						                                        @foreach (@$storages as $storage)
+							                                        <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->target_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+						                                        @endforeach
+					                                        </select>
+				                                        </div>
+			                                        @else
+				                                        <input type="text" name="target_nm" id="target_nm" value="{{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
+			                                        @endif
 		                                        </div>
 	                                        </td>
                                             <th>메모</th>
