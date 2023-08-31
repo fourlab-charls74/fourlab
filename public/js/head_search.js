@@ -1342,6 +1342,7 @@ ControlOption.prototype.SetGrid = function(divId) {
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 40, sort: null},
         {field: "opt_name" , headerName: "옵션구분", width: 150},
         {field: "goods_opt" , headerName: "옵션", width: 200, editable: true, cellStyle: {'background' : '#ffff99'}},
+		{field: "goods_opt_origin", hide: true },
         {field: "goods_no", hide: true},
     ];
     

@@ -2559,7 +2559,7 @@ class prd01Controller extends Controller
 			if ($is_single) { // 기본 싱글 옵션인 경우
 
 				$sql = "
-					select goods_opt, ifnull('$option_kind', opt_name) as opt_name, goods_no
+					select goods_opt, ifnull('$option_kind', opt_name) as opt_name, goods_no, goods_opt as goods_opt_origin
 					from goods_summary
 					where goods_no = :goods_no and use_yn = 'Y'
 					order by seq
@@ -2570,18 +2570,22 @@ class prd01Controller extends Controller
 			} else { // 기본 2단 옵션인 경우
 
 				$sql = "
-					select distinct substring_index(goods_opt, '^', :index) as goods_opt, substring_index(opt_name, '^', :index2) as opt_name, goods_no
+					select distinct substring_index(goods_opt, '^', :index) as goods_opt, ifnull(substring_index('$option_kind', '^', :index4), substring_index(opt_name, '^', :index2))  as opt_name, goods_no, substring_index(goods_opt, '^', :index3) as goods_opt_origin
 					from goods_summary
 					where goods_no = :goods_no and use_yn = 'Y'
 					order by seq
 				";
 
-				$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'goods_no' => $goods_no]));
-
+				$result = array_merge(DB::select($sql, ['index' => 1, 'index2' => 1, 'index3' => 1, 'index4' => 1, 'goods_no' => $goods_no]), DB::select($sql, ['index' => -1, 'index2' => -1, 'index3' => -1, 'index4' => -1, 'goods_no' => $goods_no]));
 			}
 
 		} catch(Exception $e) {
 			$code = 500;
+
+			return response()->json([
+				"code" => $code,
+				"msg" => $e->getMessage()
+			]);
 		}
 
 		return response()->json([
@@ -2607,6 +2611,10 @@ class prd01Controller extends Controller
 
 		$keys = $grouped->keys()->all();
 
+		$goods_opt_origin = $collection->mapToGroups(function($item, $key) {
+			return [$item['goods_opt'] => isset($item['goods_opt_origin']) ? $item['goods_opt_origin'] : ''];
+		});
+		
 		/**
 		 * 전달받은 옵션구분 항목이 1개인 경우
 		 */
@@ -2687,8 +2695,8 @@ class prd01Controller extends Controller
 			 */
 			try {
 				DB::beginTransaction();
-				$sql = " select goods_opt, seq from goods_summary where goods_no = :goods_no and opt_name = :opt_name ";
-				$rows = DB::select($sql, [ 'goods_no' => $goods_no, 'opt_name' => $opt_name ]);
+				$sql = " select goods_opt, seq from goods_summary where goods_no = :goods_no and goods_sub = 0";
+				$rows = DB::select($sql, [ 'goods_no' => $goods_no ]);
 				$opts = (object) [ 'ori' => [], 'new' => [], 'del' => [] ];
 
 				for ($i = 0; $i < count($goods_opts); $i++) {
@@ -2696,7 +2704,9 @@ class prd01Controller extends Controller
 						return $row->goods_opt === $goods_opts[$i] ? [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ] : $a;
 					}, '');
 					if ($ori !== '') array_push($opts->ori, $ori);
-					else array_push($opts->new, [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ]);
+					else {
+						array_push($opts->new, [ 'seq' => $i, 'goods_opt' => $goods_opts[$i], 'goods_opt_origin' => $goods_opt_origin[$goods_opts[$i]][0]]);
+					}
 				}
 
 				for ($i = 0; $i < count($rows); $i++) {
@@ -2708,11 +2718,27 @@ class prd01Controller extends Controller
 				for ($i = 0; $i < count($opts->new); $i++) {
 					$seq = $opts->new[$i]['seq'];
 					$goods_opt = $opts->new[$i]['goods_opt'];
-					$sql = "
-						insert into goods_summary
-							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
-						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq)
-					";
+					$goods_opt_origin = $opts->new[$i]['goods_opt_origin'];
+					if($goods_opt_origin !== '') {
+						$sql = "
+                            insert into goods_summary
+                                (goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, opt_memo, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
+                            select 
+                                :goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', gs.opt_memo, gs.good_qty, gs.wqty, gs.bad_qty, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq
+                            from 
+                                goods_summary gs
+                            where 
+                                1 = 1
+                                and goods_no = '$goods_no' and goods_sub = 0 and goods_opt = '$goods_opt_origin'
+                        ";
+					} else {
+						$sql = "
+                            insert into goods_summary
+                                (goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
+                            values( 
+                                :goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0,0,0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq)
+                        ";
+					}
 					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
 
@@ -2738,9 +2764,9 @@ class prd01Controller extends Controller
 					$goods_opt = $opts->del[$i];
 					$sql = "
                     	delete from goods_summary
-                    	where goods_no = :goods_no and goods_sub = :goods_sub and goods_opt = :goods_opt and opt_name = :opt_name
+						where goods_no = :goods_no and goods_sub = :goods_sub and goods_opt = :goods_opt
                     ";
-					DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+					DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt]);
 				}
 				
 				DB::commit();
@@ -2790,8 +2816,8 @@ class prd01Controller extends Controller
 			try {
 				DB::beginTransaction();
 
-				$sql = " select goods_opt, seq from goods_summary where goods_no = :goods_no and opt_name = :opt_name ";
-				$rows = DB::select($sql, [ 'goods_no' => $goods_no, 'opt_name' => $opt_name ]);
+				$sql = " select goods_opt, seq from goods_summary where goods_no = :goods_no and goods_sub = 0";
+				$rows = DB::select($sql, [ 'goods_no' => $goods_no ]);
 				$opts = (object) [ 'ori' => [], 'new' => [], 'del' => [] ];
 
 				for ($i = 0; $i < count($goods_opts); $i++) {
@@ -2799,7 +2825,10 @@ class prd01Controller extends Controller
 						return $row->goods_opt === $goods_opts[$i] ? [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ] : $a;
 					}, '');
 					if ($ori !== '') array_push($opts->ori, $ori);
-					else array_push($opts->new, [ 'seq' => $i, 'goods_opt' => $goods_opts[$i] ]);
+					else {
+						$idx = explode("^", $goods_opts[$i]);
+						array_push($opts->new, [ 'seq' => $i, 'goods_opt' => $goods_opts[$i], 'goods_opt_origin' => ($goods_opt_origin[$idx[0]][0] === '' || $goods_opt_origin[$idx[1]][0] === '' ) ? '' : $goods_opt_origin[$idx[0]][0].'^'.$goods_opt_origin[$idx[1]][0]]);
+					}
 				}
 
 				for ($i = 0; $i < count($rows); $i++) {
@@ -2811,11 +2840,27 @@ class prd01Controller extends Controller
 				for ($i = 0; $i < count($opts->new); $i++) {
 					$seq = $opts->new[$i]['seq'];
 					$goods_opt = $opts->new[$i]['goods_opt'];
-					$sql = "
-						insert into goods_summary
-							(goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
-						values (:goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0, 0, 0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq)
-					";
+					$goods_opt_origin = $opts->new[$i]['goods_opt_origin'];
+					if($goods_opt_origin !== '') {
+						$sql = "
+                            insert into goods_summary
+                                (goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, opt_memo, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
+                            select 
+                                :goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', gs.opt_memo, gs.good_qty, gs.wqty, gs.bad_qty, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq
+                            from 
+                                goods_summary gs
+                            where 
+                                1 = 1
+                                and goods_no = '$goods_no' and goods_sub = 0 and goods_opt = '$goods_opt_origin'
+                        ";
+					} else {
+						$sql = "
+                            insert into goods_summary
+                                (goods_no, goods_sub, opt_name, goods_opt, opt_price, soldout_yn, use_yn, good_qty, wqty, bad_qty, rt, ut, last_date, seq)
+                            values( 
+                                :goods_no, :goods_sub, :opt_name, :goods_opt, 0, 'N', 'Y', 0,0,0, NOW(), NOW(), DATE_FORMAT(NOW(),'%Y-%m-%d'), $seq)
+                        ";
+					}
 					DB::insert($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
 				}
 
@@ -2841,9 +2886,9 @@ class prd01Controller extends Controller
 					$goods_opt = $opts->del[$i];
 					$sql = "
                     	delete from goods_summary
-                    	where goods_no = :goods_no and goods_sub = :goods_sub and goods_opt = :goods_opt and opt_name = :opt_name
+						where goods_no = :goods_no and goods_sub = :goods_sub and goods_opt = :goods_opt
                     ";
-					DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt, 'opt_name' => $opt_name]);
+					DB::delete($sql, ['goods_no' => $goods_no, 'goods_sub' => 0, 'goods_opt' => $goods_opt ]);
 				}
 
 				DB::commit();
@@ -2852,7 +2897,7 @@ class prd01Controller extends Controller
 				// dd($e->getMessage());
 				DB::rollBack();
 				$code = 500;
-				$msg = "저장중 에러가 발생했습니다. 잠시 후 다시 시도해주세요.";
+				$msg = $e->getMessage();
 			}
 
 			return response()->json(['code' => $code, 'msg' => $msg], $code);
