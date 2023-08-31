@@ -869,7 +869,7 @@ class stk11Controller extends Controller {
 			$opt_name = trim($opt_kor);
 
 			$sql = "
-                select count(name) as cnt from goods_option where name = '$opt_name'
+				select count(goods_opt) as cnt from goods_good where goods_opt = '$opt_name' and goods_no = '$goods->goods_no' and goods_sub = '$goods->goods_sub'
             ";
 
 			$row = DB::selectOne($sql);
