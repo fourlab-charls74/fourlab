@@ -597,6 +597,9 @@ class prd01Controller extends Controller
 				//$wonga = Rq($row["ed_wonga"]);
 				$price = $ed_price;
 				//$wonga = $wonga;
+				$rs_wonga = DB::selectOne("select wonga from goods where goods_no = '$goods_no' and goods_sub='$goods_sub'");
+
+				$wonga = $rs_wonga->wonga;
 			} else {
 				$price = $ed_price;
 				//$wonga = round($ed_price * (1-($ed_margin_rate/100)));
@@ -687,6 +690,34 @@ class prd01Controller extends Controller
 			try {
 				DB::beginTransaction();
 
+				$sql = "
+                        select 
+                            price as ed_price, wonga as ed_wonga, c.com_type, c.margin_type,c.pay_fee
+                        from goods g
+                            inner join company c on g.com_id = c.com_id
+                        where g.goods_no = '$goods_no'
+                            and g.goods_sub = '$goods_sub'
+                    ";
+
+				$rs = DB::selectOne($sql);
+
+				if($rs !== null){
+					$ed_price = $rs->ed_price;
+					$ed_wonga = $rs->ed_wonga;
+					$com_type = $rs->com_type;
+					$margin_type = $rs->margin_type;
+					$pay_fee = $rs->pay_fee;
+
+					if($com_type == "2" &&  $margin_type == "FEE"){
+						if($ed_price > 0 && $ed_wonga > 0){
+							$pay_fee = round((1 - $ed_wonga / $ed_price)*100, 2);
+						}
+
+						$wonga = round($price * (1 - $pay_fee / 100),10);
+						$param["wonga"] = $wonga;
+					}
+				}
+				
 				$goods = new Product($user);
 
 				$mod_id = $user['id'];
