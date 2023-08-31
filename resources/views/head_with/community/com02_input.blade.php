@@ -106,6 +106,24 @@
 					<textarea name="content" id="content" class="form-control editor1" >{{ $contents['content'] }}</textarea>
 				</div>
 				<!-- 파일 첨부 -->
+				@if ($config['functions']!= "" && ($config['functions'] & 16 ) == 16)
+					<div class="flax_box w-25">
+						<input type="hidden" id="thumb_img_url" name="thumb_img_url">
+						<input type="hidden" id="thumb_img_nm" name="thumb_img_nm">
+						<ul style="padding:0; list-style:none; margin:0; list-style-type:none;">
+							<li>
+								<div style="width:157px; height:100px; border:1px solid #b3b3b3;padding:5px">
+									<label id="thumb_img_file-label" for="thumb_img_file" class="h-100">
+										<img @if($files != null) src="/data/board/{{ $board_id }}/{{ $files[0]->file_nm }}" @endif id="thumb_img" alt="" style="width:100%;height:100%" title="이미지를 추가해 주세요." >
+									</label>
+								</div>
+							</li>
+							<li style="padding-top:5px;">
+								<input type="file" id="thumb_img_file" name="thumb_img_file">
+							</li>
+						</ul>
+					</div>
+				@endif
 			</div>
 		</div>
 	</div>
@@ -186,12 +204,12 @@
 					data: $("[name=detail]").serialize(),
 					success: function (res) {
 						console.log(res);
-						if(res.return_code == 1){
+						//if(res.return_code == 1){
 							console.log(res.b_no);
 							opener.Search();
 							var url = "/head/community/com02/"+res.b_no;
 							location.href=url;
-						}
+						//}
 					},
 					error: function(request, status, error) {
 						console.log("error");
@@ -230,12 +248,45 @@
 		document.location.href = "/head/community/com02/detail?cmd=detail&b_no=&board_id="+board_id;
 	}
 
+	function validatePhoto(files) {
+		if (files === null || files.length === 0) {
+			alert("업로드할 이미지를 선택해주세요.");
+			return false;
+		}
+		if (!/(.*?)\.(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/i.test(files[0].name)) {
+			alert("이미지 형식이 아닙니다.");
+			return false;
+		}
+		return true;
+	}
+
+	function uploadImage(files,id){
+		if (validatePhoto(files) === false) return;
+		var fr = new FileReader();
+		//appendCanvas(size, id);
+		fr.onload = function (e) {
+			console.log(e.target.result);
+			$('#' + id ).attr('src',e.target.result);
+			$('#' + id + '_url' ).val(e.target.result);
+
+			let file_value  = $("#thumb_img_file").val().split("\\");
+			let file_name   = file_value[file_value.length-1];
+			$('#' + id + '_nm' ).val(file_name);
+			//drawImage(id,e);
+		};
+		fr.readAsDataURL(files[0]);
+	}
+	
 	$(function(){
 		$(".submit-btn").click(function(){
 			Save();
 
 		});
 
+		$("[name=thumb_img_file]").change(function(){
+			uploadImage(this.files,'thumb_img');
+		});
+		
 	});
 
 </script>

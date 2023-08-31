@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Components\Lib;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class Board
 {
@@ -646,5 +647,174 @@ class Board
 		DB::delete($sql);
 		
 		$this->DelBoardAuth($board_id);
+	}
+
+	function convert_file_names($file_path, $file_name){
+		$dir_resources = Storage::disk('public')->files("/".$file_path);
+		$file_count = 1;
+
+		for($i = 0; $i < count($dir_resources); $i++) {
+			$origin_name = explode('.', $dir_resources[$i]);
+			$upload_name = explode('.', $file_name)[0];
+
+			if(strpos($origin_name[0], $upload_name, 0) !== false) {
+				$file_count++;
+			}
+		}
+
+		$file_array = explode('.', $file_name);
+
+		return $file_count === 1 ? $file_name : sprintf("%s%s.%s", $file_array[0], $file_count, $file_array[1]);
+	}
+	
+	function IsRegisterdFile($b_no, $file_nm){
+		$sql = "
+            select count(*) as cnt from board_file
+            where b_no = '$b_no' and file_nm = '$file_nm'
+        ";
+		$row = DB::selectOne($sql);
+		$cnt = $row->cnt;
+
+		return ($cnt == 1) ? TRUE : FALSE;
+	}
+
+	function uploadFile($b_no, $is_edit = 0, $contents ){
+
+		$user_id	= $contents["user_id"];
+		$user_nm	= $contents["user_nm"];
+		$board_id	= $contents["board_id"];
+		$thumb_img_url = $contents["thumb_img_url"];
+		$thumb_img_nm = $contents["thumb_img_nm"];
+
+		$image_size_list_sql = "
+            select code_id , code_val  from code c2 where code_kind_cd = 'G_BOARD_IMG_SIZE'
+        ";
+
+		$image_size_list = DB::select($image_size_list_sql);
+
+		$upload_file_path =  "/data/board/" . $board_id;
+
+		$file_type	= "image";
+		$ip			= $_SERVER["REMOTE_ADDR"];
+
+		$file_nm = $this->convert_file_names("data/board/".$board_id, $thumb_img_nm);
+
+		$image      = preg_replace('/data:image\/(.*?);base64,/', '', $thumb_img_url);
+		$save_file  = sprintf("%s/%s", $upload_file_path, $file_nm);
+
+		Storage::disk('public')->put($save_file, base64_decode($image));
+
+
+		$file_size = Storage::size('/public'.$save_file);
+		$file_size = round($file_size / 1024);
+
+		$existed_file_sql = "
+            select count(*) as cnt from board_file where b_no = '$b_no'
+        ";
+
+		$row = DB::selectOne($existed_file_sql);
+
+		if($row->cnt > 0) {
+			$sql = "
+                update board_file
+                set board_id = '$board_id', file_type = '$file_type', file_nm = '$file_nm', file_size = '$file_size', user_id = '$user_id', user_nm = '$user_nm', ip = '$ip', regi_date = now()
+                where 
+                    b_no = '$b_no'
+            ";
+
+			DB::update($sql);
+		} else {
+			$sql = "
+                insert into board_file (
+                    b_no, board_id, file_type, file_nm, file_size, user_id, user_nm, ip, regi_date
+                ) values (
+                    '$b_no', '$board_id', '$file_type', '$file_nm', '$file_size', '$user_id', '$user_nm', '$ip', now()
+                )
+            ";
+
+			DB::insert($sql);
+		}
+
+		//if($i == 0){
+
+		$src_file = $upload_file_path."/".$file_nm;
+
+		$thumb = new Thumbnail();
+		$thumb->quality		= "95";
+		$thumb->amount		= "50";
+		$thumb->radius		= "0.5";
+		$thumb->threshold	= "0";
+		$thumb->srcFile		= $src_file;
+
+		if ( file_exists( $src_file ) !== true ) {
+
+			list($width, $height, $type, $attr) = GetImageSize($thumb_img_url);
+
+			$new_w = $width;
+			$new_h = $height;
+			$squarePath = Storage::disk('public')->path($save_file);
+
+			$thumb->imgFileSquareResize($thumb_img_url, $squarePath);
+
+			if(file_exists($squarePath) == true ){
+				list($width, $height, $type, $attr) = GetImageSize($squarePath);
+				$new_w = $width;
+				$new_h = $height;
+			} else {
+				$squarePath = $src_file;
+			}
+
+			$arrDstFile = [];
+
+			for($j = 0; $j < count($image_size_list); $j++) {
+				list($limit_w, $limit_h, $first_nm) = explode(",", $image_size_list[$j]->code_val);
+
+				$dstFile = sprintf("%s_%s", $first_nm, $file_nm);
+				$dstPath = $upload_file_path . "/" . $dstFile;
+
+				if(Storage::disk('public')->exists($dstPath)) {
+					Storage::disk('public')->delete($dstPath);
+				} else {
+					Storage::disk('public')->put($dstPath, base64_decode($image));
+				}
+
+				if ($width > $height) {
+					if ($width > $limit_w) {
+						$new_w = $limit_w;
+						$new_h = $height * $limit_w / $width;
+					}
+				} else if ($width == $height) {
+					if ($width > $limit_w) {
+						$new_w = $limit_w;
+						$new_h = $limit_h;
+					}
+				} else if ($width < $height) {
+					if ($height > $limit_h) {
+						$new_h = $limit_h;
+						$new_w = $width * $limit_w / $height;
+					}
+				}
+
+				array_push($arrDstFile,
+					[
+						"file" =>  Storage::disk('public')->path($dstPath),
+						"width" => $new_w,
+						"height" => $new_h
+					]
+				);
+			}
+
+			if(count($arrDstFile) > 0){
+				$thumb->imgFilesResize($squarePath, $arrDstFile,false);
+			}
+		}
+
+		if(is_numeric($b_no) && $b_no > 0){
+			$sql = "
+                update board set file_cnt = ( select count(*) as cnt from board_file where b_no = '$b_no' ) where b_no = '$b_no'
+            ";
+
+			DB::update($sql);
+		}
 	}
 }
