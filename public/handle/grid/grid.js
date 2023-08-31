@@ -823,7 +823,7 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
         // processHeaderCallback: (params) => {
         //     return (params.column.parent.originalColumnGroup.colGroupDef.headerName ? `${params.column.parent.originalColumnGroup.colGroupDef.headerName} > ` : '') + params.columnApi.getDisplayNameForColumn(params.column, null);
         // },
-		columnKeys: options.hasOwnProperty('columns') ? options.columns : this.gridOptions.api.getColumnDefs().map(c => c.colId)
+		columnKeys: options.hasOwnProperty('columns') ? options.columns : undefined
     };
     
     if (options.type === 'excel') {

@@ -1140,7 +1140,8 @@
 				</div>
                 @endif
                 @if($type != 'create')
-                <div class="card">
+				<!-- 매장관리 상품상세화면 유사상품탭 주석처리 20230831 -->
+                <!-- <div class="card">
                     <div class="card-header mb-0">
                         <a href="#" class="d-inline-block">유사 상품</a>
                     </div>
@@ -1161,7 +1162,7 @@
                         </div>
                         <p class="red mt-2">* 브랜드, 업체, 품목, 대표카테고리가 같은 상품만 유사 상품으로 등록 가능합니다.</p>
                     </div>
-                </div>
+                </div> -->
                 @endif
                 <div class="card">
                     <div class="card-header mb-0">
@@ -3488,7 +3489,9 @@
 
 
     $(document).ready(function() {
-        if (type !== 'create') SetSimilarTable();
+		// 매장관리 상품상세화면 유사상품탭 주석처리 20230831
+        // if (type !== 'create') SetSimilarTable();
+
         if (type == '') barcodeMapping();
 
         $(".similar-add-btn").on("click", function(e) {
@@ -3500,10 +3503,6 @@
             e.preventDefault();
             DeleteSimilarGoods();
         })
-
-         
-
-
     });
 
     function SetSimilarTable() {
