@@ -10,33 +10,19 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Exception;
 
-use App\Models\Conf;
-
-const PRODUCT_STOCK_TYPE_STORAGE_RETURN = 9; // 상품반품
 const PRODUCT_STOCK_TYPE_STORAGE_MOVE = 16; // 상품이동
 
 class cs04Controller extends Controller
 {
     public function index()
 	{
-        //$storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
-		$storages	= SLib::getStorage();
-        $sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
-
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            'storages'      => $storages, // 창고 리스트
-            'sup_coms'      => $sup_coms, // 공급업체 리스트
-            'style_no'		=> "", // 스타일넘버
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
-            'items'			=> SLib::getItems(), // 품목
+            'storages'      => SLib::getStorage(),
 		];
-
         return view(Config::get('shop.store.view') . '/cs/cs04', $values);
 	}
 
@@ -48,7 +34,6 @@ class cs04Controller extends Controller
         $sdate              = $request->input("sdate", now()->sub(1, 'week')->format('Ymd'));
         $edate              = $request->input("edate", date("Ymd"));
         $storage_cd         = $request->input("storage_cd", "");
-        $target_com_cd      = $request->input("target_com_cd", "");
         $target_storage_cd  = $request->input("target_storage_cd", "");
         $sgr_type           = $request->input("sgr_type", "");
         $sgr_state          = $request->input("sgr_state", "");
@@ -61,8 +46,7 @@ class cs04Controller extends Controller
             and cast(sgr.sgr_date as date) <= '$edate'
         ";
         if($storage_cd != "")           $where .= " and sgr.storage_cd = '$storage_cd'";
-        if($target_com_cd != "")        $where .= " and sgr.target_type = 'C' and sgr.target_cd = '$target_com_cd'";
-        if($target_storage_cd != "")    $where .= " and sgr.target_type = 'S' and sgr.target_cd = '$target_storage_cd'";
+        if($target_storage_cd != "")    $where .= " and sgr.target_cd = '$target_storage_cd'";
         if($sgr_type != "")             $where .= " and sgr.sgr_type = '" . $sgr_type . "'";
         if($sgr_state != "")            $where .= " and sgr.sgr_state = '" . $sgr_state . "'";
 
@@ -88,34 +72,32 @@ class cs04Controller extends Controller
                 sgr.sgr_state,
                 if(sgr.sgr_state = '10', '접수', if(sgr.sgr_state = '30', '완료', '-')) as sgr_state_nm,
                 sgr.storage_cd,
-                storage.storage_nm,
+                (select storage_nm from storage where storage_cd = sgr.storage_cd) as storage_nm,
                 sgr.target_type,
                 sgr.target_cd,
-                if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
+                (select storage_nm from storage where storage_cd = sgr.target_cd) as target_nm,
                 (select sum(return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_qty,
                 (select sum(return_price * return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_price,
                 sgr.comment
             from storage_return sgr
-                inner join storage on storage.storage_cd = sgr.storage_cd
-            where 1=1 $where
+            where sgr.target_type = 'S' $where
             $orderby
             $limit
 		";
-		
 		$result = DB::select($sql);
 
         // pagination
         $total = 0;
         $page_cnt = 0;
+
         if($page == 1) {
             $sql = "
                 select count(*) as total
                 from storage_return sgr
-                    inner join storage on storage.storage_cd = sgr.storage_cd
-                where 1=1 $where
+            	where sgr.target_type = 'S' $where
             ";
-
             $row = DB::selectOne($sql);
+
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
@@ -184,13 +166,13 @@ class cs04Controller extends Controller
                             'goods_opt' => $row->goods_opt,
                             'location_cd' => $d['storage_cd'],
                             'location_type' => 'STORAGE',
-                            'type' => $d['target_type'] == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품이동 or 상품반품
+                            'type' => PRODUCT_STOCK_TYPE_STORAGE_MOVE,
                             'price' => $row->price,
                             'wonga' => $row->wonga,
                             'qty' => ($row->return_qty ?? 0) * -1,
                             'stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
-                            'comment' => $d['target_type'] == 'S' ? '상품이동' : '상품반품',
+                            'comment' => '상품이동',
                             'rt' => now(),
                             'admin_id' => $admin_id,
                             'admin_nm' => $admin_nm,
@@ -245,25 +227,13 @@ class cs04Controller extends Controller
                                 'admin_id' => $admin_id,
                                 'admin_nm' => $admin_nm,
                             ]);
-                    } else if($d['target_type'] == 'C') {
-                        // product_stock -> 재고 / 창고재고 / 입고수량 차감
-                        $r_qty = $row->return_qty ?? 0;
-                        DB::table('product_stock')
-                            ->where('prd_cd', '=', $row->prd_cd)
-                            ->update([
-                                'qty' => DB::raw('qty - ' . $r_qty),
-                                'wqty' => DB::raw('wqty - ' . $r_qty),
-                                'in_qty' => DB::raw('in_qty - ' . $r_qty),
-                                'qty_wonga' => DB::raw('qty_wonga - ' . ($r_qty * ($row->wonga ?? 0))),
-                                'ut' => now(),
-                            ]);
                     }
                 }
             }
 
             DB::commit();
             $code = 200;
-            $msg = "상품반품이동이 정상적으로 완료처리되었습니다.";
+            $msg = "창고간상품이동이 정상적으로 완료처리되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             $code = 500;
@@ -308,8 +278,6 @@ class cs04Controller extends Controller
     {
         $sgr = '';
         $new_sgr_cd = '';
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
-        $companies = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
 
         if($sgr_cd != '') {
             $sql = "
@@ -321,7 +289,7 @@ class cs04Controller extends Controller
                     sgr.storage_cd,
                     sgr.target_type,
                     sgr.target_cd,
-                    if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
+                    (select storage_nm from storage where storage_cd = sgr.target_cd) as target_nm,
                     sgr.comment
                 from storage_return sgr
                 where sgr_cd = :sgr_cd
@@ -342,8 +310,7 @@ class cs04Controller extends Controller
         $values = [
             "cmd" => $sgr == '' ? "add" : "update",
             'sdate'         => $sgr == '' ? date("Y-m-d") : $sgr->sgr_date,
-            'storages'      => $storages,
-            'companies'     => $companies,
+            'storages'      => SLib::getStorage(),
             'sgr'           => $sgr,
             'new_sgr_cd'    => $new_sgr_cd,
         ];
@@ -424,7 +391,7 @@ class cs04Controller extends Controller
         $sgr_state = $sgr_type == "G" ? 10 : 30;
         $sgr_date = $request->input("sgr_date", date("Y-m-d"));
         $storage_cd = $request->input("storage_cd", "");
-        $target_type = $request->input("target_type", "");
+        $target_type = "S"; // 창고로 이동
         $target_cd = $request->input("target_cd", "");
         $comment = $request->input("comment", "");
         $products = $request->input("products", []);
@@ -433,7 +400,7 @@ class cs04Controller extends Controller
             DB::beginTransaction();
 
             if(count($products) < 1) {
-                throw new Exception("반품등록할 상품을 선택해주세요.");
+                throw new Exception("이동등록할 상품을 선택해주세요.");
             }
 
             $sgr_cd = DB::table('storage_return')
@@ -473,8 +440,7 @@ class cs04Controller extends Controller
                         'admin_id' => $admin_id,
                     ]);
 
-                if($sgr_type == 'B') // 일괄등록의 경우 등록 시 완료처리
-                {
+                if($sgr_type == 'B') { // 일괄등록의 경우 등록 시 완료처리
                     // 창고 재고 차감
                     DB::table('product_stock_storage')
                     ->where('prd_cd', '=', $product['prd_cd'])
@@ -493,13 +459,13 @@ class cs04Controller extends Controller
                         'goods_opt' => $prd->goods_opt,
                         'location_cd' => $storage_cd,
                         'location_type' => 'STORAGE',
-                        'type' => $target_type == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품이동 or 상품반품
+                        'type' => PRODUCT_STOCK_TYPE_STORAGE_MOVE,
                         'price' => $prd->price,
                         'wonga' => $prd->wonga,
                         'qty' => ($product['return_qty'] ?? 0) * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
-                        'comment' => $target_type == 'S' ? '상품이동' : '상품반품',
+                        'comment' => '상품이동',
                         'rt' => now(),
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
@@ -554,25 +520,13 @@ class cs04Controller extends Controller
                             'admin_id' => $admin_id,
                             'admin_nm' => $admin_nm,
                         ]);
-                    } else if($target_type == 'C') {
-                        // product_stock -> 재고 / 창고재고 / 입고수량 차감
-                        $r_qty = $product['return_qty'] ?? 0;
-                        DB::table('product_stock')
-                            ->where('prd_cd', '=', $product['prd_cd'])
-                            ->update([
-                                'qty' => DB::raw('qty - ' . $r_qty),
-                                'wqty' => DB::raw('wqty - ' . $r_qty),
-                                'in_qty' => DB::raw('in_qty - ' . $r_qty),
-                                'qty_wonga' => DB::raw('qty_wonga - ' . ($r_qty * ($prd->wonga ?? 0))),
-                                'ut' => now(),
-                            ]);
                     }
                 }
             }
 
             DB::commit();
             $code = 200;
-            $msg = "상품반품이동이 정상적으로 등록되었습니다.";
+            $msg = "창고간상품이동이 정상적으로 등록되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             $code = 500;
@@ -614,7 +568,7 @@ class cs04Controller extends Controller
 
             DB::commit();
             $code = 200;
-            $msg = "상품반품이동이 정상적으로 수정되었습니다.";
+            $msg = "창고간상품이동이 정상적으로 수정되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             $code = 500;
@@ -669,9 +623,8 @@ class cs04Controller extends Controller
 
         foreach($data as $key => $d)
         {
-            if($key < 1) 
-            {
-                $is_company = $d['target_type'] == 'C';
+            if($key < 1) {
+                $is_company = false;
                 $row = DB::table($is_company ? 'company' : 'storage')->where($is_company ? 'com_id' : 'storage_cd', '=', $d['target_cd'])->first();
                 $target_nm = $is_company ? $row->com_nm ?? '' : $row->storage_nm ?? '';
                 
@@ -699,7 +652,7 @@ class cs04Controller extends Controller
                     , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
                     , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
                 from (
-                    select pc.prd_cd, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
+                    select pc.prd_cd, pc.prd_cd_p, pc.color, pc.size, pc.goods_no, pc.goods_opt, p.style_no, pc.opt
                         , pc.brand as brand_cd
                         , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                         , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
@@ -712,7 +665,7 @@ class cs04Controller extends Controller
                         , g.opt_kind_cd
                         , b.brand_nm as brand
                         , ps.qty as storage_qty, ps.wqty as storage_wqty
-                        , '$return_price' as return_price, '$return_qty' as qty
+                        , :return_price as return_price, :return_qty as qty
                         , true as isEditable
                         , '$count' as count
                         , ('$return_price' * '$return_qty') as total_return_price
@@ -730,7 +683,7 @@ class cs04Controller extends Controller
                     left outer join opt opt on opt.opt_kind_cd = a.opt_kind_cd and opt.opt_id = 'K'
                     left outer join code c on c.code_kind_cd = 'PRD_CD_OPT' and c.code_id = a.opt
             ";
-            $row = DB::selectOne($sql);
+            $row = DB::selectOne($sql, [ 'return_price' => $return_price, 'return_qty' => $return_qty * 1 ]);
             array_push($result, $row);
         }
 

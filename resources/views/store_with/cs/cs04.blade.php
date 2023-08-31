@@ -5,7 +5,7 @@
 	<h3 class="d-inline-flex">창고간상품이동</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
-		<span>/ 생산입고관리</span>
+		<span>/ 상품관리</span>
 		<span>/ 창고간상품이동</span>
 	</div>
 </div>
@@ -31,7 +31,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="">반품일자</label>
+                            <label for="">이동일자</label>
                             <div class="form-inline date-select-inbox">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -77,16 +77,8 @@
                             {{-- 반품이동처 --}}
                             <label for="">이동창고</label>
                             <div class="flex_box">
-								<!--
-                                <select name='target_com_cd' class="form-control form-control-sm" style="width: 100%;">
+                                <select name='target_storage_cd' class="form-control form-control-sm w-100">
                                     <option value="">전체</option>
-                                    @foreach (@$sup_coms as $sup_com)
-                                        <option value='{{ $sup_com->com_id }}'>{{ $sup_com->com_nm }}</option>
-                                    @endforeach
-                                </select>
-                                <span class="text_line" style="width: 6%; text-align: center;">/</span>//-->
-                                <select name='target_storage_cd' class="form-control form-control-sm" style="width: 100%;">
-                                    <option value="">창고 전체</option>
                                     @foreach (@$storages as $storage)
                                         <option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
                                     @endforeach
@@ -187,37 +179,42 @@
 	</div>
 </div>
 
-<script language="javascript">
-	let columns = [
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: false, sort: null, width: 28,
-            checkboxSelection: function(params) {
-                return params.data.sgr_state < 30;
-            },
-        },
-        {field: "sgr_cd", headerName: "반품코드", width: 100, cellStyle: {"text-align": "center"},
+<script type="text/javascript" charset="utf-8">
+	const columns = [
+        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
+        {field: "sgr_cd", headerName: "이동코드", width: 80, cellClass: 'hd-grid-code',
             cellRenderer: function(params) {
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.value}</a>`;
             }
         },        
-        {field: "sgr_date", headerName: "이동일자", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "sgr_date", headerName: "이동일자", width: 80, cellClass: 'hd-grid-code'},
         {field: "sgr_type", hide: true},
-        {field: "sgr_type_nm", headerName: "이동구분", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_type == "B" ? "#2aa876" : "none"})},
+        {field: "sgr_type_nm", headerName: "이동구분", width: 60, cellClass: 'hd-grid-code', 
+	        cellStyle: (params) => ({"color": params.data.sgr_type == "B" ? "#2aa876" : "none"})
+        },
         {field: "sgr_state", hide: true},
-        {field: "sgr_state_nm", headerName: "반품상태", width: 60, cellStyle: (params) => ({"text-align": "center", "color": params.data.sgr_state == "30" ? "#2aa876" : "#0000ff"})},
-        {field: "storage_cd", headerName: "창고코드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "storage_nm", headerName: "창고명", width: 100, cellStyle: {"text-align": "center"}},
+        {field: "sgr_state_nm", headerName: "이동상태", width: 60, cellClass: 'hd-grid-code', 
+	        cellStyle: (params) => ({"color": params.data.sgr_state == "30" ? "#2aa876" : "#0000ff"})
+        },
+		{headerName: "출고창고", 
+			children: [
+		        {field: "storage_cd", headerName: "창고코드", width: 60, cellClass: 'hd-grid-code'},
+		        {field: "storage_nm", headerName: "창고명", width: 100},
+			]
+		},
+		{headerName: "이동창고",
+			children: [
+				{field: "target_cd", headerName: "창고코드", width: 60, cellClass: 'hd-grid-code'},
+				{field: "target_nm", headerName: "창고명", width: 100},
+			]
+		},
         {field: "target_type", hide: true},
-        {field: "target_cd", hide: true},
-        {field: "target_nm", headerName: "공급/창고", width: 120,
-            cellRenderer: (params) => (params.data.target_type == "C" ? "[공급] " : params.data.target_type == "S" ? "[창고] " : "") + params.value,
-        }, // 반품이동처
         {field: "sgr_qty", headerName: "이동수량", type: "currencyType", width: 60},
-        {field: "sgr_price", headerName: "이동금액", type: "currencyType", width: 60},
+        {field: "sgr_price", headerName: "이동금액", type: "currencyType", width: 80},
         {field: "comment", headerName: "메모", width: 300},
-        {width: "auto"}
+        {width: 0}
 	];
-</script>
-<script type="text/javascript" charset="utf-8">
+
     let gx;
     const pApp = new App('', { gridId: "#div-gd" });
 
@@ -225,7 +222,9 @@
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+			isRowSelectable: (params) => params.data.sgr_state < 30,
+        });
         Search();
     });
 
@@ -249,12 +248,12 @@
     // 반품상태변경
     function ChangeState() {
         let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("반품완료처리할 항목을 선택해주세요.");
+        if(rows.length < 1) return alert("이동완료처리할 항목을 선택해주세요.");
 
         let wrong_list = rows.filter(r => r.sgr_state != 10);
         if(wrong_list.length > 0) return alert("'접수'상태의 항목만 '완료'처리할 수 있습니다.");
 
-        if(!confirm("선택한 항목을 반품완료처리 하시겠습니까?")) return;
+        if(!confirm("선택한 항목을 이동완료처리 하시겠습니까?")) return;
 
         axios({
             url: '/store/cs/cs04/update-return-state',
@@ -266,7 +265,7 @@
                 Search();
             } else {
                 console.log(res.data);
-                alert("반품완료처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("이동완료처리 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);
@@ -281,7 +280,7 @@
         let wrong_list = rows.filter(r => r.sgr_state != 10);
         if(wrong_list.length > 0) return alert("'접수'상태의 항목만 삭제할 수 있습니다.");
 
-        if(!confirm("삭제한 거래처반품정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
+        if(!confirm("삭제한 창고간이동 정보는 다시 되돌릴 수 없습니다.\n선택한 항목을 삭제하시겠습니까?")) return;
 
         axios({
             url: '/store/cs/cs04/del-return',
