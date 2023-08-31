@@ -89,18 +89,18 @@
 			                                        <p class="fs-14" id="storage_nm"></p>
 		                                        </div>
 	                                        </td>
-                                            <th>이동창고</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="target_nm"></p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
 	                                        <th>이동코드</th>
 	                                        <td>
 		                                        <div class="form-inline">
 			                                        <p class="fs-14" id="sgr_idx"></p>
+		                                        </div>
+	                                        </td>
+                                        </tr>
+                                        <tr>
+	                                        <th>이동창고</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <p class="fs-14" id="target_nm"></p>
 		                                        </div>
 	                                        </td>
                                             <th>메모</th>

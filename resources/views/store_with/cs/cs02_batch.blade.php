@@ -13,7 +13,6 @@
                 <span class="home"></span>
                 <span>/ 상품관리</span>
                 <span>/ 상품반품관리</span>
-                <span>/ 상품반품 일괄등록</span>
             </div>
         </div>
         <div class="d-flex">
@@ -37,7 +36,7 @@
                 <a href="#">파일 업로드</a>
             </div>
             <div class="card-body">
-                <form name="f1">
+                <form name="upload_file">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -54,7 +53,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_cs02.xlsx" class="ml-2" style="text-decoration: underline !important;">상품반품 등록양식 다운로드</a>
+                                                    <a href="/sample/sample_cs02.xlsx" download="상품반품_일괄등록양식" class="ml-2" style="text-decoration: underline !important;">상품반품 일괄등록양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -84,13 +83,13 @@
                                                     <p class="fs-14" id="sgr_date"></p>
                                                 </div>
                                             </td>
-                                            <th>이동처</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="target_nm"></p>
-                                                </div>
-                                            </td>
-                                            <th>반품번호</th>
+	                                        <th>출고창고</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <p class="fs-14" id="storage_nm"></p>
+		                                        </div>
+	                                        </td>
+                                            <th>반품코드</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <p class="fs-14" id="sgr_idx"></p>
@@ -98,12 +97,29 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>반품창고</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="storage_nm"></p>
-                                                </div>
-                                            </td>
+	                                        <th>반품업체</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <p class="fs-14" id="target_nm"></p>
+		                                        </div>
+	                                        </td>
+	                                        <th>반품 주소</th>
+	                                        <td colspan="3">
+		                                        <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='return_addr' id="return_addr" value="">
+	                                        </td>
+                                        </tr>
+                                        <tr>
+	                                        <th class="required">반품사유</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <select name='return_reason' id="return_reason" class="form-control form-control-sm w-100">
+				                                        <option value="">전체</option>
+				                                        @foreach (@$return_reason as $rr)
+					                                        <option value='{{ $rr->code_id }}'>{{ $rr->code_val }}</option>
+				                                        @endforeach
+			                                        </select>
+		                                        </div>
+	                                        </td>
                                             <th>메모</th>
                                             <td colspan="3">
                                                 <div class="form-inline">
@@ -122,6 +138,7 @@
         <div class="card shadow mt-3">
             <div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
                 <a href="#">상품정보</a>
+	            <p class="text-danger">* 일괄등록 시, 즉시 <span class="font-weight-bold">반품완료</span> 처리됩니다.</p>
             </div>
             <div class="card-body">
                 <div class="table-responsive mt-2">
@@ -145,28 +162,39 @@
             },
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130},
+		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
-        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "goods_nm",	headerName: "상품명", width: 200,
+			cellRenderer: (params) => {
+				if (params.data.goods_no === undefined) return '';
+				if (params.data.goods_no != '0') {
+					return '<a href="javascript:void(0);" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+				} else {
+					return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 없는 상품입니다.`);">' + params.value + '</a>';
+				}
+			}
+		},
+        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 150},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
-        {field: "price", headerName: "현재가", type: "currencyType", width: 65},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 70},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "storage_wqty", headerName: "창고재고", width: 65, type: 'currencyType'},
-        {field: "qty", headerName: "반품수량", width: 65, type: 'currencyType', 
+        {field: "storage_wqty", headerName: "창고재고", width: 60, type: 'currencyType'},
+        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "total_return_price", headerName: "반품금액", width: 65, type: 'currencyType'},
+        {field: "total_return_price", headerName: "반품금액", width: 100, type: 'currencyType'},
+		{width: 0}
     ];
 </script>
 
@@ -276,13 +304,12 @@
 
 		var excel_columns = {
 			'A': 'sgr_date',
-			'B': 'target_type',
+			'B': 'storage_cd',
 			'C': 'target_cd',
-            'D': 'storage_cd',
-            'E': 'comment',
-            'F': 'prd_cd',
-            'G': 'return_price',
-            'H': 'return_qty',
+            'D': 'comment',
+            'E': 'prd_cd',
+            'F': 'return_price',
+            'G': 'return_qty',
 		};
 
         var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
@@ -385,6 +412,7 @@
         $("#target_nm").text(basic_info.target_nm);
         $("#storage_nm").text(basic_info.storage_nm);
         $("#comment").text(basic_info.comment);
+		$("#return_addr").val(basic_info.return_addr || '');
 
         $("#basic_info_form").removeClass("d-none");
         pApp.ResizeGrid(275, 370);
@@ -401,10 +429,13 @@
         let target_type = basic_info.target_type;
         let target_cd = basic_info.target_cd;
         let comment = basic_info.comment;
+		let return_reason = document.f1.return_reason.value;
+		let return_addr = document.f1.return_addr.value;
 
         let zero_qtys = rows.filter(r => r.qty < 1);
         if(zero_qtys.length > 0) return alert("반품수량이 0개인 항목이 존재합니다.");
-
+		
+		if (return_reason === '') return alert("반품사유를 선택해주세요.");
         if(!confirm("일괄등록하시겠습니까?")) return;
 
         axios({
@@ -417,6 +448,8 @@
                 target_type,
                 target_cd,
                 comment,
+				return_reason,
+				return_addr,
                 products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
             },
         }).then(function (res) {

@@ -45,12 +45,6 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th>반품코드</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
-                                                </div>
-                                            </td>
                                             <th class="required">반품일자</th>
                                             <td>
                                                 <div class="form-inline">
@@ -81,17 +75,19 @@
                                                     </select>
                                                 </div>
                                             </td>
+	                                        <th>반품코드</th>
+	                                        <td>
+		                                        <div class="form-inline">
+			                                        <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
+		                                        </div>
+	                                        </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">반품업체명</th>
+                                            <th class="required">반품업체</th>
                                             <td>
                                                 <div class="form-inline inline_select_box">
                                                     @if(@$cmd == 'add')
                                                     <div class="d-flex w-100">
-                                                        <select name="target_type" id="target_type" class="form-control form-control-sm mr-1" style="min-width: 90px;" hidden>
-                                                            <option value="C">공급업체</option>
-                                                            <option value="S">창고</option>
-                                                        </select>
                                                         <select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
                                                             @foreach (@$companies as $com)
                                                                <option value="{{ $com->com_id }}">{{ $com->com_nm }}</option> 
@@ -99,23 +95,17 @@
                                                         </select>
                                                     </div>
                                                     @else
-                                                    <input type="text" name="target_nm" id="target_nm" value="[{{ @$sgr->target_type == 'C' ? '공급' : '창고' }}] {{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
+                                                    <input type="text" name="target_nm" id="target_nm" value="{{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
                                                     @endif
                                                 </div>
                                             </td>
                                             <th>반품 주소</th>
-                                            <td>
+                                            <td colspan="3">
                                                 <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='return_addr' id="return_addr" value="@if($cmd == 'add'){{ @$com_addr->addr1 }} {{@$com_addr->addr2}} @else {{ @$sgr->return_addr }} @endif">
-                                            </td>
-                                            <th>메모</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="1">{{ @$sgr->comment }}</textarea>
-                                                </div>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th>상품반품사유</th>
+                                            <th class="required">반품사유</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <select name='return_reason' id="return_reason" class="form-control form-control-sm w-100">
@@ -126,10 +116,12 @@
                                                     </select>
                                                 </div>
                                             </td>
-                                            <th></th>
-                                            <td></td>
-                                            <th></th>
-                                            <td></td>
+	                                        <th>메모</th>
+	                                        <td colspan="3">
+		                                        <div class="form-inline">
+			                                        <textarea name="comment" id="comment" class="w-100" rows="1">{{ @$sgr->comment }}</textarea>
+		                                        </div>
+	                                        </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -145,7 +137,7 @@
                 @if(@$cmd == 'add')
                 <div class="d-flex">
                     <button type="button" onclick="addGoods();" class="btn btn-sm btn-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-plus"></i> 상품추가</button>
-                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm mr-1" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
+                    <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
                 </div>
                 @endif
             </div>
@@ -156,7 +148,7 @@
             </div>
         </div>
     </div>
-</div>p
+</div>
 
 <script language="javascript">
     const cmd = '{{ @$cmd }}';
@@ -173,7 +165,8 @@
             },
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130},
+		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
@@ -187,24 +180,24 @@
                 }
             }   
         },
-        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
-        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 150},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
-        {field: "price", headerName: "현재가", type: "currencyType", width: 65},
+        {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 70},
+        {field: "price", headerName: "현재가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "storage_wqty", headerName: "창고재고", width: 65, type: 'currencyType'},
-        {field: "qty", headerName: "반품수량", width: 65, type: 'currencyType', 
+        {field: "storage_wqty", headerName: "창고재고", width: 60, type: 'currencyType'},
+        {field: "qty", headerName: "반품수량", width: 60, type: 'currencyType', 
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
-        {field: "total_return_price", headerName: "반품금액", width: 65, type: 'currencyType'},
-        {width: "auto"}
+        {field: "total_return_price", headerName: "반품금액", width: 100, type: 'currencyType'},
+        {width: 0}
     ];
 </script>
 
@@ -216,7 +209,7 @@
     let companies = <?= json_encode(@$companies) ?> ;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(385);
+        pApp.ResizeGrid(435);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
@@ -253,21 +246,6 @@
             gx.gridOptions.api.setRowData([]);
             updatePinnedRow();
         });
-
-        $("#target_type").on("change", function(e) {
-            let target_type = e.target.value;
-            let html = "";
-            if(target_type === "S") {
-                for(let s of storages) {
-                    html += `<option value="${s.storage_cd}">${s.storage_nm}</option>`;
-                }
-            } else if(target_type === "C") {
-                for(let c of companies) {
-                    html += `<option value="${c.com_id}">${c.com_nm}</option>`;
-                }
-            }
-            $("#target_cd").html(html);
-        })
     });
 
     // 등록된 상품리스트 가져오기
@@ -290,7 +268,6 @@
         if(cmd === 'add') {
             let sgr_date = document.f1.sdate.value;
             let storage_cd = document.f1.storage_cd.value;
-            let target_type = document.f1.target_type.value;
             let target_cd = document.f1.target_cd.value;
 
             if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
@@ -310,7 +287,6 @@
                 data: {
                     sgr_date,
                     storage_cd,
-                    target_type,
                     target_cd,
                     return_addr,
                     comment,

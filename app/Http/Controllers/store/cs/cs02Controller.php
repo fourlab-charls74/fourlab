@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Exception;
 use App\Exports\ExcelViewExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -20,24 +19,20 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use App\Models\Conf;
 
 const PRODUCT_STOCK_TYPE_STORAGE_RETURN = 9; // 상품반품
-const PRODUCT_STOCK_TYPE_STORAGE_MOVE = 16; // 상품이동
 
 class cs02Controller extends Controller
 {
     public function index()
 	{
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
-        $sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
+        $sup_coms = DB::table("company")
+			->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
+			->select('com_id', 'com_nm')->get();
 
 		$values = [
             'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
             'edate'         => date("Y-m-d"),
-            'storages'      => $storages, // 창고 리스트
+            'storages'      => SLib::getStorage(),
             'sup_coms'      => $sup_coms, // 공급업체 리스트
-            'style_no'		=> "", // 스타일넘버
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
-            'items'			=> SLib::getItems(), // 품목
             'return_reason' => SLib::getCodes("RETURN_REASON")
 		];
 
@@ -53,7 +48,6 @@ class cs02Controller extends Controller
         $edate              = $request->input("edate", date("Ymd"));
         $storage_cd         = $request->input("storage_cd", "");
         $target_com_cd      = $request->input("target_com_cd", "");
-        $target_storage_cd  = $request->input("target_storage_cd", "");
         $sgr_type           = $request->input("sgr_type", "");
         $sgr_state          = $request->input("sgr_state", "");
         $return_reason      = $request->input("return_reason","");
@@ -66,8 +60,7 @@ class cs02Controller extends Controller
             and cast(sgr.sgr_date as date) <= '$edate'
         ";
         if($storage_cd != "")           $where .= " and sgr.storage_cd = '$storage_cd'";
-        if($target_com_cd != "")        $where .= " and sgr.target_type = 'C' and sgr.target_cd = '$target_com_cd'";
-        if($target_storage_cd != "")    $where .= " and sgr.target_type = 'S' and sgr.target_cd = '$target_storage_cd'";
+        if($target_com_cd != "")        $where .= " and sgr.target_cd = '$target_com_cd'";
         if($sgr_type != "")             $where .= " and sgr.sgr_type = '" . $sgr_type . "'";
         if($sgr_state != "")            $where .= " and sgr.sgr_state = '" . $sgr_state . "'";
         if($return_reason != "")        $where .= " and sgr.return_reason = '" . $return_reason . "'";
@@ -94,19 +87,18 @@ class cs02Controller extends Controller
                 sgr.sgr_state,
                 if(sgr.sgr_state = '10', '접수', if(sgr.sgr_state = '30', '완료', '-')) as sgr_state_nm,
                 sgr.storage_cd,
-                storage.storage_nm,
+                (select storage_nm from storage where storage_cd = sgr.storage_cd) as storage_nm,
                 sgr.target_type,
                 sgr.target_cd,
-                if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
+                (select com_nm from company where com_id = sgr.target_cd) as target_nm,
                 (select sum(return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_qty,
                 (select sum(return_price * return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_price,
                 sgr.comment,
                 sgr.return_reason,
                 c.code_val as return_reason_nm
             from storage_return sgr
-                inner join storage on storage.storage_cd = sgr.storage_cd
                 left outer join code c on c.code_id = sgr.return_reason and code_kind_cd = 'RETURN_REASON'
-            where 1=1 $where
+            where sgr.target_type = 'C' $where
             $orderby
             $limit
 		";
@@ -119,8 +111,7 @@ class cs02Controller extends Controller
             $sql = "
                 select count(*) as total
                 from storage_return sgr
-                    inner join storage on storage.storage_cd = sgr.storage_cd
-                where 1=1 $where
+                where sgr.target_type = 'C' $where
             ";
 
             $row = DB::selectOne($sql);
@@ -192,68 +183,19 @@ class cs02Controller extends Controller
                             'goods_opt' => $row->goods_opt,
                             'location_cd' => $d['storage_cd'],
                             'location_type' => 'STORAGE',
-                            'type' => $d['target_type'] == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품이동 or 상품반품
+                            'type' => PRODUCT_STOCK_TYPE_STORAGE_RETURN,
                             'price' => $row->price,
                             'wonga' => $row->wonga,
                             'qty' => ($row->return_qty ?? 0) * -1,
                             'stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
-                            'comment' => $d['target_type'] == 'S' ? '상품이동' : '상품반품',
+                            'comment' => '상품반품',
                             'rt' => now(),
                             'admin_id' => $admin_id,
                             'admin_nm' => $admin_nm,
                         ]);
                     
-                    if($d['target_type'] == 'S') {
-                        // 상품을 반품받은 창고 재고 플러스
-                        $cnt = DB::table('product_stock_storage')
-                            ->where('prd_cd', '=', $row->prd_cd)
-                            ->where('storage_cd', '=', $d['target_cd'])
-                            ->count();
-
-                        if ($cnt < 1) {
-                            DB::table('product_stock_storage')
-                                ->insert([
-                                    'prd_cd' => $row->prd_cd,
-                                    'goods_no' => $row->goods_no,
-                                    'storage_cd' => $d['target_cd'],
-                                    'qty' => $row->return_qty ?? 0,
-                                    'wqty' => $row->return_qty ?? 0,
-                                    'goods_opt' => $row->goods_opt,
-                                    'use_yn' => 'Y',
-                                    'rt' => now(),
-                                ]);
-                        } else {
-                            DB::table('product_stock_storage')
-                                ->where('prd_cd', '=', $row->prd_cd)
-                                ->where('storage_cd', '=', $d['target_cd'])
-                                ->update([
-                                    'qty' => DB::raw('qty + ' . ($row->return_qty ?? 0)),
-                                    'wqty' => DB::raw('wqty + ' . ($row->return_qty ?? 0)),
-                                    'ut' => now(),
-                                ]);
-                        }
-
-                        // 재고이력 등록
-                        DB::table('product_stock_hst')
-                            ->insert([
-                                'goods_no' => $row->goods_no,
-                                'prd_cd' => $row->prd_cd,
-                                'goods_opt' => $row->goods_opt,
-                                'location_cd' => $d['target_cd'],
-                                'location_type' => 'STORAGE',
-                                'type' => PRODUCT_STOCK_TYPE_STORAGE_MOVE, // 재고분류 : 상품이동
-                                'price' => $row->price,
-                                'wonga' => $row->wonga,
-                                'qty' => $row->return_qty ?? 0,
-                                'stock_state_date' => date('Ymd'),
-                                'ord_opt_no' => '',
-                                'comment' => '상품이동',
-                                'rt' => now(),
-                                'admin_id' => $admin_id,
-                                'admin_nm' => $admin_nm,
-                            ]);
-                    } else if($d['target_type'] == 'C') {
+                    if($d['target_type'] == 'C') {
                         // product_stock -> 재고 / 창고재고 / 입고수량 차감
                         $r_qty = $row->return_qty ?? 0;
                         DB::table('product_stock')
@@ -271,7 +213,7 @@ class cs02Controller extends Controller
 
             DB::commit();
             $code = 200;
-            $msg = "상품반품이동이 정상적으로 완료처리되었습니다.";
+            $msg = "상품반품이 정상적으로 완료처리되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             $code = 500;
@@ -317,10 +259,7 @@ class cs02Controller extends Controller
         $sgr = '';
         $new_sgr_cd = '';
         $com_addr = '';
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderByDesc('default_yn')->get();
         $companies = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')->select('com_id', 'com_nm')->get();
-
-       
 
         if($sgr_cd != '') {
             $sql = "
@@ -333,7 +272,7 @@ class cs02Controller extends Controller
                     sgr.target_type,
                     sgr.target_cd,
                     sgr.return_addr,
-                    if(sgr.target_type = 'C', (select com_nm from company where com_id = sgr.target_cd), (select storage_nm from storage where storage_cd = sgr.target_cd)) as target_nm,
+                    (select com_nm from company where com_id = sgr.target_cd) as target_nm,
                     sgr.comment,
                     sgr.return_reason
                 from storage_return sgr
@@ -366,7 +305,7 @@ class cs02Controller extends Controller
         $values = [
             "cmd" => $sgr == '' ? "add" : "update",
             'sdate'         => $sgr == '' ? date("Y-m-d") : $sgr->sgr_date,
-            'storages'      => $storages,
+            'storages'      => SLib::getStorage(),
             'companies'     => $companies,
             'sgr'           => $sgr,
             'new_sgr_cd'    => $new_sgr_cd,
@@ -451,7 +390,7 @@ class cs02Controller extends Controller
         $sgr_state = $sgr_type == "G" ? 10 : 30;
         $sgr_date = $request->input("sgr_date", date("Y-m-d"));
         $storage_cd = $request->input("storage_cd", "");
-        $target_type = $request->input("target_type", "");
+        $target_type = 'C';
         $target_cd = $request->input("target_cd", "");
         $return_addr = $request->input("return_addr","");
         $comment = $request->input("comment", "");
@@ -524,68 +463,19 @@ class cs02Controller extends Controller
                         'goods_opt' => $prd->goods_opt,
                         'location_cd' => $storage_cd,
                         'location_type' => 'STORAGE',
-                        'type' => $target_type == 'S' ? PRODUCT_STOCK_TYPE_STORAGE_MOVE : PRODUCT_STOCK_TYPE_STORAGE_RETURN, // 재고분류 : 상품이동 or 상품반품
+                        'type' => PRODUCT_STOCK_TYPE_STORAGE_RETURN,
                         'price' => $prd->price,
                         'wonga' => $prd->wonga,
                         'qty' => ($product['return_qty'] ?? 0) * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
-                        'comment' => $target_type == 'S' ? '상품이동' : '상품반품',
+                        'comment' => '상품반품',
                         'rt' => now(),
                         'admin_id' => $admin_id,
                         'admin_nm' => $admin_nm,
                     ]);
                     
-                    if($target_type == 'S') {
-                        // 상품을 반품받은 창고 재고 플러스
-                        $cnt = DB::table('product_stock_storage')
-                            ->where('prd_cd', '=', $product['prd_cd'])
-                            ->where('storage_cd', '=', $target_cd)
-                            ->count();
-
-                        if ($cnt < 1) {
-                            DB::table('product_stock_storage')
-                                ->insert([
-                                    'prd_cd' => $product['prd_cd'],
-                                    'goods_no' => $prd->goods_no,
-                                    'storage_cd' => $target_cd,
-                                    'qty' => $product['return_qty'] ?? 0,
-                                    'wqty' => $product['return_qty'] ?? 0,
-                                    'goods_opt' => $prd->goods_opt,
-                                    'use_yn' => 'Y',
-                                    'rt' => now(),
-                                ]);
-                        } else {
-                            DB::table('product_stock_storage')
-                                ->where('prd_cd', '=', $product['prd_cd'])
-                                ->where('storage_cd', '=', $target_cd)
-                                ->update([
-                                    'qty' => DB::raw('qty + ' . ($product['return_qty'] ?? 0)),
-                                    'wqty' => DB::raw('wqty + ' . ($product['return_qty'] ?? 0)),
-                                    'ut' => now(),
-                                ]);
-                        }
-                        
-                        // 재고이력 등록
-                        DB::table('product_stock_hst')
-                        ->insert([
-                            'goods_no' => $prd->goods_no,
-                            'prd_cd' => $prd->prd_cd,
-                            'goods_opt' => $prd->goods_opt,
-                            'location_cd' => $target_cd,
-                            'location_type' => 'STORAGE',
-                            'type' => PRODUCT_STOCK_TYPE_STORAGE_MOVE, // 재고분류 : 상품이동
-                            'price' => $prd->price,
-                            'wonga' => $prd->wonga,
-                            'qty' => $product['return_qty'] ?? 0,
-                            'stock_state_date' => date('Ymd'),
-                            'ord_opt_no' => '',
-                            'comment' => '상품이동',
-                            'rt' => now(),
-                            'admin_id' => $admin_id,
-                            'admin_nm' => $admin_nm,
-                        ]);
-                    } else if($target_type == 'C') {
+                    if ($target_type == 'C') {
                         // product_stock -> 재고 / 창고재고 / 입고수량 차감
                         $r_qty = $product['return_qty'] ?? 0;
                         DB::table('product_stock')
@@ -603,7 +493,7 @@ class cs02Controller extends Controller
 
             DB::commit();
             $code = 200;
-            $msg = "상품반품이동이 정상적으로 등록되었습니다.";
+            $msg = "상품반품이 정상적으로 등록되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             $code = 500;
@@ -649,7 +539,7 @@ class cs02Controller extends Controller
 
             DB::commit();
             $code = 200;
-            $msg = "상품반품이동이 정상적으로 수정되었습니다.";
+            $msg = "상품반품이 정상적으로 수정되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             $code = 500;
@@ -662,7 +552,9 @@ class cs02Controller extends Controller
     // 일괄등록 show
     public function batch_show()
     {
-        $values = [];
+        $values = [
+			'return_reason' => SLib::getCodes('RETURN_REASON')
+		];
         return view(Config::get('shop.store.view') . '/cs/cs02_batch', $values);
     }
 
@@ -700,15 +592,17 @@ class cs02Controller extends Controller
         $storage_cd = '';
         $storage_nm = '';
         $sgr_idx = '';
+		$return_addr = '';
         $result = [];
 
         foreach($data as $key => $d)
         {
             if($key < 1) 
             {
-                $is_company = $d['target_type'] == 'C';
+                $is_company = true;
                 $row = DB::table($is_company ? 'company' : 'storage')->where($is_company ? 'com_id' : 'storage_cd', '=', $d['target_cd'])->first();
                 $target_nm = $is_company ? $row->com_nm ?? '' : $row->storage_nm ?? '';
+				$return_addr = ($row->addr1 ?? '') . ' ' . ($row->addr2 ?? '');
                 
                 $storage_cd = $d['storage_cd'];
                 $row = DB::table('storage')->where('storage_cd', '=', $storage_cd)->first();
@@ -786,6 +680,7 @@ class cs02Controller extends Controller
                 "target_nm" => $target_nm,
                 "storage_nm" => $storage_nm,
                 "sgr_idx" => $sgr_idx,
+				"return_addr" => $return_addr,
             ],
             "body" => $result
         ]);
@@ -919,6 +814,6 @@ class cs02Controller extends Controller
 		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
 		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 150 ]];
 
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '상품반품명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '상품반품명세서_' . $sgr_cd . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }
