@@ -756,8 +756,12 @@
             pApp.BindSearchEnter();
             let gridDiv = document.querySelector(pApp.options.gridId);
             let options = {
-                onCellValueChanged: params => evtAfterEdit(params),
-                getRowNodeId: (data) => data.index // 업데이터 및 제거를 위한 식별 ID를 index로 할당
+				onCellValueChanged: (params) => {
+					evtAfterEdit(params);
+					params.node.setSelected(true);
+				},
+				getRowNodeId: (data) => data.index, // 업데이터 및 제거를 위한 식별 ID를 index로 할당
+				...getDeleteCellColumnObject(), ...getCopyFocusedCellToClipboardObject()
             };
             gx = new HDGrid(gridDiv, columns, options);
             const goods_nos = "<?=$goods_nos?>";

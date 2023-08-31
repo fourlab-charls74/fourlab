@@ -496,24 +496,19 @@ function getDeleteCellColumnObject() {
 
 				if(isDeleteKey || isBackspaceKey){
 					params.api.getCellRanges().forEach(r => {
-						const editable_obj = r.columns.reduce((a,c) => ({...a, [c.colId]: c.userProvidedColDef.editable}), {});
 						let colIds = r.columns.map(col => col.colId);
 						let startRowIndex = Math.min(r.startRow.rowIndex, r.endRow.rowIndex);
 						let endRowIndex = Math.max(r.startRow.rowIndex, r.endRow.rowIndex);
 
-						let itemsToUpdate = [];
-
-						for (let i = startRowIndex; i <= endRowIndex; i++) {
-							let data = params.api.rowModel.rowsToDisplay[i].data;
+						for(let i = startRowIndex; i <= endRowIndex; i++) {
+							let rowNode = params.api.getRowNode(i);
 							colIds.forEach(column => {
-								if(editable_obj[column]) {
-									data[column] = "";
-								}
+								rowNode.setDataValue(column, '');
 							});
-							itemsToUpdate.push(data);
 						}
-						params.api.applyTransaction({ update: itemsToUpdate });
 					});
+
+					return true;
 				}
 			} else {
 				let key = params.event.key;

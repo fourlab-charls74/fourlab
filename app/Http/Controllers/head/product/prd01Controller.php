@@ -518,7 +518,7 @@ class prd01Controller extends Controller
 			$goods_no 		= Lib::Rq($row['goods_no']);
 			$goods_sub 		= Lib::Rq($row['goods_sub']);
 			$goods_nm 		= Lib::Rq($row['goods_nm']);
-			$goods_nm_eng 	= $row['goods_nm_eng'];
+			$goods_nm_eng   = Lib::Rq($row['goods_nm_eng']);
 			$head_desc 		= $row['head_desc'];
 			$ad_desc 		= $row['ad_desc'];
 
