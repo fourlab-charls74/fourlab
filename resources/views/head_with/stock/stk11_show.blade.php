@@ -307,7 +307,7 @@
         },
         {headerName:"온라인코드",
             children: [
-                {headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}},
+				{headerName: "번호", field: "goods_no", width: 60, pinned:'left', cellStyle: params => params.data.goods_no === '옵션없음' ? {'text-align': 'center', backgroundColor: '#ff0000'} : {'text-align': 'center'} },
                 {headerName: "보조", field: "goods_sub", width: 60, pinned:'left', cellStyle:{'text-align': 'center'}}
             ]
         },
@@ -1095,7 +1095,7 @@
             cmd: CMD,
             url: COMMAND_URL,
             method: 'post',
-            data: { cmd: CMD, style_no: row.style_no }
+            data: { cmd: CMD, style_no: row.style_no, opt_kor: row.opt_kor }
         }).then(async (response) => {
             
             const code = response.data.code; // 0: 상품없음, -1: 상품중복 또는 입점상품, 1: 존재하는 상품

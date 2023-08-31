@@ -263,7 +263,8 @@ class stk11Controller extends Controller {
 				break;
 			case 'getgood':
 				$style_no = $request->input("style_no");
-				$response = $this->getGood($style_no);
+				$opt_kor = $request->input('opt_kor');
+				$response = $this->getGood($style_no, $opt_kor);
 				break;
 			case 'getinvoiceno':
 				$com_id = $request->input('com_id');
@@ -835,7 +836,7 @@ class stk11Controller extends Controller {
 	/**
 	 * 상품 정보 얻기
 	 */
-	public function getGood($style_no) {
+	public function getGood($style_no, $opt_kor = 'red') {
 
 		$cnt = 0;
 		$where = "";
@@ -864,6 +865,19 @@ class stk11Controller extends Controller {
 			$error_msg = "상품중복";
 			return response()->json(['code' => -1, 'message' => $error_msg], 200);
 		} else if ($cnt == 1) {
+
+			$opt_name = trim($opt_kor);
+
+			$sql = "
+                select count(name) as cnt from goods_option where name = '$opt_name'
+            ";
+
+			$row = DB::selectOne($sql);
+			if($row->cnt == 0) {
+				$error_msg = "옵션없음";
+				return response()->json(['code' => -1, 'message' => $error_msg], 200);
+			}
+			
 			if ($goods->com_type == 1){
 				return response()->json(['code' => 1, 'good' => $goods], 200);
 			} else {
