@@ -149,7 +149,7 @@ class stk30Controller extends Controller
     {
         $sr = '';
         $storages = DB::table("storage")->where('use_yn', '=', 'Y')
-			->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')
+			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
 			->orderByDesc('default_yn')->get();
 
         if($sr_cd != '') {

@@ -197,6 +197,7 @@ class stk30Controller extends Controller
             'sr_cd'         => $sr_cd,
             'sr_state'      => $sr->sr_state ?? '',
 			'reject_reasons' => SLib::getCodes('SR_REJECT_REASON'),
+			'return_storage_cd' => 'S0006', // 반품창고
         ];
         return view(Config::get('shop.store.view') . '/stock/stk30_show', $values);
     }
@@ -759,6 +760,7 @@ class stk30Controller extends Controller
 			'sdate'         => date("Y-m-d"),
 			'storages'      => $storages,
 			'sr_reasons'    => SLib::getCodes("SR_REASON"),
+			'return_storage_cd' => 'S0006', // 반품창고
 		];
         return view(Config::get('shop.store.view') . '/stock/stk30_batch', $values);
     }
