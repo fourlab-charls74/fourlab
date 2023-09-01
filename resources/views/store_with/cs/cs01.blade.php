@@ -87,26 +87,13 @@
                                     <div class="form-inline-inner input-box w-100">
                                         <div class="form-inline inline_btn_box">
                                             <input type="hidden" id="com_cd" name="com_cd">
-                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;">
+                                            <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm sch-sup-company search-all search-enter" style="width:100%;background-color: white;" readonly>
                                             <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- <div class="col-lg-4 mb-2 mb-lg-0">
-                            <div class="form-group">
-                                <label for="item">품목</label>
-                                <div class="flex_box">
-                                    <select id="item" name="item" class="form-control form-control-sm">
-                                        <option value="">전체</option>
-                                        @foreach ($items as $item)
-                                            <option value="{{ $item->cd }}">{{ $item->val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div> -->
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="user_name">입고자</label>
@@ -130,7 +117,68 @@
                                 </div>
                             </div>
                         </div>
+	                    <div class="col-lg-4 inner-td">
+		                    <div class="form-group">
+			                    <label for="goods_nm">상품명</label>
+			                    <div class="flex_box">
+				                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
+			                    </div>
+		                    </div>
+	                    </div>
                     </div>
+	                <div class="row">
+		                <div class="col-lg-4 inner-td">
+			                <div class="form-group">
+				                <label>바코드</label>
+				                <div class="flex_box">
+					                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+				                </div>
+			                </div>
+		                </div>
+		                <div class="col-lg-4 inner-td">
+			                <div class="form-group">
+				                <label for="prd_cd">상품검색조건</label>
+				                <div class="form-inline">
+					                <div class="form-inline-inner input-box w-100">
+						                <div class="form-inline inline_btn_box">
+							                <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+							                <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+							                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+						                </div>
+					                </div>
+				                </div>
+			                </div>
+		                </div>
+		                <div class="col-lg-4 inner-td">
+			                <div class="form-group">
+				                <label for="">자료수/정렬</label>
+				                <div class="form-inline">
+					                <div class="form-inline-inner input_box" style="width:24%;">
+						                <select name="limit" class="form-control form-control-sm">
+							                <option value="100">100</option>
+							                <option value="500">500</option>
+							                <option value="1000">1000</option>
+							                <option value="2000">2000</option>
+						                </select>
+					                </div>
+					                <span class="text_line">/</span>
+					                <div class="form-inline-inner input_box" style="width:45%;">
+						                <select name="ord_field" class="form-control form-control-sm">
+							                <option value="b.req_rt">등록일시</option>
+						                </select>
+					                </div>
+					                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+						                <div class="btn-group" role="group">
+							                <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+							                <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+						                </div>
+						                <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+						                <input type="radio" name="ord" id="sort_asc" value="asc">
+					                </div>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
@@ -224,7 +272,7 @@
         // logics
         function Search() {
             let data = $('form[name="search"]').serialize();
-            gx.Request('/store/cs/cs01/search', data);
+            gx.Request('/store/cs/cs01/search', data, 1);
         };
 
         const add = () => {

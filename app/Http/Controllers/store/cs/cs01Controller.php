@@ -51,15 +51,19 @@ class cs01Controller extends Controller {
 		$sdate = str_replace('-','',$request->input("sdate"));
         $edate = str_replace('-','',$request->input("edate"));
 		$invoice_no	= $request->input("invoice_no");
-		$item = $request->input("item");
+		// $item = $request->input("item");
 		$com_id = $request->input("com_cd");
 		$com_nm = $request->input("com_nm");
 		$state = $request->input("order_stock_state");
 		$user_name = $request->input("user_name");
 		$user_name_type = $request->input("user_name_type", "req_nm");
+		$goods_nm = $request->input("goods_nm", "");
+		$prd_cd = $request->input("prd_cd", "");
+		$prd_cd_range_text = $request->input("prd_cd_range", "");
 
 		$where = "where b.stock_date >= '$sdate' and b.stock_date <= '$edate'";
 		$where2 = "where 1=1";
+		$goods_where = "";
 		$having = "having 1=1";
 
 		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
@@ -67,16 +71,42 @@ class cs01Controller extends Controller {
 		if ($invoice_no != "") $where .= " and b.invoice_no like '%" . Lib::quote($invoice_no) . "%'";
 		
 		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		if ($item != "") $where2 .= " and item_cds like '%" . Lib::quote($item) . "%' ";
+		// if ($item != "") $where2 .= " and item_cds like '%" . Lib::quote($item) . "%' ";
 		
 		if ($user_name != "") $having .= " and $user_name_type like '%" . Lib::quote($user_name) . "%' ";
+		
+		if ($goods_nm != "") $goods_where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
+		if ($prd_cd != "") {
+			$prd_cd = explode(',', $prd_cd);
+			$goods_where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$goods_where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
+			}
+			$goods_where .= ")";
+		}
 
-		/**
-		 * 추후 입고 유저 롤에 대한 처리 필요
-		 */
-		// if ($role >= 1 && $role < 2) { 
-		// 		$where .= " and b.id = '$id' ";
-		// }
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$goods_where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+
+		// ordreby
+        $ord_field  = $request->input("ord_field", "b.req_rt");
+        $ord        = $request->input("ord", "desc");
+        $orderby    = sprintf("order by %s %s", $ord_field, $ord);
+        
+        // pagination
+        $page       = $request->input("page", 1);
+        $page_size  = $request->input("limit", 100);
+        if ($page < 1 or $page == "") $page = 1;
+        $startno    = ($page - 1) * $page_size;
+        $limit      = " limit $startno, $page_size ";
 
 		$sql = "
 			select
@@ -109,7 +139,14 @@ class cs01Controller extends Controller {
 					select p.stock_no, group_concat(distinct p.item) as item,
 					group_concat(distinct o.opt_kind_cd) as item_cds,
 					sum(p.qty) as qty, sum(p.exp_qty) as exp_qty, sum(total_cost) as total_cost
-					from product_stock_order b inner join product_stock_order_product p on b.stock_no = p.stock_no
+					from product_stock_order b 
+					    inner join (
+							select p.stock_no, p.item, p.qty, p.exp_qty, p.total_cost
+							from product_stock_order_product p
+								inner join product_code pc on pc.prd_cd = p.prd_cd
+								left outer join goods g on g.goods_no = p.goods_no
+							where 1=1 $goods_where
+					    ) p on b.stock_no = p.stock_no
 						left outer join opt o on p.item = o.opt_kind_nm
 					$where
 					group by p.stock_no
@@ -119,16 +156,56 @@ class cs01Controller extends Controller {
 				left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
 			$where2
 			$having
-			order by b.stock_date desc, b.req_rt desc
+			$orderby
+			$limit
 		";
 
 		$rows = DB::select($sql);
 
+		// pagination
+		$total = 0;
+		$page_cnt = 0;
+
+		if ($page == 1) {
+			$sql = "
+				select count(*) as total
+				from product_stock_order b
+					inner join (
+						select p.stock_no, group_concat(distinct p.item) as item,
+						group_concat(distinct o.opt_kind_cd) as item_cds,
+						sum(p.qty) as qty, sum(p.exp_qty) as exp_qty, sum(total_cost) as total_cost
+						from product_stock_order b 
+							inner join (
+								select p.stock_no, p.item, p.qty, p.exp_qty, p.total_cost
+								from product_stock_order_product p
+									inner join product_code pc on pc.prd_cd = p.prd_cd
+									left outer join goods g on g.goods_no = p.goods_no
+								where 1=1 $goods_where
+							) p on b.stock_no = p.stock_no
+							left outer join opt o on p.item = o.opt_kind_nm
+						$where
+						group by p.stock_no
+					) s on b.stock_no = s.stock_no
+					inner join company c on c.com_id = b.com_id
+					left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
+					left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
+				$where2
+				$having
+            ";
+			$row = DB::selectOne($sql);
+		
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
+
 		return response()->json([
             "code" => 200,
-            "head" => array(
-                "total" => count($rows)
-            ),
+			"head" => [
+				"total" => $total,
+				"page" => $page,
+				"page_cnt" => $page_cnt,
+				"page_total" => count($rows)
+			],
             "body" => $rows
         ]);
     }
