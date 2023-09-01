@@ -205,9 +205,11 @@ class IndexController extends Controller
     // 공지사항
     public function main() {
 
-        $mutable = Carbon::now();
-        $sdate = $mutable->sub(6, 'month')->format('Y-m-d');
-        $edate = date("Y-m-d");
+        // $mutable = Carbon::now();
+        // $sdate = $mutable->sub(6, 'month')->format('Y-m-d');
+        // $edate = date("Y-m-d");
+		
+		$notice_type = '01'; // 공지타입 (01: 매장공지사항 / 02: VMD게시글)
 
         $sql = "
             select 
@@ -227,14 +229,12 @@ class IndexController extends Controller
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-            where 1=1 
+            where s.store_notice_type = :notice_type
             group by s.ns_cd
             order by s.rt desc
             limit 0, 10
         ";
-
-        $result = DB::select($sql); 
-
+        $result = DB::select($sql, [ 'notice_type' => $notice_type ]);
 
         return response()->json([
             "code" => 200,

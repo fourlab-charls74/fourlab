@@ -94,7 +94,8 @@
                         <div class="card-title">
                             <div class="filter_wrap">
                                 <div class="fl_box">
-                                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+                                    <!-- <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6> -->
+	                                <h6 class="m-0 font-weight-bold"><i class="bx bx-notepad fs-14 mr-2"></i>공지사항</h6>
                                 </div>
                                 <a href="#" id="msg_del_btn" onclick="notice()"class="btn btn-sm btn-primary shadow-sm" style="float:right;">더보기</a>
                                 <div class="fr_box">
@@ -118,7 +119,8 @@
                         <div class="card-title">
                             <div class="filter_wrap">
                                 <div class="fl_box">
-                                    <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6>
+                                    <!-- <h6 class="m-0 font-weight-bold">총 <span id="gd-alarm-total" class="text-primary">0</span> 건</h6> -->
+	                                <h6 class="m-0 font-weight-bold"><i class="bx bx-bell fs-14 mr-2"></i>알리미</h6>
                                 </div>
                                 <a href="#" id="msg_del_btn" onclick="msg()"class="btn btn-sm btn-primary shadow-sm" style="float:right;">더보기</a>
                             </div>
@@ -144,39 +146,32 @@
 <!-- 공지사항 -->
 <script type="text/javascript" charset="utf-8">
      const columns = [
-        {headerName: "제목", field: "subject", width: 300,
+        {headerName: "제목", field: "subject", width: 0,
             cellRenderer: function(params) {
                 return '<a href="/shop/community/comm01/notice/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
             }
         },
-        {headerName: "이름", field: "admin_nm",  width: 60, cellClass: 'hd-grid-code'},
-        {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
+        {headerName: "이름", field: "admin_nm",  width: 70, cellClass: 'hd-grid-code'},
+        {headerName: "조회수", field: "cnt", type: 'currencyType',width: 50},
         {headerName: "등록일시", field: "rt", type:"DateTimeType"},
-        {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
-            cellStyle: params => {
-                if(params.data.all_store_yn == 'Y'){
-                    return {color:'red'}
-                }else{
-                    return {color:'blue'}
-                }
-            },
-            cellRenderer: function(params){
-                if(params.data.stores == null){
-                    return params.data.all_store_yn = "Y";
-                }else{
-                    return params.data.all_store_yn = "N";
-                }
-            }
-        },
-        {headerName: "공지매장", field: "store_nm", width: 340, cellClass: 'hd-grid-code',
-            cellRenderer: function(params) {
-
-                console.log(params.data);
-                return params.data.stores;
-            }
-        },
+        // {headerName: "전체공지여부", field: "all_store_yn", width: 80, cellClass: 'hd-grid-code',
+        //     cellStyle: params => {
+        //         if(params.data.all_store_yn == 'Y'){
+        //             return {color:'red'}
+        //         }else{
+        //             return {color:'blue'}
+        //         }
+        //     },
+        //     cellRenderer: function(params){
+        //         if(params.data.stores == null){
+        //             return params.data.all_store_yn = "Y";
+        //         }else{
+        //             return params.data.all_store_yn = "N";
+        //         }
+        //     }
+        // },
+        // {headerName: "공지매장", field: "store_nm", width: 0, cellRenderer: (params) => params.data.stores},
         {headerName: "글번호", field: "ns_cd", hide:true },
-        {width: 'auto'}
     ];
 
     const pApp = new App('', { gridId:"#div-gd" });
@@ -237,7 +232,7 @@
     }
 
     function notice() {
-        window.location.href = "/shop/common/comm01";
+        window.location.href = "/shop/community/comm01/notice";
     }
 
     function msg() {

@@ -28,7 +28,15 @@
                 <div class="card-header mb-0 justify-content-between d-flex">
                     <div></div>
                     <div>
-                        <button type="button" onclick="document.location.href='/shop/community/comm01';" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">목록</button>
+                        <button type="button"
+                            @if($store_notice_type === "notice")
+                                onclick="document.location.href='/shop/community/comm01/notice';"
+                            @else
+                                onclick="document.location.href='/shop/community/comm01/vmd';"
+                            @endif
+                                class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+                        >목록
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
