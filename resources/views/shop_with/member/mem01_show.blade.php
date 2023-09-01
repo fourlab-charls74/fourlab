@@ -382,8 +382,8 @@
                                             <th>가입매장</th>
                                             <td>
                                                 <div class="txt_box">
-                                                    <input type='hidden' id="store_cd" name="store_cd" value="{{ @$user_store }}">
-                                                    {{@$user_store_nm}}
+                                                    <input type='hidden' id="store_cd" name="store_cd" value="{{ @$user->store_cd }}">
+                                                    {{@$user->store_nm}}
                                                 </div>
                                             </td>
                                         </tr>
@@ -590,16 +590,29 @@
     // 주문 탭 컬럼
     const column2 = [
         {field: "ord_date", headerName: "주문일", width:80, pinned:'left'},
-        {field: "ord_no", headerName: "주문번호", type:"HeadOrderNoType"},
+        {field: "ord_no", headerName: "주문번호",
+			cellRenderer: (params) => {
+				if (params.value) {
+					if (params.data.store_cd === "{{ @$user_store }}") {
+						return '<a href="javascript:void(0);" onclick="return openShopOrder(\'' + params.data.ord_no + '\',\'' + params.data.ord_opt_no +'\');">'+ params.value +'</a>';
+					}
+					return params.value;
+				}
+			}
+        },
         {field: "goods_nm", headerName: "상품명", type:"HeadGoodsNameType"},
         {field: "opt", headerName: "옵션"},
         {field: "qty", headerName: "수량", type:"currencyType"},
-        {field: "price", headerName: "판매가", type:"currencyType"},
+        {field: "price", headerName: "판매가", type:"currencyType",
+            cellRenderer: (params) => params.data.store_cd === "{{ @$user_store }}" ? Comma(params.value) : '-',
+        },
         {field: "pay_type", headerName: "결제방법"},
         {field: "ord_state", headerName: "주문상태", cellStyle:StyleOrdState},
         {field: "clm_state", headerName: "클레임상태", cellStyle:StyleClmState},
         {field: "sale_place", headerName: "판매처", width:100},
-        {field: "coupon_nm", headerName: "쿠폰", width:100},
+        {field: "coupon_nm", headerName: "쿠폰", width:100,
+			cellRenderer: (params) => params.data.store_cd === "{{ @$user_store }}" ? params.value : '-',
+        },
     ];
 
     // 적립금 탭 컬럼
@@ -710,7 +723,12 @@
 
     $('.nav-link').click(function(){
         const num = this.id.split('-')[2] - 1;
+        gx.gridOptions.api.setColumnDefs([]);
         gx.gridOptions.api.setColumnDefs(columns[num]);
+
+	    if (num === 1) gx.gridOptions.getRowStyle = (params) => ({ backgroundColor: params.data.store_cd === "{{ @$user_store }}" ? '#ffeeee' : 'none' });
+		else gx.gridOptions.getRowStyle = (params) => ({ backgroundColor: 'none' });
+		gx.gridOptions.api.redrawRows();
 
         // const data = $('form[name="user"]').serialize();
         gx.Request(`/shop/member/mem01/show/search/${urls[num]}/${user_id}`, '', -1, function(res){
@@ -718,19 +736,19 @@
 
             if (data?.clm_amt) {
                 const template = [
-                    `주문수 : ${data.qty} 개`,
-                    `주문금액 : ${numberFormat(data.ord_amt)} 원`,
-                    `클레임수 : ${data.clm_qty} 개`,
-                    `클레임금액 : ${numberFormat(data.clm_amt)} 원`
+                    `주문수량 : ${data.qty} 개`,
+                    // `주문금액 : ${Comma(data.ord_amt || 0)} 원`,
+                    `클레임완료수량 : ${data.clm_qty} 개`,
+                    // `클레임금액 : ${Comma(data.clm_amt || 0)} 원`
                 ];
-
-                $('.grid-show-text').html(template.join(', '));
+				
+				let style_help_text = `<span class="mr-1" style="width:20px;height:12px;border:2px solid #ffaaaa;background-color:#ffeeee;"></span>본매장주문건 <span class="mx-2">|</span>`;
+                $('.grid-show-text').html(style_help_text + template.join(', '));
             } else if (data?.use_cnt) {
-                $('.grid-show-text').html(`사용할 수 있는 쿠폰 수 : ${numberFormat(data.use_cnt)} 개  `);
+                $('.grid-show-text').html(`사용할 수 있는 쿠폰 수 : ${Comma(data.use_cnt || 0)} 개  `);
             } else {
                 $('.grid-show-text').html('');
             }
-            console.log(res);
         });
     });
 

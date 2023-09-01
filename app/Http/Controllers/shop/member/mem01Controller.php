@@ -211,7 +211,7 @@ class mem01Controller extends Controller
                 a.job, a.interest, a.yn, a.memo, a.visit_cnt, a.opt, a.recommend_id,
                 b.ord_date, b.ord_cnt, b.ord_amt,
                 c.code_val as auth_type_nm, a.auth_type, a.auth_yn, a.auth_key, a.ipin, a.foreigner, a.mobile_cert_yn,
-                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_nm
+                a.yyyy_chk, a.yyyy, a.mm, a.dd, a.sex, a.store_cd, a.store_nm
             from $member_table a
                 left outer join member_stat b on a.user_id = b.user_id
                 left outer join code c on c.code_kind_cd = 'G_AUTH_TYPE' and c.code_id = a.auth_type
@@ -563,9 +563,10 @@ class mem01Controller extends Controller
                 ifnull(sum(if(a.clm_state = 60 or a.clm_state = 61,a.qty * a.price,0)),0) as clm_amt
             from order_opt a
                 inner join order_mst b on a.ord_no = b.ord_no
+            	inner join goods c on a.goods_no = c.goods_no and a.goods_sub = c.goods_sub
+				inner join payment d on b.ord_no = d.ord_no
             where
                 b.user_id = '$user_id'
-                and a.ord_state >= 10
         ";
 
         return DB::selectOne($sql);
@@ -590,7 +591,8 @@ class mem01Controller extends Controller
                 $sql = "
                     select
                         date_format(a.ord_date,'%Y.%m.%d') ord_date, a.ord_no, a.ord_seq, a.goods_nm, ifnull(e.opt_val, a.goods_opt) as opt, a.qty, a.price,
-                        cp.code_val as pay_type, a.bank_code, co.code_val as ord_state, cc.code_val as clm_state, a.sale_place, a.coupon_nm, a.ord_opt_no, a.goods_no
+                        cp.code_val as pay_type, a.bank_code, co.code_val as ord_state, cc.code_val as clm_state, a.store_cd, a.coupon_nm, a.ord_opt_no, a.goods_no,
+                        if(a.sale_place in ('피엘라벤', ''), ifnull((select store_nm from store where store_cd = a.store_cd), a.sale_place), a.sale_place) as sale_place
                     from
                     (
                         select
@@ -604,6 +606,7 @@ class mem01Controller extends Controller
                             end bank_code,
                             a.ord_state, a.clm_state, 
                             -- e.com_nm as sale_place, 
+                            a.store_cd,
                             ifnull(e.com_nm, a.sale_place) as sale_place,
                             i.com_nm, c.price-c.wonga as prf,
                             case a.ord_state
@@ -619,7 +622,7 @@ class mem01Controller extends Controller
                             left outer join company i on c.com_id = i.com_id
                             left outer join coupon f on a.coupon_no = f.coupon_no
                         where b.user_id = '$user_id'
-                    ) a left outer join opt e on e.opt_kind_cd = a.opt_kind_cd and e. a.goods_opt = e.opt_id
+                    ) a left outer join opt e on e.opt_kind_cd = a.opt_kind_cd and a.goods_opt = e.opt_id
                     left outer join code cc on cc.code_kind_cd = 'G_CLM_STATE' and cc.code_id = a.clm_state
                     left outer join code co on co.code_kind_cd = 'G_ORD_STATE' and co.code_id = a.ord_state
                     left outer join code cp on cp.code_kind_cd = 'G_PAY_TYPE' and cp.code_id = a.pay_type
@@ -836,7 +839,9 @@ class mem01Controller extends Controller
 		// 	}
 		// 	$where	.= ")";
 		// }
-		if ( $store_cd != "" )	$where	.= " and a.store_cd = '$store_cd'";
+		
+		// 20230901 매장에서 전체회원 조회가능하도록 수정
+		// if ( $store_cd != "" )	$where	.= " and a.store_cd = '$store_cd'";
 			
 
 		if($mail != "")			$where .= " and a.email_chk = '$mail' ";

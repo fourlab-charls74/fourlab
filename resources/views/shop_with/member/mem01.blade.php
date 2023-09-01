@@ -428,24 +428,24 @@
 	var columns = [
 		{headerName:'', headerCheckboxSelection:true, checkboxSelection:true, width:28, pinned:'left'},
 		{field:"user_id", headerName:"아이디", pinned:'left', type:"ShopUserType", width:100},
-		{field:"name", headerName:"이름", width:70, cellStyle:{"text-align": "center"}},
-		{field:"sex", headerName:"성별", width:50},
-		{field:"birth_day", headerName:"생년월일", width:80},
-		{field:"mobile", headerName:"휴대전화", width:100, cellStyle:{"text-align":"center"}},
-		{field:"email", headerName:"이메일", width:150, cellStyle:{"text-align": "center"}},
+		{field:"name", headerName:"이름", width:70, cellClass: 'hd-grid-code'},
+		{field:"sex", headerName:"성별", width:50, cellClass: 'hd-grid-code'},
+		{field:"birth_day", headerName:"생년월일", width:80, cellClass: 'hd-grid-code'},
+		{field:"mobile", headerName:"휴대전화", width:100, cellClass: 'hd-grid-code'},
+		{field:"email", headerName:"이메일", width:150},
 		{field:"point", headerName:"적립금", type:'currencyType', width:60},
-		{field:"regdate", headerName:"가입일", width:70, cellStyle:{"text-align": "center"}},
+		{field:"regdate", headerName:"가입일", width: 80, cellClass: 'hd-grid-code'},
 		{field:"store_nm", headerName:"가입 매장명", width:170},
-		{field:"lastdate", headerName:"최근로그인", width:130},
-		{field:"visit_cnt", headerName:"로그인횟수", type:'currencyType', width:80},
-		{field:"auth_yn", headerName:"인증여부", width:70, cellStyle:{"text-align": "center"}},
-		{field:"ord_date", headerName:"최근주문일", width:125, cellStyle:{"text-align": "center"}},
-		{field:"ord_cnt", headerName:"구매수량", type:'currencyType', width:60},
-		{field:"ord_amt", headerName:"구입금액", type:'currencyType', width:70},
-		{field:"email_chk", headerName:"메일수신", width:70, cellStyle:{"text-align": "center"}},
-		{field:"mobile_chk", headerName:"SMS수신", width:70, cellStyle:{"text-align": "center"}},
-		{field:"yn", headerName:"승인", width:50, cellStyle:{"text-align": "center"}},
-		{field:"site", headerName:"판매처", width:70, cellStyle:{"text-align": "center"}},
+		{field:"lastdate", headerName:"최근로그인", type: "DateTimeType"},
+		{field:"visit_cnt", headerName:"로그인횟수", type:'currencyType', width: 70},
+		{field:"auth_yn", headerName:"인증여부", width: 60, cellClass: 'hd-grid-code'},
+		{field:"ord_date", headerName:"최근주문일", type: "DateTimeType"},
+		{field:"ord_cnt", headerName:"구매수량", type:'currencyType', width: 60},
+		{field:"ord_amt", headerName:"구입금액", type:'currencyType', width: 80},
+		{field:"email_chk", headerName:"메일수신", width:70, cellClass: 'hd-grid-code'},
+		{field:"mobile_chk", headerName:"SMS수신", width:70, cellClass: 'hd-grid-code'},
+		{field:"yn", headerName:"승인", width:50, cellClass: 'hd-grid-code'},
+		{field:"site", headerName:"판매처", width: 100, cellClass: 'hd-grid-code'},
 		{width:"auto"}
 		
 	];
@@ -454,7 +454,7 @@
 	const gridDiv = document.querySelector(pApp.options.gridId);
 	const gx = new HDGrid(gridDiv, columns);
 
-	pApp.ResizeGrid(200);
+	pApp.ResizeGrid(218);
 	pApp.BindSearchEnter();
 
 	Search();
