@@ -86,7 +86,7 @@
 											<td>
 												<div class="flax_box">
 													<select name='plan_category' id="plan_category" class="form-control form-control-sm">
-														<option value=''>00 : 변경없음</option>
+														<option value='00'>00 : 변경없음</option>
 														<option value='01'>01 : 정상매장</option>
 														<option value='02'>02 : 전매장</option>
 														<option value='03'>03 : 이월취급점</option>

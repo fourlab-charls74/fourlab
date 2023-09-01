@@ -221,6 +221,7 @@ class prd05Controller extends Controller
 				, pc.prd_cd
 			    , 
 			    case
+			        when ppl.plan_category = '00' then '변경없음'
 			        when pc.plan_category = '01' then '정상매장'
 			        when pc.plan_category = '02' then '전매장'
 			        when pc.plan_category = '03' then '이월취급점'
@@ -382,7 +383,7 @@ class prd05Controller extends Controller
 		$type				= $request->input('type');
 		$admin_id			= Auth('head')->user()->id;
 		$price_kind			= $request->input('price_kind');
-		$plan_category		= $request->input('plan_category');
+		$plan_category		= $request->input('plan_category', '00');
 		
 		$change_date	= '';
 		$change_type	= '';
@@ -696,7 +697,7 @@ class prd05Controller extends Controller
 		$change_date_now	= $request->input('change_date_now');
 		$change_cnt			= $request->input('change_cnt');
 		$type				= $request->input('type');
-		$plan_category		= $request->input('plan_category', '');
+		$plan_category		= $request->input('plan_category', '00');
 		$data				= $request->input('data', []);
 		
 		if ($type == 'reservation') {
