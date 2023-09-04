@@ -4,11 +4,11 @@
 <div class="py-3 px-sm-3">
     <div class="page_tit d-flex justify-content-between">
         <div class="d-flex">
-            <h3 class="d-inline-flex">주문상세내역</h3>
+            <h3 class="d-inline-flex">판매상세내역</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장주문</span>
-                <span>/ 주문상세내역</span>
+                <span>/ 판매상세내역</span>
             </div>
         </div>
         <div>
@@ -103,12 +103,12 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th>주문상태</th>
+                                                <th>판매상태</th>
                                                 <td>
                                                     <div class="txt_box">{{ @$ord->ord_state_nm }}
                                                         <div>
                                                 </td>
-                                                <th>주문시간</th>
+                                                <th>판매시간</th>
                                                 <td>
                                                     <div class="txt_box">{{ @$ord->ord_date }}</div>
                                                 </td>
@@ -220,7 +220,7 @@
             @if (@$store)
             <div class="card shadow">
                 <div class="card-header mb-0">
-                    <a href="#" class="m-0 font-weight-bold">주문매장 정보</a>
+                    <a href="#" class="m-0 font-weight-bold">판매매장 정보</a>
                 </div>
                 <div class="card-body">
                     <div class="row_wrap">
@@ -518,7 +518,7 @@
                     @if (@$ord->ord_state === 10 || @$ord->ord_state === 20)
                         <div class="flax_box">
                             <div class="d-lg-flex" style="line-height:30px;">
-                                변경할 주문상태 :
+                                변경할 판매상태 :
                                 <div class="ml-1">
                                     <select id="chg_ord_stat" class="form-control form-control-sm" style="width: 100px;">
                                         <option value="0">== 선택 ==</option>
@@ -689,7 +689,7 @@
                                             <tr>
                                                 <th colspan="10">
                                                     결제금액 ({{ number_format($t_recv_amt) }}) =
-                                                    주문금액 ({{ number_format($t_price) }}) +
+                                                    판매금액 ({{ number_format($t_price) }}) +
                                                     결제수수료 ({{ number_format(@$pay->pay_fee) }}) +
                                                     배송비 ({{ number_format($t_dlv_amt) }}) +
                                                     적립금사용 ({{ number_format($t_use_point * -1)}}) +
@@ -744,7 +744,7 @@
                                 @endif
                             @else
                                 @if ($order_opt->ord_state > "0")
-                                <button class="btn-sm btn btn-secondary cancel-order-btn fs-12">주문취소</button>
+                                <button class="btn-sm btn btn-secondary cancel-order-btn fs-12">판매취소</button>
                                 @endif
                             @endif
                         </div>
@@ -774,7 +774,7 @@
                                                         <option value="">선택</option>
                                                         @if (@$ord->ord_state === '1' && @$ord->ord_state === '-10')
                                                         <!-- 입금예정 -->
-                                                        <option value="-10">주문취소</option>
+                                                        <option value="-10">판매취소</option>
                                                         @elseif (@$order_opt->clm_state == '40')
                                                         <!-- 교환요청 -->
                                                         <option value="40" selected>교환요청</option>
@@ -1140,7 +1140,7 @@
             {{-- 주문처리일자 정보 --}}
             <div class="card shadow">
                 <div class="card-header mb-0">
-                    <a href="#" class="m-0 font-weight-bold">주문 처리일자 정보</a>
+                    <a href="#" class="m-0 font-weight-bold">판매 처리일자 정보</a>
                 </div>
                 <div class="card-body">
                     <div class="row_wrap">
@@ -1158,7 +1158,7 @@
                                         </colgroup>
                                         <tbody>
                                             <tr>
-                                                <th>주문일시</th>
+                                                <th>판매일시</th>
                                                 <td>
                                                     <div class="txt_box">{{@$ord->ord_date}}</div>
                                                 </td>
@@ -1197,7 +1197,7 @@
             {{-- 주문상태 로그 정보 --}}
             <div class="card shadow">
                 <div class="card-header mb-0">
-                    <a href="#" class="m-0 font-weight-bold">주문상태 로그 정보</a>
+                    <a href="#" class="m-0 font-weight-bold">판매상태 로그 정보</a>
                 </div>
                 <div class="card-body">
                     <div class="row_wrap">
@@ -1207,9 +1207,9 @@
                                     <table class="table table-bordered th_border_none">
                                         <thead>
                                             <tr>
-                                                <th>이전 주문상태</th>
-                                                <th>현재 주문상태</th>
-                                                <th>주문상태일자</th>
+                                                <th>이전 판매상태</th>
+                                                <th>현재 판매상태</th>
+                                                <th>판매상태일자</th>
                                                 <th>처리자</th>
                                                 <th>로그</th>
                                             </tr>
@@ -1228,7 +1228,7 @@
                                             @else
                                             <tr>
                                                 <td colspan="5">
-                                                    <strong>주문상태 로그 정보가 없습니다.</strong>
+                                                    <strong>판매상태 로그 정보가 없습니다.</strong>
                                                 </td>
                                             </tr>
                                             @endif
@@ -1733,14 +1733,14 @@
 
         for(let i = 0; i<checkRows.length; i++) {
             if(parseInt(checkRows[i].dataset.ordKind) === 30) return alert("출고보류 주문은 출고처리중으로 변경이 불가능합니다.");
-            if(stat_num === 20 && parseInt(checkRows[i].dataset.ordState) !== 10) return alert("선택하신 주문건 중 출고요청상태가 아닌 주문건이 포함되어있습니다.");
+            if(stat_num === 20 && parseInt(checkRows[i].dataset.ordState) !== 10) return alert("선택하신 판매건 중 출고요청상태가 아닌 판매건이 포함되어있습니다.");
             opt_list.push(checkRows[i].dataset.ordNo + "||" + checkRows[i].defaultValue);
         }
 
         if(stat_num === 20) { // 출고처리중으로 변경
             const dlv_series_no = $("#release_num").val();
             if(dlv_series_no === '') return alert("출고차수를 입력해주세요.");
-            if(!confirm("선택하신 주문건을 출고처리중으로 변경하시겠습니까?")) return;
+            if(!confirm("선택하신 판매건을 출고처리중으로 변경하시겠습니까?")) return;
             updateOrderState({
                 "ord_opt_nos[]": opt_list,
                 ord_state: stat_num,
@@ -1751,7 +1751,7 @@
             if(invoice_num === '') return alert("송장번호를 입력해주세요.");
             const dlv_com_cd = $("#dlv_com_id").val();
             if(dlv_com_cd === '0') return alert("택배업체를 선택해주세요.");
-            if(!confirm("선택하신 주문건을 출고완료 처리하시겠습니까?")) return;
+            if(!confirm("선택하신 판매건을 출고완료 처리하시겠습니까?")) return;
             updateOrderState({
                 "ord_opt_nos[]": opt_list,
                 ord_state: stat_num,
@@ -1823,20 +1823,20 @@
 
     function SetOrdState(stat_num) {
         const checkRows = $('[name=goods]:checked');
-        if(checkRows.length < 1) return alert("상태를 변경할 주문건을 선택해주세요.");
+        if(checkRows.length < 1) return alert("상태를 변경할 판매건을 선택해주세요.");
 
         let opt_list = [];
 
         for(let i = 0; i<checkRows.length; i++) {
             if(parseInt(checkRows[i].dataset.ordKind) === 30) return alert("출고보류 주문은 출고처리중으로 변경이 불가능합니다.");
-            if(stat_num === 20 && parseInt(checkRows[i].dataset.ordState) !== 10) return alert("선택하신 주문건 중 출고요청상태가 아닌 주문건이 포함되어있습니다.");
+            if(stat_num === 20 && parseInt(checkRows[i].dataset.ordState) !== 10) return alert("선택하신 판매건 중 출고요청상태가 아닌 판매건이 포함되어있습니다.");
             opt_list.push(checkRows[i].dataset.ordNo + "||" + checkRows[i].defaultValue);
         }
 
         if(stat_num === 20) { // 출고처리중으로 변경
             const dlv_series_no = $("#release_num").val();
             if(dlv_series_no === '') return alert("출고차수를 입력해주세요.");
-            if(!confirm("선택하신 주문건을 출고처리중으로 변경하시겠습니까?")) return;
+            if(!confirm("선택하신 판매건을 출고처리중으로 변경하시겠습니까?")) return;
             updateOrderState({
                 "ord_opt_nos[]": opt_list,
                 ord_state: stat_num,
@@ -1847,7 +1847,7 @@
             if(invoice_num === '') return alert("송장번호를 입력해주세요.");
             const dlv_com_cd = $("#dlv_com_id").val();
             if(dlv_com_cd === '0') return alert("택배업체를 선택해주세요.");
-            if(!confirm("선택하신 주문건을 출고완료 처리하시겠습니까?")) return;
+            if(!confirm("선택하신 판매건을 출고완료 처리하시겠습니까?")) return;
             updateOrderState({
                 "ord_opt_nos[]": opt_list,
                 ord_state: stat_num,

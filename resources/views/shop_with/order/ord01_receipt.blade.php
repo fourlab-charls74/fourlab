@@ -7,7 +7,7 @@
             <h3 class="d-inline-flex">거래명세표</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 주문</span>
+                <span>/ 판매</span>
                 <span>/ 거래명세표</span>
             </div>
         </div>
@@ -19,7 +19,7 @@
     <div class="card_wrap aco_card_wrap">
         <div class="card shadow">
             <div class="card-header mb-0">
-                <a href="#" class="m-0 font-weight-bold">주문정보</a>
+                <a href="#" class="m-0 font-weight-bold">판매정보</a>
             </div>
             <div class="card-body">
                 <div class="row_wrap">
@@ -44,7 +44,7 @@
                                         <td>
                                             <div class="txt_box">{{$ord->ord_kind_nm}}</div>
                                         </td>
-                                        <th>주문상태</th>
+                                        <th>판매상태</th>
                                         <td>
                                             <div class="txt_box">{{$ord->ord_state_nm}}</div>
                                         </td>
@@ -194,12 +194,12 @@
                                 <table class="table table-bordered th_border_none">
                                     <thead>
                                         <tr>
-                                            <th>주문상태</th>
+                                            <th>판매상태</th>
                                             <th>스타일넘버</th>
                                             <th>상품명</th>
                                             <th>옵션</th>
                                             <th>수량</th>
-                                            <th>판매가</th>
+                                            <th>현재가</th>
                                             <th>주문액</th>
                                         </tr>
                                     </thead>

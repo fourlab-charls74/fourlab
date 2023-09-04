@@ -7,8 +7,8 @@
             <h3 class="d-inline-flex">수기 일괄판매</h3>
             <div class="d-inline-flex location">
                 <span class="home"></span>
-                <span>/ 주문/배송처리</span>
-                <span>/ 주문내역조회</span>
+                <span>/ 판매/배송처리</span>
+                <span>/ 판매내역조회</span>
                 <span>/ 수기 일괄판매</span>
             </div>
         </div>
@@ -40,7 +40,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th>주문매장</th>
+                                            <th>판매매장</th>
                                             <td>
                                                 <div class="flax_box mr-2">
                                                     <input type='hidden' id="store_no" name="store_no" value="{{$store_cd}}">
@@ -124,7 +124,7 @@
         },
         // {field: "ord_no", headerName: "주문번호", width: 100, cellStyle: StyleLineHeight},
         {field: "out_ord_no", headerName: "매장 주문번호", width: 100, cellStyle: StyleLineHeight},
-        {field: "ord_date", headerName: "주문일", width: 80, cellStyle: StyleLineHeight},
+        {field: "ord_date", headerName: "판매일", width: 80, cellStyle: StyleLineHeight},
         {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: StyleLineHeight},
         {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: StyleLineHeight},
         {field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"},
