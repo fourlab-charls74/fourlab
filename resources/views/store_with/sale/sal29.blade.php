@@ -30,7 +30,7 @@
                             <div class="form-inline">
                                 <input type="text" class="form-control form-control-sm docs-date mr-2" name="baebun_date" id="baebun_date" value="" autocomplete="off" onclick="openApi();">
                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-baebun"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                <input type="text" class="form-control form-control-sm ml-2" name='rel' id="rel" style="width:70px;" onclick="openApi();">차
+                                <input type="text" class="form-control form-control-sm ml-2 mr-1" name='rel' id="rel" style="width:70px;" onclick="openApi();">차
                             </div>
 						</div>
                     </div>
@@ -326,8 +326,24 @@
 
 		// 엑셀다운로드
 		$(".export-excel").on("click", function (e) {
-			if(!validation()) return; 
+			if(!validation()) return;
+			alert("엑셀다운로드가 진행되고있습니다.\n잠시만 기다려주세요.");
+
 			let data = $('form[name="search"]').serialize();
+			
+			let cols = gx.gridOptions.api.getColumnDefs().filter(c => !c.hide);
+			
+			if ($("[name=ord_field]").val() === 'store') {
+				cols = cols
+					.map(c => c.showRowGroup === 'store_nm' ? c.showRowGroup : c.colId === 'store_nm' ? '' : c.colId)
+					.join('^');
+			} else {
+				cols = cols
+					.map(c => c.showRowGroup === 'color' ? c.showRowGroup : c.colId === 'color' ? '' : c.colId)
+					.join('^');
+			}
+			data += "&columns=" + cols;
+			
 			location.href = '/store/sale/sal29/download?' + data;
 		});
 	});

@@ -239,6 +239,8 @@ class sal29Controller extends Controller
 		$baebun_date 	= $request->input('baebun_date');
 		$baebun_date	= Carbon::parse($baebun_date)->format('ymd');
 		$ord_field		= $request->input('ord_field', 'store');
+		$columns		= $request->input('columns', '');
+		$columns		= explode('^', $columns);
 
 		$values = $this->_get($request);
 		$rows = $values['result'];
@@ -250,6 +252,27 @@ class sal29Controller extends Controller
 		} else if ($ord_field === 'product') {
 			$headers = [['배분구분', 'baebun_type'], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['수량', 'qty']];
 		}
+
+		$headers = array_reduce($columns, function ($a, $c) use ($headers, $size_cols) {
+			$idx = array_search($c, array_map(function ($header) { return $header[1]; }, $headers));
+			if ($idx === false) {
+				if ($c === 'size_kind_nm') {
+					$size_kind = [];
+					foreach ($size_cols[1] as $ss) {
+						$size_kind[] = (object) [ 'size_cd' => $ss->size_kind_nm_s ];
+					}
+					$size_kind[] = $c;
+					array_push($a, [$size_kind]);
+				} else if (strpos($c, 'SIZE_') !== false) {
+					$idx = explode('_', $c)[1];
+					$size_cols[$idx][] = $c;
+					array_push($a, [$size_cols[$idx]]);
+				}
+			} else {
+				array_push($a, $headers[$idx]);
+			}
+			return $a;
+		}, []);
 
 		$group_key = $ord_field === 'store' ? 'store_cd' : 'color';
 		$rows = array_reduce($rows, function ($a, $c) use ($group_key) {
@@ -290,7 +313,6 @@ class sal29Controller extends Controller
 			'groupby' => $ord_field,
 			'group_key' => $group_key,
 			'headers' => $headers,
-			'size_columns' => $size_cols,
 			'list' => $rows
 		];
 
