@@ -42,9 +42,9 @@ class sal09Controller extends Controller
 		// 판매유형 - 추후 논의사항
 		$sql = "
 			select *
-			from __tmp_code
+			from code	
 			where
-				code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
+				code_kind_cd = 'SALE_KIND' and use_yn = 'Y' order by code_seq
 		";
 		$sell_types	= DB::select($sql);
 
