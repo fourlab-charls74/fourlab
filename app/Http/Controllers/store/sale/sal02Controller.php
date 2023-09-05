@@ -65,6 +65,7 @@ class sal02Controller extends Controller
 		$brand_cd = $request->input('brand_cd', "");
 		$style_no = $request->input('style_no', "");
 		$prd_cd = $request->input('prd_cd', "");
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		
 		// 판매 유형은 추후 반영 예정
 		$sell_type = $request->input('sell_type', '');
@@ -123,6 +124,18 @@ class sal02Controller extends Controller
 				$where .= " and o.prd_cd in ($prd_cds_str) ";
 			} else {
 				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+			}
+		}
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
 		
