@@ -1032,6 +1032,7 @@ class PosController extends Controller
                 , o.coupon_amt
                 , o.recv_amt
                 , o.clm_state
+                , if(o.clm_state < 60, '', ifnull((select ord_state_date from order_opt_wonga where ord_opt_no = o.ord_opt_no and ord_state = o.clm_state), '')) as clm_state_date
                 , om.user_id
                 , om.user_nm
                 , om.mobile

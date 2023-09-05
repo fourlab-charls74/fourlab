@@ -794,7 +794,7 @@
             $("#od_ord_qty").text(Comma(data.reduce((a,c) =>c.qty + a, 0)));
 
             $("#od_pay_type").text(ord.pay_type_nm.replaceAll("무통장", "현금"));
-            $("#od_user_info").text(ord.user_nm + (ord.user_id ? ` (${ord.user_id})` : ''));
+            $("#od_user_info").text((ord.user_nm || '') + (ord.user_id ? ` (${ord.user_id})` : ''));
             $("#od_phone").text(ord.mobile || "-");
             $("#od_dlv_comment").text(ord.dlv_comment || "-");
 
@@ -809,7 +809,10 @@
                                 <p class="fc-white br-05 bg-gray pl-2 pr-2 mt-1 mb-1">${o.prd_cd || '-'}</p>
                                 ${o.goods_opt.split("^").map(opt => `<p class="fc-gray fw-sb pl-3">&#8735; ${opt}</p>`).join("")}
                                 ${o.clm_state == 61 ? `
-                                    <div class="position-absolute d-flex justify-content-center align-items-center fc-red fs-20 fw-b w-75" style="top:50%;left:50%;transform:translate(-50%, -50%) rotate(-2deg);height:75px;border:3px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">환불완료</div>
+                                    <div class="position-absolute d-flex flex-column justify-content-center align-items-center fc-red fs-20 fw-b w-75" style="top:50%;left:50%;transform:translate(-50%, -50%) rotate(-2deg);height:85px;border:3px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">
+                                    	<span>환불완료</span>
+										<span style="font-size:0.9rem;">${o.clm_state_date.slice(0,4) + '-' + o.clm_state_date.slice(4, 6) + '-' + o.clm_state_date.slice(6,8)}</span>
+									</div>
                                 ` : ''}
                             </div>
                         </td>
