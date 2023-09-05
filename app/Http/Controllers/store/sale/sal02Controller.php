@@ -38,9 +38,9 @@ class sal02Controller extends Controller
 		// 판매유형 - 추후 논의사항
 		$sql = "
 			select *
-			from __tmp_code
+			from code
 			where
-				code_kind_cd = 'sell_type' and use_yn = 'Y' order by code_seq
+				code_kind_cd = 'SALE_KIND' and use_yn = 'Y' order by code_seq
 		";
 		$sell_types	= DB::select($sql);
 
@@ -65,7 +65,7 @@ class sal02Controller extends Controller
 		$brand_cd = $request->input('brand_cd', "");
 		$style_no = $request->input('style_no', "");
 		// 판매 유형은 추후 반영 예정
-		$sell_type = $request->input('sell_type');
+		$sell_type = $request->input('sell_type', '');
 		$store_channel	= $request->input("store_channel", '');
 		$store_channel_kind	= $request->input("store_channel_kind", '');
 
@@ -94,7 +94,7 @@ class sal02Controller extends Controller
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
 
-		if ($sell_type != "") $where .= "and o.sale_kind = '$sell_type'";
+		if ($sell_type != "") $where .= " and o.sale_kind = '$sell_type'";
 
         $where2 = "";
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
@@ -197,6 +197,7 @@ class sal02Controller extends Controller
 				where 1=1 and s.use_yn = 'Y' $where2
 			) t
 		";
+		
 
 		$res = DB::selectOne($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
 
