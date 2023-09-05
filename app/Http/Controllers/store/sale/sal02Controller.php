@@ -64,6 +64,8 @@ class sal02Controller extends Controller
 		$goods_nm = $request->input('goods_nm', "");
 		$brand_cd = $request->input('brand_cd', "");
 		$style_no = $request->input('style_no', "");
+		$prd_cd = $request->input('prd_cd', "");
+		
 		// 판매 유형은 추후 반영 예정
 		$sell_type = $request->input('sell_type', '');
 		$store_channel	= $request->input("store_channel", '');
@@ -101,6 +103,29 @@ class sal02Controller extends Controller
 		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
+		// 상품코드
+		if ($prd_cd != '') {
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+			$prd_cds = explode(',', $prd_cd);
+			if (count($prd_cds) > 1) {
+				$prd_cds_str = "";
+				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
+				for($i =0; $i < count($prd_cds); $i++) {
+					$prd_cds_str.= "'".$prd_cds[$i]."'";
+					
+					if($i !== count($prd_cds) -1) {
+						$prd_cds_str .= ",";
+					}
+				}
+				$where .= " and o.prd_cd in ($prd_cds_str) ";
+			} else {
+				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+			}
+		}
+		
 		// 전달 받은 리스트 타입에 따라 합계 쿼리 구분
 		$sum = "";
 		$sum_true = "";
@@ -153,6 +178,7 @@ class sal02Controller extends Controller
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
 						inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+						left outer join product_code pc on pc.prd_cd = o.prd_cd
 					where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
 					group by m.store_cd
 				) a on s.store_cd = a.store_cd
@@ -189,6 +215,7 @@ class sal02Controller extends Controller
 							inner join order_opt o on m.ord_no = o.ord_no 
 							inner join goods g on o.goods_no = g.goods_no
 							left outer join brand b on g.brand = b.brand
+							left outer join product_code pc on pc.prd_cd = o.prd_cd
 						where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
 						group by m.store_cd
 					) a on s.store_cd = a.store_cd
@@ -199,7 +226,6 @@ class sal02Controller extends Controller
 			) t
 		";
 		
-
 		$res = DB::selectOne($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
 
 		$total_data = $res;
