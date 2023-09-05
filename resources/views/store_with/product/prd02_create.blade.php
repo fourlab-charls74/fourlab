@@ -261,14 +261,14 @@
 		{field:"color",		headerName: "컬러",			width:72},
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"match_yn", headerName: "매칭여부",		width:72},
-		{field:"brand",		headerName:"브랜드",		hide:true},
+		{field:"brand",		headerName:"브랜드",			hide:true},
 		{field:"year",		headerName:"년도",			hide:true},
 		{field:"season",	headerName:"시즌",			hide:true},
 		{field:"gender",	headerName:"성별",			hide:true},
 		{field:"opt",		headerName:"품목",			hide:true},
 		{field:"item",		headerName:"하위품목",		hide:true},
 		{field:"seq",		headerName:"순서차수",		hide:true},
-		{field:"size_kind",		headerName:"사이즈구분", },
+		{field:"size_kind",		headerName:"사이즈구분",  hide: true},
 		{field: "", headerName:"", width:"auto"},
 	];
 
