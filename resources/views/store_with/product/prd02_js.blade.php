@@ -124,7 +124,7 @@
     SearchGoodsNo2.prototype.Search = function(){
         let data = $('form[name="search_goods_no2"]').serialize();
         //console.log(data);
-        this.grid.Request('/head/api/goods', data, 1);
+		this.grid.Request('/head/api/goods', data,1, null, 'post');
     };
 
     SearchGoodsNo2.prototype.Choice = function(){

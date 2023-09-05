@@ -348,7 +348,7 @@ class prd02Controller extends Controller
 
 		$sql	= "
 			select
-				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, '' as match_yn,
+				a.goods_no, b.style_no, b.goods_nm, a.goods_opt, '' as prd_cd1, '' as color, '' as size, 'N' as match_yn, '' as size_kind,
 				'$brand' as brand, '$year' as year, '$season' as season, '$gender' as gender, '$item' as item, '$opt' as opt,
 				'' as seq
 			from goods_summary a
@@ -359,19 +359,26 @@ class prd02Controller extends Controller
 			union all
 
 			select
-				a.goods_no, b.style_no, b.goods_nm, c.goods_opt, concat(a.brand, a.year, a.season, a.gender, a.item, a.seq, a.opt) as prd_cd1, a.color, a.size, 'Y' as match_yn,
-				a.brand, a.year, a.season, a.gender, a.item, a.opt, a.seq
+				a.goods_no, b.style_no, b.goods_nm, c.goods_opt, a.prd_cd_p as prd_cd1, a.color
+			    ,(
+					select s.size_cd from size s
+					where s.size_kind_cd = a.size_kind
+					   and s.size_cd = a.size
+					   and use_yn = 'Y'
+				) as size
+			    , 'Y' as match_yn,
+				a.brand, a.year, a.season, a.gender, a.item, a.opt, a.seq, a.size_kind
 			from product_code a
 			inner join goods b on a.goods_no = b.goods_no and b.goods_sub = 0
 			inner join product_stock c on a.prd_cd = c.prd_cd
 			where
 				a.goods_no = :goods_no2
 		";
-
+		
 		$result = DB::select($sql,['goods_no1' => $goods_no, 'goods_sub' => $goods_sub, 'goods_no2' => $goods_no]);
-
+		
 		foreach($result as $row){
-
+			
 			if( $row->match_yn == "Y" ){
 			}else{
 				$sql_sub	= " 
@@ -393,24 +400,29 @@ class prd02Controller extends Controller
 
 				$goods_opt	= explode('^', $row->goods_opt);
 				$color		= strtolower(str_replace(" ", "", $goods_opt[0]));
-				$size		= isset($goods_opt[1]) ? $goods_opt[1] : "";
-
+				$size		= $goods_opt[1];
+				
+				
 				$sql		= " select code_id as color_cd from code where	code_kind_cd = 'PRD_CD_COLOR' and LOWER(replace(code_val,' ','')) = :color limit 1 ";
 				$color_cd	= DB::selectOne($sql, ["color" => $color])->color_cd;
-
-				if( $size != "" ){
-					$size		= strtolower(str_replace(" ", "", $goods_opt[1]));
-
-					$sql		= " select code_val as size_cd from code where	code_kind_cd = 'PRD_CD_SIZE_MATCH' and LOWER(replace(code_val2,' ','')) = :size limit 1 ";
-					$size_cd	= DB::selectOne($sql, ["size" => $size])->size_cd;
-				}
 				
-				$prd_cd1		= $brand . $year . $season . $gender . $item . $seq . $opt;
-
+				$sql = "
+					select size_cd, size_kind_cd from size where size_nm = '$size';
+				";
+				
+				$size = DB::selectOne($sql);
+				
+				$row->size = $size->size_cd;
+				$row->size_kind = $size->size_kind_cd;
+				
+				$style_no 		= str_pad($row->style_no,8,"0",STR_PAD_LEFT);
+				$prd_cd1		= $brand . $year . $season . $gender . $item . $style_no ;
+				
 				$row->prd_cd1	= $prd_cd1;
 				$row->color		= isset($color_cd) ? $color_cd : "";
-				$row->size		= isset($size_cd) ? $size_cd : "";
+				
 			}
+			
 		}
 
 		return response()->json([
@@ -480,6 +492,7 @@ class prd02Controller extends Controller
 	{
 		$admin_id	= Auth('head')->user()->id;
         $datas		= $request->input("data", []);
+		
         try {
             DB::beginTransaction();
 
@@ -499,7 +512,7 @@ class prd02Controller extends Controller
 				$color		= $data['color'];
 				$size		= $data['size'];
 				$goods_opt	= $data['goods_opt'];
-
+				$size_kind  = $data['size_kind'];
 				$prd_cd		= $prd_cd1 . $color . $size;
 
 				DB::table('product_code')
@@ -507,6 +520,7 @@ class prd02Controller extends Controller
 						'prd_cd'	=> $prd_cd,
 						'prd_cd_p'	=> $prd_cd1,
 						'goods_no'	=> $goods_no,
+						'style_no'  => $style_no,
 						'goods_opt'	=> $goods_opt,
 						'brand'		=> $brand,
 						'year'		=> $year,
@@ -517,6 +531,7 @@ class prd02Controller extends Controller
 						'seq'		=> $seq,
 						'color'		=> $color,
 						'size'		=> $size,
+						'size_kind'	=> $size_kind,
 						'rt'		=> now(),
 						'ut'		=> now(),
 						'admin_id'	=> $admin_id

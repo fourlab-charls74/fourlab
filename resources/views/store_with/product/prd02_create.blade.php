@@ -250,7 +250,7 @@
 	const columns = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
             checkboxSelection: function(params) {
-                return params.data.match_yn == '';
+                return params.data.match_yn == 'N';
             },
 		},
 		{field:"goods_no",	headerName: "온라인코드",		width:72},
@@ -268,6 +268,7 @@
 		{field:"opt",		headerName:"품목",			hide:true},
 		{field:"item",		headerName:"하위품목",		hide:true},
 		{field:"seq",		headerName:"순서차수",		hide:true},
+		{field:"size_kind",		headerName:"사이즈구분", },
 		{field: "", headerName:"", width:"auto"},
 	];
 
