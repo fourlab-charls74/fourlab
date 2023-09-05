@@ -537,6 +537,7 @@ class PosController extends Controller
             #####################################################
             $order_opts = [];
             $ord_amt = 0; // 총 주문금액
+			$ord_qty = 0; // 총 주문수량
             $a_ord_amt = array_reduce($cart, function($a, $c) { return $a + ($c['ori_price'] ?? 0 * $c['qty'] ?? 0); }, 0); // 대략적 주문금액
             $dc_amt = 0; // 총 할인금액 (판매유형에 따른 할인)
             $coupon_amt = 0; // 총 쿠폰할인금액
@@ -721,6 +722,7 @@ class PosController extends Controller
                 array_push($order_opts, $order_opt);
 
                 $ord_amt += $item_ord_amt;
+                $ord_qty += $qty * 1;
                 $coupon_amt += $item_coupon_amt;
                 $dc_amt += $item_dc_amt;
                 $recv_amt += $item_recv_amt;
@@ -877,6 +879,26 @@ class PosController extends Controller
                     $point->Admin($point_amt, "PAY", "ORDER", "사용");
                 }
             }
+
+			#####################################################
+			#   회원 주문합계 데이터 업데이트
+			#####################################################
+
+			if ($member_id !== '') {
+				$values = [
+					'ord_cnt' => DB::raw('ord_cnt + ' . $ord_qty),
+					'ord_amt' => DB::raw('ord_amt + ' . $ord_amt),
+					'ord_date' => $ord_date,
+					'ut' => now()
+				];
+				$member_stat = DB::table('member_stat')->where('user_id', $member_id);
+				if ($member_stat->first() === null) {
+					$values['rt'] = now();
+					DB::table('member_stat')->insert($values);
+				} else {
+					$member_stat->update($values);
+				}
+			}
 
             DB::commit();
             $code = '200';

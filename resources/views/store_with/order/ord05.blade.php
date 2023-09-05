@@ -168,7 +168,7 @@
 									<select name="ord_field" class="form-control form-control-sm">
 										<option value="o.ord_date">주문일자</option>
 										<option value="o.ord_no">주문번호</option>
-										<option value="om.user_nm">주문자명</option>
+										<option value="o.user_nm">주문자명</option>
 									</select>
 								</div>
 								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -210,7 +210,7 @@
 			<div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
 				<h5 class="m-0 mb-3 mb-sm-0">주문상품내역<span id="select_ord_no" class="text-danger fs-14 ml-2"></span></h5>
 				<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-					<p class="text-secondary mr-2">* <span class="text-danger font-weight-bold">당월주문건</span>이고 <span class="text-danger font-weight-bold">정산대기</span> 상태인 주문건만 수정 가능합니다.</p>
+					<p class="text-secondary mr-2">* <span class="text-danger font-weight-bold">당월주문건</span>이고 <span class="text-danger font-weight-bold">정산대기</span> 상태인 <span class="text-danger font-weight-bold">교환/환불 처리되지 않은</span> 주문건만 수정 가능합니다.</p>
 				    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="return saveProductRow();"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
 					<button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="return resetProductRow();"><i class="fas fa-redo fa-sm mr-1"></i> 초기화</button> 
 				</div>
@@ -229,10 +229,10 @@
 	const columns = [
 		// {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellClass: 'hd-grid-code'},
 		{field: "ord_date", headerName: "판매일자", pinned: 'left', width: 80, cellClass: 'hd-grid-code'},
-		{field: "ord_state_nm", headerName: "판매구분", pinned: 'left', width: 60, cellClass: 'hd-grid-code',
-			cellStyle: (params) => ({ color: params.value === '판매' ? '#4444ff' : '#ff4444' }),
+		{field: "ord_state_nm", headerName: "판매구분", pinned: 'left', width: 55, cellClass: 'hd-grid-code',
+			cellStyle: (params) => ({ color: params.data.ord_state == 30 ? '#4444ff' : '#ff4444' }),
 		},
-		{field: "ord_no", headerName: "주문번호", pinned: 'left', width: 140, cellStyle: { color: "blue" },
+		{field: "ord_no", headerName: "주문번호", pinned: 'left', width: 150, cellStyle: StyleOrdNo, cellClass: 'hd-grid-code',
 			cellRenderer: (params) => `<a href="javascript:setDetailOrder('${params.value}', '${params.data.ord_state}');">${params.value}</a>`,
 		},
 		{field: "store_nm", headerName: "주문매장", width: 90},
@@ -249,6 +249,7 @@
 	const product_columns = [
 		// {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellClass: 'hd-grid-code'},
 		{field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType'},
+		{field: "clm_state_nm", headerName: "클레임상태", pinned: 'left', width: 65, cellStyle: StyleClmState},
 		{field: "prd_cd", headerName: "바코드", pinned: 'left', width: 120, cellClass: 'hd-grid-code'},
 		{field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellClass: 'hd-grid-code'},
 		{field: "style_no", headerName: "스타일넘버", pinned: 'left', width: 70, cellClass: 'hd-grid-code'},
@@ -310,6 +311,7 @@
 	const pApp2 = new App('', { gridId: "#div-gd-product", height: 275 });
 	let gx;
 	let gx2;
+	let cur_ord_no = '', cur_ord_state = '';
 
 	$(document).ready(function() {
 		pApp.ResizeGrid(275);
@@ -335,7 +337,7 @@
 	
 	// 해당 주문상품정보 수정가능여부 판단
 	function getEditableYn(params) {
-		return params.data.is_editable === 'Y';
+		return params.data.is_editable === 'Y' && params.data.ord_state == 30 && params.data.clm_state < 40;
 	}
 	
 	// 주문상품내역 조회
@@ -351,6 +353,7 @@
 				node.data.ori_sale_price = node.data.sale_price;
 				node.data.ori_dc_rate = node.data.dc_rate;
 				node.data.ori_ord_amt = node.data.ord_amt;
+				node.data.ori_recv_amt = node.data.recv_amt;
 				node.data.ori_sale_kind_amt = node.data.sale_kind_amt;
 				node.data.ori_sale_kind_cd = node.data.sale_kind_cd;
 				node.data.ori_sale_kind_nm = node.data.sale_kind_nm;
@@ -360,6 +363,8 @@
 				nodes.push(node);
 			});
 			gx2.gridOptions.api.redrawRows({ rowNodes: nodes });
+			cur_ord_no = ord_no;
+			cur_ord_state = ord_state;
 		});
 	}
 	
@@ -392,6 +397,7 @@
 			node.data.sale_price = node.data.ori_sale_price;
 			node.data.dc_rate = node.data.ori_dc_rate;
 			node.data.ord_amt = node.data.ori_ord_amt;
+			node.data.recv_amt = node.data.ori_recv_amt;
 			node.data.sale_kind_amt = node.data.ori_sale_kind_amt;
 			node.data.sale_kind_cd = node.data.ori_sale_kind_cd;
 			node.data.sale_kind_nm = node.data.ori_sale_kind_nm;
@@ -405,18 +411,19 @@
 	
 	// 주문상품내역 저장
 	function saveProductRow() {
-		return alert("해당기능은 개발중입니다.");
 		if (!confirm("해당 주문건의 상품정보를 저장하시겠습니까?\n(저장된 정보는 되돌릴 수 없습니다.)")) return;
 
-		let rows = gx2.getRows().map(row => ({ 
-			ord_opt_no: row.ord_opt_no,
-			qty: row.qty || 0, 
-			sale_kind_cd: row.sale_kind_cd || '',
-			ori_sale_price: row.ori_sale_price || 0,
-			sale_price: row.sale_price || 0, 
-			pr_code_cd: row.pr_code_cd || '', 
-			memo: row.memo || ''  
-		}));
+		let rows = gx2.getRows()
+			.filter(row => row.is_editable === 'Y' && row.ord_state == 30 && row.clm_state < 40)
+			.map(row => ({ 
+				ord_opt_no: row.ord_opt_no,
+				qty: row.qty || 0, 
+				sale_kind_cd: row.sale_kind_cd || '',
+				ori_sale_price: row.ori_sale_price || 0,
+				sale_price: row.sale_price || 0, 
+				pr_code_cd: row.pr_code_cd || '', 
+				memo: row.memo || ''  
+			}));
 
 		$.ajax({
 			async: true,
@@ -425,7 +432,10 @@
 			url: "/store/order/ord05/update",
 			data: { data: rows },
 			success: function (res) {
-				if (res.code == '200') alert("저장되었습니다.");
+				if (res.code == '200') {
+					alert("저장되었습니다.");
+					setDetailOrder(cur_ord_no, cur_ord_state);
+				}
 				else alert(res.msg);
 			},
 			error: function(e) {

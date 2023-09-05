@@ -75,7 +75,8 @@ class ord05Controller extends Controller
 		if ($store_channel_kind != '') $where .= " and s.store_channel_kind = '" . Lib::quote($store_channel_kind) . "'";
 		if ($store_cd != '') $where .= " and s.store_cd = '" . Lib::quote($store_cd) . "'";
 		
-		$orderby = sprintf("order by %s %s, ow.ord_state desc", $ord_field, $ord);
+		$orderby = sprintf("order by %s %s, o.ord_no desc, ow.ord_state desc", $ord_field, $ord);
+		// $orderby = sprintf("order by %s %s", $ord_field, $ord);
 		$page_size = $limit;
 		$startno = ($page - 1) * $page_size;
 		$limit = sprintf("limit %s, %s", $startno, $page_size);
@@ -86,14 +87,15 @@ class ord05Controller extends Controller
 			    , a.store_cd
 			    , a.store_nm
 				, concat(a.user_nm, '(', a.user_id, ')') as user_nm
-				, if(a.ord_state = 5, a.qty, a.qty * -1) as qty
+				, if(a.ord_state = 30, a.qty, a.qty * -1) as qty
+			    -- , a.qty
 				, a.ord_amt
 				, a.recv_amt
 				, a.dlv_amt
 				, pt.code_val as pay_type
 				, ot.code_val as ord_type
 			    , a.ord_state
-				, if(a.ord_state = 5, '판매', '환불') as ord_state_nm
+				, if(a.ord_state = 30, '판매', if(a.ord_state = 60, '교환', '환불')) as ord_state_nm
 			from (
 				select o.ord_date
 					, o.ord_no
@@ -102,6 +104,7 @@ class ord05Controller extends Controller
 					, o.user_id
 					, o.user_nm
 				    , sum(oo.qty) as qty
+				 	-- , (select sum(qty) from order_opt where ord_no = o.ord_no) as qty
 					, o.ord_amt
 					, o.recv_amt
 					, o.dlv_amt
@@ -110,7 +113,7 @@ class ord05Controller extends Controller
 				from order_mst o
 					inner join store s on s.store_cd = o.store_cd
 					inner join order_opt oo on oo.ord_no = o.ord_no
-                    inner join order_opt_wonga ow on ow.ord_opt_no = oo.ord_opt_no and ow.ord_state in (5,60,61)
+                    inner join order_opt_wonga ow on ow.ord_opt_no = oo.ord_opt_no and ow.ord_state in (30,60,61)
 				where 1=1 $where
 				group by o.ord_no, ow.ord_state
 				$orderby
@@ -133,11 +136,17 @@ class ord05Controller extends Controller
 					from order_mst o
 						inner join store s on s.store_cd = o.store_cd
 						inner join order_opt oo on oo.ord_no = o.ord_no
-						inner join order_opt_wonga ow on ow.ord_opt_no = oo.ord_opt_no and ow.ord_state in (5,60,61)
+						inner join order_opt_wonga ow on ow.ord_opt_no = oo.ord_opt_no and ow.ord_state in (30,60,61)
 					where 1=1 $where
 					group by o.ord_no, ow.ord_state
 				) a
 			";
+			// $sql = "
+			// 	select count(*) as total
+			// 	from order_mst o
+			// 		inner join store s on s.store_cd = o.store_cd
+			// 	where 1=1 $where
+			// ";
 			$total = DB::selectOne($sql)->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
@@ -157,7 +166,7 @@ class ord05Controller extends Controller
 	/** 특정주문의 상품내역조회 */
 	public function searchOrderOpts($ord_no, Request $request)
 	{
-		$ord_state = $request->input('ord_state', 5);
+		$ord_state = $request->input('ord_state', 30);
 		$first_of_the_current_month = now()->firstOfMonth()->format('Y-m-d 00:00:00');
 
 		$sql = "
@@ -176,26 +185,32 @@ class ord05Controller extends Controller
 					, pr_code.code_val as pr_code_nm
 					, memo.memo
 					, if(st.amt_kind = 'per', round(a.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt
+					, clm.code_val as clm_state_nm
 				from (
 					select o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng
 						, pc.prd_cd_p, pc.color, pc.size, o.goods_opt as opt_val, o.sale_kind as sale_kind_cd, o.pr_code as pr_code_cd
-						, if(w.ord_state = 5, o.qty, o.qty * -1) as qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.store_cd
-					    , if(w.ord_state = 5, o.recv_amt, o.recv_amt * -1) as recv_amt
+						, if(w.ord_state = 30, o.qty, o.qty * -1) as qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.store_cd
+					    , if(w.ord_state = 30, o.recv_amt, o.recv_amt * -1) as recv_amt, w.ord_state, o.clm_state
 					    , (o.point_amt * -1) as point_amt, (o.coupon_amt * -1) as coupon_amt
+					 	-- , o.qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.recv_amt, o.store_cd, o.clm_state
 						, round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
 					from order_opt o
 					    inner join order_opt_wonga w on w.ord_opt_no = o.ord_opt_no and w.ord_state = :ord_state
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 						inner join goods g on g.goods_no = o.goods_no
-					where o.ord_no = :ord_no
+					where o.ord_no = :ord_no 
+						-- and if(o.clm_state >= 60, :ord_state2 >= 60, 1=1)
 				) a
 					left outer join sale_type st on st.sale_kind = a.sale_kind_cd and st.use_yn = 'Y'
 					left outer join code pr_code on (pr_code.code_id = a.pr_code_cd and pr_code.code_kind_cd = 'PR_CODE')
 					left outer join order_opt_memo memo on memo.ord_opt_no = a.ord_opt_no
+					left outer join code clm on clm.code_kind_cd = 'G_CLM_STATE' and clm.code_id = a.clm_state
 				order by a.ord_opt_no desc
 			) b
 		";
 		$rows = DB::select($sql, [ 'ord_no' => $ord_no, 'first_date' => $first_of_the_current_month, 'ord_state' => $ord_state ]);
+		// $rows = DB::select($sql, [ 'ord_no' => $ord_no, 'first_date' => $first_of_the_current_month, 'ord_state' => $ord_state, 'ord_state2' => $ord_state ]);
+		// $rows = DB::select($sql, [ 'ord_no' => $ord_no, 'first_date' => $first_of_the_current_month ]);
 
 		$pr_codes = [];
 		if (count($rows) > 0) {
@@ -230,14 +245,17 @@ class ord05Controller extends Controller
 		$code = 200;
 		$msg = "";
 		$orders = $request->input('data', []);
+		$admin_id = Auth('head')->user()->id;
+		$admin_nm = Auth('head')->user()->name;
 
 		try {
 			DB::beginTransaction();
 			
 			$ord_no = '';
-			$mst_ord_amt = 0;
-			$mst_recv_amt = 0;
-			$mst_dc_amt = 0;
+			$total_diff_qty = 0;
+			$total_diff_ord_amt = 0;
+			$total_diff_dc_amt = 0;
+			$total_diff_recv_amt = 0;
 			
 			foreach ($orders as $order) {
 				$ord_opt_no = $order['ord_opt_no'];
@@ -250,30 +268,65 @@ class ord05Controller extends Controller
 				
 				$prev_order_opt = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
 				if ($prev_order_opt === null) throw new Exception("해당 주문건이 존재하지 않습니다.");
-				$ord_no = $prev_order_opt->ord_no;
+				if ($ord_no === '') $ord_no = $prev_order_opt->ord_no;
+
+				$diff_qty = $prev_order_opt->qty - ($new_qty * 1);
+				$total_diff_qty += $diff_qty;
+				$total_diff_ord_amt += $diff_qty * $prev_order_opt->price;
 
 				// 01. order_opt
 				$values = [];
-				if ($prev_order_opt->qty != $new_qty) {
-					$values['qty'] = $new_qty;
-					$mst_ord_amt += $prev_order_opt->price * $new_qty;
-				}
+				if ($diff_qty !== 0) $values['qty'] = $new_qty;
 				if ($prev_order_opt->sale_kind != $new_sale_kind_cd) $values['sale_kind'] = $new_sale_kind_cd;
 				if ($prev_order_opt->pr_code != $new_pr_code_cd) $values['pr_code'] = $new_pr_code_cd;
-				if ($prev_order_opt->qty != $new_qty || $prev_sale_price != $new_sale_price) {
+				if ($diff_qty !== 0 || $prev_sale_price != $new_sale_price) {
 					$values['dc_amt'] = ($prev_order_opt->price - $new_sale_price) * $new_qty;
 					$values['recv_amt'] = ($prev_order_opt->price * $new_qty) - $prev_order_opt->coupon_amt - $prev_order_opt->point_amt - $values['dc_amt'];
-					$mst_dc_amt += $values['dc_amt'];
-					$mst_recv_amt += $values['recv_amt'];
+					$total_diff_dc_amt += $values['dc_amt'] - ($prev_order_opt->dc_amt ?? 0);
+					$total_diff_recv_amt += $values['recv_amt'] - ($prev_order_opt->recv_amt ?? 0);
 				}
 				if (count($values) > 0) {
 					DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update($values);
+					
+					$log_values = [
+						'ord_no' => $ord_no,
+						'ord_opt_no' => $ord_opt_no,
+						'goods_no' => $prev_order_opt->goods_no,
+						'prd_cd' => $prev_order_opt->prd_cd,
+						'store_cd' => $prev_order_opt->store_cd,
+						'ord_update_date' => date('Ymd'),
+						'rt' => now(),
+						'admin_id' => $admin_id,
+						'admin_nm' => $admin_nm,
+					];
+
+					// 01-1. store_order_log (이전 내용 주문내역 수정이력)
+					DB::table('store_order_log')->insert(array_merge($log_values, [
+						'qty' => $prev_order_opt->qty * -1,
+						'point_amt' => $prev_order_opt->point_amt * -1,
+						'coupon_amt' => $prev_order_opt->coupon_amt * -1,
+						'dc_amt' => ($prev_order_opt->dc_amt ?? 0) * -1,
+						'recv_amt' => ($prev_order_opt->recv_amt ?? 0) * -1,
+						'sale_kind' => $prev_order_opt->sale_kind,
+						'pr_code' => $prev_order_opt->pr_code,
+					]));
+
+					// 01-2. store_order_log (업데이트된 내용 주문내역 수정이력)
+					DB::table('store_order_log')->insert(array_merge($log_values, [
+						'qty' => $new_qty,
+						'point_amt' => $prev_order_opt->point_amt,
+						'coupon_amt' => $prev_order_opt->coupon_amt,
+						'dc_amt' => $values['dc_amt'] ?? $prev_order_opt->dc_amt,
+						'recv_amt' => $values['recv_amt'] ?? $prev_order_opt->recv_amt,
+						'sale_kind' => $new_sale_kind_cd,
+						'pr_code' => $new_pr_code_cd,
+					]));
 				}
 				
 				// 02. order_opt_wonga
 				$values = [];
-				if ($prev_order_opt->qty != $new_qty) $values['qty'] = $new_qty;
-				if ($prev_order_opt->qty != $new_qty || $prev_sale_price != $new_sale_price) {
+				if ($diff_qty !== 0) $values['qty'] = $new_qty;
+				if ($diff_qty !== 0 || $prev_sale_price != $new_sale_price) {
 					$values['dc_apply_amt'] = ($prev_order_opt->price - $new_sale_price) * $new_qty;
 					$values['recv_amt'] = ($prev_order_opt->price * $new_qty) - $prev_order_opt->coupon_amt - $prev_order_opt->point_amt - $values['dc_apply_amt'];
 				}
@@ -281,30 +334,109 @@ class ord05Controller extends Controller
 					DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update($values);
 				}
 				
+				// 03. order_opt_memo
+				$where = [
+					'ord_opt_no' => $ord_opt_no,
+					'ord_no' => $ord_no,
+				];
+				$values = [
+					'memo' => $new_memo,
+					'ut' => now(),
+					'admin_id' => $admin_id,
+					'admin_nm' => $admin_nm,
+				];
+				DB::table('order_opt_memo')->updateOrInsert($where, $values);
 
-				// payment
-				// order_opt_memo
-				// point_list
-				// member
-				// product_stock
-				// product_stock_store
-				// product_stock_storage
-				// product_stock_hst
+				// 출고완료된 (주문으로 인해 재고처리가 완료된) 주문건의 재고 재처리
+				$is_store_order = $prev_order_opt->store_cd != '';
+				if ($prev_order_opt->ord_state >= 10 && $prev_order_opt->prd_cd != '') {
+					// 04. product_stock
+					if ($diff_qty !== 0) {
+						$values = [];
+						$values['qty'] = DB::raw('qty + ' . $diff_qty); // 전체재고 업데이트
+						if (!$is_store_order) $values['wqty'] = DB::raw('wqty + ' . $diff_qty); // 창고재고 업데이트
+						$values['out_qty'] = DB::raw('out_qty - ' . $diff_qty);
+						$values['qty_wonga'] = DB::raw('qty * wonga');
+						$values['ut'] = now();
+						DB::table('product_stock')->where('prd_cd', $prev_order_opt->prd_cd)->update($values);
+					}
+					
+					// 05. product_stock_store / product_stock_storage
+					if ($diff_qty !== 0) {
+						$values = [];
+						if ($prev_order_opt->ord_state >= 30) $values['qty'] = DB::raw('qty + ' . $diff_qty);
+						$values['wqty'] = DB::raw('wqty + ' . $diff_qty);
+						$values['ut'] = now();
+
+						if ($is_store_order) {
+							DB::table('product_stock_store')->where('store_cd', $prev_order_opt->store_cd)->where('prd_cd', $prev_order_opt->prd_cd)->update($values);
+						} else {
+							DB::table('product_stock_storage')->where('storage_cd', DB::raw("(select storage_cd from storage where default_yn = 'Y')"))->where('prd_cd', $prev_order_opt->prd_cd)->update($values);
+						}
+					}
+					
+					// 06. product_stock_hst
+					if ($diff_qty !== 0) {
+						$values = [
+							'goods_no' => $prev_order_opt->goods_no,
+							'prd_cd' => $prev_order_opt->prd_cd,
+							'goods_opt' => $prev_order_opt->goods_opt,
+							'price' => $prev_order_opt->price,
+							'type' => 2, // 재고분류 : 주문
+							'wonga' => $prev_order_opt->wonga,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => $ord_opt_no,
+							'comment' => '주문내역수정',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						];
+
+						if ($is_store_order) {
+							$values['location_cd'] = $prev_order_opt->store_cd;
+							$values['location_type'] = 'STORE';
+						} else {
+							$values['location_cd'] = DB::raw("(select storage_cd from storage where default_yn = 'Y')");
+							$values['location_type'] = 'STORAGE';
+						}
+
+						// 이전로그 마이너스처리
+						$values['qty'] = $prev_order_opt->qty;
+						DB::table('product_stock_hst')->insert($values);
+
+						// new 로그 등록
+						$values['qty'] = $new_qty * -1;
+						DB::table('product_stock_hst')->insert($values);
+					}
+				}
 			}
 
-			// order_mst
-			$values = [];
-			if ($prev_order_opt->qty != $new_qty || $prev_sale_price != $new_sale_price) {
-				$values['dc_amt'] = ($prev_order_opt->price - $new_sale_price) * $new_qty;
-				$values['recv_amt'] = ($prev_order_opt->price * $new_qty) - $prev_order_opt->coupon_amt - $prev_order_opt->point_amt - $values['dc_amt'];
-			}
-			// $test = DB::table('order_mst')->where('ord_no', $prev_order_opt->ord_no)->first();
-			// DB::table('order_mst')->where('ord_no', $prev_order_opt->ord_no)->update($values);
+			if ($total_diff_qty !== 0 || $total_diff_recv_amt !== 0) {
+				// 07. order_mst
+				$values = [];
+				$values['ord_amt'] = DB::raw('ord_amt - ' . $total_diff_ord_amt);
+				$values['dc_amt'] = DB::raw('dc_amt + ' . $total_diff_dc_amt);
+				$values['recv_amt'] = DB::raw('recv_amt + ' . $total_diff_recv_amt);
+				$values['upd_date'] = now();
+				DB::table('order_mst')->where('ord_no', $ord_no)->update($values);
 
-			// ord_amt
-			// recv_amt
-			// dc_amt
-			// upd_date
+				// 08. payment
+				$values = [];
+				$values['dc_amt'] = DB::raw('dc_amt + ' . $total_diff_dc_amt);
+				$values['pay_amt'] = DB::raw('pay_amt + ' . $total_diff_recv_amt);
+				$values['upd_dm'] = date('YmdHis');
+				DB::table('payment')->where('ord_no', $ord_no)->update($values);
+
+				// 09. member_stat
+				$user_id = DB::table('order_mst')->where('ord_no', $ord_no)->value('user_id');
+				if ($user_id != '') {
+					$values = [];
+					$values['ord_cnt'] = DB::raw('ord_cnt - ' . $total_diff_qty);
+					$values['ord_amt'] = DB::raw('ord_amt - ' . $total_diff_ord_amt);
+					$values['ut'] = now();
+					DB::table('member_stat')->where('user_id', $user_id)->update($values);
+				}
+			}
 
 			DB::commit();
 			$msg = "주문내역이 정상적으로 저장되었습니다.";

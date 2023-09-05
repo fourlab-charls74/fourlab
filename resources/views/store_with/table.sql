@@ -1276,6 +1276,32 @@ CREATE TABLE `store_conf` (
 	KEY `idx_type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='매장관리 환경설정';
 
+-- 주문내역 수정이력
+CREATE TABLE `store_order_log` (
+	`idx` INT(11) NOT NULL AUTO_INCREMENT COMMENT '일련번호',
+	`ord_no` VARCHAR(20) NOT NULL COMMENT '주문번호',
+	`ord_opt_no` INT(11) NOT NULL COMMENT '주문옵션번호',
+	`goods_no` INT(11) DEFAULT '0' COMMENT '상품번호',
+	`prd_cd` VARCHAR(50) DEFAULT NULL COMMENT '주문상품코드',
+	`store_cd` varchar(30) DEFAULT NULL COMMENT '주문매장코드',
+	`qty` INT(11) DEFAULT NULL COMMENT '수량',
+	`point_amt` INT(11) DEFAULT NULL COMMENT '사용적립금',
+	`coupon_amt` INT(11) DEFAULT NULL COMMENT '사용쿠폰금액',
+	`dc_amt` INT(11) DEFAULT NULL COMMENT '할인금액',
+	`recv_amt` INT(11) DEFAULT NULL COMMENT '실결제금액',
+	`sale_kind` VARCHAR(30) DEFAULT NULL COMMENT '판매구분 - sale_type',
+	`pr_code` VARCHAR(30) DEFAULT NULL COMMENT '판매처수수료 - code : PR_CODE',
+	`ord_update_date` VARCHAR(8) DEFAULT NULL COMMENT '주문내역수정일시',
+	`rt` DATETIME DEFAULT NULL COMMENT '등록일시',
+	`admin_id` VARCHAR(50) DEFAULT NULL COMMENT '처리자아이디',
+	`admin_nm` VARCHAR(50) DEFAULT NULL COMMENT '처리자명',
+	PRIMARY KEY (`idx`),
+	KEY `ord_no` (`ord_no`),
+	KEY `ord_opt_no` (`ord_opt_no`),
+	KEY `prd_cd` (`prd_cd`),
+	KEY `ord_update_date` (`ord_update_date`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='주문내역 수정이력';
+
 --
 -- 기존 테이블 컬럼 추가 시작
 --
