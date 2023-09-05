@@ -152,6 +152,7 @@ class sal02Controller extends Controller
 						${sum}
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
+						inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
 					where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
 					group by m.store_cd
 				) a on s.store_cd = a.store_cd
@@ -160,7 +161,7 @@ class sal02Controller extends Controller
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
             where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null or a.recv_amt <> '0') $where2
 		";
-
+			
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
 
 		$sql = "
