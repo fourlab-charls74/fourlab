@@ -98,15 +98,15 @@
 								<div class="form-inline form-radio-box">
 									<div class="custom-control custom-radio">
 										<input type="radio" name="list_type" id="qty" value="qty" class="custom-control-input" />
-										<label class="custom-control-label" for="qty">주문수량</label>
+										<label class="custom-control-label" for="qty">판매수량</label>
 									</div>
-									<div class="custom-control custom-radio">
+									<!-- <div class="custom-control custom-radio">
 										<input type="radio" name="list_type" id="ord_amt" value="ord_amt" class="custom-control-input" />
 										<label class="custom-control-label" for="ord_amt">주문금액</label>
-									</div>
+									</div> -->
 									<div class="custom-control custom-radio">
 										<input type="radio" name="list_type" id="recv_amt" value="recv_amt" class="custom-control-input" checked />
-										<label class="custom-control-label" for="recv_amt">결제금액</label>
+										<label class="custom-control-label" for="recv_amt">판매금액</label>
 									</div>
 								</div>
 							</div>
