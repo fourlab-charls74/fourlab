@@ -114,7 +114,7 @@
 					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/바코드</label>
+							<label for="style_no">스타일넘버/온라인코드</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
@@ -131,13 +131,31 @@
 					</div>
 				</div>
 				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">바코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
+							<label for="prd_cd">상품검색조건</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
                         </div>
 					</div>
 					<div class="col-lg-4">

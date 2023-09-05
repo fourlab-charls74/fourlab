@@ -78,6 +78,7 @@ class sal09Controller extends Controller
 		$list_type = $request->input('list_type', "qty");
 		$store_cd = $request->input('store_cd', "");
 		$goods_no = $request->input('goods_no', "");
+		$prd_cd = $request->input('prd_cd', "");
 		$goods_nm = $request->input('goods_nm', "");
 		$brand_cd = $request->input('brand_cd', "");
 		$style_no = $request->input('style_no', "");
@@ -86,6 +87,9 @@ class sal09Controller extends Controller
 		$sell_type = $request->input('sell_type');
 		$store_channel	= $request->input("store_channel", '');
 		$store_channel_kind	= $request->input("store_channel_kind", '');
+		
+		//
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
 		// 검색조건 필터링
 		$where = "";
@@ -106,6 +110,30 @@ class sal09Controller extends Controller
 			}
 		}
 
+
+		// 상품코드
+		if ($prd_cd != '') {
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+			$prd_cds = explode(',', $prd_cd);
+			if (count($prd_cds) > 1) {
+				$prd_cds_str = "";
+				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
+				for($i =0; $i < count($prd_cds); $i++) {
+					$prd_cds_str.= "'".$prd_cds[$i]."'";
+
+					if($i !== count($prd_cds) -1) {
+						$prd_cds_str .= ",";
+					}
+				}
+				$where .= " and o.prd_cd in ($prd_cds_str) ";
+			} else {
+				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+			}
+		}
+		
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
 
@@ -118,6 +146,18 @@ class sal09Controller extends Controller
 		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+		
 		// 전달 받은 리스트 타입에 따라 합계 쿼리 구분
 		$sum = "";
 		$sum_true = "";
@@ -152,15 +192,15 @@ class sal09Controller extends Controller
 			$comma = ($i == $months_count) ? "" : ",";
 
 			// sdate 기준 저번 달 주문금액, 결제금액 가져오기
-			$sum_month_prev .= "
-				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.price*o.qty,0)) as prev_ord_amt_${Ym}, 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.recv_amt,0)) as prev_recv_amt_${Ym},
+			$sum_month_prev .= " 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', $sum_true,0)) as prev_ord_amt_${Ym}, 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', $sum_true,0)) as prev_recv_amt_${Ym},
 			";
 
 			// 기간 이내의 주문금액, 결제금액 가져오기
 			$sum_month_others .= " 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', o.price*o.qty,0)) as ord_amt_${Ym}, 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', o.recv_amt,0)) as recv_amt_${Ym}${comma}
+				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', $sum_true,0)) as ord_amt_${Ym}, 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', $sum_true,0)) as recv_amt_${Ym}${comma}
 			";
 
 			// 기간 이내의 매장목표 가져오기
@@ -173,8 +213,8 @@ class sal09Controller extends Controller
 			$month = substr($Ym, 4, 2);
 			$last_Ym = $last_year . $month;
 			$sum_last_year .= " 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', o.price*o.qty,0)) as last_ord_amt_${Ym}, 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', o.recv_amt,0)) as last_recv_amt_${Ym}${comma}
+				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', $sum_true,0)) as last_ord_amt_${Ym}, 
+				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', $sum_true,0)) as last_recv_amt_${Ym}${comma}
 			";
 
 			// 12월 넘어가는 경우 01월로 변경, 아닌 경우 한달을 더해줌
@@ -223,7 +263,9 @@ class sal09Controller extends Controller
 					${sum_month_others}
 				from order_mst m 
 					inner join order_opt o on m.ord_no = o.ord_no 
-				where m.ord_date >= '${prev_sdate}' and m.ord_date <= '${next_edate}' and m.store_cd <> ''
+				    inner join goods g on o.goods_no = g.goods_no 
+					left outer join product_code pc on pc.prd_cd = o.prd_cd
+				where m.ord_date >= '${prev_sdate}' and m.ord_date <= '${next_edate}' and m.store_cd <> '' $where
 				group by m.store_cd
 			) a on s.store_cd = a.store_cd
 			left outer join 
