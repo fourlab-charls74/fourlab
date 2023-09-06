@@ -1343,26 +1343,6 @@ class ord01Controller extends Controller
             }
         }
 
-		#####################################################
-		#   회원 주문합계 데이터 업데이트
-		#####################################################
-
-		if ($user_id !== '') {
-			$values = [
-				'ord_cnt' => DB::raw('ord_cnt + ' . $ord_qty),
-				'ord_amt' => DB::raw('ord_amt + ' . $ord_amt),
-				'ord_date' => $ord_date,
-				'ut' => now()
-			];
-			$member_stat = DB::table('member_stat')->where('user_id', $user_id);
-			if ($member_stat->first() === null) {
-				$values['rt'] = now();
-				DB::table('member_stat')->insert($values);
-			} else {
-				$member_stat->update($values);
-			}
-		}
-
         return ['code' => $code, 'ord_no' => $ord_no];
     }
 

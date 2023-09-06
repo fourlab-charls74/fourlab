@@ -427,15 +427,15 @@ class ord05Controller extends Controller
 				$values['upd_dm'] = date('YmdHis');
 				DB::table('payment')->where('ord_no', $ord_no)->update($values);
 
-				// 09. member_stat
-				$user_id = DB::table('order_mst')->where('ord_no', $ord_no)->value('user_id');
-				if ($user_id != '') {
-					$values = [];
-					$values['ord_cnt'] = DB::raw('ord_cnt - ' . $total_diff_qty);
-					$values['ord_amt'] = DB::raw('ord_amt - ' . $total_diff_ord_amt);
-					$values['ut'] = now();
-					DB::table('member_stat')->where('user_id', $user_id)->update($values);
-				}
+				// 09. member_stat -> 프로시저로 설정되어 따로 처리가 필요없음
+				// $user_id = DB::table('order_mst')->where('ord_no', $ord_no)->value('user_id');
+				// if ($user_id != '') {
+				// 	$values = [];
+				// 	$values['ord_cnt'] = DB::raw('ord_cnt - ' . $total_diff_qty);
+				// 	$values['ord_amt'] = DB::raw('ord_amt - ' . $total_diff_ord_amt);
+				// 	$values['ut'] = now();
+				// 	DB::table('member_stat')->where('user_id', $user_id)->update($values);
+				// }
 			}
 
 			DB::commit();
