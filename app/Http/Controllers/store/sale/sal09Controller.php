@@ -21,33 +21,6 @@ class sal09Controller extends Controller
         $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
 		$edate = $request->input('edate', now()->format("Y-m"));
 
-		// 매장구분
-		$sql = " 
-			select *
-			from code
-			where 
-				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
-		";
-		$store_types = DB::select($sql);
-
-		// 행사구분 - 추후 논의사항
-		$sql = "
-			select *
-			from __tmp_code
-			where
-				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
-		";
-		$event_cds = DB::select($sql);
-
-		// 판매유형 - 추후 논의사항
-		$sql = "
-			select *
-			from code	
-			where
-				code_kind_cd = 'SALE_KIND' and use_yn = 'Y' order by code_seq
-		";
-		$sell_types	= DB::select($sql);
-
 		$months = [];
 		$sd = Carbon::parse($sdate);
         while($sd <= Carbon::parse($edate)){
@@ -59,9 +32,7 @@ class sal09Controller extends Controller
 			'sdate' 		=> $sdate,
             'edate' 		=> $edate,
 			'months'		=> $months,
-			'store_types'	=> $store_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
+			'sell_types'	=> SLib::getCodes('SALE_KIND'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];

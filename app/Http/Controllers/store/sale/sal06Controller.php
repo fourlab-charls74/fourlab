@@ -17,26 +17,12 @@ class sal06Controller extends Controller
 		$sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
 		$edate = Carbon::now()->format("Y-m-d");
 
-		$store_types = SLib::getStoreTypes();
 		$sale_kind_id = $request->input('sale_kind_id', "");
-
-		$sale_kinds = SLib::getUsedSaleKinds();
-
-		// 행사구분 - 추후 논의사항
-		$sql = "
-			select *
-			from __tmp_code
-			where
-				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
-		";
-		$event_cds = DB::select($sql);
 
 		$values = [
             'sdate'         => $sdate,
 			'edate'         => $edate,
-			'store_types'	=> $store_types,
-			'event_cds'		=> $event_cds,
-			'sale_kinds' 	=> $sale_kinds,
+			'sale_kinds' 	=> SLib::getCodes('SALE_KIND'),
 			'items'			=> SLib::getItems(), // 품목
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),

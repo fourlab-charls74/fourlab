@@ -17,38 +17,9 @@ class sal02Controller extends Controller
 		$sdate = Carbon::now()->startOfMonth()->format("Y-m"); // 이번 달 기준
 		//$sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
-		// 매장구분
-		$sql = " 
-			select *
-			from code
-			where 
-				code_kind_cd = 'store_type' and use_yn = 'Y' order by code_seq 
-		";
-		$store_types = DB::select($sql);
-
-		// 행사구분 - 추후 논의사항
-		$sql = "
-			select *
-			from __tmp_code
-			where
-				code_kind_cd = 'event_cd' and use_yn = 'Y' order by code_seq
-		";
-		$event_cds = DB::select($sql);
-
-		// 판매유형 - 추후 논의사항
-		$sql = "
-			select *
-			from code
-			where
-				code_kind_cd = 'SALE_KIND' and use_yn = 'Y' order by code_seq
-		";
-		$sell_types	= DB::select($sql);
-
 		$values = [
             'sdate'         => $sdate,
-			'store_types'	=> $store_types,
-			'event_cds'		=> $event_cds,
-			'sell_types'	=> $sell_types,
+			'sell_types'	=> SLib::getCodes('SALE_KIND'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
