@@ -132,8 +132,6 @@ class sal25Controller extends Controller
 			if( $ord_type_where != "" ){
 				$inner_where2	.= " and ( $ord_type_where ) ";
 			}
-		} else {
-			$inner_where2	.= " and ( o.ord_type < 0 ) ";
 		}
 
 		// 결제조건

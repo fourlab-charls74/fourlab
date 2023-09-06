@@ -173,8 +173,6 @@ class sal24Controller extends Controller
 			if( $ord_type_where != "" ){
 				$inner_where2	.= " and ( $ord_type_where ) ";
 			}
-		} else {
-			$inner_where2	.= " and ( o.ord_type < 0 ) ";
 		}
 		
 		// 결제조건
@@ -303,7 +301,7 @@ class sal24Controller extends Controller
 				group by a.ord_state_date
 			) p on a.sale_date = p.ord_state_date
 		";
-
+			
 		$rows = DB::select($sql);
 
 		$result = collect($rows)->map(function ($row) {

@@ -148,7 +148,7 @@
                             </div>
                         </div>
                     </div>
-					<div class="col-lg-4 inner-td">
+<!--					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="formrow-inputState">브랜드</label>
 							<div class="form-inline inline_btn_box">
@@ -156,7 +156,7 @@
 								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 26px;"></i></a>
 							</div>
 						</div>
-					</div>
+					</div>-->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputZip">상품명</label>
@@ -165,9 +165,24 @@
                             </div>
                         </div>
                     </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="formrow-email-input">매출시점</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" @if($ord_state == '10' or $ord_state == '') checked @endif>
+									<label class="custom-control-label" for="ord_state10" value="10">출고요청</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" @if($ord_state == '30') checked @endif>
+									<label class="custom-control-label" for="ord_state30" value="30">출고완료</label>
+								</div>
+							</div>
+						</div>
+					</div>
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
+<!--                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputCity">품목</label>
                             <div class="flax_box">
@@ -179,9 +194,9 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     
-					<div class="col-lg-4 inner-td">
+<!--					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="name">온라인판매처</label>
 							<div class="flax_box">
@@ -193,25 +208,10 @@
 								</select>
 							</div>
 						</div>
-					</div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="formrow-email-input">매출시점</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state10" value="10" class="custom-control-input" @if($ord_state == '10' or $ord_state == '') checked @endif>
-                                    <label class="custom-control-label" for="ord_state10" value="10">출고요청</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="ord_state" id="ord_state30" value="30" class="custom-control-input" @if($ord_state == '30') checked @endif>
-                                    <label class="custom-control-label" for="ord_state30" value="30">출고완료</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+					</div>-->
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
+<!--                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>주문구분</label>
                             <div class="form-inline form-check-box">
@@ -253,8 +253,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
+                    </div>-->
+<!--                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
@@ -288,7 +288,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>

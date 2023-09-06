@@ -65,15 +65,14 @@
 			                </div>
 		                </div>
 	                </div>
-	                <div class="col-lg-4 inner-td">
-		                <div class="form-group">
-			                <label for="formrow-inputState">브랜드</label>
-			                <div class="form-inline inline_btn_box">
-				                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-				                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16" style="line-height: 26px;"></i></a>
-			                </div>
-		                </div>
-	                </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="formrow-inputZip">상품명</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm'>
+							</div>
+						</div>
+					</div>
                 </div>
                 <div class="row">
 	                <div class="col-lg-4 inner-td" hidden>
@@ -138,15 +137,15 @@
 	                </div>
                 </div>
 	            <div class="row">
-		            <div class="col-lg-4 inner-td">
+<!--		            <div class="col-lg-4 inner-td">
 			            <div class="form-group">
 				            <label for="formrow-inputZip">상품명</label>
 				            <div class="flax_box">
 					            <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" id='goods_nm' name='goods_nm'>
 				            </div>
 			            </div>
-		            </div>
-		            <div class="col-lg-4 inner-td" hidden>
+		            </div>-->
+<!--		            <div class="col-lg-4 inner-td" hidden>
 			            <div class="form-group">
 				            <label for="formrow-inputCity">품목</label>
 				            <div class="flax_box">
@@ -158,8 +157,8 @@
 					            </select>
 				            </div>
 			            </div>
-		            </div>
-                    <div class="col-lg-4 inner-td">
+		            </div>-->
+<!--                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>주문구분</label>
                             <div class="form-inline form-check-box">
@@ -201,8 +200,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
+                    </div>-->
+<!--                    <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="formrow-inputState">결제방법</label>
                             <div class="form-inline form-check-box">
@@ -236,7 +235,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>
