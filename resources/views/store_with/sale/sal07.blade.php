@@ -88,15 +88,19 @@
 					</div>
 				</div>
                 <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-							<label>바코드</label>
-							<div class="flex_box">
-                                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">바코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
 						</div>
-                    </div>
+					</div>
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="prd_cd">상품검색조건</label>
@@ -111,7 +115,15 @@
 							</div>
 						</div>
 					</div>
-                    <div class="col-lg-4">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="formrow-email-input">상품명</label>
+							<div class="flex_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
+							</div>
+						</div>
+					</div>
+<!--                    <div class="col-lg-4">
                         <div class="form-group">
                             <label for="style_no">스타일넘버/바코드</label>
                             <div class="form-inline">
@@ -127,17 +139,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="goods_nm">상품명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
@@ -177,7 +181,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="search-area-ext d-none row">
+<!--                <div class="search-area-ext d-none row">
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="name">업체</label>
@@ -222,7 +226,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>-->
                 <div class="search-area-ext d-none row">
  
                 </div>
