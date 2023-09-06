@@ -90,40 +90,7 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="prd_cd">바코드</label>
-                            <div class="flex_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='prd_cd' value=''>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">상품검색조건</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="style_no">스타일넘버/바코드</label>
+                            <label for="style_no">스타일넘버/온라인코드</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box">
                                     <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no" value="{{ $style_no }}">
@@ -138,14 +105,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="goods_nm">상품명</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="formrow-email-input">상품명</label>
+							<div class="flex_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="goods_nm_eng">상품명(영문)</label>
@@ -155,8 +122,83 @@
                         </div>
                     </div>
                 </div>
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">바코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">상품검색조건</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">순위/구분</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:24%;">
+									<select name="limit" class="form-control form-control-sm">
+										<option value="10">10위</option>
+										<option value="20">20위</option>
+										<option value="30">30위</option>
+										<option value="50">50위</option>
+										<option value="100">100위</option>
+										<option value="200">200위</option>
+										<option value="300">300위</option>
+										<option value="400">400위</option>
+										<option value="500">500위</option>
+										<option value="1000">1000위</option>
+									</select>
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input_box" style="width:45%;">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value='ord_qty'>수량</option>
+										{{--<option value='sale_rate'>기간판매율</option>--}}
+										<option value='ord_amt'>기간판매금액</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+									<div class="btn-group" role="group">
+										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
+										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
+									</div>
+									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+									<input type="radio" name="ord" id="sort_asc" value="asc">
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--                    <div class="col-lg-4">
+											<div class="form-group">
+												<label for="brand_cd">브랜드</label>
+												<div class="form-inline inline_btn_box">
+													<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+													<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+												</div>
+											</div>
+										</div>-->
+				</div>
                 <div class="row">
-                    <div class="col-lg-4">
+<!--                    <div class="col-lg-4">
                         <div class="form-group">
                             <label for="item">품목</label>
                             <div class="flax_box">
@@ -168,7 +210,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                         <label for="formrow-email-input">조회 기준</label>
@@ -201,43 +243,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="">순위/구분</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box" style="width:24%;">
-                                    <select name="limit" class="form-control form-control-sm">
-                                        <option value="10">10위</option>
-                                        <option value="20">20위</option>
-                                        <option value="30">30위</option>
-                                        <option value="50">50위</option>
-                                        <option value="100">100위</option>
-                                        <option value="200">200위</option>
-                                        <option value="300">300위</option>
-                                        <option value="400">400위</option>
-                                        <option value="500">500위</option>
-                                        <option value="1000">1000위</option>
-                                    </select>
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input_box" style="width:45%;">
-                                    <select name="ord_field" class="form-control form-control-sm">
-                                        <option value='ord_qty'>수량</option>
-                                        {{--<option value='sale_rate'>기간판매율</option>--}}
-                                        <option value='ord_amt'>기간판매금액</option>
-                                    </select>
-                                </div>
-                                <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-                                    <div class="btn-group" role="group">
-                                        <label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="내림차순"><i class="bx bx-sort-down"></i></label>
-                                        <label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="오름차순"><i class="bx bx-sort-up"></i></label>
-                                    </div>
-                                    <input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-                                    <input type="radio" name="ord" id="sort_asc" value="asc">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
 			</div>
 		</div>
@@ -300,7 +306,7 @@
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", type: 'HeadGoodsNameType', cellStyle: {"line-height": "30px"}, width: 150},
+		{field: "goods_nm", headerName: "상품명", type: 'StoreGoodsNameType', cellStyle: {"line-height": "30px"}, width: 150},
 		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150, cellStyle: {"line-height": "30px"}},
 		{field: "prd_cd_p", headerName: "바코드", cellStyle: StyleLineHeight, width: 90},
 		{field: "color", headerName: "컬러", cellStyle: StyleLineHeight, width: 55},

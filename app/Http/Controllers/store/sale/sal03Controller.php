@@ -127,6 +127,19 @@ class sal03Controller extends Controller
 		if ($goods_nos != "") {
 			$goods_no = $goods_nos;
 		}
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc2.$opt in ($opt_join) ";
+			}
+		}
+		
 		$goods_no = preg_replace("/\s/", ",", $goods_no);
 		$goods_no = preg_replace("/\t/", ",", $goods_no);
 		$goods_no = preg_replace("/\n/", ",", $goods_no);
@@ -210,18 +223,6 @@ class sal03Controller extends Controller
 			$group_column = "goods_no";
 
 			$max_column = "max(oo.prd_cd) as prd_cd";
-		} 
-
-		// 상품옵션 범위검색
-		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
-		parse_str($prd_cd_range_text, $prd_cd_range);
-		foreach ($range_opts as $opt) {
-			$rows = $prd_cd_range[$opt] ?? [];
-			if (count($rows) > 0) {
-				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
-				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$in_where .= " and pc2.$opt in ($opt_join) ";
-			}
 		}
 
 		if ($goods_no != "") {
@@ -341,7 +342,7 @@ class sal03Controller extends Controller
 							$partial_stock_wqty
 						from order_opt oo
 							left outer join store s on oo.store_cd = s.store_cd
-							inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
+							left outer join product_code pc2 on oo.prd_cd = pc2.prd_cd 
 							, ( SELECT @rank := 0, @last := 0, @real_rank := 1 ) AS c
 						where
 							oo.ord_state = '30'
@@ -564,7 +565,7 @@ class sal03Controller extends Controller
 								$partial_stock_wqty
 							from order_opt oo
 								left outer join store s on oo.store_cd = s.store_cd
-								inner join product_code pc2 on oo.prd_cd = pc2.prd_cd 
+								left outer join product_code pc2 on oo.prd_cd = pc2.prd_cd 
 								, ( SELECT @rank := 0, @last := 0, @real_rank := 1 ) AS c
 							where
 								oo.ord_state = '30'
