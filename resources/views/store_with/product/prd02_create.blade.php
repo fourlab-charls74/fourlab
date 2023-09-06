@@ -34,13 +34,12 @@
 			<div class="card shadow">
                 <div class="card-header mb-0">
                     <ul class="nav nav-tabs" role="tablist">
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" id="tab-nav-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="list" aria-selected="false">맵핑</button>
+						</li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="tab-nav-1" data-toggle="tab" href="#tab-1" role="tab" aria-controls="send" aria-selected="false">코드 생성 및 맵핑</button>
                         </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tab-nav-2" data-toggle="tab" href="#tab-2" role="tab" aria-controls="list" aria-selected="false">맵핑</button>
-                        </li>
-                       
                     </ul>
                 </div>
 				<br>
@@ -241,11 +240,6 @@
 					</div>
 				</div>
 			</div>
-		</form>
-	</div>
-</div>
-
-
 <script>
 	const columns = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
@@ -489,7 +483,7 @@
 			$('#tab-nav-2').trigger("click");
 			$('#goods_no2').val(goods_no);
 		} else {
-			$('#tab-nav-1').trigger("click");  
+			$('#tab-nav-2').trigger("click");  
 		}
     }); 
 

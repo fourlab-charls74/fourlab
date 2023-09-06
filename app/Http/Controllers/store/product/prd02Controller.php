@@ -444,19 +444,31 @@ class prd02Controller extends Controller
 			select 
 				distinct(a.prd_cd),e.goods_nm as prd_nm, e.style_no, a.goods_no, 
 				concat(c.code_val, '^',d.code_val2) as goods_opt, 
-				a.color, a.size, '' as seq , 'N' as is_product
+				a.color, '' as seq , 'N' as is_product
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = a.size_kind
+					   and s.size_cd = a.size
+					   and use_yn = 'Y'
+				),'') as size
 			from product_code a
 				left outer join goods_summary b on a.goods_no = b.goods_no
 				inner join code c on a.color = c.code_id
 				inner join code d on a.size = d.code_id
 				inner join goods e on e.goods_no = a.goods_no 
-			where c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH' and a.goods_no = '$goods_no'
+			where c.code_kind_cd = 'PRD_CD_COLOR' and a.goods_no = '$goods_no'
 
 			union all
 
 			select
 				p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, concat(c.code_val, '^',d.code_val2) as goods_opt
-				, pc.color, pc.size, pc.seq, 'Y' as is_product
+				, pc.color, pc.seq, 'Y' as is_product
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
 			from product p
 				inner join product_code pc on pc.prd_cd = p.prd_cd
 				inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
