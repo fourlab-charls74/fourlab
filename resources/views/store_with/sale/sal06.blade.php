@@ -31,9 +31,9 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disabled>
+										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
 										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disabled>
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>
@@ -79,14 +79,19 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-                            <label for="store_cd">매장명</label>
-							<div class="form-inline inline_btn_box">
-								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							<label for="prd_cd">상품검색조건</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
 							</div>
-                        </div>
+						</div>
 					</div>
 				</div>
 				<div class="row">
@@ -121,7 +126,20 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">바코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+<!--					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="style_no">스타일넘버/바코드</label>
 							<div class="form-inline">
@@ -137,7 +155,7 @@
 								</div>
 							</div>
                         </div>
-					</div>
+					</div>-->
 					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">품목</label>
@@ -177,6 +195,17 @@
 							</div>
 						</div>
 					</div> --}}
+				</div>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="store_cd">매장명</label>
+							<div class="form-inline inline_btn_box">
+								<select id="store_cd" name="store_cd" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

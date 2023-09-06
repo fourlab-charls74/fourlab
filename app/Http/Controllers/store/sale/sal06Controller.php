@@ -59,12 +59,12 @@ class sal06Controller extends Controller
 		$goods_nm_eng = $request->input("goods_nm_eng", "");
         $brand_cd = $request->input("brand_cd");
 		$style_no = $request->input('style_no', "");
-
+		$prd_cd = $request->input('prd_cd', "");
 		$sale_yn = $request->input('sale_yn','Y');
 		$sale_kind = $request->input('sale_kind', "");
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
-
+		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
 		/**
 		 * 검색조건 필터링
@@ -97,7 +97,41 @@ class sal06Controller extends Controller
 		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
-	
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+
+		// 상품코드
+		if ($prd_cd != '') {
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+			$prd_cds = explode(',', $prd_cd);
+			if (count($prd_cds) > 1) {
+				$prd_cds_str = "";
+				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
+				for($i =0; $i < count($prd_cds); $i++) {
+					$prd_cds_str.= "'".$prd_cds[$i]."'";
+
+					if($i !== count($prd_cds) -1) {
+						$prd_cds_str .= ",";
+					}
+				}
+				$where .= " and o.prd_cd in ($prd_cds_str) ";
+			} else {
+				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+			}
+		}
+		
 		// 판매유형별 쿼리 추가
 		$sale_kinds = SLib::getUsedSaleKinds();
 		$sale_kinds_query = "";
@@ -128,6 +162,7 @@ class sal06Controller extends Controller
 					inner join order_opt o on m.ord_no = o.ord_no 
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join goods g on o.goods_no = g.goods_no
+					left outer join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join store s on m.store_cd = s.store_cd
 					left outer join brand b on g.brand = b.brand
 					left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
