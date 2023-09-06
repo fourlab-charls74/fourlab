@@ -88,7 +88,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4 inner-td">
+<!--                        <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="formrow-inputCity">품목</label>
                                 <div class="flax_box">
@@ -100,8 +100,8 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
+                        </div>-->
+<!--                        <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="formrow-inputState">브랜드</label>
                                 <div class="form-inline inline_btn_box">
@@ -109,7 +109,21 @@
                                     <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="prd_cd">상품검색조건</label>
+								<div class="form-inline">
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="formrow-inputZip">상품명</label>
@@ -118,6 +132,49 @@
                                 </div>
                             </div>
                         </div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="formrow-inputState">주문구분</label>
+								<div class="form-inline form-check-box">
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[0]" id="ord_type_5" value="5" checked>
+										<label class="custom-control-label" for="ord_type_5">교환</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[1]" id="ord_type_4" value="4" checked>
+										<label class="custom-control-label" for="ord_type_4">예약</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[2]" id="ord_type_3" value="3" checked>
+										<label class="custom-control-label" for="ord_type_3">특별주문</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[3]" id="ord_type_13" value="13" checked>
+										<label class="custom-control-label" for="ord_type_13">도매주문</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[4]" id="ord_type_12" value="12" checked>
+										<label class="custom-control-label" for="ord_type_12">서비스</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[5]" id="ord_type_17" value="17" checked>
+										<label class="custom-control-label" for="ord_type_17">기관납품</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[6]" id="ord_type_14" value="14" checked>
+										<label class="custom-control-label" for="ord_type_14">수기</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[7]" id="ord_type_15" value="15" checked>
+										<label class="custom-control-label" for="ord_type_15">정상</label>
+									</div>
+									<div class="custom-control custom-checkbox">
+										<input type="checkbox" class="custom-control-input ord_type" name="ord_type[8]" id="ord_type_16" value="16" checked>
+										<label class="custom-control-label" for="ord_type_16">오픈마켓</label>
+									</div>
+								</div>
+							</div>
+						</div>
                     </div>
 					<div class="row">
                         <div class="col-lg-4 inner-td">
@@ -163,7 +220,7 @@
                         </div>
                         
 					</div>
-                    <div class="row">
+<!--                    <div class="row">
                         <div class="col-lg-8 inner-td">
 							<div class="form-group">
 								<label for="formrow-inputState">주문구분</label>
@@ -207,7 +264,7 @@
 								</div>
 							</div>
 						</div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
             <div class="resul_btn_wrap mb-3">
@@ -272,7 +329,7 @@
                     let store_cd = $('.select2-store').val();
                     let sell_type = $('#sell_type').val();
                     let pr_code = $('#pr_code').val();
-                    return '<a href="/store/sale/sal24?store_cd='+ params.data.store_cd + '&sdate='+ s_date + '&edate='+ e_date + '&ord_type=' + s_ord_type + '&ord_state='+ s_ord_state + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_goods_nm + '&sell_type=' + sell_type + '&pr_code=' + pr_code + '" target="new">'+ params.value+'</a>';
+                    return '<a href="/store/sale/sal24?store_cd='+ params.data.store_cd + '&sdate='+ s_date + '&edate='+ e_date + '&item='+ s_item + '&brand='+ s_brand + '&goods_nm='+ s_goods_nm + '&sell_type=' + sell_type + '&pr_code=' + pr_code + '" target="new">'+ params.value+'</a>';
                 }
             
             },

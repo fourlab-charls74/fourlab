@@ -17,7 +17,7 @@ class sal24Controller extends Controller
     // 일별 매출 통계
     public function index(Request $req) 
 	{
-		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(0, 'month')->format("Ym")) . '01');
+		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(0, 'month')->format("Ym"). '01'));
 		$sdate = $date->format('Y-m-d');
 		$edate = $date->format('Y-m-t');
 
@@ -29,20 +29,29 @@ class sal24Controller extends Controller
 		$item 				= $req->input('item', '');
 		$brand_cd 			= $req->input('brand_cd', '');
 		$goods_nm 			= $req->input('goods_nm', '');
-		$store_cd 			= $req->input('store_no', '');
+		$store_cd 			= $req->input('store_cd', '');
 		$on_off_yn 			= $req->input('on_off_yn', '');
 		$store_channel 		= $req->input('store_channel', '');
 		$store_channel_kind = $req->input('store_channel_kind', '');
 		$prd_cd_range_text 	= $req->query("prd_cd_range", '');
 		$prd_cd_range_nm 	= $req->query("prd_cd_range_nm", '');
-		parse_str($prd_cd_range_text, $prd_cd_range);
 		
-		$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
-		$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());
-		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
-		$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		$pr_code_ids = [];
+		$sell_type_ids = [];
+		
+		if(!empty($pr_code)) {
+			$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
+			$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());	
+		}
+		
+		if(!empty($sell_type)) {
+			$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
+			$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());	
+		}
+		
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
-		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		//$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
 
 		$values = [
 			'sdate' 		=> $sdate,
@@ -58,7 +67,7 @@ class sal24Controller extends Controller
 			'ord_type'		=> $ord_type,
 			'ord_state'		=> $ord_state,
 			'item'			=> $item,
-			'brand'			=> $brand,
+			//'brand'			=> $brand,
 			'goods_nm'		=> $goods_nm,
 			'on_off_yn'		=> $on_off_yn,
 			'pr_code_ids'	=> $pr_code_ids,
@@ -264,7 +273,7 @@ class sal24Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
 						inner join store store on store.store_cd = o.store_cd
-						inner join product_code pc on pc.prd_cd = o.prd_cd
+						left outer join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)

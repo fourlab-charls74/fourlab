@@ -212,7 +212,7 @@ class sal25Controller extends Controller
 					from order_opt o
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
-						inner join product_code pc on pc.prd_cd = o.prd_cd
+						left outer join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= concat('$sdate', '01') 
 						and w.ord_state_date <= concat('$edate', '31') 

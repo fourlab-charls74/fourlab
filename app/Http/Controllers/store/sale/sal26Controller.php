@@ -50,7 +50,7 @@ class sal26Controller extends Controller
         $store_cd   = $request->input('store_no');
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
-
+		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
 		$inner_where	= "";
 		$inner_where2	= "";	//매출
@@ -127,6 +127,16 @@ class sal26Controller extends Controller
             $where	.= ")";
         }
 
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
 
         $sql = /** @lang text */
             "
@@ -198,6 +208,7 @@ class sal26Controller extends Controller
 							inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 							inner join company c on w.com_id = c.com_id
                             inner join store s on s.store_cd = o.store_cd
+                            left outer join product_code pc on pc.prd_cd = o.prd_cd
 						where
 							w.ord_state_date >= '$sdate' 
 							and w.ord_state_date <= '$edate' and w.ord_state in ($ord_state,60,61)
