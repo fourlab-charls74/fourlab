@@ -228,6 +228,7 @@ CREATE TABLE `product_stock_release` (
 	`exp_dlv_day` VARCHAR(8) DEFAULT NULL COMMENT '출고예정일자',
 	`rel_order` VARCHAR(30) DEFAULT NULL COMMENT '출고차수 - 출고예정일자 + "-" + 출고구분 + code : REL_ORDER (01 - 10)',
 	`req_comment` VARCHAR(255) DEFAULT NULL COMMENT '요청메모 (매장메모)',
+	`storage_comment` VARCHAR(255) DEFAULT NULL COMMENT '창고출고메모',
 	`comment` VARCHAR(255) DEFAULT NULL COMMENT '출고메모(거부사유 등)',
 	`req_id` VARCHAR(50) DEFAULT NULL COMMENT '요청자',
 	`req_rt` DATETIME DEFAULT NULL COMMENT '요청일시',

@@ -221,6 +221,7 @@ class stk10Controller extends Controller
                 psr.prc_rt as last_release_date,
                 psr.rel_order, 
                 psr.req_comment,
+                psr.storage_comment,
                 psr.comment,
                 psr.req_id,
                 (select name from mgr_user where id = psr.req_id) as req_nm, 
@@ -237,7 +238,7 @@ class stk10Controller extends Controller
             from product_stock_release psr
                 inner join product_code pc on pc.prd_cd = psr.prd_cd
                 inner join product_stock_storage pss on pss.prd_cd = psr.prd_cd and pss.storage_cd = psr.storage_cd
-                inner join product_stock_store pss2 on pss2.prd_cd = psr.prd_cd and pss2.store_cd = psr.store_cd
+                left outer join product_stock_store pss2 on pss2.prd_cd = psr.prd_cd and pss2.store_cd = psr.store_cd
                 left outer join goods g on g.goods_no = psr.goods_no
                 left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
                 left outer join brand on brand.brand = g.brand

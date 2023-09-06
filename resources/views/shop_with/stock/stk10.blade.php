@@ -398,6 +398,7 @@
             }
         },
         {field: "req_comment", headerName: "매장메모", width: 300},
+        {field: "storage_comment", headerName: "창고메모", width: 300},
         {field: "comment", headerName: "본사메모", width: 300},
         {field: "req_nm", headerName: "요청자", cellStyle: {"text-align": "center"}},
         {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},

@@ -600,6 +600,15 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('stk18/search','stk18Controller@search');
         Route::post('stk18/request-release', 'stk18Controller@request_release');
         Route::get('stk18/chg-store-type', 'stk18Controller@change_store_type');
+		
+		// 상품출고관리 - 창고출고
+		Route::get('stk19','stk19Controller@index');
+		Route::get('stk19/search','stk19Controller@search');
+		Route::post('stk19/request-release', 'stk19Controller@request_release');
+		Route::get('stk19/batch','stk19Controller@batch_show'); // 엑셀 업로드
+		Route::post('stk19/batch-import','stk19Controller@import_excel');
+		Route::post('stk19/batch-getgoods','stk19Controller@get_goods');
+		Route::post('stk19/request-release-excel', 'stk19Controller@request_release_excel');
 
         // 매장RT
         Route::get('stk20','stk20Controller@index');

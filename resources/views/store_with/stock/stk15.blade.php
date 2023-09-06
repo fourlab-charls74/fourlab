@@ -212,7 +212,7 @@
                     </div>
                     <div class="d-flex align-items-center mb-1 mb-lg-0">
                         <span class="mr-1">매장명</span>
-                        <div class="form-inline inline_btn_box" style="width:250px;">
+                        <div class="form-inline inline_btn_box" style="width:250px;font-size: 13px;">
                             <input type='hidden' id="store_nm" name="store_nm">
                             <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
                             <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
