@@ -91,7 +91,20 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-lg-4 mb-2 mb-lg-0">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">바코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+<!--					<div class="col-lg-4 mb-2 mb-lg-0">
 						<div class="form-group">
 							<label for="brand_cd">브랜드</label>
 							<div class="form-inline inline_btn_box">
@@ -99,7 +112,7 @@
 								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
-					</div>
+					</div>-->
 					<div class="col-lg-4">
 						<div class="form-group">
                             <label for="formrow-email-input">상품명</label>
@@ -120,15 +133,6 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>바코드</label>
-							<div class="flex_box">
-								<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
-								<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
 							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input-box w-100">
@@ -141,7 +145,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
+<!--					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">품목</label>
                             <div class="flax_box">
@@ -153,7 +157,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
 				</div>
 			</div>
 		</div>

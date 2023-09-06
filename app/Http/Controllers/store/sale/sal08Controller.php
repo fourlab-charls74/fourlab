@@ -64,22 +64,36 @@ class sal08Controller extends Controller
 		if ($goods_nm != '') $where2 .= " and g.goods_nm like '%$goods_nm%' ";
 		if ($goods_nm_eng != '') $where2 .= " and g.goods_nm_eng like '%$goods_nm_eng%' ";
 		if ($prd_cd != '') {
-			$prd_cd = explode(',', $prd_cd);
-			$where .= " and (1<>1 ";
-			foreach ($prd_cd as $cd) {
-				$where .= " or o.prd_cd like '$cd%' ";
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+			$prd_cds = explode(',', $prd_cd);
+			if (count($prd_cds) > 1) {
+				$prd_cds_str = "";
+				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
+				for($i =0; $i < count($prd_cds); $i++) {
+					$prd_cds_str.= "'".$prd_cds[$i]."'";
+
+					if($i !== count($prd_cds) -1) {
+						$prd_cds_str .= ",";
+					}
+				}
+				$where .= " and o.prd_cd in ($prd_cds_str) ";
+			} else {
+				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
 			}
-			$where .= " ) ";
 		}
+
 		// 상품옵션 범위검색
-		parse_str($prd_cd_range_text, $prd_cd_range);
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
 		foreach ($range_opts as $opt) {
 			$rows = $prd_cd_range[$opt] ?? [];
 			if (count($rows) > 0) {
 				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
 				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$where .= " and pc.`$opt in` ($opt_join) ";
+				$where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
 		if ($item != '') $where2 .= " and g.opt_kind_cd = '$item' ";

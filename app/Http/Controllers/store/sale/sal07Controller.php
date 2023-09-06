@@ -80,13 +80,26 @@ class sal07Controller extends Controller
 		if ($store_channel != "") $where .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
-		if ( $prd_cd != "" ) {
-			$prd_cd = explode(',', $prd_cd);
-			$where .= " and (1!=1";
-			foreach($prd_cd as $cd) {
-				$where .= " or o.prd_cd like '" . Lib::quote($cd) . "%' ";
+		if ($prd_cd != '') {
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+			$prd_cds = explode(',', $prd_cd);
+			if (count($prd_cds) > 1) {
+				$prd_cds_str = "";
+				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
+				for($i =0; $i < count($prd_cds); $i++) {
+					$prd_cds_str.= "'".$prd_cds[$i]."'";
+
+					if($i !== count($prd_cds) -1) {
+						$prd_cds_str .= ",";
+					}
+				}
+				$where .= " and o.prd_cd in ($prd_cds_str) ";
+			} else {
+				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
 			}
-			$where .= ")";
 		}
 
 		// 상품옵션 범위검색
