@@ -173,7 +173,6 @@ class sal01Controller extends Controller
 	public function show()
 	{
 		$values = [];
-		$sale_kinds = SLib::getCodes("SALE_KIND");
 		return view( Config::get('shop.store.view') . '/sale/sal01_show',$values);
 	}
 
@@ -490,12 +489,13 @@ class sal01Controller extends Controller
 				$percent = $matches[0];
 				$sale_kind = "쿠폰판매(${percent})";
 			}
-		} else if (preg_match("/할인/", $sale_kind)) {
-			if (preg_match("/\d+%/i", $sale_kind, $matches)) {
-				$percent = $matches[0];
-				$sale_kind = "${percent}할인";
-			}
-		}
+		} 
+		// else if (preg_match("/할인/", $sale_kind)) {
+		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+		// 		$percent = $matches[0];
+		// 		$sale_kind = "${percent}할인";
+		// 	}
+		// }
 		// else if (preg_match("/프로모션/", $sale_kind)) {
 		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
 		// 		$percent = $matches[0];
@@ -504,7 +504,7 @@ class sal01Controller extends Controller
 		// }
 
 		$sale_kind_id = "99"; // 조건에 없는 경우 기타로 처리
-		$sale_kinds = SLib::getCodes("SALE_KIND")->all();
+		$sale_kinds = SLib::getCodes("XMD_SALE_KIND")->all();
 		for ($i=0; $i<count($sale_kinds); $i++) {
 
 			$item = $sale_kinds[$i];
@@ -866,12 +866,13 @@ class sal01Controller extends Controller
 				$percent = $matches[0];
 				$sale_kind = "쿠폰판매(${percent})";
 			}
-		} else if (preg_match("/할인/", $sale_kind)) {
-			if (preg_match("/\d+%/i", $sale_kind, $matches)) {
-				$percent = $matches[0];
-				$sale_kind = "${percent}할인";
-			}
-		}
+		} 
+		// else if (preg_match("/할인/", $sale_kind)) {
+		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+		// 		$percent = $matches[0];
+		// 		$sale_kind = "${percent}할인";
+		// 	}
+		// }
 		// else if (preg_match("/프로모션/", $sale_kind)) {
 		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
 		// 		$percent = $matches[0];
@@ -880,7 +881,7 @@ class sal01Controller extends Controller
 		// }
 
 		$sale_kind_id = "99"; // 조건에 없는 경우 기타로 처리
-		$sale_kinds = SLib::getCodes("SALE_KIND")->all();
+		$sale_kinds = SLib::getCodes("XMD_SALE_KIND")->all();
 		for ($i=0; $i<count($sale_kinds); $i++) {
 
 			$item = $sale_kinds[$i];

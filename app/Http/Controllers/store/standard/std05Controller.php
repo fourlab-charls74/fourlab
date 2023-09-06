@@ -18,15 +18,11 @@ class std05Controller extends Controller
 {
 	public function index()
 	{
-		$values = [
-			"sale_kinds" => SLib::getCodes("SALE_KIND"),
-		];
-		return view(Config::get('shop.store.view') . '/standard/std05', $values);
+		return view(Config::get('shop.store.view') . '/standard/std05');
 	}
 
 	public function search(Request $request)
 	{
-		$sale_kind = $request->input("sale_kind");
 		$sale_type_nm = $request->input("sale_type_nm");
 		$sale_apply = $request->input("sale_apply");
 		$use_yn = $request->input("use_yn");
@@ -36,8 +32,6 @@ class std05Controller extends Controller
 		$code = 200;
 		$where = "";
 
-		if($sale_kind != null) 
-			$where .= " and s.sale_kind = '$sale_kind'";
 		if($sale_type_nm != null) 
 			$where .= " and s.sale_type_nm like '%$sale_type_nm%'";
 		if($sale_apply != null) 
@@ -48,20 +42,25 @@ class std05Controller extends Controller
 		$sql = "
 			select 
 				s.sale_kind
-				, c.code_val as sale_kind_nm
 				, s.idx as sale_type_cd
 				, s.sale_type_nm
 				, s.sale_apply
-				, s.amt_kind, s.sale_amt
-				, s.sale_per, s.use_yn
-				, (select count(ss.idx) from sale_type_store ss where ss.sale_type_cd = s.idx and ss.use_yn = 'Y' and ss.sdate <= '$date' and ss.edate >= '$date') as store_cnt
+				, s.amt_kind
+			    , s.sale_amt
+				, s.sale_per
+			    , s.use_yn
+				, (
+					select count(ss.idx)
+					from sale_type_store ss
+					where ss.sale_type_cd = s.idx and ss.use_yn = 'Y' and ss.sdate <= :date1 and ss.edate >= :date2
+				) as store_cnt
 			from sale_type s
 				inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
 			where 1=1 $where
-			order by sale_kind
+			order by c.code_seq asc
 		";
 
-		$rows = DB::select($sql);
+		$rows = DB::select($sql, [ 'date1' => $date, 'date2' => $date ]);
 
 		return response()->json([
 			"code" => $code,
@@ -79,39 +78,23 @@ class std05Controller extends Controller
 	{
 		$sale_type = "";
 
-		if($sale_type_cd != '') {
+		if ($sale_type_cd != '') {
 			$sql = "
-				select s.idx, s.sale_kind, c.code_val as sale_kind_nm, c.code_id as sale_type_cd, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn
+				select s.idx as sale_type_cd
+				     , s.sale_kind, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn
 				from sale_type s
-					inner join code c
-						on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
+					inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
 				where s.idx = :sale_type_cd
 			";
-
-			$sale_type = DB::selectOne($sql, ["sale_type_cd" => $sale_type_cd]);
+			$sale_type = DB::selectOne($sql, [ "sale_type_cd" => $sale_type_cd ]);
 		}
-
-		$sql = "
-			select c.code_id, c.code_val, c.code_id in(select sale_kind from sale_type) as use_yn
-			from code c
-				left outer join sale_type s
-					on s.sale_kind = c.code_id
-			where
-				c.code_kind_cd = 'SALE_KIND' 
-				and c.use_yn = 'Y' 
-			order by c.code_id
-		";
-		$sale_kinds = DB::select($sql);
 			
 		$values = [
 			"cmd" => $sale_type_cd == '' ? "add" : "update",
 			"sale_type" => $sale_type,
-			"sale_kinds" => $sale_kinds,
-			"store_types" => SLib::getCodes("STORE_TYPE"),
 			'store_channel'	=> SLib::getStoreChannel(),
-			'store_kind'	=> SLib::getStoreKind(),
+			'store_kind' => SLib::getStoreKind(),
 		];
-
 		return view(Config::get('shop.store.view') . '/standard/std05_show', $values);
 	}
 
@@ -120,23 +103,22 @@ class std05Controller extends Controller
 	{
 		$store_channel	= $request->input("store_channel","");
 		$store_channel_kind	= $request->input("store_channel_kind","");
-		$code = 200;
 
+		$code = 200;
 		$where = "";
-		// if($store_type_cd != '') $where .= " and store.store_type = '$store_type_cd'";
+
 		if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "' and store.use_yn = 'Y'";
 		if ($store_channel_kind != "") $where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "' and store.use_yn = 'Y'";
 		
 		$sql = "
 			select store.store_cd, store.store_nm, s.use_yn, s.sdate, s.edate
 			from store
-				left outer join sale_type_store s
-					on store.store_cd = s.store_cd and s.sale_type_cd = :sale_type_cd
+				left outer join sale_type_store s on store.store_cd = s.store_cd and s.sale_type_cd = :sale_type_cd
 			where 1=1 $where
 			order by store.store_cd
 		";
 
-		$rows = DB::select($sql, ["sale_type_cd" => $sale_type_cd]);
+		$rows = DB::select($sql, [ "sale_type_cd" => $sale_type_cd ]);
 
 		return response()->json([
 			"code" => $code,
@@ -206,7 +188,9 @@ class std05Controller extends Controller
 
 			$cnt = DB::table('code')
 					->where('code_kind_cd', '=', 'SALE_KIND')
-					->count();
+					->selectRaw('max(code_seq) as cnt')
+					->value('cnt');
+			$cnt = ($cnt ?? 0) + 1;
 
 			DB::table('code')
 				->insert([
@@ -214,7 +198,7 @@ class std05Controller extends Controller
 					'code_id' => $r['sale_kind'],
 					'code_val' => $r['sale_type_nm'],
 					'use_yn' => $r['use_yn'],
-					'code_seq' => $cnt + 1,
+					'code_seq' => $cnt,
 					'admin_id' => $admin_id,
 					'admin_nm' => $admin_nm,
 					'rt' => now(),
@@ -262,7 +246,7 @@ class std05Controller extends Controller
 
 		$admin_id = Auth('head')->user()->id;
 		$r = $request->all();
-		$idx = $r['sale_kind_cd'];
+		$idx = $r['sale_type_cd'];
 
 		try {
 			DB::beginTransaction();

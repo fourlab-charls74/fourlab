@@ -28,21 +28,6 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-							<label for="sale_kind">판매유형</label>
-                            <div class="form-inline">
-                                <select id="sale_kind" name="sale_kind" class="form-control form-control-sm w-100">
-                                    <option value="">전체</option>
-                                    @foreach ($sale_kinds as $sale_kind)
-                                    <option value="{{ $sale_kind->code_id }}">
-                                        {{ $sale_kind->code_val }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-						</div>
-                    </div>
-                    <div class="col-lg-4 inner-td" hidden>
-                        <div class="form-group">
 							<label for="sale_type_nm">판매유형명</label>
                             <div class="form-inline">
                                 <input type="text" id="sale_type_nm" name="sale_type_nm" class="form-control form-control-sm w-100 search-enter" />
@@ -118,7 +103,6 @@
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
         {field: "sale_kind", headerName: "판매유형코드", pinned: "left", width: 90, cellStyle: {"text-align": "center"}},
-        // {field: "sale_kind_nm", headerName: "판매구분", pinned: "left", width: 120},
         {field: "sale_type_nm", headerName: "판매유형명", width: 150,
             cellRenderer: function(params) {
                 return `<a href='javascript:void(0)' onclick='openPopup("${params.data.sale_type_cd}")'>${params.value}</a>`;

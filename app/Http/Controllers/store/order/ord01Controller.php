@@ -278,7 +278,7 @@ class ord01Controller extends Controller
             $prd_cds = explode(',', $prd_cd);
             if (count($prd_cds) > 1) {
                 if (count($prd_cds) > 500) array_splice($prd_cds, 500);
-                $in_prd_cds = join(',', $prd_cds);
+                $in_prd_cds = join(',', array_map(function($s) { return "'$s'"; }, $prd_cds));
                 $where .= " and o.prd_cd in ($in_prd_cds) ";
             } else {
                 $where .= " and o.prd_cd = '$prd_cd' ";

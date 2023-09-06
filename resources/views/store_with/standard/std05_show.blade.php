@@ -51,7 +51,7 @@
                                             <th class="required">판매유형코드</th>
                                             <td>
                                                 <div class="d-flex">
-                                                    <input type="text" name="sale_type_cd" id="sale_type_cd" value="{{@$sale_type->sale_type_cd}}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="width:280px;" @if($cmd == "update") readonly @endif />
+                                                    <input type="text" name="sale_kind" id="sale_kind" value="{{@$sale_type->sale_kind}}" onkeydown="setDupCheckValue()" class="form-control form-control-sm w-50 mr-2" style="width:280px;" @if($cmd == "update") readonly @endif />
                                                     @if($cmd == "add")
                                                         <button type="button" class="btn btn-primary" onclick="checkCode()">중복체크</button>
                                                     @endif
@@ -188,10 +188,8 @@
 <script language="javascript">
     let brand_columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, maxWidth: 100, cellStyle: {"text-align": "center"}},
-        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
-            cellRenderer: function(params) {
-                return `<input type="checkbox" onclick="changeUseYnVal2(event, '${params.rowIndex}')" style="width:15px;height:15px;" ${params.value === 'Y' ? "checked" : ""} />`;
-        }},
+        {field: "chk", headerName: "사용", pinned: "left", cellClass: 'hd-grid-code', checkboxSelection: true, width: 50},
+		{field: "use_yn", hide: true},
         {field: "brand", headerName: "브랜드코드", width: 100},
         {field: "brand_nm", headerName: "브랜드명", width: 200},
         {headerName: "", width: "auto"},
@@ -199,10 +197,8 @@
 
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellStyle: {"text-align": "center"}},
-        {field: "use_yn", headerName: "사용", cellStyle: {"text-align": "center"}, pinned: "left",
-            cellRenderer: function(params) {
-                return `<input type="checkbox" onclick="changeUseYnVal(event, '${params.rowIndex}')" style="width:15px;height:15px;" ${params.value === 'Y' ? "checked" : ""} />`;
-        }},
+        {field: "chk", headerName: "사용", pinned: "left", cellClass: 'hd-grid-code', checkboxSelection: true, width: 50},
+        {field: "use_yn", hide: true},
         {field: "store_cd", headerName: "매장코드", width: 100, cellStyle: {"text-align": "center"}},
         {field: "store_nm", headerName: "매장명", width: 200},
         {field: "sdate", headerName: "시작일", width: 100, cellStyle: {"text-align": "center", "background-color": "#ffff99"},
@@ -230,6 +226,10 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
+			onSelectionChanged: (params) => {
+				params.api.selectionController.lastSelectedNode.data.use_yn 
+					= params.api.selectionController.lastSelectedNode?.selected ? 'Y' : 'N';
+			},
             onCellValueChanged: (e) => {
                 e.node.data.use_yn = 'Y';
                 gx.gridOptions.api.updateRowData({update: [e.node.data]});
@@ -242,6 +242,10 @@
         pApp2.BindSearchEnter();
         let gridDiv2 = document.querySelector(pApp2.options.gridId);
         gx2 = new HDGrid(gridDiv2, brand_columns, {
+			onSelectionChanged: (params) => {
+				params.api.selectionController.lastSelectedNode.data.use_yn
+					= params.api.selectionController.lastSelectedNode?.selected ? 'Y' : 'N';
+			},
             onCellValueChanged: (e) => {
                 e.node.data.use_yn = 'Y';
                 gx2.gridOptions.api.updateRowData({update: [e.node.data]});
@@ -260,11 +264,11 @@
 
     // 매장정보 검색
     function Search() {
-        let sale_type_cd = "{{ @$sale_type->idx }}";
+        let sale_type_cd = "{{ @$sale_type->sale_type_cd }}";
         let store_channel = $("[name=store_channel]").val();
         let store_channel_kind = $("[name=store_channel_kind]").val();
         gx.Request("/store/standard/std05/search-store/" + sale_type_cd, "store_channel=" + store_channel + "&store_channel_kind=" + store_channel_kind  , -1, function(d) {
-            gx.gridOptions.api.forEachNodeAfterFilter(node => {
+            gx.gridOptions.api.forEachNode(node => {
                 if(node.data.use_yn === 'Y') node.setSelected(true);
             });
         });
@@ -272,28 +276,12 @@
 
     // 브랜드정보 검색
     function brandSearch() {
-        let sale_type_cd = "{{ @$sale_type->idx }}";
+        let sale_type_cd = "{{ @$sale_type->sale_type_cd }}";
         gx2.Request("/store/standard/std05/search-brand/" + sale_type_cd, "", -1, function(d) {
-            gx2.gridOptions.api.forEachNodeAfterFilter(node => {
+            gx2.gridOptions.api.forEachNode(node => {
                 if(node.data.use_yn === 'Y') node.setSelected(true);
             });
         });
-    }
-
-    // 매장별 사용여부 변경
-    function changeUseYnVal(e, rowIndex) {
-        const node = gx.getRowNode(rowIndex);
-        // node.data.use_yn = e.target.checked ? 'Y' : 'N';
-        node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
-        node.setSelected(e.target.checked);
-    }
-
-    // 브랜드별 사용여부 변경
-    function changeUseYnVal2(e, rowIndex) {
-        const node = gx2.getRowNode(rowIndex);
-        // node.data.use_yn = e.target.checked ? 'Y' : 'N';
-        node.setDataValue("use_yn", e.target.checked ? 'Y' : 'N');
-        node.setSelected(e.target.checked);
     }
 
     // 매장 시작일/종료일 변경 시 사용여부 변경
@@ -356,8 +344,8 @@
     const validation = (cmd) => {
         if(cmd === "add") {
             // 판매유형코드 선택여부
-            if(f1.sale_type_cd.value.trim() === '') {
-				f1.sale_type_cd.focus();
+            if(f1.sale_kind.value.trim() === '') {
+				f1.sale_kind.focus();
 				return alert("판매유형코드를 입력해주세요.");
 			}
 			
@@ -385,13 +373,9 @@
 
     // 저장데이터 반환
     const getFormData = (cmd) => {
-        let sale_types = <?= json_encode(@$sale_kinds) ?> ;
-        let sale_type = sale_types.find(s => s.code_id === f1.sale_type_cd.value);
-        
         return {
-            sale_kind_cd: cmd === 'update' ? "{{ @$sale_type->idx }}" : '',
-            sale_kind: f1.sale_type_cd.value,
-            // sale_type_nm: sale_type ? sale_type['code_val'] : '',
+            sale_type_cd: cmd === 'update' ? "{{ @$sale_type->sale_type_cd }}" : '',
+            sale_kind: f1.sale_kind.value,
             sale_type_nm: f1.sale_type_nm.value,
             sale_apply: f1.sale_apply.value,
             amt_kind: f1.amt_kind.value,
@@ -433,10 +417,10 @@
     }
 
     async function checkCode() {
-        const sale_type_cd = $("[name=sale_type_cd]").val().trim();
-        if( sale_type_cd === '' )	return alert("판매유형코드를 입력해주세요.");
+        const sale_kind = $("[name=sale_kind]").val().trim();
+        if( sale_kind === '' )	return alert("판매유형코드를 입력해주세요.");
         const response = await axios({ 
-            url: `/store/standard/std05/check-code/${sale_type_cd}`, 
+            url: `/store/standard/std05/check-code/${sale_kind}`, 
             method: 'get' 
         });
         const {data: {code, msg}} = response;
