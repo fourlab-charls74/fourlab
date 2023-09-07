@@ -1553,7 +1553,7 @@ class ord01Controller extends Controller
 					concat('$goods_img_url',replace(a.img,'$cfg_img_size_real','$cfg_img_size_list')) as img,
 					a.goods_type,
 					'2' as depth,
-					a.sms_name, a.sms_mobile, a.head_desc, a.clm_stock_check_yn
+					a.sms_name, a.sms_mobile, a.head_desc, a.clm_stock_check_yn, a.clm_comment
 				from (
 					select
 						b.ord_no, a.ord_opt_no, a.ord_state, d.pay_stat, c.goods_type, c.style_no, a.goods_nm,
@@ -1580,6 +1580,7 @@ class ord01Controller extends Controller
 						if(d.cash_yn = 'Y', '발행', '') as cash_yn,
                         b.dlv_type,
                         if(csc.state = 30, 'Y', 'N') as clm_stock_check_yn,
+                        csc.comment as clm_comment,
                         a.head_desc,
 						if(ifnull(a.goods_addopt,'') = '',
 							(select ifnull(group_concat(if(addopt_amt>0,concat(addopt,'(+',addopt_amt,')'),addopt)),'')

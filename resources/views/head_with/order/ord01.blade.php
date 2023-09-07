@@ -587,6 +587,7 @@
             cellRenderer: (params) => params.value === 'Y' ? '재고처리완료' : '',
             cellStyle: (params) => ({ 'color': params.value === 'Y' ? '#008000' : 'none' }),
         },
+        {field: "clm_comment", headerName: "창고검수메모", width: 100},
         {field:"pay_stat" , headerName:"입금상태", width:58, cellStyle:{"text-align" : "center"} },
         {field:"goods_type_nm" , headerName:"상품구분", width:58, cellStyle:StyleGoodsType  },
         {field:"style_no" , headerName:"스타일넘버", width:70, cellStyle: {'text-align':'center'} },
