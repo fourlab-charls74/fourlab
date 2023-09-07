@@ -739,6 +739,7 @@ class ord02Controller extends Controller
         $sale_place = $req->input("sale_place", "");
 
 		$point_amt_val = Lib::uncm($req->input("point_amt", ''));
+		if ($point_amt_val == '') $point_amt_val = 0;
 		$ord_amt_val =  Lib::uncm($req->input("ord_amt", ""));
 		$type = $req->input("type", "");
         $cart = $req->input("cart", []);

@@ -346,6 +346,7 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
 				<div class="fr_box d-flex">
+					<p class="text-secondary fs-12 mr-2">* 검수완료 시, <span class="text-danger font-weight-bold">'온라인창고'</span>로 설정된 창고로 재고처리됩니다.</p>
 					<a href="javascript:completeCheckStock();" class="btn btn-sm btn-primary shadow-sm">검수완료</a>
 				</div>
 			</div>
