@@ -54,11 +54,10 @@ class ord06Controller extends Controller
 		$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
 		// $brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		$ord_states = $this->_getOrdStates();
 
 		$conf = new Conf();
 		$domain = $conf->getConfigValue("shop", "domain");
-		
-		$ord_states = $this->_getOrdStates();
 
 		$values = [
 			'sdate' 		=> $sdate,
@@ -116,8 +115,8 @@ class ord06Controller extends Controller
 		$style_no       = $request->input('style_no', '');
 		$goods_no       = $request->input('goods_no', '');
 		$goods_nm       = $request->input('goods_nm', '');
-		$item           = $request->input('item', '');
-		$brand_cd       = $request->input('brand_cd', '');
+		// $item           = $request->input('item', '');
+		// $brand_cd       = $request->input('brand_cd', '');
 		$goods_nm_eng   = $request->input('goods_nm_eng', '');
 		$com_cd         = $request->input('com_cd', '');
 		$com_nm         = $request->input('com_nm', '');
@@ -193,7 +192,7 @@ class ord06Controller extends Controller
 				} else if ($ord_info_key == 'o.dlv_end_date') {
 					$where .= " and date_format($ord_info_key, '%Y%m%d') = $ord_info_value ";
 				} else if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm', 'om.bank_inpnm'])) {
-					$where .= " and $ord_info_key = '$ord_info_value' ";
+					$where .= " and $ord_info_key like '$ord_info_value%' ";
 				} else {
 					$where .= " and $ord_info_key like '$ord_info_value%' ";
 				}

@@ -23,7 +23,16 @@ use PDO;
 
 class ord01Controller extends Controller
 {
-    public function index(Request $request)
+	private function _getOrdStates() 
+	{
+		return [
+			(object) ['code_id' => 30, 'code_val' => '출고완료'],
+			(object) ['code_id' => 60, 'code_val' => '교환완료'],
+			(object) ['code_id' => 61, 'code_val' => '환불완료'],
+		];
+	}
+
+	public function index(Request $request)
 	{
 		$sdate = now()->sub(1, 'week')->format('Y-m-d');
 		$edate = date('Y-m-d');
@@ -39,8 +48,8 @@ class ord01Controller extends Controller
 		$stat_pay_type 		= $request->input('stat_pay_type', []);
 		$ord_type 			= $request->input('ord_type', []);
 		$ord_state 			= $request->input('ord_state', '');
-		$item 				= $request->input('item', '');
-		$brand_cd 			= $request->input('brand_cd', '');
+		// $item 				= $request->input('item', '');
+		// $brand_cd 			= $request->input('brand_cd', '');
 		$goods_nm 			= $request->input('goods_nm', '');
 		$store_cd 			= Auth('head')->user()->store_cd;
 		$on_off_yn 			= $request->input('on_off_yn', '');
@@ -53,7 +62,8 @@ class ord01Controller extends Controller
 		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
 		$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
-		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		// $brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		$ord_states = $this->_getOrdStates();
 
         $conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
@@ -62,20 +72,21 @@ class ord01Controller extends Controller
 			'sdate' 		=> $sdate,
 			'edate' 		=> $edate,
 			'domain'		=> $domain,
-			'ord_states'    => SLib::getordStates(), // 주문상태
+			'ord_states'    => $ord_states, // 주문상태
+			// 'ord_states'    => SLib::getordStates(), // 주문상태
 			'clm_states'    => SLib::getCodes('G_CLM_STATE'), // 클레임상태
 			'stat_pay_types' => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'), // 주문구분
 			'ord_kinds'     => SLib::getCodes('G_ORD_KIND'), // 출고구분
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-			'items' 		=> SLib::getItems(),
+			// 'items' 		=> SLib::getItems(),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
 			'stat_pay_type'	=> $stat_pay_type,
 			'ord_type'		=> $ord_type,
 			'ord_state'		=> $ord_state,
-			'item'			=> $item,
-			'brand'			=> $brand,
+			// 'item'			=> $item,
+			// 'brand'			=> $brand,
 			'goods_nm'		=> $goods_nm,
 			'on_off_yn'		=> $on_off_yn,
 			'pr_code_ids'	=> $pr_code_ids,
@@ -89,7 +100,6 @@ class ord01Controller extends Controller
 
     public function search(Request $request)
     {
-
         $store_cd       = Auth('head')->user()->store_cd;
         $sale_kind      = $request->input('sale_kind', '');
         $pr_code        = $request->input('pr_code', '');
@@ -98,7 +108,7 @@ class ord01Controller extends Controller
         $nud            = $request->input('nud', ''); // 주문일자 검색여부
         $ord_no         = $request->input('ord_no', '');
         $ord_state      = $request->input('ord_state', '');
-        $pay_state      = $request->input('pay_stat', '');
+        // $pay_state      = $request->input('pay_stat', '');
         $clm_state      = $request->input('clm_state', '');
         $ord_type       = $request->input('ord_type', '');
         $ord_kind       = $request->input('ord_kind', '');
@@ -110,9 +120,8 @@ class ord01Controller extends Controller
         $style_no       = $request->input('style_no', '');
         $goods_no       = $request->input('goods_no', '');
         $goods_nm       = $request->input('goods_nm', '');
-        // $goods_stat     = $request->input('goods_stat', []);
-        $item           = $request->input('item', '');
-        $brand_cd       = $request->input('brand_cd', '');
+        // $item           = $request->input('item', '');
+        // $brand_cd       = $request->input('brand_cd', '');
         $goods_nm_eng   = $request->input('goods_nm_eng', '');
         $com_cd         = $request->input('com_cd', '');
         $com_nm         = $request->input('com_nm', '');
@@ -121,7 +130,6 @@ class ord01Controller extends Controller
         $ord_field      = $request->input('ord_field', 'o.ord_date');
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
-        $sale_form      = $request->input('sale_form', '');
         $sell_type      = $request->input('sell_type');
 
         if ($page < 1 or $page == '') $page = 1;
@@ -152,14 +160,16 @@ class ord01Controller extends Controller
         //     $is_not_use_date = true;
         // }
         if ($is_not_use_date == false && $nud == 'on') {
-            $where .= " and o.ord_date >= '$sdate 00:00:00' ";
-            $where .= " and o.ord_date <= '$edate 23:59:59' ";
+			$sdate = str_replace("-", "", $sdate);
+			$edate = str_replace("-", "", $edate);
+            $where .= " and w.ord_state_date >= '$sdate' ";
+            $where .= " and w.ord_state_date <= '$edate' ";
         }
         if ($ord_no != '') $where .= " and o.ord_no = '$ord_no' ";
         // if ($store_no != '') $where .= " and o.store_cd = '$store_no' ";
         if ($store_cd != '') $where .= " and o.store_cd = '$store_cd' ";
-        if ($ord_state != '') $where .= " and o.ord_state = '$ord_state' ";
-        if ($pay_state != '') $where .= " and pay.pay_stat = '$pay_state' ";
+        if ($ord_state != '') $where .= " and w.ord_state = '$ord_state' ";
+        // if ($pay_state != '') $where .= " and pay.pay_stat = '$pay_state' ";
         // 클레임상태
         if ($clm_state == '90') {
             $where .= " and o.clm_state = '0' ";
@@ -185,7 +195,7 @@ class ord01Controller extends Controller
                 } else if ($ord_info_key == 'o.dlv_end_date') {
                     $where .= " and date_format($ord_info_key, '%Y%m%d') = $ord_info_value ";
                 } else if (in_array($ord_info_key, ['om.user_nm', 'om.user_id', 'om.r_nm', 'om.bank_inpnm'])) {
-                    $where .= " and $ord_info_key = '$ord_info_value' ";
+                    $where .= " and $ord_info_key like '$ord_info_value%' ";
                 } else {
                     $where .= " and $ord_info_key like '$ord_info_value%' ";
                 }
@@ -208,10 +218,13 @@ class ord01Controller extends Controller
             $prd_cds = explode(',', $prd_cd);
             if (count($prd_cds) > 1) {
                 if (count($prd_cds) > 500) array_splice($prd_cds, 500);
-                $in_prd_cds = join(',', $prd_cds);
-                $where .= " and o.prd_cd in ($in_prd_cds) ";
+				$where .= " and (1!=1";
+				foreach($prd_cds as $cd) {
+					$where .= " or o.prd_cd like '" . Lib::quote($cd) . "%' ";
+				}
+				$where .= ")";
             } else {
-                $where .= " and o.prd_cd = '$prd_cd' ";
+				$where .= " and o.prd_cd like '" . Lib::quote($prd_cd) . "%' ";
             }
         }
 
@@ -250,14 +263,11 @@ class ord01Controller extends Controller
         //         $where .= " and g.sale_stat_cl in ($in_goods_stats) ";
         //     }
         // }
-        if ($item != '') $where .= " and g.opt_kind_cd = '$item' ";
-        if ($brand_cd != '') $where .= " and g.brand = '$brand_cd' ";
+        // if ($item != '') $where .= " and g.opt_kind_cd = '$item' ";
+        // if ($brand_cd != '') $where .= " and g.brand = '$brand_cd' ";
         if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%$goods_nm_eng%' ";
         if ($com_cd != '') $where .= " and g.com_id = '$com_cd' ";
         else if ($com_nm != '') $where .= " and g.com_nm = '$com_nm' ";
-
-        if ($sale_form == 'Off') $where .= " and (o.store_cd is not null and o.store_cd <> '$offline_store') ";
-        else if ($sale_form == 'On') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
 
         if ($sale_kind != '') $where .= "and o.sale_kind = '$sale_kind' ";
 
@@ -282,7 +292,7 @@ class ord01Controller extends Controller
 		}
 
         // ordreby
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        $orderby = sprintf("order by %s %s, w.ord_wonga_no desc", $ord_field, $ord);
 
         // pagination
         $page_size = $limit;
@@ -297,7 +307,7 @@ class ord01Controller extends Controller
                 a.ord_no,
                 a.ord_opt_no,
                 a.ord_state as ord_state_cd,
-                ord_state.code_val as ord_state,
+                a.ord_state_date,
                 clm_state.code_val as clm_state,
                 pay_stat.code_val as pay_stat,
                 a.prd_cd,
@@ -310,16 +320,16 @@ class ord01Controller extends Controller
                 a.size,
                 a.img,
                 replace(a.goods_opt, '^', ' : ') as opt_val,
-                a.qty,
                 concat(a.user_nm, ' (', a.user_id, ')') as user_nm,
                 a.r_nm,
                 a.sale_place,
+                if(a.ord_state > 30, a.qty * -1, a.qty) as qty,
                 a.goods_price,
                 a.price,
                 a.goods_sh,
                 a.wonga,
-				a.recv_amt,
-                a.dlv_amt,
+				if(a.ord_state > 30, a.recv_amt * -1, a.recv_amt) as recv_amt,
+                if(a.ord_state > 30, a.dlv_amt * -1, a.dlv_amt) as dlv_amt,
                 a.sales_com_fee,
                 pay_type.code_val as pay_type,
                 ord_type.code_val as ord_type,
@@ -334,7 +344,7 @@ class ord01Controller extends Controller
                 a.ord_date,
                 a.sale_kind,
                 (a.price - a.sale_kind_amt) as sale_price,
-                (a.qty * (a.price - a.sale_kind_amt)) as ord_amt,
+                (a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1) as ord_amt,
                 sale_kind.code_val as sale_kind_nm,
                 a.sale_dc_rate,
 				round((1 - ((a.price - a.sale_kind_amt) / a.goods_sh)) * 100) as dc_rate,
@@ -349,7 +359,9 @@ class ord01Controller extends Controller
                 select
                     om.ord_no,
                     o.ord_opt_no,
-                    o.ord_state,
+                    o.ord_state as opt_ord_state,
+					w.ord_state,
+                    w.ord_state_date,
                     o.clm_state,
                     pay.pay_stat,
                     o.prd_cd,
@@ -358,7 +370,7 @@ class ord01Controller extends Controller
                     g.goods_nm_eng,
                     o.goods_nm,
                     o.goods_opt,
-                    concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                    ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p,
                     if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
                         select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                         from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -371,14 +383,14 @@ class ord01Controller extends Controller
                             and s.size_cd = pc.size
                             and use_yn = 'Y'
                     ) as size,
-                    o.qty,
+                    w.qty,
                     om.user_id,
                     om.user_nm,
                     om.r_nm,
                     om.sale_place,
                     g.price as goods_price,
                     g.goods_sh,
-                    g.wonga,
+                    o.wonga,
                     o.price,
                     o.recv_amt,
                     o.dlv_amt,
@@ -402,7 +414,8 @@ class ord01Controller extends Controller
                     st.amt_kind,
                     if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
                     round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
-                from order_opt o
+                from order_opt_wonga w
+                	inner join order_opt o on o.ord_opt_no = w.ord_opt_no
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
                     inner join goods g on o.goods_no = g.goods_no
@@ -410,11 +423,10 @@ class ord01Controller extends Controller
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                     left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
-                where 1=1 $where
+                where w.ord_state in (30,60,61) $where
                 $orderby
                 $limit
             ) a
-                left outer join code ord_state on (a.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
                 left outer join code ord_type on (a.ord_type = ord_type.code_id and ord_type.code_kind_cd = 'G_ORD_TYPE')
                 left outer join code ord_kind on (a.ord_kind = ord_kind.code_id and ord_kind.code_kind_cd = 'G_ORD_KIND')
                 left outer join code pay_type on (a.pay_type = pay_type.code_id and pay_type.code_kind_cd = 'G_PAY_TYPE')
@@ -432,11 +444,17 @@ class ord01Controller extends Controller
 		$stmt	= $pdo->prepare($sql);
 		$stmt->execute();
 		$result	= [];
+
+		$ord_states = $this->_getOrdStates();
+		
 		while($row2 = $stmt->fetch(PDO::FETCH_ASSOC))
 		{
 			if($row2["img"] != ""){
 				$row2["img"] = sprintf("%s%s",config("shop.image_svr"), $row2["img"]);
 			}
+
+			$idx = array_search($row2["ord_state_cd"], array_column($ord_states, 'code_id'));
+			$row2["ord_state"] = $ord_states[$idx]->code_val;
 
 			$result[] = $row2;
 		}
@@ -448,19 +466,20 @@ class ord01Controller extends Controller
         if($page == 1) {
             $sql = "
                 select
-                    count(*) as total,
-                    sum(o.qty) as total_qty,
-                    sum(o.qty * g.price) as total_goods_price,
-                    sum(o.qty * o.price) as total_price,
-                    sum(o.qty * g.goods_sh) as total_goods_sh,
-					sum(o.qty * o.wonga) as total_wonga,
-                    round((1 - (sum(o.price) / sum(g.goods_sh))) * 100) as avg_sale_dc_rate,
-                    sum(o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) as total_sale_price,
-                    round((1 - (sum(o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) / sum(g.goods_sh))) * 100) as avg_dc_rate,
-                    sum(o.qty * (o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt))) as total_ord_amt,
-                    sum(o.recv_amt) as total_recv_amt,
-                    sum(o.dlv_amt) as total_dlv_amt
-                from order_opt o
+					count(*) as total,
+                    sum(w.qty * if(w.ord_state > 30, -1, 1)) as total_qty,
+                    sum(w.qty * g.price * if(w.ord_state > 30, -1, 1)) as total_goods_price,
+                    sum(w.qty * o.price * if(w.ord_state > 30, -1, 1)) as total_price,
+                    sum(w.qty * g.goods_sh * if(w.ord_state > 30, -1, 1)) as total_goods_sh,
+                    sum(w.qty * o.wonga * if(w.ord_state > 30, -1, 1)) as total_wonga,
+                    round((1 - (sum(o.price * if(w.ord_state > 30, -1, 1)) / sum(g.goods_sh * if(w.ord_state > 30, -1, 1)))) * 100) as avg_sale_dc_rate,
+                    sum((o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) * if(w.ord_state > 30, -1, 1)) as total_sale_price,
+                    round((1 - (sum((o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) * if(w.ord_state > 30, -1, 1)) / sum(g.goods_sh * if(w.ord_state > 30, -1, 1)))) * 100) as avg_dc_rate,
+                    sum(w.qty * (o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) * if(w.ord_state > 30, -1, 1)) as total_ord_amt,
+                    sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as total_recv_amt,
+                    sum(o.dlv_amt * if(w.ord_state > 30, -1, 1)) as total_dlv_amt
+                from order_opt_wonga w
+                	inner join order_opt o on o.ord_opt_no = w.ord_opt_no
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
                     inner join goods g on o.goods_no = g.goods_no
@@ -468,7 +487,7 @@ class ord01Controller extends Controller
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                 	left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
-                where 1=1 $where
+                where w.ord_state in (30,60,61) $where
             ";
 
             $row = DB::selectOne($sql);
