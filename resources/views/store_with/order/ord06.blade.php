@@ -15,13 +15,14 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
-					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+					<a href="javascript:;" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
 					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 					<!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch(['#store_no'])">검색조건 초기화</a> -->
 					@if(Auth('head')->user()->logistics_group_yn == 'N')
-						<a href="javascript:void(0);" onclick="Add()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 등록</a>
-						<a href="javascript:void(0);" onclick="AddBatch()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
+						<a href="javascript:;" onclick="Add()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 등록</a>
+						<a href="javascript:;" onclick="AddBatch()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
 					@endif
+					<a href="javascript:gx.Download('판매내역조회_{{ date('YmdH') }}');" class="btn btn-download btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
@@ -30,7 +31,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="user_yn">주문일자</label>
+							<label for="user_yn">주문상태일자</label>
 							<div class="date-switch-wrap form-inline">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
@@ -245,16 +246,13 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/온라인코드</label>
+							<label for="prd_cd">상품검색조건</label>
 							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input-box" style="width:47%">
-									<div class="form-inline-inner inline_btn_box">
-										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 									</div>
 								</div>
 							</div>
@@ -275,7 +273,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="o.ord_date">주문일자</option>
+										<option value="w.ord_state_date">주문상태일자</option>
 										<option value="o.ord_no">주문번호</option>
 										<option value="om.user_nm">주문자명</option>
 										<option value="om.r_nm">수령자</option>
@@ -298,42 +296,43 @@
 				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="prd_cd">상품검색조건</label>
+							<label for="style_no">스타일넘버/온라인코드</label>
 							<div class="form-inline">
-								<div class="form-inline-inner input-box w-100">
-									<div class="form-inline inline_btn_box">
-										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
-										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								<div class="form-inline-inner input_box">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input-box" style="width:47%">
+									<div class="form-inline-inner inline_btn_box">
+										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="item">품목</label>
-							<div class="flex_box">
-								<select id="item" name="item" class="form-control form-control-sm">
-									<option value="">전체</option>
-									@foreach (@$items as $t)
-										<option value="{{ $t->cd }}" @if ($t->cd == @$item) selected @endif>{{ $t->val }}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="brand_cd">브랜드</label>
-							<div class="form-inline inline_btn_box">
-								<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row search-area-ext d-none">
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="item">품목</label>--}}
+{{--							<div class="flex_box">--}}
+{{--								<select id="item" name="item" class="form-control form-control-sm">--}}
+{{--									<option value="">전체</option>--}}
+{{--									@foreach (@$items as $t)--}}
+{{--										<option value="{{ $t->cd }}" @if ($t->cd == @$item) selected @endif>{{ $t->val }}</option>--}}
+{{--									@endforeach--}}
+{{--								</select>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="brand_cd">브랜드</label>--}}
+{{--							<div class="form-inline inline_btn_box">--}}
+{{--								<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>--}}
+{{--								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="goods_nm">상품명</label>
@@ -350,6 +349,8 @@
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="pr_code">판매유형</label>
@@ -363,8 +364,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="pr_code">판매처수수료</label>
@@ -382,7 +381,14 @@
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
-			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			<a href="javascript:;" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
+			<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
+			<!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch(['#store_no'])">검색조건 초기화</a> -->
+			@if(Auth('head')->user()->logistics_group_yn == 'N')
+				<a href="javascript:;" onclick="Add()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 등록</a>
+				<a href="javascript:;" onclick="AddBatch()" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>수기 일괄등록</a>
+			@endif
+			<a href="javascript:gx.Download('판매내역조회_{{ date('YmdH') }}');" class="btn btn-download btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 			<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 		</div>
 	</div>
@@ -426,6 +432,9 @@
 			}
 		},
 		{field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
+		{field: "ord_state_date", headerName: "주문상태일자", pinned: 'left', width: 90, cellClass: 'hd-grid-code', 
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : params.value.slice(0,4) + '-' + params.value.slice(4,6) + '-' + params.value.slice(6,8)
+		},
 		{field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellClass: 'hd-grid-code', 
 			cellStyle: (params) => ({ 'color': params.data.ord_state_cd > 30 ? '#ff0000' : '#0000ff', 'font-weight': 'bold' })
 		},
@@ -436,7 +445,7 @@
 		{field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
 		{field: "img", headerName: "이미지_url", hide:true},
-		{field: "goods_nm", headerName: "상품명", width: 150, type: "HeadGoodsNameType"},
+		{field: "goods_nm", headerName: "상품명", width: 150, type: "StoreGoodsNameType"},
 		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
 		{field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
 		{field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
@@ -503,18 +512,18 @@
 	function initSearchTab() {
 		let store_cd = "{{ @$store->store_cd }}";
 		let store_nm = "{{ @$store->store_nm }}";
-		let brand_cd = "{{ @$brand->brand }}";
-		let brand_nm = "{{ @$brand->brand_nm }}";
+		{{--let brand_cd = "{{ @$brand->brand }}";--}}
+		{{--let brand_nm = "{{ @$brand->brand_nm }}";--}}
 
 		if (store_cd != '') {
 			const option = new Option(store_nm, store_cd, true, true);
 			$('#store_no').append(option).trigger('change');
 		}
 
-		if (brand_cd != '') {
-			const option = new Option(brand_nm, brand_cd, true, true);
-			$('#brand_cd').append(option).trigger('change');
-		}
+		// if (brand_cd != '') {
+		// 	const option = new Option(brand_nm, brand_cd, true, true);
+		// 	$('#brand_cd').append(option).trigger('change');
+		// }
 
 		let prd_cd_range = <?= json_encode(@$prd_cd_range) ?>;
 		let prd_cd_range_nm = "{{ @$prd_cd_range_nm }}";

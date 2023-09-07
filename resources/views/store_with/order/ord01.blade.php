@@ -248,23 +248,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="style_no">스타일넘버/온라인코드</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input_box">
-                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
-                                </div>
-                                <span class="text_line">/</span>
-                                <div class="form-inline-inner input-box" style="width:47%">
-                                    <div class="form-inline-inner inline_btn_box">
-                                        <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="prd_cd">상품검색조건</label>
+			                <div class="form-inline">
+				                <div class="form-inline-inner input-box w-100">
+					                <div class="form-inline inline_btn_box">
+						                <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+						                <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+						                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+					                </div>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">자료수/정렬</label>
@@ -301,44 +298,45 @@
                     </div>
                 </div>
                 <div class="row search-area-ext d-none">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">상품검색조건</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="item">품목</label>
-                            <div class="flex_box">
-                                <select id="item" name="item" class="form-control form-control-sm">
-                                    <option value="">전체</option>
-                                    @foreach (@$items as $t)
-                                        <option value="{{ $t->cd }}" @if ($t->cd == @$item) selected @endif>{{ $t->val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row search-area-ext d-none">
+	                <div class="col-lg-4 inner-td">
+		                <div class="form-group">
+			                <label for="style_no">스타일넘버/온라인코드</label>
+			                <div class="form-inline">
+				                <div class="form-inline-inner input_box">
+					                <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
+				                </div>
+				                <span class="text_line">/</span>
+				                <div class="form-inline-inner input-box" style="width:47%">
+					                <div class="form-inline-inner inline_btn_box">
+						                <input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+						                <a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+					                </div>
+				                </div>
+			                </div>
+		                </div>
+	                </div>
+{{--                    <div class="col-lg-4 inner-td">--}}
+{{--                        <div class="form-group">--}}
+{{--                            <label for="item">품목</label>--}}
+{{--                            <div class="flex_box">--}}
+{{--                                <select id="item" name="item" class="form-control form-control-sm">--}}
+{{--                                    <option value="">전체</option>--}}
+{{--                                    @foreach (@$items as $t)--}}
+{{--                                        <option value="{{ $t->cd }}" @if ($t->cd == @$item) selected @endif>{{ $t->val }}</option>--}}
+{{--                                    @endforeach--}}
+{{--                                </select>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="col-lg-4 inner-td">--}}
+{{--                        <div class="form-group">--}}
+{{--                            <label for="brand_cd">브랜드</label>--}}
+{{--                            <div class="form-inline inline_btn_box">--}}
+{{--                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>--}}
+{{--                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="goods_nm">상품명</label>
@@ -355,6 +353,8 @@
                             </div>
                         </div>
                     </div>
+                </div>
+				<div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="pr_code">판매유형</label>
@@ -368,8 +368,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row search-area-ext d-none">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="pr_code">판매처수수료</label>
@@ -517,18 +515,18 @@
 	function initSearchTab() {
 		let store_cd = "{{ @$store->store_cd }}";
 		let store_nm = "{{ @$store->store_nm }}";
-		let brand_cd = "{{ @$brand->brand }}";
-		let brand_nm = "{{ @$brand->brand_nm }}";
+		{{--let brand_cd = "{{ @$brand->brand }}";--}}
+		{{--let brand_nm = "{{ @$brand->brand_nm }}";--}}
 
 		if (store_cd != '') {
 			const option = new Option(store_nm, store_cd, true, true);
 			$('#store_no').append(option).trigger('change');
 		}
 
-		if (brand_cd != '') {
-			const option = new Option(brand_nm, brand_cd, true, true);
-			$('#brand_cd').append(option).trigger('change');
-		}
+		// if (brand_cd != '') {
+		// 	const option = new Option(brand_nm, brand_cd, true, true);
+		// 	$('#brand_cd').append(option).trigger('change');
+		// }
 
 		let prd_cd_range = <?= json_encode(@$prd_cd_range) ?>;
 		let prd_cd_range_nm = "{{ @$prd_cd_range_nm }}";

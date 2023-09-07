@@ -37,8 +37,8 @@ class ord01Controller extends Controller
 		$stat_pay_type 		= $request->input('stat_pay_type', []);
 		$ord_type 			= $request->input('ord_type', []);
 		$ord_state 			= $request->input('ord_state', '');
-		$item 				= $request->input('item', '');
-		$brand_cd 			= $request->input('brand_cd', '');
+		// $item 				= $request->input('item', '');
+		// $brand_cd 			= $request->input('brand_cd', '');
 		$goods_nm 			= $request->input('goods_nm', '');
 		$store_cd 			= $request->input('store_no', '');
 		$on_off_yn 			= $request->input('on_off_yn', '');
@@ -53,7 +53,7 @@ class ord01Controller extends Controller
 		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
 		$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
-		$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		// $brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
 
 		$conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
@@ -68,7 +68,7 @@ class ord01Controller extends Controller
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'), // 주문구분
 			'ord_kinds'     => SLib::getCodes('G_ORD_KIND'), // 출고구분
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-			'items' 		=> SLib::getItems(),
+			// 'items' 		=> SLib::getItems(),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
 			'store_channel'	=> SLib::getStoreChannel(),
@@ -76,8 +76,8 @@ class ord01Controller extends Controller
 			'stat_pay_type'	=> $stat_pay_type,
 			'ord_type'		=> $ord_type,
 			'ord_state'		=> $ord_state,
-			'item'			=> $item,
-			'brand'			=> $brand,
+			// 'item'			=> $item,
+			// 'brand'			=> $brand,
 			'goods_nm'		=> $goods_nm,
 			'on_off_yn'		=> $on_off_yn,
 			'pr_code_ids'	=> $pr_code_ids,
@@ -320,8 +320,8 @@ class ord01Controller extends Controller
         //         $where .= " and g.sale_stat_cl in ($in_goods_stats) ";
         //     }
         // }
-        if ($item != '') $where .= " and g.opt_kind_cd = '$item' ";
-        if ($brand_cd != '') $where .= " and g.brand = '$brand_cd' ";
+        // if ($item != '') $where .= " and g.opt_kind_cd = '$item' ";
+        // if ($brand_cd != '') $where .= " and g.brand = '$brand_cd' ";
         if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%$goods_nm_eng%' ";
         if ($com_cd != '') $where .= " and g.com_id = '$com_cd' ";
         else if ($com_nm != '') $where .= " and g.com_nm = '$com_nm' ";
@@ -2233,8 +2233,8 @@ class ord01Controller extends Controller
 
             if ($ord_wonga_no == 0 || $clm_no == 0 || $update_stock == 0) $success_code = 0;
             if ($success_code < 1) {
-                $code = 500;
-                throw new Exception("환불처리 중 오류가 발생했습니다.");
+                if ($update_stock == 0) throw new Exception("매장 재고처리 중 오류가 발생했습니다. 해당 매장의 재고를 확인해주세요."); 
+				else throw new Exception("환불처리 중 오류가 발생했습니다.");
             }
 
             // 포인트 환원 및 반납처리
@@ -2258,7 +2258,7 @@ class ord01Controller extends Controller
             $msg = $e->getMessage();
         }
 
-        return response()->json(['code' => $code, 'msg' => $msg], $code);
+        return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 
     public function refund($ord_no, $ord_opt_no, Request $req) {

@@ -1534,7 +1534,6 @@
                 window.opener.Search();
             } else {
                 alert(res.data.msg);
-                console.log(res);
             }
         }).catch(function (err) {
             console.log(err);
