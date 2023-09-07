@@ -1203,6 +1203,10 @@ class ord03Controller extends Controller
 				, pt.code_val as pay_type
 				, bk.code_val as baesong_kind
 				, com.com_nm as sale_place
+				, concat(a.prd_cd_p, '/', a.color, '/', a.size, '/', a.sale_qty) as goods_info
+			    -- 주문사이트/창고명/배송메시지 컬럼 확정 후 수정필요
+				, concat(ifnull(com.com_nm, ''), '/', '', '/', ifnull(a.dlv_msg, '')) as sale_info
+				, '' as storage_addr
 			from (
 				select
 					rc.rel_order as dlv_series_nm
@@ -1218,6 +1222,9 @@ class ord03Controller extends Controller
 					, g.style_no
 					, b.brand_nm as brand
 					, g.com_nm
+				    , com.zip_code as com_zip_code
+				 	, concat(com.addr1, ' ', com.addr2) as com_addr
+				    , com.staff_phone1 as com_phone
 					, g.goods_nm
 					, g.goods_nm_eng
 					, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
@@ -1243,7 +1250,7 @@ class ord03Controller extends Controller
 					, om.r_phone
 					, om.r_mobile
 					, om.dlv_msg
-					, o.sale_place
+					, o.sale_place as sale_place_cd
 					, o.baesong_kind
 					, om.phone
 					, om.mobile
@@ -1252,6 +1259,7 @@ class ord03Controller extends Controller
 					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select code_val from code where code_kind_cd = 'ONLINE_ORDER_STORE' and code_id = rcp.dlv_location_cd)) as dlv_location_nm
 					, if(rcp.dlv_location_type = 'STORAGE', (select qty from product_stock_storage where storage_cd = rcp.dlv_location_cd and prd_cd = pc.prd_cd), (select qty from product_stock_store where store_cd = rcp.dlv_location_cd and prd_cd = pc.prd_cd)) as qty
 					, o.dlv_no
+				    , o.dlv_start_date
 					, o.sale_kind
 				from order_receipt_product rcp
 					inner join order_receipt rc on rc.or_cd = rcp.or_cd
@@ -1261,6 +1269,7 @@ class ord03Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join brand b on b.brand = g.brand
+					left outer join company com on com.use_yn = 'Y' and com.com_id = g.com_id
 				where rcp.reject_yn = 'N' 
 				  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
@@ -1275,7 +1284,7 @@ class ord03Controller extends Controller
 				left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = a.pay_type
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = a.baesong_kind
 				left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
-				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place
+				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place_cd
 		";
 
 		try {
@@ -1327,6 +1336,12 @@ class ord03Controller extends Controller
 				'r_addr' => 40,
 				'r_phone' => 15,
 				'r_mobile' => 15,
+				'dlv_start_date' => 12,
+				'com_addr' => 40,
+				'com_phone' => 15,
+				'goods_info' => 30,
+				'sale_info' => 30,
+				'storage_addr' => 40,
 			];
 			
 			DB::commit();
