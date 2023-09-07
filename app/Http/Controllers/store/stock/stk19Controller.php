@@ -38,12 +38,22 @@ class stk19Controller extends Controller
 			->orderByRaw('CASE WHEN online_yn = "Y" THEN 0 ELSE 1 END')
 			->get();
 
+		$storage_arr = [];
+		foreach ($storages as $index => $storage) {
+			$storage_arr[] = [
+				'storage_cd' => $storage->storage_cd,
+				'storage_nm' => $storage->storage_nm,
+				'seq' => $index,
+			];
+		}
+		
 		$values = [
 			'today'         => date("Y-m-d"),
 			'items'			=> SLib::getItems(), // 품목
 			'stores'        => $stores, // 매장리스트
 			'storages'      => $storages, // 창고리스트
 			'rel_order_res' => $rel_order_res, //창고출고 차수
+			'storage_arr'	=> $storage_arr,
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
@@ -211,10 +221,12 @@ class stk19Controller extends Controller
 		foreach($result as $re) {
 			$prd_cd = $re->prd_cd;
 			$sql = "
-                select s.storage_cd, p.prd_cd, p.wqty, p.wqty as wqty2
+                select s.storage_cd, p.prd_cd, ifnull(p.wqty,'0') as wqty , ifnull(p.wqty,'0') as wqty2
                 from storage s
                     left outer join product_stock_storage p on p.storage_cd = s.storage_cd and p.prd_cd = '$prd_cd'
-                where s.use_yn = 'Y' and p.use_yn = 'Y'
+                where s.use_yn = 'Y'
+                order by case when default_yn ='Y' then 0 else 1 end,
+                         case when online_yn = 'Y' then 0 else 1 end
             ";
 			$row = DB::select($sql);
 
@@ -244,6 +256,7 @@ class stk19Controller extends Controller
 		$rel_order = $request->input("rel_order", '');
 		$rel_type = $request->input("rel_type", '');
 		$data = $request->input("products", []);
+		
 		$exp_day = str_replace("-", "", $exp_dlv_day);
 		$exp_dlv_day_data = substr($exp_day,2,6);
 		
@@ -286,7 +299,7 @@ class stk19Controller extends Controller
 							'state' => $state,
 							'exp_dlv_day' => $exp_dlv_day_data,
 							'rel_order' => $rel_order,
-							'storage_comment' => $d['storage_memo'] ?? '',
+							'comment' => $d['storage_memo'] ?? '',
 							'req_id' => $admin_id,
 							'req_rt' => now(),
 							'rec_id' => $admin_id,
@@ -307,7 +320,7 @@ class stk19Controller extends Controller
 							'state' => $state,
 							'exp_dlv_day' => $exp_dlv_day_data,
 							'rel_order' => $rel_order,
-							'storage_comment' => $d['storage_memo'] ?? '',
+							'comment' => $d['storage_memo'] ?? '',
 							'req_id' => $admin_id,
 							'req_rt' => now(),
 							'rec_id' => $admin_id,
@@ -441,8 +454,13 @@ class stk19Controller extends Controller
         ";
 		$rel_order_res = DB::select($sql);
 
-		$storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')->orderBy('default_yn','desc')->get();
-
+		$storages = DB::table("storage")
+			->where('use_yn', '=', 'Y')
+			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
+			->orderByRaw('CASE WHEN default_yn = "Y" THEN 0 ELSE 1 END')
+			->orderByRaw('CASE WHEN online_yn = "Y" THEN 0 ELSE 1 END')
+			->get();
+		
 		$values = [
 			'today'         => date("Y-m-d"),
 			'style_no'		=> "", // 스타일넘버
@@ -485,13 +503,13 @@ class stk19Controller extends Controller
 	public function get_goods(Request $request)
 	{
 		$data = $request->input('data', []);
-		$storage_cd = '';
 		$result = [];
 
 		foreach($data as $key => $d)
 		{
 			$prd_cd = $d['prd_cd'];
 			$store_cd = $d['store_cd'];
+			$storage_cd = $d['storage_cd'];
 			$qty = $d['qty'];
 
 			$sql = "
@@ -520,7 +538,9 @@ class stk19Controller extends Controller
                     , (select wqty from product_stock_store where store_cd = '$store_cd' and prd_cd = s.prd_cd) as store_qty
                     , '$qty' as qty
                     , '$store_cd' as store_cd
+                    , '$storage_cd' as storage_cd
                     , (select store_nm from store where store_cd = '$store_cd') as store_nm
+                	, (select storage_nm from storage where storage_cd = '$storage_cd') as storage_nm
                 from goods g inner join product_stock s on g.goods_no = s.goods_no
                     left outer join product_stock_storage ps on s.prd_cd = ps.prd_cd and ps.storage_cd = '$storage_cd'
                     left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
@@ -540,12 +560,15 @@ class stk19Controller extends Controller
 		foreach($result as $re) {
 			$prd_cd = $re->prd_cd;
 			$sql = "
-                select s.storage_cd, p.prd_cd, p.wqty
+                select s.storage_cd, p.prd_cd, ifnull(p.wqty,'0') as wqty , ifnull(p.wqty,'0') as wqty2
                 from storage s
                     left outer join product_stock_storage p on p.storage_cd = s.storage_cd and p.prd_cd = '$prd_cd'
-                where s.use_yn = 'Y' and p.use_yn = 'Y'
+                where s.use_yn = 'Y'
+                order by case when default_yn ='Y' then 0 else 1 end,
+                         case when online_yn = 'Y' then 0 else 1 end
             ";
 			$row = DB::select($sql);
+
 			$re->storage_qty = $row;
 		}
 
@@ -585,9 +608,6 @@ class stk19Controller extends Controller
 		try {
 			DB::beginTransaction();
 
-			$storage_cd = DB::table('storage')->where('default_yn', '=', 'Y')->select('storage_cd')->get();
-			$storage_cd = $storage_cd[0]->storage_cd;
-
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_release order by document_number desc limit 1";
 			$document_number = DB::selectOne($sql);
 			if ($document_number === null) $document_number = 1;
@@ -615,11 +635,11 @@ class stk19Controller extends Controller
 							'goods_opt' => $prd->goods_opt,
 							'qty' => $d['qty'],
 							'store_cd' => $d['store_cd'],
-							'storage_cd' => $storage_cd,
+							'storage_cd' => $d['storage_cd'],
 							'state' => $state,
 							'exp_dlv_day' => $exp_dlv_day_data,
 							'rel_order' => $rel_order,
-							'storage_comment' => $d['storage_memo']??'',
+							'comment' => $d['storage_memo']??'',
 							'req_id' => $admin_id,
 							'req_rt' => now(),
 							'rec_id' => $admin_id,
@@ -636,11 +656,11 @@ class stk19Controller extends Controller
 							'goods_opt' => $prd->goods_opt,
 							'qty' => $d['qty'],
 							'store_cd' => $d['store_cd'],
-							'storage_cd' => $storage_cd,
+							'storage_cd' => $d['storage_cd'],
 							'state' => $state,
 							'exp_dlv_day' => $exp_dlv_day_data,
 							'rel_order' => $rel_order,
-							'storage_comment' => $d['storage_memo']??'',
+							'comment' => $d['storage_memo']??'',
 							'req_id' => $admin_id,
 							'req_rt' => now(),
 							'rec_id' => $admin_id,
@@ -714,7 +734,7 @@ class stk19Controller extends Controller
 				// product_stock_storage -> 보유재고 차감
 				DB::table('product_stock_storage')
 					->where('prd_cd', '=', $prd->prd_cd)
-					->where('storage_cd', '=', $storage_cd)
+					->where('storage_cd', '=', $d['storage_cd'])
 					->update([
 						'wqty' => DB::raw("wqty - $cnt"),
 						'ut' => now(),
@@ -726,7 +746,7 @@ class stk19Controller extends Controller
 						'goods_no' => $prd->goods_no,
 						'prd_cd' => $prd->prd_cd,
 						'goods_opt' => $prd->goods_opt,
-						'location_cd' => $storage_cd,
+						'location_cd' => $d['storage_cd'],
 						'location_type' => 'STORAGE',
 						'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
 						'price' => $prd->price,
@@ -745,14 +765,13 @@ class stk19Controller extends Controller
 					// product_stock_storage 창고 실재고 차감
 					DB::table('product_stock_storage')
 						->where('prd_cd', '=', $prd->prd_cd)
-						->where('storage_cd', '=', $storage_cd)
+						->where('storage_cd', '=', $d['storage_cd'])
 						->update([
 							'qty' => DB::raw('qty - ' . ($d['qty'] ?? 0)),
 							'ut' => now(),
 						]);
 				}
 			}
-
 			DB::commit();
 			$code = 200;
 			$msg = "창고출고가 정상적으로 등록되었습니다.";

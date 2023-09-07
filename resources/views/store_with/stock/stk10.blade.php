@@ -23,8 +23,6 @@
                     <a href="/store/stock/stk14" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청분출고</a>
                     <a href="/store/stock/stk15" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반출고</a>
                     <a href="/store/stock/stk19" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>창고출고</a>
-					@else
-                    <a href="/store/stock/stk19" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>창고출고</a>
                     @endif
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
@@ -277,8 +275,6 @@
             <a href="/store/stock/stk14" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청분출고</a>
             <a href="/store/stock/stk15" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반출고</a>
 			<a href="/store/stock/stk19" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>창고출고</a>
-			@else
-			<a href="/store/stock/stk19" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>창고출고</a>
 			@endif
             <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
         </div>
@@ -440,7 +436,7 @@
             }
         },
         {field: "req_comment", headerName: "매장메모", width: 300},
-        {field: "storage_comment", headerName: "창고메모", width: 300},
+        {field: "storage_comment", headerName: "창고메모", width: 300, hide:true},
         {field: "comment", headerName: "본사메모", width: 300, 
             editable: function(params) {return params.data.state === 10;}, 
             cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}

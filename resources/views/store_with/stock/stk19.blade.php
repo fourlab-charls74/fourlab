@@ -181,9 +181,7 @@
 							<select id='storage' name='storage' class="form-control form-control-sm"  style='width:160px;'>
 								<option value=''>선택</option>
 								@foreach ($storages as $storage)
-									@if ($storage->default_yn == "Y")
-										<option value='{{ $storage->storage_cd }}' selected >{{ $storage->storage_nm }} (대표) </option>
-									@endif
+									<option value='{{ $storage->storage_cd }}' >{{ $storage->storage_nm }} @if ($storage->default_yn == "Y") (대표) @endif </option>
 								@endforeach
 							</select>
 						</div>
@@ -213,13 +211,13 @@
 						</div>
 						<div class="d-flex">
 							<select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-								<option value="">선택</option>
+								<option value="">차수</option>
 							@foreach ($rel_order_res as $rel_order)
 								<option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
 							@endforeach
 							</select>
 							<select id='rel_type' name='rel_type' class="form-control form-control-sm mr-2"  style='width:80px;display:inline'>
-								<option value="">선택</option>
+								<option value="">상태</option>
 								<option value="rel_process">출고처리</option>
 								<option value="rel_success">출고완료</option>
 							</select>
@@ -250,25 +248,25 @@
 			{field: "rel_qty", headerName: "요청수량", type: "numberType", editable: true, cellStyle: {'background-color': '#ffff99'}},
 			{headerName: "창고보유재고",
 				children: [
-						@foreach (@$storages as $storage)
-					{field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
-						cellRenderer: function(params) {
-							let storage_cd = '{{ $storage->storage_cd }}';
-							let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-							if (arr.length > 0) {
-								let wqty = arr[0].wqty.toString();
-								let spaceIndex = wqty.indexOf(" ");
-								if (spaceIndex !== -1) {
-									let red_text = `<span style="color: red;">${wqty.slice(spaceIndex)}</span>`;
-									let change_red_font = wqty.slice(0, spaceIndex) + red_text;
-									return change_red_font;
-								} else {
-									return arr[0].wqty;
+					@foreach (@$storage_arr as $storage)
+						{field: '{{$storage['storage_cd']}}', headerName: '{{$storage['storage_nm']}}', type: "numberType",
+							cellRenderer: function(params) {
+								let storage_cd = '{{$storage['storage_cd']}}';
+								let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
+								if (arr.length > 0) {
+									let wqty = arr[0].wqty.toString();
+									let spaceIndex = wqty.indexOf(" ");
+									if (spaceIndex !== -1) {
+										let red_text = `<span style="color: red;">${wqty.slice(spaceIndex)}</span>`;
+										let change_red_font = wqty.slice(0, spaceIndex) + red_text;
+										return change_red_font;
+									} else {
+										return arr[0].wqty;
+									}
 								}
+								return 0;
 							}
-							return 0;
-						}
-					},
+						},
 					@endforeach
 				],
 			},
@@ -286,6 +284,8 @@
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			gx = new HDGrid(gridDiv, columns, {
 				onCellValueChanged: (e) => {
+					let storage = $('#storage').val();
+					if (storage == '') return alert('출고창고를 선택해주세요.');
 					e.node.setSelected(true);
 					if (e.column.colId == "rel_qty") {
 						if (isNaN(e.newValue) == true || e.newValue == "") {
@@ -295,9 +295,16 @@
 							if (e.oldValue != undefined) {
 								let oldValue = e.oldValue * 1;
 								let newValue = e.newValue * 1;
-								let qty = (parseInt(e.data.storage_qty[0].wqty) + oldValue) - newValue;
-								let total_qty = e.data.storage_qty[0].wqty2 - qty;
-								e.data.storage_qty[0].wqty = `${qty} (-${total_qty})`;
+								let storage_qty = 0;
+								@foreach ($storage_arr as  $storage) {
+									if (storage == '{{$storage['storage_cd']}}') {
+										storage_qty = {{$storage['seq']}};
+									} 
+								}
+								@endforeach
+								let qty = (parseInt(e.data.storage_qty[storage_qty].wqty) + oldValue) - newValue;
+								let total_qty = e.data.storage_qty[storage_qty].wqty2 - qty;
+								e.data.storage_qty[storage_qty].wqty = `${qty} (-${total_qty})`;
 								gx.gridOptions.api.applyTransaction({update: [e.data]});
 								gx.gridOptions.api.redrawRows();
 							}
@@ -317,20 +324,21 @@
 		// 출고
 		function requestRelease() {
 			let rows = gx.getSelectedRows();
-			if(rows.length < 1) return alert("출고처리할 상품을 선택해주세요.");
-			if(rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 요청수량을 입력해주세요.");
-
+			
 			let storage_cd = $('[name=storage]').val();
 			if(storage_cd === '') return alert("상품을 출고할 창고를 선택해주세요.");
 
 			let store_cd =$('[name=store_no]').val();
 			if(store_cd === null) return alert("상품을 보낼 매장을 선택해주세요.");
-			
+
 			let rel_order = $('#rel_order').val();
 			if(rel_order === '') return alert("출고차수를 선택해주세요.");
-			
+
 			let rel_type = $('#rel_type').val();
-			if(rel_type === '') return alert("출고구분을 선택해주세요.")
+			if(rel_type === '') return alert("상태를 선택해주세요.")
+			
+			if(rows.length < 1) return alert("출고처리할 상품을 선택해주세요.");
+			if(rows.filter(r => !r.rel_qty || !r.rel_qty.trim() || r.rel_qty == 0 || isNaN(parseInt(r.rel_qty))).length > 0) return alert("선택한 상품의 요청수량을 입력해주세요.");
 
 			let over_qty_rows = rows.filter(row => {
 				let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);

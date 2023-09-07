@@ -90,13 +90,13 @@
 								</div>
 								<div class="d-flex">
 									<select id='rel_order' name='rel_order' class="form-control form-control-sm mr-2"  style='width:70px;display:inline'>
-										<option value="">선택</option>
+										<option value="">차수</option>
 									@foreach ($rel_order_res as $rel_order)
 										<option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
 									@endforeach
 									</select>
 									<select id='rel_type' name='rel_type' class="form-control form-control-sm mr-2"  style='width:80px;display:inline'>
-										<option value="">선택</option>
+										<option value="">상태</option>
 										<option value="rel_process">출고처리</option>
 										<option value="rel_success">출고완료</option>
 									</select>
@@ -130,6 +130,7 @@
 			{field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
 			{field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
 			{field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
+			{field: "storage_nm", headerName: "출고창고", width: 100, cellStyle: {"text-align": "center"}},
 			{field: "store_nm", headerName: "출고매장", width: 100, cellStyle: {"text-align": "center"}},
 			{field: "qty", headerName: "요청수량", width: 60, type: 'currencyType', cellStyle: {"background-color": "#ffff99"}, editable:true},
 			{headerName: "창고보유재고",
@@ -247,9 +248,10 @@
 			var worksheet = workbook.Sheets[firstSheetName];
 
 			var excel_columns = {
-				'A': 'store_cd',
-				'B': 'prd_cd',
-				'C': 'qty',
+				'A': 'storage_cd',
+				'B': 'store_cd',
+				'C': 'prd_cd',
+				'D': 'qty'
 			};
 
 			var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
@@ -257,7 +259,7 @@
 
 			let count = gx.gridOptions.api.getDisplayedRowCount();
 			let rows = [];
-			while (worksheet['C' + rowIndex]) {
+			while (worksheet['D' + rowIndex]) {
 				let row = {};
 				Object.keys(excel_columns).forEach((column) => {
 					let item = worksheet[column + rowIndex];
@@ -266,7 +268,7 @@
 					}
 				});
 
-				row.return_price = row.return_price || 0; // 반품단가
+				row.return_price = row.return_price || 0;
 				row = { ...row,
 					count: ++count, isEditable: true,
 				};
@@ -330,22 +332,30 @@
 		function requestRelease() {
 			let rows = gx.getSelectedRows();
 
-			if(rows.length < 1) return alert("창고출고할 상품을 선택해주세요.");
-
-			let storage_qty = "";
-			let over_qty = "";
-			for(let i = 0; i < rows.length; i++) {
-				storage_qty = rows[i].storage_qty;
-				over_qty = rows[i].qty;
-
-				if(storage_qty < over_qty) return alert(`창고의 재고보다 많은 수량을 요청하실 수 없습니다`);
-				if(over_qty == 0) return alert(`배분수량을 0개를 요청할 수 없습니다. 1개 이상을 요청해주세요.`);
-			}
 			let rel_order = $('#rel_order').val();
 			if(rel_order === '') return alert("출고차수를 선택해주세요.");
 
 			let rel_type = $('#rel_type').val();
-			if(rel_type === '') return alert("출고구분을 선택해주세요.") 
+			if(rel_type === '') return alert("상태를 선택해주세요.")
+
+			if(rows.length < 1) return alert("창고출고할 상품을 선택해주세요.");
+
+
+			let over_qty_rows = rows.filter(row => {
+				let storage_cd = row.storage_cd;
+				let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);
+				if(cur_storage.length > 0) {
+					if(cur_storage[0].wqty2 < parseInt(row.qty)) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+				return true; // 상품재고가 없는경우
+			});
+
+			if(over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
+
 
 			if(!confirm("해당 상품을 출고하시겠습니까?")) return;
 
@@ -384,7 +394,6 @@
 			}).then(async (res) => {
 				let data = res.data.body.map(r => ({...r, qty: r.storage_wqty < r.qty ? r.storage_wqty : r.qty}));
 				await gx.gridOptions.api.applyTransaction({add : data});
-				updatePinnedRow();
 			}).catch((error) => {
 				console.log(error);
 			});
