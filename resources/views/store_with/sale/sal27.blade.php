@@ -90,15 +90,19 @@
                     </div>
 				</div>
                 <div class="row">
-	                <div class="col-lg-4 inner-td">
-		                <div class="form-group">
-			                <label>바코드</label>
-			                <div class="flex_box">
-				                <input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm search-enter">
-				                <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-			                </div>
-		                </div>
-	                </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">바코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm w-100 ac-style-no search-enter">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품검색조건</label>
@@ -200,7 +204,7 @@
                     return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
                 } else {
                     let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-                    return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
+                    return '<a href="#" onclick="return openStoreProduct(\'' + goods_no + '\');">' + (params.value || '') + '</a>';
                 }
             }
         },

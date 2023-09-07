@@ -59,6 +59,7 @@ class sal27Controller extends Controller
 
 		// 매장검색
 		$store_where = "";
+		$store_where2 = "";
 		if ($store_channel != '') {
 			$store_where .= " and s.store_channel = '" . Lib::quote($store_channel) . "'";
 		}
@@ -68,6 +69,7 @@ class sal27Controller extends Controller
 		if (count($store_cds) > 0) {
 			$store_cds = join(',', array_map(function($s) { return "'" . Lib::quote($s) . "'"; }, $store_cds));
 			$store_where .= " and s.store_cd in (" . $store_cds . ")";
+			$store_where2 .= " and h.location_cd in (" . $store_cds . ")";
 		}
 		
 		// 창고검색
@@ -186,10 +188,11 @@ class sal27Controller extends Controller
 					) as term_sale_qty
 					, (
 						select ifnull(sum(qty), 0)
-						from product_stock_hst
+						from product_stock_hst h
 						where prd_cd = pc.prd_cd
 							$date_where2
-							and type in (1,9) and location_type = 'STORAGE'
+							and type in (1,9) and location_type = 'STORE'
+							$store_where2
 					) as term_in_qty
 					, ifnull(date_format(first_release_date, '%Y-%m-%d'), '') as first_release_date
 					, ifnull(psr.qty, 0) as term_release_qty
@@ -271,7 +274,7 @@ class sal27Controller extends Controller
 						select h.prd_cd, sum(h.qty) as qty
 						from product_stock_hst h
 							inner join store s on s.store_cd = h.location_cd
-						where h.location_type = 'STORE' $store_where
+						where h.location_type = 'STORE' $store_where2
 							$date_where5
 						group by h.prd_cd
 					) store_hst on store_hst.prd_cd = pc.prd_cd
