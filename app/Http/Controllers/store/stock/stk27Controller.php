@@ -15,6 +15,19 @@ const PRODUCT_STOCK_TYPE_LOSS = 14; // 재고분류 : LOSS
 
 class stk27Controller extends Controller
 {
+	/** 창고조정종류 (code의 PRODUCT_STOCK_TYPE 참고하여 임의설정) */
+	private function _getLossTypes()
+	{
+		return [
+			(object) [ 'code_id' => 1, 'code_val' => '입고', 'hst_type' => 1 ],
+			(object) [ 'code_id' => 9, 'code_val' => '상품반품', 'hst_type' => 9 ],
+			(object) [ 'code_id' => 17, 'code_val' => '출고', 'hst_type' => 17 ],
+			(object) [ 'code_id' => 11, 'code_val' => '매장반품', 'hst_type' => 11 ],
+			(object) [ 'code_id' => 16, 'code_val' => '창고이동', 'hst_type' => 16 ],
+			(object) [ 'code_id' => 14, 'code_val' => 'LOSS', 'hst_type' => 14 ],
+		];
+	}
+
 	public function index()
 	{
         $sdate = now()->sub(1, 'week')->format('Y-m-d');
@@ -24,6 +37,7 @@ class stk27Controller extends Controller
 			'sdate' => $sdate,
 			'edate' => $edate,
 			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
+			'loss_types' => $this->_getLossTypes(),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk27', $values);
 	}
@@ -34,6 +48,7 @@ class stk27Controller extends Controller
         $edate = $request->input('edate', date('Y-m-d'));
         $storage_cd = $request->input('storage_no', '');
 		$loss_reason = $request->input('loss_reason', '');
+		$loss_type = $request->input('loss_type', '');
 
         // where
         $where = "";
@@ -41,6 +56,7 @@ class stk27Controller extends Controller
         $where .= " and s.ssc_date <= '$edate' ";
         if($storage_cd != '') $where .= " and s.storage_cd = '$storage_cd' ";
         if($loss_reason != '') $where .= " and sp.loss_reason = '$loss_reason' ";
+        if($loss_type != '') $where .= " and sp.loss_type = '$loss_type' ";
 
         $sql = "
             select
@@ -106,6 +122,7 @@ class stk27Controller extends Controller
             'sdate'         => $ssc == '' ? date("Y-m-d") : $ssc->ssc_date,
             'ssc'           => $ssc,
 			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
+			'loss_types' => $this->_getLossTypes(),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk27_show', $values);
     }
@@ -144,6 +161,7 @@ class stk27Controller extends Controller
                 s.loss_price,
                 (s.storage_qty * s.price) as loss_price2,
                 (s.storage_qty * s.tag_price) as loss_tag_price,
+                s.loss_type,
                 if(r.code_val is null, '', s.loss_reason) as loss_reason,
                 ifnull(r.code_val, s.loss_reason) as loss_reason_val,
                 s.comment
@@ -158,6 +176,12 @@ class stk27Controller extends Controller
             where s.ssc_cd = :ssc_cd
         ";
         $products = DB::select($sql, ['ssc_cd' => $ssc_cd]);
+		$loss_types = $this->_getLossTypes();
+
+		foreach ($products as $row) {
+			$type_idx = array_search(($row->loss_type ?? ''), array_column($loss_types, 'code_id'));
+			$row->loss_type_val = ($type_idx === false ? '' : $loss_types[$type_idx]->code_val);
+		}
 
 		return response()->json([
 			"code" => 200,
@@ -200,6 +224,8 @@ class stk27Controller extends Controller
                     'admin_id' => $admin_id,
                 ]);
 
+			$loss_types = $this->_getLossTypes();
+
             foreach($products as $product) {
 				$loss_qty = $product['storage_qty'] - $product['qty'];
 				
@@ -214,6 +240,7 @@ class stk27Controller extends Controller
                         'storage_qty' => $product['storage_qty'],
                         'loss_qty' => $loss_qty,
                         'loss_price' => $product['price'] * $loss_qty,
+						'loss_type' => $product['loss_type'] ?? null,
 						'loss_reason' => $product['loss_reason'] ?? null,
 						'comment' => $product['comment'] ?? null,
                         'rt' => now(),
@@ -244,6 +271,9 @@ class stk27Controller extends Controller
 				$wonga = DB::table('product_stock')->where('prd_cd', $product['prd_cd'])->value('wonga');
 
 				if ($loss_qty > 0 || $loss_qty < 0) {
+					$loss_hst_type = array_search(($product['loss_type'] ?? ''), array_column($loss_types, 'code_id'));
+					$loss_hst_type = $loss_hst_type === false ? '' : $loss_types[$loss_hst_type]->hst_type;
+
 					// 재고이력 등록
 					DB::table('product_stock_hst')
 						->insert([
@@ -252,13 +282,13 @@ class stk27Controller extends Controller
 							'goods_opt' => $product['goods_opt'],
 							'location_cd' => $storage_cd,
 							'location_type' => 'STORAGE',
-							'type' => PRODUCT_STOCK_TYPE_LOSS, // 재고분류 : LOSS
+							'type' => $loss_hst_type,
 							'price' => $product['price'],
 							'wonga' => $wonga ?? 0,
 							'qty' => $loss_qty * -1,
 							'stock_state_date' => date('Ymd'),
 							'ord_opt_no' => '',
-							'comment' => 'LOSS등록',
+							'comment' => '창고재고조정(' . ($product['loss_type_val'] ?? '') . ')',
 							'rt' => now(),
 							'admin_id' => $admin_id,
 							'admin_nm' => $admin_nm,
@@ -283,6 +313,7 @@ class stk27Controller extends Controller
 		$values = [ 
 			'sdate' => date("Y-m-d"),
 			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
+			'loss_types' => $this->_getLossTypes(),
 		];
         return view(Config::get('shop.store.view') . '/stock/stk27_batch', $values);
     }
@@ -320,11 +351,13 @@ class stk27Controller extends Controller
         $data = $request->input('data', []);
 		$ssc_type = $request->input('ssc_type', 'B');
         $result = [];
+		$loss_types = $this->_getLossTypes();
 
         foreach ($data as $key => $d) {
             $prd_cd = $d['prd_cd'];
             $qty = $d['qty'] ?? 0;
             $count = $d['count'] ?? '';
+			$loss_type_val = $d['loss_type_val'] ?? '';
 			$loss_reason_val = $d['loss_reason_val'] ?? '';
 			$comment = $d['comment'] ?? '';
 			
@@ -373,6 +406,11 @@ class stk27Controller extends Controller
                 limit 1
             ";
             $row = DB::selectOne($sql);
+
+			$type_idx = array_search($loss_type_val, array_column($loss_types, 'code_val'));
+			$row->loss_type = ($type_idx === false ? '' : $loss_types[$type_idx]->code_id);
+			$row->loss_type_val = ($type_idx === false ? '' : $loss_type_val);
+
             array_push($result, $row);
         }
 
@@ -394,6 +432,7 @@ class stk27Controller extends Controller
 		$values = [
 			'sdate' => date("Y-m-d"),
 			'loss_reasons'	=> SLib::getCodes('STORAGE_LOSS_REASON'),
+			'loss_types' => $this->_getLossTypes(),
 		];
 		return view(Config::get('shop.store.view') . '/stock/stk27_barcode_batch', $values);
 	}

@@ -44,7 +44,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">재고조정일자</th>
+                                            <th class="required">조정일자</th>
                                             <td>
 	                                            <div class="form-inline">
 		                                            <div class="docs-datepicker form-inline-inner input_box w-100">
@@ -72,7 +72,7 @@
 		                                            </div>
 	                                            </div>
                                             </td>
-                                            <th>재고조정코드</th>
+                                            <th>조정코드</th>
                                             <td></td>
                                         </tr>
                                         <tr>
@@ -137,6 +137,8 @@
 
 	const loss_reasons = <?= json_encode(@$loss_reasons) ?>;
 	loss_reasons.unshift({ code_id: "", code_val: "-" });
+	const loss_types = <?= json_encode(@$loss_types) ?>;
+	loss_types.unshift({ code_id: "", code_val: "-" });
 
     let columns = [
         {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 40, cellClass: 'hd-grid-code',
@@ -175,14 +177,24 @@
 			editable: (params)=> params.node.rowPinned !== 'top',
 			cellClass: (params) => (['hd-grid-number', params.node.rowPinned !== 'top' ? 'hd-grid-edit' : '']),
         },
-        {field: "loss_qty", headerName: "LOSS수량", width: 80, type: 'currencyType',
+        {field: "loss_qty", headerName: "조정수량", width: 80, type: 'currencyType',
 			cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && (params.value > 0 || params.value < 0) ? '#ff9999' : 'inherit' }),
 		},
-        {field: "loss_price", headerName: "LOSS금액", width: 80, type: 'currencyType',
+        {field: "loss_price", headerName: "조정금액", width: 80, type: 'currencyType',
 			cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && (params.value > 0 || params.value < 0) ? '#ff9999' : 'inherit' }),
         },
+		{field: "loss_type", hide: true},
+		{field: "loss_type_val", headerName: "조정종류", width: 90,
+			editable: (params)=> params.node.rowPinned !== 'top',
+			cellClass: (params) => (['hd-grid-code', params.node.rowPinned === 'top' ? '' : 'hd-grid-edit']),
+			cellEditor: 'agRichSelectCellEditor',
+			cellEditorPopup: true,
+			cellEditorParams: {
+				values: loss_types.map(rs => rs.code_val),
+			},
+		},
 		{field: "loss_reason", hide: true},
-		{field: "loss_reason_val", headerName: "LOSS사유", width: 90,
+		{field: "loss_reason_val", headerName: "조정사유", width: 90,
 			editable: (params)=> params.node.rowPinned !== 'top',
 			cellClass: (params) => (['hd-grid-code', params.node.rowPinned === 'top' ? '' : 'hd-grid-edit']),
 			cellEditor: 'agRichSelectCellEditor',
@@ -229,6 +241,8 @@
 						e.node.setDataValue('loss_price', parseInt(e.data.price) * parseInt(e.data.loss_qty));
                         updatePinnedRow();
                     }
+				} else if (e.column.colId === "loss_type_val") {
+					e.node.setDataValue('loss_type', loss_types.find(rs => rs.code_val === e.value)?.code_id || '');
                 } else if (e.column.colId === "loss_reason_val") {
 					e.node.setDataValue('loss_reason', loss_reasons.find(rs => rs.code_val === e.value)?.code_id || '');
 				}
@@ -308,8 +322,9 @@
 		let excel_columns = {
 			'A': 'prd_cd',
 			'B': 'qty',
-			'C': 'loss_reason_val',
-			'D': 'comment',
+			'C': 'loss_type_val',
+			'D': 'loss_reason_val',
+			'E': 'comment',
         };
 
         let firstRowIndex = 2; // 엑셀 2행부터 시작 (샘플데이터 참고)
@@ -422,8 +437,8 @@
 		if(rows.length < 1) return alert("재고조정할 상품을 추가해주세요.");
 		if(md_id === '') return alert("담당자를 선택해주세요.");
 
-		let not_reason_rows = rows.filter(row => row.storage_wqty != row.qty && !row.loss_reason);
-		if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
+		let not_reason_rows = rows.filter(row => row.storage_wqty != row.qty && (!row.loss_reason || !row.loss_type));
+		if (not_reason_rows.length > 0) return alert("조정수량이 발생한 항목에는 반드시 조정종류와 조정사유를 입력해주세요.");
 
         if(!confirm("등록하시겠습니까?")) return;
 

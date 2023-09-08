@@ -44,7 +44,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">재고조정일자</th>
+                                            <th class="required">조정일자</th>
                                             <td>
 	                                            <div class="form-inline">
 		                                            <div class="docs-datepicker form-inline-inner input_box w-100">
@@ -72,7 +72,7 @@
 			                                        </div>
 		                                        </div>
 	                                        </td>
-	                                        <th>재고조정코드</th>
+	                                        <th>조정코드</th>
 	                                        <td></td>
                                         </tr>
                                         <tr>
@@ -128,7 +128,7 @@
 			                @endforeach
 		                </select>
 	                </div>
-                    <button type="button" onclick="setAllLossReason();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-pen"></i> LOSS사유 일괄입력</button>
+                    <button type="button" onclick="setAllLossReason();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-pen"></i> 조정사유 일괄입력</button>
 	                <span class="mx-2">|</span>
                     <button type="button" onclick="delGoods();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 상품삭제</button>
                 </div>
@@ -185,14 +185,14 @@
 			editable: (params)=> params.node.rowPinned !== 'top',
 			cellClass: (params) => (['hd-grid-number', params.node.rowPinned !== 'top' ? 'hd-grid-edit' : '']),
         },
-        {field: "loss_qty", headerName: "LOSS수량", width: 80, type: 'currencyType',
+        {field: "loss_qty", headerName: "조정수량", width: 80, type: 'currencyType',
 			cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && (params.value > 0 || params.value < 0) ? '#ff9999' : 'inherit' }),
         },
-        {field: "loss_price", headerName: "LOSS금액", width: 80, type: 'currencyType',
+        {field: "loss_price", headerName: "조정금액", width: 80, type: 'currencyType',
 			cellStyle: (params) => ({ 'background-color': params.node.rowPinned !== 'top' && (params.value > 0 || params.value < 0) ? '#ff9999' : 'inherit' }),
         },
 		{field: "loss_reason", hide: true},
-		{field: "loss_reason_val", headerName: "LOSS사유", width: 90,
+		{field: "loss_reason_val", headerName: "조정사유", width: 90,
 			editable: (params)=> params.node.rowPinned !== 'top',
 			cellClass: (params) => (['hd-grid-code', params.node.rowPinned === 'top' ? '' : 'hd-grid-edit']),
 			cellEditor: 'agRichSelectCellEditor',
@@ -457,7 +457,7 @@
 		if(md_id === '') return alert("담당자를 선택해주세요.");
 
 		let not_reason_rows = rows.filter(row => row.storage_wqty != row.qty && !row.loss_reason);
-		if (not_reason_rows.length > 0) return alert("LOSS수량이 발생한 항목에는 반드시 LOSS사유를 입력해주세요.");
+		if (not_reason_rows.length > 0) return alert("조정수량이 발생한 항목에는 반드시 조정사유를 입력해주세요.");
 
 		if(!confirm("등록하시겠습니까?")) return;
 
