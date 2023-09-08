@@ -79,9 +79,9 @@
                                                         <option value="1" @if($row->as_type == '1') selected @endif>매장접수(A/S)</option>
                                                         <option value="2" @if($row->as_type == '2') selected @endif>매장접수(불량)</option>
                                                         <option value="3" @if($row->as_type == '3') selected @endif>매장접수(심의)</option>
-                                                        <option value="4" @if($row->as_type == '4') selected @endif>본사A/S접수/진행</option>
-                                                        <option value="5" @if($row->as_type == '5') selected @endif>본사A/S완료</option>
-                                                        <option value="6" @if($row->as_type == '6') selected @endif>본사불량</option>
+                                                        <option value="4" @if($row->as_type == '4') selected @endif>접수완료/진행</option>
+                                                        <option value="5" @if($row->as_type == '5') selected @endif>완료(정상)</option>
+                                                        <option value="6" @if($row->as_type == '6') selected @endif>완료(불량)</option>
                                                     </select>
                                                 </div>
                                             </td>

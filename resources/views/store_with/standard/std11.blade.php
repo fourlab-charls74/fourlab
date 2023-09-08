@@ -110,13 +110,17 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="as_state">수선상태</label>
-                            <div class="flex_box">
+							<div class="d-flex justify-content-between align-items-center">
                                 <select class="form-control form-control-sm" name="as_state" id="as_state">
                                     <option value="">전체</option>
                                 @foreach($as_states as $as)
                                     <option value="{{ $as->code_id }}">{{ $as->code_val }}</option>
                                 @endforeach
                                 </select>
+								<div class="custom-control custom-checkbox form-check-box ml-1" style="min-width: 110px;">
+									<input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y" checked>
+									<label class="custom-control-label font-weight-normal" for="ext_done_state">완료 조회 제외</label>
+								</div>
                             </div>
                         </div>
                     </div>
@@ -155,20 +159,18 @@
 		 *  1 : 매장접수(A/S)
 		 *  2 : 매장접수(불량)
 		 *  3 : 매장접수(심의)
-		 *  4 : 본사A/S접수/진행
-		 *  5 : 본사A/S완료
-		 *  6 : 본사불량
+		 *  4 : 접수완료/진행
+		 *  5 : 완료(정상)
+		 *  6 : 완료(불량)
 		 */
 
 		/**
 		 * 수선진행상태
-		 *  10 : 수선요청
-		 *  11 : 불량요청
-		 *  12 : 본사심의요청
-		 *  20 : 수선접수
-		 *  30 : 수선진행
-		 *  40 : 수선완료
-		 *  50 : 불량
+		 *  10 : 매장접수
+		 *  20 : 본사접수
+		 *  30 : 진행중
+		 *  40 : 완료(정상)
+		 *  50 : 완료(불량)
 		 */
 
     const DEFAULT_STYLE = {'text-align': 'center'};
@@ -213,27 +215,23 @@
             cellRenderer: (params) => {
                 switch (params.value) {
                     case 10:
-                        return "수선요청";
                     case 11:
-                        return "불량요청";
                     case 12:
-                        return "본사심의요청";
+                        return "매장접수";
                     case 20:
-                        return "수선접수";
+                        return "본사접수";
                     case 30:
-                        return "수선진행";
+                        return "진행중";
                     case 40:
-                        return "수선완료";
+                        return "완료(정상)";
                     case 50:
-                        return "불량";
+                        return "완료(불량)";
                 }
             },
             cellStyle: (params) => {
                 switch (params.value) {
                     case 10:
-                        return {'text-align' : 'center'};
                     case 11:
-                        return {'text-align' : 'center'};
                     case 12:
                         return {'text-align' : 'center'};
                     case 20:
@@ -261,11 +259,11 @@
                     case "3": 
                         return "매장접수(심의)";
                     case "4": 
-                        return "본사A/S접수/진행";
+                        return "접수완료/진행";
                     case "5": 
-                        return "본사A/S완료";
+                        return "완료(정상)";
                     case "6": 
-                        return "본사불량";
+                        return "완료(불량)";
                     default:
                         return params.value;
                 };

@@ -86,13 +86,15 @@ class std11Controller extends Controller
 		$store_cd = $request->input('store_no');
 		$as_type = $request->input('as_type');
 		$as_state = $request->input('as_state');
-
+		$ext_done_state = $request->input('ext_done_state');
+		
 		$where = "";
 		if ($date_type != '') $where .= "and $date_type >= '$sdate' and $date_type <= '$edate'";
 		if ($where1 != '') $where .= "and $where1 like '%" . $where2 . "%'";
 		if ($store_cd != '') $where .= "and a.store_cd = '$store_cd'";
 		if ($as_type != '') $where .= "and a.as_type = '$as_type'";
 		if ($as_state != '') $where .= "and a.as_state = '$as_state'";
+		if ($ext_done_state == 'Y') $where .= "and (a.as_state != '40' and a.as_state != '50')";
 		
 
 		$query = /** @lang text */

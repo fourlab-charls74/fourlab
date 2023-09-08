@@ -25,12 +25,14 @@ class std11Controller extends Controller
 		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
 		$as_states = SLib::getCodes("AS_STATE");
+		$as_types = SLib::getCodes("AS_TYPE");
 		$values = [
             'sdate' => $sdate,
             'edate' => date("Y-m-d"),
 			'items' => $items,
 		    'com_types' => $com_types,
-		    'as_states' => $as_states
+		    'as_states' => $as_states,
+			'as_types' => $as_types
         ];
 		return view(Config::get('shop.shop.view') . '/standard/std11', $values);
 	}
@@ -77,21 +79,55 @@ class std11Controller extends Controller
 		$where2 = $request->input('where2');
 		$store_cd = $request->input('store_no');
 		$as_type = $request->input('as_type');
+		$as_state = $request->input('as_state');
 		$user_store = Auth('head')->user()->store_cd;
+		$ext_done_state = $request->input('ext_done_state');
 
 		$where = "";
 		if ($date_type != '') $where .= "and $date_type >= '$sdate' and $date_type <= '$edate'";
 		if ($where1 != '') $where .= "and $where1 like '%" . $where2 . "%'";
 		if ($store_cd != '') $where .= "and a.store_cd = '$store_cd'";
 		if ($as_type != '') $where .= "and a.as_type = '$as_type'";
+		if ($as_state != '') $where .= "and a.as_state = '$as_state'";
+		if ($ext_done_state == 'Y') $where .= "and (a.as_state != '40' and a.as_state != '50')";
 		
 
 		$query = /** @lang text */
             "select
-				a.*
+				a.idx
+				, a.receipt_date
+				, a.as_state
+				, s.store_cd
+				, s.store_nm as store_nm
+				, a.as_type
+				, a.customer_no
+				, a.customer
+				, a.mobile
+				, a.zipcode
+				, a.addr1
+				, a.addr2
+				, a.prd_cd
+				, a.goods_nm
+				, a.color
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
+				, a.is_free
+				, a.as_amt
+				, a.content
+				, a.h_receipt_date
+				, a.end_date
+				, a.err_date
+				, a.h_content
+				, a.rt
+				, a.ut
 				, s.store_nm as store_nm
 			from repair_service a
-				left outer join store s on s.store_cd = a.store_cd 
+				left outer join store s on s.store_cd = a.store_cd
+				inner join product_code pc on pc.prd_cd = a.prd_cd
 			where 1=1 and a.store_cd = '$user_store'
 			$where
 			order by a.idx desc

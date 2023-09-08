@@ -149,13 +149,13 @@
                                             <td>
                                                 <div class="flex_box">
                                                     <div class="form-inline form-radio-box">
+														<div class="custom-control custom-radio">
+															<input type="radio" name="is_free" id="use_n" class="custom-control-input" value="N" checked/>
+															<label class="custom-control-label" for="use_n">무료</label>
+														</div>
                                                         <div class="custom-control custom-radio">
                                                             <input type="radio" name="is_free" id="use_y" class="custom-control-input" value="Y"/>
                                                             <label class="custom-control-label" for="use_y">유료</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="is_free" id="use_n" class="custom-control-input" value="N" checked/>
-                                                            <label class="custom-control-label" for="use_n">무료</label>
                                                         </div>
                                                     </div>
                                                     <div >
