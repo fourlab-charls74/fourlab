@@ -192,7 +192,7 @@
                         </div>
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="pr_code">행사코드</label>
+                                <label for="pr_code">판매처수수료</label>
                                 <div class="flax_box">
                                     <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
                                         <option value=''>전체</option>

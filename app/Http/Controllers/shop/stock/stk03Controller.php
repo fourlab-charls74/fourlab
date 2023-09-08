@@ -163,7 +163,7 @@ class stk03Controller extends Controller
                 $in_prd_cds = join(',', $prd_cds);
                 $where .= " and o.prd_cd in ($in_prd_cds) ";
             } else {
-                $where .= " and o.prd_cd = '$prd_cd' ";
+                $where .= " and o.prd_cd like '$prd_cd%' ";
             }
         }
 

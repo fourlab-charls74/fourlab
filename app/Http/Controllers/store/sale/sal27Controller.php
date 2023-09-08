@@ -14,7 +14,7 @@ class sal27Controller extends Controller
 {
 	public function index(Request $request)
 	{
-		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m-d"));
+		$sdate = $request->input('sdate', now()->startOfMonth()->format("Y-m-d"));
 		$edate = $request->input('edate', now()->format("Y-m-d"));
 
 		$values = [

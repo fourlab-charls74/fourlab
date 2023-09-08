@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Number;
 
 class sal06Controller extends Controller
 {
@@ -114,7 +115,7 @@ class sal06Controller extends Controller
 				}
 				$where .= " and o.prd_cd in ($prd_cds_str) ";
 			} else {
-				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+				$where .= " and o.prd_cd like '" . Lib::quote($prd_cd) . "%' ";
 			}
 		}
 		
@@ -163,12 +164,35 @@ class sal06Controller extends Controller
 
 		$result = DB::select($sql);
 
+		$array = [];
+		
+		foreach($sale_kinds as $item) {
+			$id = $item->code_id;
+			$array["sale_kind_$id"] = 0;
+		}
+
+		$array['store_nm'] = '합계';
+
+		collect($result)->map(function ($row) use (&$sale_kinds, &$array) {
+			
+			foreach($sale_kinds as $item) {
+				$id = $item->code_id;
+
+				if(array_key_exists("sale_kind_$id", $array)) {
+					$array_row = (array) $row;
+					$array["sale_kind_$id"] += (int)($array_row["sale_kind_$id"]);
+				}
+			}
+
+		})->all();
+		
 		return response()->json([
 			'code'	=> 200,
 			'head'	=> array(
 				'total'	=> count($result)
 			),
-			'body' => $result
+			'body' => $result,
+			"sum" => $array
 		]);
 
 	}

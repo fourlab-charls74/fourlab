@@ -103,7 +103,7 @@
 				            </div>
 			            </div>
 		            </div>
-		            <div class="col-lg-4 inner-td">
+<!--		            <div class="col-lg-4 inner-td">
 			            <div class="form-group">
 				            <label for="formrow-email-input">매출시점</label>
 				            <div class="form-inline form-radio-box">
@@ -117,7 +117,7 @@
 					            </div>
 				            </div>
 			            </div>
-		            </div>
+		            </div>-->
 		            <div class="col-lg-4 inner-td">
 			            <div class="form-group">
 				            <label for="sell_type">판매유형</label>

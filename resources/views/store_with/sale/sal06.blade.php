@@ -86,7 +86,7 @@
 								<div class="form-inline-inner input-box w-100">
 									<div class="form-inline inline_btn_box">
 										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
 										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 									</div>
 								</div>
@@ -156,7 +156,7 @@
 							</div>
                         </div>
 					</div>-->
-					<div class="col-lg-4 inner-td">
+<!--					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">품목</label>
                             <div class="flax_box">
@@ -177,7 +177,7 @@
                                 <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                             </div>
                         </div>
-					</div>
+					</div>-->
 					{{-- <div class="col-lg-4">
 						<div class="form-group">
 							<label for="sale_yn">매출여부</label>
@@ -195,8 +195,6 @@
 							</div>
 						</div>
 					</div> --}}
-				</div>
-				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="store_cd">매장명</label>
@@ -277,11 +275,30 @@
 		gridId:"#div-gd",
 	});
 	let gx;
+	
+	let sale_kind_arr = '<?php echo $sale_kinds ?>';
+	
+	const pinnedRowData = [{ store_nm: '합계', sale_kind: [] }];
+	let column_data = [];
+	
+	JSON.parse(sale_kind_arr).forEach(function(row) {
+		let data = { 'headerName': row['code_val'], 'field': `sale_kind_${row['code_id']}`, 'type': 'currencyMinusColorType'};
+		column_data.push(data);
+	});
+
+	pinnedRowData.sale_kind = column_data;
+	
+	console.log(pinnedRowData);
 	$(document).ready(function() {
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns, {
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => { // 고정된 row styling
+				if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'};
+			},
+		});
 		Search();
 
 		// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
@@ -290,7 +307,14 @@
 	
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/sale/sal06/search', data, -1);
+		let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+		gx.Request('/store/sale/sal06/search', data, -1, function(res) {
+			gx.gridOptions.api.setPinnedTopRowData([{
+				...pinnedRow.data,
+				...res.sum,
+			}]);
+		});
+
 	}
 </script>
 @stop

@@ -98,7 +98,7 @@ class sal07Controller extends Controller
 				}
 				$where .= " and o.prd_cd in ($prd_cds_str) ";
 			} else {
-				$where .= " and o.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+				$where .= " and o.prd_cd like '" . Lib::quote($prd_cd) . "'% ";
 			}
 		}
 

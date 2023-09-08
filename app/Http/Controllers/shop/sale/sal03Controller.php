@@ -446,12 +446,12 @@ class sal03Controller extends Controller
 
 			$tot_in = DB::selectOne($sql_in);
 
-			$row['in_sum_qty']	= $tot_in->in_sum_qty;
-			$row['in_sum_amt']	= $tot_in->in_sum_amt;
+			$row['in_sum_qty']	= !empty($tot_in) ? $tot_in->in_sum_qty :  0;
+			$row['in_sum_amt']	= !empty($tot_in) ? $tot_in->in_sum_amt : 0;
 			$row['in_sale_rate']	= ($row['in_sum_qty'] == 0)?0:round($row['total_ord_qty'] / $row['in_sum_qty'] * 100);
 
-			$tot_in_sum_qty	+= $tot_in->in_sum_qty;
-			$tot_in_sum_amt	+= $tot_in->in_sum_amt;
+			$tot_in_sum_qty	+= !empty($tot_in) ? $tot_in->in_sum_qty :  0;
+			$tot_in_sum_amt	+= !empty($tot_in) ? $tot_in->in_sum_amt : 0;
 
 			//출고 데이터
 			if($group_type_condition == 'color_and_size') {
