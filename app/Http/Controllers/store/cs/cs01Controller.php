@@ -62,19 +62,15 @@ class cs01Controller extends Controller {
 		$prd_cd_range_text = $request->input("prd_cd_range", "");
 
 		$where = "where b.stock_date >= '$sdate' and b.stock_date <= '$edate'";
-		$where2 = "where 1=1";
+		$where2 = "";
 		$goods_where = "";
-		$having = "having 1=1";
+		$having = "";
 
 		if ($com_id != "") $where .= " and b.com_id = '" . Lib::quote($com_id) . "'";
 		if ($state != "") $where .= " and b.state = '" . Lib::quote($state) . "'";
 		if ($invoice_no != "") $where .= " and b.invoice_no like '%" . Lib::quote($invoice_no) . "%'";
-		
 		if ($com_nm != "") $where2 .= " and c.com_nm like '%" . Lib::quote($com_nm) . "%' ";
-		// if ($item != "") $where2 .= " and item_cds like '%" . Lib::quote($item) . "%' ";
-		
 		if ($user_name != "") $having .= " and $user_name_type like '%" . Lib::quote($user_name) . "%' ";
-		
 		if ($goods_nm != "") $goods_where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
 		if ($prd_cd != "") {
 			$prd_cd = explode(',', $prd_cd);
@@ -154,12 +150,12 @@ class cs01Controller extends Controller {
 				inner join company c on c.com_id = b.com_id
 				left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
 				left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
-			$where2
-			$having
+			where 1=1 $where2
+			having 1=1 $having
 			$orderby
 			$limit
 		";
-
+		
 		$rows = DB::select($sql);
 
 		// pagination
@@ -168,30 +164,48 @@ class cs01Controller extends Controller {
 
 		if ($page == 1) {
 			$sql = "
-				select count(*) as total
-				from product_stock_order b
+				select count(*) as total,
+					   req_nm,
+					   prc_nm,
+					   fin_nm,
+					   cfm_nm,
+					   rej_nm
+				from (
+					select b.stock_no,
+						   (select name from mgr_user where id = b.req_id) as req_nm,
+						   (select name from mgr_user where id = b.prc_id) as prc_nm,
+						   (select name from mgr_user where id = b.fin_id) as fin_nm,
+						   (select name from mgr_user where id = b.cfm_id) as cfm_nm,
+						   (select name from mgr_user where id = b.rej_id) as rej_nm
+					from product_stock_order b
 					inner join (
-						select p.stock_no, group_concat(distinct p.item) as item,
-						group_concat(distinct o.opt_kind_cd) as item_cds,
-						sum(p.qty) as qty, sum(p.exp_qty) as exp_qty, sum(total_cost) as total_cost
+						select p.stock_no,
+							   group_concat(distinct p.item) as item,
+							   group_concat(distinct o.opt_kind_cd) as item_cds,
+							   sum(p.qty) as qty,
+							   sum(p.exp_qty) as exp_qty,
+							   sum(total_cost) as total_cost
 						from product_stock_order b 
-							inner join (
-								select p.stock_no, p.item, p.qty, p.exp_qty, p.total_cost
-								from product_stock_order_product p
-									inner join product_code pc on pc.prd_cd = p.prd_cd
-									left outer join goods g on g.goods_no = p.goods_no
-								where 1=1 $goods_where
-							) p on b.stock_no = p.stock_no
-							left outer join opt o on p.item = o.opt_kind_nm
-						$where
+						inner join (
+							select p.stock_no, p.item, p.qty, p.exp_qty, p.total_cost
+							from product_stock_order_product p
+							inner join product_code pc on pc.prd_cd = p.prd_cd
+							left outer join goods g on g.goods_no = p.goods_no
+							where 1=1 
+						) p on b.stock_no = p.stock_no
+						left outer join opt o on p.item = o.opt_kind_nm
+						where b.stock_date >= '20230308' and b.stock_date <= '20230908'
 						group by p.stock_no
 					) s on b.stock_no = s.stock_no
 					inner join company c on c.com_id = b.com_id
 					left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
 					left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
-				$where2
-				$having
+					where 1=1 
+				) as a
+				where 1=1 $having
+
             ";
+			
 			$row = DB::selectOne($sql);
 		
 			$total = $row->total;
