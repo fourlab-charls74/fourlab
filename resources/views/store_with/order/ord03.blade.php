@@ -88,7 +88,8 @@
                                 <div class="form-inline-inner input_box w-25">
                                     <div class="form-group">
                                         <select name="dlv_place_type" id="dlv_place_type" class="form-control form-control-sm">
-                                            <option value="storage">창고</option>
+                                            <option value="">전체</option>
+                                            <option value="storage" selected>창고</option>
                                             @if (@$user_group === @$user_groups['HEAD'])
                                             <option value="store">매장</option>
                                             @endif

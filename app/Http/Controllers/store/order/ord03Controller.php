@@ -77,7 +77,7 @@ class ord03Controller extends Controller
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$rel_order = $request->input('rel_order', '');
-		$dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
+		$dlv_place_type = strtoupper($request->input('dlv_place_type', ''));
 		$storage_cd = $request->input('storage_cd', '');
 		$store_cd = $request->input('store_no', '');
 		$ord_no = $request->input('ord_no', '');
@@ -116,10 +116,16 @@ class ord03Controller extends Controller
 		}
 
 		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
-		if ($dlv_place_type === 'STORAGE' && $storage_cd != '') {
-			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $storage_cd . "' ";
-		} else if ($dlv_place_type === 'STORE' && $store_cd != '') {
-			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $store_cd . "' ";
+		if ($dlv_place_type === 'STORAGE') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
+			if ($storage_cd != '') {
+				$where .= " and rcp.dlv_location_cd = '" . $storage_cd . "' ";
+			}
+		} else if ($dlv_place_type === 'STORE') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
+			if ($store_cd != '') {
+				$where .= " and rcp.dlv_location_cd = '" . $store_cd . "' ";
+			}
 		}
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		if ($ord_state != '') $where .= " and rcp.state = '" . $ord_state . "' ";
@@ -859,7 +865,7 @@ class ord03Controller extends Controller
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$rel_order = $request->input('rel_order', '');
-		$dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
+		$dlv_place_type = strtoupper($request->input('dlv_place_type', ''));
 		$storage_cd = $request->input('storage_cd', '');
 		$store_cd = $request->input('store_no', '');
 		$ord_no = $request->input('ord_no', '');
@@ -898,10 +904,16 @@ class ord03Controller extends Controller
 		}
 
 		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
-		if ($dlv_place_type === 'STORAGE' && $storage_cd != '') {
-			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $storage_cd . "' ";
-		} else if ($dlv_place_type === 'STORE' && $store_cd != '') {
-			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $store_cd . "' ";
+		if ($dlv_place_type === 'STORAGE') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
+			if ($storage_cd != '') {
+				$where .= " and rcp.dlv_location_cd = '" . $storage_cd . "' ";
+			}
+		} else if ($dlv_place_type === 'STORE') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
+			if ($store_cd != '') {
+				$where .= " and rcp.dlv_location_cd = '" . $store_cd . "' ";
+			}
 		}
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		if ($ord_state != '') $where .= " and rcp.state = '" . $ord_state . "' ";
@@ -1063,7 +1075,7 @@ class ord03Controller extends Controller
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$rel_order = $request->input('rel_order', '');
-		$dlv_place_type = strtoupper($request->input('dlv_place_type', 'storage'));
+		$dlv_place_type = strtoupper($request->input('dlv_place_type', ''));
 		$storage_cd = $request->input('storage_cd', '');
 		$store_cd = $request->input('store_no', '');
 		$ord_no = $request->input('ord_no', '');
@@ -1102,10 +1114,16 @@ class ord03Controller extends Controller
 		}
 
 		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
-		if ($dlv_place_type === 'STORAGE' && $storage_cd != '') {
-			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $storage_cd . "' ";
-		} else if ($dlv_place_type === 'STORE' && $store_cd != '') {
-			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' and rcp.dlv_location_cd = '" . $store_cd . "' ";
+		if ($dlv_place_type === 'STORAGE') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
+			if ($storage_cd != '') {
+				$where .= " and rcp.dlv_location_cd = '" . $storage_cd . "' ";
+			}
+		} else if ($dlv_place_type === 'STORE') {
+			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
+			if ($store_cd != '') {
+				$where .= " and rcp.dlv_location_cd = '" . $store_cd . "' ";
+			}
 		}
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		if ($ord_state != '') $where .= " and rcp.state = '" . $ord_state . "' ";
@@ -1204,8 +1222,7 @@ class ord03Controller extends Controller
 				, bk.code_val as baesong_kind
 				, com.com_nm as sale_place
 				, concat(a.prd_cd_p, '/', a.color, '/', a.size, '/', a.sale_qty) as goods_info
-			    -- 주문사이트/창고명/배송메시지 컬럼 확정 후 수정필요
-				, concat(ifnull(com.com_nm, ''), '/', '', '/', ifnull(a.dlv_msg, '')) as sale_info
+				, concat(ifnull(com.com_nm, ''), '/', if(a.dlv_location_type = 'STORAGE', a.dlv_location_nm, ''), '/', ifnull(a.dlv_msg, '')) as sale_info
 				, '' as storage_addr
 			from (
 				select
