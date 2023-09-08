@@ -162,9 +162,12 @@ class stk30Controller extends Controller
     public function show($sr_cd = '') 
     {
         $sr = '';
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')
+		$storages = DB::table("storage")
+			->where('use_yn', '=', 'Y')
+			->whereIn('storage_cd', ['S0006', 'C0005'])
 			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
-			->orderByDesc('default_yn')->get();
+			->orderByDesc('default_yn')
+			->get();
 
         if($sr_cd != '') {
             $sql = "
@@ -484,15 +487,38 @@ class stk30Controller extends Controller
 					'admin_nm' => $admin_nm,
 				]);
 		}
+		//해당 창고에 재고있는지 확인하는 부분
+		$storage_stock_cnt =
+			DB::table('product_stock_storage')
+				->where('storage_cd', '=', $row->storage_cd)
+				->where('prd_cd', '=', $row->prd_cd)
+				->count();
 		
-		// 창고보유재고 증가 (+ history)
-		DB::table('product_stock_storage')
-			->where('prd_cd', '=', $row->prd_cd)
-			->where('storage_cd', '=', $row->storage_cd)
-			->update([
-				'wqty' => DB::raw('wqty + ' . $qty),
-				'ut' => now(),
-			]);
+		if($storage_stock_cnt < 1) {
+			// 해당 창고에 상품 기존재고가 없을 경우
+			DB::table('product_stock_storage')
+				->insert([
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'storage_cd' => $row->storage_cd,
+					'qty' => 0,
+					'wqty' => $qty,
+					'goods_opt' => $row->goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now()
+				]);
+		} else {
+			// 해당 창고에 상품 기존재고가 이미 존재할 경우
+			// 창고보유재고 증가
+			DB::table('product_stock_storage')
+				->where('prd_cd', '=', $row->prd_cd)
+				->where('storage_cd', '=', $row->storage_cd)
+				->update([
+					'wqty' => DB::raw('wqty + ' . ($qty)),
+					'ut' => now(),
+				]);
+		}
+		
 		if ($qty > 0 || $qty < 0) {
 			DB::table('product_stock_hst')
 				->insert([

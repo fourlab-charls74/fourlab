@@ -99,9 +99,9 @@
                                             <th class="required">반품창고</th>
                                             <td>
                                                 <div class="form-inline">
-                                                    <select name='storage_cd' class="form-control form-control-sm w-100" disabled>
+                                                    <select name='storage_cd' class="form-control form-control-sm w-100">
                                                         @foreach (@$storages as $storage)
-                                                            <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @elseif(@$cmd === 'add' && $storage->storage_cd == $return_storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+                                                            <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @elseif(@$cmd === 'add') selected @endif>{{ $storage->storage_nm }}</option>
                                                         @endforeach
                                                         <input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
                                                     </select>
@@ -538,12 +538,14 @@
     function UpgradeState(new_state) {
 		let title = new_state === 30 ? '반품처리중' : new_state === 40 ? '반품완료' : '';
 		if(!confirm(title + " 상태로 변경하시겠습니까?")) return;
-		
+
 		let rows = gx.getRows();
 		
 		if (new_state == 40) {
 			let wrong_list = rows.filter(row => row.qty != row.fixed_return_qty);
 			if (wrong_list.length > 0 && !confirm("요청수량과 확정수량이 일치하지 않는 항목이 존재합니다.\n그래도 변경하시겠습니까?")) return;
+			let no_zero_fixed_return_qty = rows.filter(row => row.fixed_return_qty == '0');
+			if (no_zero_fixed_return_qty.length > 0) return alert('확정수량을 입력해주세요.');
 		}
 		
 		let sr_cd = '{{ @$sr->sr_cd }}';
