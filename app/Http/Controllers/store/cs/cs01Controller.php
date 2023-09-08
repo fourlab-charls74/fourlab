@@ -191,10 +191,10 @@ class cs01Controller extends Controller {
 							from product_stock_order_product p
 							inner join product_code pc on pc.prd_cd = p.prd_cd
 							left outer join goods g on g.goods_no = p.goods_no
-							where 1=1 
+							where 1=1 $goods_where
 						) p on b.stock_no = p.stock_no
 						left outer join opt o on p.item = o.opt_kind_nm
-						where b.stock_date >= '20230308' and b.stock_date <= '20230908'
+						$where
 						group by p.stock_no
 					) s on b.stock_no = s.stock_no
 					inner join company c on c.com_id = b.com_id
