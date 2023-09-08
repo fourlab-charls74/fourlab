@@ -200,7 +200,7 @@ class cs01Controller extends Controller {
 					inner join company c on c.com_id = b.com_id
 					left outer join code ar on ar.code_kind_cd = 'g_buy_order_ar_type' and ar.code_id = b.area_type
 					left outer join code cd on cd.code_kind_cd = 'STOCK_ORDER_STATE' and cd.code_id = b.state
-					where 1=1 
+					where 1=1 $where2
 				) as a
 				where 1=1 $having
 
