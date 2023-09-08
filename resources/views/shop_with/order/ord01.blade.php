@@ -450,13 +450,13 @@
 			const t = e.head.total_row;
 			gx.gridOptions.api.setPinnedTopRowData([{ 
 				qty: t.total_qty,
-				goods_sh: t.total_goods_sh,
-				goods_price: t.total_goods_price,
-				price: t.total_price,
-				wonga: t.total_wonga,
-				sale_dc_rate: t.avg_sale_dc_rate,
-				sale_price: t.total_sale_price,
-				dc_rate: t.avg_dc_rate,
+				// goods_sh: t.total_goods_sh,
+				// goods_price: t.total_goods_price,
+				// price: t.total_price,
+				// wonga: t.total_wonga,
+				// sale_dc_rate: t.avg_sale_dc_rate,
+				// sale_price: t.total_sale_price,
+				// dc_rate: t.avg_dc_rate,
 				ord_amt: t.total_ord_amt,
 				recv_amt: t.total_recv_amt,
 				dlv_amt: t.total_dlv_amt
