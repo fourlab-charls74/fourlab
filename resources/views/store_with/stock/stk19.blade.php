@@ -285,34 +285,54 @@
 			gx = new HDGrid(gridDiv, columns, {
 				onCellValueChanged: (e) => {
 					let storage = $('#storage').val();
-					if (storage == '') return alert('출고창고를 선택해주세요.');
+					if (storage == '') {
+						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+						return alert('출고창고를 선택해주세요.');
+					}
 					e.node.setSelected(true);
 					if (e.column.colId == "rel_qty") {
 						if (isNaN(e.newValue) == true || e.newValue == "") {
 							alert("숫자만 입력가능합니다.");
 							gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
 						} else {
-							if (e.oldValue != undefined) {
-								let oldValue = e.oldValue * 1;
-								let newValue = e.newValue * 1;
-								let storage_qty = 0;
-								@foreach ($storage_arr as  $storage) {
-									if (storage == '{{$storage['storage_cd']}}') {
-										storage_qty = {{$storage['seq']}};
-									} 
-								}
-								@endforeach
-								let qty = (parseInt(e.data.storage_qty[storage_qty].wqty) + oldValue) - newValue;
-								let total_qty = e.data.storage_qty[storage_qty].wqty2 - qty;
-								e.data.storage_qty[storage_qty].wqty = `${qty} (-${total_qty})`;
-								gx.gridOptions.api.applyTransaction({update: [e.data]});
-								gx.gridOptions.api.redrawRows();
+							let newValue = e.newValue * 1;
+							let storage_qty = 0;
+						@foreach ($storage_arr as  $storage)
+							if (storage == '{{$storage['storage_cd']}}') {
+								storage_qty = {{$storage['seq']}};
 							}
+						@endforeach							
+							e.data.storage_qty.forEach((sq, i) => {
+								if (i === storage_qty) {
+									sq.wqty = `${parseInt(sq.wqty2) - newValue} (${newValue * -1})`;
+								} else {
+									sq.wqty = sq.wqty2;
+								}
+							});
+							gx.gridOptions.api.applyTransaction({ update: [ e.data ] });
+							gx.gridOptions.api.redrawRows();
 						}
 					}
 				}
 			});
 			Search();
+			
+			$("[name=storage]").on('change', function (e) {
+				let storage_cd = e.target.value;
+				gx.gridOptions.api.forEachNode(node => {
+					if (node.data.rel_qty !== '') {
+						node.data.storage_qty.forEach(sq => {
+							if (sq.storage_cd === storage_cd) {
+								let qty = node.data.rel_qty * 1;
+								sq.wqty = `${parseInt(sq.wqty2) - qty} (${qty * -1})`;
+							} else {
+								sq.wqty = sq.wqty2;
+							}
+						});
+					}
+				});
+				gx.gridOptions.api.redrawRows();
+			});
 		});
 
 		function Search() {
