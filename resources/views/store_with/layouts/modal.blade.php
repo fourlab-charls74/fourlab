@@ -614,7 +614,7 @@
                                             <label for="formrow-email-input">매칭여부</label>
                                                 <div class="form-inline form-radio-box">
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="match_yn" value="A" id="match_all" class="custom-control-input">
+                                                        <input type="radio" name="match_yn" value="A" id="match_all" class="custom-control-input" checked>
                                                         <label class="custom-control-label" for="match_all">전체</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
@@ -622,7 +622,7 @@
                                                         <label class="custom-control-label" for="match_y">Y</label>
                                                     </div>
                                                     <div class="custom-control custom-radio">
-                                                        <input type="radio" name="match_yn" value="N" id="match_n" class="custom-control-input" checked>
+                                                        <input type="radio" name="match_yn" value="N" id="match_n" class="custom-control-input">
                                                         <label class="custom-control-label" for="match_n">N</label>
                                                     </div>
                                                 </div>
@@ -652,14 +652,15 @@
                                                 <div id="div-gd-prdcd-gender" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
+										<div class="col-4 col-lg-2 p-1 pr-0 pr-lg-2">
+											<div class="table-responsive">
+												<div id="div-gd-prdcd-opt" class="ag-theme-balham"></div>
+											</div>
+										</div>
+										
                                         <div class="col-4 col-lg-2 p-1">
                                             <div class="table-responsive">
                                                 <div id="div-gd-prdcd-item" class="ag-theme-balham"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-4 col-lg-2 p-1 pr-0 pr-lg-2">
-                                            <div class="table-responsive">
-                                                <div id="div-gd-prdcd-opt" class="ag-theme-balham"></div>
                                             </div>
                                         </div>
                                     </div>

@@ -287,8 +287,7 @@
 	});
 
 	pinnedRowData.sale_kind = column_data;
-	
-	console.log(pinnedRowData);
+
 	$(document).ready(function() {
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();

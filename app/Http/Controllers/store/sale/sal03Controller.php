@@ -108,7 +108,6 @@ class sal03Controller extends Controller
 
 		if ($com_type != "") $where .= " and final.com_type = '$com_type' ";
 		if ($store_cd != "")	$in_where .= " and oo.store_cd = '" . $store_cd . "' ";
-		if ($prd_cd != "")	$in_where .= " and oo.prd_cd like '" . $prd_cd . "%' ";
 		if ($com_id != "") $where .= " and final.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and final.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if ($style_no != "") $where .= " and final.style_no like '" . Lib::quote($style_no) . "%' ";
@@ -147,6 +146,7 @@ class sal03Controller extends Controller
 			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
 			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
 			$prd_cds = explode(',', $prd_cd);
+
 			if (count($prd_cds) > 1) {
 				$prd_cds_str = "";
 				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
@@ -157,6 +157,7 @@ class sal03Controller extends Controller
 						$prd_cds_str .= ",";
 					}
 				}
+				
 				$in_where .= " and oo.prd_cd in ($prd_cds_str) ";
 			} else {
 				$in_where .= " and oo.prd_cd like '" . Lib::quote($prd_cd) . "%'";

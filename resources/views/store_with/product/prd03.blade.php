@@ -229,7 +229,7 @@
 			},
 			{
 				field: "size",
-				headerName: "사이즈명",
+				headerName: "사이즈",
 				cellStyle: DEFAULT,
 				width: 80
 			},

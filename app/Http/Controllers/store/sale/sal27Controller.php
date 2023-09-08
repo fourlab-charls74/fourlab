@@ -83,15 +83,29 @@ class sal27Controller extends Controller
 		
 		// 바코드검색
 		$product_where = "";
+		// 바코드검색
 		if ($prd_cd != '') {
-			$product_where .= " and (1<>1";
-			$product_where .= join('', array_map(
-				function($s) { return " or pc.prd_cd like '" . Lib::quote($s) . "%'"; },
-				explode(",", $prd_cd)
-			));
-			$product_where .= ") ";
-		}
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+			$prd_cds = explode(',', $prd_cd);
+			if (count($prd_cds) > 1) {
+				$prd_cds_str = "";
+				if (count($prd_cds) > 500) array_splice($prd_cds, 500);
+				for($i =0; $i < count($prd_cds); $i++) {
+					$prd_cds_str.= "'".$prd_cds[$i]."'";
 
+					if($i !== count($prd_cds) -1) {
+						$prd_cds_str .= ",";
+					}
+				}
+				$product_where .= " and pc.prd_cd in ($prd_cds_str) ";
+			} else {
+				$product_where .= " and pc.prd_cd = '" . Lib::quote($prd_cd) . "' ";
+			}
+		}
+		
 		// 상품조건검색
 		parse_str($prd_cd_range_text, $prd_cd_range);
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];

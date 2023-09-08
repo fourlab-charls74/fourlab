@@ -131,12 +131,7 @@ class prd03Controller extends Controller
 				( select img_url from product_image where prd_cd = p.prd_cd order by seq limit 1 ) as img,
 				p.prd_cd as prd_cd,
 				c7.code_val as color,
-				ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+				pc.size,
 				p.prd_nm as prd_nm,
 				p.tag_price as tag_price,
 				p.price as price,

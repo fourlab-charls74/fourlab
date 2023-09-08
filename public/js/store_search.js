@@ -687,9 +687,6 @@ SearchPrdcd.prototype.Choice = function() {
         this.callback(code, name);
     } else {
         let rows = this.grid.getSelectedRows();
-        if(rows.length < 1) return alert("항목을 선택해주세요.");
-        if(rows.length > 1) return alert("항목을 한 개만 선택해주세요.");
-        
         if($('#prd_cd').length > 0){
             $('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
         }
@@ -850,7 +847,6 @@ SearchPrdcd_sub.prototype.SetGrid = function(divId){
             { field: "prd_cd", headerName: "원부자재코드", width: 120, cellStyle: {"text-align": "center"} },
             { field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
             { field: "prd_nm", headerName: "상품명", width: 400 },
-            { field: "goods_opt", headerName: "옵션", width: 300 },
             { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
             { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
             { width: "auto" }

@@ -857,22 +857,15 @@ class goods extends Controller
                 pc.prd_cd
                 , pc.goods_no
                 , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
-                , concat(c.code_val, '^',s.size_nm) as goods_opt
+                , pc.goods_opt
                 , concat(pc.brand,pc.year, pc.season, pc.gender
                 , pc.item, pc.opt, pc.seq) as prd_cd1,
-                pc.color, p.match_yn
-               , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+                pc.color, p.match_yn,
+				pc.size
                 from product_code pc
                     left outer join goods g on g.goods_no = pc.goods_no
                     inner join product p on pc.prd_cd = p.prd_cd
-                    inner join code c on pc.color = c.code_id
-                    inner join size s on s.size_cd = pc.size
-                where 1=1 and c.code_kind_cd = 'PRD_CD_COLOR'
+                where 1=1
                 $where
             ";
         } else {
@@ -1110,26 +1103,19 @@ class goods extends Controller
         $page_cnt = 0;
 
         $sql = "
-            select 
-                  pc.prd_cd
-                , p.prd_nm
-                , pc.goods_no
-                , concat(c.code_val, '^',s.size_nm) as goods_opt
-                , pc.color
-                , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
-            from product_code pc 
-                inner join product p on p.prd_cd = pc.prd_cd
-                inner join code c on pc.color = c.code_id
-                inner join size s on s.size_cd = pc.size
-            where 1=1 and pc.brand in('PR','SM') and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
-            $where
+			select 
+				  pc.prd_cd
+				, p.prd_nm
+				, pc.goods_no
+				, pc.color
+				, pc.`size` 
+				, pc.color 
+			from product_code pc 
+				inner join product p on p.prd_cd = pc.prd_cd
+			where 1=1 and pc.brand in('PR','SM')
+				$where   
         ";
-      
+
         $result = DB::select($sql);
 
         return response()->json([
