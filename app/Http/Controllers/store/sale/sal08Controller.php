@@ -15,7 +15,7 @@ class sal08Controller extends Controller
 {
 	public function index(Request $request) 
 	{
-		$sdate = Carbon::now()->sub(4, 'week')->format("Y-m-d");
+		$sdate = Carbon::now()->firstOfMonth()->format("Y-m-d");
 		$edate = Carbon::now()->format("Y-m-d");
 
 		$values = [
@@ -97,10 +97,14 @@ class sal08Controller extends Controller
 			}
 		}
 		if ($item != '') $where2 .= " and g.opt_kind_cd = '$item' ";
+		
+		$vat = 1.1;
 
 		$sql = "
 			select
-				a.store_cd, a.store_nm, a.store_type, st.code_val as store_type_nm
+				a.store_cd, a.store_nm
+				, a.store_channel, a.store_channel_kind as store_kind
+			    , concat(sc.store_channel, '/', sc.store_kind) as store_kind_nm
 				, a.pr_code, prc.code_val as pr_code_nm
 				, a.brand, b.brand_nm
 				, sum(a.sale_amt) as sale_amt
@@ -111,28 +115,28 @@ class sal08Controller extends Controller
 			from (
 				select
 					o.ord_opt_no
-					, o.store_cd, s.store_nm, s.store_type
+					, o.store_cd, s.store_nm, s.store_channel, s.store_channel_kind
 					, o.prd_cd, pc.brand, o.pr_code
-					, (w.qty * w.price) as sale_amt
+					, (w.qty * w.price / :vat1) as sale_amt
 					, w.recv_amt
-					, (w.qty * w.wonga) as wonga_amt
-					, (w.qty * (w.price - w.wonga)) as margin_amt
+					, (w.qty * w.wonga / :vat2) as wonga_amt
+					, (w.qty * (w.price - w.wonga) / :vat3) as margin_amt
 					, o.ord_state, o.goods_no, o.ord_date, o.sale_kind
 				from order_opt o
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					inner join store s on s.store_cd = o.store_cd
-				where w.ord_state in ('30', '60', '61') and o.store_cd <> '' $where
+				where w.ord_state in (30,60,61) and o.store_cd <> '' $where
 			) a
-				inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = a.store_type
+			    inner join store_channel sc on sc.store_channel_cd = a.store_channel and sc.store_kind_cd = a.store_channel_kind and sc.dep = 2 and sc.use_yn = 'Y'
 				left outer join goods g on g.goods_no = a.goods_no
 				left outer join brand b on b.br_cd = a.brand
 				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = a.pr_code
 			where 1=1 $where2
 			group by a.store_cd, a.brand, a.pr_code
-			order by a.store_cd, a.brand, prc.code_seq
+			order by a.store_channel, a.store_channel_kind, a.store_cd, a.brand, prc.code_seq
 		";
-		$result = DB::select($sql);
+		$result = DB::select($sql, [ 'vat1' => $vat, 'vat2' => $vat, 'vat3' => $vat ]);
 
 		return response()->json([
 			'code'	=> 200,

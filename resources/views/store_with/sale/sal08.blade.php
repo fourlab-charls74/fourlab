@@ -204,9 +204,9 @@
 	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     let columns = [
-		{field: "store_type", hide: true},
-		{field: "store_type_nm" , headerName: "매장구분", rowGroup: true, hide: true},
-		{headerName: '매장구분', showRowGroup: 'store_type_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 115},
+		{field: "store_kind", hide: true},
+		{field: "store_kind_nm" , headerName: "매장구분", rowGroup: true, hide: true},
+		{headerName: '매장구분', showRowGroup: 'store_kind_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 170},
 		{field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}, groupDepth: 1, 
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
@@ -219,12 +219,12 @@
 		},
 		{field: "brand_nm", headerName: "브랜드명", rowGroup: true, hide: true},
 		{headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 100},
-		{field: "pr_code", headerName: "행사코드", width: 55, cellStyle: {"text-align": "center"}},
-		{field: "pr_code_nm", headerName: "행사명", width: 55, cellStyle: {"text-align": "center"}},
-		{field: "sale_amt", headerName: "판매금액", width: 90, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
-		{field: "recv_amt", headerName: "실입금액", width: 90, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
-		{field: "wonga_amt", headerName: "원가금액", width: 90, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
-		{field: "margin_amt", headerName: "이익금액", width: 90, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "pr_code", headerName: "판매처수수료코드", width: 100, cellStyle: {"text-align": "center"}},
+		{field: "pr_code_nm", headerName: "판매처수수료명", width: 100, cellStyle: {"text-align": "center"}},
+		{field: "sale_amt", headerName: "판매금액(-VAT)", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "recv_amt", headerName: "실입금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "wonga_amt", headerName: "원가금액(-VAT)", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "margin_amt", headerName: "이익금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_rate", headerName: "이익율(%)", width: 70, type: "currencyType",
 			aggFunc: (params) => {
 				return params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_rate * 1) + a, 0) / params.rowNode.allLeafChildren.length;
@@ -288,10 +288,10 @@
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
-                sale_amt += parseInt(row?.sale_amt || 0);
+                sale_amt += parseFloat(row?.sale_amt || 0);
                 recv_amt += parseInt(row?.recv_amt || 0);
-                wonga_amt += parseInt(row?.wonga_amt || 0);
-                margin_amt += parseInt(row?.margin_amt || 0);
+                wonga_amt += parseFloat(row?.wonga_amt || 0);
+                margin_amt += parseFloat(row?.margin_amt || 0);
                 margin_rate += parseFloat(row?.margin_rate || 0);
 				cnt += row !== undefined ? 1 : 0;
             });
