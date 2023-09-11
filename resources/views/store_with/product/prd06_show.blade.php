@@ -15,39 +15,62 @@
         <input type="hidden" name="idx" id="idx" value="{{ @$idx }}"/>
         <div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
-                <div class="card-header mb-0">
-                    <a href="#">기본 정보</a>
-                </div>
-                <div class="card-body mt-1">
-                    <div class="row_wrap">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table-box-ty2 mobile">
-                                    <table class="table incont table-bordered" width="100%" cellspacing="0">
-                                        <tbody>
-                                            <tr>
-                                                <th>가격 반영</th>
-                                                <td>
-                                                    <div class="form-inline form-radio-box">
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="price_apply_yn" id="price_apply_y" class="custom-control-input" value="Y" @if($price_apply_yn == 'Y') checked @endif/>
-                                                            <label class="custom-control-label" for="price_apply_y">예</label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio">
-                                                            <input type="radio" name="price_apply_yn" id="price_apply_n" class="custom-control-input" value="N" @if($price_apply_yn == 'N' || $price_apply_yn == null) checked @endif/>
-                                                            <label class="custom-control-label" for="price_apply_n">아니오</label>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<div class="card-header mb-0">
+					<a href="#">기본 정보</a>
+				</div>
+				<div class="card-body mt-1">
+					<div class="row_wrap">
+						<div class="row">
+							<div class="col-12">
+								<div class="table-box-ty2 mobile">
+									<table class="table incont table-bordered" width="100%" cellspacing="0">
+										<tbody>
+											<tr>
+												<th>가격 반영</th>
+												<td>
+													<div class="form-inline form-radio-box">
+														<div class="custom-control custom-radio">
+															<input type="radio" name="price_apply_yn" id="price_apply_y" class="custom-control-input" value="Y" @if($price_apply_yn == 'Y') checked @endif/>
+															<label class="custom-control-label" for="price_apply_y">예</label>
+														</div>
+														<div class="custom-control custom-radio">
+															<input type="radio" name="price_apply_yn" id="price_apply_n" class="custom-control-input" value="N" @if($price_apply_yn == 'N' || $price_apply_yn == null) checked @endif/>
+															<label class="custom-control-label" for="price_apply_n">아니오</label>
+														</div>
+													</div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card shadow">
+				<div class="card-header mb-0">
+					<a href="#">재고 일자</a>
+				</div>
+				<div class="card-body mt-1">
+					<div class="row_wrap">
+						<div class="row">
+							<div class="col-12">
+								<div class="table-box-ty2 mobile">
+									<table class="table incont table-bordered" width="100%" cellspacing="0">
+										<tbody>
+										<tr>
+											<th>예외 일자</th>
+											<td>시스템 시간 사용(2024년까지 공휴일+휴일다음날 예외 처리)</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="card shadow">
                 <div class="card-header mb-0 d-flex align-items-center justify-content-between">
                     <a href="#">창고 버퍼링 설정</a>

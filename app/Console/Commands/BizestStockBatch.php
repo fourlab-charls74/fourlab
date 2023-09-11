@@ -63,6 +63,17 @@ class BizestStockBatch extends Command
 			limit 1
 		";
 		$stock_conf	= DB::selectOne($sql);
+		
+		// 재고 등록 예외 일자 처리 시작
+		$today	= date('Ymd');
+		$sql	= " select count(*) as tot from bizest_stock_exp_date where exp_date = :exp_date ";
+		$chk_date_cnt	= DB::selectOne($sql,['exp_date' => $today])->tot;
+		
+		if( $chk_date_cnt > 0 ){
+			return 1;
+			exit;
+		}
+		// 재고 등록 예외 일자 처리 종료
 
 		//재고 매장 사용 수 구하기
 		$sql	= " select count(*) as tot from bizest_stock_store where store_use_yn = 'Y' ";
