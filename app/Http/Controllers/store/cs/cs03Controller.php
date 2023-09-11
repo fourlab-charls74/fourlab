@@ -113,9 +113,11 @@ class cs03Controller extends Controller
 					left outer join `code` c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = p4.color
 					left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_UNIT' and c3.code_id = p3.unit
 					left outer join mgr_user m on p2.admin_id = m.id
-				where 1=1 $where
+				where 1=1 and p2.rt >= :sdate and p2.rt < date_add(:edate, interval 1 day)
+					$where
 			";
-			$row = DB::select($sql);
+
+			$row = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
 			$total = $row[0]->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}

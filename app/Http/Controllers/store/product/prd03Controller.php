@@ -280,7 +280,9 @@ class prd03Controller extends Controller
 					$unique_img_name = $prd_cd . $seq;
 					$img_name = strtolower($unique_img_name);
 					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
-		
+
+					$size_kinds = DB::selectOne("select size_kind_cd from size where size_cd = '$size'");
+					
 					DB::table('product_code')->insert([
 						'prd_cd'	=> $prd_cd,
 						'prd_cd_p'	=> $prd_cd_p,
@@ -297,6 +299,7 @@ class prd03Controller extends Controller
 						'type'		=> $type,
 						'rt'		=> now(),
 						'ut'		=> now(),
+						'size_kind' => $size_kinds->size_kind_cd,
 						'admin_id'	=> $admin_id
 					]);
 					

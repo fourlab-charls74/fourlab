@@ -108,7 +108,6 @@
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
 											<option value="prd_cd">바코드</option>
-											<option value="idx">가격정보 코드</option>
 											<option value="change_date">변경일자</option>
 											<option value="rt">등록일</option>
 											<option value="ut" selected>수정일</option>
