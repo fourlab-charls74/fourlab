@@ -195,7 +195,7 @@
                                 <div class="flax_box">
                                     <a href="#" onclick="Add(); return false;" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">추가</a>
                                     <a href="#" onclick="ChangeData(); return false;" class="btn-sm btn btn-primary shadow-sm pl-2 mr-1">선택 정보 변경</a>
-                                <div>
+                                </div>
                             </div>
 						</div>
 					</div>
