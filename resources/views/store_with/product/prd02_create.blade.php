@@ -269,7 +269,7 @@
 	const columns_code = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null,
             checkboxSelection: function(params) {
-				return params.data.checkbox == true && params.data.is_product == 'Y';
+				return params.data.err_code == '0';
             },
 		},
 		{field:"goods_no",	headerName: "온라인코드",		width:72},
@@ -285,8 +285,16 @@
 		{field:"size",		headerName: "사이즈",		width:72},
 		{field:"", headerName: "알림",		width:120,
 			cellRenderer: function(params) {
-				if(params.data.checkbox == false && params.data.is_product == 'Y' ) {
-					return "매칭할 수 없는 상품입니다."
+
+				if( params.data.err_code == '0' ) {
+				}else if( params.data.err_code == '1' ) {
+						return "[1]매칭가능한 옵션이 없습니다.";
+				}else if( params.data.err_code == '2' ){
+					return "[2]다른 상품정보와 이미 매칭";
+				}else if( params.data.err_code == '3' ){
+					return "[3]해당 상품정보와 이미 매칭";
+				}else{
+					return "기타 오류";
 				}
 			},
 			cellStyle: {'color':'red'},
@@ -423,6 +431,9 @@
 	}
 
 	function addPrdCd(){
+		
+		return alert('준비중입니다.');
+		
 
 		let rows	= gx.getSelectedRows();
 		if(rows.length < 1) return alert("저장할 바코드 정보를 선택해주세요.");
@@ -455,6 +466,8 @@
 
 		if(rows.length < 1) return alert("저장할 바코드 정보를 선택해주세요.");
 
+		console.log(rows);
+		
 		axios({
 			url: '/store/product/prd02/add-product-product',
 			method: 'put',

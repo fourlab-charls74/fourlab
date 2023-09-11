@@ -439,6 +439,52 @@ class prd02Controller extends Controller
 	public function prd_search_code(Request $request){
 		$prd_cd 	= $request->input('prd_cd');
 		$goods_no 	= $request->input('goods_no2');
+
+		$sql = "
+			select 
+				pc.prd_cd, p.prd_nm, p.style_no, pc.goods_no, concat(c.code_val, '^',s.size_nm) as goods_opt, pc.color, s.size_cd as size,
+				p.match_yn, '0' as err_code
+			from product_code pc 
+			inner join product p on pc.prd_cd = p.prd_cd
+			inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
+			inner join size s on s.size_kind_cd = pc.size_kind and s.size_cd = pc.size and s.use_yn = 'Y'
+			where 
+				pc.prd_cd like '$prd_cd%'
+		";
+		$result = DB::select($sql);
+
+		foreach ($result as $row) {
+			if( $row->match_yn == 'Y'){
+				if( $row->goods_no == $goods_no ){
+					$row->err_code	= '3';	// 해당 상품정보와 매칭
+				}else{
+					$row->err_code	= '2';	// 다른 상품정보와 매칭 
+				}
+			}else{
+				$row->goods_no	= $goods_no;
+
+				$sql_goods	= " select count(*) as tot from goods_summary where goods_no = :goods_no and goods_opt = :goods_opt";
+				$goods_opt_cnt	= DB::selectOne($sql_goods,['goods_no' => $goods_no, 'goods_opt' => $row->goods_opt])->tot;
+				
+				if( $goods_opt_cnt == 0 ){
+					$row->err_code	= '1';	// 매칭가능한 옵션이 없음
+				}
+			}
+		}
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total" => count($result),
+			),
+			"body" => $result,
+		]);
+
+	}
+
+	public function prd_search_code_bak(Request $request){
+		$prd_cd 	= $request->input('prd_cd');
+		$goods_no 	= $request->input('goods_no2');
 		
 		$sql = "
 			select 
@@ -461,7 +507,14 @@ class prd02Controller extends Controller
 			union all
 
 			select
-				p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, concat(c.code_val, '^',d.code_val2) as goods_opt
+				p.prd_cd, p.prd_nm, p.style_no, '$goods_no' as goods_no, concat(c.code_val, '^',
+					ifnull((
+						select s.size_nm from size s
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'')					
+			    ) as goods_opt
 				, pc.color, pc.seq, 'Y' as is_product
 				, ifnull((
 					select s.size_cd from size s
@@ -472,7 +525,6 @@ class prd02Controller extends Controller
 			from product p
 				inner join product_code pc on pc.prd_cd = p.prd_cd
 				inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
-				inner join code d on pc.size = d.code_id and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
 			where p.prd_cd like '$prd_cd%'
 			order by seq desc
 		";
@@ -485,7 +537,7 @@ class prd02Controller extends Controller
         $result = collect($result)->map(function($row) use ($goods_opt_counts) {
             $goods_opt = $row->goods_opt;
             $count = $goods_opt_counts[$goods_opt];
-            $row->checkbox = $count > 1 ? true : false;
+            $row->checkbox = $count > 1 ? false : true;
             return $row;
         })->all();
 
@@ -596,6 +648,74 @@ class prd02Controller extends Controller
 
 
 	public function add_product_product(Request $request)
+	{
+		$datas = $request->input("data", []);
+		$now = now();
+
+		try {
+			DB::beginTransaction();
+
+			foreach ($datas as $data) {
+
+				$prd_cd = $data['prd_cd'];
+				$goods_no = $data['goods_no'];
+				$goods_opt = $data['goods_opt'];
+
+				$product_sql = "
+					update product 
+					set match_yn = 'Y', ut = 'now()'
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_sql);
+
+				$product_code_sql = "
+					update product_code
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_code_sql);
+
+				$product_stock_sql = "
+					update product_stock 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_stock_sql);
+
+				$product_stock_sql = "
+					update product_stock_storage 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_stock_sql);
+
+				$product_stock_sql = "
+					update product_stock_store 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_stock_sql);
+
+				//기존 상품 매핑 정보 테이블 정보 추가
+				$sql = " insert into goods_xmd(cd, goods_no, goods_sub, goods_opt, rt, ut) values ( :prd_cd, :goods_no, '0', :goods_opt, now(), now() ) ";
+				DB::insert($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "바코드 매칭이 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+	
+	// 추후 삭제 해야함
+	public function add_product_product_bak(Request $request)
 	{
         $datas		= $request->input("data", []);
 		$now		= now();
