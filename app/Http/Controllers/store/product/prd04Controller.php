@@ -482,6 +482,7 @@ class prd04Controller extends Controller
         	if ($store_channel_kind ?? '' != '') $where .= "and store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 			$case_sql = "";
+			$case_sum_sql = "";
 			foreach ($sizes as $size) {
 				$case_sql .= "
 					, if(pc.size = '$size', (ps.qty
@@ -493,66 +494,91 @@ class prd04Controller extends Controller
 						- ifnull(w.qty, 0)
 					), 0) as '" . str_replace('.', '', $size) . "_wqty'
 				";
+				$case_sum_sql .= "
+					, sum(a.`" . str_replace('.', '', $size) . "_qty`) as '" . str_replace('.', '', $size) . "_qty'
+					, sum(a.`" . str_replace('.', '', $size) . "_wqty`) as '" . str_replace('.', '', $size) . "_wqty'
+				";
 			}
 
 			$sql = "
-				select pc.color, c.code_val as color_nm, ps.store_cd, s.store_nm, ps.prd_cd
-					$case_sql
-					, (ps.qty
-						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
-						- ifnull(w.qty, 0)
-					) as qty
-					, (ps.wqty
-						- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
-						- ifnull(w.qty, 0)
-					) as wqty
-				from product_stock_store ps
-					inner join product_code pc on pc.prd_cd = ps.prd_cd
-					inner join store s on s.store_cd = ps.store_cd
-					left outer join (
-						select prd_cd, location_cd, type, qty
-						from product_stock_hst
-						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORE'
-					) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd
-					left outer join (
-						select prd_cd, store_cd, sum(qty * if(ord_state = 30, -1, 1)) as qty
-						from order_opt_wonga
-						where ord_state_date >= '$next_edate' and ord_state_date <= '$now_date' and ord_state in (30,60,61)
-						group by prd_cd, store_cd
-					) w on w.prd_cd = ps.prd_cd and w.store_cd = ps.store_cd
-					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
-				where ps.prd_cd like '$prd_cd_p%' $where
-				group by ps.store_cd, pc.color
-				order by pc.color, s.store_nm
+				select a.store_cd, a.store_nm, a.prd_cd, a.color, c.code_val as color_nm
+					$case_sum_sql
+					, sum(a.qty) as qty
+					, sum(a.wqty) as wqty
+				from (
+					select pc.color, ps.store_cd, s.store_nm, ps.prd_cd
+						$case_sql
+						, (ps.qty
+							- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
+							- ifnull(w.qty, 0)
+						) as qty
+						, (ps.wqty
+							- sum(if(hst.type in (1, 11, 14, 15), ifnull(hst.qty, 0), 0))
+							- ifnull(w.qty, 0)
+						) as wqty
+					from product_stock_store ps
+						inner join product_code pc on pc.prd_cd = ps.prd_cd
+						inner join store s on s.store_cd = ps.store_cd
+						left outer join (
+							select prd_cd, location_cd, type, qty
+							from product_stock_hst
+							where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORE'
+						) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.store_cd
+						left outer join (
+							select prd_cd, store_cd, sum(qty * if(ord_state = 30, -1, 1)) as qty
+							from order_opt_wonga
+							where ord_state_date >= '$next_edate' and ord_state_date <= '$now_date' and ord_state in (30,60,61)
+							group by prd_cd, store_cd
+						) w on w.prd_cd = ps.prd_cd and w.store_cd = ps.store_cd
+						left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
+					where ps.prd_cd like '$prd_cd_p%' $where
+					group by ps.store_cd, pc.prd_cd
+					order by pc.color, s.store_nm
+				) a
+					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = a.color
+				group by a.store_cd, a.color
 			";
 
 			$store_rows = DB::select($sql);
 
 			$case_sql = "";
+			$case_sum_sql = "";
 			foreach ($sizes as $size) {
 				$case_sql .= "
 					, if(pc.size = '$size', (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_qty'
 					, if(pc.size = '$size', (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))), 0) as '" . str_replace('.', '', $size) . "_wqty'
 				";
+				$case_sum_sql .= "
+					, sum(a.`" . str_replace('.', '', $size) . "_qty`) as '" . str_replace('.', '', $size) . "_qty'
+					, sum(a.`" . str_replace('.', '', $size) . "_wqty`) as '" . str_replace('.', '', $size) . "_wqty'
+				";
 			}
 
 			$sql = "
-				select pc.color, c.code_val as color_nm, ps.storage_cd, s.storage_nm, ps.prd_cd
-					$case_sql
-					, (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))) as qty
-					, (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))) as wqty
-				from product_stock_storage ps
-					inner join product_code pc on pc.prd_cd = ps.prd_cd
-					inner join storage s on s.storage_cd = ps.storage_cd and s.use_yn = 'Y'
-					left outer join (
-						select prd_cd, location_cd, type, qty
-						from product_stock_hst
-						where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORAGE'
-					) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd
-					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
-				where ps.prd_cd like '$prd_cd_p%' and ps.qty != 0 and ps.wqty != 0
-				group by ps.storage_cd, pc.color
-				order by pc.color, s.storage_nm
+				select a.storage_cd, a.storage_nm, a.prd_cd, a.color, c.code_val as color_nm
+					$case_sum_sql
+					, sum(a.qty) as qty
+					, sum(a.wqty) as wqty
+				from (
+					select pc.color, ps.storage_cd, s.storage_nm, ps.prd_cd
+						$case_sql
+						, (ps.qty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))) as qty
+						, (ps.wqty - sum(if(hst.type in (1, 9, 11, 16, 17), ifnull(hst.qty, 0), 0))) as wqty
+					from product_stock_storage ps
+						inner join product_code pc on pc.prd_cd = ps.prd_cd
+						inner join storage s on s.storage_cd = ps.storage_cd and s.use_yn = 'Y'
+						left outer join (
+							select prd_cd, location_cd, type, qty
+							from product_stock_hst
+							where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORAGE'
+						) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd
+						left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
+					where ps.prd_cd like '$prd_cd_p%' and ps.qty != 0 and ps.wqty != 0
+					group by ps.storage_cd, pc.prd_cd
+					order by pc.color, s.storage_nm
+				) a
+					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = a.color
+				group by a.storage_cd, a.color
 			";
 			$storage_rows = DB::select($sql);
 
