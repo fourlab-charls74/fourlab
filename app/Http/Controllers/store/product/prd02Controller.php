@@ -1021,6 +1021,7 @@ class prd02Controller extends Controller
 
 	}
 
+	//바코드 일괄매칭 자료 업로드
 	public function upload(Request $request)
 	{
 
@@ -1040,7 +1041,8 @@ class prd02Controller extends Controller
         }
 
 	}
-
+	
+	//바코드 일괄매칭 저장
 	public function update(Request $request)
 	{
 		$admin_id		= Auth('head')->user()->id;
@@ -1059,7 +1061,7 @@ class prd02Controller extends Controller
 		for( $i = 0; $i < count($datas); $i++ ){
 			$data	= (array)$datas[$i];
 
-			$cd			= $data["xmd_code"];
+			$cd			= $data["prd_cd"];
 			$goods_no	= $data["goods_no"];
 			$goods_opt	= $data["goods_opt"];
 
@@ -1170,7 +1172,7 @@ class prd02Controller extends Controller
 		for ( $i = 0; $i < count($datas); $i++ ) {
 			$data	= (array)$datas[$i];
 
-			$prd_cd		= $data["xmd_code"];
+			$prd_cd		= $data["prd_cd"];
 			$goods_no	= $data["goods_no"];
 			$goods_opt	= $data["goods_opt"];
 
@@ -1179,7 +1181,7 @@ class prd02Controller extends Controller
 	
 			$sql	= " delete from product_stock where prd_cd = :prd_cd ";
 			DB::delete($sql,['prd_cd' => $prd_cd]);
-	
+
 			if( substr($prd_cd, 0 , 2) != "HR" || substr($prd_cd, 0 , 2) != "TR" ){
 				$cd_cut_cnt	= "1";
 	
@@ -1675,46 +1677,53 @@ class prd02Controller extends Controller
 	{
         $data = $request->input('data', []);
         $result = [];
-
+		
         foreach($data as $key => $d)
         {
 			$brand = $d['brand'];
-			$opt_kind_nm = $d['opt_kind_nm'];
-			$prd_cd_p = $d['prd_cd_p'];
-			$color = $d['color'];
-			$size = $d['size'];
-			$goods_nm = $d['goods_nm'];
-			$goods_nm_eng = $d['goods_nm_eng'];
-			$style_no = $d['style_no'];
-			$seq = $d['seq'];
-			$price = $d['price'];
-			$wonga = $d['wonga'];
-			$tag_price = $d['tag_price'];
 			$year = $d['year'];
 			$season = $d['season'];
 			$gender = $d['gender'];
 			$item = $d['item'];
+			$opt = $d['opt'];
+			$style_no = $d['style_no'];
+			$color = $d['color'];
+			$size_kind = $d['size_kind'];
+			$size = $d['size'];
+			$plan_category = $d['plan_category'];
+			$goods_nm = $d['goods_nm'];
+			$goods_nm_eng = $d['goods_nm_eng'];
 			$sup_com = $d['sup_com'];
+			$wonga = $d['wonga'];
+			$tag_price = $d['tag_price'];
+			$price = $d['price'];
+			$origin = $d['origin'];
+			
+			$prd_cd = $brand . $year . $season . $gender . $opt . $style_no . $color . $size;
+			$prd_cd_p = $brand . $year . $season . $gender . $opt . $style_no;
 
             $sql = "
 				select
-				 	'$brand' as brand
-					, '$opt_kind_nm' as opt_kind_nm
-				 	, '$prd_cd_p' as prd_cd_p
-					, '$color' as color
-					, '$size' as size
-					, '$goods_nm' as goods_nm
-					, '$goods_nm_eng' as goods_nm_eng
-					, '$style_no' as style_no
-					, '$seq' as seq
-					, '$price' as price
-					, '$wonga' as wonga
-					, '$tag_price' as tag_price
+				    '$prd_cd' as prd_cd
+				    , '$prd_cd_p' as prd_cd_p
+				 	, '$brand' as brand
 					, '$year' as year
 					, '$season' as season
 					, '$gender' as gender
 					, '$item' as item
+					, '$opt' as opt
+					, '$style_no' as style_no
+					, '$color' as color
+					, '$size_kind' as size_kind
+					, '$size' as size
+					, '$plan_category' as plan_category
+					, '$goods_nm' as goods_nm
+					, '$goods_nm_eng' as goods_nm_eng
 					, '$sup_com' as sup_com
+					, '$wonga' as wonga
+					, '$tag_price' as tag_price
+					, '$price' as price
+					, '$origin' as origin
 				from product_code
 				limit 1
 
@@ -1739,31 +1748,32 @@ class prd02Controller extends Controller
 	{
 		$admin_id = Auth('head')->user()->id;
 		$data = $request->input("products", []);
-
+		
 
 		try {
-
 			DB::beginTransaction();
 
 			foreach ($data as $row) {
-				$brand = $row['brand'];
-				$opt_kind_nm = $row['opt_kind_nm'];
+				$prd_cd = $row['prd_cd'];
 				$prd_cd_p = $row['prd_cd_p'];
-				$color = $row['color'];
-				$size = $row['size'];
-				$goods_nm = $row['goods_nm'];
-				$goods_nm_eng = $row['goods_nm_eng'];
-				$style_no = $row['style_no'];
-				$seq = $row['seq'];
-				$price = $row['price'];
-				$wonga = $row['wonga'];
-				$tag_price = $row['tag_price'];
+				$brand = $row['brand'];
 				$year = $row['year'];
 				$season = $row['season'];
 				$gender = $row['gender'];
 				$item = $row['item'];
+				$opt = $row['opt'];
+				$style_no = $row['style_no'];
+				$color = $row['color'];
+				$size_kind = $row['size_kind'];
+				$size = $row['size'];
+				$plan_category = $row['plan_category'];
+				$goods_nm = $row['goods_nm'];
+				$goods_nm_eng = $row['goods_nm_eng'];
 				$sup_com = $row['sup_com'];
-				$prd_cd = $prd_cd_p.$color.$size;
+				$wonga = $row['wonga'];
+				$tag_price = $row['tag_price'];
+				$price = $row['price'];
+				$origin = $row['origin'];
 
 				$unit = "";
 				$goods_no = "";
@@ -1790,22 +1800,25 @@ class prd02Controller extends Controller
 					]);
 
 					DB::table('product_code')->insert([
-						'prd_cd'	=> $prd_cd,
-						'prd_cd_p'	=> $prd_cd_p,
-						'seq'		=> $seq,
-						'goods_no'	=> $goods_no,
-						'goods_opt'	=> $goods_opt,
-						'brand'		=> $brand,
-						'year'		=> $year,
-						'season'	=> $season,
-						'gender'	=> $gender,
-						'item'		=> $item,
-						'opt'		=> $opt_kind_nm,
-						'color'		=> $color,
-						'size'		=> $size,
-						'rt'		=> now(),
-						'ut'		=> now(),
-						'admin_id'	=> $admin_id
+						'prd_cd'		=> $prd_cd,
+						'prd_cd_p'		=> $prd_cd_p,
+						'style_no'		=> $style_no,
+						'seq'			=> '',
+						'goods_no'		=> $goods_no,
+						'goods_opt'		=> $goods_opt,
+						'brand'			=> $brand,
+						'year'			=> $year,
+						'season'		=> $season,
+						'gender'		=> $gender,
+						'item'			=> $item,
+						'opt'			=> $opt,
+						'color'			=> $color,
+						'size_kind' 	=> $size_kind,
+						'size'			=> $size,
+						'plan_category' => $plan_category,
+						'rt'			=> now(),
+						'ut'			=> now(),
+						'admin_id'		=> $admin_id
 					]);
 					
 					DB::table('product_stock')->insert([

@@ -89,24 +89,26 @@
 
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd", headerName: "바코드", width: 150, cellStyle: {"text-align": "center"}},
+        {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
-		{field: "year", headerName: "년도", width: 80, cellStyle: {"text-align": "center"}},
+		{field: "year", headerName: "연도", width: 80, cellStyle: {"text-align": "center"}},
 		{field: "season", headerName: "시즌",width: 80, cellStyle: {"text-align": "center"}},
 		{field: "gender", headerName: "성별", width: 80, cellStyle: {"text-align": "center"}},
-		{field: "item", headerName: "아이템", width: 80, cellStyle: {"text-align": "center"}},
-        {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "seq", headerName: "순서", width: 50},
+		{field: "item", headerName: "품목", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "opt", headerName: "하위품목", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
         {field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"}},
+        {field: "size_kind", headerName: "사이즈구분", width: 80, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"}},
-        
+        {field: "plan_category", headerName: "상품운영구분", width: 90, cellStyle: {"text-align": "center"}},
         {field: "goods_nm",	headerName: "상품명", width: 220},
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 220},
-        {field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
-		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
-		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
+		{field: "tag_price", headerName: "정상가", type: 'currencyType', width: 80},
+		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "sup_com", headerName: "공급업체", width: 120, cellStyle: {"text-align": "center"}},
+		{field: "origin", headerName: "원산지", width: 100, cellStyle: {"text-align": "center"}},
 
        
     ];
@@ -207,23 +209,24 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var excel_columns = {
-			'A': 'prd_cd_p',
-			'B': 'brand',
-			'C': 'year',
-			'D': 'season',
-			'E': 'gender',
-			'F': 'item',
-			'G': 'seq',
-			'H': 'opt_kind_nm',
-			'I': 'color',
+			'A': 'brand',
+			'B': 'year',
+			'C': 'season',
+			'D': 'gender',
+			'E': 'item',
+			'F': 'opt',
+			'G': 'style_no',
+			'H': 'color',
+			'I': 'size_kind',
 			'J': 'size',
-			'K': 'goods_nm',
-			'L': 'goods_nm_eng',
-			'M': 'style_no',
-			'N': 'price',
+			'K': 'plan_category',
+			'L': 'goods_nm',
+			'M': 'goods_nm_eng',
+			'N': 'sup_com',
 			'O': 'wonga',
 			'P': 'tag_price',
-			'Q': 'sup_com',
+			'Q': 'price',
+			'R': 'origin'
 		};
 
         var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)

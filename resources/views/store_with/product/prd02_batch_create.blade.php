@@ -49,7 +49,7 @@
 												</div>
 											</td>
 											<th>샘플파일</th>
-											<td style="width:35%;"><a href="/data/head/sample/상품맵핑_샘플.xlsx"> 상품맵핑_샘플.xlsx</a></td>
+											<td style="width:35%;"><a href="/sample/sample_barcode_batch.xlsx"> sample_barcode_batch.xlsx</a></td>
 										</tr>
 									</tbody>
 								</table>
@@ -99,7 +99,7 @@
 <script language="javascript">
 	var columnDefs = [
 		{headerName: "#", field: "num",filter:true,width:50,valueGetter: function(params) {return params.node.rowIndex+1;},pinned:'left'},
-		{headerName:"바코드",field:"xmd_code", width:150},
+		{headerName:"바코드",field:"prd_cd", width:150},
 		{headerName:"온라인코드",field:"goods_no", width:100},
 		{headerName:"옵션",field:"goods_opt", width:250},
 	];
@@ -212,11 +212,10 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var columns	= {
-			'A': 'xmd_code',
+			'A': 'prd_cd',
 			'B': 'goods_no',
 			'C': 'goods_opt',
 		};
-
 
 		// start at the 2nd row - the first row are the headers
 		var rowIndex = 2;
