@@ -1959,7 +1959,8 @@ class prd02Controller extends Controller
 			DB::table('product_code')
 				->where('prd_cd', '=', $prd_cd)
 				->update([
-					'goods_no' => 0
+					'goods_no'	=> 0,
+					'goods_opt'	=> ''
 				]);
 
 			DB::table('product')
@@ -1971,20 +1972,26 @@ class prd02Controller extends Controller
 			DB::table('product_stock')
 				->where('prd_cd', '=', $prd_cd)
 				->update([
-					'goods_no' => 0
+					'goods_no'	=> 0,
+					'goods_opt'	=> ''
 				]);
 
 			DB::table('product_stock_store')
 				->where('prd_cd', '=', $prd_cd)
 				->update([
-					'goods_no' => 0
+					'goods_no'	=> 0,
+					'goods_opt'	=> ''
 				]);
 
 			DB::table('product_stock_storage')
 				->where('prd_cd', '=', $prd_cd)
 				->update([
-					'goods_no' => 0
+					'goods_no'	=> 0,
+					'goods_opt'	=> ''
 				]);
+
+			// 기존 상품 코드 매핑 테이블 삭제
+			DB::table('goods_xmd')->where('cd', $prd_cd)->delete();
 
 			DB::commit();
 			$code = 200;

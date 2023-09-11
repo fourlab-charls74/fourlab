@@ -277,7 +277,7 @@
 		}).then(function (res) {
 			if(res.data.code === 200) {
 				alert(res.data.msg);
-				SearchBarcodeMapping();
+				Search();
 			} else {
 				console.log(res.data);
 				alert("바코드 맵핑 정보 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
