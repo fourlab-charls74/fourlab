@@ -332,20 +332,25 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         Route::get('prd02/batch', 'prd02Controller@batch_show');
         Route::post('prd02/batch-import', 'prd02Controller@import_excel');
+        Route::post('prd02/batch-import2', 'prd02Controller@import_excel2');
         Route::get('prd02/batch-create', 'prd02Controller@batch_create');
         Route::post('prd02/upload', 'prd02Controller@upload');
         Route::put('prd02/show', 'prd02Controller@update');
+        Route::get('prd02/barcode-batch', 'prd02Controller@barcode_batch');
 
         Route::get('prd02/product_upload', 'prd02Controller@product_upload');
         Route::post('prd02/change-size', 'prd02Controller@change_size');
         Route::post('prd02/get-seq', 'prd02Controller@getSeq');
         Route::post('prd02/save_product', 'prd02Controller@save_product');
+        Route::post('prd02/save_product2', 'prd02Controller@save_product2');
         Route::post('prd02/update_product', 'prd02Controller@update_product');
         Route::post('prd02/del-img', 'prd02Controller@delImg');
         Route::post('prd02/sel_seq', 'prd02Controller@selSeq');
         Route::post('prd02/change_seq', 'prd02Controller@changeSeq');
         Route::post('prd02/batch-getproducts','prd02Controller@get_products'); 
+        Route::post('prd02/batch-getproducts2','prd02Controller@get_products2'); 
         Route::post('prd02/batch-products','prd02Controller@batch_products'); 
+        Route::post('prd02/batch-products2','prd02Controller@batch_products2'); 
 
         Route::get('prd02/create_barcode', 'prd02Controller@create_barcode');
         Route::post('prd02/dup-style-no', 'prd02Controller@dup_style_no');

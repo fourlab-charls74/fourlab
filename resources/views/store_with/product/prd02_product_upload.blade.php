@@ -71,7 +71,7 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">년도</th>
+											<th class="required">연도</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<select name='year' id='year' class="form-control form-control-sm prd_code">
@@ -98,7 +98,7 @@
 											<th class="required">성별</th>
 											<td>
 												<div class="flax_box">
-													<select name='gender' id='gender' class="form-control form-control-sm prd_code" onchange="change_gender();">
+													<select name='gender' id='gender' class="form-control form-control-sm prd_code">
 														<option value=''>선택</option>
 														@foreach ($genders as $gender)
 														<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
@@ -153,6 +153,17 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">사이즈구분</th>
+											<td>
+												<div class="flax_box">
+													<select name="size_kind" id="size_kind" class="form-control form-control-sm" onchange="change_size();">
+														<option value=''> 선택 </option>
+														@foreach ($size_kind as $sk)
+															<option value='{{ $sk->size_kind_cd }}'>{{ $sk->size_kind_cd }} : {{ $sk->size_kind_nm }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
 											<th class="required">사이즈</th>
 											<td>
 												<div class="flax_box">
@@ -164,28 +175,28 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">스타일넘버</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='style_no' id="style_no" value=''>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">상품명</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
+										</tr>
+                                        <tr>
 											<th class="required">상품명(영문)</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
 												</div>
 											</td>
-										</tr>
-                                        <tr>
 											<th class="required">공급업체</th>
 											<td>
 												<div class="flax_box">
@@ -197,25 +208,30 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">원가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>현재가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
+											</td>
+											<th></th>
+											<td>
 											</td>
 										</tr>
 										<tr>
@@ -277,8 +293,12 @@
 	const columns = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 30, pinned: 'left', sort: null},
 		{field: "brand", headerName: "브랜드", width: 70},
+		{field: "year", headerName: "년도", width: 80},
+		{field: "season", headerName: "시즌",width: 80},
+		{field: "gender", headerName: "성별", width: 80},
 		{field: "image_url", headerName: "이미지 경로", hide: true},
 		{field: "opt", headerName: "품목", width: 80},
+		{field: "seq", headerName: "순서", width: 50},
 		{field: "item", headerName: "하위품목", width: 80},
 		{field: "image", headerName: "이미지",
 			cellRenderer: (params) => `<img style="display:block; width: 100%; max-width: 30px; margin: 0 auto;" src="${params.data.image}">`
@@ -287,19 +307,17 @@
 		{field: "color", headerName: "컬러", width: 80,
 			cellRenderer: (params) => params.data.color.split(':')[1]
 		},
+		{field: "size_kind", headerName: "사이즈구분", width: 120},
 		{field: "size", headerName: "사이즈", width: 80,
 			cellRenderer: (params) => params.data.size.split(':')[1]
 		},
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
 		{field: "style_no", headerName: "스타일넘버", width: 100},
-		{field: "seq", headerName: "순서", width: 50},
 		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
-		{field: "tag_price", headerName: "tag가", type: 'currencyType', width: 80},
-		{field: "year", headerName: "년도", width: 80},
-		{field: "season", headerName: "시즌",width: 80},
-		{field: "gender", headerName: "성별", width: 80},
+		{field: "tag_price", headerName: "정상가", type: 'currencyType', width: 80},
+		
 		{field: "sup_com", headerName: "공급업체", width: 120},
 	];
 </script>
@@ -369,8 +387,7 @@
 				item: document.f1.item.value,
 				opt: document.f1.opt.value
 			}
-
-		});
+		}).catch();
 
 		const { code } = response.data;
 		if (code == 200) {
@@ -402,6 +419,7 @@
 				opt: document.f1.opt.value,
 				color: document.f1.color.value,
 				size: document.f1.size.value,
+				size_kind: document.f1.size_kind.value,
 				prd_nm: document.f1.prd_nm.value,
 				prd_nm_eng: document.f1.prd_nm_eng.value,
 				style_no: document.f1.style_no.value,
@@ -424,6 +442,7 @@
 				image: added_base64_image,
 				opt: document.f1.opt[document.f1.opt.selectedIndex].text,
 				color: document.f1.color[document.f1.color.selectedIndex].text,
+				size_kind: document.f1.size_kind.value,
 				size: document.f1.size[document.f1.size.selectedIndex].text,
 				prd_nm: document.f1.prd_nm.value,
 				prd_nm_eng: document.f1.prd_nm_eng.value,
@@ -450,10 +469,10 @@
 			return alert("브랜드를 선택해주세요.");
 		}
 
-		// 년도 선택여부
+		// 연도 선택여부
 		if (f1.year.selectedIndex == 0) {
 			f1.year.focus();
-			return alert("년도를 선택해주세요.");
+			return alert("연도를 선택해주세요.");
 		}
 
 		// 시즌 선택여부
@@ -468,16 +487,22 @@
 			return alert("성별을 선택해주세요.");
 		}
 
-		// 아이템 선택여부
+		// 품목 선택여부
 		if (f1.item.selectedIndex == 0) {
 			f1.item.focus();
-			return alert("아이템을 선택해주세요.");
+			return alert("품목을 선택해주세요.");
 		}
-
-		// 품목 선택여부
+		
+		// 하위품목 선택여부
 		if (f1.opt.selectedIndex == 0) {
 			f1.opt.focus();
-			return alert("품목을 선택해주세요.");
+			return alert("하위품목을 선택해주세요.");
+		}
+
+		// 순서 선택여부
+		if (f1.seq.selectedIndex == 0) {
+			f1.seq.focus();
+			return alert("순서를 선택해주세요.");
 		}
 
 		// 컬러 선택여부
@@ -486,10 +511,22 @@
 			return alert("컬러를 선택해주세요.");
 		}
 
+		// 사이즈구분 선택여부
+		if (f1.size_kind.selectedIndex == 0) {
+			f1.size_kind.focus();
+			return alert("사이즈구분을 선택해주세요.");
+		}
+
 		// 사이즈 선택여부
 		if (f1.size.selectedIndex == 0) {
 			f1.size.focus();
 			return alert("사이즈를 선택해주세요.");
+		}
+
+		// 스타일넘버 입력여부
+		if (f1.style_no.value.trim() === '') {
+			f1.style_no.focus();
+			return alert("스타일넘버를 입력해주세요.");
 		}
 
 		// 상품명 입력여부
@@ -504,10 +541,10 @@
 			return alert("상품명(영문)을 입력해주세요.");
 		}
 
-		// 스타일넘버 입력여부
-		if (f1.style_no.value.trim() === '') {
-			f1.style_no.focus();
-			return alert("스타일넘버를 입력해주세요.");
+		// 공급업체 선택여부
+		if (f1.sup_com.selectedIndex == 0) {
+			f1.sup_com.focus();
+			return alert("공급업체를 선택해주세요.");
 		}
 
 		// 원가 입력여부
@@ -523,9 +560,10 @@
 		let rows = added_rows;
 		if (rows.length < 1) return alert("저장 목록에 정보를 입력해주세요.");
 		let sel_rows = gx.getSelectedRows();
-
+		if (sel_rows.length < 1) return alert("저장할 상품을 선택해주세요.");
+		
 		axios({
-			url: '/store/product/prd02/save_product',
+			url: '/store/product/prd02/save_product2',
 			method: 'post',
 			data: {
 				data: rows,
@@ -770,15 +808,15 @@
 				});
 		}
 
-	//성별에 따라 사이즈 값 다르게 출력
-	function change_gender() {
-		let gender = $('#gender option:selected').val();
-		
+	//사이즈구분값에 따라 사이즈 값 다르게 출력
+	function change_size() {
+		let size_kind = $('#size_kind option:selected').val();
+
 		$.ajax({
 			method: 'post',
-			url: '/store/product/prd03/change-gender',
+			url: '/store/product/prd02/change-size',
 			data: {
-				gender : gender
+				size_kind : size_kind,
 			},
 			success: function (res) {
 				if(res.code == 200) {
@@ -788,11 +826,11 @@
 					let sel =''
 					for(let i = 0; i < res.result.length;i++) {
 						sel = "<option value=''>선택</option>"
-						option += '<option value='+ res.result[i].code_id +'>' + res.result[i].code_id + ' : ' + res.result[i].code_val+ '</option>';
+						option += '<option value='+ res.result[i].size_cd +'>' + res.result[i].size_cd + ' : ' + res.result[i].size_nm+ '</option>';
 					}
 					$('#size').append(sel);
 					$('#size').append(option);
-					
+
 				}
 			},
 			error: function(request, status, error) {
@@ -867,7 +905,7 @@
 
 		// 상품관리(코드) 엑셀 일괄등록 팝업 오픈
 		const openBatchPopup = () => {
-			const url = '/store/product/prd02/batch';
+			const url = '/store/product/prd02/barcode-batch';
 			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=800");
 		}
 

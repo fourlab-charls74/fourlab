@@ -1269,6 +1269,8 @@ class prd02Controller extends Controller
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
 
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y' and size_kind_cd like 'OLD%'";
+		$size_kind = DB::select($size_kind_sql);
 
 		$values = [
 			'brands' 	=> $brands,
@@ -1282,7 +1284,8 @@ class prd02Controller extends Controller
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'sup_coms' 	=> $sup_coms,
 			'units' 	=> SLib::getCodes("PRD_CD_UNIT"),
-			'images' 	=> []
+			'images' 	=> [],
+			'size_kind' => $size_kind
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_product_upload',$values);
@@ -1292,6 +1295,8 @@ class prd02Controller extends Controller
 	{
 		$admin_id = Auth('head')->user()->id;
 		$sel_data = $request->input("sel_data");
+		
+		dd($sel_data);
 
 		try {
 
@@ -1360,15 +1365,7 @@ class prd02Controller extends Controller
 						'admin_id' => $admin_id
 					]);
 
-					/**
-					 *  상품 이미지 저장 (단일 이미지)
-					 */
-					$base64_src = $row['image'];
-					$save_path = "/images/prd02";
-
-					$unique_img_name = $prd_cd . $style_no;
-
-					$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
+					
 
 					$prd_cd_p	= $brand[0] . $year[0] . $season[0] . $gender[0] . $item[0] . $style_no;
 		
@@ -1392,14 +1389,6 @@ class prd02Controller extends Controller
 						'ut'		=> now(),
 						'admin_id'	=> $admin_id
 					]);
-					
-					DB::table('product_image')->insert([
-						'prd_cd' => $prd_cd,
-						'img_url' => $img_url,
-						'rt' => now(),
-						'ut' => now(),
-						'admin_id'	=> $admin_id
-					]);
 
 					DB::table('product_stock')->insert([
 						'goods_no' => $goods_no,
@@ -1415,6 +1404,27 @@ class prd02Controller extends Controller
 						'rt' => now(),
 						'ut' => now()
 					]);
+
+					/**
+					 *  상품 이미지 저장 (단일 이미지)
+					 */
+					if ($row['image'] != null) {
+						$base64_src = $row['image'];
+						$save_path = "/images/prd02";
+
+						$unique_img_name = $prd_cd . $style_no;
+
+						$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
+
+						DB::table('product_image')->insert([
+							'prd_cd' => $prd_cd,
+							'img_url' => $img_url,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id'	=> $admin_id
+						]);
+					}
+					
 
 				} else {
 					DB::rollback();
@@ -1794,6 +1804,7 @@ class prd02Controller extends Controller
 						'tag_price'		=> $tag_price,
 						'com_id'		=> $sup_com,
 						'unit'			=> $unit,
+						'origin'		=> $origin,
 						'rt'			=> now(),
 						'ut'			=> now(),
 						'admin_id'		=> $admin_id
@@ -2017,5 +2028,372 @@ class prd02Controller extends Controller
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	/*
+	 * 
+	 * 바코드등록(구) 일괄등록 부분
+	 * 
+	 * */
+	public function barcode_batch()
+	{
+		$values = [];
+
+		return view(Config::get('shop.store.view') . '/product/prd02_barcode_batch', $values);
+	}
+
+	public function import_excel2(Request $request)
+	{
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+
+				$save_path = "data/product/prd02/";
+				$file_name = "${now}_${user_id}.${extension}";
+
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+
+				$file = sprintf("${save_path}%s", $file_name);
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+
+	public function get_products2(Request $request)
+	{
+		$data = $request->input('data', []);
+		$result = [];
+
+		foreach($data as $key => $d)
+		{
+			$brand = $d['brand'];
+			$opt_kind_nm = $d['opt_kind_nm'];
+			$prd_cd_p = $d['prd_cd_p'];
+			$color = $d['color'];
+			$size_kind = $d['size_kind'];
+			$size = $d['size'];
+			$goods_nm = $d['goods_nm'];
+			$goods_nm_eng = $d['goods_nm_eng'];
+			$style_no = $d['style_no'];
+			$seq = $d['seq'];
+			$price = $d['price'];
+			$wonga = $d['wonga'];
+			$tag_price = $d['tag_price'];
+			$year = $d['year'];
+			$season = $d['season'];
+			$gender = $d['gender'];
+			$item = $d['item'];
+			$sup_com = $d['sup_com'];
+
+			$sql = "
+				select
+				 	'$brand' as brand
+					, '$opt_kind_nm' as opt_kind_nm
+				 	, '$prd_cd_p' as prd_cd_p
+					, '$color' as color
+				    , '$size_kind' as size_kind
+					, '$size' as size
+					, '$goods_nm' as goods_nm
+					, '$goods_nm_eng' as goods_nm_eng
+					, '$style_no' as style_no
+					, '$seq' as seq
+					, '$price' as price
+					, '$wonga' as wonga
+					, '$tag_price' as tag_price
+					, '$year' as year
+					, '$season' as season
+					, '$gender' as gender
+					, '$item' as item
+					, '$sup_com' as sup_com
+				from product_code
+				limit 1
+
+            ";
+			$row = DB::selectOne($sql);
+			array_push($result, $row);
+		}
+
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+			],
+			"body" => $result
+		]);
+	}
+
+	public function batch_products2(Request $request)
+	{
+		$admin_id = Auth('head')->user()->id;
+		$data = $request->input("products", []);
+		
+		try {
+			DB::beginTransaction();
+
+			foreach ($data as $row) {
+				$prd_cd_p = $row['prd_cd_p'];
+				$brand = $row['brand'];
+				$year = $row['year'];
+				$season = $row['season'];
+				$gender = $row['gender'];
+				$item = $row['item'];
+				$opt = $row['opt_kind_nm'];
+				$style_no = $row['style_no'];
+				$seq = $row['seq'];
+				$color = $row['color'];
+				$size_kind = $row['size_kind'];
+				$size = $row['size'];
+				$goods_nm = $row['goods_nm'];
+				$goods_nm_eng = $row['goods_nm_eng'];
+				$sup_com = $row['sup_com'];
+				$wonga = $row['wonga'];
+				$tag_price = $row['tag_price'];
+				$price = $row['price'];
+
+				$unit = "";
+				$goods_no = "";
+				$goods_opt = "";
+				
+				$prd_cd = $prd_cd_p . $color . $size;
+
+				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+				
+				if ($result->count == 0) {
+
+					DB::table('product')->insert([
+						'prd_cd'		=> $prd_cd,
+						'prd_nm'		=> $goods_nm,
+						'prd_nm_eng'	=> $goods_nm_eng,
+						'style_no'		=> $style_no,
+						'price'			=> $price,
+						'wonga'			=> $wonga,
+						'tag_price'		=> $tag_price,
+						'com_id'		=> $sup_com,
+						'unit'			=> $unit,
+						'rt'			=> now(),
+						'ut'			=> now(),
+						'admin_id'		=> $admin_id
+					]);
+
+					DB::table('product_code')->insert([
+						'prd_cd'		=> $prd_cd,
+						'prd_cd_p'		=> $prd_cd_p,
+						'style_no'		=> $style_no,
+						'seq'			=> $seq,
+						'goods_no'		=> $goods_no,
+						'goods_opt'		=> $goods_opt,
+						'brand'			=> $brand,
+						'year'			=> $year,
+						'season'		=> $season,
+						'gender'		=> $gender,
+						'item'			=> $item,
+						'opt'			=> $opt,
+						'color'			=> $color,
+						'size_kind' 	=> $size_kind,
+						'size'			=> $size,
+						'rt'			=> now(),
+						'ut'			=> now(),
+						'admin_id'		=> $admin_id
+					]);
+
+					DB::table('product_stock')->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'qty_wonga'	=> 0,
+						'in_qty' => 0,
+						'out_qty' => 0,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'barcode' => $prd_cd,
+						'use_yn' => 'Y',
+						'rt' => now(),
+						'ut' => now()
+					]);
+				}else {
+					DB::rollback();
+					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+				}
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "성공";
+		} catch (\Exception $e) {
+			DB::rollback();
+			$msg = $e->getMessage();
+			$code = 500;
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
+	public function save_product2(Request $request)
+	{
+		$admin_id = Auth('head')->user()->id;
+		$sel_data = $request->input("sel_data");
+		
+		try {
+
+			DB::beginTransaction();
+
+			foreach($sel_data as $row) {
+
+				$brand 		= $row['brand'];
+				$year 		= $row['year'];
+				$season		= $row['season'];
+				$gender		= $row['gender'];
+				$opt 		= $row['opt'];
+				$seq		= $row['seq'];
+				$item 		= $row['item'];
+				$color 		= $row['color'];
+				$size_kind	= $row['size_kind'];
+				$size 		= $row['size'];
+				$prd_nm		= $row['prd_nm'];
+				$prd_nm_eng	= $row['prd_nm_eng']??'';
+				$style_no 	= $row['style_no'];
+				$sup_com 	= $row['sup_com'];
+				$price 		= $row['price'];
+				$wonga 		= $row['wonga'];
+				$tag_price 	= $row['tag_price'];
+//				$origin 	= $row['origin'];
+//				$plan_category 	= $row['plan_category'];
+				
+				$brand 		= explode(' : ', $brand);
+				$year 		= explode(' : ', $year);
+				$season 	= explode(' : ', $season);
+				$gender 	= explode(' : ', $gender);
+				$opt 		= explode(' : ', $opt);
+				$item 		= explode(' : ', $item);
+				$color 		= explode(' : ', $color);
+				$size_kind  = explode(' : ', $size_kind);
+				$size		= explode(' : ', $size);
+				$sup_com 	= explode(' : ', $sup_com);
+//				$plan_category 	= explode(' : ', $plan_category);
+
+				$unit = "";
+
+				$prd_cd	= $row['prd_cd'].$color[0].$size[0];
+				$goods_no = "";
+
+				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+				// $size_sql = "select * from code where code_kind_cd = 'PRD_CD_SIZE_MATCH' and code_id = '$size[0]'";
+				// $size_cd = DB::selectOne($size_sql)->code_val2;
+
+				$prd_cd_p	= $brand[0] . $year[0] . $season[0] . $gender[0] . $item[0] . $seq . $opt[0];
+				
+
+				$goods_opt = "";
+				if ($result->count == 0) {
+
+					DB::table('product')->insert([
+						'prd_cd' => $prd_cd,
+						'prd_nm' => $prd_nm,
+						'prd_nm_eng' => $prd_nm_eng,
+						'style_no' => $style_no,
+						'price' => $price,
+						'wonga' => $wonga,
+						'tag_price' => $tag_price,
+						'com_id' => $sup_com[0],
+//						'origin' => $origin,
+						'unit' => $unit,
+						'rt' => now(),
+						'ut' => now(),
+						'admin_id' => $admin_id
+					]);
+
+					DB::table('product_code')->insert([
+						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd_p,
+						'goods_no'	=> $goods_no,
+						'style_no'	=> $style_no,
+						'goods_opt'	=> $goods_opt,
+						'brand'		=> $brand[0],
+						'year'		=> $year[0],
+						'season'	=> $season[0],
+						'gender'	=> $gender[0],
+						'seq'		=> $seq,
+						'opt'		=> $opt[0],
+						'item'		=> $item[0],
+						'color'		=> $color[0],
+						'size_kind' => $size_kind[0],
+						'size'		=> $size[0],
+//						'plan_category' => $plan_category[0],
+						'rt'		=> now(),
+						'ut'		=> now(),
+						'admin_id'	=> $admin_id
+					]);
+
+					
+
+					DB::table('product_stock')->insert([
+						'goods_no' => $goods_no,
+						'prd_cd' => $prd_cd,
+						'qty_wonga'	=> 0,
+						'in_qty' => 0,
+						'out_qty' => 0,
+						'qty' => 0,
+						'wqty' => 0,
+						'goods_opt' => $goods_opt,
+						'barcode' => $prd_cd,
+						'use_yn' => 'Y',
+						'rt' => now(),
+						'ut' => now()
+					]);
+
+					/**
+					 *  상품 이미지 저장 (단일 이미지)
+					 */
+					if ($row['image'] != null) {
+						$base64_src = $row['image'];
+						$save_path = "/images/prd02";
+
+						$unique_img_name = $prd_cd . $style_no;
+
+						$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
+
+						
+
+						DB::table('product_image')->insert([
+							'prd_cd' => $prd_cd,
+							'img_url' => $img_url,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id'	=> $admin_id
+						]);
+					}
+					
+
+				} else {
+					DB::rollback();
+					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
+				}
+			}
+			DB::commit();
+			$code = 200;
+			$msg = "성공";
+		} catch (\Exception $e) {
+			DB::rollback();
+			$msg = $e->getMessage();
+			$code = 500;
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }

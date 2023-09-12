@@ -199,7 +199,7 @@
 													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
 												</div>
 											</td>
-											<th class="required">업체명</th>
+											<th class="required">공급업체</th>
 											<td>
 												<div class="flax_box">
 													<select name='sup_com' id="sup_com" class="form-control form-control-sm">
@@ -320,7 +320,7 @@
 		},
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
-		{field: "sup_com", headerName: "업체명", width: 120},
+		{field: "sup_com", headerName: "공급업체", width: 120},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "정상가", type: 'currencyType', width: 80},
 		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
@@ -557,10 +557,10 @@
 			return alert("상품명(영문)을 입력해주세요.");
 		}
 
-		// 업체명 선택여부
+		// 공급업체 선택여부
 		if (f1.sup_com.selectedIndex == 0) {
 			f1.sup_com.focus();
-			return alert("업체명를 선택해주세요.");
+			return alert("공급업체를 선택해주세요.");
 		}
 
 		// 원가 입력여부
