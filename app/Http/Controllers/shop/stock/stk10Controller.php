@@ -234,7 +234,8 @@ class stk10Controller extends Controller
                 psr.prc_rt, 
                 psr.fin_id, 
                 (select name from mgr_user where id = psr.fin_id) as fin_nm, 
-                psr.fin_rt
+                psr.fin_rt,
+                if( psr.prc_rt > now(), 'N', 'Y' ) as fin_ok
             from product_stock_release psr
                 inner join product_code pc on pc.prd_cd = psr.prd_cd
                 inner join product_stock_storage pss on pss.prd_cd = psr.prd_cd and pss.storage_cd = psr.storage_cd
@@ -252,7 +253,7 @@ class stk10Controller extends Controller
 		";
 		$result = DB::select($sql);
 
-        // pagination
+		// pagination
         $total = 0;
         $page_cnt = 0;
         if($page == 1) {
