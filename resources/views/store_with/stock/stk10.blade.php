@@ -368,8 +368,10 @@
             //     return params.data.state < 40 && params.data.state > 0;
             // },
         },
-        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 110, cellStyle: {"text-align": "center"}, 
-            cellRenderer: function(params) {
+        {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 80, cellStyle: {"text-align": "center"},
+			editable: function(params) {return params.data.state === 20;},
+			cellStyle: function(params) {return params.data.state === 20 ? {"background-color": "#ffFF99"} : {};},
+			cellRenderer: function(params) {
                return params.data.state > 0 ? (params.value || '') : '';
             }
         },
@@ -383,7 +385,7 @@
         },
         {field: "exp_dlv_day", headerName: "출고예정일자", pinned:'left', cellStyle: {"text-align": "center"}, width: 90,
            cellRenderer: function(params) {
-                return params.data.dlv_day;
+                return params.data.exp_dlv_day_data;
            }
         },
         {field: "storage_cd",	headerName: "창고코드", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
@@ -404,8 +406,8 @@
 		{field: "storage_wqty", headerName: "창고재고", width: 60, type: "currencyType"},
 		{field: "store_wqty", headerName: "매장재고", width: 60, type: "currencyType"},
 		{field: "qty", headerName: "수량", type: "currencyType", width: 50,
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};},
+            editable: function(params) {return params.data.state === 10 || params.data.state === 20;}, 
+            cellStyle: function(params) {return params.data.state === 10 || params.data.state === 20 ? {"background-color": "#ffFF99"} : {};},
             cellRenderer: function(params) {
                 if (params.data.state != 10) {
                     if (params.value !== undefined) {
@@ -438,8 +440,8 @@
         {field: "req_comment", headerName: "매장메모", width: 300},
         {field: "storage_comment", headerName: "창고메모", width: 300, hide:true},
         {field: "comment", headerName: "본사메모", width: 300, 
-            editable: function(params) {return params.data.state === 10;}, 
-            cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99"} : {};}
+            editable: function(params) {return params.data.state === 10 || params.data.state === 20;}, 
+            cellStyle: function(params) {return params.data.state === 10 || params.data.state === 20 ? {"background-color": "#ffFF99"} : {};}
         },
         {field: "req_nm", headerName: "요청자", cellStyle: {"text-align": "center"}},
         {field: "req_rt", headerName: "요청일시", width: 120, cellStyle: {"text-align": "center"}},

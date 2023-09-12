@@ -443,19 +443,127 @@ class stk10Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
+		$prc_rt = date('Y-m-d H:i:s');
 
         try {
             DB::beginTransaction();
 
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
+				
+				//***** 출고일, 본사메모, 수량 변경 수정 시작
+				//=====
+				$sql	= " select exp_dlv_day, qty, comment from product_stock_release where idx = :idx ";
+				$stock_release	= DB::selectOne($sql,['idx' => $d['idx']]);
 
+				//출고일 변경
+				$update_value	= "";
+				if( $stock_release->exp_dlv_day != $d['dlv_day'] ){
+					//$update_value .= " exp_dlv_day = '" . str_replace("-","",$d['dlv_day']) . "' ";	출고예정일자는 그대로 
+					$prc_rt	= $d['dlv_day'] . " 00:00:00";
+				}
+				
+				//본사 메모 변경
+				if( $stock_release->comment != $d['comment'] ){
+					if($update_value != "") $update_value .= ",";
+					$update_value .= " comment = '" . Lib::quote($d['comment']) . "' "; 
+				}
+				
+				// 수량 변경
+				if( $stock_release->qty != $d['qty'] ){
+					if($update_value != "") $update_value .= ",";
+					$update_value .= " qty = '" . $d['qty'] . "' ";
+					
+					$gap_qty	= $d['qty'] - $stock_release->qty;
+
+					$sql = "
+						select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
+						from product_code pc
+							inner join goods g on g.goods_no = pc.goods_no
+						where prd_cd = :prd_cd
+					";
+					$prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
+						
+					// product_stock -> 창고보유재고 차감
+					DB::table('product_stock')
+						->where('prd_cd', '=', $prd->prd_cd)
+						->update([
+							'wqty' => DB::raw('wqty - ' . ($gap_qty ?? 0)),
+							'ut' => now(),
+						]);
+
+					// product_stock_storage -> 보유재고 차감
+					DB::table('product_stock_storage')
+						->where('prd_cd', '=', $prd->prd_cd)
+						->where('storage_cd', '=', $d['storage_cd'])
+						->update([
+							'wqty' => DB::raw('wqty - ' . ($gap_qty ?? 0)),
+							'ut' => now(),
+						]);
+
+					// 재고이력 등록
+					DB::table('product_stock_hst')
+						->insert([
+							'goods_no' => $prd->goods_no,
+							'prd_cd' => $prd->prd_cd,
+							'goods_opt' => $prd->goods_opt,
+							'location_cd' => $d['storage_cd'],
+							'location_type' => 'STORAGE',
+							'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
+							'price' => $prd->price,
+							'wonga' => $prd->wonga,
+							'qty' => ($gap_qty ?? 0) * -1,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => '',
+							'comment' => '창고출고',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						]);
+					
+                    DB::table('product_stock_store')
+						->where('prd_cd', '=', $prd->prd_cd)
+						->where('store_cd', '=', $d['store_cd'])
+						->update([
+							'wqty' => DB::raw('wqty + ' . ($gap_qty ?? 0)),
+							'ut' => now(),
+						]);
+
+					// 재고이력 등록
+					DB::table('product_stock_hst')
+						->insert([
+							'goods_no' => $prd->goods_no,
+							'prd_cd' => $prd->prd_cd,
+							'goods_opt' => $prd->goods_opt,
+							'location_cd' => $d['store_cd'],
+							'location_type' => 'STORE',
+							'type' => PRODUCT_STOCK_TYPE_STORE_IN, // 재고분류 : (매장)입고
+							'price' => $prd->price,
+							'wonga' => $prd->wonga,
+							'qty' => $gap_qty ?? 0,
+							'stock_state_date' => date('Ymd'),
+							'ord_opt_no' => '',
+							'comment' => '매장입고',
+							'rt' => now(),
+							'admin_id' => $admin_id,
+							'admin_nm' => $admin_nm,
+						]);
+				}
+				
+				if($update_value != ""){
+					$sql	= " update product_stock_release set $update_value where idx = :idx ";
+					DB::update($sql, ['idx' => $d['idx']]);
+				}
+				//=====
+				//***** 출고일, 본사메모, 수량 변경 수정 종료
+
+				
                 DB::table('product_stock_release')
                     ->where('idx', '=', $d['idx'])
                     ->update([
                         'state' => $new_state,
                         'prc_id' => $admin_id,
-                        'prc_rt' => now(),
+                        'prc_rt' => $prc_rt,
                         'ut' => now(),
                     ]);
 
