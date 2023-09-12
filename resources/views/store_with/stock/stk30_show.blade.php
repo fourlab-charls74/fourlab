@@ -544,8 +544,8 @@
 		if (new_state == 40) {
 			let wrong_list = rows.filter(row => row.qty != row.fixed_return_qty);
 			if (wrong_list.length > 0 && !confirm("요청수량과 확정수량이 일치하지 않는 항목이 존재합니다.\n그래도 변경하시겠습니까?")) return;
-			let no_zero_fixed_return_qty = rows.filter(row => row.fixed_return_qty == '0');
-			if (no_zero_fixed_return_qty.length > 0) return alert('확정수량을 입력해주세요.');
+			// let no_zero_fixed_return_qty = rows.filter(row => row.fixed_return_qty == '0');
+			// if (no_zero_fixed_return_qty.length > 0) return alert('확정수량을 입력해주세요.');
 		}
 		
 		let sr_cd = '{{ @$sr->sr_cd }}';
