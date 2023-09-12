@@ -331,9 +331,11 @@
                 return rel_states[params.value];
             }
         },
-        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 60, cellClass: 'hd-grid-code'},
-        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100},
-        {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100},
+        {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 80, cellClass: 'hd-grid-code'},
+        {field: "store_channel",	headerName: "판매채널", pinned: 'left', width: 80, cellStyle:{"text-align" : "center"}},
+        {field: "store_channel_kind",	headerName: "매장구분", pinned: 'left', width: 80, cellStyle:{"text-align" : "center"}},
+        {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100, cellStyle:{"text-align" : "center"} },
+        {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle:{"text-align" : "center"}},
 		{field: "type_nm", headerName: "구분", width: 60, cellClass: 'hd-grid-code'},
 		{field: "opt", headerName: "품목", width: 80, cellClass: 'hd-grid-code'},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, surl: "{{config('shop.front_url')}}"},
@@ -347,7 +349,7 @@
         },
         {field: "prd_nm", headerName: "원부자재명", width: 150},
 		{field: "color", headerName: "컬러명", width: 80},
-		{field: "size", headerName: "사이즈명", width: 80},
+		{field: "size", headerName: "사이즈", width: 80},
 		{field: "unit", headerName: "단위", width: 100},
 		{field: "goods_price", headerName: "현재가", type: 'currencyType', width: 70},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 70},

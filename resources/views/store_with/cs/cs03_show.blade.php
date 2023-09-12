@@ -153,8 +153,8 @@
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right', fontWeight: 'bold'},
         },
-        {field: "goods_sh", headerName: "TAG가", width: 70, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 70, type: "currencyType"},
+        {field: "goods_sh", headerName: "정상가", width: 70, type: "currencyType"},
+        {field: "price", headerName: "현재가", width: 70, type: "currencyType"},
         {field: "stock_date", headerName: "최근입고일자", width: 90, cellStyle: StyleCenter},
         {width: "auto"}
     ];

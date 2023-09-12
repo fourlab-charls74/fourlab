@@ -154,8 +154,6 @@
 						<div class="fl_box px-0 mx-0">
 							<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span> 건</h6>
 						</div>
-						<div class="fr_box">
-						</div>
 					</div>
 				</div>
 				<div class="table-responsive">
@@ -198,7 +196,8 @@
 			$("#prd_nm").attr("readonly",true); 
 			$("#price").attr("readonly",true); 
 			$("#wonga").attr("readonly",true); 
-			$("#unit").attr("readonly",true); 
+			// $("#unit").attr("readonly",true);
+			$("#unit").prop("disabled", true);
 		}
 	});
 
@@ -282,7 +281,7 @@
 				wonga: document.f1.wonga.value,
 				image: added_base64_image,
 				unit: document.f1.unit.value,
-				seq: 01, // 단일 이미지로 일단 처리 - 01로 고정
+				seq: '01', // 단일 이미지로 일단 처리 - 01로 고정
 				img: img_ck
 			},
 		}).then(function(res) {

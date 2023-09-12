@@ -659,6 +659,8 @@ class cs03Controller extends Controller
 			$orderby
 			$limit
 		";
+		
+		dd($query);
 
 		$rows = DB::select($query);
 

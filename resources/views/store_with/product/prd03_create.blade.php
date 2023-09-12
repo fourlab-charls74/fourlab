@@ -70,7 +70,7 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">년도</th>
+											<th class="required">연도</th>
 											<td style="width:35%;">
 												<div class="flax_box">
 													<select name='year' class="form-control form-control-sm">
@@ -97,7 +97,7 @@
 											<th class="required">성별</th>
 											<td>
 												<div class="flax_box">
-													<select name='gender' id="gender" class="form-control form-control-sm" onchange="change_gender()">
+													<select name='gender' id="gender" class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($genders as $gender)
 														<option value='{{ $gender->code_id }}'>{{ $gender->code_id }} : {{ $gender->code_val }}</option>
@@ -142,75 +142,81 @@
 													</select>
 												</div>
 											</td>
-											<th class="required">사이즈</th>
+											<th class="required">사이즈구분</th>
 											<td>
 												<div class="flax_box">
-													<select name='size' id="size" class="form-control form-control-sm">
-														<option value=''>선택</option>
-														<!-- @foreach ($sizes as $size)
-														<option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
-														@endforeach -->
+													<select name="size_kind" id="size_kind" class="form-control form-control-sm" onchange="change_size();">
+														<option value=''> 선택 </option>
+														@foreach ($size_kind as $sk)
+															<option value='{{ $sk->size_kind_cd }}'>{{ $sk->size_kind_cd }} : {{ $sk->size_kind_nm }}</option>
+														@endforeach
 													</select>
 												</div>
 											</td>
 										</tr>
 										<tr>
+											<th class="required">사이즈</th>
+											<td>
+												<div class="flax_box">
+													<select name='size' id="size" class="form-control form-control-sm">
+														<option value=''>선택</option>
+													</select>
+												</div>
+											</td>
 											<th class="required">원부자재명</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='prd_nm' id="prd_nm" value=''>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">원부자재 업체</th>
 											<td>
 												<div class="flax_box">
 													<select name='sup_com' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($sup_coms as $com)
-														<option value='{{ $com->com_id }}'>{{ $com->com_id }} : {{ $com->com_nm }}</option>
+															<option value='{{ $com->com_id }}'>{{ $com->com_id }} : {{ $com->com_nm }}</option>
 														@endforeach
 													</select>
 												</div>
 											</td>
-											<!-- <th class="required">원부자재명(영문)</th>
-											<td>
-												<div class="flax_box">
-													<input type='text' class="form-control form-control-sm" name='prd_nm_eng' id="prd_nm_eng" value=''>
-												</div>
-											</td> -->
-										</tr>
-										<tr>
 											<th class="required">정상가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='tag_price' id="tag_price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">현재가</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">원가</th>
 											<td>
 											<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='wonga' id="wonga" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th class="required">단위</th>
 											<td>
 												<div class="flax_box">
 													<select name='unit' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($units as $unit)
-														<option value='{{ $unit->code_id }}'>{{ $unit->code_id }} : {{ $unit->code_val }}</option>
+															<option value='{{ $unit->code_id }}'>{{ $unit->code_id }} : {{ $unit->code_val }}</option>
 														@endforeach
 													</select>
 												</div>
 											</td>
+											<th></th>
+											<td></td>
 										</tr>
 										<tr>
 											<th>이미지</th>
@@ -299,7 +305,7 @@
 		},
 		{
 			field: "prd_cd",
-			headerName: "원부자재코드일련",
+			headerName: "원부자재품번",
 			width: 140,
 		},
 		{
@@ -307,6 +313,12 @@
 			headerName: "컬러",
 			cellRenderer: (params) => params.data.color.split(':')[1],
 			width: 80
+		},
+		{
+			field: "size_kind",
+			headerName: "사이즈구분",
+			cellRenderer: (params) => params.data.size_kind.split(':')[1],
+			width: 120
 		},
 		{
 			field: "size",
@@ -349,7 +361,7 @@
 		},
 		{
 			field: "year",
-			headerName: "년도",
+			headerName: "연도",
 			width: 80
 		},
 		{
@@ -409,15 +421,15 @@
 		}
 	};
 
-	//성별에 따라 사이즈 값 다르게 출력
-	function change_gender() {
-		let gender = $('#gender option:selected').val();
-		
+	//사이즈구분에 따라 사이즈 값 다르게 출력
+	function change_size() {
+		let size_kind = $('#size_kind option:selected').val();
+
 		$.ajax({
 			method: 'post',
-			url: '/store/product/prd03/change-gender',
+			url: '/store/product/prd02/change-size',
 			data: {
-				gender : gender
+				size_kind : size_kind,
 			},
 			success: function (res) {
 				if(res.code == 200) {
@@ -427,11 +439,11 @@
 					let sel =''
 					for(let i = 0; i < res.result.length;i++) {
 						sel = "<option value=''>선택</option>"
-						option += '<option value='+ res.result[i].code_id +'>' + res.result[i].code_id + ' : ' + res.result[i].code_val+ '</option>';
+						option += '<option value='+ res.result[i].size_cd +'>' + res.result[i].size_cd + ' : ' + res.result[i].size_nm+ '</option>';
 					}
 					$('#size').append(sel);
 					$('#size').append(option);
-					
+
 				}
 			},
 			error: function(request, status, error) {
@@ -513,9 +525,9 @@
 				image: added_base64_image,
 				opt: document.f1.opt.value,
 				color: document.f1.color.value,
+				size_kind: document.f1.size_kind.value,
 				size: document.f1.size.value,
 				prd_nm: document.f1.prd_nm.value,
-				// prd_nm_eng: document.f1.prd_nm_eng.value,
 				sup_com: document.f1.sup_com.value,
 				unit: document.f1.unit.value,
 				year: document.f1.year.value,
@@ -536,6 +548,7 @@
 				image: added_base64_image,
 				opt: document.f1.opt[document.f1.opt.selectedIndex].text,
 				color: document.f1.color[document.f1.color.selectedIndex].text,
+				size_kind: document.f1.size_kind[document.f1.size_kind.selectedIndex].text,
 				size: document.f1.size[document.f1.size.selectedIndex].text,
 				prd_nm: document.f1.prd_nm.value,
 				// prd_nm_eng: document.f1.prd_nm_eng.value,
@@ -562,10 +575,10 @@
 			return alert("구분을 선택해주세요.");
 		}
 
-		// 년도 선택여부
+		// 연도 선택여부
 		if (f1.year.selectedIndex == 0) {
 			f1.year.focus();
-			return alert("년도를 선택해주세요.");
+			return alert("연도를 선택해주세요.");
 		}
 
 		// 시즌 선택여부
@@ -598,6 +611,12 @@
 			return alert("컬러를 선택해주세요.");
 		}
 
+		// 사이즈구분 선택여부
+		if (f1.size_kind.selectedIndex == 0) {
+			f1.size_kind.focus();
+			return alert("사이즈구분을 선택해주세요.");
+		}
+		
 		// 사이즈 선택여부
 		if (f1.size.selectedIndex == 0) {
 			f1.size.focus();

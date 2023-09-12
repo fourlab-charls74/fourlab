@@ -778,7 +778,7 @@
 
 	}
 
-	//성별에 따라 사이즈 값 다르게 출력
+	//사이즈구분에 따라 사이즈 값 다르게 출력
 	function change_size() {
 		let size_kind = $('#size_kind option:selected').val();
 		

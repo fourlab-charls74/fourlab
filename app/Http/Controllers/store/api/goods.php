@@ -1044,6 +1044,15 @@ class goods extends Controller
                     where code_kind_cd = 'PRD_MATERIAL_TYPE'
                 ";
             }
+			
+			if ($key == 'opt') {
+				$sql = "
+					select code_id, code_val
+					from code
+					where code_kind_cd = 'PRD_MATERIAL_OPT'
+				";
+			}
+			
             $result[$key] = DB::select($sql);
         }
 
@@ -1078,8 +1087,8 @@ class goods extends Controller
         $where = "";
 
         if($prd_cd != '') $where .= " and pc.prd_cd like '$prd_cd%'";
-        if($goods_nm != '') $where .= " and pc.prd_nm like '%$goods_nm%'";
-
+        if($goods_nm != '') $where .= " and p.prd_nm like '%$goods_nm%'";
+		
         foreach (self::Conds_sub as $key => $value) {
             if ($key === 'item') $key = 'items';
             if (count(${ $key }) > 0) {
@@ -1108,8 +1117,15 @@ class goods extends Controller
 				, p.prd_nm
 				, pc.goods_no
 				, pc.color
-				, pc.`size` 
-				, pc.color 
+				, ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
+				, pc.color
+				, pc.item
+				, pc.opt
 			from product_code pc 
 				inner join product p on p.prd_cd = pc.prd_cd
 			where 1=1 and pc.brand in('PR','SM')

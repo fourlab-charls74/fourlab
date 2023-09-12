@@ -89,7 +89,7 @@ class stk16Controller extends Controller
 
         if ($req['type'] != "") $where .= " and pc.brand = '" . Lib::quote($req['type']) . "'";
         if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
-        if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '________%" . Lib::quote($req['prd_nm']) . "%' ";
+        if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '%" . Lib::quote($req['prd_nm']) . "%' ";
 
         if ($req['rel_order'] != null)
             $where .= " and psr.rel_order like '%" . Lib::quote($req['rel_order']) . "'";
@@ -151,6 +151,8 @@ class stk16Controller extends Controller
                 psr.qty,
                 ifnull(psr.rec_qty, psr.qty) as rec_qty,
                 ifnull(psr.prc_qty, psr.qty) as prc_qty,
+                sc.store_channel as store_channel,
+				sc2.store_kind as store_channel_kind,
                 psr.store_cd,
                 s.store_nm, 
                 psr.storage_cd,
@@ -186,6 +188,8 @@ class stk16Controller extends Controller
                 left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
                 left outer join store s on s.store_cd = psr.store_cd
                 left outer join storage sg on sg.storage_cd = psr.storage_cd
+				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
             where 1=1 $where
             $orderby
             $limit

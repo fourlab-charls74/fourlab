@@ -1269,7 +1269,7 @@ class prd02Controller extends Controller
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
 
-		$size_kind_sql = "select * from size_kind where use_yn = 'Y' and size_kind_cd like 'OLD%'";
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y'";
 		$size_kind = DB::select($size_kind_sql);
 
 		$values = [

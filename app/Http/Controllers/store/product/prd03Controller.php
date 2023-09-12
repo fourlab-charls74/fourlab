@@ -192,20 +192,24 @@ class prd03Controller extends Controller
 	{
 		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '6')
 			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
+
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y'";
+		$size_kind = DB::select($size_kind_sql);
+
 		$values = [
-			'types' => SLib::getCodes("PRD_MATERIAL_TYPE"),
-			'brand' => SLib::getCodes("PRD_CD_BRAND"),
-			'years'	=> SLib::getCodes("PRD_CD_YEAR"),
-			'seasons' => SLib::getCodes("PRD_CD_SEASON"),
-			'genders' => SLib::getCodes("PRD_CD_GENDER"),
-			'items'	=> SLib::getCodes("PRD_CD_ITEM"),
-			'opts' => SLib::getCodes("PRD_MATERIAL_OPT"),
-			'colors' => SLib::getCodes("PRD_CD_COLOR"),
-			'sizes'	=> SLib::getCodes("PRD_CD_SIZE_MATCH"),
-			'years'	=> SLib::getCodes("PRD_CD_YEAR"),
-			'sup_coms' => $sup_coms,
-			'units' => SLib::getCodes("PRD_CD_UNIT"),
-			'images' => []
+			'types' 	=> SLib::getCodes("PRD_MATERIAL_TYPE"),
+			'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
+			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
+			'items'		=> SLib::getCodes("PRD_CD_ITEM"),
+			'opts' 		=> SLib::getCodes("PRD_MATERIAL_OPT"),
+			'colors' 	=> SLib::getCodes("PRD_CD_COLOR"),
+			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
+			'sup_coms' 	=> $sup_coms,
+			'units' 	=> SLib::getCodes("PRD_CD_UNIT"),
+			'size_kind' => $size_kind,
+			'images' 	=> []
 		];
 		return view( Config::get('shop.store.view') . '/product/prd03_create',$values);
 	}
@@ -220,27 +224,24 @@ class prd03Controller extends Controller
 
 			foreach($data as $row) {
 
-				$brand	= $row['brand'];
-				$type	= $row['type'];
-
-				$season	= $row['season'];
-				$gender	= $row['gender'];
-				$item	= $row['item'];
-				$seq	= $row['seq'];
-				$opt	= $row['opt'];
-				$color	= $row['color'];
-				$size	= $row['size'];
-
-				$tag_price = $row['tag_price'];
-				$price	= $row['price'];
-				$wonga	= $row['wonga'];
-
-				$sup_com = $row['sup_com'];
-				$unit	= $row['unit'];
-				$year	= $row['year'];
-				
-				$prd_nm	= $row['prd_nm'];
-				$prd_cd	= $row['prd_cd'];
+				$brand		= $row['brand'];
+				$type		= $row['type'];
+				$season		= $row['season'];
+				$gender		= $row['gender'];
+				$item		= $row['item'];
+				$seq		= $row['seq'];
+				$opt		= $row['opt'];
+				$color		= $row['color'];
+				$size		= $row['size'];
+				$size_kind	= $row['size_kind'];
+				$tag_price 	= $row['tag_price'];
+				$price		= $row['price'];
+				$wonga		= $row['wonga'];
+				$sup_com 	= $row['sup_com'];
+				$unit		= $row['unit'];
+				$year		= $row['year'];
+				$prd_nm		= $row['prd_nm'];
+				$prd_cd		= $row['prd_cd'];
 
 				$prd_cd_p	= $brand . $year . $season . $gender . $item . $seq . $opt;
 
@@ -263,25 +264,7 @@ class prd03Controller extends Controller
 						'admin_id'	=> $admin_id
 					]);
 
-					/**
-					 * 원부자재 상품 이미지 저장 (단일 이미지)
-					 */
-					$wonboo_cd	= substr($prd_cd,0,2);
-
-					$save_path = "";
-					if($wonboo_cd == 'PR') {
-						$save_path = "/images/s_goods/pr/";
-					}else if($wonboo_cd == 'SM') {
-						$save_path = "/images/s_goods/sm/";
-					}
-
-					$base64_src = $row['image'];
-					
-					$unique_img_name = $prd_cd . $seq;
-					$img_name = strtolower($unique_img_name);
-					$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
-
-					$size_kinds = DB::selectOne("select size_kind_cd from size where size_cd = '$size'");
+//					$size_kinds = DB::selectOne("select size_kind_cd from size where size_cd = '$size'");
 					
 					DB::table('product_code')->insert([
 						'prd_cd'	=> $prd_cd,
@@ -296,19 +279,10 @@ class prd03Controller extends Controller
 						'opt'		=> $opt,
 						'color'		=> $color,
 						'size'		=> $size,
+						'size_kind' => $size_kind,
 						'type'		=> $type,
 						'rt'		=> now(),
 						'ut'		=> now(),
-						'size_kind' => $size_kinds->size_kind_cd,
-						'admin_id'	=> $admin_id
-					]);
-					
-					DB::table('product_image')->insert([
-						'prd_cd' => $prd_cd,
-						'seq' => $seq,
-						'img_url' => $img_url,
-						'rt' => now(),
-						'ut' => now(),
 						'admin_id'	=> $admin_id
 					]);
 
@@ -334,6 +308,36 @@ class prd03Controller extends Controller
 						'rt' => now(),
 						'ut' => now()
 					]);
+
+					/**
+					 * 원부자재 상품 이미지 저장 (단일 이미지)
+					 */
+					
+					if ($row['image'] != null) {
+						$wonboo_cd	= substr($prd_cd,0,2);
+
+						$save_path = "";
+						if($wonboo_cd == 'PR') {
+							$save_path = "/images/s_goods/pr/";
+						}else if($wonboo_cd == 'SM') {
+							$save_path = "/images/s_goods/sm/";
+						}
+
+						$base64_src = $row['image'];
+
+						$unique_img_name = $prd_cd . $seq;
+						$img_name = strtolower($unique_img_name);
+						$img_url = ULib::uploadBase64img($save_path, $base64_src, $img_name);
+
+						DB::table('product_image')->insert([
+							'prd_cd' => $prd_cd,
+							'seq' => $seq,
+							'img_url' => $img_url,
+							'rt' => now(),
+							'ut' => now(),
+							'admin_id'	=> $admin_id
+						]);
+					} 
 
 				} else {
 					DB::rollback();
