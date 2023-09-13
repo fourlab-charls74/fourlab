@@ -47,11 +47,11 @@
 							<label>창고사용</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="use_yn_A" name="use_yn" value="" checked />
+                                    <input type="radio" class="custom-control-input" id="use_yn_A" name="use_yn" value="" />
                                     <label class="custom-control-label" for="use_yn_A">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" />
+                                    <input type="radio" class="custom-control-input" id="use_yn_Y" name="use_yn" value="Y" checked />
                                     <label class="custom-control-label" for="use_yn_Y">Y</label>
                                 </div>
                                 <div class="custom-control custom-radio">
