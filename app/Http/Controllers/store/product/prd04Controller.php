@@ -725,6 +725,7 @@ class prd04Controller extends Controller
 					//product_code 등록/수정
 					$values	= [
 						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd_p,
 						'goods_no'	=> $goods_no,
 						'goods_opt'	=> $goods_opt,
 						'brand'		=> $brand,
@@ -925,6 +926,7 @@ class prd04Controller extends Controller
 						//product_code 등록/수정
 						$values	= [
 							'prd_cd'	=> $prd_cd,
+							'prd_cd_p'	=> $prd_cd_p,
 							'goods_no'	=> '',
 							'goods_opt'	=> '',
 							'brand'		=> $brand,

@@ -101,7 +101,7 @@
                                             </td>
                                             <th>반품 주소</th>
                                             <td colspan="3">
-                                                <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='return_addr' id="return_addr" value="@if($cmd == 'add'){{ @$com_addr->addr1 }} {{@$com_addr->addr2}} @else {{ @$sgr->return_addr }} @endif">
+                                                <input type='text' class="form-control form-control-sm search-enter" name='return_addr' id="return_addr" value="@if($cmd == 'add'){{ @$com_addr->addr1 }} {{@$com_addr->addr2}} @else {{ @$sgr->return_addr }} @endif">
                                             </td>
                                         </tr>
                                         <tr>
