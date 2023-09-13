@@ -286,6 +286,7 @@
         let { data, status } = await axios({ url: "/store/product/prd04/stock/search?" + params, method: "get" });
         if (status === 200) {
             const sizes = data.data.sizes;
+			console.log(sizes);
             setGoodsInfo(data.data.prd);
             await setColumns(sizes);
             gx.gridOptions.api.applyTransaction({ add: data.data.storages });

@@ -587,8 +587,8 @@
     // RT 요청
     function RequestRT() {
         let rows = gx3.getSelectedRows();
-        if(rows.length < 1) return alert("RT등록할 항목을 선택해주세요.");
-        if(!confirm("선택한 항목을 RT등록하시겠습니까?")) return;
+        if(rows.length < 1) return alert("매장요청 할 항목을 선택해주세요.");
+        if(!confirm("선택한 항목을 매장요청하시겠습니까?")) return;
 
         axios({
             url: '/store/stock/stk22/request-rt',
@@ -602,7 +602,7 @@
                 alert(res.data.msg);
             } else {
                 console.log(res.data);
-                alert("RT등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+                alert("매장요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
             }
         }).catch(function (err) {
             console.log(err);

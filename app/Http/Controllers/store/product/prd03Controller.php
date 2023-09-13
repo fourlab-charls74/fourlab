@@ -541,6 +541,21 @@ class prd03Controller extends Controller
 					'ut' => now(),
 					'admin_id' => $admin_id
 				]);
+				
+				$sql = "
+					select 
+						'$wonga' as wonga, in_qty
+					from product_stock
+					where prd_cd = :prd_cd
+				";
+				
+				$wongaData = DB::selectOne($sql,['prd_cd' => $prd_cd]);
+				
+				DB::table('product_stock')->where('prd_cd', '=', $prd_cd)->update([
+					'wonga' => $wonga,
+					'qty_wonga' => (int)$wongaData->wonga * $wongaData->in_qty,
+					'ut' => now()
+				]);
 			}	
 
 			$code = 200;

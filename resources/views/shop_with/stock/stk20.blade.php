@@ -18,7 +18,7 @@
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <!-- <a href="/shop/stock/stk21" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>요청RT</a> -->
-                    <a href="/shop/stock/stk22" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>일반RT</a>
+                    <a href="/shop/stock/stk22" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>매장요청RT</a>
                     <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- {{-- <a href="javascript:void(0);" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> --}} -->
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
@@ -34,8 +34,8 @@
                             <div class="flex_box">
                                 <select name='rt_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    <option value='G'>일반RT</option>
-                                    <option value='R'>요청RT</option>
+                                    <option value='G'>본사요청RT</option>
+                                    <option value='R'>매장요청RT</option>
                                 </select>
                             </div>
                         </div>
@@ -311,7 +311,7 @@
         },
         {field: "type", headerName: "구분", pinned: 'left', cellStyle: StyleRtType,
             cellRenderer: function(params) {
-                return params.value === 'R' ? '요청RT' : params.value === 'G' ? '일반RT' : '';
+                return params.value === 'R' ? '매장요청RT' : params.value === 'G' ? '본사요청RT' : '';
             }
         },
         {field: "state", headerName: "RT상태", pinned: 'left', cellStyle: StyleReleaseState,
