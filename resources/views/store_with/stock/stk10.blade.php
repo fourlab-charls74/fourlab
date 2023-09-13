@@ -403,7 +403,12 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-		{field: "storage_wqty", headerName: "창고재고", width: 60, type: "currencyType"},
+		{headerName: "창고",
+			children: [
+				{field: "storage_qty", headerName: "재고", width: 40, type: "currencyType"},
+				{field: "storage_wqty", headerName: "보유재고", width: 60, type: "currencyType"},
+			]
+		},
 		{field: "store_wqty", headerName: "매장재고", width: 60, type: "currencyType"},
 		{field: "qty", headerName: "수량", type: "currencyType", width: 50,
             editable: function(params) {return params.data.state === 10 || params.data.state === 20;}, 

@@ -214,6 +214,7 @@ class stk10Controller extends Controller
                 psr.prd_cd,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, 
                 psr.qty,
+                pss.qty as storage_qty,
                 pss.wqty as storage_wqty,
                 pss2.wqty as store_wqty,
                 psr.store_cd,
