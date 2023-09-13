@@ -1269,7 +1269,7 @@ class prd02Controller extends Controller
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
 
-		$size_kind_sql = "select * from size_kind where use_yn = 'Y'";
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y' order by seq";
 		$size_kind = DB::select($size_kind_sql);
 
 		$values = [
@@ -1295,8 +1295,6 @@ class prd02Controller extends Controller
 	{
 		$admin_id = Auth('head')->user()->id;
 		$sel_data = $request->input("sel_data");
-		
-		dd($sel_data);
 
 		try {
 
@@ -1889,7 +1887,7 @@ class prd02Controller extends Controller
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
 
-		$size_kind_sql = "select * from size_kind where use_yn = 'Y'";
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y' order by seq ";
 		$size_kind = DB::select($size_kind_sql);
 
 		$values = [
