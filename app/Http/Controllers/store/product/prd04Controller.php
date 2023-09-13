@@ -428,8 +428,6 @@ class prd04Controller extends Controller
 			";
 			$sizes = array_map(function($row) {return $row->size_cd;}, DB::select($sql));
 			
-			dd($sizes);
-
 			// get goods info
 			$cfg_img_size_real = "a_500";
 			$cfg_img_size_list = "a_500";
