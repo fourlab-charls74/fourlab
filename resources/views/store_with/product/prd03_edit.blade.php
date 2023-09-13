@@ -193,19 +193,15 @@
 
 		if('{{$method}}' === 'show') {
 			//view일 떈, readonly 처리
-			$("#prd_nm").attr("readonly",true); 
-			$("#price").attr("readonly",true); 
+			$("#prd_nm").attr("readonly",true);
+			$("#price").attr("readonly",true);
 			$("#wonga").attr("readonly",true); 
-			// $("#unit").attr("readonly",true);
 			$("#unit").prop("disabled", true);
 		}
 	});
 
 	function Search() {
 		let data = $('form[name="f1"]').serialize();
-
-		console.log(data);
-
 		gx.Request('/store/product/prd03/edit-search/', data);
 	}
 	
@@ -255,6 +251,7 @@
 
 	const PRD_CD = "{{$prd_cd}}";
 	let added_base64_image = "";
+	
 
 	function save() {
 
@@ -266,10 +263,9 @@
 			img_ck = "img_not_null";
 		}
 
-
-		console.log(img);
-
 		if (!validation()) return;
+		alert('원가수정 시, 해당상품 전체의 평균원가가 변경됩니다.');
+		
 		axios({
 			url: '/store/product/prd03/edit',
 			method: 'post',

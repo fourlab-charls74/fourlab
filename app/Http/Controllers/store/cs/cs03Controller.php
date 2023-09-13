@@ -209,11 +209,12 @@ class cs03Controller extends Controller
 					 * 변경 전 상태 가져오기
 					 */
 					$sql = "
-						select state from sproduct_stock_order_product
+						select state, wonga from sproduct_stock_order_product
 						where prd_cd = :prd_cd and prd_ord_no = :prd_ord_no
 					";
 					$row = DB::selectOne($sql, ['prd_cd' => $prd_cd, 'prd_ord_no' => $prd_ord_no]);
 					$prev_state = $row->state;
+					$wonga = $row->wonga;
 
 					/**
 					 * 입고/반품 상태에 따른 수량변경
@@ -237,11 +238,12 @@ class cs03Controller extends Controller
 								$in_qty = $row->in_qty + $change_qty;
 								$qty = $row->qty + $change_qty;
 								$wqty = $row->wqty + $change_qty;
+								$qty_wonga = $wonga * $in_qty;
 
 								$sql = "
-									update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+									update product_stock set wonga = :wonga, qty_wonga = :qty_wonga, in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 								";
-								DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								DB::update($sql, ['wonga' => $wonga, 'qty_wonga' => $qty_wonga, 'in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 							}
 
 							$sql = "
@@ -311,11 +313,12 @@ class cs03Controller extends Controller
 									$in_qty = $row->in_qty + $change_qty;
 									$qty = $row->qty + $change_qty;
 									$wqty = $row->wqty + $change_qty;
+									$qty_wonga = $wonga * $in_qty;
 									
 									$sql = "
-										update product_stock set in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+										update product_stock set wonga = :wonga, qty_wonga = :qty_wonga, in_qty = :in_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
-									DB::update($sql, ['in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+									DB::update($sql, ['wonga' => $wonga, 'qty_wonga' => $qty_wonga, 'in_qty' => $in_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
 
 								$prc_sql = "
@@ -357,9 +360,9 @@ class cs03Controller extends Controller
 								$qty = $row->qty - $change_qty;
 								$wqty = $row->wqty - $change_qty;
 								$sql = "
-									update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+									update product_stock set wonga = :wonga, out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 								";
-								DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								DB::update($sql, ['wonga' => $wonga, 'out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 							}
 
 							$prc_sql = "
@@ -448,9 +451,9 @@ class cs03Controller extends Controller
 									$qty = $row->qty - $change_qty;
 									$wqty = $row->wqty - $change_qty;
 									$sql = "
-										update product_stock set out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+										update product_stock set wonga = :wonga, out_qty = :out_qty, qty = :qty, wqty = :wqty where prd_cd = :prd_cd
 									";
-									DB::update($sql, ['out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+									DB::update($sql, ['wonga' => $wonga, 'out_qty' => $out_qty, 'qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
 								}
 
 								$prc_sql = "

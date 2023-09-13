@@ -1182,6 +1182,8 @@ class cs01Controller extends Controller {
 				$total_wonga = $total_old_wonga + $total_cur_wonga;
 				$avg_wonga = round($total_wonga / ($stock->in_qty));
 				
+				dd($qty, $cost, $total_old_wonga, $total_cur_wonga);
+				
 				$values = [
 					'wonga' => $avg_wonga,
 					'qty_wonga' => DB::raw('qty * ' . $avg_wonga),

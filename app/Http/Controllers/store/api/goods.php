@@ -672,7 +672,7 @@ class goods extends Controller
                 left outer join product_image i on p.prd_cd = i.prd_cd
                 left outer join code c on c.code_id = pc.opt and c.code_kind_cd = 'PRD_MATERIAL_OPT'
                 left outer join code d on d.code_id = pc.brand and d.code_kind_cd = 'PRD_MATERIAL_TYPE'
-            where 1=1 $inner_where
+            where 1=1 and p.use_yn = 'Y' $inner_where
         ";
 
         $sql = "
@@ -710,7 +710,7 @@ class goods extends Controller
                 left outer join product_image i on p.prd_cd = i.prd_cd
                 left outer join code c on c.code_id = pc.opt and c.code_kind_cd = 'PRD_MATERIAL_OPT'
                 left outer join code d on d.code_id = pc.brand and d.code_kind_cd = 'PRD_MATERIAL_TYPE'
-            where 1=1 $inner_where
+            where 1=1 and p.use_yn = 'Y' $inner_where
             $limit
         ";
 
@@ -1128,7 +1128,7 @@ class goods extends Controller
 				, pc.opt
 			from product_code pc 
 				inner join product p on p.prd_cd = pc.prd_cd
-			where 1=1 and pc.brand in('PR','SM')
+			where 1=1 and pc.brand in('PR','SM') and p.use_yn = 'Y'
 				$where   
         ";
 
