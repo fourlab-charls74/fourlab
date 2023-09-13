@@ -1,13 +1,13 @@
 @extends('store_with.layouts.layout')
-@section('title','요청RT')
+@section('title','본사요청RT')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">요청RT</h3>
+	<h3 class="d-inline-flex">본사요청RT</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 매장관리</span>
 		<span>/ 매장RT관리</span>
-		<span>/ 요청RT</span>
+		<span>/ 본사요청RT</span>
 	</div>
 </div>
 
