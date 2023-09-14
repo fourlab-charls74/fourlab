@@ -29,7 +29,7 @@ class prm10Controller extends Controller
 
     private $apply = [
         'AG'	=> '전체상품',
-        'SC'	=> '대표카테고리',
+        //'SC'	=> '대표카테고리',
         'SG'	=> '상품'
     ];
 

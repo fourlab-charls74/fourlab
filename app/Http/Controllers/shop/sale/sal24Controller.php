@@ -204,15 +204,15 @@ class sal24Controller extends Controller
 			) a left outer join (
 				select
 					b.sale_date
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.qty, 0), 0)) as qty_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.recv_amt, 0), 0)) as recv_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.point_amt, 0), 0)) as point_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.coupon_amt, 0), 0)) as coupon_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.dc_amt, 0), 0)) as dc_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.fee_amt,0), 0)) as fee_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.wonga,0), 0)) as wonga_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.taxation_amt, 0), 0)) as taxation_amt_30					
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.tax_amt, 0), 0)) as tax_amt_30
+					, sum(if(ord_state = 30, ifnull(b.qty, 0), 0)) as qty_30
+					, sum(if(ord_state = 30, ifnull(b.recv_amt, 0), 0)) as recv_amt_30
+					, sum(if(ord_state = 30, ifnull(b.point_amt, 0), 0)) as point_amt_30
+					, sum(if(ord_state = 30, ifnull(b.coupon_amt, 0), 0)) as coupon_amt_30
+					, sum(if(ord_state = 30, ifnull(b.dc_amt, 0), 0)) as dc_amt_30
+					, sum(if(ord_state = 30, ifnull(b.fee_amt,0), 0)) as fee_amt_30
+					, sum(if(ord_state = 30, ifnull(b.wonga,0), 0)) as wonga_30
+					, sum(if(ord_state = 30, ifnull(b.taxation_amt, 0), 0)) as taxation_amt_30					
+					, sum(if(ord_state = 30, ifnull(b.tax_amt, 0), 0)) as tax_amt_30
 					
 					, sum(if(ord_state = 60, ifnull(b.qty, 0), 0)) * -1 as qty_60
 					, sum(if(ord_state = 60, ifnull(b.recv_amt, 0), 0)) * -1 as recv_amt_60
@@ -256,8 +256,8 @@ class sal24Controller extends Controller
 						left outer join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
-						and w.ord_state in (10,30,60,61)
-						and o.ord_state >= 10
+						and w.ord_state in (30,60,61)
+						and o.ord_state >= 30
 						$inner_where2 $inner_where
 						$where
 					group by w.ord_state_date, w.ord_state
@@ -279,8 +279,8 @@ class sal24Controller extends Controller
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
-						and w.ord_state in (10,30,60,61)
-						and o.ord_state >= 10
+						and w.ord_state in (30,60,61)
+						and o.ord_state >= 30
 						$inner_where2 $inner_where
 					group by o.ord_no,w.ord_state,ord_state_date
 				) a inner join order_mst m on a.ord_no = m.ord_no

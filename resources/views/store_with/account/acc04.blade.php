@@ -216,8 +216,9 @@
                 "color": params.value === 'Y' ? '#0BAC00' : params.value === 'N' ? '#ff0000' : 'none'
             }),
         },
+        { field: "store_channel", headerName: "판매채널", pinned: 'left', width: 70, cellStyle: CENTER },
+        { field: "store_channel_kind", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
         { field: "store_cd", headerName: "매장코드", pinned: 'left', width: 60, cellStyle: CENTER },
-        { field: "store_type_nm", headerName: "매장구분", pinned: 'left', width: 70, cellStyle: CENTER },
         { field: "store_nm", headerName: "매장명", pinned: 'left', type: 'StoreNameType', width: 150 },
         { field: "manager_nm", headerName: "매니저", pinned: 'left', width: 55, cellStyle: CENTER },
 		{ field: "grade_nm", headerName: "수수료등급", pinned: 'left', width: 65, cellStyle: CENTER },

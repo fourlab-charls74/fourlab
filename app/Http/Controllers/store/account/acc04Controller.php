@@ -108,7 +108,7 @@ class acc04Controller extends Controller
                         + a.ord_OL_amt_except_vat_s * a.fee_12 / 100
                     ) as fee_amt
                 from (
-                    select s.store_cd, s.store_nm, s.store_type, st.code_val as store_type_nm, s.manager_nm
+                    select s.store_cd, s.store_nm, s.store_type, s.manager_nm
                         , w.*, ae.*, sf.*, s.grade_cd, sg.grade_nm, sg.fee1, sg.fee2, sg.fee3, sg.fee_10, sg.fee_11, sg.fee_12
                         , round(w.sales_amt / 1.1) as sales_amt_except_vat
                         , ((w.sales_amt / 1.1) - ifnull(ae.extra_M1_amt, 0)) as sales_profit_except_M1 -- 매출이익(원가제외)
@@ -126,8 +126,11 @@ class acc04Controller extends Controller
                         , w.ord_TG_amt / 1.1 as ord_TG_amt_except_vat_s
                         , w.ord_YP_amt / 1.1 as ord_YP_amt_except_vat_s
                         , w.ord_OL_amt / 1.1 as ord_OL_amt_except_vat_s
+                        , sc.store_channel as store_channel
+                        , sc2.store_kind as store_channel_kind
                     from store s
-                        left outer join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = s.store_type
+                        left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+						left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
                         left outer join (
                             select grade_cd, name as grade_nm
                                 , fee1, round(amt1 * 1.1) as amt1, fee2, round(amt2 * 1.1) as amt2, fee3
