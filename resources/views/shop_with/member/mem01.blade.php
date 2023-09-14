@@ -18,7 +18,6 @@
 				<h4>검색</h4>
 				<div class="flax_box">
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-					<a href="#" onclick="Batch()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
 					<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 					<!-- <a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
 					<div class="btn-group dropleftbtm mr-1">
@@ -26,10 +25,6 @@
 							<i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
 						</button>
 						<div class="dropdown-menu" style="">
-							<a class="dropdown-item add-btn" href="#">회원추가</a>
-							<a class="dropdown-item coupon-btn" href="#" >쿠폰지급</a>
-							<a class="dropdown-item point-btn" href="#" >적립금지급</a>
-							<a class="dropdown-item sms-btn" href="#" >SMS 발송</a>
 							<a class="dropdown-item download-btn" href="#" >다운로드</a>
 						</div>
 						<input type="hidden" name="data" id="data" value=""/>
@@ -388,7 +383,6 @@
 		</div>
 		<div class="resul_btn_wrap mb-3">
 			<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-			<a href="#" onclick="Batch()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i>데이터업로드</a>
 			<!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
 			<!-- <a href="#" onclick="document.search.reset()" class="btn btn-sm btn-outline-primary mr-1">검색조건 초기화</a> -->
 			<div class="btn-group dropleftbtm mr-1">
@@ -396,10 +390,6 @@
 					<i class="fa fa-folder"></i> <i class="bx bx-chevron-down fs-12"></i>
 				</button>
 				<div class="dropdown-menu" style="">
-					<a class="dropdown-item add-btn" href="#">회원추가</a>
-					<a class="dropdown-item coupon-btn" href="#" >쿠폰지급</a>
-					<a class="dropdown-item point-btn" href="#" >적립금지급</a>
-					<a class="dropdown-item sms-btn" href="#" >SMS 발송</a>
 					<a class="dropdown-item download-btn" href="#" >다운로드</a>
 				</div>
 			</div>
