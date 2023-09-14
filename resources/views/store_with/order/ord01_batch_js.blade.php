@@ -56,7 +56,7 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var excel_columns = {
-			'A': 'out_ord_no', // 매장 주문번호
+			// 'A': 'out_ord_no', // 매장 주문번호
 			'B': 'ord_date', // 주문일
 			'C': 'prd_cd', // 바코드
             'D': 'goods_no', // 상품번호
@@ -92,7 +92,7 @@
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
 
-		while (worksheet['A' + rowIndex]) {
+		while (worksheet['C' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
@@ -107,16 +107,17 @@
 
         if(rows.length < 1) return alert("한 개 이상의 주문건을 입력해주세요.");
 
-        rows = rows
-                .sort((a, b) => a.out_ord_no - b.out_ord_no)
-                .filter(r => Object.keys(r).length > 1);
+        rows = rows.filter(r => Object.keys(r).length > 1);
+        // .sort((a, b) => a.out_ord_no - b.out_ord_no)
 
         rows.forEach((row, i) => {
             let prev = rows[i - 1];
-            if(i > 0 && row.out_ord_no === prev.out_ord_no) {
+            // if(i > 0 && row.out_ord_no === prev.out_ord_no) {
+            if(i > 0) {
                 rows[i] = {
                     ...row, 
                     ord_date: prev.ord_date,
+	                price: row.price || 0,
                     dlv_amt: prev.dlv_amt,
                     add_dlv_amt: prev.add_dlv_amt,
                     pay_type: prev.pay_type,
@@ -135,6 +136,7 @@
                     dlv_msg: prev.dlv_msg,
                     dlv_cd: prev.dlv_cd,
                     dlv_no: prev.dlv_no,
+	                dlv_comment: row.dlv_comment || '',
                     fee_rate: prev.fee_rate,
                 }
             }
@@ -228,7 +230,7 @@
         let failed_list = [];
 
         rows.forEach((row, i) => {
-            if(row.out_ord_no) {
+            if(row.prd_cd) {
                 let cart = {
                     prd_cd: row.prd_cd,
                     goods_no: row.goods_no,
@@ -241,8 +243,10 @@
                     dlv_comment: row.dlv_comment,
                     fee_rate: row.fee_rate,
                 };
-                if(i > 0 && row.out_ord_no === rows[i - 1].out_ord_no) {
-                    orders = orders.map(order => order.out_ord_no === row.out_ord_no ? ({...order, cart: order.cart.concat(cart)}) : order);
+                // if(i > 0 && row.out_ord_no === rows[i - 1].out_ord_no) {
+                if(i > 0) {
+                    // orders = orders.map(order => order.out_ord_no === row.out_ord_no ? ({...order, cart: order.cart.concat(cart)}) : order);
+                    orders = orders.map(order => ({...order, cart: order.cart.concat(cart)}));
                 } else {
                     orders.push({...row, cart: [cart]});
                 }

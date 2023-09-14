@@ -60,7 +60,7 @@
                                                     <div class="btn-group ml-2">
                                                         <button class="btn btn-outline-primary apply-btn" type="button" onclick="upload();">적용</button>
                                                     </div>
-                                                    <a href="/sample/sample_sugi_batch.xlsx" class="ml-2" style="text-decoration: underline !important;">수기 일괄판매 양식 다운로드</a>
+                                                    <a href="/sample/sample_sugi_batch.xlsx" download="수기일괄판매양식" class="ml-2" style="text-decoration: underline !important;">수기 일괄판매 양식 다운로드</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -126,12 +126,12 @@
             cellRenderer: (params) => params.value == null ? '' : params.value  == '200' ? '성공' : ('실패(' + (out_order_errors[params.value] || '') + ')')
         },
         // {field: "ord_no", headerName: "주문번호", width: 100, cellStyle: StyleLineHeight},
-        {field: "out_ord_no", headerName: "매장 주문번호", width: 100, cellStyle: StyleLineHeight},
+        // {field: "out_ord_no", headerName: "매장 주문번호", width: 100, cellStyle: StyleLineHeight},
         {field: "ord_date", headerName: "주문일", width: 80, cellStyle: StyleLineHeight},
         {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: StyleLineHeight},
-        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: StyleLineHeight},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 230, cellStyle: {"line-height": "30px"}},
-        {field: "goods_opt", headerName: "옵션", width: 180, cellStyle: {"line-height": "30px"}},
+        {field: "goods_no", headerName: "온라인코드", width: 80, cellStyle: StyleLineHeight},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 200, cellStyle: {"line-height": "30px"}},
+        {field: "goods_opt", headerName: "옵션", width: 100, cellStyle: {"line-height": "30px"}},
         {field: "qty", headerName: "수량", width: 50, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "price", headerName: "판매가", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},

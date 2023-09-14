@@ -934,11 +934,12 @@ class ord01Controller extends Controller
             if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
             $goods_type = $cart[$i]['goods_type_cd'] ?? '';
             $goods_price = ($cart[$i]['price'] ?? 0) - ($cart[$i]['dc_amt'] ?? 0) - ($cart[$i]['coupon_amt'] ?? 0);
+			$sugi_price = ($cart[$i]['price'] ?? 0) * 1;
             $point = $cart[$i]['point'] ?? '';
             $com_type = $cart[$i]['com_type'] ?? '';
             $prd_cd = $cart[$i]['prd_cd'] ?? '';
             $goods_opt = $cart[$i]['goods_opt'] ?? '';
-            $qty = $cart[$i]['qty'] ?? 0; // 판매수량
+            $qty = ($cart[$i]['qty'] ?? 0) * 1; // 판매수량
             $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
             $order_addopt_amt = $addopt_amt * $qty;
 
@@ -959,6 +960,11 @@ class ord01Controller extends Controller
                 where a.goods_no = :goods_no
             ";
             $goods = DB::selectOne($sql, ["goods_no" => $goods_no]);
+			
+			// 판매가 지정되지 않은 경우, 현재판매가로 설정
+			if ($sugi_price == 0 || $sugi_price == '') {
+				$sugi_price = DB::table('product')->where('prd_cd', $prd_cd)->value('price') ?? 0;
+			}
 
             // 위탁상품인 경우, 옵션가격이 있다면 수수료율에 맞춰 원가 재계산 > 정산 시 수수료율 보정
             if ($goods_type == "P" && ($opt_amt + $addopt_amt) > 0) {
@@ -991,7 +997,7 @@ class ord01Controller extends Controller
                     }
                 }
             } else {
-                if ($qty > $product_stock) {
+                if ($qty >= 0 && $qty > $product_stock) {
                     if ($reservation_yn === 'Y') {
                         $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
                     } else {
@@ -1001,6 +1007,7 @@ class ord01Controller extends Controller
                 }
             }
 
+			if ($qty === 0) $code = '-103'; // 판매수량 0일 경우 에러처리
             if ($code != '200') break;
 
             $com_rat = 0;
@@ -1045,7 +1052,7 @@ class ord01Controller extends Controller
             $ord_opt_point_amt = Lib::getValue($cart[$i], "point_amt", 0);
             $ord_opt_coupon_amt = Lib::getValue($cart[$i], "coupon_amt", 0);
             // $ord_opt_dc_amt = Lib::getValue($cart[$i], "dc_amt", 0);
-			$ord_opt_dc_amt = ($goods->price - ($cart[$i]['price'] ?? 0)) * $qty;
+			$ord_opt_dc_amt = ($goods->price - $sugi_price) * $qty;
             $ord_opt_dlv_amt = Lib::getValue($cart[$i], "dlv_amt", 0);
 
             $a_ord_amt = $cart[$i]["ord_amt"] ?? 0;
@@ -1064,7 +1071,7 @@ class ord01Controller extends Controller
                     'goods_opt' => $goods_opt,
                     'qty' => $qty,
                     'wonga' => $goods->wonga,
-                    'price' => $goods->price,
+                    'price' => $sugi_price,
                     'dlv_amt' => $ord_opt_dlv_amt,
                     'pay_type' => $pay_type,
                     'point_amt' => $ord_opt_point_amt,
@@ -1456,12 +1463,12 @@ class ord01Controller extends Controller
                     if (!isset($item['prd_cd'])) {
                         $code = '-101';
                         throw new Exception('바코드 없음');
-                    } else if (!isset($item['qty']) || (int)$item['qty'] < 1) {
+                    } else if (!isset($item['qty'])) {
                         $code = '-103';
-                        throw new Exception('수량정보 부정확');
-                    } else if (!isset($item['price'])) {
-                        $code = '-104';
-                        throw new Exception('판매가 부정확');
+                        throw new Exception('수량정보 없음');
+                    // } else if (!isset($item['price'])) {
+                    //     $code = '-104';
+                    //     throw new Exception('판매가 부정확');
                     } else {
                         $sql = "
                             select
@@ -1535,6 +1542,7 @@ class ord01Controller extends Controller
 
                 if ($order_result['code'] != '200') {
                     $code = $order_result['code'];
+                    if ($code == '-103') throw new Exception('수량 부정확');
                     if ($code == '-105') throw new Exception('재고 부족');
                 }
 
