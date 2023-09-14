@@ -599,19 +599,22 @@ class PosController extends Controller
                             select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.coupon_no, c.coupon_nm, c.coupon_type
                                 , if(c.use_date_type = 'S', c.use_fr_date, date_format(cm.down_date, '%Y%m%d')) as use_fr_date
                                 , if(c.use_date_type = 'S', c.use_to_date, date_format(date_add(cm.down_date, interval c.use_date DAY), '%Y%m%d')) as use_to_date
-                                , c.coupon_apply, ifnull(GROUP_CONCAT(cg.goods_no), '') as goods_nos, ifnull(GROUP_CONCAT(cge.goods_no), '') as ex_goods_nos
+                                , c.coupon_apply
                                 , c.coupon_amt_kind, c.coupon_amt, c.coupon_per
                                 , c.price_yn, c.low_price, c.high_price
                             from coupon_member cm
                                 inner join coupon c on c.coupon_no = cm.coupon_no and c.use_yn = 'Y' and c.coupon_type <> 'O'
-                                left outer join coupon_goods cg on cg.coupon_no = cm.coupon_no
-                                left outer join coupon_goods_ex cge on cge.coupon_no = cm.coupon_no
                             where cm.user_id = :user_id and cm.coupon_no = :coupon_no and cm.use_yn = 'N'
                             group by cm.coupon_no
                         ) a
                             where date_format(now(), '%Y%m%d') >= a.use_fr_date and date_format(now(), '%Y%m%d') <= a.use_to_date
                     ";
                     $cp = DB::selectOne($sql, ['user_id' => $member_id, 'coupon_no' => $coupon_no]);
+					
+					$goods_nos = DB::table('coupon_goods')->where('coupon_no', $coupon_no)->select('goods_no')->get()->toArray();
+					$goods_nos = array_map(function ($no) { return $no->goods_no; }, $goods_nos);
+					$ex_goods_nos = DB::table('coupon_goods_ex')->where('coupon_no', $coupon_no)->select('goods_no')->get()->toArray();
+					$ex_goods_nos = array_map(function ($no) { return $no->goods_no; }, $ex_goods_nos);
 
                     // 해당 쿠폰의 사용기간 유효성 체크
                     if ($cp === null) {
@@ -625,8 +628,8 @@ class PosController extends Controller
                     }
                     // 해당 쿠폰의 해당/제외 상품정보 부합 체크
                     if (
-                        ($cp->coupon_apply === 'AG' && in_array($goods->goods_no, explode(',', $cp->ex_goods_nos)))
-                        || ($cp->coupon_apply === 'SG' && !in_array($goods->goods_no, explode(',', $cp->goods_nos)))
+                        ($cp->coupon_apply === 'AG' && in_array($goods->goods_no, $ex_goods_nos))
+                        || ($cp->coupon_apply === 'SG' && !in_array($goods->goods_no, $goods_nos))
                     ) {
                         $code = '-112';
                         throw new Exception("[" . $goods->goods_nm . "]상품에는 해당 쿠폰을 적용할 수 없습니다.");
