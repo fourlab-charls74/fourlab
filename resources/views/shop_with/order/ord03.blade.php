@@ -412,11 +412,6 @@
         @endforeach
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, hide:true, cellStyle: {'text-align': 'center'}},
 		{field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-		{field: "r_zipcode", headerName: "우편번호", width: 70},
-		{field: "r_addr", headerName: "주소", width: 250},
-		{field: "r_phone", headerName: "전화번호", width: 85},
-		{field: "r_mobile", headerName: "모바일", width: 85},
-		{field: "dlv_msg", headerName: "특이사항", width: 90},
         {field: "goods_sh", headerName: "정상가", hide:true, width: 60, type: "currencyType"},
         {field: "price", headerName: "현재가", hide:true, width: 60, type: "currencyType"},
         {field: "dc_rate", headerName: "할인율(%)", hide:true, width: 65, type: "currencyType"},
