@@ -74,24 +74,75 @@
 						</div>
 					</div>
 					<div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="dlv_kind">회원가입 종류</label>
-                            <div class="form-inline form-radio-box">
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="type" id="type_nb" class="custom-control-input" checked="" value="">
-                                    <label class="custom-control-label" for="type_nb">전체</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="type" id="type_n" class="custom-control-input" value="N">
-                                    <label class="custom-control-label" for="type_n">온라인</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
-                                    <label class="custom-control-label" for="type_b">오프라인</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+						<div class="form-group">
+							<label for="good_types">판매채널/매장구분</label>
+							<div class="d-flex align-items-center">
+								<div class="flex_box w-100">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<option value=''>전체</option>
+										@foreach ($store_channel as $sc)
+											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+										@endforeach
+									</select>
+								</div>
+								<span class="mr-2 ml-2">/</span>
+								<div class="flex_box w-100">
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<option value=''>전체</option>
+										@foreach ($store_kind as $sk)
+											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>매장명</label>
+							<div class="form-inline inline_btn_box">
+								<input type='hidden' id="store_nm" name="store_nm">
+								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-send-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
+					{{--
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">인증방식</label>
+							<div class="flax_box">
+								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
+									<option value="">전체</option>
+									@foreach($auth_type as $val)
+										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					--}}
+				</div>
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="dlv_kind">회원가입 종류</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="type" id="type_nb" class="custom-control-input" checked="" value="">
+									<label class="custom-control-label" for="type_nb">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="type" id="type_n" class="custom-control-input" value="N">
+									<label class="custom-control-label" for="type_n">온라인</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
+									<label class="custom-control-label" for="type_b">오프라인</label>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="item">자료수/정렬</label>
@@ -126,21 +177,6 @@
 							</div>
 						</div>
 					</div>
-					{{--
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">인증방식</label>
-							<div class="flax_box">
-								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
-									<option value="">전체</option>
-									@foreach($auth_type as $val)
-										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					--}}
 				</div>
 				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
@@ -425,6 +461,8 @@
 		{field:"email", headerName:"이메일", width:150},
 		{field:"point", headerName:"적립금", type:'currencyType', width:60},
 		{field:"regdate", headerName:"가입일", width: 80, cellClass: 'hd-grid-code'},
+		{field:"store_channel", headerName:"판매채널", width: 80, cellClass: 'hd-grid-code'},
+		{field:"store_channel_kind", headerName:"매장구분", width: 80, cellClass: 'hd-grid-code'},
 		{field:"store_nm", headerName:"가입 매장명", width:170},
 		{field:"lastdate", headerName:"최근로그인", type: "DateTimeType"},
 		{field:"visit_cnt", headerName:"로그인횟수", type:'currencyType', width: 70},
@@ -447,7 +485,67 @@
 	pApp.ResizeGrid(218);
 	pApp.BindSearchEnter();
 
+	// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
+	load_store_channel();
+	
+	//페이지를 로드할 때 본인의 매장으로 먼저 검색되는 부분
+	initStore();
 	Search();
+	
+	
+	
+	function initStore() {
+		let store_cd = '{{@$user_store}}';
+		let store_nm = '{{@$user_store_nm}}';
+
+		if (store_cd != '') {
+			const option = new Option(store_nm, store_cd, true, true);
+			$('#store_no').append(option).trigger('change');
+		}
+	}
+	function load_store_channel() {
+		const store_channel = document.getElementById("store_channel");
+		const store_channel_kind = document.getElementById("store_channel_kind");
+
+		store_channel.addEventListener("change", () => {
+			if (store_channel.value) {
+				store_channel_kind.disabled = false;
+			} else {
+				store_channel_kind.disabled = true;
+			}
+		});
+	}
+	function chg_store_channel() {
+
+		const sel_channel = document.getElementById("store_channel").value;
+
+		$.ajax({
+			method: 'post',
+			url: '/shop/member/mem01/chg-store-channel',
+			data: {
+				'store_channel' : sel_channel
+			},
+			dataType: 'json',
+			success: function (res) {
+				if(res.code == 200){
+					$('#store_channel_kind').empty();
+					let select =  $("<option value=''>전체</option>");
+					$('#store_channel_kind').append(select);
+
+					for(let i = 0; i < res.store_kind.length; i++) {
+						let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+						$('#store_channel_kind').append(option);
+					}
+
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
+	}
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();

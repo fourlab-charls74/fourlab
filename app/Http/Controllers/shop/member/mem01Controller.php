@@ -24,15 +24,19 @@ class mem01Controller extends Controller
 	public function index($type='') 
 	{
 		$values = [
-			'mail'		=> SLib::getCodes('S_MAIL'),
-			'mobile'	=> SLib::getCodes('G_MOBILE'),
-			'sex'		=> SLib::getCodes('G_SEX_TYPE'),
-			'age'		=> SLib::getCodes('G_AGE'),
-			'yn'		=> SLib::getCodes('G_YN'),
-			'auth_type'	=> SLib::getCodes('G_AUTH_TYPE'),
-			'type'		=> $type,
-			'today'		=> date("md"),
-			'layout'	=> $type ? 'head_skote.layouts.master-without-nav' : 'head_skote.layouts.app',
+			'mail'			=> SLib::getCodes('S_MAIL'),
+			'mobile'		=> SLib::getCodes('G_MOBILE'),
+			'sex'			=> SLib::getCodes('G_SEX_TYPE'),
+			'age'			=> SLib::getCodes('G_AGE'),
+			'yn'			=> SLib::getCodes('G_YN'),
+			'auth_type'		=> SLib::getCodes('G_AUTH_TYPE'),
+			'type'			=> $type,
+			'today'			=> date("md"),
+			'layout'		=> $type ? 'head_skote.layouts.master-without-nav' : 'head_skote.layouts.app',
+			'user_store'	=> Auth('head')->user()->store_cd,
+			'user_store_nm' => Auth('head')->user()->store_nm,
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
 		];
 
 		$sql = " select group_no as id, group_nm as val from user_group order by group_no ";
@@ -102,6 +106,7 @@ class mem01Controller extends Controller
 				from
 					member a
 					$join
+					left outer join store s on s.store_cd = a.store_cd
 					-- left outer join code d ON d.code_kind_cd = 'G_SEX_TYPE' AND a.sex = d.code_id
 					-- left outer join member_stat e ON a.user_id = e.user_id
 				where 1=1 and out_yn <> 'I' $where
@@ -150,17 +155,22 @@ class mem01Controller extends Controller
 				'' as chkbox, a.user_id, a.name,
 				d.code_val as sex, concat(ifnull(a.yyyy, ''),ifnull(a.mm, ''),ifnull(a.dd, '')) as birth_day,
 				ifnull(a.jumin1, '') as jumin,
-				a.phone, a.mobile, a.email, a.point, a.store_nm,
+				a.phone, a.mobile, a.email, a.point, a.store_nm, a.store_cd,
 				date_format(a.regdate,'%Y-%m-%d') as regdate,
 				a.lastdate as lastdate, a.visit_cnt,
 				a.auth_type, f.code_val as auth_type_str, a.auth_yn,
 				e.ord_date, e.ord_cnt, e.ord_amt,
 				a.email_chk, a.mobile_chk, a.yn, ifnull(cm.com_nm,a.site) as site,
 				a.name_chk, a.addr, a.zip
+				, sc.store_channel as store_channel
+				, sc2.store_kind as store_channel_kind
 				${group_sql}
 			from
 				member a
 				$join
+				left outer join store s on s.store_cd = a.store_cd
+				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
 				left outer join code d on d.code_kind_cd = 'G_SEX_TYPE' and a.sex = d.code_id
 				left outer join member_stat e on a.user_id = e.user_id
 				left outer join code f on f.code_kind_cd = 'G_AUTH_TYPE' and a.auth_type = f.code_id
@@ -753,52 +763,55 @@ class mem01Controller extends Controller
 
 	private function get_condition(Request $req) {
 
-		$user_id	= Request("user_ids");
-		$name		= Request("name");
-		$yn			= Request("yn");
-		$jumin		= Request("jumin");
-		$phone		= Request("phone");
-		$mobile		= Request("mobile");
-		$sex		= Request("sex");
-		$age		= Request("age");
-		$user_group	= Request("user_group");
+		$user_id			= Request("user_ids");
+		$name				= Request("name");
+		$yn					= Request("yn");
+		$jumin				= Request("jumin");
+		$phone				= Request("phone");
+		$mobile				= Request("mobile");
+		$sex				= Request("sex");
+		$age				= Request("age");
+		$user_group			= Request("user_group");
 		// $store_no 	= Request("store_no");
-		$store_cd 	= Auth('head')->user()->store_cd;
+		$user_store 		= Auth('head')->user()->store_cd;
+		$store_channel 		= Request('store_channel');
+		$store_channel_kind = Request('store_channel_kind');
+		$store_cd 			= Request('store_no','');
+		
+		$sdate				= Request("sdate");
+		$edate				= Request("edate");
+		$last_sdate			= Request("last_sdate");
+		$last_edate			= Request("last_edate");
+		$ord_sdate			= Request("order_sdate");
+		$ord_edate			= Request("order_edate");
+		$mmdd				= Request("mmdd");
+		$mail				= Request("mail");
+		$mobile_chk			= Request("mobile_chk");
+		$type				= Request("type");
 
-		$sdate		= Request("sdate");
-		$edate		= Request("edate");
-		$last_sdate	= Request("last_sdate");
-		$last_edate	= Request("last_edate");
-		$ord_sdate	= Request("order_sdate");
-		$ord_edate	= Request("order_edate");
-		$mmdd		= Request("mmdd");
-		$mail		= Request("mail");
-		$mobile_chk	= Request("mobile_chk");
-		$type		= Request("type");
+		$fr_ord_amt			= Lib::uncm(Request("cond_amt_from"));
+		$to_ord_amt			= Lib::uncm(Request("cond_amt_to"));
+		$fr_ord_cnt			= Lib::uncm(Request("cond_cnt_from"));
+		$to_ord_cnt			= Lib::uncm(Request("cond_cnt_to"));
 
-		$fr_ord_amt	= Lib::uncm(Request("cond_amt_from"));
-		$to_ord_amt	= Lib::uncm(Request("cond_amt_to"));
-		$fr_ord_cnt	= Lib::uncm(Request("cond_cnt_from"));
-		$to_ord_cnt	= Lib::uncm(Request("cond_cnt_to"));
-
-		$birth_sdate = Request("birth_sdate");
-		$birth_edate = Request("birth_edate");
+		$birth_sdate 		= Request("birth_sdate");
+		$birth_edate 		= Request("birth_edate");
 
 		// 인증
-		$auth_type	= Request("auth_type");
-		$auth_yn	= Request("auth_yn");
-		$site 	    = Request("site");
+		$auth_type			= Request("auth_type");
+		$auth_yn			= Request("auth_yn");
+		$site 	    		= Request("site");
 
-		$mobile_yn	= Request("mobile_yn"); // 모바일 주문 여부
-		$app_yn		= Request("app_yn"); // 앱 주문 여부
+		$mobile_yn			= Request("mobile_yn"); // 모바일 주문 여부
+		$app_yn				= Request("app_yn"); // 앱 주문 여부
 
-		$where		= "";
+		$where				= "";
 
 		// ag grid copy & paste 추가
-		$user_id	= preg_replace("/\s/",",",$user_id);
-		$user_id	= preg_replace("/,,/",",",$user_id);
-		$user_id	= preg_replace("/\t/",",",$user_id);
-		$user_id	= preg_replace("/\n/",",",$user_id);
+		$user_id			= preg_replace("/\s/",",",$user_id);
+		$user_id			= preg_replace("/,,/",",",$user_id);
+		$user_id			= preg_replace("/\t/",",",$user_id);
+		$user_id			= preg_replace("/\n/",",",$user_id);
 
 		if($user_id !=""){
 			$ids = explode(",",$user_id);
@@ -853,6 +866,9 @@ class mem01Controller extends Controller
 		if($to_ord_cnt != "")	$where .= " and e.ord_cnt < '$to_ord_cnt' ";
 		if($birth_sdate != "")	$where .= " and a.yyyy >= '$birth_sdate' ";
 		if($birth_edate != "")	$where .= " and a.yyyy <= $birth_edate";
+		if($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+		if($store_cd != "") $where .= "and a.store_cd = '$store_cd'";
 
 		if($age != "") {
 			if($age == '10')	$where .= " and  a.yyyy > YEAR(CURDATE())-7 and a.yyyy <= YEAR(CURDATE()) ";	// 초등학생미만
@@ -1178,4 +1194,59 @@ class mem01Controller extends Controller
 
         return response()->json(['code' => $code, 'message' => $msg], $code);
     }
+
+	public function change_store_channel(Request $request) {
+
+		$store_channel = $request->input('store_channel');
+
+		try {
+			DB::beginTransaction();
+			$sql = "
+					select 
+						store_kind_cd
+						, store_kind
+					from store_channel
+					where store_channel_cd = '$store_channel' and dep = 2 and use_yn = 'Y' 
+					order by seq asc
+                ";
+			$store_kind = DB::select($sql);
+
+			DB::commit();
+			$code = 200;
+			$msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind]);
+	}
+
+	public function change_store_channel_kind(Request $request) {
+
+		$store_channel_kind = $request->input('store_channel_kind');
+
+		try {
+			DB::beginTransaction();
+			$sql = "
+					select
+						store_cd
+						, store_nm
+					from store
+					where store_channel_kind = '$store_channel_kind' and use_yn = 'Y'
+                ";
+			$stores = DB::select($sql);
+
+			DB::commit();
+			$code = 200;
+			$msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg, 'stores' => $stores]);
+	}
 }

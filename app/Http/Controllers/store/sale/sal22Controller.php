@@ -16,13 +16,12 @@ class sal22Controller extends Controller
     public function index()
 	{
 
-        $sql = "select * from storage";
-        $storage = DB::select($sql);
+		$storages	= SLib::getStorage();
 
         $values = [
             'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
             'edate' => date('Y-m-d'),
-            'storage' => $storage
+            'storage' => $storages
 		];
         return view(Config::get('shop.store.view') . '/sale/sal22', $values);
 	}

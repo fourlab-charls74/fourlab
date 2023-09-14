@@ -631,6 +631,9 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::delete('mem01/user/{id}', 'mem01Controller@delete_user');
         Route::delete('mem01/user/group/{id}', 'mem01Controller@del_group');
 
+		Route::post('mem01/chg-store-channel/{store_cd?}', 'mem01Controller@change_store_channel');
+		Route::post('mem01/chg-store-channel_kind/{store_cd?}', 'mem01Controller@change_store_channel_kind');
+
     });
 
     // 영업관리

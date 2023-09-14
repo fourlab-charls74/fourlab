@@ -94,11 +94,11 @@
 						<label for="">매장사용 유무</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
-									<input type="radio" name="store_yn" value="" id="store_a" class="custom-control-input" checked>
+									<input type="radio" name="store_yn" value="" id="store_a" class="custom-control-input">
 									<label class="custom-control-label" for="store_a">전체</label>
 								</div>
 								<div class="custom-control custom-radio">
-									<input type="radio" name="store_yn" value="Y" id="store_y" class="custom-control-input">
+									<input type="radio" name="store_yn" value="Y" id="store_y" class="custom-control-input" checked>
 									<label class="custom-control-label" for="store_y">Y</label>
 								</div>
 								<div class="custom-control custom-radio">

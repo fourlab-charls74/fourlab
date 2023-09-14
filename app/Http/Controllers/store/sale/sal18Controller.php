@@ -74,15 +74,18 @@ class sal18Controller extends Controller
 				s.store_cd,
 				s.store_nm,
 				s.store_type,
-				c.code_val as store_type_nm,
 				'$sale_month' as apply_date,
 				stas.apply_rate as this_month_rate,
 				(select apply_rate from sale_type_apply_store where apply_date = '$last_month' and store_cd = s.store_cd) as last_month_rate,
 				(select apply_rate from sale_type_apply_store where apply_date = '$last_year' and store_cd = s.store_cd) as last_year_rate,
-				stas.comment
+				stas.comment,
+				sc.store_channel as store_channel,
+				sc2.store_kind as store_channel_kind
 			from store s
-				left outer join code c on c.code_kind_cd = 'STORE_TYPE' and s.store_type = c.code_id
 				left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = s.store_cd
+			 	left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+				
 			where 1=1 $where
 			order by s.store_cd
 		";
