@@ -73,7 +73,9 @@ class ord02Controller extends Controller
 		$used_orders = DB::select($sql);
 		$used_orders = array_map(function($r) { return $r->code_val; }, $used_orders);
 
-		return array_diff($rel_orders, $used_orders);
+		// 출고여부와 관계없이 모든 온라인 출고차수 조회하도록 변경 (2023-09-14)
+		return $rel_orders;
+		// return array_diff($rel_orders, $used_orders);
 	}
 
 	public function search(Request $request)
