@@ -34,8 +34,8 @@
                             <div class="flex_box">
                                 <select name='rt_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
-                                    <option value='G'>본사요청RT</option>
-                                    <option value='R'>매장요청RT</option>
+                                    <option value='G'>매장요청RT</option>
+                                    <option value='R'>본사요청RT</option>
                                 </select>
                             </div>
                         </div>
@@ -271,7 +271,7 @@
 				<div class="d-flex justify-content-between">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
-                        <div class="d-flex mr-2 mb-1 mb-lg-0">
+                        {{--<div class="d-flex mr-2 mb-1 mb-lg-0">
                             <span class="mr-1">출고예정일</span>
                             <div class="docs-datepicker form-inline-inner input_box" style="width:130px;display:inline;">
                                 <div class="input-group">
@@ -284,7 +284,7 @@
                                 </div>
                                 <div class="docs-datepicker-container"></div>
                             </div>
-                        </div>
+                        </div>--}}
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">RT처리중</a>
@@ -350,7 +350,7 @@
         },
         {field: "type", headerName: "RT구분", pinned: 'left', cellStyle: StyleRtType,
             cellRenderer: function(params) {
-                return params.value === 'R' ? '매장요청RT' : params.value === 'G' ? '본사요청RT' : '';
+                return params.value === 'R' ? '본사요청RT' : params.value === 'G' ? '매장요청RT' : '';
             }
         },
         {field: "state", headerName: "RT상태", pinned: 'left', cellStyle: StyleReleaseState,

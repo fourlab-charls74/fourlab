@@ -87,7 +87,7 @@
                    
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
+                    {{--<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">상품검색조건</label>
                             <div class="form-inline">
@@ -100,7 +100,15 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>--}}
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="goods_nm_eng">상품명(영문)</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="style_no">스타일넘버/온라인코드</label>
@@ -217,14 +225,7 @@
                     </div>
                 </div>
                 <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_nm_eng">상품명(영문)</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">카테고리</label>
@@ -277,7 +278,20 @@
                             </div>
                         </div>
 					</div>
-                    
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>상단홍보글/하단홍보글</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width: 47%">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
+								</div>
+								<span class="text_line" style="width: 6%">/</span>
+								<div class="form-inline-inner input-box" style="width: 47%">
+									<input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
+								</div>
+							</div>
+						</div>
+					</div>
                     <!-- <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">재고구분</label>
@@ -297,22 +311,6 @@
                             </div>
                         </div>
                     </div> -->
-                </div>
-                <div class="search-area-ext d-none row">
-                    <div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label>상단홍보글/하단홍보글</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width: 47%">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='head_desc' value=''>
-								</div>
-								<span class="text_line" style="width: 6%">/</span>
-								<div class="form-inline-inner input-box" style="width: 47%">
-                                    <input type='text' class="form-control form-control-sm w-100 search-enter" name='ad_desc' value=''>
-								</div>
-							</div>
-						</div>
-					</div>
                 </div>
             </div>
         </div>

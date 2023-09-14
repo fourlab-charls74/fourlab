@@ -331,7 +331,7 @@ class stk21Controller extends Controller
                         'sender_type' => 'H',
                         'sender_cd' => 'HEAD',
                         'reservation_yn' => 'N',
-                        'content' => 'RT요청이 있습니다.',
+                        'content' => '본사요청RT가 있습니다.',
                         'rt' => now()
                     ]);
 
@@ -347,7 +347,7 @@ class stk21Controller extends Controller
 
 			DB::commit();
             
-            $msg = "RT요청이 정상적으로 완료되었습니다.";
+            $msg = "본사요청RT가 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			if ($code === 200) $code = 500;

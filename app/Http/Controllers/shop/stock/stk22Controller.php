@@ -302,7 +302,7 @@ class stk22Controller extends Controller
                         'sender_type' => 'S',
                         'sender_cd' => $d['store_cd'] ?? '',
                         'reservation_yn' => 'N',
-                        'content' => $d['store_nm'].'에서 일반RT를 요청 하였습니다.',
+                        'content' => $d['store_nm'].'에서 매장요청RT를 요청 하였습니다.',
                         'rt' => now()
                     ]);
 
@@ -318,7 +318,7 @@ class stk22Controller extends Controller
 
             DB::commit();
 
-            $msg = "일반RT등록이 정상적으로 완료되었습니다.";
+            $msg = "매장요청RT 등록이 정상적으로 완료되었습니다.";
         } catch (Exception $e) {
             DB::rollback();
             if ($code === 200) $code = 500;
