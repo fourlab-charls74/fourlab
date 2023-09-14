@@ -289,8 +289,8 @@
         const usable_coupon_nos = $("#coupon_no option").toArray()
             .filter(opt => {
                 let d = opt.dataset;
-                if (d.apply === 'AG' && d.ex_goods_nos.split(",").includes(goods.goods_no + '')) return false;
-                if (d.apply === 'SG' && !d.goods_nos.split(",").includes(goods.goods_no + '')) return false;
+                if (d.apply === 'AG' && d.ex_goods_nos.includes(goods.goods_no + '')) return false;
+                if (d.apply === 'SG' && !d.goods_nos.includes(goods.goods_no + '')) return false;
                 if (selected_coupon_nos.includes(opt.value) && goods.coupon_no !== opt.value) return false;
                 return true;
             }).map(opt => opt.value);

@@ -1181,28 +1181,22 @@ class PosController extends Controller
                 select cm.user_id, cm.use_to_date as to_date, cm.down_date, cm.idx as coupon_no, cm.coupon_no as c_no, c.coupon_nm, c.coupon_type
                     , if(c.use_date_type = 'S', c.use_fr_date, date_format(cm.down_date, '%Y%m%d')) as use_fr_date
                     , if(c.use_date_type = 'S', c.use_to_date, date_format(date_add(cm.down_date, interval c.use_date DAY), '%Y%m%d')) as use_to_date
-                    , if(c.coupon_apply = 'AG', ifnull(cg.goods_no, ''), '') as goods_nos
-                    , if(c.coupon_apply = 'SG', ifnull(cge.goods_no, ''), '') as ex_goods_nos
                     , c.coupon_apply, c.coupon_amt_kind, c.coupon_amt, c.coupon_per
                     , c.price_yn, c.low_price, c.high_price
                 from coupon_member cm
                     inner join coupon c on c.coupon_no = cm.coupon_no and c.use_yn = 'Y' and c.coupon_type <> 'O'
-                    left outer join (
-                        select coupon_no, GROUP_CONCAT(goods_no) as goods_no
-                        from coupon_goods
-                        group by coupon_no
-                    ) cg on cg.coupon_no = cm.coupon_no
-                    left outer join (
-                        select coupon_no, GROUP_CONCAT(goods_no) as goods_no
-                        from coupon_goods_ex
-                        group by coupon_no
-                    ) cge on cge.coupon_no = cm.coupon_no
                 where cm.user_id = :user_id and cm.use_yn = 'N'
             ) a
                 where date_format(now(), '%Y%m%d') >= a.use_fr_date and date_format(now(), '%Y%m%d') <= a.use_to_date
         ";
-
         $result = DB::select($sql, ['user_id' => $user_id]);
+		
+		foreach ($result as $row) {
+			$goods_nos = DB::table('coupon_goods')->where('coupon_no', $row->c_no)->select('goods_no')->get()->toArray();
+			$row->goods_nos = array_map(function ($no) { return $no->goods_no; }, $goods_nos);
+			$ex_goods_nos = DB::table('coupon_goods_ex')->where('coupon_no', $row->c_no)->select('goods_no')->get()->toArray();
+			$row->ex_goods_nos = array_map(function ($no) { return $no->goods_no; }, $ex_goods_nos);
+		}
 
         return response()->json(['code' => '200', 'body' => $result], 200);
     }
