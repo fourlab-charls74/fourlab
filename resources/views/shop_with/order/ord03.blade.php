@@ -373,17 +373,17 @@
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
-        {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'},
+        {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}, hide:true,
             cellRenderer: (params) => {
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
-        {field: "ord_state_nm", headerName: "주문상태", width: 70, cellStyle: StyleOrdState},
-        {field: "pay_stat_nm", headerName: "입금상태", width: 55, cellStyle: {'text-align': 'center'}},
-        {field: "ord_type_nm", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "ord_kind_nm", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
+        {field: "ord_state_nm", headerName: "주문상태", width: 70, hide:true, cellStyle: StyleOrdState},
+        {field: "pay_stat_nm", headerName: "입금상태", width: 55, hide:true, cellStyle: {'text-align': 'center'}},
+        {field: "ord_type_nm", headerName: "주문구분", width: 60, hide:true, cellStyle: {'text-align': 'center'}},
+        {field: "ord_kind_nm", headerName: "출고구분", width: 60, hide:true, cellStyle: StyleOrdKind},
         {field: "sale_place_nm", headerName: "판매처", width: 80, cellStyle: {'text-align': 'center'}},
-        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}},
+        {field: "goods_no", headerName: "온라인코드", width: 70, hide:true, cellStyle: {'text-align': 'center'}},
         {field: "prd_cd", headerName: "바코드", width: 125, cellStyle: {'text-align': 'center'}},
         {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
@@ -410,22 +410,22 @@
                 }
             },
         @endforeach
-        {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
+        {field: "user_nm", headerName: "주문자(아이디)", width: 120, hide:true, cellStyle: {'text-align': 'center'}},
         {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType"},
-        {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
-        {field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
-        {field: "sale_kind_nm", headerName: "판매유형", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "pr_code_nm", headerName: "행사구분", width: 60, cellStyle: {"text-align": "center"}},
-        {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
-        {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
-        {field: "pay_type_nm", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
-        {field: "baesong_kind", headerName: "배송구분", width: 60, cellStyle: {'text-align': 'center'}},
+        {field: "goods_sh", headerName: "정상가", hide:true, width: 60, type: "currencyType"},
+        {field: "price", headerName: "현재가", hide:true, width: 60, type: "currencyType"},
+        {field: "dc_rate", headerName: "할인율(%)", hide:true, width: 65, type: "currencyType"},
+        {field: "sale_kind_nm", headerName: "판매유형", hide:true, width: 100, cellStyle: {"text-align": "center"}},
+        {field: "pr_code_nm", headerName: "행사구분", hide:true, width: 60, cellStyle: {"text-align": "center"}},
+        {field: "dlv_amt", headerName: "배송비", hide:true, width: 60, type: "currencyType"},
+        {field: "sales_com_fee", headerName: "판매수수료", hide:true, width: 80, type: "currencyType"},
+        {field: "pay_type_nm", headerName: "결제방법", hide:true, width: 80, cellStyle: {'text-align': 'center'}},
+        {field: "baesong_kind", headerName: "배송구분", hide:true, width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_date", headerName: "주문일시", width: 125, cellStyle: {'text-align': 'center'}},
-        {field: "pay_date", headerName: "입금일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "pay_date", headerName: "입금일시", hide:true, width: 125, cellStyle: {'text-align': 'center'}},
         {field: "req_nm", headerName: "접수자", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "receipt_date", headerName: "접수일시", width: 125, cellStyle: {'text-align': 'center'}},
-        {field: "receipt_comment", headerName: "접수메모", width: 150},
+        {field: "receipt_comment", headerName: "접수메모", hide:true, width: 150},
     ];
 </script>
 
