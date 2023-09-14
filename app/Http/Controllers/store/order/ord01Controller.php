@@ -281,7 +281,7 @@ class ord01Controller extends Controller
                 $in_prd_cds = join(',', array_map(function($s) { return "'$s'"; }, $prd_cds));
                 $where .= " and o.prd_cd in ($in_prd_cds) ";
             } else {
-                $where .= " and o.prd_cd = '$prd_cd' ";
+                $where .= " and o.prd_cd like '$prd_cd%' ";
             }
         }
 
