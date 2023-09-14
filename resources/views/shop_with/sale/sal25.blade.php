@@ -612,11 +612,6 @@
 						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
 					}
 				},
-				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_wonga', yName: '매출원가',
-					tooltip: {
-						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
-					}
-				},
 			],
 			axes: [
 				{ type: 'category', position: 'bottom' },

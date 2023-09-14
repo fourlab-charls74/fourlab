@@ -527,11 +527,6 @@
 						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
 					}
 				},
-				{ type: 'column', xKey: 'chart_x_str', yKey: 'sum_wonga', yName: '매출원가',
-					tooltip: {
-						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
-					}
-				},
 			],
 			axes: [
 				{ type: 'category', position: 'bottom', },
@@ -579,11 +574,6 @@
 			legend: { position: 'right' },
 			series: [
 				{ type: 'column', xKey: 'name', yKey: 'sum_amt', yName: '매출액',
-					tooltip: {
-						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
-					}
-				},
-				{ type: 'column', xKey: 'name', yKey: 'sum_wonga', yName: '매출원가',
 					tooltip: {
 						renderer: (params) => ({ content: params.xValue + ': ' + Comma(params.yValue) + '원' })
 					}
