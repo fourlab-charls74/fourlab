@@ -152,9 +152,9 @@
                         'background-color': params.data.dlv_location_cd === '{{ $loc->location_cd }}' ? (params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9') : 'none'
                     }
                 ),
-                onCellDoubleClicked: (e) => {
-                    if (e.data && e.value >= e.data.qty) e.node.setDataValue('dlv_place', "{{ $loc->location_nm }}");
-                }
+                {{--onCellDoubleClicked: (e) => {--}}
+                {{--    if (e.data && e.value >= e.data.qty) e.node.setDataValue('dlv_place', "{{ $loc->location_nm }}");--}}
+                {{--}--}}
             },
         @endforeach
         {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'}},
@@ -260,7 +260,7 @@
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
-		while (worksheet['A' + rowIndex].w) {
+		while (worksheet['A' + rowIndex]?.w) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
