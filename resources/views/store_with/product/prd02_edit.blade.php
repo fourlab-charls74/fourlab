@@ -11,7 +11,7 @@
 			<div class="d-inline-flex location">
 				<span class="home"></span>
 				<span>/ 상품관리</span>
-				<span>/ 상품코드등록</span>
+				<span>/ 상품코드관리</span>
 			</div>
 		</div>
 		<div class="d-flex">
@@ -215,7 +215,7 @@
 	}
 
 	function save() {
-		if(!window.confirm("가격 정보를 수정하시겠습니까?")) return;
+		if(!window.confirm("품번이 같은 모든상품의 정상가와 현재가가 변경됩니다.\n가격 정보를 수정하시겠습니까?")) return;
 
 		axios({
 			url: '/store/product/prd02/update_product',

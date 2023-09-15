@@ -793,9 +793,15 @@ class prd02Controller extends Controller
 		if( $goods_no != "" ){
 			$sql	= "
 				select
-					pc.prd_cd, pc.goods_no, g.goods_nm, g.style_no, pc.color, c1.code_val as color_nm,  pc.size, pc.goods_opt
-					, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
-					, if(pc.goods_no = 0, p.price, g.price) as price
+					pc.prd_cd, pc.goods_no, g.goods_nm, g.style_no, pc.color, c1.code_val as color_nm, pc.goods_opt
+				     , ifnull((
+						select s.size_cd from size s
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size
+					, p.tag_price as goods_sh
+					, p.price as price
 				from product_code pc
 					inner join product p on p.prd_cd = pc.prd_cd
 					inner join goods g on g.goods_no = pc.goods_no
@@ -1453,6 +1459,7 @@ class prd02Controller extends Controller
 		$sql = "
 			select
 				c.prd_cd
+				, c.prd_cd_p
 			from goods_summary a
 			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
 			where
@@ -1475,7 +1482,7 @@ class prd02Controller extends Controller
 			
 			foreach($result as $row){
 				DB::table('product')
-					->where('prd_cd', '=', $row->prd_cd)
+					->where('prd_cd', 'like', $row->prd_cd_p . '%')
 					->update([
 						"price" => $price,
 						"tag_price" => $tag_price,
