@@ -697,8 +697,17 @@ class prd02Controller extends Controller
 				DB::update($product_stock_sql);
 
 				//기존 상품 매핑 정보 테이블 정보 추가
-				$sql = " insert into goods_xmd(cd, goods_no, goods_sub, goods_opt, rt, ut) values ( :prd_cd, :goods_no, '0', :goods_opt, now(), now() ) ";
-				DB::insert($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				$sql	= " select count(*) as tot from goods_xmd where cd = :prd_cd ";
+				$tot	= DB::selectOne($sql,['prd_cd' => $prd_cd]);
+				
+				if( $tot == 0 ){
+					$sql	= " insert into goods_xmd(cd, goods_no, goods_sub, goods_opt, rt, ut) values ( :prd_cd, :goods_no, '0', :goods_opt, now(), now() ) ";
+					DB::insert($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				}else{
+					$sql	= " update goods_xmd set goods_no = :goods_no, goods_opt = :goods_opt, ut = now() where cd = :prd_cd ";
+					DB::update($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				}
+				
 			}
 
 			DB::commit();
