@@ -133,12 +133,12 @@ class Order
         return $ord_no;
     }
 
-    public function CompleteOrderSugi($ord_opt_no = "", $ord_state = "", $is_store_order = false, $is_sugi = true)
+    public function CompleteOrderSugi($ord_opt_no = "", $ord_state = "", $is_store_order = false, $is_sugi = true, $ord_state_date = '')
 	{
 		if ( $ord_state != ORD_STATE_PG_EXPECTED ) {	// 출고요청, 출고완료 상태만 재고 차감 처리
 
 			if ($is_store_order == true) {
-				$result = $this->ProcStoreOrder($ord_opt_no, $point_flag = false, $sms_flag = false, $is_sugi);
+				$result = $this->ProcStoreOrder($ord_opt_no, $point_flag = false, $sms_flag = false, $is_sugi, $ord_state_date);
 			} else {
 				$result = $this->ProcOrder($ord_opt_no, $point_flag = false, $sms_flag = false);
 			}
@@ -1441,7 +1441,7 @@ class Order
 	/////////////////////// 매장주문 //////////////////////
 	//////////////////////////////////////////////////////
 
-	public function ProcStoreOrder($ord_opt_no = "", $point_flag = true, $sms_flag = true, $is_sugi = true)
+	public function ProcStoreOrder($ord_opt_no = "", $point_flag = true, $sms_flag = true, $is_sugi = true, $ord_state_date = '')
 	{
 		$result_code = 1;
 		$ord_no = $this->ord_no;
@@ -1540,7 +1540,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 
@@ -1567,7 +1568,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 				unset($order_opt_wonga);
@@ -1681,7 +1683,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 
@@ -1708,7 +1711,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 				unset($order_opt_wonga);
@@ -1823,7 +1827,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 
@@ -1853,7 +1858,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 
@@ -1880,7 +1886,8 @@ class Order
 					"com_coupon_ratio" => $com_coupon_ratio,
 					"sales_com_fee" => $sales_com_fee,
 					"prd_cd" => $prd_cd,
-					"store_cd" => $store_cd
+					"store_cd" => $store_cd,
+					"ord_state_date" => $ord_state_date,
 				);
 				$this->__InsertOptWonga($order_opt_wonga);
 				unset($order_opt_wonga);

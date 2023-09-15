@@ -878,6 +878,7 @@ class ord01Controller extends Controller
 
         $out_ord_no = $data['out_ord_no'] ?? '';
         $ord_date = $data['ord_date'] ?? date('Y-m-d H:i:s');
+        $ord_state_date = date_format(date_create($ord_date), 'Ymd');
         $ord_date = date_format(date_create($ord_date), 'Y-m-d H:i:s');
         $fee_rate = $data['fee_rate'] ?? 0;
 
@@ -1055,8 +1056,9 @@ class ord01Controller extends Controller
 			$ord_opt_dc_amt = ($goods->price - $sugi_price) * $qty;
             $ord_opt_dlv_amt = Lib::getValue($cart[$i], "dlv_amt", 0);
 
-            $a_ord_amt = $cart[$i]["ord_amt"] ?? 0;
-            $a_recv_amt = $cart[$i]["recv_amt"] ?? ($a_ord_amt - $ord_opt_point_amt - $ord_opt_coupon_amt - $ord_opt_dc_amt);
+            $a_ord_amt = $sugi_price * $qty;
+            $a_recv_amt = $a_ord_amt;
+            // $a_recv_amt = ($a_ord_amt - $ord_opt_point_amt - $ord_opt_coupon_amt - $ord_opt_dc_amt);
             if ($dlv_apply == 'N' || $a_ord_amt >= $free_dlv_amt) {
                 $ord_opt_dlv_amt = 0;
             }
@@ -1252,8 +1254,9 @@ class ord01Controller extends Controller
             #	재고 처리
             #####################################################
             $is_store_order = true;
+			$is_sugi = true;
             $order->SetOrdOptNo($ord_opt_no);
-            $order->CompleteOrderSugi($ord_opt_no, $ord_state, $is_store_order);
+            $order->CompleteOrderSugi($ord_opt_no, $ord_state, $is_store_order, $is_sugi, $ord_state_date);
 
             if ($ord_state == "10" || $ord_state == "30") {
 

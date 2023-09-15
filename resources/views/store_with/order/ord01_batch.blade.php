@@ -137,7 +137,7 @@
         {field: "dlv_amt", headerName: "배송비", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "add_dlv_amt", headerName: "추가배송비", width: 70, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "pay_type", headerName: "결제방법", width: 60, cellStyle: StyleLineHeight,
-            cellRenderer: (params) => params.value == 1 ? '현금' : '카드',
+            cellRenderer: (params) => params.value == 2 ? '카드' : '현금',
         },
         {field: "pay_date", headerName: "입금일자", width: 80, cellStyle: StyleLineHeight},
         {field: "bank_inpnm", headerName: "입금자명", width: 60, cellStyle: StyleLineHeight},
