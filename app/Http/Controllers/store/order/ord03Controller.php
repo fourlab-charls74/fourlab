@@ -267,7 +267,7 @@ class ord03Controller extends Controller
 							inner join store_grade sg on sg.grade_cd = s.grade_cd
 					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
 				where rcp.reject_yn = 'N'
-					and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
@@ -301,7 +301,7 @@ class ord03Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 				where rcp.reject_yn = 'N'
-					and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 			";
@@ -1029,7 +1029,7 @@ class ord03Controller extends Controller
 				left outer join payment p on p.ord_no = o.ord_no
 				left outer join brand b on b.brand = g.brand
 			where rcp.reject_yn = 'N' 
-			  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+			  	-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 				and o.clm_state in (-30,1,90,0)
 				$where
 			group by rcp.prd_cd
@@ -1288,7 +1288,7 @@ class ord03Controller extends Controller
 					left outer join brand b on b.brand = g.brand
 					left outer join company com on com.use_yn = 'Y' and com.com_id = g.com_id
 				where rcp.reject_yn = 'N' 
-				  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				  	-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
@@ -1457,7 +1457,7 @@ class ord03Controller extends Controller
 							inner join store_grade sg on sg.grade_cd = s.grade_cd
 					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
 				where rcp.reject_yn = 'N' 
-				  	and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+				  	-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					and o.ord_opt_no in ($opt_nos)
 				order by rc.or_cd desc
