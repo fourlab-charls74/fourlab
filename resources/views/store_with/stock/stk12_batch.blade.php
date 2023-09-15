@@ -109,7 +109,7 @@
 </div>
 
 <script language="javascript">
-    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0 }];
 
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
@@ -128,7 +128,10 @@
         {field: "goods_opt", headerName: "옵션", width: 200},
         {field: "storage_qty", headerName: "창고재고", width: 60, type: 'currencyType'},
         {field: "store_qty", headerName: "매장재고", width: 60, type: 'currencyType'},
-        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType', cellStyle: {"background-color": "#ffff99"}, editable:true},
+        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType'
+			, cellStyle: params => params.node.rowPinned == 'top' ? {} :{"background-color": "#ffff99"}
+			, editable: params => params.node.rowPinned == 'top' ? false : true
+		},
     ];
 </script>
 
@@ -140,7 +143,24 @@
         pApp.ResizeGrid(275, 450);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns,{
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => {
+				if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+			},
+			onCellValueChanged: (e) => {
+				e.node.setSelected(true);
+				if (e.column.colId == "qty") {
+					if (isNaN(parseFloat(e.newValue)) == true || e.newValue == "") {
+						alert("숫자만 입력가능합니다.");
+						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+					} else {
+						updatePinnedRow();
+
+					}
+				}
+			}
+		});
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -369,18 +389,17 @@
     // };
 
     const updatePinnedRow = () => { // 총 반품금액, 반품수량을 반영한 PinnedRow를 업데이트
-        let [ qty, total_return_price ] = [ 0, 0 ];
+        let [ qty ] = [ 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
                 qty += parseFloat(row.qty);
-                total_return_price += parseFloat(row.total_return_price);
             });
         }
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, qty: qty, total_return_price: total_return_price }
+            { ...pinnedRow.data, qty: qty }
         ]);
     };
 

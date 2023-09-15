@@ -359,10 +359,12 @@
             }
         }
     }
-
+	const pinnedRowData = [{ prd_cd: '합계', qty: 0 }];
 	let columns = [
         {field: "idx", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"},
+			cellRenderer: params => params.node.rowPinned == 'top' ? '' : parseInt(params.value) + 1
+		},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28, headerCheckboxSelection: true,
             // checkboxSelection: function(params) {
             //     return params.data.state < 40 && params.data.state > 0;
@@ -416,7 +418,11 @@
             cellRenderer: function(params) {
                 if (params.data.state != 10) {
                     if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + Comma(params.value) + '</a>';
+						if (params.node.rowPinned != 'top') {
+	                        return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + Comma(params.value) + '</a>';
+						} else {
+							return params.data.qty;
+						}
                     }
                 } else {
                     return params.data.qty;
@@ -477,13 +483,20 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => {
+				if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+			},
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
                 if (e.column.colId == "qty") {
-                    if (isNaN(e.newValue) == true || e.newValue == "") {
+                    if (isNaN(parseFloat(e.newValue)) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    }
+                    } else {
+						updatePinnedRow();
+
+					}
                 }
             }
         });
@@ -496,10 +509,35 @@
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
         load_store_channel();
     });
+	
+	const updatePinnedRow = () => {
+		let [ qty ] = [ 0 ];
+		const rows = gx.getRows();
+		if (rows && Array.isArray(rows) && rows.length > 0) {
+			rows.forEach((row, idx) => {
+				qty += parseFloat(row.qty);
+			});
+		}
+
+		let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+		gx.gridOptions.api.setPinnedTopRowData([
+			{ ...pinnedRow.data, qty }
+		]);
+	};
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/stock/stk10/search', data, 1);
+		gx.Request('/store/stock/stk10/search', data, 1, function(e) {
+			let total_data = e.head.total_data;
+
+			const pinnedRowData = {
+				prd_cd : '합계',
+				qty: total_data
+			};
+
+			gx.gridOptions.api.setPinnedTopRowData([pinnedRowData]);
+			
+		});
 	}
 
     function selectCurRow(fieldName, e, rowIndex) {

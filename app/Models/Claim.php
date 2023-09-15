@@ -800,6 +800,43 @@ class Claim
 		$qty = $ord->qty;
 
 		if ($store_cd != '' && $store_cd != null && $prd_cd != '' && $prd_cd != null) {
+			
+			$sql = "
+				select 
+					count(*) as cnt 
+				from product_stock_store 
+				where prd_cd = :prd_cd and store_cd = :store_cd
+			";
+			
+			$product_cnt = DB::selectOne($sql,['prd_cd' => $prd_cd, 'store_cd' => $store_cd]);
+			
+			if ($product_cnt->cnt < 1) {
+				
+				$sql = "
+					select
+						prd_cd, goods_no, goods_opt
+					from product_code
+					where prd_cd = :prd_cd
+				";
+				
+				$product_info = DB::selectOne($sql,['prd_cd'=> $prd_cd]);
+				
+				$goods_no = $product_info->goods_no;
+				$goods_opt = $product_info->goods_opt;
+				
+				DB::table('product_stock_store')->insert([
+					[
+						'goods_no' 	=> $goods_no,
+						'prd_cd' 	=> $prd_cd,
+						'store_cd'	=> $store_cd,
+						'qty'		=> 0,
+						'wqty'		=> 0,
+						'goods_opt' => $goods_opt,
+						'use_yn'	=> 'Y',
+						'rt'		=> now()
+					]
+				]);
+			}
 
 			// 매장재고 업데이트
 			$success_code = DB::table('product_stock_store')
