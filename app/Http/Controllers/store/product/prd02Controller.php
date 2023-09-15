@@ -698,7 +698,7 @@ class prd02Controller extends Controller
 
 				//기존 상품 매핑 정보 테이블 정보 추가
 				$sql	= " select count(*) as tot from goods_xmd where cd = :prd_cd ";
-				$tot	= DB::selectOne($sql,['prd_cd' => $prd_cd]);
+				$tot	= DB::selectOne($sql,['prd_cd' => $prd_cd])->tot;
 				
 				if( $tot == 0 ){
 					$sql	= " insert into goods_xmd(cd, goods_no, goods_sub, goods_opt, rt, ut) values ( :prd_cd, :goods_no, '0', :goods_opt, now(), now() ) ";
