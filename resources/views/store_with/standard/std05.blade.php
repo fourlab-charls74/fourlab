@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sale_apply_P" name="sale_apply" value="price" />
-                                    <label class="custom-control-label" for="sale_apply_P">판매가</label>
+                                    <label class="custom-control-label" for="sale_apply_P">현재가</label>
                                 </div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" class="custom-control-input" id="sale_apply_T" name="sale_apply" value="tag" />
@@ -110,7 +110,7 @@
         },
         {field: "sale_apply", headerName: "기준금액", width: 70, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                    return params.value === "price" ? "판매가" : params.value === "tag" ? "정상가" : "";
+                    return params.value === "price" ? "현재가" : params.value === "tag" ? "정상가" : "";
         }},
         {field: "amt_kind", headerName: "적용구분", width: 70, cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {

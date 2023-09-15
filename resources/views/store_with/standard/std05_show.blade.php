@@ -76,7 +76,7 @@
                                                     </div>
                                                     <div class="custom-control custom-radio">
                                                         <input type="radio" class="custom-control-input" id="sale_apply_P" name="sale_apply" value="price" @if(@$sale_type->sale_apply != 'tag') checked @endif />
-                                                        <label class="custom-control-label" for="sale_apply_P">판매가</label>
+                                                        <label class="custom-control-label" for="sale_apply_P">현재가</label>
                                                     </div>
                                                 </div>
                                             </td>

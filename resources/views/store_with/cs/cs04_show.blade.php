@@ -171,7 +171,7 @@
         {field: "goods_opt", headerName: "옵션", width: 150},
         {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 70},
         {field: "price", headerName: "현재가", type: "currencyType", width: 70},
-        {field: "return_price", headerName: "이동단가", width: 70, type: 'currencyType',
+        {field: "return_price", headerName: "이동단가", width: 70, type: 'currencyType', hide:true,
             editable: (params) => checkIsEditable(params),
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
