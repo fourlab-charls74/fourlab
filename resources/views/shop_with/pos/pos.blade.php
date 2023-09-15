@@ -108,7 +108,7 @@
 			                    <td class="pl-3 pr-2">
 				                    <select name="sale_type" id="sale_type" class="sel w-100" onchange="return updateOrderValue('sale_type', event.target.value);"></select>
 			                    </td>
-			                    <th>수수료유형</th>
+			                    <th>점포수수료</th>
 			                    <td class="pl-3 pr-2">
 				                    <select name="pr_code" id="pr_code" class="sel w-100" onchange="return updateOrderValue('pr_code', event.target.value)">
 					                    @foreach (@$pr_codes as $pr_code)
