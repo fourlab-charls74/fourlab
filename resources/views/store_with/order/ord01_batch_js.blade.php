@@ -110,37 +110,38 @@
         rows = rows.filter(r => Object.keys(r).length > 1);
         // .sort((a, b) => a.out_ord_no - b.out_ord_no)
 
-        rows.forEach((row, i) => {
-            let prev = rows[i - 1];
-            // if(i > 0 && row.out_ord_no === prev.out_ord_no) {
-            if(i > 0) {
-                rows[i] = {
-                    ...row, 
-                    ord_date: prev.ord_date,
-	                price: row.price || 0,
-                    dlv_amt: prev.dlv_amt,
-                    add_dlv_amt: prev.add_dlv_amt,
-                    pay_type: prev.pay_type,
-                    pay_date: prev.pay_date,
-                    bank_inpnm: prev.bank_inpnm,
-                    user_id: prev.user_id,
-                    user_nm: prev.user_nm,
-                    phone: prev.phone,
-                    mobile: prev.mobile,
-                    r_nm: prev.r_nm,
-                    r_phone: prev.r_phone,
-                    r_mobile: prev.r_mobile,
-                    r_zipcode: prev.r_zipcode,
-                    r_addr1: prev.r_addr1,
-                    r_addr2: prev.r_addr2,
-                    dlv_msg: prev.dlv_msg,
-                    dlv_cd: prev.dlv_cd,
-                    dlv_no: prev.dlv_no,
-	                dlv_comment: row.dlv_comment || '',
-                    fee_rate: prev.fee_rate,
-                }
-            }
-        });
+	    // 하나의 row를 하나의 주문건(order_mst)로 설정 (2023-09-15)
+        // rows.forEach((row, i) => {
+        //     let prev = rows[i - 1];
+        //     // if(i > 0 && row.out_ord_no === prev.out_ord_no) {
+        //     if(i > 0) {
+        //         rows[i] = {
+        //             ...row, 
+        //             ord_date: prev.ord_date,
+	    //             price: row.price || 0,
+        //             dlv_amt: prev.dlv_amt,
+        //             add_dlv_amt: prev.add_dlv_amt,
+        //             pay_type: prev.pay_type,
+        //             pay_date: prev.pay_date,
+        //             bank_inpnm: prev.bank_inpnm,
+        //             user_id: prev.user_id,
+        //             user_nm: prev.user_nm,
+        //             phone: prev.phone,
+        //             mobile: prev.mobile,
+        //             r_nm: prev.r_nm,
+        //             r_phone: prev.r_phone,
+        //             r_mobile: prev.r_mobile,
+        //             r_zipcode: prev.r_zipcode,
+        //             r_addr1: prev.r_addr1,
+        //             r_addr2: prev.r_addr2,
+        //             dlv_msg: prev.dlv_msg,
+        //             dlv_cd: prev.dlv_cd,
+        //             dlv_no: prev.dlv_no,
+	    //             dlv_comment: row.dlv_comment || '',
+        //             fee_rate: prev.fee_rate,
+        //         }
+        //     }
+        // });
 
         await gx.gridOptions.api.applyTransaction({ add : rows });
 	};
@@ -219,7 +220,7 @@
         if(rows.length < 1) return alert("일괄판매할 주문건이 존재하지 않습니다.");
 
         let bank_code = $("[name=bank_code]").val();
-        if(bank_code === "") return alert("입금은행을 선택해주세요.");
+        // if(bank_code === "") return alert("입금은행을 선택해주세요.");
 
         let apy_fee = $("[name=apy_fee]").is(":checked");
         let fee = $("[name=fee]").val();
@@ -244,16 +245,17 @@
                     dlv_comment: row.dlv_comment,
                     fee_rate: row.fee_rate,
                 };
-                // if(i > 0 && row.out_ord_no === rows[i - 1].out_ord_no) {
-                if(i > 0) {
-                    // orders = orders.map(order => order.out_ord_no === row.out_ord_no ? ({...order, cart: order.cart.concat(cart)}) : order);
-                    orders = orders.map(order => ({...order, cart: order.cart.concat(cart)}));
-                } else {
-                    orders.push({...row, cart: [cart]});
-                }
+
+				// 하나의 row를 하나의 주문건(order_mst)로 설정 (2023-09-15)
+				orders.push({...row, cart: [cart]});
+                // if(i > 0) {
+                //     orders = orders.map(order => ({...order, cart: order.cart.concat(cart)}));
+                // } else {
+                //     orders.push({...row, cart: [cart]});
+                // }
             } else {
-                // 매장 주문번호 미기입 시 실패처리
-                failed_list.push({...row, error_code: '-100'});
+                // 바코드 미기입 시 실패처리
+                failed_list.push({...row, error_code: '-101'});
             }
         });
 
