@@ -232,6 +232,7 @@
         rows.forEach((row, i) => {
             if(row.prd_cd) {
                 let cart = {
+					ord_date: row.ord_date,
                     prd_cd: row.prd_cd,
                     goods_no: row.goods_no,
                     goods_nm: row.goods_nm,
