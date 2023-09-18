@@ -315,12 +315,13 @@ class ord02Controller extends Controller
 							inner join order_mst om on om.ord_no = o.ord_no
 							left outer join (
 							    select pc.prd_cd, pc.prd_cd_p, pc.goods_no, pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt, pc.color
-								, ifnull((
-									select s.size_cd from size s
-									where s.size_kind_cd = pc.size_kind
-									   and s.size_cd = pc.size
-									   and use_yn = 'Y'
-								),'') as size
+								-- , ifnull((
+								-- 	select s.size_cd from size s
+								-- 	where s.size_kind_cd = pc.size_kind
+								-- 	   and s.size_cd = pc.size
+								-- 	   and use_yn = 'Y'
+								-- ),'') as size
+							    , pc.size
 								, p.match_yn
 							    from product_code pc
 							    	inner join product p on p.prd_cd = pc.prd_cd
