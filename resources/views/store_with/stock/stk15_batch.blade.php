@@ -109,7 +109,7 @@
 </div>
 
 <script language="javascript">
-    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 }];
+    const pinnedRowData = [{ prd_cd: '합계', qty: 0 }];
 
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
@@ -129,21 +129,27 @@
         {headerName: "창고보유재고",
             children: [
                 @foreach (@$storages as $storage)
-                    {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType",
+                    {field: '{{ $storage->storage_cd }}', headerName: '{{ $storage->storage_nm }}', type: "numberType", width:100,
                         cellRenderer: function(params) {
                             let storage_cd = '{{ $storage->storage_cd }}';
-                            let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
-                            if(arr.length > 0) {
-                                return arr[0].wqty;
-                            }
-                            return 0;
+							if (params.data && Array.isArray(params.data.storage_qty)) {
+								let arr = params.data.storage_qty.filter(s => s.storage_cd === storage_cd);
+								if (arr.length > 0) {
+									return arr[0].wqty;
+								} else {
+                            		return 0;
+								}
+							}
                         }
                     },
                 @endforeach
             ],
         },
         {field: "store_qty", headerName: "매장재고", width: 60, type: 'currencyType'},
-        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType', cellStyle: {"background-color": "#ffff99"}, editable:true},
+        {field: "qty", headerName: "배분수량", width: 60, type: 'currencyType'
+			, cellStyle: params => params.node.rowPinned == 'top' ? {} :{"background-color": "#ffff99"}
+			, editable: params => params.node.rowPinned == 'top' ? false : true
+		},
     ];
 </script>
 
@@ -155,7 +161,24 @@
         pApp.ResizeGrid(275, 450);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+		gx = new HDGrid(gridDiv, columns,{
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle: (params) => {
+				if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+			},
+			onCellValueChanged: (e) => {
+				e.node.setSelected(true);
+				if (e.column.colId == "qty") {
+					if (isNaN(parseFloat(e.newValue)) == true || e.newValue == "") {
+						alert("숫자만 입력가능합니다.");
+						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+					} else {
+						updatePinnedRow();
+
+					}
+				}
+			}
+		});
 
         $('#excel_file').on('change', function(e){
             if (validateFile() === false) {
@@ -378,6 +401,21 @@
             console.log(error);
         });
     };
+
+	const updatePinnedRow = () => { 
+		let qty = 0;
+		const rows = gx.getRows();
+		if (rows && Array.isArray(rows) && rows.length > 0) {
+			rows.forEach((row, idx) => {
+				qty += parseFloat(row.qty);
+			});
+		}
+
+		let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+		gx.gridOptions.api.setPinnedTopRowData([
+			{ ...pinnedRow.data, qty: qty }
+		]);
+	};
 
 </script>
 @stop

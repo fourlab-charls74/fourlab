@@ -507,7 +507,7 @@ class stk15Controller extends Controller
                     , g.goods_type as goods_type_cd
                     , com.com_type as com_type_d
                     , s.prd_cd
-                    , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.opt,pc.seq) as prd_cd_p
+                    , pc.prd_cd_p as prd_cd_p
                     , pc.color
                     , ifnull((
 						select s.size_cd from size s
