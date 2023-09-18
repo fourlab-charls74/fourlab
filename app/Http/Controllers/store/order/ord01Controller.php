@@ -207,7 +207,8 @@ class ord01Controller extends Controller
         // $fintech        = $request->input('fintech', '');  // 핀테크
 
         $where = "";
-        $where .= " and o.ord_kind != '10' "; // 정상판매건이 아닌 경우에만 출력
+        //2023-09-18 해당 주석처리
+		//$where .= " and o.ord_kind != '10' "; // 정상판매건이 아닌 경우에만 출력
 
         // 날짜검색 미사용 여부
         $is_not_use_date = false;
@@ -484,7 +485,6 @@ class ord01Controller extends Controller
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                     left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
-					inner join store store on store.store_cd = o.store_cd
                 where 1=1 $where
                 $orderby
                 $limit
@@ -504,7 +504,7 @@ class ord01Controller extends Controller
         // $result = DB::select($sql);
 
         $pdo	= DB::connection()->getPdo();
-		$stmt	= $pdo->prepare($sql);
+		$stmt	= $pdo->prepare($sql); dd($sql);
 		$stmt->execute();
 		$result	= [];
 		while($row2 = $stmt->fetch(PDO::FETCH_ASSOC))

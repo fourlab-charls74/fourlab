@@ -144,7 +144,8 @@ class ord01Controller extends Controller
         // $fintech        = $request->input('fintech', '');  // 핀테크
 
         $where = "";
-        $where .= " and o.ord_kind != '10' "; // 정상판매건이 아닌 경우에만 출력
+        //2023-09-18 해당 주석처리
+		//$where .= " and o.ord_kind != '10' "; // 정상판매건이 아닌 경우에만 출력
 
         // 날짜검색 미사용 여부
         $is_not_use_date = false;
