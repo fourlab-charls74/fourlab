@@ -101,7 +101,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">생년월일</th>
+                                            <th>생년월일</th>
                                             <td>
                                                 @if( $type == 'add')
                                                 <div class="flax_box">
@@ -118,18 +118,9 @@
                                                         <div class="form-inline-inner input_box" style="width:29%;">
                                                             <select name="mm" id="mm" class="form-control form-control-sm mr-1" onchange="setBirthDay()">
                                                                 <option value="">월</option>
-                                                                <option value="1">1</option>
-                                                                <option value="2">2</option>
-                                                                <option value="3">3</option>
-                                                                <option value="4">4</option>
-                                                                <option value="5">5</option>
-                                                                <option value="6">6</option>
-                                                                <option value="7">7</option>
-                                                                <option value="8">8</option>
-                                                                <option value="9">9</option>
-                                                                <option value="10">10</option>
-                                                                <option value="11">11</option>
-                                                                <option value="12">12</option>
+																@for($i = 1; $i < 13; $i++)
+																	<option value="{{$i}}">{{$i}}</option>
+																@endfor
                                                             </select>
                                                         </div>
                                                         <span class="text_line">-</span>
@@ -156,7 +147,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">성별</th>
+                                            <th>성별</th>
                                             <td>
                                                 @if($type == 'add')
                                                     <div class="form-inline form-radio-box">
@@ -205,7 +196,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">이메일</th>
+                                            <th>이메일</th>
                                             <td>
                                                 <div class="flax_box">
                                                     <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
@@ -225,7 +216,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">전화번호</th>
+                                            <th>전화번호</th>
                                             <td>
                                                 <div class="flax_box">
                                                     <div class="form-inline mr-0 mr-sm-1" style="width:100%;max-width:400px;vertical-align:top;">
@@ -276,7 +267,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">주소</th>
+                                            <th>주소</th>
                                             <td>
                                                 <div class="input_box flax_box address_box">
                                                     <input type="text" id="zipcode" name="zipcode" class="form-control form-control-sm" value="{{@$user->zip}}" style="width:calc(25% - 10px);margin-right:10px;" readonly="readonly">
@@ -939,33 +930,33 @@
             return false;
         }
 
-        const mailReg = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+        // const mailReg = /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+		//
+        // if (!mailReg.test(ff.email.value)) {
+        //     alert("이메일을 확인해주세요.");
+        //     ff.email.focus();
+        //     return false;
+        // }
 
-        if (!mailReg.test(ff.email.value)) {
-            alert("이메일을 확인해주세요.");
-            ff.email.focus();
-            return false;
-        }
-
-        const phone_reg = /(^(0(2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))$)|^01(?:0|1|[6-9])$/; // mobile 패턴 추가 (일반전화 없을 시)
-
-        if (!phone_reg.test(ff.phone1.value)) {
-            alert("일반전화 앞3자리를 확인해주세요.");
-            ff.phone1.focus();
-            return false;
-        }
-
-        if (!ff.phone2.value) {
-            alert("일반전화의 중간 번호를 입력해 주세요.");
-            ff.phone2.focus();
-            return false;
-        }
-
-        if (!ff.phone3.value) {
-            alert("일반전화의 나머지 번호를 입력해 주세요.");
-            ff.phone3.focus();
-            return false;
-        }
+        // const phone_reg = /(^(0(2|3[1-3]|4[1-4]|5[1-5]|6[1-4]))$)|^01(?:0|1|[6-9])$/; // mobile 패턴 추가 (일반전화 없을 시)
+		//
+        // if (!phone_reg.test(ff.phone1.value)) {
+        //     alert("일반전화 앞3자리를 확인해주세요.");
+        //     ff.phone1.focus();
+        //     return false;
+        // }
+		//
+        // if (!ff.phone2.value) {
+        //     alert("일반전화의 중간 번호를 입력해 주세요.");
+        //     ff.phone2.focus();
+        //     return false;
+        // }
+		//
+        // if (!ff.phone3.value) {
+        //     alert("일반전화의 나머지 번호를 입력해 주세요.");
+        //     ff.phone3.focus();
+        //     return false;
+        // }
 
         const mobile_reg = /^01(?:0|1|[6-9])$/;
 
