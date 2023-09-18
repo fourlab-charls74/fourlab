@@ -504,7 +504,7 @@ class ord01Controller extends Controller
         // $result = DB::select($sql);
 
         $pdo	= DB::connection()->getPdo();
-		$stmt	= $pdo->prepare($sql); dd($sql);
+		$stmt	= $pdo->prepare($sql);
 		$stmt->execute();
 		$result	= [];
 		while($row2 = $stmt->fetch(PDO::FETCH_ASSOC))
