@@ -463,7 +463,7 @@ class prd02Controller extends Controller
 			}else{
 				$row->goods_no	= $goods_no;
 
-				$sql_goods	= " select count(*) as tot from goods_summary where goods_no = :goods_no and goods_opt = :goods_opt";
+				$sql_goods	= " select count(*) as tot from goods_summary where goods_no = :goods_no and replace(goods_opt, ' ', '') = replace(:goods_opt, ' ', '')";
 				$goods_opt_cnt	= DB::selectOne($sql_goods,['goods_no' => $goods_no, 'goods_opt' => $row->goods_opt])->tot;
 				
 				if( $goods_opt_cnt == 0 ){
