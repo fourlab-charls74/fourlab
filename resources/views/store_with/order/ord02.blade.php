@@ -433,7 +433,7 @@
 					return params.value;
 				} else {
 					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
-					return '<a href="#" onclick="return openHeadProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+					return '<a href="#" onclick="return openStoreProduct(\'' + goods_no + '\');">' + params.value + '</a>';
 				}
 			}
         },
