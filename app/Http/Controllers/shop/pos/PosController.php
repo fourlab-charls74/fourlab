@@ -193,12 +193,13 @@ class PosController extends Controller
                 )) as img
                 , ifnull((select wqty from product_stock_store where store_cd = :store_cd and prd_cd = pc.prd_cd), 0) as wqty
                 , concat('[', pc.color, '] ', color.code_val) as color
-                , (
-					select s.size_cd from size s 
-					where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
-						and s.size_cd = pc.size
-						and use_yn = 'Y'
-				) as size
+                -- , (
+				-- 	select s.size_cd from size s 
+				-- 	where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX'))) 
+				-- 		and s.size_cd = pc.size
+				-- 		and use_yn = 'Y'
+				-- ) as size
+                , pc.size
                 , '' as sale_type
                 , '' as pr_code
                 , '' as coupon_no
