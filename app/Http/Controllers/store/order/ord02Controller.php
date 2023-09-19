@@ -252,14 +252,15 @@ class ord02Controller extends Controller
 						select count(*)
                         from product_code inpc
 							inner join code inc on inc.code_kind_cd = 'PRD_CD_COLOR' and inc.code_id = inpc.color
-							inner join code incs on if(inpc.gender = 'M', incs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(inpc.gender = 'W', incs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(inpc.gender = 'U', incs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', incs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and incs.code_id = inpc.size
+                            inner join size incs on incs.size_kind_cd = inpc.size_kind and incs.size_cd = inpc.size
                         where inpc.goods_no = o.goods_no
 							and inc.code_val = substring_index(o.goods_opt, '^', 1)
-							and replace(incs.code_val, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+							and replace(incs.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 							$prd_where
 					) as goods_no_group
-					, ifnull(rcp.reject_reason, '') as reject_reason
-					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), if(rcp.dlv_location_type = 'STORE', (select store_nm from store where store_cd = rcp.dlv_location_cd), '')) as reject_location_nm 
+					, if(rcp.reject_yn = 'Y', ifnull(rcp.reject_reason, ''), '') as reject_reason
+					, if(rcp.reject_yn = 'Y', if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), if(rcp.dlv_location_type = 'STORE', (select store_nm from store where store_cd = rcp.dlv_location_cd), '')), '') as reject_location_nm
+					, if(rcp.reject_yn = 'N', rcp.dlv_location_cd, '') as order_proc_location_cd
 					$qty_sql
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
@@ -282,7 +283,7 @@ class ord02Controller extends Controller
 						from product_code p
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 					) pc on pc.goods_no = o.goods_no and lower(pc.color_nm) = lower(substring_index(o.goods_opt, '^', 1)) and lower(replace(pc.size_nm, ' ', '')) = lower(replace(substring_index(o.goods_opt, '^', -1), ' ', ''))
-					left outer join order_receipt_product rcp on rcp.ord_opt_no = o.ord_opt_no and rcp.reject_yn = 'Y'
+					left outer join order_receipt_product rcp on rcp.ord_opt_no = o.ord_opt_no -- and rcp.reject_yn = 'Y'
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 					and o.clm_state in (-30,1,90,0)
 					$where
