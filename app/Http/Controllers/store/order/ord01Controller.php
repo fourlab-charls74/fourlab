@@ -662,13 +662,14 @@ class ord01Controller extends Controller
 			";
 			$pr_codes = DB::select($sql, [ 'store_cd' => $store_cd, 'date1' => $date, 'date2' => $date ]);
 			
+			// 판매채널이 '자사온라인' or '위탁온라인' 인 매장에서는 수기판매 출고완료처리가 불가능합니다. (2023-09-19)
 			$sql = "
 				select count(*) as cnt
 				from store
 				where store_cd = :store_cd and store_cd in (
 					select store_cd
 					from store
-					where store_channel = 'EC' or store_channel = 'CE' or store_cd = 'A0003'
+					where store_channel = 'EC' or store_channel = 'CE'
 				)
 			";
 			$is_online = DB::selectOne($sql, [ 'store_cd' => $store_cd ])->cnt;
