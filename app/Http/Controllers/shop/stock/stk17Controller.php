@@ -46,7 +46,7 @@ class stk17Controller extends Controller
 
         if ($req['type'] != "") $where .= " and pc.brand = '" . Lib::quote($req['type']) . "'";
         if ($req['opt'] != "") $where .= " and pc.opt = '" . Lib::quote($req['opt']) . "'";
-		if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '" . Lib::quote($req['prd_nm']) . "%' ";
+		if ($req['prd_nm'] != "") $where .= " and p.prd_nm like '%" . Lib::quote($req['prd_nm']) . "%' ";
 
         // orderby
         $ord = $req['ord'] ?? 'desc';
