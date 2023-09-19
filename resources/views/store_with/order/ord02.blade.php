@@ -626,6 +626,9 @@
             isRowSelectable: (params) => {
                 return (params.aggData && params.aggData.order_proc_location_cd === '') || (params.data && params.data.ord_opt_no_group === null && params.data.order_proc_location_cd === '');
             },
+			getRowStyle: (params) => {
+				if ((params.node.aggData && params.node.aggData.order_proc_location_cd !== '') || (params.node.data && params.node.data.ord_opt_no_group === null && params.node.data.order_proc_location_cd !== '')) return { 'background-color': '#ff8080' };
+			},
         });
 
 		Search();
