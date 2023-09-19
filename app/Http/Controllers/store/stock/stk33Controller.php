@@ -184,6 +184,8 @@ class stk33Controller extends Controller
 
         $where = "";
         $sale_amt = "";
+		$null_sale_amt = "";
+		$sum_sale_amt = "";
 
         if($store_no != '') $where .= "and cs.store_cd = '$store_no'";
         if($date != '') $where .= "and cs.sale_date like '$date%'";
@@ -191,8 +193,12 @@ class stk33Controller extends Controller
         for ($i = 1; $i<=$day; $i++) {
             if ($i < 10) {
                 $sale_amt .= ",sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt,0)) as sale_amt_0$i ";
+				$null_sale_amt .= ", '0' as sale_amt_0$i";
+				$sum_sale_amt .= ", sum(sale_amt_0$i) as sale_amt_0$i";
             } else {
                 $sale_amt .= ",sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt,0)) as sale_amt_$i ";
+				$null_sale_amt .= ", '0' as sale_amt_$i";
+				$sum_sale_amt .= ", sum(sale_amt_$i) as sale_amt_$i";
             }
         }
 
@@ -211,17 +217,38 @@ class stk33Controller extends Controller
         if(count($result) > 0 ) {
             $sql = "
                 select
-                    c.code_id as competitor_cd
-                    , cs.store_cd
-                    , c.code_val as competitor_nm
-                    , cs.sale_memo
-                    $sale_amt
-                from competitor_sale cs
-                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor' and c.use_yn = 'Y'
-                where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-31'
-                group by cs.competitor_cd
-                
+					competitor_cd,
+					max(store_cd) as store_cd,
+					max(competitor_nm) as competitor_nm,
+					max(sale_memo) as sale_memo
+					$sum_sale_amt
+				from (
+					select
+						distinct(c.code_id) as competitor_cd,
+						cs.store_cd,
+						c.code_val as competitor_nm,
+						cs.sale_memo
+						$sale_amt
+					from competitor_sale cs
+						left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor' and c.use_yn = 'Y'
+					where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-30'
+					group by cs.competitor_cd
+				
+					union
+					
+					select
+						distinct(cd.code_id) as competitor_cd,
+						'$store_no' as store_cd,
+						cd.code_val as competitor_nm,
+						null as sale_memo
+						$null_sale_amt
+					from code cd
+						left outer join competitor com on cd.code_id = com.competitor_cd
+					where cd.code_kind_cd = 'COMPETITOR' and cd.use_yn = 'Y' and com.use_yn = 'Y' and com.store_cd = '$store_no'
+				) a
+				group by competitor_cd;
             ";
+			
         } else {
 
             $sql = "
