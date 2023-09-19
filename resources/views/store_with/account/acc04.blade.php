@@ -315,6 +315,8 @@
 				},
             ]
         },
+
+		@if($extra_types != '')
 		{ headerName: "기타재반자료",
 			children: [
 				@foreach (@$extra_types as $entry_cd => $children)
@@ -333,6 +335,8 @@
 				@endforeach
 			]
 		},
+		@endif
+			
         { field: "real_profit", headerName: "영업이익", type: 'currencyType', width: 100, cellStyle: { 'font-weight': '700' }, aggregation: true, },
         { field: "real_profit_rate", headerName: "영업이익율(%)", type: 'percentType', width: 100, cellStyle: { 'font-weight': '700' } },
         { width: "auto" }
