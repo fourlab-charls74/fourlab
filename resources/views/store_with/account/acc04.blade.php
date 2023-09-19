@@ -315,27 +315,6 @@
 				},
             ]
         },
-
-		@if($extra_types != '[]')
-		{ headerName: "기타재반자료",
-			children: [
-				@foreach (@$extra_types as $entry_cd => $children)
-					@if (true)
-					{ headerName: `{{ $children[0]->entry_nm }} ${ PAYER["{{ $children[0]->payer }}"] || '' }`,
-						children: [
-							@foreach ($children as $child)
-								{ headerName: "{{ $child->type_nm }}", field: "extra_{{ $child->type_cd }}_amt", type: 'currencyType', width: 90, aggregation: true },
-							@endforeach
-							{ headerName: "합계", field: "extra_{{ $entry_cd }}_sum", type: 'currencyType', width: 90, aggregation: true,
-								cellStyle: (params) => params.node.rowPinned === 'top' ? '' : ({ 'color': '#ff2222', 'background-color': '#fffafa' }) 
-							},
-						]
-					},
-					@endif
-				@endforeach
-			]
-		},
-		@endif
 			
         { field: "real_profit", headerName: "영업이익", type: 'currencyType', width: 100, cellStyle: { 'font-weight': '700' }, aggregation: true, },
         { field: "real_profit_rate", headerName: "영업이익율(%)", type: 'percentType', width: 100, cellStyle: { 'font-weight': '700' } },
