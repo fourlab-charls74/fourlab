@@ -28,7 +28,7 @@ class sal02Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate = $request->input('sdate', now()->format("Y-m"));
+		$sdate = $request->input('sdate', now()->format("Ym"));
 		$list_type = $request->input('list_type', "qty");
 		$store_cd = $request->input('store_cd', "");
 		$goods_no = $request->input('goods_no', "");
@@ -44,7 +44,7 @@ class sal02Controller extends Controller
 		$store_channel_kind	= $request->input("store_channel_kind", '');
 
 		$ym = str_replace("-", "", $sdate);
-		$edate = Carbon::parse($sdate)->firstOfMonth()->addMonth()->format("Y-m-d");
+		$edate = Carbon::parse($sdate)->firstOfMonth()->addMonth()->format("Ymd");
 
 		// 검색조건 필터링
 		$where = "";
@@ -71,7 +71,7 @@ class sal02Controller extends Controller
 		if ($sell_type != "") $where .= " and o.sale_kind = '$sell_type'";
 
         $where2 = "";
-		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
+		if ($store_cd != "") $where2 .= " and s.store_cd = '" . Lib::quote($store_cd)."'";
 		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
@@ -136,7 +136,11 @@ class sal02Controller extends Controller
 		for ($i = 0; $i < $max_day; $i++) {
 			$day = $i + 1;
 			$comma = ($day == $max_day) ? "" : ",";
-			$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) as ${day}_val${comma}";
+			if ($list_type == 'recv_amt') {
+				$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) - sum(if(day(w.ord_state_date) = ${day}, if(w.ord_state > 30, w.recv_amt, 0), 0)) as ${day}_val${comma}";
+			} else {
+				$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) as ${day}_val${comma}";
+			}
 			$total_sum .= ", sum(t.${day}_val) as ${day}_val";
 
 			// 해당 월의 모든 요일 구하기
@@ -144,6 +148,8 @@ class sal02Controller extends Controller
 			$day = $sdate . "-${day}";
 			$yoil_codes[$i] = date('w', strtotime($day));
 		}
+		
+		$startdate = str_replace("-","",$sdate);
 
 		$sql = /** @lang text */
             "
@@ -159,20 +165,21 @@ class sal02Controller extends Controller
 					select 
 						m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
 						${sum}
-					from order_mst m 
-						inner join order_opt o on m.ord_no = o.ord_no 
+					from order_opt_wonga w 
+						inner join order_opt o on w.ord_opt_no = o.ord_opt_no 
+						inner join order_mst m on m.ord_no = o.ord_no
 						inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
 						left outer join product_code pc on pc.prd_cd = o.prd_cd
-					where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
+					where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
 					group by m.store_cd
 				) a on s.store_cd = a.store_cd
                 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
-            where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null or a.recv_amt <> '0') $where2
+            where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null) $where2
 		";
 			
-		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
+		$rows = DB::select($sql, ['sdate' => $startdate.'01', 'edate' => $edate, 'ym' => $ym]);
 
 		$sql = "
 			select 
@@ -195,22 +202,24 @@ class sal02Controller extends Controller
 						select 
 							m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
 							${sum}
-						from order_mst m 
-							inner join order_opt o on m.ord_no = o.ord_no 
+						from order_opt_wonga w 
+							inner join order_opt o on w.ord_opt_no = o.ord_opt_no 
+							inner join order_mst m on m.ord_no = o.ord_no
 							inner join goods g on o.goods_no = g.goods_no
 							left outer join brand b on g.brand = b.brand
 							left outer join product_code pc on pc.prd_cd = o.prd_cd
-						where m.ord_date >= :sdate and m.ord_date < :edate and m.store_cd <> '' $where
+						where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
 						group by m.store_cd
 					) a on s.store_cd = a.store_cd
 					left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
 					left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 					left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
-				where 1=1 and s.use_yn = 'Y' $where2
+				where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null) $where2
 			) t
+			
 		";
 		
-		$res = DB::selectOne($sql, ['sdate' => $sdate, 'edate' => $edate, 'ym' => $ym]);
+		$res = DB::selectOne($sql, ['sdate' => $startdate.'01', 'edate' => $edate, 'ym' => $ym]);
 
 		$total_data = $res;
 		

@@ -427,7 +427,7 @@ class ord06Controller extends Controller
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                     left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
-					inner join store store on store.store_cd = o.store_cd
+					left outer join store store on store.store_cd = o.store_cd
                 where w.ord_state in (30,60,61) $where
                 $orderby
                 $limit
