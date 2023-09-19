@@ -218,7 +218,7 @@ class acc04Controller extends Controller
                 ) a
             ) b
         ";
-        $result = DB::select($sql);dd($sql);exit;
+        $result = DB::select($sql);
 
         return response()->json([
             'code'	=> 200,
