@@ -551,7 +551,8 @@
         // {field: "last_up_date", headerName: "클레임일시", width: 125, cellStyle: {'text-align': 'center'},
         //     aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 		// 	cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        // },
+        // }
+		{field: "order_proc_location_cd", hide: true, aggFunc: (params) => params.values.length > 0 ? params.values[0] : ''},
     ];
 </script>
 
@@ -577,7 +578,6 @@
             groupDefaultExpanded: 2,
 			suppressAggFuncInHeader: true,
 			animateRows: true,
-			isRowSelectable: params => !params.data.order_proc_location_cd,
             onCellValueChanged: (e) => {
                 if (e.column.colId === "dlv_place") {
                     let arr = dlv_locations.filter(s => s.location_nm === e.newValue);
@@ -624,7 +624,7 @@
                 }
             },
             isRowSelectable: (params) => {
-                return params.aggData || params.data?.ord_opt_no_group === null;
+                return (params.aggData && params.aggData.order_proc_location_cd === '') || params.data?.ord_opt_no_group === null;
             },
         });
 
