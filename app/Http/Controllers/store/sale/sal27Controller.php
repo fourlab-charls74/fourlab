@@ -163,8 +163,8 @@ class sal27Controller extends Controller
 				, ((a.term_storage_qty * a.goods_sh) + (a.term_store_qty * a.goods_sh)) as term_total_goods_sh
 				, ((a.term_storage_qty * a.price) + (a.term_store_qty * a.price)) as term_total_price
 				, ((a.term_storage_qty * a.wonga) + (a.term_store_qty * a.wonga)) as term_total_wonga
-			 	, (a.sale_qty / a.term_in_qty * 100) as sale_ratio
-			    , round((1 - (a.sale_recv_price / (a.sale_qty * a.price))) * 100, 2) as discount_ratio
+			 	, round(a.sale_qty / a.term_in_qty * 100) as sale_ratio
+			    , round((1 - (a.sale_recv_price / (a.sale_qty * a.price))) * 100) as discount_ratio
 			from (
 				select pc.*
 					, ps.in_qty as total_in_qty

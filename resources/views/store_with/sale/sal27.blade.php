@@ -257,12 +257,17 @@
                 {field: "sale_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
                 {field: "sale_recv_price", headerName: "실판매가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
                 {field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
-                {field: "sale_ratio", headerName: "판매율", width: 80, type: "percentType",
+                {field: "sale_ratio", headerName: "판매율", width: 80, cellStyle: {'text-align' : 'right'},
 	                aggFunc: (params) => {
-						return params.rowNode ? params.rowNode.aggData ? (params.rowNode.aggData.sale_qty / (params.rowNode.aggData.term_in_qty === 0 ? 1 : params.rowNode.aggData.term_in_qty) * 100) : 0 : 0;
+						return ( params.rowNode ? params.rowNode.aggData ? Math.round(params.rowNode.aggData.sale_qty / (params.rowNode.aggData.term_in_qty === 0 ? 1 : params.rowNode.aggData.term_in_qty) * 100) : 0 : 0 ) + '%';
 	                } 
                 },
-                {field: "discount_ratio", headerName: "할인율", width: 80, type: "percentType"},
+                {field: "discount_ratio", headerName: "할인율", width: 80, cellStyle: {'text-align' : 'right'},
+					cellRenderer: function(params) {
+						if(params.value != undefined)
+							return params.value + '%';
+					}
+				},
             ]
         },
         {
@@ -389,7 +394,7 @@
 		gx.gridOptions.api.setPinnedTopRowData([{ 
 			...pinnedRow.data, 
 			...totals, 
-			sale_ratio: totals.sale_qty / (totals.term_in_qty === 0 ? 1 : totals.term_in_qty) * 100,
+			sale_ratio: Math.round( totals.sale_qty / (totals.term_in_qty === 0 ? 1 : totals.term_in_qty) * 100 ) + '%',
 		}]);
 	};
 </script>
