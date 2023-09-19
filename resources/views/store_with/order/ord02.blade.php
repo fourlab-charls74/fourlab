@@ -624,7 +624,7 @@
                 }
             },
             isRowSelectable: (params) => {
-                return (params.aggData && params.aggData.order_proc_location_cd === '') || params.data?.ord_opt_no_group === null;
+                return (params.aggData && params.aggData.order_proc_location_cd === '') || (params.data && params.data.ord_opt_no_group === null && params.data.order_proc_location_cd === '');
             },
         });
 
