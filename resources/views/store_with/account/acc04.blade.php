@@ -317,7 +317,7 @@
         },
 
 		@if($extra_types != '')
-		{ headerName: "기타재반자료",
+		{ headerName: "기타재반자료 {{$extra_types}}",
 			children: [
 				@foreach (@$extra_types as $entry_cd => $children)
 					@if (true)
