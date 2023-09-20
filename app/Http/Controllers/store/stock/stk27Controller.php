@@ -248,14 +248,33 @@ class stk27Controller extends Controller
                     ]);
 
 				// 창고재고처리
-				DB::table('product_stock_storage')
-					->where('storage_cd', $storage_cd)
-					->where('prd_cd', $product['prd_cd'])
-					->update([
-						'qty' => DB::raw("qty - " . $loss_qty),
-						'wqty' => $product['qty'],
-						'ut' => now(),
-					]);
+				$sql	= " select count(*) as tot from product_stock_storage where storage_cd = :storage_cd and prd_cd = :prd_cd";
+				$tot	= DB::selectOne($sql,['storage_cd' => $storage_cd, 'prd_cd' => $product['prd_cd']])->tot;
+				
+				if( $tot > 0 ){
+					DB::table('product_stock_storage')
+						->where('storage_cd', $storage_cd)
+						->where('prd_cd', $product['prd_cd'])
+						->update([
+							'qty' => DB::raw("qty - " . $loss_qty),
+							'wqty' => $product['qty'],
+							'ut' => now(),
+						]);
+				}else{
+					DB::table('product_stock_storage')
+						->insert([
+							'goods_no'		=> $product['goods_no'],
+							'prd_cd'		=> $product['prd_cd'],
+							'storage_cd'	=> $storage_cd,
+							'qty'			=> $product['qty'],
+							'wqty'			=> $product['wqty'],
+							'goods_opt'		=> $product['goods_opt'],
+							'use_yn'		=> 'Y',
+							'rt'			=> now(),
+							'ut'			=> now()
+						]);
+				}
+				
 
 				// 전체재고처리
 				DB::table('product_stock')
