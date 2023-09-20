@@ -267,7 +267,7 @@ class stk27Controller extends Controller
 							'prd_cd'		=> $product['prd_cd'],
 							'storage_cd'	=> $storage_cd,
 							'qty'			=> $product['qty'],
-							'wqty'			=> $product['wqty'],
+							'wqty'			=> $product['qty'],
 							'goods_opt'		=> $product['goods_opt'],
 							'use_yn'		=> 'Y',
 							'rt'			=> now(),
