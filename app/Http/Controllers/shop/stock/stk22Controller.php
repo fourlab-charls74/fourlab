@@ -216,7 +216,6 @@ class stk22Controller extends Controller
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
             where
                 s.use_yn = 'Y'
-                and s.store_type = '08'
                 and s.rt_yn = 'Y'
                 and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
             	$where
