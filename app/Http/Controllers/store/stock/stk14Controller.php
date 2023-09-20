@@ -135,12 +135,13 @@ class stk14Controller extends Controller
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 pc.color,
                 c.code_val as color_nm,
-                ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+                -- ifnull((
+				-- 	select s.size_cd from size s
+				-- 	where s.size_kind_cd = pc.size_kind
+				-- 	   and s.size_cd = pc.size
+				-- 	   and use_yn = 'Y'
+				-- ),'') as size,
+                
                 g.goods_nm_eng,
                 p.goods_opt,
                 p.qty as storage_qty,
@@ -154,7 +155,7 @@ class stk14Controller extends Controller
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                 inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                left outer join product_code pc on pc.prd_cd = p.prd_cd
+                inner join product_code pc on pc.prd_cd = p.prd_cd
                 left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
             where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
@@ -174,7 +175,7 @@ class stk14Controller extends Controller
                     inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
                     inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                     inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                    left outer join product_code pc on pc.prd_cd = p.prd_cd
+                    inner join product_code pc on pc.prd_cd = p.prd_cd
                 where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             ";
 
