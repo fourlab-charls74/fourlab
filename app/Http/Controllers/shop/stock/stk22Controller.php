@@ -34,6 +34,8 @@ class stk22Controller extends Controller
             'items'			=> SLib::getItems(), // 품목
             'stores'        => $stores, // 매장리스트
             'storages'      => $storages, // 창고리스트
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
         ];
 
         return view(Config::get('shop.shop.view') . '/stock/stk22', $values);
@@ -189,7 +191,13 @@ class stk22Controller extends Controller
 
         $code = 200;
         $prd_cd = $request->input("prd_cd", '');
+		$store_channel = $request->input('store_channel', '');
+		$store_channel_kind = $request->input('store_channel_kind', '');
         $now_date = date('Ymd');
+		$where = "";
+
+		if($store_channel != '') $where .= " and s.store_channel = '$store_channel'";
+		if($store_channel_kind != '') $where .= " and s.store_channel_kind = '$store_channel_kind'";
 
         $sql = "
             select
@@ -211,6 +219,8 @@ class stk22Controller extends Controller
                 and s.store_type = '08'
                 and s.rt_yn = 'Y'
                 and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+            	$where
+            
 		";
 
         $result = DB::select($sql);
@@ -238,6 +248,7 @@ class stk22Controller extends Controller
                 where
                     s.use_yn = 'Y'
                     and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+                	$where
             ) as a
         ";
 
@@ -327,4 +338,58 @@ class stk22Controller extends Controller
 
         return response()->json([ "code" => $code, "msg" => $msg ]);
     }
+	public function change_store_channel(Request $request) {
+
+		$store_channel = $request->input('store_channel');
+
+		try {
+			DB::beginTransaction();
+			$sql = "
+					select 
+						store_kind_cd
+						, store_kind
+					from store_channel
+					where store_channel_cd = '$store_channel' and dep = 2 and use_yn = 'Y' 
+					order by seq asc
+                ";
+			$store_kind = DB::select($sql);
+
+			DB::commit();
+			$code = 200;
+			$msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind]);
+	}
+
+	public function change_store_channel_kind(Request $request) {
+
+		$store_channel_kind = $request->input('store_channel_kind');
+
+		try {
+			DB::beginTransaction();
+			$sql = "
+					select
+						store_cd
+						, store_nm
+					from store
+					where store_channel_kind = '$store_channel_kind' and use_yn = 'Y'
+                ";
+			$stores = DB::select($sql);
+
+			DB::commit();
+			$code = 200;
+			$msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg, 'stores' => $stores]);
+	}
 }

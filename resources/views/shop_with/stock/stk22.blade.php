@@ -174,25 +174,44 @@
         </div>
     </div>
     <div class="col-lg-7">
-        <div class="card shadow mb-0 pt-2 pt-sm-0">
-            <div class="card-title">
-                <div class="filter_wrap d-flex flex-column mt-2 pt-2">
-                    <div class="d-flex justify-content-between">
-                        <h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건</h6>
-                        <div class="d-flex justify-content-between mt-1">
-                            <div class="d-flex">
-                                <p class="mr-2">(대표)창고재고 <span id="storage_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개 / 우리매장재고 <span id="store_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개</p>
-                                <a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm" style="min-width:130px;">RT리스트에 등록</a>
-                            </div>
-                        </div>
-                    </div>
-	                <div>ㄴ 선택 상품 :<strong id="selected_prd_nm" class="ml-2 fs-14 text-danger font-weight-normal"></strong></div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <div id="div-gd-stock" class="ag-theme-balham"></div>
-            </div>
-        </div>
+		<div class="card shadow mb-0 pt-2 pt-sm-0">
+			<div class="card-title">
+				<div class="filter_wrap mt-2 pt-2">
+					<h6 class="font-weight-bold m-0 mr-2">총 : <span id="gd-stock-total" class="text-primary">0</span>건 <strong id="selected_prd_nm" class="ml-2 fs-14 text-danger font-weight-normal"></strong></h6>
+					<div class="d-flex justify-content-between mt-1">
+						<div class="d-flex">
+							<span class="mr-2">보내는매장 : 판매채널/매장구분</span>
+							<div class="d-flex align-items-center">
+								<div class="flex_box w-100">
+									<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<option value=''>전체</option>
+										@foreach ($store_channel as $sc)
+											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+										@endforeach
+									</select>
+								</div>
+								<span class="mr-2 ml-2">/</span>
+								<div class="flex_box w-100">
+									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled >
+										<option value=''>전체</option>
+										@foreach ($store_kind as $sk)
+											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex">
+							<p class="mr-2">(대표)창고재고 <span id="storage_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개 / 우리매장재고 <span id="store_stock" class="text-primary font-weight-bold" style="cursor: pointer;" onclick="return openStorageStockPopup();">0</span>개</p>
+							<a href="javascript:void(0);" onclick="AddRTToFinalTable()" class="btn btn-sm btn-outline-primary shadow-sm" style="min-width:130px;">RT리스트에 등록</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<div id="div-gd-stock" class="ag-theme-balham"></div>
+			</div>
+		</div>
     </div>
 </div>
 
@@ -262,7 +281,9 @@
 
     let stock_columns = [
         {field: "prd_cd", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"}},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 30, cellStyle: {"text-align": "center"},
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+		},
         {field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 30},
         {field: "dep_store_cd",	headerName: "매장코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "dep_store_nm",	headerName: "보내는 매장", pinned: 'left', width: 140},
@@ -391,9 +412,13 @@
         let gridDiv3 = document.querySelector(pApp3.options.gridId);
         gx3 = new HDGrid(gridDiv3, rt_columns);
 
-        $("[name=store_type]").on("change", function(e) {
-            SearchStock();
-        });
+		$("[name=store_channel]").on("change", function(e) {
+			SearchStock();
+		})
+
+		$("[name=store_channel_kind]").on("change", function(e) {
+			SearchStock();
+		})
 
         // 검색조건 숨김 시 grid 높이 설정
         $(".search_mode_wrap .dropdown-menu a").on("click", function(e) {
@@ -403,6 +428,9 @@
         });
 
         Search();
+
+		// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
+		load_store_channel();
     });
 
     // 상품검색
@@ -420,12 +448,14 @@
         }
         if(!selected_prd.prd_cd) return alert("좌측에서 상품을 선택해주세요.");
 
-        let store_type = $("[name=store_type]").val();
-        let data = 'prd_cd=' + selected_prd.prd_cd + "&store_type=" + store_type;
+		let store_channel = $("[name=store_channel]").val();
+		let store_channel_kind = $("[name=store_channel_kind]").val();
+		let data = 'prd_cd=' + selected_prd.prd_cd + "&store_channel=" + store_channel + "&store_channel_kind=" + store_channel_kind;
         gx2.Request('/shop/stock/stk22/search-stock', data, -1, function(d) {
             $("#selected_prd_nm").html(`[${selected_prd.prd_cd}] ${selected_prd.goods_nm}`);
-            $("#storage_stock").html(d.body[0]?.storage_qty + ' / ' + d.body[0]?.storage_wqty);
+            // $("#storage_stock").html(d.body[0]?.storage_qty + ' / ' + d.body[0]?.storage_wqty);
             $("#store_stock").html(d.body[0]?.send_qty + ' / ' + d.body[0]?.send_wqty);
+			$("#storage_stock").html('재고 ' + d.body[0]?.storage_qty + ' / ' + '가용재고 ' + d.body[0]?.storage_wqty);
             let pinnedRow = gx2.gridOptions.api.getPinnedTopRow(0);
             let total_data = d.head.total_data;
 			if(pinnedRow && total_data != '') {

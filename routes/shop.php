@@ -472,6 +472,8 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('stk22/search-goods','stk22Controller@search_goods');
         Route::get('stk22/search-stock','stk22Controller@search_stock');
         Route::post('stk22/request-rt','stk22Controller@request_rt');
+		Route::post('stk22/chg-store-channel/{store_cd?}', 'stk22Controller@change_store_channel');
+		Route::post('stk22/chg-store-channel_kind/{store_cd?}', 'stk22Controller@change_store_channel_kind');
 
 
         // 매장별할인율적용조회
