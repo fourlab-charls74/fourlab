@@ -182,12 +182,13 @@ class stk13Controller extends Controller
 					o.prd_cd,
 					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 					pc.color,
-					ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size,
+					-- ifnull((
+					-- 	select s.size_cd from size s
+					-- 	where s.size_kind_cd = pc.size_kind
+					-- 	   and s.size_cd = pc.size
+					-- 	   and use_yn = 'Y'
+					-- ),'') as size,
+					pc.size,
 					o.goods_no,
 					op.opt_kind_nm,
 					b.brand_nm, 
