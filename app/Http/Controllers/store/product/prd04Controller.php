@@ -418,11 +418,11 @@ class prd04Controller extends Controller
 
 			// get sizes
 			$sql = "
-				select 
-					pc.size, s.size_cd
-				from product_code pc
-					left outer join size s on s.size_cd = pc.size 
-				where pc.prd_cd like '$prd_cd_p%'
+				select
+				    	s.size_cd
+				from size s
+					inner join product_code pc on pc.size = s.size_cd
+				where s.size_kind_cd = pc.size_kind and s.size_cd = pc.size and use_yn = 'Y' and pc.prd_cd like '$prd_cd_p%'
 				group by s.size_cd
 				order by s.size_seq asc
 			";
@@ -580,6 +580,7 @@ class prd04Controller extends Controller
 					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = a.color
 				group by a.storage_cd, a.color
 			";
+			
 			$storage_rows = DB::select($sql);
 
 			$values = [
