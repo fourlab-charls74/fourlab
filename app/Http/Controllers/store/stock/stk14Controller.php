@@ -141,7 +141,7 @@ class stk14Controller extends Controller
 				-- 	   and s.size_cd = pc.size
 				-- 	   and use_yn = 'Y'
 				-- ),'') as size,
-                
+                pc.size,
                 g.goods_nm_eng,
                 p.goods_opt,
                 p.qty as storage_qty,
