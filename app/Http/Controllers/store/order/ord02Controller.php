@@ -439,6 +439,14 @@ class ord02Controller extends Controller
 					array_push($failed_rows, $row['ord_no']);
 					continue;
 				}
+
+				//이미 출고등록된 자료가 존재할때 오류 처리
+				$receipt_product_cnt = DB::table('order_receipt_product')->where('ord_opt_no', '=', $row['ord_opt_no'])->where('reject_yn', '=', 'N')->count();
+				if ($receipt_product_cnt > 0) {
+					array_push($failed_rows, $row['ord_no']);
+					continue;
+				}
+
 				$order->SetOrdOptNo($row['ord_opt_no'], $row['ord_no']);
 
 				// 재고검사
