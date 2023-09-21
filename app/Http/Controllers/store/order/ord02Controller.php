@@ -310,12 +310,12 @@ class ord02Controller extends Controller
 						select
 							pc.prd_cd, if(pc.prd_cd_p = '', concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt), pc.prd_cd_p) as prd_cd_p
 							, pc.color, o.ord_opt_no as ord_opt_no_group, pc.match_yn as prd_match
-							, pc.size
+							, pc.size, pc.product_price
 							$qty_sql
 						from order_opt o
 							inner join order_mst om on om.ord_no = o.ord_no
 							left outer join (
-							    select pc.prd_cd, pc.prd_cd_p, pc.goods_no, pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt, pc.color
+							    select pc.prd_cd, pc.prd_cd_p, pc.goods_no, pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt, pc.color, p.price as product_price
 								-- , ifnull((
 								-- 	select s.size_cd from size s
 								-- 	where s.size_kind_cd = pc.size_kind
