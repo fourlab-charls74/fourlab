@@ -32,7 +32,7 @@
 	                            <option value="goods_nm">상품명</option>
 	                            <option value="style_no">스타일넘버</option>
 	                        </select>
-	                        <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_prd_keyword_out" name="search_prd_keyword_out" placeholder="검색어를 입력하세요">
+	                        <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_prd_keyword_out" name="search_prd_keyword_out" placeholder="검색어를 입력하세요" autocomplete="off">
 	                        <button type="button" id="search_btn_out" class="butt br-2 bg-lightgray p-2 pl-3 pr-3"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
 	                    </div>
 	                </div>
@@ -275,7 +275,7 @@
 			                    <option value="200">200개씩 보기</option>
 			                    <option value="500">500개씩 보기</option>
 		                    </select>
-		                    <input type="text" id="order_search_keyword" name="order_search_keyword" class="inp b-1-gray br-05 px-2 mr-2" style="width: 150px;" placeholder="휴대폰뒷자리 or 고객명">
+		                    <input type="text" id="order_search_keyword" name="order_search_keyword" class="inp b-1-gray br-05 px-2 mr-2" style="width: 150px;" placeholder="휴대폰뒷자리 or 고객명" autocomplete="off">
 	                        <button type="button" class="butt fc-white fs-10 br-05 bg-navy" style="width:80px;" onclick="return SearchOrder();">검색</button>
 	                    </div>
 	                </form>
@@ -426,7 +426,7 @@
                                     <option value="goods_nm">상품명</option>
                                     <option value="style_no">스타일넘버</option>
                                 </select>
-                                <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_prd_keyword" name="search_prd_keyword" placeholder="검색어를 입력하세요">
+                                <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_prd_keyword" name="search_prd_keyword" placeholder="검색어를 입력하세요" autocomplete="off">
                                 <button type="button" class="butt br-2 bg-lightgray p-3" onclick="return Search();"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
                             </div>
                             <div class="d-flex">
@@ -462,7 +462,7 @@
 		                                <th class="required">이름</th>
 		                                <td>
 			                                <div class="flax_box">
-				                                <input type="text" name="name" id="name" class="form-control form-control-sm" value="">
+				                                <input type="text" name="name" id="name" class="form-control form-control-sm" value="" autocomplete="off">
 			                                </div>
 		                                </td>
 	                                </tr>
@@ -472,15 +472,15 @@
 			                                <div class="d-flex flex-column flex-sm-row">
 				                                <div class="form-inline mr-1 mb-2 mb-sm-0" style="width:100%;max-width:400px;vertical-align:top;">
 					                                <div class="form-inline-inner input_box" style="width:30%;">
-						                                <input type="text" name="mobile1" id="mobile1" class="form-control form-control-sm" maxlength="3" onkeyup="onlynum(this)">
+						                                <input type="text" name="mobile1" id="mobile1" class="form-control form-control-sm" maxlength="3" onkeyup="onlynum(this)" autocomplete="off">
 					                                </div>
 					                                <span class="text_line">-</span>
 					                                <div class="form-inline-inner input_box" style="width:29%;">
-						                                <input type="text" name="mobile2" id="mobile2" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)">
+						                                <input type="text" name="mobile2" id="mobile2" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)" autocomplete="off">
 					                                </div>
 					                                <span class="text_line">-</span>
 					                                <div class="form-inline-inner input_box" style="width:29%;">
-						                                <input type="text" name="mobile3" id="mobile3" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)">
+						                                <input type="text" name="mobile3" id="mobile3" class="form-control form-control-sm" maxlength="4" onkeyup="onlynum(this)" autocomplete="off">
 					                                </div>
 				                                </div>
 				                                <input type="hidden" name="user_mobile_check" id="user_mobile_check" value="N">
@@ -493,7 +493,7 @@
                                         <td>
 	                                        <div class="d-flex flex-column">
 	                                            <div class="flax_box inline_btn_box" style="padding-right:75px;">
-	                                                <input type="text" name="user_id" id="user_id" class="form-control form-control-sm" readonly>
+	                                                <input type="text" name="user_id" id="user_id" class="form-control form-control-sm" autocomplete="off" readonly>
 	                                                <input type="hidden" name="user_id_check" id="user_id_check" value="N">
 	                                                <a href="#" onclick="return checkUserId();" class="butt d-flex justify-content-center align-items-center fc-white fw-sb br-05 bg-gray" style="width:70px;">중복확인</a>
 	                                            </div>
@@ -555,7 +555,7 @@
                                                     </a>
                                                 </div>
                                                 <input type="text" id="addr1" name="addr1" class="form-control form-control-sm w-100 mb-2" readonly="readonly">
-                                                <input type="text" id="addr2" name="addr2" class="form-control form-control-sm w-100">
+                                                <input type="text" id="addr2" name="addr2" class="form-control form-control-sm w-100" autocomplete="off">
                                             </div>
                                         </td>
                                     </tr>
@@ -634,7 +634,7 @@
                                     <option value="phone">휴대폰번호</option>
                                     <option value="user_nm">고객명</option>
                                 </select>
-                                <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_member_keyword" name="search_member_keyword" placeholder="검색어를 입력하세요">
+                                <input type="text" class="flex-1 inp h-40 fs-10 mr-1" id="search_member_keyword" name="search_member_keyword" placeholder="검색어를 입력하세요" autocomplete="off">
                                 <button type="button" class="butt br-2 bg-lightgray p-3" onclick="return SearchMember();"><i class="fa fa-search fc-black fs-10" aria-hidden="true"></i></button>
                             </div>
                             <p class="d-flex mb-2">* <span class="d-block ml-2 mr-1" style="width: 50px;height: 15px;background-color:#c9f9f9;"></span> : 본 매장 고객</p>
@@ -673,7 +673,7 @@
                                     <p><strong id="total_order_amt2" class="fw-b mr-1">0</strong>원</p>
                                 </div>
                                 <div id="payment_calculator" class="calculator-grid payment fs-20 mt-4">
-                                    <input type="text" id="pay_press_amt" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;" value="0">
+                                    <input type="text" id="pay_press_amt" class="inp fc-black fs-20 fw-b text-right pr-3" style="grid-area:a;border:2px solid #bbb;" value="0" autocomplete="off">
                                     <button type="button" class="butt bg-white" value="1" style="grid-area:b;">1</button>
                                     <button type="button" class="butt bg-white" value="2" style="grid-area:c;">2</button>
                                     <button type="button" class="butt bg-white" value="3" style="grid-area:d;">3</button>
@@ -791,7 +791,7 @@
                                                     <div class="form-group">
                                                         <label style="min-width:80px;">은행</label>
                                                         <div class="flex_box">
-                                                            <input type="text" name="store_refund_bank" id="store_refund_bank" value="" class="form-control form-control-sm">
+                                                            <input type="text" name="store_refund_bank" id="store_refund_bank" value="" class="form-control form-control-sm" autocomplete="off">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -799,7 +799,7 @@
                                                     <div class="form-group">
                                                         <label style="min-width:80px;">예금주</label>
                                                         <div class="flex_box">
-                                                            <input type="text" name="store_refund_nm" id="store_refund_nm" value="" class="form-control form-control-sm">
+                                                            <input type="text" name="store_refund_nm" id="store_refund_nm" value="" class="form-control form-control-sm" autocomplete="off">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -809,7 +809,7 @@
                                                     <div class="form-group">
                                                         <label style="min-width:80px;">환불계좌</label>
                                                         <div class="flex_box">
-                                                            <input type="text" name="store_refund_account" id="store_refund_account" value="" class="form-control form-control-sm">
+                                                            <input type="text" name="store_refund_account" id="store_refund_account" value="" class="form-control form-control-sm" autocomplete="off">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -819,7 +819,7 @@
                                                     <div class="form-group">
                                                         <label style="min-width:80px;">메모</label>
                                                         <div class="flex_box">
-                                                            <input type="text" name="store_refund_memo" id="store_refund_memo" value="" class="form-control form-control-sm">
+                                                            <input type="text" name="store_refund_memo" id="store_refund_memo" value="" class="form-control form-control-sm" autocomplete="off">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -852,7 +852,7 @@
                         </div>
                         <div class="card-body b-none mt-4">
                             <div class="d-flex align-items-center fs-12 mb-4">
-                                <input type="text" id="search_ord_no" class="inp fs-14 fw-sb pl-2 w-100" style="height: 50px;border: solid #ED2939;border-width: 2px 0 2px 2px;" placeholder="주문번호로 검색">
+                                <input type="text" id="search_ord_no" class="inp fs-14 fw-sb pl-2 w-100" style="height: 50px;border: solid #ED2939;border-width: 2px 0 2px 2px;" placeholder="주문번호로 검색" autocomplete="off">
                                 <button type="button" id="search_ord_no_btn" class="butt bg-red" style="width: 60px;height: 50px;"><i class="fa fa-search fc-white fs-14" aria-hidden="true"></i></button>
                             </div>
                             <div id="search_ord_no_result"></div>
