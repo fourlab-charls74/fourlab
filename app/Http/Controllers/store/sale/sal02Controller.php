@@ -136,11 +136,7 @@ class sal02Controller extends Controller
 		for ($i = 0; $i < $max_day; $i++) {
 			$day = $i + 1;
 			$comma = ($day == $max_day) ? "" : ",";
-			if ($list_type == 'recv_amt') {
-				$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) - sum(if(day(w.ord_state_date) = ${day}, if(w.ord_state > 30, w.recv_amt, 0), 0)) as ${day}_val${comma}";
-			} else {
-				$sum .= "sum(if(day(m.ord_date) = ${day}, ${sum_true}, ${sum_false})) as ${day}_val${comma}";
-			}
+			$sum .= "sum(if(day(w.ord_state_date) = ${day} ,if(w.ord_state > 30, ${sum_true} * -1, ${sum_true}),0)) as ${day}_val${comma}";
 			$total_sum .= ", sum(t.${day}_val) as ${day}_val";
 
 			// 해당 월의 모든 요일 구하기
@@ -153,67 +149,74 @@ class sal02Controller extends Controller
 
 		$sql = /** @lang text */
             "
-			select 
+			select
 				a.*
 				, s.store_cd
 				, s.store_nm
 				, ifnull(p.amt,0) as proj_amt
 				, sc.store_channel as store_channel
 				, sc2.store_kind as store_channel_kind
-			from store s 
+			from store s
 				left outer join (
-					select 
-						m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
-						${sum}
-					from order_opt_wonga w 
-						inner join order_opt o on w.ord_opt_no = o.ord_opt_no 
-						inner join order_mst m on m.ord_no = o.ord_no
-						inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
-						left outer join product_code pc on pc.prd_cd = o.prd_cd
-					where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
-					group by m.store_cd
+				   select
+					  m.store_cd, sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty,
+					  sum(o.price*o.qty) as ord_amt,
+					  sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
+					  w.ord_state,
+					  ${sum}
+				   from order_opt_wonga w
+					  inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					  inner join order_mst m on m.ord_no = o.ord_no
+					  inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
+					  left outer join product_code pc on pc.prd_cd = o.prd_cd
+				   where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
+				   group by m.store_cd
 				) a on s.store_cd = a.store_cd
-                left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
+						 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
-            where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null) $where2
+			where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null) $where2
 		";
 			
 		$rows = DB::select($sql, ['sdate' => $startdate.'01', 'edate' => $edate, 'ym' => $ym]);
 
 		$sql = "
-			select 
-					count(t.store_nm) as total
-					, sum(t.proj_amt) as proj_amt
-					, sum(t.recv_amt) as recv_amt
-			     	, round(sum(t.recv_amt) / sum(t.proj_amt) * 100, 0) as progress_proj_amt
-					, sum(t.qty) as qty
-					, sum(t.ord_amt) as ord_amt
-					${total_sum}
+
+			select
+				   count(t.store_nm) as total
+				   , sum(t.proj_amt) as proj_amt
+				   , sum(t.recv_amt) as recv_amt
+					, round(sum(t.recv_amt) / sum(t.proj_amt) * 100, 0) as progress_proj_amt
+				   , sum(t.qty) as qty
+				   , sum(t.ord_amt) as ord_amt
+				   ${total_sum}
 			from (
-				select 
-					s.store_nm
-					, a.*
-					, ifnull(p.amt,0) as proj_amt
-					, sc.store_channel as store_channel
-					, sc2.store_kind as store_channel_kind
-				from store s 
-					left outer join (
-						select 
-							m.store_cd, sum(o.qty) as qty, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
-							${sum}
-						from order_opt_wonga w 
-							inner join order_opt o on w.ord_opt_no = o.ord_opt_no 
-							inner join order_mst m on m.ord_no = o.ord_no
-							inner join goods g on o.goods_no = g.goods_no
-							left outer join brand b on g.brand = b.brand
-							left outer join product_code pc on pc.prd_cd = o.prd_cd
-						where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
-						group by m.store_cd
-					) a on s.store_cd = a.store_cd
-					left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`			
-					left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
-					left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+				select
+				   s.store_nm
+				   , a.*
+				   , ifnull(p.amt,0) as proj_amt
+				   , sc.store_channel as store_channel
+				   , sc2.store_kind as store_channel_kind
+				from store s
+				   left outer join (
+					  select
+					     m.store_cd,
+						 sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty, 
+						 sum(o.price*o.qty) as ord_amt,
+						 sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,  
+						 ${sum}
+					  from order_opt_wonga w
+						 inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+						 inner join order_mst m on m.ord_no = o.ord_no
+						 inner join goods g on o.goods_no = g.goods_no
+						 left outer join brand b on g.brand = b.brand
+						 left outer join product_code pc on pc.prd_cd = o.prd_cd
+					  where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
+					  group by m.store_cd
+				   ) a on s.store_cd = a.store_cd
+				   left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
+				   left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				   left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
 				where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null) $where2
 			) t
 			
