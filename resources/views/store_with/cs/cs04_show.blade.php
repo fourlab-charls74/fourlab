@@ -45,26 +45,6 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">이동일자</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    @if(@$cmd == 'add')
-                                                    <div class="docs-datepicker form-inline-inner input_box w-100">
-                                                        <div class="input-group">
-                                                            <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off">
-                                                            <div class="input-group-append">
-                                                                <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="docs-datepicker-container"></div>
-                                                    </div>
-                                                    @else
-                                                    <p class="fs-14">{{ $sgr->sgr_date }}</p>
-                                                    @endif
-                                                </div>
-                                            </td>
 	                                        <th class="required">출고창고</th>
 	                                        <td>
 		                                        <div class="form-inline">
@@ -101,7 +81,7 @@
 		                                        </div>
 	                                        </td>
                                             <th>메모</th>
-                                            <td colspan="3">
+                                            <td>
                                                 <div class="form-inline">
                                                     <textarea name="comment" id="comment" class="w-100" rows="1">{{ @$sgr->comment }}</textarea>
                                                 </div>
@@ -247,7 +227,7 @@
         let rows = gx.getRows();
 
         if(cmd === 'add') {
-            let sgr_date = document.f1.sdate.value;
+            //let sgr_date = document.f1.sdate.value;
             let storage_cd = document.f1.storage_cd.value;
             let target_cd = document.f1.target_cd.value;
 
@@ -266,7 +246,7 @@
                 url: '/store/cs/cs04/add-storage-return',
                 method: 'put',
                 data: {
-                    sgr_date,
+                    //sgr_date,
                     storage_cd,
                     target_cd,
                     comment,
@@ -285,7 +265,7 @@
                 console.log(err);
             });
         } else if(cmd === 'update') {
-            let sgr_state = '{{ @$sgr->sgr_state }}';
+            //let sgr_state = '{{ @$sgr->sgr_state }}';
             let sgr_cd = '{{ @$sgr->sgr_cd }}';
 
             if('{{ @$sgr->sgr_state }}' != 10) return alert("창고간이동이 '접수'상태일떄만 수정가능합니다.");

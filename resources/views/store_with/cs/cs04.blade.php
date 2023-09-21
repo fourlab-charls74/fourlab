@@ -212,6 +212,8 @@
         {field: "sgr_qty", headerName: "이동수량", type: "currencyType", width: 60},
         {field: "sgr_price", headerName: "이동금액", type: "currencyType", width: 80},
         {field: "comment", headerName: "메모", width: 300},
+		{field: "rt", headerName: "등록일자", width: 110, cellStyle: {"line-height": "30px"}},
+		{field: "ut", headerName: "수정일자", width: 110, cellStyle: {"line-height": "30px"}},
         {width: 0}
 	];
 

@@ -77,12 +77,6 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th>이동일자</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="sgr_date"></p>
-                                                </div>
-                                            </td>
 	                                        <th>출고창고</th>
 	                                        <td>
 		                                        <div class="form-inline">
@@ -104,7 +98,7 @@
 		                                        </div>
 	                                        </td>
                                             <th>메모</th>
-                                            <td colspan="3">
+                                            <td>
                                                 <div class="form-inline">
                                                     <p class="fs-14" id="comment"></p>
                                                 </div>
@@ -277,13 +271,12 @@
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var excel_columns = {
-			'A': 'sgr_date',
-			'B': 'storage_cd',
-			'C': 'target_cd',
-            'D': 'comment',
-            'E': 'prd_cd',
-            'F': 'return_price',
-            'G': 'return_qty',
+			'A': 'storage_cd',
+			'B': 'target_cd',
+            'C': 'comment',
+            'D': 'prd_cd',
+            'E': 'return_price',
+            'F': 'return_qty',
 		};
 
         var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
@@ -381,7 +374,7 @@
     function setBasicInfo(obj) {
         basic_info = {...obj};
         
-        $("#sgr_date").text(basic_info.sgr_date);
+        //$("#sgr_date").text(basic_info.sgr_date);
         $("#sgr_idx").text(basic_info.sgr_idx);
         $("#target_nm").text(basic_info.target_nm);
         $("#storage_nm").text(basic_info.storage_nm);
@@ -394,10 +387,10 @@
     // 상품반품 일괄등록
     function Save() {
         let rows = gx.getRows();
-        if(basic_info.sgr_date === undefined) return alert("일괄등록할 엑셀 파일을 적용해주세요.");
+        //if(basic_info.sgr_date === undefined) return alert("일괄등록할 엑셀 파일을 적용해주세요.");
         if(rows.length < 1) return alert("일괄등록할 상품이 존재하지 않습니다.");
 
-        let sgr_date = basic_info.sgr_date;
+        //let sgr_date = basic_info.sgr_date;
         let storage_cd = basic_info.storage_cd;
         let target_type = basic_info.target_type;
         let target_cd = basic_info.target_cd;
@@ -413,7 +406,7 @@
             method: 'put',
             data: {
                 sgr_type: 'B',
-                sgr_date,
+                //sgr_date,
                 storage_cd,
                 target_type,
                 target_cd,

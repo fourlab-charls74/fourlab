@@ -78,7 +78,9 @@ class cs04Controller extends Controller
                 (select storage_nm from storage where storage_cd = sgr.target_cd) as target_nm,
                 (select sum(return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_qty,
                 (select sum(return_price * return_qty) from storage_return_product where sgr_cd = sgr.sgr_cd) as sgr_price,
-                sgr.comment
+                sgr.comment,
+                sgr.rt, 
+                sgr.ut
             from storage_return sgr
             where sgr.target_type = 'S' $where
             $orderby
@@ -121,6 +123,7 @@ class cs04Controller extends Controller
         $admin_id = Auth('head')->user()->id;
         $admin_nm = Auth('head')->user()->name;
         $data = $request->input("data", []);
+		$sgr_date	= date('Y-m-d');
 
         try {
             DB::beginTransaction();
@@ -129,9 +132,10 @@ class cs04Controller extends Controller
                 DB::table('storage_return')
                     ->where('sgr_cd', '=', $d['sgr_cd'])
                     ->update([
-                        'sgr_state' => $new_state,
-                        'ut' => now(),
-                        'admin_id' => $admin_id,
+						'sgr_date'	=> $sgr_date,
+                        'sgr_state'	=> $new_state,
+                        'ut'		=> now(),
+                        'admin_id'	=> $admin_id,
                     ]);
                 
                 $sql = "
@@ -389,7 +393,7 @@ class cs04Controller extends Controller
         $admin_nm = Auth('head')->user()->name;
         $sgr_type = $request->input("sgr_type", "G");
         $sgr_state = $sgr_type == "G" ? 10 : 30;
-        $sgr_date = $request->input("sgr_date", date("Y-m-d"));
+        $sgr_date = date("Y-m-d");
         $storage_cd = $request->input("storage_cd", "");
         $target_type = "S"; // 창고로 이동
         $target_cd = $request->input("target_cd", "");
