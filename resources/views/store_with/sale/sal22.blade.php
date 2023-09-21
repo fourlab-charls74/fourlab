@@ -162,125 +162,131 @@
 </div>
 
 <style>
-	.ag-row-level-3 {background-color: #edf4fd !important;}
-	/* .ag-row-level-2 {background-color: #e2e2e2 !important;} */
+	.ag-row-level-1 {background-color: #f2f2f2 !important;}
+	.ag-row-level-2 {background-color: #e2e2e2 !important;}
 </style>
 
 <script language="javascript">
     const pinnedRowData = [{ storage_cd: '합계'}];
-    // const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+    const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     let AlignCenter = {"text-align": "center"};
     let columns = [
         {field: "storage_nm",	headerName: "창고명", rowGroup: true, hide: true},
-        {field: "storage_cd", headerName: "창고코드", rowGroup: true, hide: true},
-        {headerName: '창고명', showRowGroup: 'storage_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 130, pinned: 'left'},
         {field: "storage_cd" , headerName: "창고코드", width: 90, cellStyle: {"text-align": "center"}, pinned: 'left',
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.value == '합계' ? '합계' : params.node.level == 1 ? params.value : '',
+			cellRenderer: (params) => params.value == '합계' ? '합계' : params.node.level == 0 ? params.value : '',
 		},
+        {headerName: '창고명', showRowGroup: 'storage_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 130, pinned: 'left'},
         {headerName: '품번', showRowGroup: 'prd_cd_p', pinned: "left", cellRenderer: 'agGroupCellRenderer', minWidth: 150},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter, pinned:'left'},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter, pinned:'left'},
-        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: AlignCenter},
-        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: AlignCenter},
-        {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter},
-        {field: "prd_nm", headerName: "상품명", width: 200,
-            cellRenderer: function (params) {
-                    if (params.value !== undefined) {
-                        if(params.data.goods_no == '0') { 
-                            return '<a href="javascript:void(0);" onclick="return alert(`온라인코드가 비어있는 상품입니다.`);">' + params.value + '</a>';
-                        }
-                        
-                        return '<a href="#" onclick="return openStoreProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-                    }
-                }
+        {field: "prd_cd", headerName: "바코드", width: 140, cellStyle: AlignCenter},
+        {field: "goods_no", headerName: "온라인코드", width: 80, cellStyle: AlignCenter,
+			aggFunc: (params) => params.rowNode.level === 0 ? '' : (params.values?.[0] || ''),
         },
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
+        {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter,
+			aggFunc: (params) => params.rowNode.level === 0 ? '' : (params.values?.[0] || ''),
+        },
+        {field: "prd_nm", headerName: "상품명", width: 200,
+			aggFunc: (params) => params.rowNode.level === 0 ? '' : (params.values?.[0] || ''),
+			cellRenderer: function (params) {
+				if (params.node.rowPinned === 'top') return '';
+				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
+					return params.value;
+				} else {
+					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					return '<a href="#" onclick="return openStoreProduct(\'' + goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+        },
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200,
+			aggFunc: (params) => params.rowNode.level === 0 ? '' : (params.values?.[0] || ''),
+        },
         {field: "prd_cd_p", headerName: "품번", rowGroup: true, hide: true},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "wonga", headerName: "원가", width: 80, type: "currencyType"},
-        {field: "goods_sh", headerName: "정상가", width: 80, type: "currencyType"},
-        {field: "price", headerName: "현재가", width: 80, type: "currencyType"},
+        {field: "wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: "first"},
+        {field: "goods_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: "first"},
+        {field: "price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: "first"},
         {
             headerName: "이전재고",
             children: [
-                {field: "prev_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "prev_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "prev_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "prev_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "prev_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "prev_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "prev_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "prev_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "상품입고",
             children: [
-                {field: "storage_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "storage_in_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "storage_in_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "storage_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "storage_in_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "storage_in_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "storage_in_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "storage_in_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "상품반품",
             children: [
-                {field: "storage_return_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "storage_return_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "storage_return_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "storage_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "storage_return_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "storage_return_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "storage_return_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "storage_return_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "매장출고",
             children: [
-                {field: "store_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_out_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "store_out_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "store_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "store_out_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_out_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_out_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_out_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "매장반품",
             children: [
-                {field: "store_return_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "store_return_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "store_return_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "store_return_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "store_return_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_return_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_return_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "store_return_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "이동입고",
             children: [
-                {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_in_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "rt_in_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "rt_in_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "rt_in_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "rt_in_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "rt_in_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "rt_in_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "이동출고",
             children: [
-                {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "rt_out_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "rt_out_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "rt_out_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "rt_out_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "rt_out_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "rt_out_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "rt_out_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "LOSS",
             children: [
-                {field: "loss_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "loss_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "loss_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "loss_wonga", headerName: "원가금액", width: 80, type: "currencyType"},
+                {field: "loss_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "loss_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "loss_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "loss_wonga", headerName: "원가금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
         {
             headerName: "기말재고",
             children: [
-                {field: "term_qty", headerName: "수량", width: 50, type: "currencyType"},
-                {field: "term_sh", headerName: "정상가", width: 80, type: "currencyType"},
-                {field: "term_price", headerName: "현재가", width: 80, type: "currencyType"},
-                {field: "term_wonga", headerName: "원가", width: 80, type: "currencyType"},
+                {field: "term_qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "term_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "term_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+                {field: "term_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
             ]
         },
     ];
