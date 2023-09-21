@@ -230,8 +230,11 @@
 													<input type='text' class="form-control form-control-sm" name='price' id="price" value='' onkeyup="onlynum(this)">
 												</div>
 											</td>
-											<th></th>
+											<th>원산지</th>
 											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='origin' id="origin" value=''>
+												</div>
 											</td>
 										</tr>
 										<tr>
@@ -252,7 +255,6 @@
 											</td>
 										</tr>
 								</table>
-
 								<div style="width:100%;padding-top:20px;text-align:center;">
 									<button type="button" class="btn btn-primary ml-2" onclick="add()">추가</button>
 								</div>
@@ -263,7 +265,6 @@
 				</div>
 			</div>
 		</div>
-
 		<div class="card">
 			<div class="card-header mb-0">
 				<a href="#">일괄저장목록</a>
@@ -280,13 +281,11 @@
 					</div>
 				</div>
 				<div class="table-responsive">
-						<div id="div-gd" class="ag-theme-balham"></div>
-					</div>
+					<div id="div-gd" class="ag-theme-balham"></div>
+				</div>
 			</div>
 		</div>
-
 	</form>
-
 </div>
 
 <script>
@@ -317,8 +316,8 @@
 		{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 		{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 		{field: "tag_price", headerName: "정상가", type: 'currencyType', width: 80},
-		
 		{field: "sup_com", headerName: "공급업체", width: 120},
+		{field: "origin", headerName: "원산지", width: 120},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
@@ -429,7 +428,8 @@
 				seq: seq,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value,
-                tag_price: document.f1.tag_price.value
+                tag_price: document.f1.tag_price.value,
+				origin: document.f1.origin.value
 			});
 
 			let rows = {
@@ -453,7 +453,8 @@
 				seq: seq,
 				price: document.f1.price.value,
 				wonga: document.f1.wonga.value,
-                tag_price: document.f1.tag_price.value
+                tag_price: document.f1.tag_price.value,
+				origin: document.f1.origin.value,
 			};
 
 			addRow(rows);

@@ -172,7 +172,7 @@ class sal02Controller extends Controller
 				   where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
 				   group by m.store_cd
 				) a on s.store_cd = a.store_cd
-						 left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
+				left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
 			where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or qty is not null) $where2

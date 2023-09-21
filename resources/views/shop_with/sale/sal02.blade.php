@@ -67,7 +67,7 @@
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/상품코드</label>
+							<label for="style_no">스타일넘버/온라인코드</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
 									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
@@ -82,15 +82,15 @@
 							</div>
                         </div>
 					</div>
-					<div class="col-lg-4">
-						<div class="form-group">
-                            <label for="brand_cd">브랜드</label>
-                            <div class="form-inline inline_btn_box">
-                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-					</div>
+{{--					<div class="col-lg-4">--}}
+{{--						<div class="form-group">--}}
+{{--                            <label for="brand_cd">브랜드</label>--}}
+{{--                            <div class="form-inline inline_btn_box">--}}
+{{--                                <select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>--}}
+{{--                                <a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--					</div>--}}
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="qty">집계구분</label>
@@ -156,34 +156,33 @@
 	};
 
 	var columns = [
-		{ headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", aggAvg:"평균", cellStyle: { 'text-align': "center" },
+
+		{ field: "store_channel", headerName: "판매채널", pinned:'left', minWidth:100, cellStyle: { 'text-align': "center" } },
+		{ field: "store_channel_kind", headerName: "매장구분", pinned:'left', minWidth:100, cellStyle: { 'text-align': "center" } },
+		{ field: "store_cd", headerName: "매장코드", pinned:'left', width:70, cellStyle: { 'text-align': "center" },
 			cellRenderer: function (params) {
 				if (params.node.rowPinned === 'top') {
 					return "합계";
 				} else {
-					return parseInt(params.value) + 1;
+					return params.value;
 				}
 			}
 		},
-		{ field: "store_cd", headerName: "매장코드", pinned:'left', width:70, cellStyle: { 'text-align': "center" } },
-		{ field: "store_type_nm", headerName: "매장구분", pinned:'left', width:90, cellStyle: { 'text-align': "center" } },
 		{ field: "store_nm", headerName: "매장명", pinned:'left', type: 'ShopNameType', width: 250 },
 		{ field: "proj_amt", headerName: "목표", pinned:'left', width:85, type: 'currencyType', aggregation:true },
         { field: "progress_proj_amt", headerName: "달성율(%)", pinned:'left', width:85, type: 'percentType',
 			cellRenderer: function (params) {
 				if (params.node.rowPinned === 'top') {
-					return "";
+					return params.data.progress_proj_amt;
 				} else {
-					let { proj_amt, recv_amt } = params.data;
+					let proj_amt = params.data.proj_amt;
+					let recv_amt = params.data.recv_amt;
 					/**
 					 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
 					 */
 					let progress = 0;
 					proj_amt = toInt(proj_amt);
 					recv_amt = toInt(recv_amt);
-
-					// if (progress > 100) return progress = 100; // 달성율 100 넘어가는 경우 100으로 고정
-					// if (proj_amt <= recv_amt) return progress = 100; // 목표액보다 큰 경우 100 처리
 
 					progress = ( recv_amt / proj_amt ) * 100;
 					progress = Comma(Math.round(progress * 1)); // 소수점 첫째짜리까지 반올림 처리
@@ -203,7 +202,7 @@
 				{ headerName: "오프라인", field: "offline", type: 'numberType', aggregation: true },
 				{ headerName: "온라인", field: "online", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
 				{ headerName: "주문수량", field: "qty", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
-				{ headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
+				// { headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
 				{ headerName: "결제금액", field: "recv_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' }
 			]
 		}
@@ -258,7 +257,7 @@
 		let options = {
 			getRowStyle: (params) => {
 				if (params.node.rowPinned === 'top') {
-					return { 'background': '#eee' }
+					return { 'font-weight': 'bold', 'background': '#eee', 'border': 'none'};
 				}
 			}
 		}

@@ -31,9 +31,27 @@ class sal28Controller extends Controller
 	{
 		$sdate		= str_replace("-", "", $request->input("sdate", date('Ymd')));
 		$edate		= str_replace("-", "", $request->input("edate", date("Ymd")));
-		$storage_cd	= $request->input('storage_cd');
+		$storage_cd = $request->input('storage_no');
+		
 
-		$where	= "";
+		$where = "";
+		$where_storage = "";
+
+		// 창고검색
+		if ( $storage_cd != "" ) {
+			$where	.= " and (1!=1";
+			foreach($storage_cd as $sc) {
+				$where .= " or hst.location_cd = '$sc' ";
+			}
+			$where	.= ")";
+			
+			// 창고 총재고 정보 where
+			$where_storage	.= " and (1!=1";
+			foreach($storage_cd as $sc) {
+				$where_storage .= " or storage_cd = '$sc' ";
+			}
+			$where_storage	.= ")";
+		}
 
 		$limit	= 100;
 
@@ -60,12 +78,12 @@ class sal28Controller extends Controller
 						from product_stock_hst hst
 						where
 							hst.location_type = 'STORAGE'
-							and hst.location_cd = :storage_cd
 							and hst.stock_state_date >= :sdate and hst.stock_state_date <= :edate
+							$where
 						group by hst.stock_state_date
 					) a
 				";
-			$row = DB::selectOne($sql, ['storage_cd' => $storage_cd, 'sdate' => $sdate, 'edate' => $edate]);
+			$row = DB::selectOne($sql, ['sdate' => $sdate, 'edate' => $edate]);
 			$total = $row->total;
 			if ($total > 0) {
 				$page_cnt = (int)(($total - 1) / $page_size) + 1;
@@ -73,8 +91,8 @@ class sal28Controller extends Controller
 		}
 		
 		//창고 총재고 정보
-		$sql	= " select sum(qty) as period_out_qty from product_stock_storage where storage_cd = :storage_cd ";
-		$row	= DB::selectOne($sql, ['storage_cd' => $storage_cd]);
+		$sql	= " select sum(qty) as period_out_qty from product_stock_storage where 1=1 $where_storage ";
+		$row	= DB::selectOne($sql);
 		$total_qty	= $row->period_out_qty;
 		
 		//기간 후 재고 정보
@@ -84,15 +102,16 @@ class sal28Controller extends Controller
 			from product_stock_hst hst
 			where
 				hst.location_type = 'STORAGE'
-				and hst.location_cd = :storage_cd
 				and hst.stock_state_date >= :sdate
+				$where
 		";
-		$row	= DB::selectOne($sql, ['storage_cd' => $storage_cd, 'sdate' => $sdate]);
+		$row	= DB::selectOne($sql, [ 'sdate' => $sdate]);
 		$period_out_qty	= $row->period_out_qty;
 
 		$sql	=
 			"
 				select
+				    a.location_cd as location_cd,
 					a.stock_state_date,
 					( a.storage_in_qty + a.rt_in_qty ) as in_qty,
 					( a.storage_return_qty + a.storage_out_qty + a.rt_out_qty ) as out_qty,
@@ -103,6 +122,7 @@ class sal28Controller extends Controller
 				from
 				(
 					select
+					    s.storage_nm as location_cd,
 						hst.stock_state_date,
 						sum(if(hst.type = 1, hst.qty, 0)) as storage_in_qty,					-- 상품입고
 						sum(if(hst.type = 16 and hst.qty > 0, hst.qty, 0)) as rt_in_qty,		-- 이동입고
@@ -113,10 +133,11 @@ class sal28Controller extends Controller
 						sum(if(hst.type = 14, hst.qty * -1, 0)) as loss_qty,					-- LOSS
 						sum(hst.qty) as qty														-- 기간재고
 					from product_stock_hst hst
+						inner join storage s on s.storage_cd = hst.location_cd
 					where
 						hst.location_type = 'STORAGE'
-						and hst.location_cd = :storage_cd
 						and hst.stock_state_date >= :sdate and hst.stock_state_date <= :edate
+						$where
 					group by hst.stock_state_date
 				) a
 	            limit $startno,$page_size
@@ -124,7 +145,7 @@ class sal28Controller extends Controller
 		
 		$term_qty	= $total_qty - $period_out_qty;
 		
-		$rows = DB::select($sql, ['storage_cd' => $storage_cd, 'sdate' => $sdate, 'edate' => $edate]);
+		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
 		foreach ($rows as $row) {
 			$term_qty		= $term_qty + $row->period_in_qty;
 			$row->term_qty	= $term_qty;

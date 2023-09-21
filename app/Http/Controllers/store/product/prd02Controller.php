@@ -2285,7 +2285,7 @@ class prd02Controller extends Controller
 				$price 		= $row['price'];
 				$wonga 		= $row['wonga'];
 				$tag_price 	= $row['tag_price'];
-//				$origin 	= $row['origin'];
+				$origin 	= $row['origin'];
 //				$plan_category 	= $row['plan_category'];
 				
 				$brand 		= explode(' : ', $brand);
@@ -2326,7 +2326,7 @@ class prd02Controller extends Controller
 						'wonga' => $wonga,
 						'tag_price' => $tag_price,
 						'com_id' => $sup_com[0],
-//						'origin' => $origin,
+						'origin' => $origin,
 						'unit' => $unit,
 						'rt' => now(),
 						'ut' => now(),

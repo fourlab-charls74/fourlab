@@ -198,7 +198,8 @@
 
             // 계산금액 표시
             let amt = e.head.amts;
-            $("[name=total_sale_amt]").val(Comma(amt.total_sale_amt || 0));
+            // $("[name=total_sale_amt]").val(Comma(amt.total_sale_amt || 0));
+            $("[name=total_sale_amt]").val(Comma(amt.total_recv_amt || 0));
             $("[name=total_dc_amt]").val(Comma(amt.total_dc_amt || 0));
             $("[name=dc_price]").val(Comma(amt.dc_price || 0));
             $("[name=left_dc_price]").val(Comma(amt.left_dc_price || 0));

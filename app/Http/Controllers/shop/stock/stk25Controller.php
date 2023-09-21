@@ -47,7 +47,7 @@ class stk25Controller extends Controller
 
 	public function search(Request $request)
 	{	
-        $store_cd = $request->input("store_no", "");
+		$store_cd = Auth('head')->user()->store_cd;
 		$sale_month = str_replace('-', '', $request->input('sdate', ''));
         $sale_types = [];
         $where = "";
@@ -135,7 +135,8 @@ class stk25Controller extends Controller
                 cast((sum(ow.price * ow.qty) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt,
                 sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty) as dc_price,
                 (cast((sum(ow.price * ow.qty) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty)) as left_dc_price,
-                stas.apply_rate
+                stas.apply_rate,
+                sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) as total_recv_amt -- 판매내역의 실결제금액
             from order_opt_wonga ow
                 inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
                 inner join order_mst om on om.ord_no = o.ord_no
@@ -143,12 +144,12 @@ class stk25Controller extends Controller
                 inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
                 inner join goods g on g.goods_no = o.goods_no
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                inner join brand b on b.brand = g.brand
+                -- inner join brand b on b.brand = g.brand
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join sale_type st on st.sale_kind = o.sale_kind
                 left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
             where 1=1 
-                and ow.ord_state = 30
+                and ow.ord_state in (30, 60, 61)
                 and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
                 $where
         ";

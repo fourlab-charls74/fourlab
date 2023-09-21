@@ -56,13 +56,11 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">창고</label>
-							<div class="d-flex">
-								<select name='storage_cd' class="form-control form-control-sm">
-									@foreach (@$storages as $storage)
-										<option value='{{ $storage->storage_cd }}'>{{ $storage->storage_nm }}</option>
-									@endforeach
-								</select>
+							<label>창고명</label>
+							<div class="form-inline inline_btn_box">
+								<input type='hidden' id="storage_nm" name="storage_nm">
+								<select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select" multiple></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
@@ -97,6 +95,7 @@
 	const columns = [
 		{headerName: '#',	width:35,	type:'NumType',	cellStyle: {"background":"#F5F7F7", "text-align":"center"}},
 		{field: "stock_state_date",	headerName: "일자",	width: 120,	cellClass: 'hd-grid-code'},
+		{field: "location_cd",	headerName: "창고명",	width: 120,	cellClass: 'hd-grid-code'},
 		{field: "in_qty",	headerName: "입고",	width: 100, type: "currencyType"},
 		{field: "out_qty",	headerName: "출고",	width: 100, type: "currencyType"},
 		{field: "return_qty",	headerName: "반품",	width: 100, type: "currencyType"},
@@ -116,10 +115,12 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
-		Search();
 	});
 
 	function Search() {
+		let storage_no = $("#storage_no").val();
+		if (storage_no.length < 1) return alert('조회할 창고를 선택해주세요.');
+		
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/store/sale/sal28/search', data, 1);
 	}
