@@ -229,6 +229,7 @@ class ord02Controller extends Controller
 
 		$sql = "
 			select a.*
+			    , p.price as product_price
 				, os.code_val as ord_state_nm
 				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
@@ -290,6 +291,7 @@ class ord02Controller extends Controller
 				$orderby
 				$limit
 			) a
+			    left outer join product p on p.prd_cd = a.prd_cd
 				left outer join code sk on sk.code_kind_cd = 'SALE_KIND' and sk.code_id = a.sale_kind
 				left outer join code pr on pr.code_kind_cd = 'PR_CODE' and pr.code_id = a.pr_code
 				left outer join code os on os.code_kind_cd = 'G_ORD_STATE' and os.code_id = a.ord_state
