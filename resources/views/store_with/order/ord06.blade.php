@@ -31,7 +31,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="user_yn">주문상태일자</label>
+							<label for="user_yn">판매상태일자</label>
 							<div class="date-switch-wrap form-inline">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
@@ -101,7 +101,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>주문/클레임상태</label>
+							<label>판매/클레임상태</label>
 							<div class="form-inline">
 								<select name='ord_state' class="form-control form-control-sm" style="width:47%">
 									<option value=''>전체</option>
@@ -133,7 +133,7 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>주문/출고구분</label>
+							<label>판매/출고구분</label>
 							<div class="form-inline">
 								<select name='ord_type' class="form-control form-control-sm" style="width: 47%;">
 									<option value=''>전체</option>
@@ -155,7 +155,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="ord_info_key">주문정보</label>
+							<label for="ord_info_key">판매정보</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box" style="width: 35%;margin-right:1%;">
 									<div class="form-group">
@@ -273,7 +273,7 @@
 								<span class="text_line">/</span>
 								<div class="form-inline-inner input_box" style="width:45%;">
 									<select name="ord_field" class="form-control form-control-sm">
-										<option value="w.ord_state_date">주문상태일자</option>
+										<option value="w.ord_state_date">판매상태일자</option>
 										<option value="o.ord_no">주문번호</option>
 										<option value="om.user_nm">주문자명</option>
 										<option value="om.r_nm">수령자</option>
@@ -432,10 +432,10 @@
 			}
 		},
 		{field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'StoreOrderNoType', cellStyle: {'text-align': 'center'}},
-		{field: "ord_state_date", headerName: "주문상태일자", pinned: 'left', width: 90, cellClass: 'hd-grid-code', 
+		{field: "ord_state_date", headerName: "판매상태일자", pinned: 'left', width: 90, cellClass: 'hd-grid-code', 
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : params.value.slice(0,4) + '-' + params.value.slice(4,6) + '-' + params.value.slice(6,8)
 		},
-		{field: "ord_state", headerName: "주문상태", pinned: 'left', width: 70, cellClass: 'hd-grid-code', 
+		{field: "ord_state", headerName: "판매상태", pinned: 'left', width: 70, cellClass: 'hd-grid-code', 
 			cellStyle: (params) => ({ 'color': params.data.ord_state_cd > 30 ? '#ff0000' : '#0000ff', 'font-weight': 'bold' })
 		},
 		{field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
@@ -476,7 +476,7 @@
 		{field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
 		{field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
 		{field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
-		{field: "ord_type", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
+		{field: "ord_type", headerName: "판매구분", width: 60, cellStyle: {'text-align': 'center'}},
 		{field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
 		{field: "store_nm", headerName: "주문매장", width: 100},
 		{field: "baesong_kind", headerName: "배송구분", width: 60},
