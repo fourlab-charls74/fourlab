@@ -82,7 +82,7 @@
             </div><br>
             @if ($msg_type == 'pop')
             <div class="resul_btn_wrap mt-1 d-block">
-                <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : '매장알림')) }} 바로 가기</a>
+                <a href="javascript:locate('{{ @$msg_kind }}');" class="btn btn-sm btn-primary">{{ (@$msg_kind == 'AS' ? '수선관리' : (@$msg_kind == 'RT' ? '매장RT' : @$msg_kind == 'STORE_RETURN' ? '매장반품관리' : '매장알림')) }} 바로 가기</a>
 				<a href="#" onclick="OpenReply();" class="btn btn-sm btn-primary shadow-sm pl-2"> 답장</a>
 				<a href="#" onclick=window.close(); class="btn btn-sm btn-primary shadow-sm pl-2"> 닫기</a>
 			</div>
@@ -151,7 +151,10 @@
         } else if(kind == 'AS') {
             url = "/shop/standard/std11";
             msg = '수선관리 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
-        }
+        } else if (kind == 'STORE_RETURN') {
+			url = "/shop/stock/stk30";
+			msg = '매장반품관리 메뉴로 이동시 자동으로 읽음 처리 됩니다.\r\n이동하시겠습니까?';
+		}
 
         if(!confirm(msg)){
             return false;

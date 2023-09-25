@@ -132,9 +132,9 @@ class stk25Controller extends Controller
         $sql = "
             select 
                 sum(ow.price * ow.qty) as total_sale_amt,
-                cast((sum(ow.price * ow.qty) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt,
+                cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt,
                 sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty) as dc_price,
-                (cast((sum(ow.price * ow.qty) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty)) as left_dc_price,
+                (cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty)) as left_dc_price,
                 stas.apply_rate,
                 sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) as total_recv_amt -- 판매내역의 실결제금액
             from order_opt_wonga ow

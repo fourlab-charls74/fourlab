@@ -84,25 +84,24 @@
                                                 @if($no > 0)
                                                 <div class="form-inline inline_btn_box">
                                                     <input type='hidden' id="store_nm" name="store_nm">
-                                                            @foreach($storeCode as $sc)
-                                                                @if($sc->store_nm == null)
-                                                                    <b style="color:red;">※전체 매장 공지입니다.</b>
-                                                                @elseif($sc->check_yn == 'Y')
-                                                                    <div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
-                                                                        <span>{{$sc->store_nm}}
-                                                                            <b style="color:blue;">[확인]</b>&nbsp;&nbsp;
-                                                                        </span>
-                                                                    </div>
-                                                                @elseif($sc->check_yn == 'N')
-                                                                    <div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
-                                                                        <span>{{$sc->store_nm}}
-                                                                            <b style="color:red;">[미확인]</b>&nbsp;
-                                                                            <button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;padding-bottom:3px;">x</button>&nbsp;&nbsp;
-                                                                        </span>
-                                                                    </div>
-                                                                @endif
-                                                            @endforeach
-                                                            
+													@foreach($storeCode as $sc)
+														@if($sc->store_nm == null)
+															<b style="color:red;">※전체 매장 공지입니다.</b>
+														@elseif($sc->check_yn == 'Y')
+															<div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
+																<span>{{$sc->store_nm}}
+																	<b style="color:blue;">[확인]</b>&nbsp;&nbsp;
+																</span>
+															</div>
+														@elseif($sc->check_yn == 'N')
+															<div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
+																<span>{{$sc->store_nm}}
+																	<b style="color:red;">[미확인]</b>&nbsp;
+																	<button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;padding-bottom:3px;">x</button>&nbsp;&nbsp;
+																</span>
+															</div>
+														@endif
+													@endforeach
                                                 </div>
                                                 @endif
                                                 <div class="form-inline inline_btn_box">
@@ -292,7 +291,6 @@
 
     function clearFormData() {
         for (const key of formData.keys()) {
-            console.log(key);
             formData.delete(`${key}`);
         };
     }
@@ -403,12 +401,16 @@
             return false;
         }
 
+		// 업데이트 시 이미 선택되어있던 매장의 개수
+		const store_sel_cnt = document.querySelectorAll('.store_sel').length;
+
         //form data 재설정
         formData.append('store_notice_type', $('#store_notice_type').val());
         formData.append('subject', $('input[name="subject"]').val());
         formData.append('name', $('input[name="name"]').val());
         formData.append('content', $('input[name="content"]').val());
         formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
+		formData.append('store_cd', store_sel_cnt);
         formData.append('store_nm', $('input[name="store_nm"]').val());
         formData.append('_token', "{{ csrf_token() }}");
 

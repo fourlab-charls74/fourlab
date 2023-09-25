@@ -278,6 +278,7 @@
             },
             getRowNodeId: (data) => data.hasOwnProperty('count') ? data.count : "0", // 업데이터 및 제거를 위한 식별 ID를 count로 할당
             onCellValueChanged: (e) => {
+				e.node.setSelected(true);
                 if (['return_price', 'qty', 'return_p_qty', 'fixed_return_qty'].includes(e.column.colId)) {
                     if (isNaN(e.newValue) == true || e.newValue === "") {
                         alert("숫자만 입력가능합니다.");

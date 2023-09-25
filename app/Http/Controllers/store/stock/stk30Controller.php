@@ -330,6 +330,36 @@ class stk30Controller extends Controller
                     ]);
             }
 
+			//상품반품 등록 시 매장에 내역 확인 알림 표시
+			$sql = "
+				select
+					store_nm
+				from store
+				where store_cd = :store_cd
+			";
+			
+			$store_nm = DB::selectOne($sql,['store_cd' => $store_cd]);
+			
+			$res = DB::table('msg_store')
+				->insertGetId([
+					'msg_kind' => 'STORE_RETURN',
+					'sender_type' => 'H',
+					'sender_cd' => $admin_id ?? '',
+					'reservation_yn' => 'N',
+					'content' => '본사에서 '.$store_nm->store_nm.'에 매장반품 요청하였습니다.',
+					'rt' => now()
+				]);
+
+			DB::table('msg_store_detail')
+				->insert([
+					'msg_cd' => $res,
+					'receiver_type' => 'S',
+					'receiver_cd' => $store_cd ?? '',
+					'check_yn' => 'N',
+					'rt' => now()
+				]);
+
+
 			DB::commit();
             $msg = "매장반품이 정상적으로 요청되었습니다.";
 		} catch (Exception $e) {

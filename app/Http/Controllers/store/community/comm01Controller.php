@@ -127,7 +127,7 @@ class comm01Controller extends Controller
         $user->attach_file_url = '';
 
         $values = ['no' => $no, 'user' => $user, 'store_notice_type' => $notice_id];
-
+		
         return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
     }
 
@@ -150,6 +150,8 @@ class comm01Controller extends Controller
         ";
 
         $storeCodes = DB::select($sql);
+		
+//		dd($storeCodes);
 
         $values = [
             'no' => $no,
@@ -187,8 +189,8 @@ class comm01Controller extends Controller
 
         $files = $request->file('files');
         $file_url = null;
-
-        if ($store_cd == null) {
+		
+        if ($store_cd[0] == "") {
             $all_store_yn = "Y";
         } else {
             $all_store_yn = "N";
@@ -224,7 +226,7 @@ class comm01Controller extends Controller
                     'rt' => $rt
                 ]);
 
-            if (count($store_cd) > 0) {
+            if ($store_cd[0] != "") {
                 foreach ($store_cd as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
@@ -235,7 +237,7 @@ class comm01Controller extends Controller
                         ]);
                 }
             }
-            
+			
             DB::commit();
             $code = 200;
             $msg = "";
@@ -253,26 +255,26 @@ class comm01Controller extends Controller
 
     public function update($no, Request $request)
     {
-
         $id =  Auth('head')->user()->id;
         $now = date('YmdHis');
 
         $subject = $request->input('subject');
         $content = $request->input('content');
-        $store_cd = explode(',', $request->input('store_no', ''));
+        $store_no = explode(',', $request->input('store_no', ''));
         $files = $request->file('files');
         $file_url = null;
-
+		$store_cd = (int)$request->input('store_cd');
+		
         $ns_cd = $no;
         $ut = DB::raw('now()');
         $rt2 = DB::raw('now()');
-
-        if ($store_cd == null) {
+		
+        if ($store_cd == 0 && $store_no[0] == '') {
             $all_store_yn = "Y";
         } else {
             $all_store_yn = "N";
         }
-
+		
         $notice_store = [
             'subject' => $subject,
             'content' => $content,
@@ -307,9 +309,9 @@ class comm01Controller extends Controller
             ";
 
             DB::update($sql);
-            
-            if (count($store_cd) > 0) {
-                foreach ($store_cd as $sc) {
+			
+            if ($store_no[0] != '') {
+                foreach ($store_no as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
                             'ns_cd' => $ns_cd,

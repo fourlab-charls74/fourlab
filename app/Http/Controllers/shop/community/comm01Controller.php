@@ -48,13 +48,13 @@ class comm01Controller extends Controller
         if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
         if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
 
-        if ($store_no != "") {
-            if($notice_id === 'notice') {
-                $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
-            }
-        } else {
-            $where .= " and s.all_store_yn = 'Y'";
-        }
+//        if ($store_no != "") {
+//            if($notice_id === 'notice') {
+//                $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
+//            }
+//        } else {
+//            $where .= " and s.all_store_yn = 'Y'";
+//        }
         
 
         if ($store_type != "") $where .= " and a.store_type = '$store_type' or s.all_store_yn = 'Y'";
@@ -99,6 +99,7 @@ class comm01Controller extends Controller
                     select code_id from code c2 where c2.code_kind_cd  = 'STORE_NOTICE_TYPE' and c2.code_val = '$notice_id'
                 )
                 $where
+                and (s.all_store_yn = 'Y' or d.store_cd = 'S0007')
             group by s.ns_cd
             $orderby
             $limit
