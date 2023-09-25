@@ -892,6 +892,14 @@ class prd02Controller extends Controller
 					->where('prd_cd', '=', $prd_cd)
 					->delete();
 
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
+				DB::table('product_stock_storage')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
 				DB::commit();
 				$code = 200;
 				$msg = "바코드 삭제가 완료되었습니다.";
