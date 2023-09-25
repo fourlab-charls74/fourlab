@@ -324,11 +324,12 @@ class stk33Controller extends Controller
 		";
 		DB::insert($sql);
 
+		//당분간 상품 가격 수정은 막아놓을 예정
 		$sql	= "
 			UPDATE goods g INNER JOIN _tmp_goods_xmd_stock_maxprice b ON g.goods_no = b.goods_no
 			SET g.price = b.max_price
 		";
-		DB::update($sql);
+		//DB::update($sql);
 
 		//stock update
 		$sql	= "
