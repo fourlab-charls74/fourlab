@@ -282,17 +282,44 @@ class ord04Controller extends Controller
 
 				$prd_cd = $row['prd_cd'] ?? '';
 				$qty = $row['qty'] ?? 0;
+				$goods_opt = $row['goods_opt'] ?? '';
+				$goods_no = $row['goods_no'] ?? 0;
 
-				// 1) product_stock_storage -> 반품창고 보유재고/실재고 증감처리
-				DB::table('product_stock_storage')
-					->where('prd_cd', $prd_cd)
-					->where('storage_cd', $return_storage_cd)
-					->update([
-						'qty' => DB::raw('qty + ' . $qty),
-						'wqty' => DB::raw('wqty + ' . $qty),
-						'ut' => now(),
-					]);
+				//해당 창고에 재고있는지 확인하는 부분
+				$storage_stock_cnt =
+					DB::table('product_stock_storage')
+						->where('storage_cd', '=', $return_storage_cd)
+						->where('prd_cd', '=', $prd_cd)
+						->count();
 
+				// 1) product_stock_storage -> 온라인창고 보유재고/실재고 증감처리
+				// product_stock_storage 의 온라인창고에 데이터가 없으면 insert 있으면 update 처리
+				if($storage_stock_cnt < 1) {
+					// 해당 창고에 상품 기존재고가 없을 경우
+					DB::table('product_stock_storage')
+						->insert([
+							'goods_no' => $goods_no,
+							'prd_cd' => $prd_cd,
+							'storage_cd' => $return_storage_cd,
+							'qty' => $qty,
+							'wqty' => $qty,
+							'goods_opt' => $goods_opt,
+							'use_yn' => 'Y',
+							'rt' => now()
+						]);
+				} else {
+					// 해당 창고에 상품 기존재고가 이미 존재할 경우
+					// 창고보유재고 증가
+					DB::table('product_stock_storage')
+						->where('prd_cd', $prd_cd)
+						->where('storage_cd', $return_storage_cd)
+						->update([
+							'qty' => DB::raw('qty + ' . $qty),
+							'wqty' => DB::raw('wqty + ' . $qty),
+							'ut' => now(),
+						]);
+				}
+				
 				// 2) product_stock -> 전체재고/창고재고 증감처리
 				DB::table('product_stock')
 					->where('prd_cd', $prd_cd)
