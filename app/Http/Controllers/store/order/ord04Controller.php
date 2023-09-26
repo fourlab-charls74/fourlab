@@ -203,6 +203,7 @@ class ord04Controller extends Controller
 						   and use_yn = 'Y'
 					),'') as size
 					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
+					, csc.comment
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
 				    inner join claim c on c.ord_opt_no = o.ord_opt_no

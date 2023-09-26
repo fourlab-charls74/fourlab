@@ -392,12 +392,15 @@
 		{field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold"}},
 		{field: "comment", headerName: "검수메모", width: 150, 
 			cellClass: (params) => params.data.stock_check_yn !== 'Y' ? 'hd-grid-edit' : '', 
-			editable: (params) => params.data.stock_check_yn !== 'Y'
+			editable: (params) => params.data.stock_check_yn !== 'Y',
+			cellRenderer: function(params) {
+				return params.data.comment;
+			}
 		},
 		{field: "user_nm", headerName: "주문자(아이디)", width: 120, cellClass: 'hd-grid-code'},
 		{field: "r_nm", headerName: "수령자", width: 70, cellClass: 'hd-grid-code'},
 		{field: "wonga", headerName: "원가", width: 60, type: "currencyType"},
-		{field: "goods_sh", headerName: "TAG가", width: 60, type: "currencyType"},
+		{field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType"},
 		{field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
 		{field: "price", headerName: "판매가", width: 60, type: "currencyType"},
 		{field: "pay_type_nm", headerName: "결제방법", width: 80, cellClass: 'hd-grid-code'},
