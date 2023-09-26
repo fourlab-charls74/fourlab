@@ -819,6 +819,7 @@ class prd02Controller extends Controller
 					, p.tag_price as goods_sh
 					, p.price as price
 					, pc.size_kind
+					, p.origin as origin
 				from product_code pc
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on g.goods_no = pc.goods_no
@@ -829,10 +830,14 @@ class prd02Controller extends Controller
 			$product	= DB::selectOne($sql,['prd_cd' => $product_code]);
 		}
 
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y' order by seq";
+		$size_kind = DB::select($size_kind_sql);
+
 		$values = [
 			'prd_cd'	=> $product_code,
 			'goods_no'	=> $goods_no,
-			'product'	=> $product
+			'product'	=> $product,
+			'size_kind' => $size_kind
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_edit',$values);
@@ -1477,20 +1482,23 @@ class prd02Controller extends Controller
 		$admin_id = Auth('head')->user()->id;
 		$admin_name = Auth('head')->user()->name;
 
+		$prd_cd 	= $request->input('prd_cd');
 		$goods_no	= $request->input('goods_no');
 		$tag_price	= $request->input('tag_price');
 		$price		= $request->input('price');
-
-		$sql = "
-			select
-				c.prd_cd
-				, c.prd_cd_p
-			from goods_summary a
-			left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
-			where
-				a.goods_no = :goods_no
-		";
-		$result = DB::select($sql,['goods_no' => $goods_no]);
+		$size_kind	= $request->input('size_kind');
+		$origin 	= $request->input('origin', '');
+		
+			$sql = "
+				select
+					c.prd_cd
+					, c.prd_cd_p
+				from goods_summary a
+				left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
+				where
+					a.goods_no = :goods_no
+			";
+			$result = DB::select($sql, ['goods_no' => $goods_no]);
 
 		try {
 			DB::beginTransaction();
@@ -1498,27 +1506,71 @@ class prd02Controller extends Controller
 			DB::table('goods')
 				->where('goods_no', '=', $goods_no)
 				->update([
-					"price" => $price,
-					"goods_sh" => $tag_price,
-					"admin_id"=> $admin_id,
-					"admin_nm"=> $admin_name,
-					"upd_dm" => now(),
+					"price" 	=> $price,
+					"goods_sh" 	=> $tag_price,
+					"org_nm" 	=> $origin, // goods 테이블의 원산지 변경
+					"admin_id"	=> $admin_id,
+					"admin_nm"	=> $admin_name,
+					"upd_dm" 	=> now(),
 				]);
 			
 			foreach($result as $row){
 				DB::table('product')
 					->where('prd_cd', 'like', $row->prd_cd_p . '%')
 					->update([
-						"price" => $price,
+						"price" 	=> $price,
 						"tag_price" => $tag_price,
-						"admin_id"=> $admin_id,
+						"origin"	=> $origin,	//product 테이블의 원산지 변경
+						"admin_id"	=> $admin_id,
 						"ut" => now(),
 					]);
+				
+				//사이즈구분 변경하는 부분
+				DB::table('product_code')
+					->where('prd_cd', 'like', $row->prd_cd_p . '%')
+					->update([
+						"size_kind" => $size_kind,
+						"ut"		=> now(),
+						"admin_id"	=> $admin_id
+					]);
+			}
+			
+			// 바코드가 매칭되지않았을 때 
+			if ($goods_no == '0') {
+				$sql = "
+					select 
+						prd_cd
+						, prd_cd_p
+					from product_code
+					where prd_cd = :prd_cd
+				";
+				
+				$product_result = DB::select($sql,['prd_cd' => $prd_cd]);
+				
+				foreach ($product_result as $pr) {
+					DB::table('product_code')
+						->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+						->update([
+							"size_kind" => $size_kind,
+							"ut"		=> now(),
+							"admin_id"	=> $admin_id
+						]);
+
+					DB::table('product')
+						->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+						->update([
+							"price" 	=> $price,
+							"tag_price" => $tag_price,
+							"origin"	=> $origin,
+							"admin_id"	=> $admin_id,
+							"ut" => now(),
+						]);
+				}
 			}
 
 			DB::commit();
 			$code = 200;
-			$msg = "가격 정보 수정이 완료되었습니다.";
+			$msg = "바코드 정보 수정이 완료되었습니다.";
 
 		} catch (\Exception $e) {
 			DB::rollback();

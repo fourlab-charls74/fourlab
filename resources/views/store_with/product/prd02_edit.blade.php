@@ -87,16 +87,33 @@
 												</div>
 											</td>
 										</tr>
+										<tr>
+											<th>사이즈구분</th>
+											<td>
+												<div class="flax_box">
+													<select name="size_kind" id="size_kind" class="form-control form-control-sm">
+														<option value=''> 선택 </option>
+														@foreach ($size_kind as $sk)
+															<option value='{{ $sk->size_kind_cd }}' @if ($product->size_kind === @$sk->size_kind_cd) selected @endif>{{ $sk->size_kind_cd }} : {{ $sk->size_kind_nm }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th>원산지</th>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='origin' id="origin" value='{{ $product->origin }}'>
+												</div>
+											</td>
+										</tr>
 									</tbody>
 								</table>
-
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
 		<div class="card">
 			<div class="card-header mb-0">
 				<a href="#">바코드정보</a>
@@ -116,15 +133,10 @@
 				</div>
 			</div>
 		</div>
-
 	</form>
-
 </div>
 
-
-
 <script>
-
 	const CELL_COLOR = {
 		THISPRD: { 'background' : '#F8D3D4' }
 	};
@@ -216,15 +228,21 @@
 	}
 
 	function save() {
-		if(!window.confirm("품번이 같은 모든상품의 정상가와 현재가가 변경됩니다.\n가격 정보를 수정하시겠습니까?")) return;
+		let size_kind = $('#size_kind').val();
+		if (size_kind == '') return alert('사이즈구분을 선택해주세요.');
+		if(!window.confirm("품번이 같은 상품의 정상가, 현재가, 사이즈구분, 원산지가 변경됩니다.\n정보를 수정하시겠습니까?")) return;
+		
 
 		axios({
 			url: '/store/product/prd02/update_product',
 			method: 'post',
 			data: {
+				prd_cd : $('#prd_cd').val(),
 				goods_no : $("#goods_no").val(),
 				tag_price : $("#tag_price").val(),
-				price : $("#price").val()
+				price : $("#price").val(),
+				size_kind : $('#size_kind').val(),
+				origin : $('#origin').val()
 			},
 		}).then(function(res) {
 			if (res.data.code === 200) {
@@ -232,7 +250,7 @@
 				opener.Search();
 			} else {
 				console.log(res.data);
-				alert("가격 정보 수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				alert("바코드 매칭 정보 수정 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 			}
 		}).catch(function(err) {
 			console.log(err);
