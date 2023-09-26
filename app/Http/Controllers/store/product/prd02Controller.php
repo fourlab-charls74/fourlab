@@ -307,6 +307,8 @@ class prd02Controller extends Controller
 
 	public function create(Request $request)
 	{
+		$prd_cd	= $request->input('prd_cd');
+		
 		$sql	= " select brand_nm, br_cd from brand where use_yn = 'Y' and br_cd <> '' order by field(brand_nm, '헤스트라', '프리머스', '한바그', '피엘라벤') desc, brand_nm asc";
 		$brands	= DB::select($sql);
 
@@ -321,6 +323,7 @@ class prd02Controller extends Controller
 		$goods_no = $request->query("goods_no","");
 
 		$values = [
+			'prd_cd'	=> $prd_cd,
 			'brands'	=> $brands,
 			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons'	=> SLib::getCodes("PRD_CD_SEASON"),
@@ -799,23 +802,27 @@ class prd02Controller extends Controller
 
 	public function edit_goods_no($product_code, $goods_no, Request $request)
 	{
+		$product = array(); 
 
 		if( $goods_no != "" ){
 			$sql	= "
 				select
-					pc.prd_cd, pc.goods_no, g.goods_nm, g.style_no, pc.color, c1.code_val as color_nm, pc.goods_opt
-				     , ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size
+					pc.prd_cd
+				    , pc.prd_cd_p
+				    , pc.goods_no
+				    , ifnull(g.goods_nm,p.prd_nm) as goods_nm
+					, ifnull(g.style_no,p.style_no) as style_no
+				    , pc.color
+				    , c1.code_val as color_nm
+				    , pc.goods_opt
+				    , pc.size
 					, p.tag_price as goods_sh
 					, p.price as price
+					, pc.size_kind
 				from product_code pc
-					inner join product p on p.prd_cd = pc.prd_cd
-					inner join goods g on g.goods_no = pc.goods_no
-					left outer join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = pc.color and c1.use_yn = 'Y'
+				inner join product p on p.prd_cd = pc.prd_cd
+				left outer join goods g on g.goods_no = pc.goods_no
+				left outer join code c1 on c1.code_kind_cd = 'PRD_CD_COLOR' and c1.code_id = pc.color and c1.use_yn = 'Y'
 				where
 					pc.prd_cd = :prd_cd
 			";

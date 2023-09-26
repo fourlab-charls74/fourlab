@@ -16,6 +16,7 @@
 		</div>
 		<div class="d-flex">
 			<a href="javascript:void(0)" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
+			@if($goods_no == '0')<a href="javascript:void(0)" onclick="match();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>상품매핑</a>@endif
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
@@ -285,6 +286,12 @@
 		}).catch(function (err) {
 			console.log(err);
 		});
+	}
+
+	function match() {
+		prd_cd	= '{{ $product->prd_cd_p }}';
+		var url = '/store/product/prd02/create?prd_cd=' + prd_cd;
+		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=900");
 	}
 </script>
 @stop

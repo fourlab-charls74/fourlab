@@ -474,7 +474,7 @@
 		}
 
 		function EditProduct(product_code, goods_no) {
-			//if( goods_no == '' )	goods_no = "0";
+			if( goods_no == '' )	goods_no = "0";
 			var url = '/store/product/prd02/edit-goods-no/' + product_code + '/' + goods_no;
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=900");
 		}

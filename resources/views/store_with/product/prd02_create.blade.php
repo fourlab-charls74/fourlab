@@ -192,7 +192,7 @@
 															<th class="required" style="text-align:center;vertical-align:middle;">바코드(맵핑 X)</th>
 															<td>
 																<div class="flex_box">
-																	<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+																	<input type='text' id="prd_cd" name='prd_cd' value='{{ $prd_cd }}' class="form-control form-control-sm ac-style-no search-enter">
 																	<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 																</div>
 															</td>
