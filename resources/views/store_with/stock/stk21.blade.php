@@ -22,6 +22,7 @@
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
+					<a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 엑셀 업로드</a>
 					<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                     <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
                     <!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> -->
@@ -168,6 +169,7 @@
 		</div>
 
         <div class="resul_btn_wrap mb-3">
+			<a href="javascript:void(0);" onclick="openBatchPopup()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 엑셀 업로드</a>
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
             <!-- 2023-05-25 검색조건 초기화 주석처리 -양대성- -->
             <!-- <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1" onclick="initSearch()">검색조건 초기화</a> -->
@@ -633,6 +635,11 @@
         gx2.gridOptions.api.setPinnedTopRowData([{ ...pinnedRow.data, ...row }]);
 
     }
+
+	const openBatchPopup = () => {
+		const url = '/store/stock/stk21/batch';
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+	}
 
 </script>
 @stop

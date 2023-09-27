@@ -8,9 +8,10 @@ use App\Components\SLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Exception;
-
 use App\Models\Conf;
 
 class stk21Controller extends Controller
@@ -356,4 +357,283 @@ class stk21Controller extends Controller
 
         return response()->json([ "code" => $code, "msg" => $msg ]);
     }
+
+	
+	/*
+	 * 
+	 * 매장RT 엑셀업로드 부분
+	 * 
+	 * */
+	public function batch_show()
+	{
+		$sql = "
+            select
+                *
+            from code
+            where code_kind_cd = 'rel_order' and code_id not like 'R_%'
+        ";
+		$rel_order_res = DB::select($sql);
+
+		$storages = DB::table("storage")
+			->where('use_yn', '=', 'Y')
+			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
+			->orderByRaw('CASE WHEN default_yn = "Y" THEN 0 ELSE 1 END')
+			->orderByRaw('CASE WHEN online_yn = "Y" THEN 0 ELSE 1 END')
+			->get();
+
+		$values = [
+			'today'         => date("Y-m-d"),
+			'style_no'		=> "", // 스타일넘버
+			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
+			'items'			=> SLib::getItems(), // 품목
+			'storages'      => $storages, // 창고리스트
+			'rel_order_res' => $rel_order_res
+		];
+
+		return view(Config::get('shop.store.view') . '/stock/stk21_batch', $values);
+	}
+
+	public function import_excel(Request $request)
+	{
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+
+				$save_path = "data/store/stk21/";
+				$file_name = "${now}_${user_id}.${extension}";
+				
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+
+				$file = sprintf("${save_path}%s", $file_name);
+				
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+
+	public function get_goods(Request $request)
+	{
+		$data = $request->input('data', []);
+		$result = [];
+		$fail_prd_cd = [];
+		$success_prd_cd = [];
+		$goods_nos = [];
+		$msg = '';
+		
+		foreach ($data as $row) {
+			$prd_cd = $row['prd_cd'];
+			
+			$sql = "
+				select prd_cd, goods_no from product_code where prd_cd = :prd_cd
+			";
+			
+			$search_true_prd_cd = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+			
+			if (!empty($search_true_prd_cd)) {
+				array_push($success_prd_cd, $search_true_prd_cd);
+				array_push($goods_nos, $search_true_prd_cd->goods_no);
+			} else {
+				array_push($fail_prd_cd, $prd_cd);
+			}
+		}
+		
+		$not_match_product = [];
+		foreach($goods_nos as $g) {
+			$goods_no = $g['goods_no'];
+			if ($goods_no == 0) {
+				array_push($not_match_product, $goods_no);
+			}
+		}
+		
+		dd($not_match_product);
+		
+		if (count($fail_prd_cd) > 0) {
+			$message = "바코드가 존재하지않는 상품이 있습니다.";
+		} else if (count($success_prd_cd) > 0  ) {
+			
+		}
+		
+		
+		
+		foreach($data as $key => $d)
+		{
+			$dep_store_cd = $d['dep_store_cd'];
+			$store_cd = $d['store_cd'];
+			$prd_cd = $d['prd_cd'];
+			$qty = $d['qty'];
+			$comment = $d['comment'];
+			
+			
+			$sql = "
+                select
+                    g.goods_no
+                    , opt.opt_kind_nm
+                    , brand.brand_nm as brand
+                    , g.style_no
+                    , g.goods_nm
+                    , g.goods_nm_eng
+                    , g.goods_type as goods_type_cd
+                    , com.com_type as com_type_d
+                    , s.prd_cd
+                    , pc.prd_cd_p as prd_cd_p
+                    , pc.color
+                    , ifnull((
+						select s.size_cd from size s
+						where s.size_kind_cd = pc.size_kind
+						   and s.size_cd = pc.size
+						   and use_yn = 'Y'
+					),'') as size
+                    , s.goods_opt
+                    , (select wqty from product_stock_store where store_cd = '$dep_store_cd' and prd_cd = s.prd_cd) as store_qty
+                    , '$qty' as qty
+                    , '$store_cd' as store_cd
+                    , '$dep_store_cd' as dep_store_cd
+                    , (select store_nm from store where store_cd = '$store_cd') as store_nm
+                	, (select store_nm from store where store_cd = '$dep_store_cd') as dep_store_nm
+                	, '$comment' as comment
+                	, p.tag_price as tag_price
+                	, p.price as price
+                	, p.wonga as wonga
+                from goods g
+                	inner join product_stock s on g.goods_no = s.goods_no
+                	inner join product p on p.prd_cd = s.prd_cd
+                    left outer join goods_coupon gc on gc.goods_no = g.goods_no and gc.goods_sub = g.goods_sub
+                    left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
+                    left outer join product_code pc on pc.prd_cd = s.prd_cd
+                    left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join company com on com.com_id = g.com_id
+                    left outer join brand brand on brand.brand = g.brand
+                where s.prd_cd = '$prd_cd'
+            ";
+			$row = DB::selectOne($sql);
+			array_push($result, $row);
+		}
+		
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+			],
+			"body" => $result
+		]);
+	}
+
+	public function batch_request_rt(Request $request)
+	{
+		$code = 200;
+		$msg = '';
+
+		$state = 10;
+		$rt_type = 'R';
+		$admin_id = Auth('head')->user()->id;
+		$data = $request->input("data", []);
+		
+		try {
+			DB::beginTransaction();
+
+			$prd_store_qtys = array_reduce($data, function ($a, $c) {
+				$idx = $c['dep_store_cd'] . '^' . $c['prd_cd'];
+				if (isset($a[$idx])) {
+					$a[$idx] += $c['qty'];
+				} else {
+					$a[$idx] = $c['qty'];
+				}
+				return $a;
+			}, []);
+			
+			$over_qtys = array_filter($prd_store_qtys, function ($val, $key) {
+				list($dep_store_cd, $prd_cd) = explode('^', $key);
+				$store_wqty = DB::table('product_stock_store')->where('store_cd', $dep_store_cd)->where('prd_cd', $prd_cd)->value('wqty');
+				return $val > $store_wqty;
+			}, ARRAY_FILTER_USE_BOTH);
+			
+			$keys = array_keys($over_qtys);
+			$failed_data = [];
+			foreach($keys as $k) {
+				$explode_data = explode('^', $k);
+				array_push($failed_data, $explode_data);
+			}
+
+			if (count($over_qtys) > 0) {
+				$code = 400;
+				$message = '보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.'."\n";
+				
+				foreach ($failed_data as $fd) {
+					$message .= "매장코드 : {$fd[0]}, 바코드 : {$fd[1]}" . "\n";
+				}
+				$message = rtrim($message, ', ');
+				throw new Exception($message);
+			}
+
+			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
+			$document_number = DB::selectOne($sql);
+			if ($document_number === null) $document_number = 1;
+			else $document_number = $document_number->document_number;
+
+			foreach($data as $d) {
+				
+				dd('실패');
+				
+				DB::table('product_stock_rotation')
+					->insert([
+						'document_number' => $document_number,
+						'type' => $rt_type,
+						'goods_no' => $d['goods_no'] ?? 0,
+						'prd_cd' => $d['prd_cd'] ?? 0,
+						'goods_opt' => $d['goods_opt'] ?? '',
+						'qty' => $d['qty'] ?? 0,
+						'dep_store_cd' => $d['dep_store_cd'] ?? '',
+						'store_cd' => $d['store_cd'] ?? '',
+						'state' => $state,
+						'req_comment' => $d['comment'] ?? '',
+						'req_id' => $admin_id,
+						'req_rt' => now(),
+						'rt' => now(),
+					]);
+
+				//RT요청 알림 전송
+				$res = DB::table('msg_store')
+					->insertGetId([
+						'msg_kind' => 'RT',
+						'sender_type' => 'H',
+						'sender_cd' => $admin_id,
+						'reservation_yn' => 'N',
+						'content' => '본사요청RT가 있습니다.',
+						'rt' => now()
+					]);
+
+				DB::table('msg_store_detail')
+					->insert([
+						'msg_cd' => $res,
+						'receiver_type' => 'S',
+						'receiver_cd' => $d['dep_store_cd'] ?? '',
+						'check_yn' => 'N',
+						'rt' => now()
+					]);
+			}
+
+			DB::commit();
+
+			$msg = "본사요청RT가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollback();
+			if ($code === 200) $code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json([ "code" => $code, "msg" => $msg ]);
+	}
 }
