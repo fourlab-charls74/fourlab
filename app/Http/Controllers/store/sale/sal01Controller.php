@@ -484,12 +484,12 @@ class sal01Controller extends Controller
 		 */
 		$sale_kind = $order['sale_kind'];
 		$sale_kind = str_replace(" ", "", $sale_kind); // 공백 제거
-		if (preg_match("/쿠폰/", $sale_kind)) {
-			if (preg_match("/\d+%/i", $sale_kind, $matches)) {
-				$percent = $matches[0];
-				$sale_kind = "쿠폰판매(${percent})";
-			}
-		} 
+		// if (preg_match("/쿠폰/", $sale_kind)) {
+		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+		// 		$percent = $matches[0];
+		// 		$sale_kind = "쿠폰판매(${percent})";
+		// 	}
+		// } 
 		// else if (preg_match("/할인/", $sale_kind)) {
 		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
 		// 		$percent = $matches[0];
@@ -861,12 +861,12 @@ class sal01Controller extends Controller
 		 */
 		$sale_kind = $order['sale_kind'];
 		$sale_kind = str_replace(" ", "", $sale_kind); // 공백 제거
-		if (preg_match("/쿠폰/", $sale_kind)) {
-			if (preg_match("/\d+%/i", $sale_kind, $matches)) {
-				$percent = $matches[0];
-				$sale_kind = "쿠폰판매(${percent})";
-			}
-		} 
+		// if (preg_match("/쿠폰/", $sale_kind)) {
+		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
+		// 		$percent = $matches[0];
+		// 		$sale_kind = "쿠폰판매(${percent})";
+		// 	}
+		// } 
 		// else if (preg_match("/할인/", $sale_kind)) {
 		// 	if (preg_match("/\d+%/i", $sale_kind, $matches)) {
 		// 		$percent = $matches[0];
