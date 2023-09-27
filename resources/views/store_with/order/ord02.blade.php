@@ -168,17 +168,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
+					<div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="name">공급업체</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
+                            <label for="pr_code">출고구분</label>
+                            <div class="flax_box">
+								<select name='ord_kind' class="form-control form-control-sm w-100">
+									<option value=''>전체</option>
+									@foreach (@$ord_kinds as $ord_kind)
+										<option value='{{ $ord_kind->code_id }}'>{{ $ord_kind->code_val }}</option>
+									@endforeach
+								</select>
                             </div>
                         </div>
                     </div>
@@ -299,6 +298,22 @@
 						</div>
 					</div>
                 </div>
+				<div class="row search-area-ext d-none">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">공급업체</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type="hidden" id="com_cd" name="com_cd" />
+										<input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
+										<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">

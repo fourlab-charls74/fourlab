@@ -91,6 +91,7 @@ class ord02Controller extends Controller
 		$stat_pay_type = $request->input('stat_pay_type', ''); // 결제방법
 		$not_complex = $request->input('not_complex', 'N'); // 복합결제 제외여부
 		$sale_kind = $request->input('sale_kind', []); // 판매유형
+		$ord_kind = $request->input('ord_kind', ''); //출고구분
 		$com_id = $request->input('com_cd', '');
 		$prd_cd = $request->input('prd_cd', '');
 		$style_no = $request->input('style_no', '');
@@ -115,6 +116,7 @@ class ord02Controller extends Controller
 		if ($ord_state != '') $where .= " and o.ord_state = '" . $ord_state . "' ";
 		if ($pay_stat != '') $where .= " and p.pay_stat = '" . $pay_stat . "' ";
 		if ($sale_place != '') $where .= " and o.sale_place = '" . $sale_place . "' ";
+		if ($ord_kind != '') $where .= " and o.ord_kind = '$ord_kind' ";
 
 		// 주문정보검색
 		if ($ord_info_value != '') {
