@@ -427,8 +427,10 @@ class stk21Controller extends Controller
 		$result = [];
 		$fail_prd_cd = [];
 		$success_prd_cd = [];
-		$goods_nos = [];
+		$not_prd_cd = [];
+		$not_match_prd_cd = [];
 		$msg = '';
+		$code = 200;
 		
 		foreach ($data as $row) {
 			$prd_cd = $row['prd_cd'];
@@ -439,31 +441,24 @@ class stk21Controller extends Controller
 			
 			$search_true_prd_cd = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 			
-			if (!empty($search_true_prd_cd)) {
-				array_push($success_prd_cd, $search_true_prd_cd);
-				array_push($goods_nos, $search_true_prd_cd->goods_no);
-			} else {
-				array_push($fail_prd_cd, $prd_cd);
+			if (empty($search_true_prd_cd)) {
+				array_push($not_prd_cd, $prd_cd);
 			}
-		}
-		
-		$not_match_product = [];
-		foreach($goods_nos as $g) {
-			$goods_no = $g['goods_no'];
-			if ($goods_no == 0) {
-				array_push($not_match_product, $goods_no);
-			}
-		}
-		
-		dd($not_match_product);
-		
-		if (count($fail_prd_cd) > 0) {
-			$message = "바코드가 존재하지않는 상품이 있습니다.";
-		} else if (count($success_prd_cd) > 0  ) {
 			
+			if ($search_true_prd_cd && isset($search_true_prd_cd->goods_no) && $search_true_prd_cd->goods_no == 0) {
+				array_push($not_match_prd_cd, $prd_cd);
+			}
 		}
 		
+		if (count($not_prd_cd) > 0) {
+			$code = 400;
+			$msg .= "존재하지않는 상품이 있습니다." . "\n". implode(', ', $not_prd_cd) . "\n";
+		}
 		
+		if (count($not_match_prd_cd) > 0) {
+			$code = 400;
+			$msg .= "매칭이 되지않은 상품이 존재합니다." . "\n" . implode(', ' , $not_match_prd_cd) . "\n";
+		}
 		
 		foreach($data as $key => $d)
 		{
@@ -520,7 +515,8 @@ class stk21Controller extends Controller
 		}
 		
 		return response()->json([
-			"code" => 200,
+			"code" => $code,
+			"msg"  => $msg,
 			"head" => [
 				"total" => count($result),
 				"page" => 1,
@@ -584,8 +580,6 @@ class stk21Controller extends Controller
 			else $document_number = $document_number->document_number;
 
 			foreach($data as $d) {
-				
-				dd('실패');
 				
 				DB::table('product_stock_rotation')
 					->insert([

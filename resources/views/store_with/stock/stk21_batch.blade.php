@@ -397,7 +397,7 @@
 				} else if (res.data.code === 400) {
 					alert(res.data.msg);
 				} else {
-					alert("상품정보조회 중 오류가 발생했습니다.\n다시 시도해주세요.");
+					alert("엑셀일괄업로드 중 오류가 발생했습니다.\n다시 시도해주세요.");
 				}
 			}).catch((error) => {
 				console.log(error);
@@ -423,8 +423,8 @@
 		//RT등록
 		function RequestRT() {
 			let rows = gx.getSelectedRows();
-			if(rows.length < 1) return alert("일괄RT등록할 항목을 선택해주세요.");
-			if(!confirm("선택한 항목을 일괄RT등록하시겠습니까?")) return;
+			if(rows.length < 1) return alert("일괄RT 요청할 항목을 선택해주세요.");
+			if(!confirm("선택한 항목을 일괄RT 요청하시겠습니까?")) return;
 
 			axios({
 				url: '/store/stock/stk21/batch-request-rt',
@@ -439,7 +439,7 @@
 					alert(res.data.msg);
 				} else {
 					console.log(res.data);
-					alert("본사요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+					alert("본사요청RT 일괄등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
 				}
 			}).catch(function (err) {
 				console.log(err);
