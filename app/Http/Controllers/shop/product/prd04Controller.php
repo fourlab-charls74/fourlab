@@ -38,6 +38,8 @@ class prd04Controller extends Controller
 		if( $page < 1 or $page == "" )	$page = 1;
 		$limit	= $request->input('limit', 100);
 
+		$store_cd	= Auth('head')->user()->store_cd;
+	
 		$sdate 		= $request->input("sdate", date("Y-m-d"));
 		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($sdate)));
 		$prd_cd		= $request->input("prd_cd", "");
@@ -61,7 +63,7 @@ class prd04Controller extends Controller
 		$where		= "";
 		$having = "";
 		$in_store_sql	= "";
-		$store_qty_sql	= "(ps.qty - ps.wqty)";
+		$store_qty_sql	= "ifnull((ps.qty - ps.wqty),0)";
 		$next_store_qty_sql = "";
 
 		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
@@ -120,16 +122,16 @@ class prd04Controller extends Controller
 			$where .= " and ( g.goods_nm like '%" . Lib::quote($goods_nm) . "%' or p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ) ";
 		}
 		if( $store_no != "" ){
-			$in_store_sql	= " inner join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd and pss.store_cd = '" . Lib::quote($store_cd) . "' ";
 
-			$where	.= " and ( 1<>1";
-			foreach($store_no as $store_cd) {
-				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
-			}
-			$where	.= ")";
+			//$where	.= " and ( 1<>1";
+			//foreach($store_no as $store_cd) {
+			//	$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
+			//}
+			//$where	.= ")";
 
 			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
-			$store_qty_sql	= "pss.qty";
+			$store_qty_sql	= " ifnull(pss.qty, 0)";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -189,7 +191,7 @@ class prd04Controller extends Controller
 						inner join product p on p.prd_cd = pc.prd_cd
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
-						inner join code c on pc.color = c.code_id
+						inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
@@ -205,7 +207,8 @@ class prd04Controller extends Controller
 						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where
-						c.code_kind_cd = 'PRD_CD_COLOR'
+						-- c.code_kind_cd = 'PRD_CD_COLOR'
+						1=1
 						$where
 					group by pc.prd_cd
 					$having
@@ -244,12 +247,12 @@ class prd04Controller extends Controller
                         and s.size_cd = pc.size
                         and use_yn = 'Y'
                 ) as size
-				, (
-                    select s.size_nm from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size_nm
+				-- , (
+                --     select s.size_nm from size s
+                --     where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
+                --         and s.size_cd = pc.size
+                --         and use_yn = 'Y'
+                --  ) as size_nm
 				, pc.goods_opt
 				, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
 				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
@@ -274,7 +277,7 @@ class prd04Controller extends Controller
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on pc.goods_no = g.goods_no
 				left outer join brand brand on brand.brand = g.brand
-				inner join code c on pc.color = c.code_id
+				inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 				inner join brand b on b.br_cd = pc.brand
 				left outer join (
 					select prd_cd, sum(qty) as qty, stock_state_date
@@ -290,7 +293,8 @@ class prd04Controller extends Controller
 				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 			where
-				c.code_kind_cd = 'PRD_CD_COLOR'
+				-- c.code_kind_cd = 'PRD_CD_COLOR'
+				1=1
 				$where
 			group by pc.prd_cd
 			$having

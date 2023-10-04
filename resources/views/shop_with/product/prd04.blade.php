@@ -276,7 +276,7 @@
 		{field: "color", headerName: "컬러", width: 50, cellStyle: StyleLineHeight},
 		{field: "color_nm", headerName: "컬러명", width: 90, cellStyle: {"line-height": "30px", 'text-align' : 'center'}},
 		{field: "size", headerName: "사이즈", width: 50, cellStyle: StyleLineHeight},
-		{field: "size_nm", headerName: "사이즈명", width: 70, cellStyle: StyleLineHeight},
+		// {field: "size_nm", headerName: "사이즈명", width: 70, cellStyle: StyleLineHeight},
 		// {field: "goods_opt", headerName: "옵션", width: 190},
 		{field: "brand_nm", headerName: "브랜드", width: 70, cellStyle: StyleLineHeight, aggFunc: "first"},
 		{field: "plan_category", headerName: "상품운영구분", width: 100, cellStyle: StyleLineHeight},
@@ -377,8 +377,8 @@
 			const t = e.head.total_row;
 			gx.gridOptions.api.setPinnedTopRowData([{ 
 				goods_nm: '', 
-				goods_sh: t.total_goods_sh, 
-				price: t.total_price, 
+				//goods_sh: t.total_goods_sh, 
+				//price: t.total_price, 
 				wonga: t.total_wonga,
 				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
