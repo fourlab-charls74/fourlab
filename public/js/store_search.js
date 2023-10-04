@@ -121,8 +121,8 @@ $( document ).ready(function() {
 		allowClear: true,
 		minimumInputLength: 1,
 		templateResult: function (state) {
-			if (!state.id) {
-				return state.text;
+			if (!state.code_id) {
+				return state.code_val;
 			}
 			if(state.img !== undefined && state.img !== ""){
 				var $state = $(
@@ -130,7 +130,7 @@ $( document ).ready(function() {
 				);
 			} else {
 				var $state = $(
-					'<span>' + '[' + state.id +  '] ' + state.text + '</span>'
+					'<span>' + '[' + state.code_id +  '] ' + state.code_val + '</span>'
 				);
 			}
 			return $state;

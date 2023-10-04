@@ -142,9 +142,13 @@
 											</td>
 											<th class="required">컬러</th>
 											<td>
-												<div class="form-inline inline_btn_box">
-													<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-color"></select>
-													<a href="#" class="btn btn-sm btn-outline-primary sch-color"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+												<div class="flax_box">
+													<select name='color' id='color' class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($colors as $color)
+														<option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
+														@endforeach
+													</select>
 												</div>
 											</td>
 										</tr>
