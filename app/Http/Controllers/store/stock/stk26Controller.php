@@ -326,7 +326,7 @@ class stk26Controller extends Controller
 		$products 	= $request->input("products", []);
 		$admin_id   = Auth('head')->user()->id;
 		$admin_nm   = Auth('head')->user()->name;
-
+		
 		try {
 			DB::beginTransaction();
 
@@ -358,16 +358,37 @@ class stk26Controller extends Controller
 
 				$original_wqty = DB::table('product_stock_store')->where('store_cd', $store_cd)->where('prd_cd', $product['prd_cd'])->value('wqty');
 				$minus_qty = ($original_wqty ?? 0) - ($qty ?? 0);
-
-				DB::table('product_stock_store')
-					->where('store_cd', $store_cd)
-					->where('prd_cd', $product['prd_cd'])
-					->update([
-						'qty' => DB::raw("qty - " . $minus_qty),
-						'wqty' => $qty,
-						'ut' => now(),
-					]);
-
+				
+				$store_stock_cnt =
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $product['prd_cd'])
+						->where('store_cd', '=', $store_cd)
+						->count();
+				if($store_stock_cnt < 1) {
+					// 해당 매장에 상품 기존재고가 없을 경우
+					DB::table('product_stock_store')
+						->insert([
+							'goods_no' => $product['goods_no'],
+							'prd_cd' => $product['prd_cd'],
+							'store_cd' => $store_cd,
+							'qty' => $qty,
+							'wqty' => $qty,
+							'goods_opt' => $product['goods_opt'],
+							'use_yn' => 'Y',
+							'rt' => now(),
+						]);
+				} else {
+					// 해당 매장에 상품 기존재고가 이미 존재할 경우
+					DB::table('product_stock_store')
+						->where('store_cd', $store_cd)
+						->where('prd_cd', $product['prd_cd'])
+						->update([
+							'qty' => DB::raw("qty - " . $minus_qty),
+							'wqty' => $qty,
+							'ut' => now(),
+						]);
+				}
+				
 				DB::table('product_stock')
 					->where('prd_cd', $product['prd_cd'])
 					->update([

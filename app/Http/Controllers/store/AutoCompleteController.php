@@ -95,4 +95,49 @@ class AutoCompleteController extends Controller
         }
 
     }
+
+	public function color(Request $req)
+	{
+
+		$type = $req->input('type', 'ac');
+		$keyword = $req->input('keyword', '');
+
+		if ($keyword == '') return '';
+
+		$where = '';
+
+		if ($type == "select2") {
+			$sql = /** @lang text */
+				"
+                select
+                	code_id, code_val
+                from code
+                where code_kind_cd = 'PRD_CD_COLOR' and (code_id like :code_id or code_val like :code_val)
+                order by code_id
+                limit 0. 10
+            ";
+			$results =  DB::select($sql, [
+				"code_id" => sprintf("%s%%", $keyword),
+				"code_val" => sprintf("%s%%", $keyword)
+			]);
+
+			return response()->json([
+				"results" => $results
+			]);
+
+		} else {
+			$sql = /** @lang text */
+				"
+                select
+                	code_id, code_val
+                from code
+                where code_kind_cd = 'PRD_CD_COLOR' and code_val like :keyword
+                limit 0. 5
+            ";
+
+			return DB::select($sql,["keyword" => sprintf("%s%%",$keyword)]);
+
+		}
+
+	}
 }

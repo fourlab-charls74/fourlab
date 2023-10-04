@@ -36,6 +36,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 창고명 조회 (자동완성)
         Route::get('/storage', 'AutoCompleteController@storage');
 
+		// 컬러 조회 (자동완성)
+		Route::get('/color', 'AutoCompleteController@color');
+
     });
 
     Route::prefix("api")->namespace('api')->group(function () {

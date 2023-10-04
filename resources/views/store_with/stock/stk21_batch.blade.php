@@ -140,7 +140,7 @@
 		const pApp = new App('', { gridId: "#div-gd" });
 
 		$(document).ready(function() {
-			pApp.ResizeGrid(275, 450);
+			pApp.ResizeGrid(275, 550);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			gx = new HDGrid(gridDiv, columns,{

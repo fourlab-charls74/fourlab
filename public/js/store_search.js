@@ -101,6 +101,50 @@ $( document ).ready(function() {
             }
         }
     });
+
+	$('.select2-color').select2({
+		ajax: {
+			url: "/store/auto-complete/color",
+			dataType: 'json',
+			delay: 250,
+			data: function (params) {
+				return {
+					type:'select2',
+					keyword: params.term, // search term
+					page: params.page
+				};
+			},
+			cache: true
+		},
+		width:'100%',
+		placeholder: '',
+		allowClear: true,
+		minimumInputLength: 1,
+		templateResult: function (state) {
+			if (!state.id) {
+				return state.text;
+			}
+			if(state.img !== undefined && state.img !== ""){
+				var $state = $(
+					'<span><img src="' + state.img + '" style="width:50px" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + '[' + state.id +  '] '  + state.text + '</span>'
+				);
+			} else {
+				var $state = $(
+					'<span>' + '[' + state.id +  '] ' + state.text + '</span>'
+				);
+			}
+			return $state;
+		},
+		//templateSelection: formatRepoSelection,
+		language: {
+			// You can find all of the options in the language files provided in the
+			// build. They all must be functions that return the string that should be
+			// displayed.
+			inputTooShort: function () {
+				return "한글자 이상 입력해 주세요.";
+			}
+		}
+	});
     
 });
 
