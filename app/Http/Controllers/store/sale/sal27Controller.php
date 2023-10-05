@@ -122,7 +122,7 @@ class sal27Controller extends Controller
 		$month_sale_cols = [];
 		$sdate_month = date('Ym01', strtotime($sdate));
 		$edate_month = date('Ym01', strtotime($edate));
-		$interval = date_diff(date_create($sdate_month), date_create($edate_month));
+		$interval = date_diff(date_create($sdate_month), date_create($edate_month)->setTime(24,0,0));
 		for ($i = 0; $i <= ($interval->m + ($interval->y * 12)); $i++) {
 			$from = date('Ymd', strtotime($sdate_month . '+' . $i . ' month'));
 			$to = date('Ymd', strtotime(date('Y-m', strtotime($from)) . '-' . date('t', strtotime($from))));
