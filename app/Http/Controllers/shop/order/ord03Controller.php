@@ -239,7 +239,7 @@ class ord03Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 				where rcp.reject_yn = 'N'
-					and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby

@@ -302,7 +302,28 @@
 			const code = yoil.codes[i];
 			const day_of_week = yoil.format[code];
 			const f_day = day + ` (${day_of_week})`;
-			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc };
+			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc,
+				cellRenderer:function(params) {
+					let val = Comma(params.value);
+					let store_cd = '';
+					if (params.node.rowPinned === 'top') {
+						return val;
+					} else if (params.node.level == 2) {
+						if (val == 'null') {
+							return 0;
+						} else {
+							if (params.value < 0) {
+								return `<a href="#" style="color:blue" onclick="dayAmtClick(${val}, ${store_cd})">${val}</a>`;
+							} else {
+								return `<a href="#" style="color:black" onclick="dayAmtClick(${val}, ${store_cd})">${val}</a>`;
+							}
+						}
+					} else {
+						return val;
+					}
+					// return val;	
+				}
+			};
 			if ( code == 0 ) {
 				col.headerClass = 'hd-grid-red'; // 일요일 표시
 			} else if ( code == 6 ) {
@@ -389,6 +410,11 @@
         });
         
     }
+	
+	function dayAmtClick(val, store_cd) {
+		console.log(val, store_cd);
+		
+	}
 
 </script>
 @stop
