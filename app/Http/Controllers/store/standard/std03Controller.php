@@ -34,7 +34,7 @@ class std03Controller extends Controller
 		if($storage_cd != null) 
 			$where .= " and storage_cd like '%$storage_cd%'";
 		if($storage_nm != null) 
-			$where .= " and (storage_nm like '%$storage_nm%' or storage_nm_s like '%$storage_nm%')";
+			$where .= " and (storage_nm like '%$storage_nm%')";
 		if($use_yn != null) 
 			$where .= " and use_yn = '$use_yn'";
 		if($stock_check_yn != null) 

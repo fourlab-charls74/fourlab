@@ -233,8 +233,13 @@ class std07Controller extends Controller
 					]);
 				} else if($d['use_yn'] == 'Y' || $d['use_yn'] == 'N') {
 					$edate = $d['edate'] ?? '9999-12-31';
+					
 					if($new_data != '') {
-						$edate = date('Y-m-d', strtotime($new_data['sdate'] . '-1 day'));
+						if ($new_data['sdate'] == '0000-00-00') {
+							$edate = '0000-00-00';
+						} else {
+							$edate = date('Y-m-d', strtotime($new_data['sdate'] . '-1 day'));
+						}
 					}
 					// 수정
 					DB::table('store_fee')
