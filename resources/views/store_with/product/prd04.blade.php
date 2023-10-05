@@ -388,7 +388,7 @@
 		};
 		pApp.ResizeGrid(275);
 		pApp.BindSearchEnter();
-		Search();
+		//Search();
         
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
