@@ -128,7 +128,7 @@ class prd04Controller extends Controller
 			$where	.= ")";
 
 			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
-			$store_qty_sql	= "pss.qty";
+			$store_qty_sql	= "pss.wqty";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -145,7 +145,7 @@ class prd04Controller extends Controller
 			$where	.= ")";
 
 			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
-			$store_qty_sql	= "sum(pss.qty)";
+			$store_qty_sql	= "sum(pss.wqty)";
 		}
 
 		if( $store_no == "" && $store_channel != "" && $store_channel_kind ){
@@ -161,7 +161,7 @@ class prd04Controller extends Controller
 			$where	.= ")";
 
 			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
-			$store_qty_sql	= "sum(pss.qty)";
+			$store_qty_sql	= "sum(pss.wqty)";
 		}
 
 		if($ext_store_storage_qty == 'true') {

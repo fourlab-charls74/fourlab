@@ -1364,14 +1364,13 @@ class prd02Controller extends Controller
 				$gender 	= explode(' : ', $gender);
 				$opt 		= explode(' : ', $opt);
 				$item 		= explode(' : ', $item);
-				$color 		= explode(' : ', $color);
 				$size_kind  = explode(' : ', $size_kind);
 				$sup_com 	= explode(' : ', $sup_com);
 				$plan_category 	= explode(' : ', $plan_category);
 
 				$unit = "";
 
-				$prd_cd	= $row['prd_cd'].$color[0].$size;
+				$prd_cd	= $row['prd_cd'].$color.$size;
 				$goods_no = "";
 
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
@@ -1415,7 +1414,7 @@ class prd02Controller extends Controller
 						'gender'	=> $gender[0],
 						'opt'		=> $opt[0],
 						'item'		=> $item[0],
-						'color'		=> $color[0],
+						'color'		=> $color,
 						'size_kind' => $size_kind[0],
 						'size'		=> $size,
 						'plan_category' => $plan_category[0],
@@ -1458,8 +1457,6 @@ class prd02Controller extends Controller
 							'admin_id'	=> $admin_id
 						]);
 					}
-					
-
 				} else {
 					DB::rollback();
 					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);
@@ -2361,7 +2358,6 @@ class prd02Controller extends Controller
 				$gender 	= explode(' : ', $gender);
 				$opt 		= explode(' : ', $opt);
 				$item 		= explode(' : ', $item);
-				$color 		= explode(' : ', $color);
 				$size_kind  = explode(' : ', $size_kind);
 				$size		= explode(' : ', $size);
 				$sup_com 	= explode(' : ', $sup_com);
@@ -2369,7 +2365,7 @@ class prd02Controller extends Controller
 
 				$unit = "";
 
-				$prd_cd	= $row['prd_cd'].$color[0].$size[0];
+				$prd_cd	= $row['prd_cd'].$color.$size[0];
 				$goods_no = "";
 
 				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
@@ -2413,7 +2409,7 @@ class prd02Controller extends Controller
 						'seq'		=> $seq,
 						'opt'		=> $opt[0],
 						'item'		=> $item[0],
-						'color'		=> $color[0],
+						'color'		=> $color,
 						'size_kind' => $size_kind[0],
 						'size'		=> $size[0],
 //						'plan_category' => $plan_category[0],
@@ -2450,8 +2446,6 @@ class prd02Controller extends Controller
 
 						$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 
-						
-
 						DB::table('product_image')->insert([
 							'prd_cd' => $prd_cd,
 							'img_url' => $img_url,
@@ -2460,8 +2454,6 @@ class prd02Controller extends Controller
 							'admin_id'	=> $admin_id
 						]);
 					}
-					
-
 				} else {
 					DB::rollback();
 					return response()->json(["code" => -1, "prd_cd" => $prd_cd]);

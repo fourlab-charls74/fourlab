@@ -429,17 +429,36 @@ class stk21Controller extends Controller
 		$success_prd_cd = [];
 		$not_prd_cd = [];
 		$not_match_prd_cd = [];
+		$not_store_cd = [];
+		$not_dep_store_cd = [];
 		$msg = '';
 		$code = 200;
 		
 		foreach ($data as $row) {
 			$prd_cd = $row['prd_cd'];
+			$store_cd = $row['store_cd'];
+			$dep_store_cd = $row['dep_store_cd'];
 			
+			//바코드, 온라인코드 검색
 			$sql = "
 				select prd_cd, goods_no from product_code where prd_cd = :prd_cd
 			";
 			
 			$search_true_prd_cd = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+			// 수령매장 검색
+			$sql = "
+				select store_cd from store where store_cd = :store_cd
+			";
+
+			$search_true_store_cd = DB::selectOne($sql,['store_cd' => $store_cd]);
+			
+			//보내는 매장 검색
+			$sql = "
+				select store_cd from store where store_cd = :dep_store_cd
+			";
+
+			$search_true_dep_store_cd = DB::selectOne($sql,['dep_store_cd' => $dep_store_cd]);
 			
 			if (empty($search_true_prd_cd)) {
 				array_push($not_prd_cd, $prd_cd);
@@ -447,6 +466,14 @@ class stk21Controller extends Controller
 			
 			if ($search_true_prd_cd && isset($search_true_prd_cd->goods_no) && $search_true_prd_cd->goods_no == 0) {
 				array_push($not_match_prd_cd, $prd_cd);
+			}
+			
+			if (empty($search_true_store_cd)) {
+				array_push($not_store_cd, $store_cd);	
+			}
+			
+			if (empty($search_true_dep_store_cd)) {
+				array_push($not_dep_store_cd, $dep_store_cd);	
 			}
 		}
 		
@@ -458,6 +485,16 @@ class stk21Controller extends Controller
 		if (count($not_match_prd_cd) > 0) {
 			$code = 400;
 			$msg .= "매칭이 되지않은 상품이 존재합니다." . "\n" . implode(', ' , $not_match_prd_cd) . "\n";
+		}
+
+		if (count($not_dep_store_cd) > 0) {
+			$code = 400;
+			$msg .= "존재하지않는 출고매장이 있습니다." . "\n". implode(', ', $not_dep_store_cd) . "\n";
+		}
+		
+		if (count($not_store_cd) > 0) {
+			$code = 400;
+			$msg .= "존재하지않는 수령매장이 있습니다." . "\n". implode(', ', $not_store_cd) . "\n";
 		}
 		
 		foreach($data as $key => $d)

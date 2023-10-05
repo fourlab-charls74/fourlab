@@ -121,18 +121,12 @@ $( document ).ready(function() {
 		allowClear: true,
 		minimumInputLength: 1,
 		templateResult: function (state) {
-			if (!state.code_id) {
-				return state.code_val;
+			if (!state.id) {
+				return state.text;
 			}
-			if(state.img !== undefined && state.img !== ""){
-				var $state = $(
-					'<span><img src="' + state.img + '" style="width:50px" onError="this.src=\'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==\'"/> ' + '[' + state.id +  '] '  + state.text + '</span>'
-				);
-			} else {
-				var $state = $(
-					'<span>' + '[' + state.code_id +  '] ' + state.code_val + '</span>'
-				);
-			}
+			var $state = $(
+				'<span>' + '[' + state.id +  '] ' + state.text + '</span>'
+			);
 			return $state;
 		},
 		//templateSelection: formatRepoSelection,

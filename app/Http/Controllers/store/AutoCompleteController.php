@@ -110,7 +110,7 @@ class AutoCompleteController extends Controller
 			$sql = /** @lang text */
 				"
                 select
-                	code_id, code_val
+                	code_id as id, code_val as text
                 from code
                 where code_kind_cd = 'PRD_CD_COLOR' and (code_id like :code_id or code_val like :code_val)
                 order by code_id
@@ -129,7 +129,7 @@ class AutoCompleteController extends Controller
 			$sql = /** @lang text */
 				"
                 select
-                	code_id, code_val
+                	code_id as id, code_val as label
                 from code
                 where code_kind_cd = 'PRD_CD_COLOR' and code_val like :keyword
                 limit 0, 5

@@ -1,5 +1,5 @@
 @extends('store_with.layouts.layout-nav')
-@section('title', '본사요청RT 엑셀 업로드')
+@section('title', '본사요청RT 일괄등록')
 @section('content')
 
 	<!-- import excel lib -->
@@ -8,13 +8,13 @@
 	<div class="show_layout py-3 px-sm-3">
 		<div class="page_tit d-flex justify-content-between">
 			<div class="d-flex">
-				<h3 class="d-inline-flex">본사요청RT 엑셀 업로드</h3>
+				<h3 class="d-inline-flex">본사요청RT 일괄등록</h3>
 				<div class="d-inline-flex location">
 					<span class="home"></span>
 					<span>/ 매장관리</span>
 					<span>/ 매장RT관리</span>
 					<span>/ 본사요청RT</span>
-					<span>/ 엑셀 업로드</span>
+					<span>/ 일괄등록</span>
 				</div>
 			</div>
 			<div class="d-flex">
@@ -434,7 +434,7 @@
 				if(res.data.code === 200) {
 					alert(res.data.msg);
 					window.close();
-					location.href = "/store/stock/stk20";
+					window.opener.location.href = "/store/stock/stk20";
 				} else if (res.data.code === 400) {
 					alert(res.data.msg);
 				} else {
