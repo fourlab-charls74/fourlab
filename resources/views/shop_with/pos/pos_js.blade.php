@@ -804,16 +804,18 @@
                     <tr>
                         <td class="pt-2 pb-2 pl-1">
                             <div class="position-relative d-flex flex-column align-items-start fs-08 pr-2">
-                                <p class="fc-gray fs-08" style="text-decoration: underline;">No. ${o.ord_opt_no}</p>
+								<div class="d-flex">
+                                	<p class="fc-gray fs-08 mr-2" style="text-decoration: underline;">No. ${o.ord_opt_no}</p>
+	                                ${o.clm_state == 61 ? `
+	                                    <div class="d-flex justify-content-center align-items-center fc-red fw-b px-1" style="top:50%;left:50%;border:2px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">
+	                                        <span style="font-size:0.7rem;" class="mr-2">환불완료</span>
+											<span style="font-size:0.7rem;">${o.clm_state_date.slice(0,4) + '-' + o.clm_state_date.slice(4, 6) + '-' + o.clm_state_date.slice(6,8)}</span>
+										</div>
+	                                ` : ''}								
+								</div>
                                 <p class="fw-sb fs-09">${o.goods_nm}</p>
                                 <p class="fc-white br-05 bg-gray pl-2 pr-2 mt-1 mb-1">${o.prd_cd || '-'}</p>
                                 ${o.goods_opt.split("^").map(opt => `<p class="fc-gray fw-sb pl-3">&#8735; ${opt}</p>`).join("")}
-                                ${o.clm_state == 61 ? `
-                                    <div class="position-absolute d-flex flex-column justify-content-center align-items-center fc-red fs-20 fw-b w-75" style="top:50%;left:50%;transform:translate(-50%, -50%) rotate(-2deg);height:85px;border:3px solid #ED2939;text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">
-                                    	<span>환불완료</span>
-										<span style="font-size:0.9rem;">${o.clm_state_date.slice(0,4) + '-' + o.clm_state_date.slice(4, 6) + '-' + o.clm_state_date.slice(6,8)}</span>
-									</div>
-                                ` : ''}
                             </div>
                         </td>
                         <td class="text-center">${Comma(o.price)}</td>

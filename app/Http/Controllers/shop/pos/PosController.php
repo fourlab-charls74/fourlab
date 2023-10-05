@@ -185,8 +185,8 @@ class PosController extends Controller
         $sql = "
             select pc.prd_cd, pc.prd_cd_p as prd_cd_sm
                 , pc.goods_no, g.goods_sub, g.goods_nm, g.goods_nm_eng, pc.goods_opt, g.style_no
-                , g.goods_type as goods_type_cd, g.brand, g.price, g.price as ori_price, g.goods_sh
-                , (100 - round(g.price / g.goods_sh * 100)) as dc_rate
+                , g.goods_type as goods_type_cd, g.brand, p.price, p.price as ori_price, p.tag_price as goods_sh
+                , (100 - round(p.price / p.tag_price * 100)) as dc_rate
                 , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
                     select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                     from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -204,6 +204,7 @@ class PosController extends Controller
                 , '' as pr_code
                 , '' as coupon_no
             from product_code pc
+                inner join product p on p.prd_cd = pc.prd_cd
                 inner join product_stock ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = pc.color
@@ -567,7 +568,13 @@ class PosController extends Controller
                     where g.goods_no = :goods_no
                 ";
                 $goods = DB::selectOne($sql, ['goods_no' => $goods_no]);
-                $item_ord_amt = $goods->price * $qty; // 해당상품 총 주문금액 (주문금액은 판매가기준)
+				
+				$sql = "
+					select p.price, p.wonga, p.tag_price as goods_sh from product p where p.prd_cd = :prd_cd
+				";
+				$product = DB::selectOne($sql, [ 'prd_cd' => $prd_cd ]);
+
+                $item_ord_amt = $product->price * $qty; // 해당상품 총 주문금액 (주문금액은 판매가기준)
 
                 ######################### 재고수량 판매가능여부 체크 ############################
                 $prd_wqty = DB::table('product_stock_store')->where('prd_cd', $prd_cd)->where('store_cd', $store_cd)->value('wqty');
@@ -638,12 +645,12 @@ class PosController extends Controller
 
                     // 쿠폰할인은 TAG가 기준입니다.
                     $item_coupon_amt = $cp->coupon_amt_kind === 'P'
-                        ? round($goods->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0)
+                        ? round($product->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0)
                         : ($cp->coupon_amt ?? 0);
                 }
 
                 ######################### 상품별 적립금 반영 ############################
-                $item_point_amt = round($goods->price / $a_ord_amt * $point_amt, 0); // 해당상품 적립금사용금액
+                $item_point_amt = round($product->price / $a_ord_amt * $point_amt, 0); // 해당상품 적립금사용금액
 
                 if ($i < count($cart) - 1) $used_point_amt += $item_point_amt;
                 else $item_point_amt = $point_amt - $used_point_amt;
@@ -651,16 +658,16 @@ class PosController extends Controller
                 ######################### 상품별 추가적립금 반영 ############################
                 $add_group_point = $ord_opt_add_point = 0;
 
-                if ($add_point_ratio > 0) $add_group_point = ($goods->price * $add_point_ratio / 100) * $qty;
+                if ($add_point_ratio > 0) $add_group_point = ($product->price * $add_point_ratio / 100) * $qty;
                 if ($point_flag && $goods->point_yn === 'Y') {
                     if ($goods->point_cfg === 'G') {
                         if ($goods->point_unit === 'P') {
-                            $ord_opt_add_point = round(($goods->price * $goods->point / 100) * $qty, 0) + $add_group_point;
+                            $ord_opt_add_point = round(($product->price * $goods->point / 100) * $qty, 0) + $add_group_point;
                         } else {
                             $ord_opt_add_point = ($goods->point * $qty) + $add_group_point;
                         }
                     } else {
-                        $ord_opt_add_point = round(($goods->price * $cfg_ratio / 100) * $qty, 0) + $add_group_point;
+                        $ord_opt_add_point = round(($product->price * $cfg_ratio / 100) * $qty, 0) + $add_group_point;
                     }
                 }
 
@@ -672,8 +679,8 @@ class PosController extends Controller
                 if ($sk !== null) {
                     $item_dc_amt = $sk->amt_kind === 'per'
                     ? $sk->sale_apply === 'tag'
-                        ? round($goods->goods_sh * $qty * ($sk->sale_per ?? 0) / 100, 0)
-                        : round($goods->price * $qty * ($sk->sale_per ?? 0) / 100, 0)
+                        ? round($product->goods_sh * $qty * ($sk->sale_per ?? 0) / 100, 0)
+                        : round($product->price * $qty * ($sk->sale_per ?? 0) / 100, 0)
                     : ($sk->sale_amt ?? 0);
                     if ($item_dc_amt < 0) $item_dc_amt = 0;
                 }
@@ -690,8 +697,8 @@ class PosController extends Controller
                     'goods_nm'      => $goods->goods_nm ?? '',
                     'goods_opt'     => $goods_opt,
                     'qty'           => $qty,
-                    'wonga'         => $goods->wonga,
-                    'price'         => $goods->price,
+                    'wonga'         => $product->wonga,
+                    'price'         => $product->price,
                     'dlv_amt'       => 0,
                     'pay_type'      => $pay_type,
                     'coupon_amt'    => $item_coupon_amt,
@@ -996,9 +1003,9 @@ class PosController extends Controller
                 , o.goods_nm
                 , o.goods_opt
                 , g.brand
-                , g.price
-                , g.price as ori_price
-                , g.goods_sh
+                , p.price
+                , p.price as ori_price
+                , p.tag_price as goods_sh
                 , o.pay_type
                 , o.sale_kind
                 , s.sale_type_nm
@@ -1041,6 +1048,7 @@ class PosController extends Controller
             from order_opt o
                 inner join order_mst om on om.ord_no = o.ord_no
                 inner join product_code pc on pc.prd_cd = o.prd_cd
+                inner join product p on p.prd_cd = o.prd_cd
                 left outer join goods g on g.goods_no = o.goods_no
                 left outer join code pt on pt.code_kind_cd = 'G_PAY_TYPE' and pt.code_id = o.pay_type
                 left outer join sale_type s on s.sale_kind = o.sale_kind
