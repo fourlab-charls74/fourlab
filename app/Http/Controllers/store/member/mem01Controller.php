@@ -454,9 +454,9 @@ class mem01Controller extends Controller
 					'auth_yn'	=> 'N',
 					'site'		=> 'HEAD_OFFICE',
 					'type'		=> 'B',
-					'store_nm'	=> $store_nm,
-					'store_cd'	=> $store_cd
+					'store_nm'	=> $store_nm
 				];
+				//'store_cd'	=> $store_cd
 
 				//회원처리
 				DB::table('member')->updateOrInsert($where, $values);
