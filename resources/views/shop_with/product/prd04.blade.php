@@ -344,7 +344,7 @@
             $("#store_no").select2({data:['{{ @$user_store }}']??'', tags: true});
         @endif
 
-		Search();
+		//Search();
 
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
