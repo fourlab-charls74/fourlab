@@ -18,7 +18,7 @@ class sal25Controller extends Controller
 	{
 
         $mutable = Carbon::now();
-        $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m'));
+        $sdate	= sprintf("%s",$mutable->sub(3, 'month')->format('Y-m'));
 
         $values = [
             'sdate' => $sdate,

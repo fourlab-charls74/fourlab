@@ -23,7 +23,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">매출일자</label>
+                            <label for="formrow-firstname-input">판매기간</label>
                             <div class="form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -75,32 +75,33 @@
 							</div>
 						</div>
 					</div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">상품검색조건</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>매장명</label>
+							<div class="form-inline inline_btn_box">
+								<input type='hidden' id="store_nm" name="store_nm">
+								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label>매장명</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="store_nm" name="store_nm">
-                                <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
+                   
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">상품검색조건</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="sell_type">판매유형</label>
@@ -129,7 +130,7 @@
                     </div>
                 </div>
                 <div class="row">
-	                <div class="col-lg-4 inner-td">
+	                <div class="col-lg-4 inner-td" hidden>
 		                <div class="form-group">
 			                <label for="">온라인/오프라인</label>
 			                <div class="form-inline form-radio-box">
@@ -165,7 +166,7 @@
                             </div>
                         </div>
                     </div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4 inner-td" hidden>
 						<div class="form-group">
 							<label for="formrow-email-input">매출시점</label>
 							<div class="form-inline form-radio-box">
