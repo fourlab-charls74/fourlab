@@ -61,8 +61,6 @@
                                                             @if ($res->change_type == 'R')
                                                                 checked
                                                             @endif
-                                                        @else
-                                                            checked
                                                         @endif
                                                         >
                                                         <label class="custom-control-label" for="reservation">예약</label>
@@ -73,6 +71,8 @@
                                                             @if ($res->change_type != 'R')
                                                                 checked
                                                             @endif
+													   @else
+														   checked
                                                         @endif>
                                                         <label class="custom-control-label" for="now">즉시</label>
                                                     </div>

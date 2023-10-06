@@ -71,22 +71,39 @@ class ProductPriceBatch extends Command
 						->update(['price' => $change_price]);
 
 					//product 테이블 price 가격변경
+					//DB::table('product')
+					//	->where('prd_cd', '=', $prd_cd)
+					//	->update(['price'=> $change_price]);
+
+					//if($plan_category != '00'){
+					//	DB::table('product_code')
+					//		->where('prd_cd', '=', $prd_cd)
+					//		->update(['plan_category' => $plan_category]);
+					//}
+				}
+
+				$sql = " select prd_cd, prd_cd_p from product_code where prd_cd = :prd_cd ";
+				$product_result = DB::select($sql,['prd_cd' => $prd_cd]);
+
+				foreach ($product_result as $pr) {
 					DB::table('product')
-						->where('prd_cd', '=', $prd_cd)
-						->update(['price'=> $change_price]);
+						->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+						->update([
+							"price" 	=> $change_price,
+							"ut" => now()
+						]);
 
 					if($plan_category != '00'){
 						DB::table('product_code')
-							->where('prd_cd', '=', $prd_cd)
+							->where('prd_cd', 'like', $pr->prd_cd_p . '%')
 							->update(['plan_category' => $plan_category]);
 					}
-
-					//product_price 테이블 가격적용 상태 변경
-					DB::table('product_price_list')
-						->where('idx', '=', $idx)
-						->update(['apply_yn'=> 'Y','ut' => DB::raw('now()')]);
 				}
 
+				//product_price 테이블 가격적용 상태 변경
+				DB::table('product_price_list')
+					->where('idx', '=', $idx)
+					->update(['apply_yn'=> 'Y','ut' => DB::raw('now()')]);
 			}
 
 			DB::commit();

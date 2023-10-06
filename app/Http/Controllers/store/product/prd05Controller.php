@@ -438,20 +438,30 @@ class prd05Controller extends Controller
 						]);
 
 					if ($type == 'now') {
-						//goods 테이블 price 가격변경
-						DB::table('goods')
-						->where('goods_no', '=', $d['goods_no'])
-						->update(['price' => $d['change_val']]);
-	
-						//product 테이블 price 가격변경
-						DB::table('product')
-						->where('prd_cd', '=', $d['prd_cd'])
-						->update(['price'=> $d['change_val']]);
+						if( $d['goods_no'] != 0 ){
+							//goods 테이블 price 가격변경
+							DB::table('goods')
+								->where('goods_no', '=', $d['goods_no'])
+								->update(['price' => $d['change_val']]);
+						}
 
-						if($plan_category != '00'){
-							DB::table('product_code')
-								->where('prd_cd', '=', $d['prd_cd'])
-								->update(['plan_category' => $plan_category]);
+						$sql = " select prd_cd, prd_cd_p from product_code where prd_cd = :prd_cd ";
+						$product_result = DB::select($sql,['prd_cd' => $d['prd_cd']]);
+
+						foreach ($product_result as $pr) {
+							DB::table('product')
+								->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+								->update([
+									"price" 	=> $d['change_val'],
+									"admin_id"	=> $admin_id,
+									"ut"		=> now()
+								]);
+
+							if($plan_category != '00'){
+								DB::table('product_code')
+									->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+									->update(['plan_category' => $plan_category]);
+							}
 						}
 					}
 				}
