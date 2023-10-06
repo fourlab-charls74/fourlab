@@ -512,6 +512,7 @@
 	function initSearchTab() {
 		let store_cd = "{{ @$store->store_cd }}";
 		let store_nm = "{{ @$store->store_nm }}";
+
 		{{--let brand_cd = "{{ @$brand->brand }}";--}}
 		{{--let brand_nm = "{{ @$brand->brand_nm }}";--}}
 

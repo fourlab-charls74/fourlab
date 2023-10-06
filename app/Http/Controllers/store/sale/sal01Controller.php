@@ -156,6 +156,8 @@ class sal01Controller extends Controller
 		";
 
 		$result = DB::select($query, ['sdate' => $sdate,'edate' => $edate]);
+		
+		dd($query);
 
 		return response()->json([
 			"code"	=> 200,

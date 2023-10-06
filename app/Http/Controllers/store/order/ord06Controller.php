@@ -48,6 +48,11 @@ class ord06Controller extends Controller
 		$prd_cd_range_nm 	= $request->query("prd_cd_range_nm", '');
 		parse_str($prd_cd_range_text, $prd_cd_range);
 
+		//매장별판매집계표(일별)에서 쿼리스트링으로 가져온 값들
+		$sdate = $request->query('sdate', $sdate);
+		$edate = $request->query('sdate', $edate);
+		$store_cd = $request->query('store_cd',$store_cd);
+		
 		$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
 		$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());
 		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
@@ -58,6 +63,9 @@ class ord06Controller extends Controller
 
 		$conf = new Conf();
 		$domain = $conf->getConfigValue("shop", "domain");
+
+		
+		
 
 		$values = [
 			'sdate' 		=> $sdate,
@@ -89,6 +97,7 @@ class ord06Controller extends Controller
 			'store'			=> $store,
 			'prd_cd_range'	=> $prd_cd_range,
 			'prd_cd_range_nm' => $prd_cd_range_nm,
+			'store_cd'		=> $store_cd
 		];
 		return view(Config::get('shop.store.view') . '/order/ord06', $values);
 	}

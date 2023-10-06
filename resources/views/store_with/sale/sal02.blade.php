@@ -31,7 +31,7 @@
 							<label for="good_types">판매기간(판매연월)</label>
 							<div class="docs-datepicker flex_box">
 								<div class="input-group">
-								<input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">
+								<input type="text" class="form-control form-control-sm docs-date month" id="sdate" name="sdate" value="{{ $sdate }}" autocomplete="off">
 									<div class="input-group-append">
 										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 											<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -305,17 +305,18 @@
 			let col = { field: `${day}_val`, headerName: f_day, type: 'numberType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc,
 				cellRenderer:function(params) {
 					let val = Comma(params.value);
-					let store_cd = '';
 					if (params.node.rowPinned === 'top') {
 						return val;
 					} else if (params.node.level == 2) {
+						let store_cd = params.data.store_cd;
+						let colId = params.column.colId;
 						if (val == 'null') {
 							return 0;
 						} else {
 							if (params.value < 0) {
-								return `<a href="#" style="color:blue" onclick="dayAmtClick(${val}, ${store_cd})">${val}</a>`;
+								return `<a href="#" style="color:blue" onclick="dayAmtClick('${colId}', '${store_cd}')">${val}</a>`;
 							} else {
-								return `<a href="#" style="color:black" onclick="dayAmtClick(${val}, ${store_cd})">${val}</a>`;
+								return `<a href="#" style="color:black" onclick="dayAmtClick('${colId}', '${store_cd}')">${val}</a>`;
 							}
 						}
 					} else {
@@ -411,9 +412,19 @@
         
     }
 	
-	function dayAmtClick(val, store_cd) {
-		console.log(val, store_cd);
+	function dayAmtClick(colId, store_cd) {
+		let yearMonth = $('#sdate').val();
+		let col = colId.replace("_val", "");
+		let res = parseInt(col);
+		let day = "";
+		if (res < 10) {
+			day = '0'+ res;
+		} else {
+			day = res;
+		}
+		let sdate = yearMonth + '-' + day;
 		
+		window.location.href = '/store/order/ord06?sdate=' + sdate + '&store_cd=' + store_cd;
 	}
 
 </script>
