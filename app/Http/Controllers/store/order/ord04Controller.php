@@ -211,7 +211,7 @@ class ord04Controller extends Controller
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
 				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
-					and o.clm_state in (40,41)
+					and o.clm_state in (40,41,61)
 					$where
 				$orderby
 				$limit
@@ -240,7 +240,7 @@ class ord04Controller extends Controller
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
 				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
-					and o.clm_state in (40,41)
+					and o.clm_state in (40,41,61)
 					$where
 			";
 			$row = DB::selectOne($sql);
