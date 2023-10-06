@@ -28,7 +28,7 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">매출일자</label>
+                            <label for="formrow-firstname-input">판매기간</label>
                             <div class="form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">

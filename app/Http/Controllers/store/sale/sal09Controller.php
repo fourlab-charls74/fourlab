@@ -18,7 +18,7 @@ class sal09Controller extends Controller
 		// $sdate = Carbon::now()->startOfMonth()->subMonth()->format("Y-m"); // 1달전 기준 (테스트 용)
 
 		$mutable = Carbon::now();
-        $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
+        $sdate = $request->input('sdate', now()->format("Y-m"));
 		$edate = $request->input('edate', now()->format("Y-m"));
 
 		$months = [];
