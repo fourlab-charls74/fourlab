@@ -137,7 +137,8 @@ class prd03Controller extends Controller
 				p.price as price,
 				p.wonga as wonga,
 				ifnull(pss.wqty, 0) as stock_qty,
-				ifnull(pss2.wqty, 0) as store_qty,
+				ifnull(( select sum(wqty) from product_stock_store where prd_cd = p.prd_cd ),0) as store_qty,
+				-- ifnull(pss2.wqty, 0) as store_qty,
 				pc.seq as seq,
 				c3.code_val as year,
 				c4.code_val as season,
@@ -150,7 +151,7 @@ class prd03Controller extends Controller
 			from product p
 				inner join product_code pc on p.prd_cd = pc.prd_cd
 				left outer join product_stock_storage pss on p.prd_cd = pss.prd_cd
-				left outer join product_stock_store pss2 on p.prd_cd = pss2.prd_cd
+				-- left outer join product_stock_store pss2 on p.prd_cd = pss2.prd_cd
 				inner join company cp on p.com_id = cp.com_id
 				$in_store_sql
 				left outer join code c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
