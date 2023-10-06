@@ -247,9 +247,9 @@ class prd02Controller extends Controller
 				, c.code_val as color_nm
 				, ps.wqty
 				, (ps.qty - ps.wqty) as sqty
-				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
-				, if(pc.goods_no = 0, p.price, g.price) as price
-				, if(pc.goods_no = 0, p.wonga, p.wonga) as wonga
+				, p.tag_price as goods_sh
+				, p.price as price
+				, p.wonga as wonga
 				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - p.wonga))) as margin_rate
 				, (if(pc.goods_no = 0, p.price, g.price) - p.wonga) as margin_amt
 				, g.org_nm
@@ -1485,59 +1485,60 @@ class prd02Controller extends Controller
 		$price		= $request->input('price');
 		$size_kind	= $request->input('size_kind');
 		$origin 	= $request->input('origin', '');
-		
-			$sql = "
-				select
-					c.prd_cd
-					, c.prd_cd_p
-				from goods_summary a
-				left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
-				where
-					a.goods_no = :goods_no
-			";
-			$result = DB::select($sql, ['goods_no' => $goods_no]);
+	
+		// $sql = "
+		// 	select
+		// 		c.prd_cd
+		// 		, c.prd_cd_p
+		// 	from goods_summary a
+		// 	left outer join product_code c on c.goods_no = a.goods_no and c.goods_opt = a.goods_opt
+		// 	where
+		// 		a.goods_no = :goods_no
+		// ";
+		// $result = DB::select($sql, ['goods_no' => $goods_no]);
 
 		try {
 			DB::beginTransaction();
-
-			DB::table('goods')
-				->where('goods_no', '=', $goods_no)
-				->update([
-					"price" 	=> $price,
-					"goods_sh" 	=> $tag_price,
-					"org_nm" 	=> $origin, // goods 테이블의 원산지 변경
-					"admin_id"	=> $admin_id,
-					"admin_nm"	=> $admin_name,
-					"upd_dm" 	=> now(),
-				]);
 			
-			foreach($result as $row){
-				DB::table('product')
-					->where('prd_cd', 'like', $row->prd_cd_p . '%')
+			if ($goods_no != '0') {
+				DB::table('goods')
+					->where('goods_no', '=', $goods_no)
 					->update([
-						"price" 	=> $price,
-						"tag_price" => $tag_price,
-						"origin"	=> $origin,	//product 테이블의 원산지 변경
-						"admin_id"	=> $admin_id,
-						"ut" => now(),
-					]);
-				
-				//사이즈구분 변경하는 부분
-				DB::table('product_code')
-					->where('prd_cd', 'like', $row->prd_cd_p . '%')
-					->update([
-						"size_kind" => $size_kind,
-						"ut"		=> now(),
-						"admin_id"	=> $admin_id
+						"price" => $price,
+						"goods_sh" => $tag_price,
+						"org_nm" => $origin, // goods 테이블의 원산지 변경
+						"admin_id" => $admin_id,
+						"admin_nm" => $admin_name,
+						"upd_dm" => now(),
 					]);
 			}
 			
+			// foreach($result as $row){
+			// 	DB::table('product')
+			// 		->where('prd_cd', 'like', $row->prd_cd_p . '%')
+			// 		->update([
+			// 			"price" 	=> $price,
+			// 			"tag_price" => $tag_price,
+			// 			"origin"	=> $origin,	//product 테이블의 원산지 변경
+			// 			"admin_id"	=> $admin_id,
+			// 			"ut" => now(),
+			// 		]);
+				
+				//사이즈구분 변경하는 부분
+			// 	DB::table('product_code')
+			// 		->where('prd_cd', 'like', $row->prd_cd_p . '%')
+			// 		->update([
+			// 			"size_kind" => $size_kind,
+			// 			"ut"		=> now(),
+			// 			"admin_id"	=> $admin_id
+			// 		]);
+			// }
+			
 			// 바코드가 매칭되지않았을 때 
-			if ($goods_no == '0') {
+			//if ($goods_no == '0') {
 				$sql = "
 					select 
-						prd_cd
-						, prd_cd_p
+						prd_cd, prd_cd_p
 					from product_code
 					where prd_cd = :prd_cd
 				";
@@ -1563,7 +1564,7 @@ class prd02Controller extends Controller
 							"ut" => now(),
 						]);
 				}
-			}
+			//}
 
 			DB::commit();
 			$code = 200;
