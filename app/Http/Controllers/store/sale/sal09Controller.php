@@ -164,14 +164,14 @@ class sal09Controller extends Controller
 
 			// sdate 기준 저번 달 주문금액, 결제금액 가져오기
 			$sum_month_prev .= " 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', $sum_true,0)) as prev_ord_amt_${Ym}, 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', $sum_true,0)) as prev_recv_amt_${Ym},
+				sum(if(date_format(w.ord_state_date,'%Y%m') = '${prev_sdate}', if(w.ord_state > 30, $sum_true * -1, $sum_true),0)) as prev_ord_amt_${Ym}, 
+				sum(if(date_format(w.ord_state_date,'%Y%m') = '${prev_sdate}', if(w.ord_state > 30, $sum_true * -1, $sum_true),0)) as prev_recv_amt_${Ym},
 			";
 
 			// 기간 이내의 주문금액, 결제금액 가져오기
 			$sum_month_others .= " 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', $sum_true,0)) as ord_amt_${Ym}, 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', $sum_true,0)) as recv_amt_${Ym}${comma}
+				sum(if(date_format(w.ord_state_date,'%Y%m') = '${Ym}', if(w.ord_state > 30, $sum_true * -1, $sum_true),0)) as ord_amt_${Ym}, 
+				sum(if(date_format(w.ord_state_date,'%Y%m') = '${Ym}', if(w.ord_state > 30, $sum_true * -1, $sum_true),0)) as recv_amt_${Ym}${comma}
 			";
 
 			// 기간 이내의 매장목표 가져오기
@@ -209,8 +209,8 @@ class sal09Controller extends Controller
 
 		$ym_s = str_replace("-", "", $sdate);
 		$ym_e = str_replace("-", "", $edate);
-		$prev_sdate = Carbon::parse($sdate)->format("Y-m-01");
-		$next_edate = Carbon::parse($edate)->format("Y-m-31");
+		$prev_sdate = Carbon::parse($sdate)->format("Ym01");
+		$next_edate = Carbon::parse($edate)->format("Ym31");
 
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format("Y-m");
 		$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
@@ -227,29 +227,31 @@ class sal09Controller extends Controller
 				, sc.store_channel as store_channel
 				, sc2.store_kind as store_channel_kind
 			from store s 
-			left outer join (
-				select 
-					m.store_cd, sum(o.recv_amt) as recv_amt, sum(o.qty) as qty,
-					${sum_month_prev}
-					${sum_month_others}
-				from order_mst m 
-					inner join order_opt o on m.ord_no = o.ord_no 
-				    inner join goods g on o.goods_no = g.goods_no 
-					left outer join product_code pc on pc.prd_cd = o.prd_cd
-				where m.ord_date >= '${prev_sdate}' and m.ord_date <= '${next_edate}' and m.store_cd <> '' $where
-				group by m.store_cd
-			) a on s.store_cd = a.store_cd
-			left outer join 
-			(
-				select 
-					ssp.store_cd, sum(amt) as proj_amt, ssp.amt,
-					${sum_proj_amt}
-				from store_sales_projection ssp
-				where ym >= '${ym_s}' and ym <= '${ym_e}'
-				group by ssp.store_cd
-			) p on s.store_cd = p.store_cd 
-			left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
-			left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+				left outer join (
+					select 
+						m.store_cd, sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty,
+						sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
+						${sum_month_prev}
+						${sum_month_others}
+					from order_opt_wonga w
+						inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					    inner join order_mst m on m.ord_no = o.ord_no
+						inner join goods g on o.goods_no = g.goods_no and g.goods_sub = o.goods_sub
+						left outer join product_code pc on pc.prd_cd = o.prd_cd
+					where w.ord_state in(30, 60, 61) and w.ord_state_date >= '${prev_sdate}' and w.ord_state_date <= '${next_edate}' and m.store_cd <> '' $where
+					group by m.store_cd
+				) a on s.store_cd = a.store_cd
+				left outer join 
+				(
+					select 
+						ssp.store_cd, sum(amt) as proj_amt, ssp.amt,
+						${sum_proj_amt}
+					from store_sales_projection ssp
+					where ym >= '${ym_s}' and ym <= '${ym_e}'
+					group by ssp.store_cd
+				) p on s.store_cd = p.store_cd 
+				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
             where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or a.qty is not null or a.recv_amt <> '0') $where2
 		";
 		

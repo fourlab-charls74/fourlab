@@ -23,7 +23,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="formrow-firstname-input">매출일자</label>
+                            <label for="formrow-firstname-input">판매기간</label>
                             <div class="form-inline">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -129,7 +129,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
+                    <div class="col-lg-4 inner-td" hidden>
                         <div class="form-group">
                             <label for="">온라인/오프라인</label>
                             <div class="form-inline form-radio-box">
@@ -165,7 +165,7 @@
                             </div>
                         </div>
                     </div>
-					<div class="col-lg-4 inner-td">
+					<div class="col-lg-4 inner-td" hidden>
 						<div class="form-group">
 							<label for="formrow-email-input">매출시점</label>
 							<div class="form-inline form-radio-box">
