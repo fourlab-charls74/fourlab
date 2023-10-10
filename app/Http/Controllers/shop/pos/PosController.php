@@ -32,7 +32,7 @@ class PosController extends Controller
             order by s.sale_kind
         ";
 		
-		dd($sql);
+		
         $sale_types = DB::select($sql);
 
 		foreach ($sale_types as $key => $type) {
