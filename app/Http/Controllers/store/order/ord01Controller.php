@@ -989,26 +989,29 @@ class ord01Controller extends Controller
             }
             if ($row != null) $product_stock = $row->wqty;
 
-            // 예약판매가 아닐 경우에만 재고부족 에러처리
-            if ($goods->is_unlimited == "Y") {
-                if ($product_stock < 1) {
-                    if ($reservation_yn === 'Y') {
-                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
-                    } else {
-                        $code = '-105';
-                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
-                    }
-                }
-            } else {
-                if ($qty >= 0 && $qty > $product_stock) {
-                    if ($reservation_yn === 'Y') {
-                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
-                    } else {
-                        $code = '-105';
-                        // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
-                    }
-                }
-            }
+			// 예약판매가 아닐 경우에만 재고부족 에러처리
+			
+			// 본사에서 수기 일괄등록 매장재고 부족상품도 판매등록 가능하게 수정요청
+			
+//            if ($goods->is_unlimited == "Y") {
+//                if ($product_stock < 1) {
+//                    if ($reservation_yn === 'Y') {
+//                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
+//                    } else {
+//                        $code = '-105';
+//                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+//                    }
+//                }
+//            } else {
+//                if ($qty >= 0 && $qty > $product_stock) {
+//                    if ($reservation_yn === 'Y') {
+//                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
+//                    } else {
+//                        $code = '-105';
+//                        // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+//                    }
+//                }
+//            }
 
 			if ($qty === 0) $code = '-103'; // 판매수량 0일 경우 에러처리
             if ($code != '200') break;
