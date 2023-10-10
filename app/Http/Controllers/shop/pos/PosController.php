@@ -22,6 +22,7 @@ class PosController extends Controller
     {
         $store_cd = Auth::guard('head')->user()->store_cd;
         $today = date('Y-m-d');
+		// 날짜형식 변경 시간 분 초 삭제
         $sql = "
             select
                 s.idx as sale_type, s.sale_kind, s.sale_type_nm,
