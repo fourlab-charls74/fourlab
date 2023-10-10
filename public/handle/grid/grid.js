@@ -444,6 +444,11 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                         lineStyle: 'Continuous',
                         weight: 2,
                     },
+					borderRight: {
+						color: '#aaa',
+						lineStyle: 'Continuous',
+						weight: 1,
+					},
                 },
             },
             {
@@ -780,6 +785,7 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
         headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : 30,
         skipPinnedTop: options.hasOwnProperty('addPinnedTop') ? !options.addPinnedTop : true,
         skipGroups: options.hasOwnProperty('skipGroups') ? options.skipGroups : false,
+		columnGroups: true,
         shouldRowBeSkipped: (params) => {
             return options.hasOwnProperty('level') && Number.isInteger(options.level) ? options.level !== params.node.level : false;
         },
