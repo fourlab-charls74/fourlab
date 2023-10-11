@@ -499,7 +499,10 @@
         rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
         gx3.gridOptions.api.updateRowData({ add: rows });
         $("#gd-rt-total").html(gx3.getRows().length);
-        document.getElementById("final_table_area").scrollIntoView({ behavior: "smooth" });
+		// 애니메이션 기능 삭제 (RT리스트에 등록할때마다 다시 올라가서 등록하기 번거로움)
+        // document.getElementById("final_table_area").scrollIntoView({ behavior: "smooth" });
+		// RT리스트에 등록 버튼을 클릭 시 체크박스 해제하는 기능
+		gx2.gridOptions.api.deselectAll();
     }
 
     // 최종RT 리스트 중 선택항목 삭제

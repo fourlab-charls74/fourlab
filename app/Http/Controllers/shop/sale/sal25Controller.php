@@ -18,7 +18,7 @@ class sal25Controller extends Controller
 	{
 
         $mutable = Carbon::now();
-        $sdate	= sprintf("%s",$mutable->sub(6, 'month')->format('Y-m'));
+        $sdate	= sprintf("%s",$mutable->sub(3, 'month')->format('Y-m'));
 
         $values = [
             'sdate' => $sdate,
@@ -241,6 +241,7 @@ class sal25Controller extends Controller
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
             $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
 			$row["sum_wonga"] = $row["sum_wonga"] * 1;
+			$row["recv_amt_61"] = $row["recv_amt_61"] + $row["fee_amt_61"];
 
             $result[] = $row;
         }
