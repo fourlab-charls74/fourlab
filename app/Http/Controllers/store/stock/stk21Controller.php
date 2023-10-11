@@ -518,12 +518,7 @@ class stk21Controller extends Controller
                     , s.prd_cd
                     , pc.prd_cd_p as prd_cd_p
                     , pc.color
-                    , ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size
+                    , pc.size
                     , s.goods_opt
                     , (select wqty from product_stock_store where store_cd = '$dep_store_cd' and prd_cd = s.prd_cd) as store_qty
                     , '$qty' as qty
