@@ -591,34 +591,8 @@
     function RequestRT() {
         let rows = gx3.getSelectedRows();
         if(rows.length < 1) return alert("매장요청 할 항목을 선택해주세요.");
-		
-		// 받는 매장이 동일상품 여러매장에 찔러보기식 요청 못하게 막는 부분 (동일상품 & 동일일자 2개이상 못하게)
-		
-		// const groupedData = {};
-		// rows.forEach(row => {
-		// 	const key  = `${row.prd_cd}_${row.store_cd}`;
-		// 	if (!groupedData[key]) {
-		// 		groupedData[key] = [];
-		// 	}
-		// 	groupedData[key].push(row);
-		// });
-		//
-		// Object.keys(groupedData).forEach(key => {
-		// 	if (groupedData[key].length > 2) {
-		// 		const prd_cd = groupedData[key][0].prd_cd;
-		// 		const store_cd = groupedData[key][0].store_cd;
-		// 		alert(prd_cd + '의 상품을 ' + store_cd + '매장에 두번 이상 요청할 수 없습니다');
-		// 		return false;
-		// 	}
-		// });
-		
-		
-		
-		
-		
-		
-		
 		if(!confirm("선택한 항목을 매장요청하시겠습니까?")) return;
+		
         axios({
             url: '/store/stock/stk22/request-rt',
             method: 'post',
