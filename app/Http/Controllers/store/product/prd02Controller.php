@@ -2472,7 +2472,7 @@ class prd02Controller extends Controller
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 	
-	//상품코드 일괄 매핑 페이지
+	// 상품코드 일괄 매핑 페이지
 	public function show_batch_mapping()
 	{
 
@@ -2480,5 +2480,92 @@ class prd02Controller extends Controller
 		];
 
 		return view(Config::get('shop.store.view') . '/product/prd02_show_batch_mapping', $values);
+	}
+
+	// 상품코드 일괄 매핑 엑셀 업로드
+	public function mapping_import_excel(Request $request)
+	{
+		if (count($_FILES) > 0) {
+			if ( 0 < $_FILES['file']['error'] ) {
+				return response()->json(['code' => 0, 'message' => 'Error: ' . $_FILES['file']['error']], 200);
+			}
+			else {
+				$file = $request->file('file');
+				$now = date('YmdHis');
+				$user_id = Auth::guard('head')->user()->id;
+				$extension = $file->extension();
+
+				$save_path = "data/store/product/prd02/";
+				$file_name = "${now}_${user_id}.${extension}";
+
+				if (!Storage::disk('public')->exists($save_path)) {
+					Storage::disk('public')->makeDirectory($save_path);
+				}
+
+				$file = sprintf("${save_path}%s", $file_name);
+
+				move_uploaded_file($_FILES['file']['tmp_name'], $file);
+
+				return response()->json(['code' => 1, 'file' => $file], 200);
+			}
+		}
+	}
+	
+	// 상품코드 일괄 매핑 검토 및 데이터 생성
+	public function mapping_data(Request $request)
+	{
+
+		$data	= $request->input('data', []);
+		$result	= [];
+		$msg	= '';
+		$code	= 200;
+		
+		$not_prd_cd		= [];
+		$not_goods_opt	= [];
+
+		foreach ($data as $row) {
+			$prd_cd		= $row['prd_cd'];
+			$goods_no	= $row['goods_no'];
+			$goods_opt	= $row['goods_opt'];
+
+			//바코드, 온라인코드 검색
+			$sql	= " select prd_cd, goods_no from product_code where prd_cd = :prd_cd ";
+			$search_true_prd_cd = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+			if(empty($search_true_prd_cd)) {
+				array_push($not_prd_cd, $prd_cd);
+			}
+			
+			//상품정보, 옵션 검색
+			$sql	= " select goods_no, goods_opt from goods_summary where goods_no = :goods_no and goods_opt = :goods_opt";
+			$search_true_goods = DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+
+			if(empty($search_true_goods)) {
+				array_push($not_goods_opt, $goods_no . "||" . $goods_opt);
+			}
+		}
+
+		if (count($not_prd_cd) > 0) {
+			$code = 400;
+			$msg .= "존재하지않는 상품이 있습니다." . "\n". implode(', ', $not_prd_cd) . "\n";
+		}
+
+		if (count($not_goods_opt) > 0) {
+			$code = 400;
+			$msg .= "존재하지않는 온라인코드 혹은 옵션이 있습니다." . "\n". implode(', ', $not_goods_opt) . "\n";
+		}
+
+		return response()->json([
+			"code"	=> $code,
+			"msg"	=> $msg,
+			"head"	=> [
+				"total"		=> count($data),
+				"page"		=> 1,
+				"page_cnt"	=> 1,
+				"page_total"=> 1,
+			],
+			"body"	=> $data
+		]);
+
 	}
 }

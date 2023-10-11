@@ -317,6 +317,11 @@ class stk10Controller extends Controller
 
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
+				
+				//저장된 데이터가 출고요청상태가 아닐때 실패
+				$sql	= " select state from product_stock_release where idx = :idx ";
+				$chk_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
+				if( $chk_state != $ori_state ) continue;
 
                 $sql = "
                     select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga

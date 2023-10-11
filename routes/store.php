@@ -341,7 +341,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd02/show', 'prd02Controller@update');
         Route::get('prd02/barcode-batch', 'prd02Controller@barcode_batch');
 		Route::get('prd02/show-batch-mapping', 'prd02Controller@show_batch_mapping');
-		
+		Route::post('prd02/batch-mapping-import','prd02Controller@mapping_import_excel');
+		Route::post('prd02/batch-mapping-data','prd02Controller@mapping_data');
 
         Route::get('prd02/product_upload', 'prd02Controller@product_upload');
         Route::post('prd02/change-size', 'prd02Controller@change_size');

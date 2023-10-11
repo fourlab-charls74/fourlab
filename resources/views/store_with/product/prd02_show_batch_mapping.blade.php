@@ -209,7 +209,7 @@
 
 			let count = gx.gridOptions.api.getDisplayedRowCount();
 			let rows = [];
-			while (worksheet['E' + rowIndex]) {
+			while (worksheet['C' + rowIndex]) {
 				let row = {};
 				Object.keys(excel_columns).forEach((column) => {
 					let item = worksheet[column + rowIndex];
@@ -226,7 +226,7 @@
 			}
 			if(rows.length < 1) return alert("한 개 이상의 상품정보를 입력해주세요.");
 			rows = rows.filter(r => r.prd_cd);
-			await getGood(rows, firstRowIndex);
+			await getData(rows, firstRowIndex);
 		};
 
 		const importExcel = async (url) => {
@@ -257,7 +257,7 @@
 
 			axios({
 				method: 'post',
-				url: '/store/stock/stk21/batch-import',
+				url: '/store/product/prd02/batch-mapping-import',
 				data: form_data,
 				headers: {
 					"Content-Type": "multipart/form-data",
@@ -277,73 +277,15 @@
 			return false;
 		};
 
-		// 출고요청
-		function requestRelease() {
-			let rows = gx.getSelectedRows();
-
-			let rel_order = $('#rel_order').val();
-			if(rel_order === '') return alert("출고차수를 선택해주세요.");
-
-			let rel_type = $('#rel_type').val();
-			if(rel_type === '') return alert("상태를 선택해주세요.")
-
-			if(rows.length < 1) return alert("창고출고할 상품을 선택해주세요.");
-
-
-			let over_qty_rows = rows.filter(row => {
-				let storage_cd = row.storage_cd;
-				let cur_storage = row.storage_qty.filter(s => s.storage_cd === storage_cd);
-				if(cur_storage.length > 0) {
-					if(cur_storage[0].wqty2 < parseInt(row.qty)) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-				return true; // 상품재고가 없는경우
-			});
-
-			if(over_qty_rows.length > 0) return alert(`선택하신 창고의 재고보다 많은 수량을 요청하실 수 없습니다.\n바코드 : ${over_qty_rows.map(o => o.prd_cd).join(", ")}`);
-
-
-			if(!confirm("해당 상품을 출고하시겠습니까?")) return;
-
-			const data = {
-				products: rows,
-				exp_dlv_day: $('[name=exp_dlv_day]').val(),
-				rel_order: $('[name=rel_order]').val(),
-				rel_order,
-				rel_type
-			};
+		const getData = async (rows, firstIndex) => {
 
 			axios({
-				url: '/store/stock/stk19/request-release-excel',
-				method: 'post',
-				data: data,
-			}).then(function (res) {
-				if(res.data.code === 200) {
-					alert('해당상품이 출고요청 되었습니다.');
-					window.close();
-					opener.location.href = "/store/stock/stk10";
-				} else {
-					console.log(res.data);
-					alert("출고요청 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-				}
-			}).catch(function (err) {
-				console.log(err);
-			});
-		}
-
-		const getGood = async (rows, firstIndex) => {
-
-			axios({
-				url: '/store/stock/stk21/batch-getgoods',
+				url: '/store/product/prd02/batch-mapping-data',
 				method: 'post',
 				data: { data: rows },
 			}).then(async (res) => {
 				if (res.data.code == 200) {
 					await gx.gridOptions.api.applyTransaction({add : res.data.body});
-					updatePinnedRow();
 				} else if (res.data.code === 400) {
 					alert(res.data.msg);
 				} else {
@@ -354,22 +296,6 @@
 			});
 		};
 
-		const updatePinnedRow = () => {
-			let qty = 0;
-			const rows = gx.getRows();
-			if (rows && Array.isArray(rows) && rows.length > 0) {
-				rows.forEach((row, idx) => {
-					qty += parseFloat(row.qty);
-				});
-			}
-
-			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
-			gx.gridOptions.api.setPinnedTopRowData([
-				{ ...pinnedRow.data, qty: qty }
-			]);
-		};
-
-
 		//매핑등록
 		function RequestMapping() {
 			let rows = gx.getSelectedRows();
@@ -377,7 +303,7 @@
 			if(!confirm("선택한 항목을 일괄 매핑 하시겠습니까?")) return;
 
 			axios({
-				url: '/store/product/prd02/batch-mapping',
+				url: '/store/product/prd02/add-product-product',
 				method: 'post',
 				data: {data: rows},
 			}).then(function (res) {
