@@ -497,8 +497,6 @@ class stk21Controller extends Controller
 			$msg .= "존재하지않는 수령매장이 있습니다." . "\n". implode(', ', $not_store_cd) . "\n";
 		}
 		
-		dd($data);
-		
 		foreach($data as $key => $d)
 		{
 			$dep_store_cd = $d['dep_store_cd'];
