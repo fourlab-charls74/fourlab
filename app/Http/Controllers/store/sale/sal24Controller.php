@@ -282,7 +282,8 @@ class sal24Controller extends Controller
 						$where
 					group by w.ord_state_date, w.ord_state
 				) b group by b.sale_date
-			) t on a.sale_date = t.sale_date left outer join (
+			) t on a.sale_date = t.sale_date 
+			left outer join (
 				select
 					ord_state_date,
 					sum(cal_pg_fee(a.ord_state,a.ord_state_date,p.pay_type,p.pay_amt,p.pay_date,a.refund_amt)) as pg_fee
@@ -417,7 +418,7 @@ class sal24Controller extends Controller
 				"dc_amt_61"		=> ($dc_amt_61) ? $dc_amt_61:0,
 				"coupon_amt_61"	=> ($coupon_amt_61) ? $coupon_amt_61:0,
 				"fee_amt_61"	=> ($fee_amt_61) ? $fee_amt_61:0,
-				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61 - $fee_amt_61:0,
+				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61 + $fee_amt_61:0,
 			);
 
 			return $array;
