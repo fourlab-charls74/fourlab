@@ -572,7 +572,10 @@
         rows = rows.map(r => ({...selected_prd, ...r, comment: r.comment ?? ''}));
         gx3.gridOptions.api.updateRowData({ add: rows });
         $("#gd-rt-total").html(gx3.getRows().length);
-        document.getElementById("final_table_area").scrollIntoView({ behavior: "smooth" });
+		// 애니메이션 기능 삭제 (RT리스트에 등록할때마다 다시 올라가서 등록하기 번거로움)
+        // document.getElementById("final_table_area").scrollIntoView({ behavior: "smooth" });
+		// RT리스트에 등록 버튼을 클릭 시 체크박스 해제하는 기능
+		gx2.gridOptions.api.deselectAll();
     }
 
     // 최종RT 리스트 중 선택항목 삭제
@@ -588,8 +591,34 @@
     function RequestRT() {
         let rows = gx3.getSelectedRows();
         if(rows.length < 1) return alert("매장요청 할 항목을 선택해주세요.");
-        if(!confirm("선택한 항목을 매장요청하시겠습니까?")) return;
-
+		
+		// 받는 매장이 동일상품 여러매장에 찔러보기식 요청 못하게 막는 부분 (동일상품 & 동일일자 2개이상 못하게)
+		
+		// const groupedData = {};
+		// rows.forEach(row => {
+		// 	const key  = `${row.prd_cd}_${row.store_cd}`;
+		// 	if (!groupedData[key]) {
+		// 		groupedData[key] = [];
+		// 	}
+		// 	groupedData[key].push(row);
+		// });
+		//
+		// Object.keys(groupedData).forEach(key => {
+		// 	if (groupedData[key].length > 2) {
+		// 		const prd_cd = groupedData[key][0].prd_cd;
+		// 		const store_cd = groupedData[key][0].store_cd;
+		// 		alert(prd_cd + '의 상품을 ' + store_cd + '매장에 두번 이상 요청할 수 없습니다');
+		// 		return false;
+		// 	}
+		// });
+		
+		
+		
+		
+		
+		
+		
+		if(!confirm("선택한 항목을 매장요청하시겠습니까?")) return;
         axios({
             url: '/store/stock/stk22/request-rt',
             method: 'post',

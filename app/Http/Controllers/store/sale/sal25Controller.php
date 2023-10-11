@@ -169,7 +169,8 @@ class sal25Controller extends Controller
 				where d >= concat('$sdate', '01') and d <= concat('$edate', '31')
 				group by sale_date
 				order by sale_date desc
-			) a left outer join (
+			) a 
+			left outer join (
 				select
 					b.sale_date
 					, sum(if(ord_state = '$ord_state', ifnull(b.qty,0), 0)) as qty_30
@@ -250,6 +251,7 @@ class sal25Controller extends Controller
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
             $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
             $row["sum_wonga"] = $row["sum_wonga"] * 1;
+			$row["recv_amt_61"] = $row["recv_amt_61"] + $row["fee_amt_61"];
 
             $result[] = $row;
         }

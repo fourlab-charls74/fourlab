@@ -290,6 +290,35 @@ class stk22Controller extends Controller
                 $code = 400;
                 throw new Exception('보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.');
             }
+			
+			// 받는 매장이 동일상품 여러 매장에 찔러보기식 요청 못하도록 막는 부분
+			// 같은 매장이 2번 이상 같은 상품을 요청하지 못하도록
+			$duplication = [];
+			foreach ($data as $d) {
+				$duplication_req = $d['prd_cd'].'^'.$d['store_cd'];
+				array_push($duplication, $duplication_req);
+			}
+			$dup_cnt = array_count_values($duplication);
+
+			$dup_req = [];
+			foreach ($dup_cnt as $dup => $count) {
+				if ($count > 2) {
+					$dup_req[] = $dup;
+				}
+			}
+			
+			if (count($dup_req) > 0) {
+				$code = 400;
+				$message = '한번에 동일상품을 여러매장에서 2번 이상 요청할 수 없습니다.'."\n";
+				foreach ($dup_req as $dr) {
+					$explode_data = explode('^', $dr);
+					$prd_cd = $explode_data[0];
+					$store_cd = $explode_data[1];
+					$message .= "바코드 : {$prd_cd}, 매장코드 : {$store_cd}" . "\n";
+				}
+				$message = rtrim($message, ', ');
+				throw new Exception($message);
+			}
 
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
 			$document_number = DB::selectOne($sql);
