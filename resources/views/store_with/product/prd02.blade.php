@@ -480,8 +480,8 @@
 		}
 
 		function AddProducts() {
-			var url = '/store/product/prd02/batch-create';
-			//var url = '/store/product/prd02/show-batch-mapping';
+			//var url = '/store/product/prd02/batch-create';
+			var url = '/store/product/prd02/show-batch-mapping';
 			var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
 		}
 

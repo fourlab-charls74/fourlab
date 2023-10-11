@@ -2522,6 +2522,7 @@ class prd02Controller extends Controller
 		
 		$not_prd_cd		= [];
 		$not_goods_opt	= [];
+		$mapping_y		= [];
 
 		foreach ($data as $row) {
 			$prd_cd		= $row['prd_cd'];
@@ -2534,6 +2535,14 @@ class prd02Controller extends Controller
 
 			if(empty($search_true_prd_cd)) {
 				array_push($not_prd_cd, $prd_cd);
+			}
+
+			//매핑 여부 검색
+			$sql	= " select prd_cd from product where prd_cd = :prd_cd and match_yn = 'N' ";
+			$search_match_n = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+			if(empty($search_match_n)) {
+				array_push($mapping_y, $prd_cd);
 			}
 			
 			//상품정보, 옵션 검색
@@ -2548,6 +2557,11 @@ class prd02Controller extends Controller
 		if (count($not_prd_cd) > 0) {
 			$code = 400;
 			$msg .= "존재하지않는 상품이 있습니다." . "\n". implode(', ', $not_prd_cd) . "\n";
+		}
+
+		if (count($mapping_y) > 0) {
+			$code = 400;
+			$msg .= "이미 매핑된 상품이 있습니다." . "\n". implode(', ', $mapping_y) . "\n";
 		}
 
 		if (count($not_goods_opt) > 0) {
