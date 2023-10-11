@@ -2471,4 +2471,14 @@ class prd02Controller extends Controller
 
 		return response()->json(["code" => $code, "msg" => $msg]);
 	}
+	
+	//상품코드 일괄 매핑 페이지
+	public function show_batch_mapping()
+	{
+
+		$values = [
+		];
+
+		return view(Config::get('shop.store.view') . '/product/prd02_show_batch_mapping', $values);
+	}
 }

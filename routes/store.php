@@ -340,6 +340,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd02/upload', 'prd02Controller@upload');
         Route::put('prd02/show', 'prd02Controller@update');
         Route::get('prd02/barcode-batch', 'prd02Controller@barcode_batch');
+		Route::get('prd02/show-batch-mapping', 'prd02Controller@show_batch_mapping');
+		
 
         Route::get('prd02/product_upload', 'prd02Controller@product_upload');
         Route::post('prd02/change-size', 'prd02Controller@change_size');
