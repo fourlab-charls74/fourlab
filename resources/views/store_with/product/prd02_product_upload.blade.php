@@ -162,11 +162,8 @@
 											<th class="required">사이즈</th>
 											<td>
 												<div class="flax_box">
-													<select name='size' id='size' class="form-control form-control-sm">
+													<select name='size[]' id='size' class="form-control form-control-sm multi_select" multiple>
 														<option value=''>선택</option>
-														<!-- @foreach ($sizes as $size)
-														<option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
-														@endforeach -->
 													</select>
 												</div>
 											</td>
@@ -300,9 +297,7 @@
 		{field: "prd_cd", headerName: "품번", width: 140},
 		{field: "color", headerName: "컬러", width: 80},
 		{field: "size_kind", headerName: "사이즈구분", width: 120},
-		{field: "size", headerName: "사이즈", width: 80,
-			cellRenderer: (params) => params.data.size.split(':')[1]
-		},
+		{field: "size", headerName: "사이즈", width: 80},
 		{field: "prd_nm", headerName: "상품명", width: 100},
 		{field: "prd_nm_eng", headerName: "상품명(영문)", width: 100},
 		{field: "style_no", headerName: "스타일넘버", width: 100},
@@ -369,7 +364,9 @@
 	
 	let added_rows = [];
 	const add = async() => {
-		let color = $('#color').val();		
+		let size = $('#size').val();
+		let color = $('#color').val();
+		
 		
 		if (!validation()) return;
 		const response = await axios({ url: `/store/product/prd02/get-seq`, method: 'post',
@@ -402,59 +399,63 @@
 			const prd_cd = no_color_size_prd_cd + document.f1.color.value + document.f1.size.value;
 
 			for (let i = 0;i<color.length;i++) {
-				added_rows.push({
-					idx: idx,
-					brand: brand,
-					year: document.f1.year.value,
-					season: document.f1.season.value,
-					gender: document.f1.gender.value,
-					item: document.f1.item.value,
-					image: added_base64_image,
-					opt: document.f1.opt.value,
-					color: color[i],
-					size: document.f1.size.value,
-					size_kind: document.f1.size_kind.value,
-					prd_nm: document.f1.prd_nm.value,
-					prd_nm_eng: document.f1.prd_nm_eng.value,
-					style_no: document.f1.style_no.value,
-					sup_com: document.f1.sup_com.value,
-					year: document.f1.year.value,
-					prd_cd: prd_cd,
-					seq: seq,
-					price: document.f1.price.value,
-					wonga: document.f1.wonga.value,
-					tag_price: document.f1.tag_price.value,
-					origin: document.f1.origin.value
-				});
+				for (let j = 0;j<size.length;j++) {
+					added_rows.push({
+						idx: idx,
+						brand: brand,
+						year: document.f1.year.value,
+						season: document.f1.season.value,
+						gender: document.f1.gender.value,
+						item: document.f1.item.value,
+						image: added_base64_image,
+						opt: document.f1.opt.value,
+						color: color[i],
+						size: size[j],
+						size_kind: document.f1.size_kind.value,
+						prd_nm: document.f1.prd_nm.value,
+						prd_nm_eng: document.f1.prd_nm_eng.value,
+						style_no: document.f1.style_no.value,
+						sup_com: document.f1.sup_com.value,
+						year: document.f1.year.value,
+						prd_cd: prd_cd,
+						seq: seq,
+						price: document.f1.price.value,
+						wonga: document.f1.wonga.value,
+						tag_price: document.f1.tag_price.value,
+						origin: document.f1.origin.value
+					});
+				}
 			}
 			
 			for (let i = 0;i<color.length;i++) {
-				let rows = {
-					idx: idx,
-					brand: document.f1.brand[document.f1.brand.selectedIndex].text,
-					year: document.f1.year[document.f1.year.selectedIndex].text,
-					season: document.f1.season[document.f1.season.selectedIndex].text,
-					gender: document.f1.gender[document.f1.gender.selectedIndex].text,
-					item: document.f1.item[document.f1.item.selectedIndex].text,
-					image: added_base64_image,
-					opt: document.f1.opt[document.f1.opt.selectedIndex].text,
-					color: color[i],
-					size_kind: document.f1.size_kind.value,
-					size: document.f1.size[document.f1.size.selectedIndex].text,
-					prd_nm: document.f1.prd_nm.value,
-					prd_nm_eng: document.f1.prd_nm_eng.value,
-					style_no: document.f1.style_no.value,
-					sup_com: document.f1.sup_com[document.f1.sup_com.selectedIndex].text,
-					year: document.f1.year[document.f1.year.selectedIndex].text,
-					prd_cd: no_color_size_prd_cd,
-					seq: seq,
-					price: document.f1.price.value,
-					wonga: document.f1.wonga.value,
-					tag_price: document.f1.tag_price.value,
-					origin: document.f1.origin.value,
-				};
+				for (let j = 0; j < size.length; j++) {
+					let rows = {
+						idx: idx,
+						brand: document.f1.brand[document.f1.brand.selectedIndex].text,
+						year: document.f1.year[document.f1.year.selectedIndex].text,
+						season: document.f1.season[document.f1.season.selectedIndex].text,
+						gender: document.f1.gender[document.f1.gender.selectedIndex].text,
+						item: document.f1.item[document.f1.item.selectedIndex].text,
+						image: added_base64_image,
+						opt: document.f1.opt[document.f1.opt.selectedIndex].text,
+						color: color[i],
+						size_kind: document.f1.size_kind.value,
+						size: size[j],
+						prd_nm: document.f1.prd_nm.value,
+						prd_nm_eng: document.f1.prd_nm_eng.value,
+						style_no: document.f1.style_no.value,
+						sup_com: document.f1.sup_com[document.f1.sup_com.selectedIndex].text,
+						year: document.f1.year[document.f1.year.selectedIndex].text,
+						prd_cd: no_color_size_prd_cd,
+						seq: seq,
+						price: document.f1.price.value,
+						wonga: document.f1.wonga.value,
+						tag_price: document.f1.tag_price.value,
+						origin: document.f1.origin.value,
+					};
 
-				addRow(rows);
+					addRow(rows);
+				}
 			}
 		}
 

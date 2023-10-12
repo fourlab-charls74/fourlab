@@ -276,11 +276,75 @@ class stk22Controller extends Controller
         $state = 10;
         $rt_type = 'G';
         $admin_id = Auth('head')->user()->id;
+		$user_store = Auth('head')->user()->store_cd;
         $data = $request->input("data", []);
+		$sdate = date('Y-m-d').' 00:00:00';
+		$edate = date('Y-m-d').' 23:59:59';
 
         try {
             DB::beginTransaction();
-
+			
+			/**
+			 * 같은 매장이 동일상품을 여러 매장에 찔러보기식 요청하지 못하도록 제한하는 기능
+			 * 같은 매장이 하루에 동일상품을 2번이상 요청하지 못하도록
+			 */
+			//이미 요청되어있는 상품 넣는 배열
+			$dup_request = [];
+			//RT요청하려는 상품 넣는 배열
+			$dup_product = [];
+			foreach ($data as $d) {
+				$prd_cd = $d['prd_cd'];
+				
+				$sql = "
+					select 
+						count(prd_cd) as cnt
+					from product_stock_rotation
+					where prd_cd = :prd_cd and type = :rt_type and state = :rt_state and store_cd = :store_cd and del_yn = :del_yn and req_rt >= :sdate and req_rt <= :edate
+				";
+				
+				$result = DB::selectOne($sql,['prd_cd' => $prd_cd, 'rt_type' => $rt_type, 'rt_state' => $state, 'store_cd' => $user_store, 'del_yn' => 'N', 'sdate' => $sdate, 'edate' => $edate]);
+				
+				if ($result->cnt > 2) {
+					array_push($dup_request, $prd_cd);
+				}
+				array_push($dup_product, $prd_cd);
+			}
+			$dup_request = array_unique($dup_request);
+			$dup_cnt = array_count_values($dup_product);
+			
+			//매장요청RT에서 RT등록 버튼을 클릭했을 때 바코드가 같은 상품이 2개보다 많을 때 해당 바코드를 넣는 배열
+			$dup_barcode = [];
+			foreach ($dup_cnt as $dup => $count) {
+				if ($count > 2) {
+					$dup_barcode[] = $dup;
+				}
+			}
+			
+			if (count($dup_barcode) > 0) {
+				$code = 400;
+				$message = "한번에 같은 상품을 2번보다 많이 요청하실 수 없습니다."."\n";
+				foreach ($dup_barcode as $db) {
+					$prd_cd = $db;
+					$message .= "바코드 : {$prd_cd}". "\n";
+				}
+				$message = rtrim($message, ', ');
+				throw new Exception($message);
+			}
+			
+			if (count($dup_request) > 0) {
+				$code = 400;
+				$message = "이미 같은 상품이 2번 이상 RT요청되어 있습니다." ."\n". "금일은 더 이상 같은 상품을 RT요청하실 수 없습니다."."\n";
+				foreach ($dup_request as $dr) {
+					$message .= "바코드 : {$dr}" . "\n";
+				}
+				$message = rtrim($message, ', ');
+				throw new Exception($message);
+			}
+			
+			/**
+			 *  동일매장 찔러보기식 요청 막는 기능 끝
+			 */
+			
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
 			$document_number = DB::selectOne($sql);
 			if ($document_number === null) $document_number = 1;
