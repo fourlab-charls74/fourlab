@@ -145,31 +145,62 @@
 		</div>
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
-				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-0">
+				<div class="card-header d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row mb-1">
 					<a href="#">매장 정보</a>
                     <div class="d-flex align-items-center justify-content-end">
-							판매채널/매장구분 : 
-							<div class="d-flex align-items-center ml-2" >
-								<div class="flex_box w-100">
-									<select name='store_channel' id="store_channel" class="form-control form-control-sm" style="width:110px" onchange="chg_store_channel();">
-										<option value=''>전체</option>
-									@foreach ($store_channel as $sc)
-										<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
-									@endforeach
-									</select>
-								</div>
-								<span class="mr-2 ml-2">/</span>
-								<div class="flex_box w-100">
-									<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" style="width:110px" disabled>
-										<option value=''>전체</option>
-									@foreach ($store_kind as $sk)
-										<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
-									@endforeach
-									</select>
-								</div>
+						판매채널 / 매장구분 : 
+						<div class="d-flex align-items-center ml-2" >
+							<div class="flex_box w-100">
+								<select name='store_channel' id="store_channel" class="form-control form-control-sm" style="width:110px" onchange="chg_store_channel();">
+									<option value=''>전체</option>
+								@foreach ($store_channel as $sc)
+									<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
+								@endforeach
+								</select>
 							</div>
+							<span class="mr-2 ml-2">/</span>
+							<div class="flex_box w-100">
+								<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" style="width:110px" disabled>
+									<option value=''>전체</option>
+								@foreach ($store_kind as $sk)
+									<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
+								@endforeach
+								</select>
+							</div>
+						</div>
                         <button type="button" class="btn btn-sm btn-primary shadow-sm ml-2 p-1 pl-3 pr-3" onclick="Search()">조회</button>
                     </div>
+				</div>
+				<div class="d-flex align-items-center justify-content-end">
+					시작일 / 종료일 일괄적용
+					<div class="d-flex align-items-center ml-2 mr-2" >
+						<div class="form-inline">
+							<div class="docs-datepicker form-inline-inner input_box">
+								<div class="input-group" style="width: 150px;">
+									<input type="text" class="form-control form-control-sm docs-date w-50" name="sdate" value="" autocomplete="off" disable>
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+											<i class="fa fa-calendar" aria-hidden="true"></i>
+										</button>
+									</div>
+								</div>
+								<div class="docs-datepicker-container"></div>
+							</div>
+							<span class="text_line"></span>
+							<div class="docs-datepicker form-inline-inner input_box">
+								<div class="input-group" style="width: 150px;">
+									<input type="text" class="form-control form-control-sm docs-date search-enter" name="edate" value="" autocomplete="off">
+									<div class="input-group-append">
+										<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+											<i class="fa fa-calendar" aria-hidden="true"></i>
+										</button>
+									</div>
+								</div>
+								<div class="docs-datepicker-container"></div>
+							</div>
+						</div>
+					</div>
+					<button type="button" class="btn btn-sm btn-primary shadow-sm ml-2 p-1 pl-3 pr-3" onclick="applySdateEdate()">적용</button>
 				</div>
 				<div class="card-body">
                     <div class="row">
@@ -428,6 +459,25 @@
         $("#dupcheck").css("color", code === 200 ? "#00BB00" : "#ff0000");
         $("[name=sale_type_only]").val(code === 200 ? "true" : "false");
     }
+
+	/**
+	 * 시작일 종료일 일괄적용
+	 */
+	function applySdateEdate() {
+		let rows  = gx.getSelectedRows();
+		let sdate = $("input[name=sdate]").val();
+		let edate = $("input[name=edate]").val();
+		if (sdate == '') return alert('시작일을 설정해주세요.');
+		if (edate == '') return alert('종료일을 설정해주세요.');
+		if (rows.length < 1) return alert('시작일 종료일을 일괄적용할 매장을 선택해주세요.');
+		if (!confirm("선택된 매장에 시작일 종료일을 일괄적용하시겠습니까?")) return;
+		
+		for (let i=0;i<rows.length;i++) {
+			rows[i].sdate = sdate;
+			rows[i].edate = edate;
+			gx.gridOptions.api.updateRowData({ update: [rows[i]] });
+		}
+	}
 
 </script>
 @stop

@@ -112,9 +112,9 @@ class std05Controller extends Controller
 		
 		$sql = "
 			select store.store_cd, store.store_nm, s.use_yn, s.sdate, s.edate
-			from store
+			from store store
 				left outer join sale_type_store s on store.store_cd = s.store_cd and s.sale_type_cd = :sale_type_cd
-			where 1=1 $where
+			where 1=1 and store.use_yn = 'Y' $where
 			order by store.store_cd
 		";
 
