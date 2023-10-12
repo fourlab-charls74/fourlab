@@ -304,7 +304,7 @@ class stk22Controller extends Controller
 				
 				$result = DB::selectOne($sql,['prd_cd' => $prd_cd, 'rt_type' => $rt_type, 'rt_state' => $state, 'store_cd' => $user_store, 'del_yn' => 'N', 'sdate' => $sdate, 'edate' => $edate]);
 				
-				if ($result->cnt > 2) {
+				if ($result->cnt >= 2) {
 					array_push($dup_request, $prd_cd);
 				}
 				array_push($dup_product, $prd_cd);
