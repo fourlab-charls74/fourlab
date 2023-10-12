@@ -2345,7 +2345,7 @@ class prd02Controller extends Controller
 				$size 		= $row['size'];
 				$prd_nm		= $row['prd_nm'];
 				$prd_nm_eng	= $row['prd_nm_eng']??'';
-				$style_no 	= $row['style_no'];
+				$style_no 	= $row['style_no']??'';
 				$sup_com 	= $row['sup_com'];
 				$price 		= $row['price'];
 				$wonga 		= $row['wonga'];

@@ -172,7 +172,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th class="required">스타일넘버</th>
+											<th>스타일넘버</th>
 											<td>
 												<div class="flax_box">
 													<input type='text' class="form-control form-control-sm" name='style_no' id="style_no" value=''>
@@ -523,10 +523,10 @@
 		}
 
 		// 스타일넘버 입력여부
-		if (f1.style_no.value.trim() === '') {
-			f1.style_no.focus();
-			return alert("스타일넘버를 입력해주세요.");
-		}
+		// if (f1.style_no.value.trim() === '') {
+		// 	f1.style_no.focus();
+		// 	return alert("스타일넘버를 입력해주세요.");
+		// }
 
 		// 상품명 입력여부
 		if (f1.prd_nm.value.trim() === '') {
