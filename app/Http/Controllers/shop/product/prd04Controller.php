@@ -131,7 +131,7 @@ class prd04Controller extends Controller
 			//}
 			//$where	.= ")";
 
-			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			$store_qty_sql	= " ifnull(pss.qty, 0)";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
@@ -148,7 +148,7 @@ class prd04Controller extends Controller
 			}
 			$where	.= ")";
 
-			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			$store_qty_sql	= "sum(pss.qty)";
 		}
 
@@ -178,8 +178,20 @@ class prd04Controller extends Controller
 				from (
 					select
 						pc.prd_cd
-						, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
-						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
+						, (ps.wqty - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							and prd_cd = ps.prd_cd
+							group by prd_cd
+						), 0)) as wqty
+						, ($store_qty_sql - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							and prd_cd = ps.prd_cd $next_store_qty_sql
+							group by prd_cd
+						), 0)) as sqty
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
 						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -191,21 +203,8 @@ class prd04Controller extends Controller
 						$in_store_sql
 						inner join product p on p.prd_cd = pc.prd_cd
 						left outer join goods g on pc.goods_no = g.goods_no
-						left outer join brand brand on brand.brand = g.brand
 						inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 						inner join brand b on b.br_cd = pc.brand
-						left outer join (
-							select prd_cd, sum(qty) as qty, stock_state_date
-							from product_stock_hst
-							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-							group by prd_cd
-						) _next_storage on _next_storage.prd_cd = ps.prd_cd
-						left outer join (
-							select prd_cd, sum(qty) as qty, location_cd, stock_state_date
-							from product_stock_hst
-							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-							group by prd_cd
-						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where
 						-- c.code_kind_cd = 'PRD_CD_COLOR'
@@ -243,15 +242,21 @@ class prd04Controller extends Controller
 				, g.goods_nm_eng
 				, pc.color, c.code_val as color_nm
 				, pc.size
-				-- , (
-                --     select s.size_nm from size s
-                --     where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                --         and s.size_cd = pc.size
-                --         and use_yn = 'Y'
-                --  ) as size_nm
 				, pc.goods_opt
-				, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
-				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
+				, (ps.wqty - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					and prd_cd = ps.prd_cd
+					group by prd_cd
+				), 0)) as wqty
+				, ($store_qty_sql - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					and prd_cd = ps.prd_cd $next_store_qty_sql
+					group by prd_cd
+				), 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -272,21 +277,8 @@ class prd04Controller extends Controller
 				$in_store_sql
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on pc.goods_no = g.goods_no
-				left outer join brand brand on brand.brand = g.brand
 				inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 				inner join brand b on b.br_cd = pc.brand
-				left outer join (
-					select prd_cd, sum(qty) as qty, stock_state_date
-					from product_stock_hst
-					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by prd_cd
-				) _next_storage on _next_storage.prd_cd = ps.prd_cd
-				left outer join (
-					select prd_cd, sum(qty) as qty, location_cd, stock_state_date
-					from product_stock_hst
-					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by prd_cd
-				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 				left outer join product_orderby ob on pc.size = ob.size_cd
 			where

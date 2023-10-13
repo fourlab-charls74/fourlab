@@ -20,7 +20,7 @@ class prd04Controller extends Controller
 	{
 		$values = [
 			'sdate'			=> date('Y-m-d'),
-            'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
@@ -62,7 +62,7 @@ class prd04Controller extends Controller
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
 		$next_store_qty_sql = "";
-		
+
 		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
 
 		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
@@ -78,14 +78,14 @@ class prd04Controller extends Controller
 		}
 
 		// 창고검색
-        if ( $storage_cd != "" ) {
-            $where	.= " and (1!=1";
-            foreach($storage_cd as $storage_cd) {
-                $where .= " or pss2.storage_cd = '$storage_cd' ";
+		if ( $storage_cd != "" ) {
+			$where	.= " and (1!=1";
+			foreach($storage_cd as $storage_cd) {
+				$where .= " or pss2.storage_cd = '$storage_cd' ";
 
-            }
-            $where	.= ")";
-        }
+			}
+			$where	.= ")";
+		}
 
 		// 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
@@ -100,20 +100,20 @@ class prd04Controller extends Controller
 		}
 
 		$goods_no	= preg_replace("/\s/",",",$goods_no);
-        $goods_no	= preg_replace("/\t/",",",$goods_no);
-        $goods_no	= preg_replace("/\n/",",",$goods_no);
-        $goods_no	= preg_replace("/,,/",",",$goods_no);
+		$goods_no	= preg_replace("/\t/",",",$goods_no);
+		$goods_no	= preg_replace("/\n/",",",$goods_no);
+		$goods_no	= preg_replace("/,,/",",",$goods_no);
 
-        if( $goods_no != "" ){
-            $goods_nos = explode(",",$goods_no);
-            if(count($goods_nos) > 1){
-                if(count($goods_nos) > 500) array_splice($goods_nos,500);
-                $in_goods_nos = join(",",$goods_nos);
-                $where .= " and g.goods_no in ( $in_goods_nos ) ";
-            } else {
-                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
-            }
-        }
+		if( $goods_no != "" ){
+			$goods_nos = explode(",",$goods_no);
+			if(count($goods_nos) > 1){
+				if(count($goods_nos) > 500) array_splice($goods_nos,500);
+				$in_goods_nos = join(",",$goods_nos);
+				$where .= " and g.goods_no in ( $in_goods_nos ) ";
+			} else {
+				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+			}
+		}
 
 		if( $style_no != "" )	$where .= " and ( g.style_no like '" . Lib::quote($style_no) . "%' or p.style_no like '" . Lib::quote($style_no) . "%' ) ";
 		if( $goods_nm != "" ){
@@ -128,7 +128,7 @@ class prd04Controller extends Controller
 			}
 			$where	.= ")";
 
-			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			$store_qty_sql	= "pss.wqty";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
@@ -145,7 +145,7 @@ class prd04Controller extends Controller
 			}
 			$where	.= ")";
 
-			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			$store_qty_sql	= "sum(pss.wqty)";
 		}
 
@@ -161,7 +161,7 @@ class prd04Controller extends Controller
 			}
 			$where	.= ")";
 
-			$next_store_qty_sql = " and _next_store.location_cd = pss.store_cd ";
+			$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			$store_qty_sql	= "sum(pss.wqty)";
 		}
 
@@ -179,7 +179,7 @@ class prd04Controller extends Controller
 
 		if( $page == 1 ){
 			$query	= /** @lang text */
-			"
+				"
 				select
 					count(prd_cd) as total,
 					ifnull(sum(a.goods_sh * a.wqty + a.goods_sh * a.sqty),0) as total_goods_sh,
@@ -190,8 +190,20 @@ class prd04Controller extends Controller
 				from (
 					select
 						pc.prd_cd
-						, (ps.wqty - ifnull(_next_storage.qty, 0)) as wqty
-						, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
+						, (ps.wqty - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							and prd_cd = ps.prd_cd
+							group by prd_cd
+						), 0)) as wqty
+						, ($store_qty_sql - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							and prd_cd = ps.prd_cd $next_store_qty_sql
+							group by prd_cd
+						), 0)) as sqty
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						, if(pc.goods_no = 0, p.price, g.price) as price
 						, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -204,21 +216,8 @@ class prd04Controller extends Controller
 						$in_store_sql
 						inner join product p on p.prd_cd = pc.prd_cd
 						left outer join goods g on pc.goods_no = g.goods_no
-						left outer join brand brand on brand.brand = g.brand
 						inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
 						inner join brand b on b.br_cd = pc.brand
-						left outer join (
-							select prd_cd, sum(qty) as qty, stock_state_date
-							from product_stock_hst
-							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-							group by prd_cd
-						) _next_storage on _next_storage.prd_cd = ps.prd_cd
-						left outer join (
-							select prd_cd, sum(qty) as qty, location_cd, stock_state_date
-							from product_stock_hst
-							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-							group by prd_cd
-						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where
 						1=1
@@ -238,8 +237,8 @@ class prd04Controller extends Controller
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
-		$query	= /** @lang text */
-		"
+		$query	= /** @lang text */ 
+			"
 			select
 				pc.prd_cd
 				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
@@ -256,8 +255,20 @@ class prd04Controller extends Controller
 				, pc.color, c.code_val as color_nm
 				, pc.size
 				, pc.goods_opt
-				, (sum(pss2.wqty) - ifnull(_next_storage.qty, 0)) as wqty
-				, ($store_qty_sql - ifnull(_next_store.qty, 0)) as sqty
+				, (sum(pss2.wqty) - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					and prd_cd = ps.prd_cd
+					group by prd_cd
+				), 0)) as wqty
+				, ($store_qty_sql - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					and prd_cd = ps.prd_cd $next_store_qty_sql
+					group by prd_cd
+				), 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				, if(pc.goods_no = 0, p.price, g.price) as price
 				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -279,21 +290,8 @@ class prd04Controller extends Controller
 				$in_store_sql
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on pc.goods_no = g.goods_no
-				left outer join brand brand on brand.brand = g.brand
 				inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
 				inner join brand b on b.br_cd = pc.brand
-				left outer join (
-					select prd_cd, sum(qty) as qty, stock_state_date
-					from product_stock_hst
-					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by prd_cd
-				) _next_storage on _next_storage.prd_cd = ps.prd_cd
-				left outer join (
-					select prd_cd, sum(qty) as qty, location_cd, stock_state_date
-					from product_stock_hst
-					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					group by prd_cd
-				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 				left outer join product_orderby ob on pc.size = ob.size_cd
 			where
@@ -424,7 +422,7 @@ class prd04Controller extends Controller
 				order by s.size_seq asc
 			";
 			$sizes = array_map(function($row) {return $row->size_cd;}, DB::select($sql));
-			
+
 			// get goods info
 			$cfg_img_size_real = "a_500";
 			$cfg_img_size_list = "a_500";
@@ -475,8 +473,8 @@ class prd04Controller extends Controller
 
 			// get store stock
 			$where = "";
-            if ($store_channel != '') $where .= "and store_channel ='" . Lib::quote($store_channel). "'";
-        	if ($store_channel_kind ?? '' != '') $where .= "and store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+			if ($store_channel != '') $where .= "and store_channel ='" . Lib::quote($store_channel). "'";
+			if ($store_channel_kind ?? '' != '') $where .= "and store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 			$case_sql = "";
 			$case_sum_sql = "";
@@ -577,7 +575,7 @@ class prd04Controller extends Controller
 					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = a.color
 				group by a.storage_cd, a.color
 			";
-			
+
 			$storage_rows = DB::select($sql);
 
 			$values = [
@@ -636,147 +634,147 @@ class prd04Controller extends Controller
 			$error_code	= "400";
 		}
 
-        //try
+		//try
 		//{
-        //    DB::beginTransaction();
+		//    DB::beginTransaction();
 
-			$sql	= " delete from product_stock_storage ";
-			DB::delete($sql);
+		$sql	= " delete from product_stock_storage ";
+		DB::delete($sql);
 
-			for( $i = 0; $i < count($datas); $i++ )
-			{
-				$data		= (array)$datas[$i];
+		for( $i = 0; $i < count($datas); $i++ )
+		{
+			$data		= (array)$datas[$i];
 
-				$storage_cd	= trim($data['storage_cd']);
-				$prd_cd_p	= trim($data['prd_cd_p']);
-				$prd_cd		= trim($data['prd_cd']);
-				$prd_nm		= trim($data['prd_nm']);
-				$brand_nm	= trim($data['brand_nm']);
-				$style_no	= trim($data['style_no']);
-				$color		= trim($data['color']);
-				$size		= trim($data['size']);
-				$qty		= Lib::uncm(trim($data['qty']));
-				$wonga		= Lib::uncm(trim($data['wonga']));
-				$tag_price	= Lib::uncm(trim($data['tag_price']));
-				$price		= Lib::uncm(trim($data['price']));
+			$storage_cd	= trim($data['storage_cd']);
+			$prd_cd_p	= trim($data['prd_cd_p']);
+			$prd_cd		= trim($data['prd_cd']);
+			$prd_nm		= trim($data['prd_nm']);
+			$brand_nm	= trim($data['brand_nm']);
+			$style_no	= trim($data['style_no']);
+			$color		= trim($data['color']);
+			$size		= trim($data['size']);
+			$qty		= Lib::uncm(trim($data['qty']));
+			$wonga		= Lib::uncm(trim($data['wonga']));
+			$tag_price	= Lib::uncm(trim($data['tag_price']));
+			$price		= Lib::uncm(trim($data['price']));
 
-				//창고 존재 유무 검토
-				$sql		= " select count(*) as tot from storage where storage_cd = :storage_cd ";
-				$storage	= DB::selectOne($sql, ['storage_cd' => $storage_cd]);
+			//창고 존재 유무 검토
+			$sql		= " select count(*) as tot from storage where storage_cd = :storage_cd ";
+			$storage	= DB::selectOne($sql, ['storage_cd' => $storage_cd]);
 
-				if( $storage->tot == 0 ){
-					$error_code		= "501";
-					$result_code	= "창고정보가 존재하지 않습니다. [" . $storage_cd . "]";
+			if( $storage->tot == 0 ){
+				$error_code		= "501";
+				$result_code	= "창고정보가 존재하지 않습니다. [" . $storage_cd . "]";
 
-					break;
-				}
+				break;
+			}
 
-				//브랜드 존재 유무 검토
-				$brand	= "";
-				$sql	= " select br_cd from brand where brand_nm = :brand_nm ";
-				$result = DB::select($sql,['brand_nm' => $brand_nm]);
-				foreach($result as $row){
-					$brand	= $row->br_cd;
-				}
-				if( $brand == "" ){
-					$error_code		= "502";
-					$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
+			//브랜드 존재 유무 검토
+			$brand	= "";
+			$sql	= " select br_cd from brand where brand_nm = :brand_nm ";
+			$result = DB::select($sql,['brand_nm' => $brand_nm]);
+			foreach($result as $row){
+				$brand	= $row->br_cd;
+			}
+			if( $brand == "" ){
+				$error_code		= "502";
+				$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
 
-					break;
-				}
+				break;
+			}
 
-				//상품코드 존재 유무
-				$sql		= " select count(*) as tot from product_code where prd_cd = :prd_cd ";
-				$obj_prd_code	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+			//상품코드 존재 유무
+			$sql		= " select count(*) as tot from product_code where prd_cd = :prd_cd ";
+			$obj_prd_code	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 
-				if( $obj_prd_code->tot == 0 ){
+			if( $obj_prd_code->tot == 0 ){
 
-					$where	= ['prd_cd'	=> $prd_cd];
-
-					//product 등록/수정
-					$values	= [
-						'prd_nm'	=> $prd_nm,
-						'style_no'	=> $style_no,
-						'tag_price'	=> $tag_price,
-						'price'		=> $price,
-						'wonga'		=> $wonga,
-						'type'		=> 'N',			//일반상품
-						'com_id'	=> 'alpen',		//
-						'unit'		=> '',
-						'match_yn'	=> 'N',
-						'rt'		=> now(),
-						'ut'		=> now(),
-						'admin_id'	=> $id
-					];
-					DB::table('product')->updateOrInsert($where, $values);
-
-					$year	= substr(str_replace($brand, "", $prd_cd), 0 ,2);
-					$season	= substr(str_replace($brand, "", $prd_cd), 2 ,1);
-					$gender	= substr(str_replace($brand, "", $prd_cd), 3 ,1);
-					$item	= substr(str_replace($brand, "", $prd_cd), 4 ,2);
-					$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
-					$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
-
-					$goods_no	= "";
-					$goods_opt	= "";
-
-					//product_code 등록/수정
-					$values	= [
-						'prd_cd'	=> $prd_cd,
-						'prd_cd_p'	=> $prd_cd_p,
-						'goods_no'	=> $goods_no,
-						'goods_opt'	=> $goods_opt,
-						'brand'		=> $brand,
-						'year'		=> $year,
-						'season'	=> $season,
-						'gender'	=> $gender,
-						'item'		=> $item,
-						'opt'		=> $opt,
-						'seq'		=> $seq,
-						'color'		=> $color,
-						'size'		=> $size,
-						'type'		=> 'N',			//일반상품
-						'rt'		=> now(),
-						'ut'		=> now(),
-						'admin_id'	=> $id
-					];
-					DB::table('product_code')->Insert($values);
-
-				}else{
-					$sql		= " select goods_no, goods_opt from product_code where prd_cd = :prd_cd ";
-					$obj_prd_code	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
-
-					$goods_no	= $obj_prd_code->goods_no;
-					$goods_opt	= $obj_prd_code->goods_opt;
-				}
-
-				//재고정보 처리
 				$where	= ['prd_cd'	=> $prd_cd];
 
-                //창고별 재고등록 오류 수정 시작
-                $sql_ps		= " select count(*) as tot from product_stock where prd_cd = :prd_cd ";
-                $obj_ps	= DB::selectOne($sql_ps, $where);
+				//product 등록/수정
+				$values	= [
+					'prd_nm'	=> $prd_nm,
+					'style_no'	=> $style_no,
+					'tag_price'	=> $tag_price,
+					'price'		=> $price,
+					'wonga'		=> $wonga,
+					'type'		=> 'N',			//일반상품
+					'com_id'	=> 'alpen',		//
+					'unit'		=> '',
+					'match_yn'	=> 'N',
+					'rt'		=> now(),
+					'ut'		=> now(),
+					'admin_id'	=> $id
+				];
+				DB::table('product')->updateOrInsert($where, $values);
 
-                if($obj_ps->tot == 0){
+				$year	= substr(str_replace($brand, "", $prd_cd), 0 ,2);
+				$season	= substr(str_replace($brand, "", $prd_cd), 2 ,1);
+				$gender	= substr(str_replace($brand, "", $prd_cd), 3 ,1);
+				$item	= substr(str_replace($brand, "", $prd_cd), 4 ,2);
+				$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
+				$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
 
-                    $values	= [
-                        //'goods_no'	=> '',
-                        'wonga'		=> $wonga,
-                        'qty_wonga'	=> $qty * $wonga,
-                        'in_qty'	=> $qty,
-                        'out_qty'	=> '0',
-                        'qty'		=> $qty,
-                        'wqty'		=> $qty,
-                        //'goods_opt'	=> '',
-                        'barcode'	=> $prd_cd,
-                        'use_yn'	=> 'Y',
-                        'rt'		=> now(),
-                        'ut'		=> now()
-                    ];
-                    DB::table('product_stock')->Insert($where, $values);
+				$goods_no	= "";
+				$goods_opt	= "";
 
-                }else{
-                    $sql_ps = "
+				//product_code 등록/수정
+				$values	= [
+					'prd_cd'	=> $prd_cd,
+					'prd_cd_p'	=> $prd_cd_p,
+					'goods_no'	=> $goods_no,
+					'goods_opt'	=> $goods_opt,
+					'brand'		=> $brand,
+					'year'		=> $year,
+					'season'	=> $season,
+					'gender'	=> $gender,
+					'item'		=> $item,
+					'opt'		=> $opt,
+					'seq'		=> $seq,
+					'color'		=> $color,
+					'size'		=> $size,
+					'type'		=> 'N',			//일반상품
+					'rt'		=> now(),
+					'ut'		=> now(),
+					'admin_id'	=> $id
+				];
+				DB::table('product_code')->Insert($values);
+
+			}else{
+				$sql		= " select goods_no, goods_opt from product_code where prd_cd = :prd_cd ";
+				$obj_prd_code	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+
+				$goods_no	= $obj_prd_code->goods_no;
+				$goods_opt	= $obj_prd_code->goods_opt;
+			}
+
+			//재고정보 처리
+			$where	= ['prd_cd'	=> $prd_cd];
+
+			//창고별 재고등록 오류 수정 시작
+			$sql_ps		= " select count(*) as tot from product_stock where prd_cd = :prd_cd ";
+			$obj_ps	= DB::selectOne($sql_ps, $where);
+
+			if($obj_ps->tot == 0){
+
+				$values	= [
+					//'goods_no'	=> '',
+					'wonga'		=> $wonga,
+					'qty_wonga'	=> $qty * $wonga,
+					'in_qty'	=> $qty,
+					'out_qty'	=> '0',
+					'qty'		=> $qty,
+					'wqty'		=> $qty,
+					//'goods_opt'	=> '',
+					'barcode'	=> $prd_cd,
+					'use_yn'	=> 'Y',
+					'rt'		=> now(),
+					'ut'		=> now()
+				];
+				DB::table('product_stock')->Insert($where, $values);
+
+			}else{
+				$sql_ps = "
                         update product_stock set
                             wonga       = $wonga ,
                             qty_wonga   = '" . $qty * $wonga . "',
@@ -788,31 +786,31 @@ class prd04Controller extends Controller
                         where
                             prd_cd = :prd_cd
                     ";
-                    DB::update($sql_ps, $where);
-                }
-                //창고별 재고등록 오류 수정 종료
-
-				//창고재고 정보 처리
-				$where	= ['prd_cd'	=> $prd_cd, 'storage_cd' => $storage_cd];
-
-				$values	= [
-					'goods_no'	=> $goods_no,
-					'qty'		=> $qty,
-					'wqty'		=> $qty,
-					'goods_opt'	=> $goods_opt,
-					'use_yn'	=> 'Y',
-					'rt'		=> now(),
-					'ut'		=> now()
-				];
-				DB::table('product_stock_storage')->updateOrInsert($where, $values);
-
+				DB::update($sql_ps, $where);
 			}
+			//창고별 재고등록 오류 수정 종료
+
+			//창고재고 정보 처리
+			$where	= ['prd_cd'	=> $prd_cd, 'storage_cd' => $storage_cd];
+
+			$values	= [
+				'goods_no'	=> $goods_no,
+				'qty'		=> $qty,
+				'wqty'		=> $qty,
+				'goods_opt'	=> $goods_opt,
+				'use_yn'	=> 'Y',
+				'rt'		=> now(),
+				'ut'		=> now()
+			];
+			DB::table('product_stock_storage')->updateOrInsert($where, $values);
+
+		}
 
 		//	DB::commit();
-        //}
+		//}
 		//catch(Exception $e)
 		//{
-        //    DB::rollback();
+		//    DB::rollback();
 
 		//	$result_code	= "500";
 		//	$result_msg		= "데이터 등록/수정 오류";
@@ -869,142 +867,142 @@ class prd04Controller extends Controller
 			$error_code	= "400";
 		}
 
-        //try
+		//try
 		//{
-        //    DB::beginTransaction();
+		//    DB::beginTransaction();
 
-			for( $i = 0; $i < count($datas); $i++ )
-			{
-				$data		= (array)$datas[$i];
+		for( $i = 0; $i < count($datas); $i++ )
+		{
+			$data		= (array)$datas[$i];
 
-				$prd_cd_p	= trim($data['prd_cd_p']);
-				$style_no	= trim($data['style_no']);
-				$prd_nm		= trim($data['prd_nm']);
-				$color		= trim($data['color']);
-				$size		= trim($data['size']);
-				$tag_price	= Lib::uncm(trim($data['tag_price']));
-				$price		= Lib::uncm(trim($data['price']));
-				$wonga		= Lib::uncm(trim($data['wonga']));
-				$store_qty	= Lib::uncm(trim($data['store_qty']));
-				$storage_qty	= Lib::uncm(trim($data['storage_qty']));
-				$tot_qty	= Lib::uncm(trim($data['tot_qty']));
+			$prd_cd_p	= trim($data['prd_cd_p']);
+			$style_no	= trim($data['style_no']);
+			$prd_nm		= trim($data['prd_nm']);
+			$color		= trim($data['color']);
+			$size		= trim($data['size']);
+			$tag_price	= Lib::uncm(trim($data['tag_price']));
+			$price		= Lib::uncm(trim($data['price']));
+			$wonga		= Lib::uncm(trim($data['wonga']));
+			$store_qty	= Lib::uncm(trim($data['store_qty']));
+			$storage_qty	= Lib::uncm(trim($data['storage_qty']));
+			$tot_qty	= Lib::uncm(trim($data['tot_qty']));
 
-				$prd_cd		= $prd_cd_p . $color . $size;
+			$prd_cd		= $prd_cd_p . $color . $size;
 
-				if( $store_qty != 0 || $storage_qty != 0 ){
-					$sql	= " select count(*) as cnt from product_code where prd_cd = :prd_cd";
-					$product_code	= DB::selectOne($sql,['prd_cd' => $prd_cd]);
+			if( $store_qty != 0 || $storage_qty != 0 ){
+				$sql	= " select count(*) as cnt from product_code where prd_cd = :prd_cd";
+				$product_code	= DB::selectOne($sql,['prd_cd' => $prd_cd]);
 
-					if( $product_code->cnt == 0 ){
-						// 상품코드 정보가 없을시
+				if( $product_code->cnt == 0 ){
+					// 상품코드 정보가 없을시
 
-						$brand	= "";
-						$sql	= " select br_cd, length(br_cd) as chk_len from brand where use_yn = 'Y' and br_cd <>'' order by length(br_cd) asc ";
-						$result = DB::select($sql);
-						foreach($result as $row){
-							if( substr($prd_cd, 0, $row->chk_len) == $row->br_cd ){
-								$brand	= $row->br_cd;
-							}
+					$brand	= "";
+					$sql	= " select br_cd, length(br_cd) as chk_len from brand where use_yn = 'Y' and br_cd <>'' order by length(br_cd) asc ";
+					$result = DB::select($sql);
+					foreach($result as $row){
+						if( substr($prd_cd, 0, $row->chk_len) == $row->br_cd ){
+							$brand	= $row->br_cd;
 						}
-
-						if( $brand == "" ){
-							$error_code		= "501";
-							$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
-
-							break;
-						}
-
-						$year	= substr(str_replace($brand, "", $prd_cd), 0 ,2);
-						$season	= substr(str_replace($brand, "", $prd_cd), 2 ,1);
-						$gender	= substr(str_replace($brand, "", $prd_cd), 3 ,1);
-						$item	= substr(str_replace($brand, "", $prd_cd), 4 ,2);
-						$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
-						$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
-
-						//product_code 등록/수정
-						$values	= [
-							'prd_cd'	=> $prd_cd,
-							'prd_cd_p'	=> $prd_cd_p,
-							'goods_no'	=> '',
-							'goods_opt'	=> '',
-							'brand'		=> $brand,
-							'year'		=> $year,
-							'season'	=> $season,
-							'gender'	=> $gender,
-							'item'		=> $item,
-							'opt'		=> $opt,
-							'seq'		=> $seq,
-							'color'		=> $color,
-							'size'		=> $size,
-							'type'		=> 'N',			//일반상품
-							'rt'		=> now(),
-							'ut'		=> now(),
-							'admin_id'	=> $id
-						];
-						DB::table('product_code')->Insert($values);
-
 					}
 
-					//product 등록/수정
-					$where	= ['prd_cd'	=> $prd_cd];
+					if( $brand == "" ){
+						$error_code		= "501";
+						$result_code	= "브랜드정보가 존재하지 않습니다. [" . $prd_cd . "]";
+
+						break;
+					}
+
+					$year	= substr(str_replace($brand, "", $prd_cd), 0 ,2);
+					$season	= substr(str_replace($brand, "", $prd_cd), 2 ,1);
+					$gender	= substr(str_replace($brand, "", $prd_cd), 3 ,1);
+					$item	= substr(str_replace($brand, "", $prd_cd), 4 ,2);
+					$seq	= substr(str_replace($brand, "", $prd_cd), 6 ,2);
+					$opt	= substr(str_replace($brand, "", $prd_cd), 8 ,2);
+
+					//product_code 등록/수정
 					$values	= [
-						'prd_nm'	=> $prd_nm,
-						'style_no'	=> $style_no,
-						'tag_price'	=> $tag_price,
-						'price'		=> $price,
-						'wonga'		=> $wonga,
+						'prd_cd'	=> $prd_cd,
+						'prd_cd_p'	=> $prd_cd_p,
+						'goods_no'	=> '',
+						'goods_opt'	=> '',
+						'brand'		=> $brand,
+						'year'		=> $year,
+						'season'	=> $season,
+						'gender'	=> $gender,
+						'item'		=> $item,
+						'opt'		=> $opt,
+						'seq'		=> $seq,
+						'color'		=> $color,
+						'size'		=> $size,
 						'type'		=> 'N',			//일반상품
-						'com_id'	=> 'alpen',		//
-						'unit'		=> '',
-						//'match_yn'	=> 'N',
 						'rt'		=> now(),
 						'ut'		=> now(),
 						'admin_id'	=> $id
 					];
-					DB::table('product')->updateOrInsert($where, $values);
+					DB::table('product_code')->Insert($values);
 
-					//재고정보 처리
-					$values	= [
-						//'goods_no'	=> '',
-						'wonga'		=> $wonga,
-						'qty_wonga'	=> '0',
-						'in_qty'	=> '0',
-						'out_qty'	=> '0',
-						'qty'		=> '0',
-						'wqty'		=> '0',
-						//'goods_opt'	=> '',
-						'barcode'	=> $prd_cd,
-						'use_yn'	=> 'Y',
-						'rt'		=> now(),
-						'ut'		=> now()
-					];
-					DB::table('product_stock')->updateOrInsert($where, $values);
-
-				}else{
-					//재고정보 초기화
-					$where	= ['prd_cd'	=> $prd_cd];
-
-					$values	= [
-						'wonga'		=> $wonga,
-						'qty_wonga'	=> '0',
-						'in_qty'	=> '0',
-						'out_qty'	=> '0',
-						'qty'		=> '0',
-						'wqty'		=> '0',
-						'ut'		=> now()
-					];
-					DB::table('product_stock')
-						->where($where)
-						->update($values);
 				}
 
+				//product 등록/수정
+				$where	= ['prd_cd'	=> $prd_cd];
+				$values	= [
+					'prd_nm'	=> $prd_nm,
+					'style_no'	=> $style_no,
+					'tag_price'	=> $tag_price,
+					'price'		=> $price,
+					'wonga'		=> $wonga,
+					'type'		=> 'N',			//일반상품
+					'com_id'	=> 'alpen',		//
+					'unit'		=> '',
+					//'match_yn'	=> 'N',
+					'rt'		=> now(),
+					'ut'		=> now(),
+					'admin_id'	=> $id
+				];
+				DB::table('product')->updateOrInsert($where, $values);
+
+				//재고정보 처리
+				$values	= [
+					//'goods_no'	=> '',
+					'wonga'		=> $wonga,
+					'qty_wonga'	=> '0',
+					'in_qty'	=> '0',
+					'out_qty'	=> '0',
+					'qty'		=> '0',
+					'wqty'		=> '0',
+					//'goods_opt'	=> '',
+					'barcode'	=> $prd_cd,
+					'use_yn'	=> 'Y',
+					'rt'		=> now(),
+					'ut'		=> now()
+				];
+				DB::table('product_stock')->updateOrInsert($where, $values);
+
+			}else{
+				//재고정보 초기화
+				$where	= ['prd_cd'	=> $prd_cd];
+
+				$values	= [
+					'wonga'		=> $wonga,
+					'qty_wonga'	=> '0',
+					'in_qty'	=> '0',
+					'out_qty'	=> '0',
+					'qty'		=> '0',
+					'wqty'		=> '0',
+					'ut'		=> now()
+				];
+				DB::table('product_stock')
+					->where($where)
+					->update($values);
 			}
 
+		}
+
 		//	DB::commit();
-        //}
+		//}
 		//catch(Exception $e)
 		//{
-        //    DB::rollback();
+		//    DB::rollback();
 
 		//	$result_code	= "500";
 		//	$result_msg		= "데이터 등록/수정 오류";
@@ -1062,112 +1060,112 @@ class prd04Controller extends Controller
 			$error_code	= "400";
 		}
 
-        //try
+		//try
 		//{
-        //    DB::beginTransaction();
+		//    DB::beginTransaction();
 
-			if( $init_chk == "Y"){
-				$sql	= " delete from product_stock_store ";
-				DB::delete($sql);
+		if( $init_chk == "Y"){
+			$sql	= " delete from product_stock_store ";
+			DB::delete($sql);
+		}
+
+		for( $i = 0; $i < count($datas); $i++ )
+		{
+			$data		= (array)$datas[$i];
+
+			$store_cd	= trim($data['store_cd']);
+			$prd_cd_p	= trim($data['prd_cd_p']);
+			$prd_nm		= trim($data['prd_nm']);
+			$style_no	= trim($data['style_no']);
+			$color		= trim($data['color']);
+			$size		= trim($data['size']);
+			$qty		= Lib::uncm(trim($data['qty']));
+			$tag_price	= Lib::uncm(trim($data['tag_price']));
+			$price		= Lib::uncm(trim($data['price']));
+			$qty_wonga	= 0;
+			$wonga		= 0;
+			$in_qty		= 0;
+			$org_qty	= 0;
+
+			$prd_cd		= $prd_cd_p . $color . $size;
+
+			//매장 존재 유무 검토
+			$sql		= " select count(*) as tot from store where store_cd = :store_cd ";
+			$store	= DB::selectOne($sql, ['store_cd' => $store_cd]);
+
+			if( $store->tot == 0 ){
+				$error_code		= "501";
+				$result_code	= "매장정보가 존재하지 않습니다. [" . $store_cd . "]";
+
+				break;
 			}
 
-			for( $i = 0; $i < count($datas); $i++ )
-			{
-				$data		= (array)$datas[$i];
+			//상품코드 존재 유무
+			$sql		= " select goods_no, goods_opt, wonga, qty_wonga, in_qty, qty from product_stock where prd_cd = :prd_cd ";
+			$result = DB::select($sql, ['prd_cd' => $prd_cd]);
 
-				$store_cd	= trim($data['store_cd']);
-				$prd_cd_p	= trim($data['prd_cd_p']);
-				$prd_nm		= trim($data['prd_nm']);
-				$style_no	= trim($data['style_no']);
-				$color		= trim($data['color']);
-				$size		= trim($data['size']);
-				$qty		= Lib::uncm(trim($data['qty']));
-				$tag_price	= Lib::uncm(trim($data['tag_price']));
-				$price		= Lib::uncm(trim($data['price']));
-				$qty_wonga	= 0;
-				$wonga		= 0;
-				$in_qty		= 0;
-				$org_qty	= 0;
+			foreach($result as $row){
+				$qty_wonga	= $row->qty_wonga;
+				$wonga		= $row->wonga;
 
-				$prd_cd		= $prd_cd_p . $color . $size;
+				if( $qty_wonga > 0 )	$wonga = $qty_wonga / $row->qty;
 
-				//매장 존재 유무 검토
-				$sql		= " select count(*) as tot from store where store_cd = :store_cd ";
-				$store	= DB::selectOne($sql, ['store_cd' => $store_cd]);
+				$in_qty		= $row->in_qty;
+				$org_qty	= $row->qty;
 
-				if( $store->tot == 0 ){
-					$error_code		= "501";
-					$result_code	= "매장정보가 존재하지 않습니다. [" . $store_cd . "]";
+				$goods_no	= $row->goods_no;
+				$goods_opt	= $row->goods_opt;
+			}
 
-					break;
-				}
+			if( $wonga == 0 ){
+				//$error_code		= "502";
+				//$result_code	= "상품정보 혹은 원가정보가 존재하지 않습니다. [" . $prd_cd . "]";
 
-				//상품코드 존재 유무
-				$sql		= " select goods_no, goods_opt, wonga, qty_wonga, in_qty, qty from product_stock where prd_cd = :prd_cd ";
-				$result = DB::select($sql, ['prd_cd' => $prd_cd]);
+				//break;
+				$result_code	.= "|". $prd_cd;
+			}else{
 
-				foreach($result as $row){
-					$qty_wonga	= $row->qty_wonga;
-					$wonga		= $row->wonga;
+				//재고정보 처리
+				$where	= ['prd_cd'	=> $prd_cd];
 
-					if( $qty_wonga > 0 )	$wonga = $qty_wonga / $row->qty;
+				$values	= [
+					'wonga'		=> $wonga,
+					'qty_wonga'	=> $qty_wonga + $qty * $wonga,
+					'in_qty'	=> $in_qty + $qty,
+					'qty'		=> $org_qty + $qty,
+					'ut'		=> now()
+				];
+				DB::table('product_stock')
+					->where($where)
+					->update($values);
+				//DB::table('product_stock')->update($where, $values);
 
-					$in_qty		= $row->in_qty;
-					$org_qty	= $row->qty;
+				//매장재고 정보 처리
+				$where	= ['prd_cd'	=> $prd_cd, 'store_cd' => $store_cd];
 
-					$goods_no	= $row->goods_no;
-					$goods_opt	= $row->goods_opt;
-				}
-
-				if( $wonga == 0 ){
-					//$error_code		= "502";
-					//$result_code	= "상품정보 혹은 원가정보가 존재하지 않습니다. [" . $prd_cd . "]";
-
-					//break;
-					$result_code	.= "|". $prd_cd;
-				}else{
-
-					//재고정보 처리
-					$where	= ['prd_cd'	=> $prd_cd];
-
-					$values	= [
-						'wonga'		=> $wonga,
-						'qty_wonga'	=> $qty_wonga + $qty * $wonga,
-						'in_qty'	=> $in_qty + $qty,
-						'qty'		=> $org_qty + $qty,
-						'ut'		=> now()
-					];
-					DB::table('product_stock')
-						->where($where)
-						->update($values);
-					//DB::table('product_stock')->update($where, $values);
-
-					//매장재고 정보 처리
-					$where	= ['prd_cd'	=> $prd_cd, 'store_cd' => $store_cd];
-
-					$values	= [
-						'goods_no'	=> $goods_no,
-						'qty'		=> $qty,
-						'wqty'		=> $qty,
-						'goods_opt'	=> $goods_opt,
-						'use_yn'	=> 'Y',
-						'rt'		=> now(),
-						'ut'		=> now()
-					];
-					DB::table('product_stock_store')->updateOrInsert($where, $values);
-
-				}
+				$values	= [
+					'goods_no'	=> $goods_no,
+					'qty'		=> $qty,
+					'wqty'		=> $qty,
+					'goods_opt'	=> $goods_opt,
+					'use_yn'	=> 'Y',
+					'rt'		=> now(),
+					'ut'		=> now()
+				];
+				DB::table('product_stock_store')->updateOrInsert($where, $values);
 
 			}
+
+		}
 
 		//	DB::commit();
-        //}
+		//}
 		//catch(Exception $e)
 		//{
-        //   DB::rollback();
+		//   DB::rollback();
 
 		//	$result_code	= "500";
-			//$result_msg		= "데이터 등록/수정 오류";
+		//$result_msg		= "데이터 등록/수정 오류";
 		//	$result_msg = $e->getMessage();
 		//}
 
