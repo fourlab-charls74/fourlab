@@ -51,8 +51,9 @@ class prd04Controller extends Controller
 
 		$ord		= $request->input('ord','desc');
 		$ord_field	= $request->input('ord_field','prd_cd_p');
-		if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
-		$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);	//22-12-08 매칭된 상품을 상단으로
+		//if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
+		//$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);	//22-12-08 매칭된 상품을 상단으로
+		$orderby	= sprintf("order by p.match_yn desc, %s %s, concat(pc.prd_cd_p,pc.color), ob.seq", $ord_field, $ord);	//사이즈 정렬 기준으로 변경
 		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
 
@@ -204,7 +205,7 @@ class prd04Controller extends Controller
 						inner join product p on p.prd_cd = pc.prd_cd
 						left outer join goods g on pc.goods_no = g.goods_no
 						left outer join brand brand on brand.brand = g.brand
-						inner join code c on pc.color = c.code_id
+						inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
 						inner join brand b on b.br_cd = pc.brand
 						left outer join (
 							select prd_cd, sum(qty) as qty, stock_state_date
@@ -220,7 +221,7 @@ class prd04Controller extends Controller
 						) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where
-						c.code_kind_cd = 'PRD_CD_COLOR'
+						1=1
 						$where
 					group by pc.prd_cd
 					$having
@@ -284,7 +285,7 @@ class prd04Controller extends Controller
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on pc.goods_no = g.goods_no
 				left outer join brand brand on brand.brand = g.brand
-				inner join code c on pc.color = c.code_id
+				inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
 				inner join brand b on b.br_cd = pc.brand
 				left outer join (
 					select prd_cd, sum(qty) as qty, stock_state_date
@@ -299,8 +300,9 @@ class prd04Controller extends Controller
 					group by prd_cd
 				) _next_store on _next_store.prd_cd = ps.prd_cd $next_store_qty_sql
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
+				left outer join product_orderby ob on pc.size = ob.size_cd
 			where
-				c.code_kind_cd = 'PRD_CD_COLOR'
+				1=1
 				$where
 			group by pc.prd_cd
 			$having
