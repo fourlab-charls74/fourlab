@@ -274,7 +274,8 @@ class ord04Controller extends Controller
 
 		// 온라인클레임으로 반품되는 창고는 온라인창고로 설정된 창고입니다. (2023-09-07)
 		// 추후 온라인창고가 아닌 대표창고로 반품할 경우, 아래 'online_yn'을 'default_yn'으로 변경하십시오.
-		$return_storage_cd = DB::table('storage')->where('online_yn', 'Y')->value('storage_cd');
+		// 온라인클레임으로 반품되는 창고는 온라인창고에서 온라인반품창고로 변경되었습니다 (2023-10-13)
+		$return_storage_cd = DB::table('storage')->where('storage_cd', 'S0007')->value('storage_cd');
 
 		try {
 			DB::beginTransaction();

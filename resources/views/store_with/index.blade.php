@@ -58,8 +58,14 @@
                 </div>
                 <div class="tab-pane fade h-100" id="pie" role="tabpanel" aria-labelledby="pie-tab">
                     <div class="w-100 h-100" style="margin-top: 20px;max-height: 83%;">
-                        <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1" style="float:right;">더보기</a>
+                        <a href="#" id="msg_del_btn" onclick="sale_amt_store()"class="btn btn-sm btn-primary shadow-sm mr-1 ml-2" style="float:right;">더보기</a>
+						<div style="text-align:right">
+							<span style="font-size: 17px;">[ {{@$sdate3}} ~ {{@$edate3}} ]</span>
+						</div>
                         <canvas id="myChart2" class="my-chart"></canvas>
+						<div>
+							<span style="color: red; float: right"> * 매출액은 VAT 포함 매출액입니다.</span>
+						</div>
                     </div>
                 </div>
             </div>

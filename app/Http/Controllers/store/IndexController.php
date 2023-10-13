@@ -26,13 +26,18 @@ class IndexController extends Controller
         $sdate2 = $mutable3->sub(1, 'month')->format('Y-m-d');
         $edate2 = date("Y-m-d");
 
+		$mutable4 = Carbon::now();
+		$sdate3 = $mutable4->sub(1, 'week')->format('Y-m-d');
+		$edate3 = date("Y-m-d");
+
         $sql = "
             select
                 date_format(a.sale_date,'%Y%m%d') as date,
                 (t.recv_amt_30 + t.recv_amt_60 + t.recv_amt_61) as sum_recv_amt,
                 (t.wonga_30 + t.wonga_60 + t.wonga_61) as sum_wonga,
                 (t.point_amt_30 + t.point_amt_60 + t.point_amt_61) as sum_point_amt,
-                (t.fee_amt_30 + t.fee_amt_60 + t.fee_amt_61 ) as sum_fee_amt
+                (t.fee_amt_30 + t.fee_amt_60 + t.fee_amt_61 ) as sum_fee_amt,
+            	(t.taxation_amt_30 + t.taxation_amt_60 + t.taxation_amt_61) as sum_taxation_amt
             from (
                 select d as sale_date from mdate where d >='$startdate' and d <= '$enddate' order by sale_date desc
             ) a 
@@ -43,16 +48,19 @@ class IndexController extends Controller
                     , sum(if(ord_state = '10', ifnull(b.point_amt, 0), 0)) as point_amt_30
                     , sum(if(ord_state = '10', ifnull(b.fee_amt,0), 0)) as fee_amt_30
                     , sum(if(ord_state = '10', ifnull(b.wonga,0), 0)) as wonga_30
+              		, sum(if(ord_state = '10', ifnull(b.taxation_amt, 0), 0)) as taxation_amt_30
                     
                     , sum(if(ord_state = 60, ifnull(b.recv_amt, 0), 0)) * -1 as recv_amt_60
                     , sum(if(ord_state = 60, ifnull(b.point_amt, 0), 0)) * -1 as point_amt_60
                     , sum(if(ord_state = 60, ifnull(b.fee_amt,0), 0)) * 1 as fee_amt_60
                     , sum(if(ord_state = 60, ifnull(b.wonga, 0), 0)) as wonga_60
+              		, sum(if(ord_state = 60, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_60
                                     
                     , sum(if(ord_state = 61, ifnull(b.recv_amt, 0), 0)) * -1 as recv_amt_61
                     , sum(if(ord_state = 61, ifnull(b.point_amt, 0), 0)) * -1 as point_amt_61
                     , sum(if(ord_state = 61, ifnull(b.fee_amt,0), 0)) * 1 as fee_amt_61
                     , sum(if(ord_state = 61, ifnull(b.wonga, 0), 0))  as wonga_61
+            		, sum(if(ord_state = 61, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_61
                 from (
                     select
                         w.ord_state_date as sale_date, w.ord_state
@@ -60,8 +68,10 @@ class IndexController extends Controller
                         , sum(w.point_apply_amt) as point_amt
                         , sum(w.wonga * w.qty) as wonga
                         , sum(w.sales_com_fee) as fee_amt
+            			, sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
                     from order_opt o
                         inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+            			inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
                     where
                         w.ord_state_date >= '$startdate' and w.ord_state_date <= '$enddate'
                         and w.ord_state in ('10',60,61)
@@ -76,13 +86,15 @@ class IndexController extends Controller
 
         $result = collect($rows)->map(function ($row) {
 
-			$sale_date		= $row->date;
-
-			$sum_point		= $row->sum_point_amt;	//포인트 합계
-			$sum_fee		= $row->sum_fee_amt;		//수수료 합계
-			$sum_recv		= $row->sum_recv_amt;		//무통장 또는 카드 합계
-			$sum_wonga		= (int)$row->sum_wonga;		//원가 합계
-			$sum_amt		= $sum_recv + $sum_point - $sum_fee;
+			$sale_date				= $row->date;
+			$sum_point				= $row->sum_point_amt;	//포인트 합계
+			$sum_fee				= $row->sum_fee_amt;		//수수료 합계
+			$sum_recv				= $row->sum_recv_amt;		//무통장 또는 카드 합계
+			$sum_wonga				= (int)$row->sum_wonga;		//원가 합계
+			$sum_taxation			= $row->sum_taxation_amt;
+			$sum_taxation_no_vat	= round($sum_taxation/1.1);
+			$vat 					= $sum_taxation - $sum_taxation_no_vat;
+			$sum_amt				= $sum_recv + $sum_point - $sum_fee - $vat;
 
 
 			$array = array(
@@ -187,14 +199,16 @@ class IndexController extends Controller
         $chart3Result = DB::select($sql);
 
         $values = [
-            'sdate' => $sdate,
-            'edate' => $edate,
-            'sdate2' => $sdate2,
-            'edate2' => $edate2,
-            'result' => $result,
-            'pieResult' => $piechart,
-            'chart2Result' => $chart2Result,
-            'chart3Result' => $chart3Result
+            'sdate' 		=> $sdate,
+            'edate' 		=> $edate,
+            'sdate2' 		=> $sdate2,
+            'edate2' 		=> $edate2,
+			'sdate3'		=> $sdate3,
+			'edate3' 		=> $edate3,
+            'result' 		=> $result,
+            'pieResult' 	=> $piechart,
+            'chart2Result' 	=> $chart2Result,
+            'chart3Result' 	=> $chart3Result
             
         ];
 

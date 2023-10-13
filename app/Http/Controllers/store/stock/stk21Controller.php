@@ -610,7 +610,10 @@ class stk21Controller extends Controller
 			if ($document_number === null) $document_number = 1;
 			else $document_number = $document_number->document_number;
 
+			$msg_dep_store_cd = [];	
 			foreach($data as $d) {
+				$dep_store_cd = $d['dep_store_cd'];
+				array_push($msg_dep_store_cd, $dep_store_cd);
 				
 				DB::table('product_stock_rotation')
 					->insert([
@@ -630,13 +633,51 @@ class stk21Controller extends Controller
 					]);
 
 				//RT요청 알림 전송
+//				$res = DB::table('msg_store')
+//					->insertGetId([
+//						'msg_kind' => 'RT',
+//						'sender_type' => 'H',
+//						'sender_cd' => $admin_id,
+//						'reservation_yn' => 'N',
+//						'content' => '본사요청RT가 있습니다.',
+//						'rt' => now()
+//					]);
+//
+//				DB::table('msg_store_detail')
+//					->insert([
+//						'msg_cd' => $res,
+//						'receiver_type' => 'S',
+//						'receiver_cd' => $d['dep_store_cd'] ?? '',
+//						'check_yn' => 'N',
+//						'rt' => now()
+//					]);
+			}
+			
+			/**
+			 * RT일괄요청으로 요청 시 매장에 다량의 알리미가 발송되는 문제를 막는 부분
+			 * 알리미 기능 전체를 수정해야하지만 일단 일괄등록부터 구현
+			 * 알리미가 전송되고 요청RT가 처리되면 RT가 몇 건 남았는지도 보내줘야함
+			 * 팀장님과 회의 후 진행해야할 거 같음
+			*/
+			$msg_dep_store_cnt = array_count_values($msg_dep_store_cd);
+			
+			$store_dup_cnt = [];
+			foreach ($msg_dep_store_cnt as $value => $count) {
+				array_push($store_dup_cnt, $value.'^'.$count);
+			}
+			
+			foreach ($store_dup_cnt as $sd) {
+				$dep_store_cnt_data = explode('^', $sd);
+				$dep_store_cd = $dep_store_cnt_data[0];
+				$dep_store_msg_cnt = $dep_store_cnt_data[1];
+				
 				$res = DB::table('msg_store')
 					->insertGetId([
 						'msg_kind' => 'RT',
 						'sender_type' => 'H',
 						'sender_cd' => $admin_id,
 						'reservation_yn' => 'N',
-						'content' => '본사요청RT가 있습니다.',
+						'content' => '본사요청RT이 '.$dep_store_msg_cnt.'건 요청되었습니다.',
 						'rt' => now()
 					]);
 
@@ -644,7 +685,7 @@ class stk21Controller extends Controller
 					->insert([
 						'msg_cd' => $res,
 						'receiver_type' => 'S',
-						'receiver_cd' => $d['dep_store_cd'] ?? '',
+						'receiver_cd' => $dep_store_cd ?? '',
 						'check_yn' => 'N',
 						'rt' => now()
 					]);
