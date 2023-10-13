@@ -53,7 +53,7 @@ class prd04Controller extends Controller
 		$ord_field	= $request->input('ord_field','prd_cd_p');
 		//if ($ord_field == 'prd_cd_p') $ord_field = 'pc.rt';
 		//$orderby	= sprintf("order by p.match_yn desc, %s %s, pc.prd_cd", $ord_field, $ord);	//22-12-08 매칭된 상품을 상단으로
-		$orderby	= sprintf("order by p.match_yn desc, %s %s, concat(pc.prd_cd_p,pc.color), ob.seq", $ord_field, $ord);	//사이즈 정렬 기준으로 변경
+		$orderby	= sprintf("order by %s %s, concat(pc.prd_cd_p,pc.color), ob.seq", $ord_field, $ord);	//사이즈 정렬 기준으로 변경
 		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
 
