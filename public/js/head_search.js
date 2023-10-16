@@ -1184,7 +1184,7 @@ SearchGoodsNos.prototype.Open = function(id = 'goods_no',callback = null){
 SearchGoodsNos.prototype.SetGrid = function(divId){
     const columns = [
 		{field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, pinned: 'left', sort: null},
-		{field: "goods_no", headerName: "상품번호", width: 70, cellClass: 'hd-grid-code', pinned: 'left'},
+		{field: "goods_no", headerName: "온라인코드", width: 70, cellClass: 'hd-grid-code', pinned: 'left'},
 		{field: "style_no", headerName: "스타일넘버", width: 100, pinned: 'left'},
 		{field: "img", headerName: "이미지", width: 50, cellClass: 'hd-grid-code',
 			cellRenderer: (params) => {

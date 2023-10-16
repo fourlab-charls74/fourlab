@@ -75,6 +75,7 @@ class ord04Controller extends Controller
 		$goods_nm = $request->input('goods_nm', '');
 		$goods_nm_eng = $request->input('goods_nm_eng', '');
 		$stock_check_yn = $request->input('stock_check_yn', 'N');
+		$search_date_type = $request->input('search_date_type', '');
 
 		$ord_field = $request->input('ord_field', 'o.ord_date');
 		$ord = $request->input('ord', 'desc');
@@ -174,6 +175,14 @@ class ord04Controller extends Controller
 				$where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
+		
+		//일자검색
+		$where_sql = "";
+		if ($search_date_type == 'ord_date') {
+			$where_sql .= "o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'";
+		} else {
+			$where_sql .= "csc.rt >= '$sdate 00:00:00' and csc.rt <= '$edate 23:59:59'";
+		}
 
 		// order by
 		$orderby = sprintf("order by %s %s, pc.prd_cd asc", $ord_field, $ord);
@@ -206,13 +215,14 @@ class ord04Controller extends Controller
 					),'') as size
 					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
 					, csc.comment
+					, csc.rt as csc_rt
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
 				    inner join claim c on c.ord_opt_no = o.ord_opt_no
 					inner join goods g on g.goods_no = o.goods_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
-				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
+				where $where_sql
 					and o.clm_state in (40,41,60,61)
 					$where
 				$orderby
@@ -241,7 +251,7 @@ class ord04Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
-				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
+				where $where_sql
 					and o.clm_state in (40,41,60,61)
 					$where
 			";

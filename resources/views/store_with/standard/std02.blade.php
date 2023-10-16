@@ -12,7 +12,6 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -21,7 +20,6 @@
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
-
 			<div class="card-body">
 				<div class="row">
 					<div class="col-lg-4 inner-td">
@@ -82,7 +80,7 @@
 					</div> -->
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="item">사용유무</label>
+							<label for="item">사용여부</label>
 							<div class="form-inline form-radio-box">
 								<div class="custom-control custom-radio">
 									<input type="radio" name="use_yn" id="use_yn" class="custom-control-input" value="">
@@ -195,7 +193,8 @@
 		// },
 		{headerName:"판매수수료율",	field:"sale_fee",		width:84, cellStyle:{"text-align":"right"}},
 		{headerName:"사용여부",		field:"use_yn",			width:60, cellStyle:{"text-align":"center"}},
-		{headerName:"",				field:"",				width:0}
+		{headerName:"등록일",		field:"reg_date",		width:130, cellStyle:{"text-align":"center"}},
+		{width: "auto"}
 	];
 
 	function Add()

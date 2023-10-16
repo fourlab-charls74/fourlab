@@ -28,30 +28,40 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="good_types">주문일자</label>
-							<div class="form-inline date-select-inbox">
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ @$sdate }}" autocomplete="off" disable>
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
+							<div class="form-group">
+								<label>일자검색</label>
+								<div class="d-flex">
+									<div class="flex_box w-25 mr-2">
+										<select name='search_date_type' id="search_date_type" class="form-control form-control-sm">
+											<option value='ord_date' selected>주문일자</option>
+											<option value='inspect_date'>검수일시</option>
+										</select>
+									</div>
+									<div class="form-inline date-select-inbox w-75">
+										<div class="docs-datepicker form-inline-inner input_box">
+											<div class="input-group">
+												<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
+												<div class="input-group-append">
+													<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+														<i class="fa fa-calendar" aria-hidden="true"></i>
+													</button>
+												</div>
+											</div>
+											<div class="docs-datepicker-container"></div>
+										</div>
+										<span class="text_line">~</span>
+										<div class="docs-datepicker form-inline-inner input_box">
+											<div class="input-group">
+												<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+												<div class="input-group-append">
+													<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+														<i class="fa fa-calendar" aria-hidden="true"></i>
+													</button>
+												</div>
+											</div>
+											<div class="docs-datepicker-container"></div>
 										</div>
 									</div>
-									<div class="docs-datepicker-container"></div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="docs-datepicker form-inline-inner input_box">
-									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ @$edate }}" autocomplete="off">
-										<div class="input-group-append">
-											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-												<i class="fa fa-calendar" aria-hidden="true"></i>
-											</button>
-										</div>
-									</div>
-									<div class="docs-datepicker-container"></div>
 								</div>
 							</div>
 						</div>
@@ -197,8 +207,8 @@
 							<label>검수여부</label>
 							<div class="form-inline">
 								<select name='stock_check_yn' id="stock_check_yn" class="form-control form-control-sm w-100">
-									<option value=''>전체</option>
-									<option value='N' selected>검수전</option>
+									<option value='' selected>전체</option>
+									<option value='N'>검수전</option>
 									<option value='Y'>검수완료</option>
 								</select>
 							</div>
@@ -410,6 +420,7 @@
 		{field: "pay_date", headerName: "입금일시", type: 'DateTimeType'},
 		{field: "dlv_end_date", headerName: "배송일시", type: 'DateTimeType'},
 		{field: "last_up_date", headerName: "클레임일시", type: 'DateTimeType'},
+		{field: "csc_rt", headerName: "검수일시", type: 'DateTimeType'},
 	];
 
 	const pApp = new App('', { gridId:"#div-gd", height: 265 });

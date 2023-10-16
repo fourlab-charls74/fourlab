@@ -111,16 +111,6 @@ class prd02Controller extends Controller
 			}
 		}
 
-		// 스타일넘버 다중검색
-		$style_nos = explode(',', $style_no);
-		if ( $style_no != "" ) {
-			$where	.= " and (1!=1";
-			foreach($style_nos as $styleno) {
-				$where .= " or if(pc.goods_no = 0, p.style_no, g.style_no) = '$styleno' ";
-
-			}
-			$where	.= ")";
-		}
 		if($item != "")			$where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if($brand_cd != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
@@ -160,6 +150,23 @@ class prd02Controller extends Controller
 			$where .= "and ps.wqty > 0";
 		}
 
+		// 스타일넘버 다중검색
+		$style_no	= preg_replace("/\s/",",",$style_no);
+		$style_no	= preg_replace("/\t/",",",$style_no);
+		$style_no	= preg_replace("/\n/",",",$style_no);
+		$style_no	= preg_replace("/,,/",",",$style_no);
+
+		if( $style_no != "" ){
+			$style_nos = explode(",",$style_no);
+			if(count($style_nos) > 1){
+				if(count($style_nos) > 500) array_splice($style_nos,500);
+				$in_style_nos = join(",",$style_nos);
+				$where .= " and g.style_no in ( $in_style_nos ) ";
+			} else {
+				if ($style_no != "") $where .= " and g.style_no = '" . Lib::quote($style_no) . "' ";
+			}
+		}
+		
 		if($goods_nos != ""){
 			$goods_no	= $goods_nos;
 		}
@@ -204,8 +211,10 @@ class prd02Controller extends Controller
 					from product_code pc
 						inner join product_stock ps on ps.prd_cd = pc.prd_cd
 						inner join product p on p.prd_cd = pc.prd_cd
-						$in_store_sql
 						left outer join goods g on g.goods_no = pc.goods_no
+						$in_store_sql
+						inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
+						inner join brand b on b.br_cd = pc.brand
 					where 1 = 1
 					$where
 					group by pc.prd_cd
