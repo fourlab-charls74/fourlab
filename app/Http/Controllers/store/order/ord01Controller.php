@@ -963,15 +963,20 @@ class ord01Controller extends Controller
                 where a.goods_no = :goods_no
             ";
             $goods = DB::selectOne($sql, ["goods_no" => $goods_no]);
+
+			$product = DB::table('product')->where('prd_cd', $prd_cd)->first();
+			$product_price = $product->price ?? 0;
+			$product_wonga = $product->wonga ?? 0;
 			
 			// 판매가 지정되지 않은 경우, 현재판매가로 설정
 			if ($sugi_price == 0 || $sugi_price == '') {
-				$sugi_price = DB::table('product')->where('prd_cd', $prd_cd)->value('price') ?? 0;
+				$sugi_price = $product_price;
 			}
 
             // 위탁상품인 경우, 옵션가격이 있다면 수수료율에 맞춰 원가 재계산 > 정산 시 수수료율 보정
             if ($goods_type == "P" && ($opt_amt + $addopt_amt) > 0) {
-                $goods->wonga = ($goods_price + $opt_amt + $addopt_amt) * (1 - $goods->margin_rate / 100);
+                // $goods->wonga = ($goods_price + $opt_amt + $addopt_amt) * (1 - $goods->margin_rate / 100);
+				$product_wonga = ($goods_price + $opt_amt + $addopt_amt) * (1 - $goods->margin_rate / 100);
             }
 
             $product_stock = 0;
@@ -1058,7 +1063,7 @@ class ord01Controller extends Controller
             $ord_opt_point_amt = Lib::getValue($cart[$i], "point_amt", 0);
             $ord_opt_coupon_amt = Lib::getValue($cart[$i], "coupon_amt", 0);
             // $ord_opt_dc_amt = Lib::getValue($cart[$i], "dc_amt", 0);
-			$ord_opt_dc_amt = ($goods->price - $sugi_price) * $qty;
+			$ord_opt_dc_amt = ($product_price - $sugi_price) * $qty;
             $ord_opt_dlv_amt = Lib::getValue($cart[$i], "dlv_amt", 0);
 
             $a_ord_amt = $sugi_price * $qty;
@@ -1077,7 +1082,7 @@ class ord01Controller extends Controller
                     'goods_nm' => $goods->goods_nm,
                     'goods_opt' => $goods_opt,
                     'qty' => $qty,
-                    'wonga' => $goods->wonga,
+                    'wonga' => $product_wonga,
                     'price' => $sugi_price,
                     'dlv_amt' => $ord_opt_dlv_amt,
                     'pay_type' => $pay_type,

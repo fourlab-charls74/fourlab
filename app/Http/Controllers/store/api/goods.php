@@ -289,18 +289,19 @@ class goods extends Controller
                 , (ps.qty - ps.wqty) as s_qty
                 , ps.wqty as sg_qty
                 , ps.qty as total_qty
-                , g.goods_sh
-                , g.price
-                , g.wonga
+                , p.tag_price as goods_sh
+                , p.price
+                , p.wonga
                 -- , ps.wonga
-                , (100 / (g.price / (g.price - g.wonga))) as margin_rate
-                , (g.price - g.wonga) as margin_amt
+                , (100 / (p.price / (p.price - p.wonga))) as margin_rate
+                , (p.price - p.wonga) as margin_amt
                 , g.org_nm
                 , g.com_id
                 , com.com_nm
                 , g.make
                 , pc.rt as reg_dm
             from product_code pc
+                inner join product p on p.prd_cd = pc.prd_cd
                 inner join product_stock ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
@@ -366,11 +367,11 @@ class goods extends Controller
                     , (ps.qty - ps.wqty) as s_qty, ps.wqty as sg_qty, ps.qty as total_qty
                     , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                     , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
-                    , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
-                    , if(pc.goods_no = 0, p.price, g.price) as price
-                    , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-                    , if(pc.goods_no = 0, (100 / (p.price / (p.price - p.wonga))), (100 / (g.price / (g.price - g.wonga)))) as margin_rate
-                    , if(pc.goods_no = 0, p.price - p.wonga, g.price - g.wonga) as margin_amt
+                    , p.tag_price as goods_sh
+                    , p.price
+                    , p.wonga as wonga
+                    , (100 / (p.price / (p.price - p.wonga))) as margin_rate
+                    , p.price - p.wonga as margin_amt
                     , if(pc.goods_no = 0, p.com_id, g.com_id) as com_id
                     , g.org_nm, g.make, g.opt_kind_cd
                     , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
@@ -455,18 +456,19 @@ class goods extends Controller
                 , (ps.qty - ps.wqty) as s_qty
                 , ps.wqty as sg_qty
                 , ps.qty as total_qty
-                , g.goods_sh
-                , g.price
-                , g.wonga
+                , p.tag_price as goods_sh
+                , p.price
+                , p.wonga
                 -- , ps.wonga
-                , (100 / (g.price / (g.price - g.wonga))) as margin_rate
-                , (g.price - g.wonga) as margin_amt
+                , (100 / (p.price / (p.price - p.wonga))) as margin_rate
+                , (p.price - p.wonga) as margin_amt
                 , g.org_nm
                 , g.com_id
                 , com.com_nm
                 , g.make
                 , pc.rt as reg_dm
             from product_code pc
+                inner join product p on p.prd_cd = pc.prd_cd
                 inner join product_stock ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
@@ -539,18 +541,19 @@ class goods extends Controller
                 , (ps.qty - ps.wqty) as s_qty
                 , ps.wqty as sg_qty
                 , ps.qty as total_qty
-                , g.goods_sh
-                , g.price
-                , g.wonga
+                , p.tag_price as goods_sh
+                , p.price
+                , p.wonga
                 -- , ps.wonga
-                , (100 / (g.price / (g.price - g.wonga))) as margin_rate
-                , (g.price - g.wonga) as margin_amt
+                , (100 / (p.price / (p.price - p.wonga))) as margin_rate
+                , (p.price - p.wonga) as margin_amt
                 , g.org_nm
                 , g.com_id
                 , com.com_nm
                 , g.make
                 , pc.rt as reg_dm
             from product_code pc
+                inner join product p on p.prd_cd = pc.prd_cd
                 inner join product_stock ps on ps.prd_cd = pc.prd_cd
                 inner join goods g on g.goods_no = pc.goods_no
                 inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
@@ -611,11 +614,11 @@ class goods extends Controller
 					),'') as size
                     , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                     , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
-                    , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
-                    , if(pc.goods_no = 0, p.price, g.price) as price
-                    , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
-                    , if(pc.goods_no = 0, (100 / (p.price / (p.price - p.wonga))), (100 / (g.price / (g.price - g.wonga)))) as margin_rate
-                    , if(pc.goods_no = 0, p.price - p.wonga, g.price - g.wonga) as margin_amt
+                    , p.tag_price as goods_sh
+                    , p.price
+                    , p.wonga
+                    , (100 / (p.price / (p.price - p.wonga))) as margin_rate
+                    , p.price - p.wonga as margin_amt
                     , if(pc.goods_no = 0, p.com_id, g.com_id) as com_id
                     , g.org_nm, g.make, g.opt_kind_cd
                     , if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
@@ -718,8 +721,8 @@ class goods extends Controller
     }
 
     /*********************************************************************************/
-    /******************************** 상품코드(바코드) 검색 관련 ******************************/
-    /********************************************************************************/
+    /*************************** 상품코드(바코드) 검색 관련 **************************/
+    /*********************************************************************************/
 
     const Conds = [
         'brand' => 'BRAND',
