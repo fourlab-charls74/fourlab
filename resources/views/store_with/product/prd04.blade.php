@@ -317,7 +317,7 @@
 		@if(true) // 슈퍼관리자 권한설정 필요 (추후)
 			{field: "wonga", headerName: "원가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		@endif
-		{field: "hwqty", headerName: "창고재고", width:70, type: 'currencyType', 
+		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
 			},
@@ -421,8 +421,6 @@
 		let ischeck = $('#ext_store_storage_qty').is(':checked');
 		let data = $('form[name="search"]').serialize();
 		data += '&ext_store_storage_qty=' + ischeck;
-
-		console.log(ischeck);
 		
 		gx.Request('/store/product/prd04/search', data, 1, function(e) {
 			const t = e.head.total_row;
@@ -431,7 +429,7 @@
 				goods_sh: t.total_goods_sh, 
 				price: t.total_price, 
 				wonga: t.total_wonga,
-				hwqty: Comma(t.total_wqty),
+				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
 			}]);
 			setAllRowGroupExpanded($("#grid_expand").is(":checked"));

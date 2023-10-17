@@ -202,7 +202,7 @@
         {field: "goods_opt", headerName: "옵션", width: 153},
         {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
         {field: "price", headerName: "현재가", type: "currencyType", width: 65},
-        {field: "change_val", headerName: "가격", type: "currencyType", width: 80 @if ($cmd == 'update' && $res->apply_yn == 'N') ,editable:true, cellStyle: {'background' : '#ffff99'} @elseif($cmd == 'add') ,editable:true, cellStyle: {'background' : '#ffff99'} @endif},
+        {field: "change_val", headerName: "가격", type: "currencyType", width: 80, cellStyle: {'background' : '#FFDFDF'}},
 		{width : 'auto'}
     ];
 </script>

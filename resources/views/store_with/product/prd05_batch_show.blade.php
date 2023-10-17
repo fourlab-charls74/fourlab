@@ -156,7 +156,7 @@
 					}
 				}
 			},
-			{field: "change_val", headerName: "가격", type: "currencyType", width: 80, editable:true, cellStyle: {'background' : '#ffff99'}},
+			{field: "change_val", headerName: "가격", type: "currencyType", width: 80, cellStyle: {'background' : '#FFDFDF'}},
 			{width : 'auto'}
 		];
 	</script>

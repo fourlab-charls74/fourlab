@@ -64,7 +64,7 @@ class prd04Controller extends Controller
 		$where		= "";
 		$having = "";
 		$in_store_sql	= "";
-		$store_qty_sql	= "ifnull((ps.qty - ps.wqty),0)";
+		$store_qty_sql	= "pss.wqty";
 		$next_store_qty_sql = "";
 
 		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
@@ -97,7 +97,6 @@ class prd04Controller extends Controller
 			$where	.= " and (1!=1";
 			foreach($storage_cd as $storage_cd) {
 				$where .= " or storage_cd = '$storage_cd' ";
-
 			}
 			$where	.= ")";
 		}
@@ -118,7 +117,24 @@ class prd04Controller extends Controller
             }
         }
 
-		if( $style_no != "" )	$where .= " and ( g.style_no like '" . Lib::quote($style_no) . "%' or p.style_no like '" . Lib::quote($style_no) . "%' ) ";
+		// 스타일넘버 다중검색
+		$style_no	= preg_replace("/\s/",",",$style_no);
+		$style_no	= preg_replace("/\t/",",",$style_no);
+		$style_no	= preg_replace("/\n/",",",$style_no);
+		$style_no	= preg_replace("/,,/",",",$style_no);
+
+		if( $style_no != "" ){
+			$style_nos = explode(",",$style_no);
+			if(count($style_nos) > 1){
+				if(count($style_nos) > 500) array_splice($style_nos,500);
+				$in_style_nos = join(",",$style_nos);
+				$where .= " and g.style_no in ( $in_style_nos ) ";
+			} else {
+				if ($style_no != "") $where .= " and g.style_no = '" . Lib::quote($style_no) . "' ";
+			}
+		}
+
+//		if( $style_no != "" )	$where .= " and ( g.style_no like '" . Lib::quote($style_no) . "%' or p.style_no like '" . Lib::quote($style_no) . "%' ) ";
 		if( $goods_nm != "" ){
 			$where .= " and ( g.goods_nm like '%" . Lib::quote($goods_nm) . "%' or p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ) ";
 		}
@@ -132,7 +148,7 @@ class prd04Controller extends Controller
 			//$where	.= ")";
 
 			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= " ifnull(pss.qty, 0)";
+			$store_qty_sql	= "pss.wqty";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -149,7 +165,7 @@ class prd04Controller extends Controller
 			$where	.= ")";
 
 			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "sum(pss.qty)";
+			$store_qty_sql	= "pss.wqty";
 		}
 
 		if($ext_store_qty == 'true') {
@@ -173,18 +189,10 @@ class prd04Controller extends Controller
 					sum(a.goods_sh * a.sqty) as total_goods_sh,
 					sum(a.price * a.sqty) as total_price,
 					sum(a.wonga * a.sqty) as total_wonga,
-					sum(a.wqty) as total_wqty,
 					sum(a.sqty) as total_sqty
 				from (
 					select
 						pc.prd_cd
-						, (ps.wqty - ifnull((
-							select sum(qty) as qty
-							from product_stock_hst
-							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-							and prd_cd = ps.prd_cd
-							group by prd_cd
-						), 0)) as wqty
 						, ($store_qty_sql - ifnull((
 							select sum(qty) as qty
 							from product_stock_hst
@@ -209,7 +217,7 @@ class prd04Controller extends Controller
 					where
 						-- c.code_kind_cd = 'PRD_CD_COLOR'
 						1=1
-						$where
+						$where and pss.store_cd = '$store_cd'
 					group by pc.prd_cd
 					$having
 				) a
@@ -243,13 +251,6 @@ class prd04Controller extends Controller
 				, pc.color, c.code_val as color_nm
 				, pc.size
 				, pc.goods_opt
-				, (ps.wqty - ifnull((
-					select sum(qty) as qty
-					from product_stock_hst
-					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					and prd_cd = ps.prd_cd
-					group by prd_cd
-				), 0)) as wqty
 				, ($store_qty_sql - ifnull((
 					select sum(qty) as qty
 					from product_stock_hst
@@ -284,7 +285,7 @@ class prd04Controller extends Controller
 			where
 				-- c.code_kind_cd = 'PRD_CD_COLOR'
 				1=1
-				$where
+				$where and pss.store_cd = '$store_cd'
 			group by pc.prd_cd
 			$having
 			$orderby

@@ -322,7 +322,7 @@
                     {field: "storage_qty", headerName: "재고", type: 'currencyType', width: 60},
                     {field: "storage_wqty", headerName: "보유재고", type: 'currencyType', width: 80,
                         cellRenderer: (params) => params.value === undefined ? ''
-                            : ((params.value * 1) - (params.data?.already_cnt || 0)) + (params.data?.already_cnt > 0 ? ` <span class="text-danger">(-${params.data?.already_cnt || 0})</span>` : ''),
+                            : Comma(((params.value * 1) - (params.data?.already_cnt || 0))) + (params.data?.already_cnt > 0 ? ` <span class="text-danger">(-${params.data?.already_cnt || 0})</span>` : ''),
                     },
                 ]
             },

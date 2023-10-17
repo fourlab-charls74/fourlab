@@ -161,6 +161,7 @@ class stk13Controller extends Controller
         $limit = " limit $startno, $page_size ";
 		$total = 0;
 		$page_cnt = 0;
+		$total_data = 0;
 
 		if ($page == 1) {
 			$sql = "
