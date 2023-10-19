@@ -58,6 +58,8 @@ class prd04Controller extends Controller
 		$match_yn = $request->input('match_yn1');
 
 		$where		= "";
+		$store_where1	= "";
+		$store_where2	= "";
 		$having = "";
 		$in_store_sql	= "";
 		$store_qty_sql	= "(ps.qty - ps.wqty)";
@@ -136,49 +138,64 @@ class prd04Controller extends Controller
 			$where .= " and ( g.goods_nm like '%" . Lib::quote($goods_nm) . "%' or p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ) ";
 		}
 		if( $store_no != "" ){
-			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			//$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= "";
 
-			$where	.= " and ( 1<>1";
+			$store_where1	.= " and ( 1<>1";
+			$store_where2	.= " and ( 1<>1";
 			foreach($store_no as $store_cd) {
-				$where .= " or pss.store_cd = '" . Lib::quote($store_cd) . "' ";
+				$store_where1 .= " or location_cd = '" . Lib::quote($store_cd) . "' ";
+				$store_where2 .= " or store_cd = '" . Lib::quote($store_cd) . "' ";
 			}
-			$where	.= ")";
+			$store_where1	.= ")";
+			$store_where2	.= ")";
 
-			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "pss.wqty";
+			//$next_store_qty_sql = " and location_cd = pss.store_cd ";
+			//$store_qty_sql	= "pss.wqty";
+			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
 		if( $store_no == "" && $store_channel != "" ){
-			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			//$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= "";
 
 			$sql	= " select store_cd from store where store_channel = :store_channel and use_yn = 'Y' ";
 			$result = DB::select($sql,['store_channel' => $store_channel]);
 
-			$where	.= " and ( 1<>1";
+			$store_where1	.= " and ( 1<>1";
+			$store_where2	.= " and ( 1<>1";
 			foreach($result as $row){
-				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+				$store_where1 .= " or location_cd = '" . Lib::quote($row->store_cd) . "' ";
+				$store_where2 .= " or store_cd = '" . Lib::quote($row->store_cd) . "' ";
 			}
-			$where	.= ")";
+			$store_where1	.= ")";
+			$store_where2	.= ")";
 
-			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "sum(pss.wqty)";
+			//$next_store_qty_sql = " and location_cd = pss.store_cd ";
+			//$store_qty_sql	= "sum(pss.wqty)";
+			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 
 		if( $store_no == "" && $store_channel != "" && $store_channel_kind ){
-			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			//$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
+			$in_store_sql	= "";
 
 			$sql	= " select store_cd from store where store_channel = :store_channel and store_channel_kind = :store_channel_kind and use_yn = 'Y' ";
 			$result = DB::select($sql,['store_channel' => $store_channel, 'store_channel_kind' => $store_channel_kind]);
 
-			$where	.= " and ( 1<>1";
+			$store_where1	.= " and ( 1<>1";
+			$store_where2	.= " and ( 1<>1";
 			foreach($result as $row){
-				$where .= " or pss.store_cd = '" . Lib::quote($row->store_cd) . "' ";
+				$store_where1 .= " or location_cd = '" . Lib::quote($row->store_cd) . "' ";
+				$store_where2 .= " or store_cd = '" . Lib::quote($row->store_cd) . "' ";
 			}
-			$where	.= ")";
+			$store_where1	.= ")";
+			$store_where2	.= ")";
 
-			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "sum(pss.wqty)";
+			//$next_store_qty_sql = " and location_cd = pss.store_cd ";
+			//$store_qty_sql	= "sum(pss.wqty)";
+			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 
 		if($ext_store_storage_qty == 'true') {
@@ -217,7 +234,7 @@ class prd04Controller extends Controller
 							select sum(qty) as qty
 							from product_stock_hst
 							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-							and prd_cd = ps.prd_cd $next_store_qty_sql
+							and prd_cd = ps.prd_cd $store_where1
 							group by prd_cd
 						), 0)) as sqty
 						, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
@@ -282,7 +299,7 @@ class prd04Controller extends Controller
 					select sum(qty) as qty
 					from product_stock_hst
 					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
-					and prd_cd = ps.prd_cd $next_store_qty_sql
+					and prd_cd = ps.prd_cd $store_where1
 					group by prd_cd
 				), 0)) as sqty
 				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
