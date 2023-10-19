@@ -219,7 +219,7 @@
                                 <div class="form-inline-inner input-box w-100">
                                     <div class="form-inline inline_btn_box">
                                         <input type="hidden" id="com_cd" name="com_cd" />
-                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter" style="width:100%;" autocomplete="off" />
+                                        <input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter ac-company sch-sup-company" style="width:100%;" autocomplete="off" />
                                         <a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                     </div>
                                 </div>

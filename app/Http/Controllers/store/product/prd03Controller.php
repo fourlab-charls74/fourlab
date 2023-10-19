@@ -38,7 +38,7 @@ class prd03Controller extends Controller
 			'domain'		=> $domain,
 			'style_no'		=> "",
 			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-			'types' => SLib::getCodes("PRD_MATERIAL_TYPE"),
+			'types' 		=> SLib::getCodes("PRD_MATERIAL_TYPE"),
 			// 'com_types'     => SLib::getCodes('G_COM_TYPE'),
 			'items'			=> SLib::getItems(),
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
