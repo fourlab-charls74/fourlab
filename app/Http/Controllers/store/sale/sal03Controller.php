@@ -152,7 +152,7 @@ class sal03Controller extends Controller
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
-		if($group_type_condition == 'color_and_size') {
+//		if($group_type_condition == 'color_and_size') {
 			$sql = "
 				select 
 					a.goods_no,
@@ -226,9 +226,9 @@ class sal03Controller extends Controller
 				$orderby 
 				$limit
 			";
-		} else {
+//		} else {
 			
-		}
+//		}
 
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
