@@ -230,7 +230,7 @@ class prd04Controller extends Controller
 							and prd_cd = ps.prd_cd
 							group by prd_cd
 						), 0)) as wqty
-						, ($store_qty_sql - ifnull((
+						, (ifnull(($store_qty_sql),0) - ifnull((
 							select sum(qty) as qty
 							from product_stock_hst
 							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
