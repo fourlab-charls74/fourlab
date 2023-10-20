@@ -152,7 +152,7 @@ class sal03Controller extends Controller
 		$cfg_img_size_real	= "a_500";
 		$cfg_img_size_list	 = "s_50";
 
-//		if($group_type_condition == 'color_and_size') {
+		if($group_type_condition == 'color_and_size') {
 			$sql = "
 				select 
 					a.goods_no,
@@ -226,9 +226,85 @@ class sal03Controller extends Controller
 				$orderby 
 				$limit
 			";
-//		} else {
+		} else {
+			$sql = "
+					select 
+						a.goods_no,
+						a.prd_cd,
+						a.prd_cd_p,
+						g.brand,
+						brd.brand_nm,
+						g.style_no,
+						a.goods_opt,
+						if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
+							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
+							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
+						)) as img,
+						'' as img_view,
+						g.goods_nm,
+						g.goods_nm_eng,
+						pc.prd_cd_p as prd_cd_p, 
+						pc.color, 
+						pc.size,
+						
+						-- 입고
+						0 as in_sum_qty,
+						0 as in_sum_amt,
+						0 as in_sale_rate,
+					
+						-- 출고
+						0 as ex_sum_qty,
+						'' as ex_date,
+						
+						-- 총판매
+						a.qty as total_ord_qty,
+						0 as total_ord_amt,
+						ifnull(round((a.qty / ps.qty) * 100),0) as total_sale_rate,
+						
+						-- 기간판매
+						a.per_qty as ord_qty,
+						a.t_price as ord_amt,
+						if(ps.qty = 0, 0, round((a.per_qty / ps.qty) * 100)) as sale_rate,
+					
+						-- 매장재고, 창고재고
+						a.storage_wqty,
+						a.store_wqty
+					from ( 
+						select
+							sum(oo.qty) as per_qty
+							, sum(oo.recv_amt) as t_price
+							, pc.prd_cd
+						    , pc.prd_cd_p
+							,0 as qty
+							,0 as total_ord_amt
+							, sum(oo.price * oo.qty) as ord_amt
+							, oo.goods_no, oo.goods_opt
+							, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
+							, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
+						from order_opt oo
+						left outer join store s on oo.store_cd = s.store_cd
+						inner join product_code pc on pc.prd_cd = oo.prd_cd
+						where
+							oo.ord_state in (30, 60, 61)
+							and oo.ord_date >= '$sdate2'
+							and oo.ord_date <= '$edate2'
+							$in_where
+						group by pc.prd_cd_p
+						order by sum(oo.qty) desc
+						limit 10
+					) as a
+					inner join goods g on a.goods_no = g.goods_no
+					left outer join brand brd on g.brand = brd.brand
+					inner join product_code pc on pc.prd_cd = a.prd_cd
+					inner join product_stock ps on a.prd_cd = ps.prd_cd 
+					where
+						1=1
+						$where
+					order by ord_qty desc
+					
+				";
 			
-//		}
+		}
 
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
@@ -255,7 +331,7 @@ class sal03Controller extends Controller
 				from order_opt 
 				where 
 					prd_cd = '$prd_cd' 
-					and ord_state = '30' 
+					and ord_state in (30, 60, 61) 
 					and ( clm_state = 0 or clm_state = -30 or clm_state = 90)
 			";
 			$tot_ord = DB::selectOne($sql_tot_ord);
@@ -313,12 +389,11 @@ class sal03Controller extends Controller
 		$page_cnt = 0;
 
 		if ( $page == 1 ) {
-
-			$query	= "
+			$query = "
 				select
-				  	sum(t.ord_qty) as ord_qty
-				    , sum(t.ord_amt) as ord_amt
-				    , sum(t.storage_wqty) as storage_wqty
+					sum(t.ord_qty) as ord_qty
+					, sum(t.ord_amt) as ord_amt
+					, sum(t.storage_wqty) as storage_wqty
 					, sum(t.store_wqty) as store_wqty
 				from (
 					select 
@@ -372,7 +447,7 @@ class sal03Controller extends Controller
 						$where
 					group by a.prd_cd
 					order by ord_qty desc
- 					limit 0, 10
+					limit 0, 10
 				) t
 			";
 

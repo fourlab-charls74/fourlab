@@ -24,7 +24,7 @@
                     <div class="row">
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
-                                <label for="formrow-firstname-input">매출일자</label>
+                                <label for="formrow-firstname-input">판매기간</label>
                                 <div class="form-inline">
                                     <div class="docs-datepicker form-inline-inner input_box">
                                         <div class="input-group">
@@ -76,16 +76,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label>매장명</label>
-                                <div class="form-inline inline_btn_box">
-                                    <input type='hidden' id="store_nm" name="store_nm">
-                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
-                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                </div>
-                            </div>
-                        </div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="prd_cd">상품검색조건</label>
+								<div class="form-inline">
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
                     </div>
                     <div class="row">
 <!--                        <div class="col-lg-4 inner-td">
@@ -112,27 +116,41 @@
                         </div>-->
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="prd_cd">상품검색조건</label>
-								<div class="form-inline">
-									<div class="form-inline-inner input-box w-100">
-										<div class="form-inline inline_btn_box">
-											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 sch-prdcd-range" readonly style="background-color: #fff;">
-											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-										</div>
-									</div>
+								<label>매장명</label>
+								<div class="form-inline inline_btn_box">
+									<input type='hidden' id="store_nm" name="store_nm">
+									<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select"></select>
+									<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 								</div>
 							</div>
 						</div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="formrow-inputZip">상품명</label>
-                                <div class="flax_box">
-                                    <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
-                                </div>
-                            </div>
-                        </div>
 						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="sell_type">판매유형</label>
+								<div class="flax_box">
+									<select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+										<option value=''>전체</option>
+										@foreach ($sale_kinds as $sale_kind)
+											<option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="pr_code">판매처수수료</label>
+								<div class="flax_box">
+									<select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
+										<option value=''>전체</option>
+										@foreach ($pr_codes as $pr_code)
+											<option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td" hidden>
 							<div class="form-group">
 								<label for="formrow-inputState">주문구분</label>
 								<div class="form-inline form-check-box">
@@ -177,33 +195,15 @@
 						</div>
                     </div>
 					<div class="row">
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="sell_type">판매유형</label>
-                                <div class="flax_box">
-                                    <select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                        <option value=''>전체</option>
-                                        @foreach ($sale_kinds as $sale_kind)
-                                        <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
-                            <div class="form-group">
-                                <label for="pr_code">판매처수수료</label>
-                                <div class="flax_box">
-                                    <select id="pr_code" name="pr_code[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                        <option value=''>전체</option>
-                                        @foreach ($pr_codes as $pr_code)
-                                        <option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_val }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 inner-td">
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="formrow-inputZip">상품명</label>
+								<div class="flax_box">
+									<input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' value=''>
+								</div>
+							</div>
+						</div>
+                        <div class="col-lg-4 inner-td" hidden>
                             <div class="form-group">
                                 <label for="formrow-email-input">매출시점</label>
                                 <div class="form-inline form-radio-box">

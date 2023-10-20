@@ -336,33 +336,69 @@
 		{field: "goods_opt", headerName: "옵션", cellStyle: {"line-height": "30px"}, width: 130},
         {field: "in_warehouse",	headerName: "입고",
             children: [
-                {headerName: "수량", field: "in_sum_qty", type: 'numberType', width: 60, aggFunc: "first"},
-                {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 70, aggFunc: "first"},
+                {headerName: "수량", field: "in_sum_qty", type: 'numberType', width: 60,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
+                {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 70,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
                 {headerName: "판매율(%)", field: "in_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
         {field: "ex_warehouse",	headerName: "출고",
             children: [
-                {headerName: "수량", field: "ex_sum_qty", type: 'numberType', width: 60, aggFunc: "first"},
+                {headerName: "수량", field: "ex_sum_qty", type: 'numberType', width: 60,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
                 {headerName: "최초출고일", field: "ex_date", width: 70, cellStyle: StyleLineHeight},
             ]
         },
         {field: "total_sale", headerName: "총판매",
             children: [
-                {headerName: "수량", field: "total_ord_qty", type: 'numberType', width: 60, aggFunc: "first"},
-                {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 70, aggFunc: "first"},
+                {headerName: "수량", field: "total_ord_qty", type: 'numberType', width: 60,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
+                {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 70,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
                 {headerName: "판매율(%)", field: "total_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
         {field: "sale",	headerName: "기간판매",
             children: [
-                {headerName: "수량", field: "ord_qty", type: 'numberType', width: 60, aggFunc: "first"},
-                {headerName: "금액", field: "ord_amt", type: 'currencyMinusColorType', width: 70, aggFunc: "first"},
+                {headerName: "수량", field: "ord_qty", type: 'numberType', width: 60,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
+                {headerName: "금액", field: "ord_amt", type: 'currencyMinusColorType', width: 70,
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+				},
                 {headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
-        {field: "store_wqty", headerName: "매장재고", type: 'numberType', width: 60},
-        {field: "storage_wqty", headerName: "창고재고", type: 'numberType', width: 60},
+        {field: "store_wqty", headerName: "매장재고", type: 'numberType', width: 60,
+			aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
+		},
+        {field: "storage_wqty", headerName: "창고재고", type: 'numberType', width: 60,
+			aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
+		},
         {width: "auto"}
 	];
 </script>
