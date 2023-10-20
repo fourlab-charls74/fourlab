@@ -244,7 +244,8 @@ class sal24Controller extends Controller
 						, sum(w.sales_com_fee) as fee_amt
 						, sum(w.dc_apply_amt) as dc_amt
 						, sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
-						, sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11), 0)) as tax_amt
+						-- , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11), 0)) as tax_amt
+						, sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
 						, o.store_cd
 						, o.sale_kind
 						, o.pr_code
@@ -299,11 +300,11 @@ class sal24Controller extends Controller
 			$wonga_60		= $row->wonga_60;			//교환원가
 			$wonga_61		= $row->wonga_61;			//환불원가
 			$qty_30			= $row->qty_30;			//판매
-			$recv_amt_30	= $row->recv_amt_30 ;
+			$recv_amt_30	= $row->recv_amt_30/1.1 ;
 			$qty_60			= $row->qty_60;			//교환
-			$recv_amt_60	= $row->recv_amt_60 ;
+			$recv_amt_60	= $row->recv_amt_60/1.1 ;
 			$qty_61			= $row->qty_61;			//환불
-			$recv_amt_61	= $row->recv_amt_61 ;
+			$recv_amt_61	= $row->recv_amt_61/1.1 ;
 			$point_amt_30	= $row->point_amt_30;		//판매 포인트
 			$point_amt_60	= $row->point_amt_60;		//교환 포인트
 			$point_amt_61	= $row->point_amt_61;		//환불 포인트
@@ -334,9 +335,11 @@ class sal24Controller extends Controller
 			$sum_taxfree	= $sum_amt -  $sum_taxation;
 
 			$sum_taxation_no_vat	= round($sum_taxation/1.1);		// 과세 부가세 별도
-			$vat = $sum_taxation - $sum_taxation_no_vat;			// 부가세
+			//$vat = $sum_taxation - $sum_taxation_no_vat;			// 부가세
+			$vat = $sum_tax;			// 부가세
 
-			$sum_amt		= $sum_recv + $sum_point - $sum_fee - $vat;
+			//$sum_amt		= $sum_recv + $sum_point - $sum_fee - $vat;
+			$sum_amt		= $sum_recv + $sum_point - $vat;
 			$sum_taxfree	= $sum_amt -  $sum_taxation;
 
 			$exp_pg_fee		= $row->exp_pg_fee;
@@ -382,7 +385,8 @@ class sal24Controller extends Controller
 				"dc_amt_30"		=> ($dc_amt_30) ? $dc_amt_30:0,
 				"coupon_amt_30"	=> ($coupon_amt_30) ? $coupon_amt_30:0,
 				"fee_amt_30"	=> ($fee_amt_30) ? $fee_amt_30:0,
-				"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30 - $fee_amt_30:0,
+				//"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30 - $fee_amt_30:0,
+				"recv_amt_30"	=> ($recv_amt_30) ? $recv_amt_30:0,
 
 				"qty_60"		=> ($qty_60) ? $qty_60:0,
 				"point_amt_60"	=> ($point_amt_60) ? $point_amt_60:0,

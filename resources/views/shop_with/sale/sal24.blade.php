@@ -339,7 +339,7 @@
                 {headerName: "적립금", field: "sum_point", type: 'currencyType', aggregation: true},
                 {headerName: "할인", field: "sum_dc", type: 'currencyType', aggregation: true, width: 80},
                 {headerName: "쿠폰", field: "sum_coupon", type: 'currencyType', aggregation: true},
-                {headerName: "수수료", field: "sum_fee", type: 'currencyType', aggregation: true},
+                // {headerName: "수수료", field: "sum_fee", type: 'currencyType', aggregation: true, hide:true},
                 {headerName: "결제금액", field: "sum_recv", type: 'currencyType', aggregation: true},
                 // {headerName: "과세", field: "sum_taxation", type: 'currencyType', aggregation: true},
                 // {headerName: "비과세", field: "sum_taxfree", type: 'currencyType', aggregation: true},

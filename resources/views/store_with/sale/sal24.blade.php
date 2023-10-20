@@ -337,11 +337,9 @@
             <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
         </div>
         <ul class="mb-0">
-            <li>매출액 = 과세 + 비과세</li>
+			<li>할인 = 현재가(판매시점) - 결제금액</li>
+			<li>부가세 = 과세 - ( 과세 / 1.1 )</li>
             <li>매출원가 = 실제판매원가</li>
-            <li>부가세 = 과세 - ( 과세 / 1.1 )</li>
-            <li>세전 매출이익 = 매출액 - 매출원가</li>
-            <li>세후 매출이익 = 매출액 - 매출원가 - 부가세</li>
         </ul>
     </div>
 </div>
@@ -361,7 +359,7 @@
                 {headerName: "적립금", field: "sum_point", type: 'currencyType', aggregation: true},
                 {headerName: "할인", field: "sum_dc", type: 'currencyType', aggregation: true, width: 80},
                 {headerName: "쿠폰", field: "sum_coupon", type: 'currencyType', aggregation: true},
-                {headerName: "수수료", field: "sum_fee", type: 'currencyType', aggregation: true},
+                // {headerName: "수수료", field: "sum_fee", type: 'currencyType', aggregation: true},
                 {headerName: "결제금액", field: "sum_recv", type: 'currencyType', aggregation: true},
                 // {headerName: "과세", field: "sum_taxation", type: 'currencyType', aggregation: true},
                 // {headerName: "비과세", field: "sum_taxfree", type: 'currencyType', aggregation: true},
