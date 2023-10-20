@@ -337,6 +337,7 @@
             <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
         </div>
         <ul class="mb-0">
+			<li>매출액 = 적립금 + 결제금액</li>
 			<li>할인 = 현재가(판매시점) - 결제금액</li>
 			<li>부가세 = 과세 - ( 과세 / 1.1 )</li>
             <li>매출원가 = 실제판매원가</li>
