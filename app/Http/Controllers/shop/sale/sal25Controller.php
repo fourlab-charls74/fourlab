@@ -204,7 +204,8 @@ class sal25Controller extends Controller
 						, sum(w.dc_apply_amt) as dc_amt						
 						, sum(w.sales_com_fee) as fee_amt
 						, sum(if( ifnull(g.tax_yn,'Y') = 'Y',w.recv_amt + w.point_apply_amt - w.sales_com_fee,0)) as taxation_amt
-						, sum(if( ifnull(g.tax_yn,'Y') = 'Y',floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11),0)) as tax_amt
+						-- , sum(if( ifnull(g.tax_yn,'Y') = 'Y',floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11),0)) as tax_amt
+						, sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
                         , o.store_cd
 						, o.sale_kind
 						, o.pr_code
@@ -234,14 +235,19 @@ class sal25Controller extends Controller
         while($row = $stmt->fetch(PDO::FETCH_ASSOC))
         {
             $row["sum_taxation_no_vat"]	= round($row["sum_taxation_amt"]/1.1);		// 과세 부가세 별도
-            $row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
-			$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
+            //$row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
+			$row["vat"] = $row["sum_tax_amt"];
+			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
+			$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["vat"];
 			$row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
             $row["margin"] = $row["sum_amt"]? round((1 - $row["sum_wonga"]/$row["sum_amt"])*100, 2):0;
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
             $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
 			$row["sum_wonga"] = $row["sum_wonga"] * 1;
-			$row["recv_amt_61"] = $row["recv_amt_61"] + $row["fee_amt_61"];
+			//$row["recv_amt_61"] = $row["recv_amt_61"] + $row["fee_amt_61"];
+			$row["recv_amt_30"]	= $row["recv_amt_30"]/1.1;
+			$row["recv_amt_60"]	= $row["recv_amt_60"]/1.1;
+			$row["recv_amt_61"]	= $row["recv_amt_61"]/1.1;
 
             $result[] = $row;
         }

@@ -311,7 +311,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <div id="div-gd" style="width:100%;min-height:600px;" class="ag-theme-balham"></div>
+            <div id="div-gd" class="ag-theme-balham"></div>
         </div>
     </div>
 </div>
@@ -321,10 +321,10 @@
             <h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
         </div>
         <ul class="mb-0">
-            <li>매출액 = 과세 + 비과세</li>
-            <li>매출원가 = 실제판매원가</li>
-            <li>부가세 = 과세 - ( 과세 / 1.1 )</li>
-            <li>세전 매출이익 = 매출액 - 매출원가</li>
+			<li>매출액 = 적립금 + 결제금액</li>
+			<li>할인 = 현재가(판매시점) - 결제금액</li>
+			<li>부가세 = 과세 - ( 과세 / 1.1 )</li>
+			<li>매출원가 = 실제판매원가</li>
         </ul>
     </div>
 </div>
@@ -371,12 +371,12 @@
                     type: 'currencyType',
                     aggregation: true
                 },
-                {
-                    headerName: "수수료",
-                    field: "sum_fee_amt",
-                    type: 'currencyType',
-                    aggregation: true
-                },
+                //{
+                //    headerName: "수수료",
+                //    field: "sum_fee_amt",
+                //    type: 'currencyType',
+                //    aggregation: true
+                //},
                 {
                     headerName: "결제금액",
                     field: "sum_recv_amt",
@@ -577,7 +577,7 @@
     });
 
     $(document).ready(function() {
-        pApp.ResizeGrid(300);
+        pApp.ResizeGrid(500);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         let options = {
