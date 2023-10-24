@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class sal27Controller extends Controller
+class  sal27Controller extends Controller
 {
 	public function index(Request $request)
 	{
@@ -216,13 +216,9 @@ class sal27Controller extends Controller
 					, (ifnull(pss.wqty, 0) - ifnull(store_hst.qty, 0)) as term_store_qty
 				from (
 					select pc.item, pc.brand, pc.prd_cd, pc.goods_no, pc.color, pc.goods_opt
-						, (
-							select s.size_cd from size s
-							where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-								and s.size_cd = pc.size
-								and use_yn = 'Y'
-						) as size
-						, ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
+						, pc.size
+						-- , ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
+				  		, pc.prd_cd_p
 						, g.goods_nm, g.goods_nm_eng, g.goods_sh, g.price, g.wonga, g.com_id
 					from product_code pc
 						inner join goods g on g.goods_no = pc.goods_no
