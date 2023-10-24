@@ -415,14 +415,16 @@ class sal24Controller extends Controller
 				"dc_amt_60"		=> ($dc_amt_60) ? $dc_amt_60:0,
 				"coupon_amt_60"	=> ($coupon_amt_60) ? $coupon_amt_60:0,
 				"fee_amt_60"	=> ($fee_amt_60) ? $fee_amt_60:0,
-				"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60 - $fee_amt_60 :0,
+				//"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60 - $fee_amt_60 :0,
+				"recv_amt_60"	=> ($recv_amt_60) ? $recv_amt_60:0,
 
 				"qty_61"		=> ($qty_61) ? $qty_61:0,
 				"point_amt_61"	=> ($point_amt_61) ? $point_amt_61:0,
 				"dc_amt_61"		=> ($dc_amt_61) ? $dc_amt_61:0,
 				"coupon_amt_61"	=> ($coupon_amt_61) ? $coupon_amt_61:0,
 				"fee_amt_61"	=> ($fee_amt_61) ? $fee_amt_61:0,
-				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61 + $fee_amt_61:0,
+				//"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61 + $fee_amt_61:0,
+				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61:0,
 			);
 
 			return $array;
