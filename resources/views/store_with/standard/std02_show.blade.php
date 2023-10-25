@@ -440,7 +440,7 @@
 													<select name='com_id' id="com_id" class="form-control form-control-sm" style="width:70%;">
 														<option value=''>전체</option>
 															@foreach ($store_match as $sm)
-																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') disabled style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
+																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') @if(@$store->com_id != $sm->com_id) disabled @endif style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
 															@endforeach
 													</select>
 												</div>
