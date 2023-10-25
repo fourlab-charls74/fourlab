@@ -164,15 +164,15 @@ class sal25Controller extends Controller
 			) a left outer join (
 				select
 					b.sale_date
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.qty, 0), 0)) as qty_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.recv_amt, 0), 0)) as recv_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.point_amt, 0), 0)) as point_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.coupon_amt, 0), 0)) as coupon_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.dc_amt, 0), 0)) as dc_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.fee_amt,0), 0)) as fee_amt_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.wonga,0), 0)) as wonga_30
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.taxation_amt, 0), 0)) as taxation_amt_30					
-					, sum(if(ord_state = 10 OR ord_state = 30, ifnull(b.tax_amt, 0), 0)) as tax_amt_30
+					, sum(if(ord_state = 30, ifnull(b.qty, 0), 0)) as qty_30
+					, sum(if(ord_state = 30, ifnull(b.recv_amt, 0), 0)) as recv_amt_30
+					, sum(if(ord_state = 30, ifnull(b.point_amt, 0), 0)) as point_amt_30
+					, sum(if(ord_state = 30, ifnull(b.coupon_amt, 0), 0)) as coupon_amt_30
+					, sum(if(ord_state = 30, ifnull(b.dc_amt, 0), 0)) as dc_amt_30
+					, sum(if(ord_state = 30, ifnull(b.fee_amt,0), 0)) as fee_amt_30
+					, sum(if(ord_state = 30, ifnull(b.wonga,0), 0)) as wonga_30
+					, sum(if(ord_state = 30, ifnull(b.taxation_amt, 0), 0)) as taxation_amt_30					
+					, sum(if(ord_state = 30, ifnull(b.tax_amt, 0), 0)) as tax_amt_30
 					
 					, sum(if(ord_state = 60, ifnull(b.qty,0), 0)) * -1 as qty_60
 					, sum(if(ord_state = 60, ifnull(b.recv_amt,0), 0)) * -1 as recv_amt_60
@@ -205,7 +205,8 @@ class sal25Controller extends Controller
 						, sum(w.sales_com_fee) as fee_amt
 						, sum(if( ifnull(g.tax_yn,'Y') = 'Y',w.recv_amt + w.point_apply_amt - w.sales_com_fee,0)) as taxation_amt
 						-- , sum(if( ifnull(g.tax_yn,'Y') = 'Y',floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11),0)) as tax_amt
-						, sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+						-- , sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+						, sum(w.recv_amt - w.recv_amt/1.1) as tax_amt
                         , o.store_cd
 						, o.sale_kind
 						, o.pr_code
@@ -217,8 +218,8 @@ class sal25Controller extends Controller
 					where
 						w.ord_state_date >= concat('$sdate', '01') 
 						and w.ord_state_date <= concat('$edate', '31') 
-						and w.ord_state in (10,30,60,61)
-						and o.ord_state >= 10
+						and w.ord_state in (30,60,61)
+						and o.ord_state >= 30
 						$inner_where2 $inner_where $where
 					group by sale_date, w.ord_state
 				) b group by b.sale_date
@@ -238,7 +239,8 @@ class sal25Controller extends Controller
             //$row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
 			$row["vat"] = $row["sum_tax_amt"];
 			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
-			$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["vat"];
+			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["vat"];
+			$row["sum_amt"] = $row["sum_recv_amt"] - $row["vat"];
 			$row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
             $row["margin"] = $row["sum_amt"]? round((1 - $row["sum_wonga"]/$row["sum_amt"])*100, 2):0;
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];

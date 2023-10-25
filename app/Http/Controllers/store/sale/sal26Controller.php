@@ -198,7 +198,8 @@ class sal26Controller extends Controller
 							, sum(w.dc_apply_amt) as dc_amt
 							, sum(if( ifnull(g.tax_yn,'Y') = 'Y',w.recv_amt + w.point_apply_amt - w.sales_com_fee,0)) as taxation_amt
 							-- , sum(if( ifnull(g.tax_yn,'Y') = 'Y',floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11),0)) as tax_amt
-							, sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+							-- , sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+							, sum(w.recv_amt - w.recv_amt/1.1) as tax_amt
                             , o.sale_kind
 						    , o.pr_code
                             , s.store_type
@@ -231,7 +232,8 @@ class sal26Controller extends Controller
 			//$row->vat = $row->sum_taxation_amt - $row->sum_taxation_no_vat;
 			$row->vat = $row->sum_tax_amt;
 
-			$row->sum_amt	= $row->sum_recv_amt + $row->sum_point_amt - $row->vat;
+			//$row->sum_amt	= $row->sum_recv_amt + $row->sum_point_amt - $row->vat;
+			$row->sum_amt	= $row->sum_recv_amt - $row->vat;
 
             $row->margin = $row->sum_amt? round((1 - $row->sum_wonga/$row->sum_amt)*100, 2):0;
             $row->margin1 = $row->wonga_10 - $row->wonga_60;

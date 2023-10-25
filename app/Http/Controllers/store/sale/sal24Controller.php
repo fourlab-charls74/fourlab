@@ -264,7 +264,8 @@ class sal24Controller extends Controller
 						, sum(w.dc_apply_amt) as dc_amt
 						, sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
 						-- , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11), 0)) as tax_amt
-						, sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+						-- , sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+						, sum(w.recv_amt - w.recv_amt/1.1) as tax_amt
 						, o.store_cd
 						, o.sale_kind
 						, o.pr_code
@@ -298,7 +299,7 @@ class sal24Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
 						left outer join claim clm on w.ord_opt_no = clm.ord_opt_no
-						inner join store store on store.store_cd = o.store_cd
+						left outer join store store on store.store_cd = o.store_cd
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
@@ -360,7 +361,8 @@ class sal24Controller extends Controller
 			$vat = $sum_tax;			// 부가세
 
 			//$sum_amt		= $sum_recv + $sum_point - $sum_fee - $vat;
-			$sum_amt		= $sum_recv + $sum_point - $vat;
+			//$sum_amt		= $sum_recv + $sum_point - $vat;
+			$sum_amt		= $sum_recv - $vat;
 			$sum_taxfree	= $sum_amt -  $sum_taxation;
 
 			$exp_pg_fee		= $row->exp_pg_fee;

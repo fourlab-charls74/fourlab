@@ -214,7 +214,8 @@ class sal25Controller extends Controller
 						, sum(w.sales_com_fee) as fee_amt
 						, sum(if( ifnull(g.tax_yn,'Y') = 'Y',w.recv_amt + w.point_apply_amt - w.sales_com_fee,0)) as taxation_amt
 						-- , sum(if( ifnull(g.tax_yn,'Y') = 'Y',floor((w.recv_amt + w.point_apply_amt - w.sales_com_fee)/11),0)) as tax_amt
-						, sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+						-- , sum((w.recv_amt + w.point_apply_amt) - (w.recv_amt + w.point_apply_amt)/1.1) as tax_amt
+						, sum(w.recv_amt - w.recv_amt/1.1) as tax_amt
                         , o.store_cd
 						, o.sale_kind
 						, o.pr_code
@@ -222,7 +223,7 @@ class sal25Controller extends Controller
 					from order_opt o
 						inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
-						inner join store store on store.store_cd = o.store_cd
+						left outer join store store on store.store_cd = o.store_cd
 						left outer join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= concat('$sdate', '01') 
@@ -248,7 +249,8 @@ class sal25Controller extends Controller
 			//$row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
 			$row["vat"] = $row["sum_tax_amt"];
 			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
-			$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["vat"];
+			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["vat"];
+			$row["sum_amt"] = $row["sum_recv_amt"] - $row["vat"];
             $row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
             $row["margin"] = $row["sum_amt"]? round(($row["sum_amt"] - $row["sum_wonga"]) / $row["sum_amt"] * 100,2) : 0;
             $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
