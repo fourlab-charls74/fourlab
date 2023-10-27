@@ -284,7 +284,7 @@
 
         let count = gx.gridOptions.api.getDisplayedRowCount();
         let rows = [];
-		while (worksheet['E' + rowIndex]) {
+		while (worksheet['A' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
                 let item = worksheet[column + rowIndex];
