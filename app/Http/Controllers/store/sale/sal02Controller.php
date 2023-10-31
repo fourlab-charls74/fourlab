@@ -159,7 +159,7 @@ class sal02Controller extends Controller
 			from store s
 				left outer join (
 				   select
-					  m.store_cd, sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty,
+					  o.store_cd, sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty,
 					  sum(o.price*o.qty) as ord_amt,
 					  sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
 					  w.ord_state,
@@ -169,8 +169,8 @@ class sal02Controller extends Controller
 					  inner join order_mst m on m.ord_no = o.ord_no
 					  inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
 					  left outer join product_code pc on pc.prd_cd = o.prd_cd
-				   where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
-				   group by m.store_cd
+				   where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and o.store_cd <> '' $where
+				   group by o.store_cd
 				) a on s.store_cd = a.store_cd
 				left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
@@ -200,7 +200,7 @@ class sal02Controller extends Controller
 				from store s
 				   left outer join (
 					  select
-					     m.store_cd,
+					     o.store_cd,
 						 sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty, 
 						 sum(o.price*o.qty) as ord_amt,
 						 sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,  
@@ -211,8 +211,8 @@ class sal02Controller extends Controller
 						 inner join goods g on o.goods_no = g.goods_no
 						 left outer join brand b on g.brand = b.brand
 						 left outer join product_code pc on pc.prd_cd = o.prd_cd
-					  where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and m.store_cd <> '' $where
-					  group by m.store_cd
+					  where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and o.store_cd <> '' $where
+					  group by o.store_cd
 				   ) a on s.store_cd = a.store_cd
 				   left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
 				   left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
