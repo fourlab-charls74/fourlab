@@ -112,13 +112,13 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="required">바코드</th>
-                                            <td>
-                                                <div class="flex_box">
-                                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='' style="width:87%">
-                                                    <a href="#" class="btn btn-sm ml-2 btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                </div>
-                                            </td>
+											<th class="required">바코드</th>
+											<td>
+												<div class="flex_box">
+													<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='' style="width:87%">
+													<a href="#" class="btn btn-sm ml-2 btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+												</div>
+											</td>
                                             <th class="required">수선 상품명</th>
                                             <td>
                                                 <div class="flex_box">

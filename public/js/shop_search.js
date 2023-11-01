@@ -686,206 +686,203 @@ const conds = {
     item: '하위품목'
 };
 function SearchPrdcd(){
-    this.grid = null;
+	this.grid = null;
 }
 
 SearchPrdcd.prototype.Open = async function(callback = null, match = false, prd_cd_p = false){
-    if(this.grid === null){
-        this.isMatch = match === "match";
-        this.isPrdCdP = prd_cd_p;
-        if(this.isPrdCdP) this.SetModal();
-        this.SetGrid("#div-gd-prdcd");
-        this.SetGridCond();
-        // $("#SearchPrdcdModal").draggable();
-        this.callback = callback;
+	if(this.grid === null){
+		this.isMatch = match === "match";
+		this.isPrdCdP = prd_cd_p;
+		if(this.isPrdCdP) this.SetModal();
+		this.SetGrid("#div-gd-prdcd");
+		this.SetGridCond();
+		// $("#SearchPrdcdModal").draggable();
+		this.callback = callback;
 
-        if (this.isMatch == false) {
-            $("input:radio[name='match_yn']:radio[value='A']").prop('checked', true); 
-        }
-    }
-    $('#SearchPrdcdModal').modal({
-        keyboard: false
-    });
+		if (this.isMatch == false) {
+			$("input:radio[name='match_yn']:radio[value='Y']").prop('checked', true);
+		}
+	}
+	$('#SearchPrdcdModal').modal({
+		keyboard: false
+	});
 };
 
 SearchPrdcd.prototype.SetModal = function() {
-    $("#SearchPrdcdModalLabel").text("품번 검색");
-    $("#search_prdcd_match").addClass("d-none");
-    $("#search_prdcd_code").addClass("col-lg-6");
-    $("#search_prdcd_name").addClass("col-lg-6");
-    $("#search_prdcd_code label").text("품번");
-    $("#select_prdcd_btn").addClass("d-none");
+	$("#SearchPrdcdModalLabel").text("품번 검색");
+	$("#search_prdcd_match").addClass("d-none");
+	$("#search_prdcd_code").addClass("col-lg-6");
+	$("#search_prdcd_name").addClass("col-lg-6");
+	$("#search_prdcd_code label").text("품번");
+	$("#select_prdcd_btn").addClass("d-none");
 }
 
 SearchPrdcd.prototype.SetGrid = function(divId){
-    let columns = [];
+	let columns = [];
 
-    if (this.isMatch) {
-        columns.push(
-            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-            { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"} },
-            { field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "prd_nm", headerName: "상품명", width: 300 },
-            { field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
-            { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
-            { field: "rt", headerName: '등록일', cellClass: 'hd-grid-code', width: 150, hide:true},
-            { width: "auto" }
-        );
-    } else if (this.isPrdCdP) {
-        columns.push(
-            { headerName: "선택", width: 60, cellStyle: {"text-align": "center"},
-                cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return searchPrdcd.ChoiceOne('${params.data.prd_cd_p}');">선택</a>`,
-            },
-            { field: "prd_cd_p", headerName: "품전", width: 100, cellStyle: {"text-align": "center"} },
-            { field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"} },
-            { field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {"text-align": "center"} },
-            { field: "goods_nm", headerName: "상품명", width: 300 },
-            { field: "goods_nm_eng", headerName: "상품명(영문)", width: 280 },
-            { width: "auto" }
-        );
-    } else {
-        columns.push(
-            { field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
-            { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"} },
-            { field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "goods_nm", headerName: "상품명", width: 300 },
-            { field: "goods_opt", headerName: "옵션", width: 150 },
-            { field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
-            { field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
-            { field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
-            { width: "auto" }
-        );
-    }
+	if (this.isMatch) {
+		columns.push(
+			{ field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
+			{ field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"} },
+			{ field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "prd_nm", headerName: "상품명", width: 300 },
+			{ field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
+			{ field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
+			{ field: "rt", headerName: '등록일', cellClass: 'hd-grid-code', width: 150, hide:true},
+			{ width: "auto" }
+		);
+	} else if (this.isPrdCdP) {
+		columns.push(
+			{ headerName: "선택", width: 60, cellStyle: {"text-align": "center"},
+				cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return searchPrdcd.ChoiceOne('${params.data.prd_cd_p}');">선택</a>`,
+			},
+			{ field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"} },
+			{ field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"} },
+			{ field: "style_no", headerName: "스타일넘버", width: 100, cellStyle: {"text-align": "center"} },
+			{ field: "goods_nm", headerName: "상품명", width: 300 },
+			{ field: "goods_nm_eng", headerName: "상품명(영문)", width: 280 },
+			{ width: "auto" }
+		);
+	} else {
+		columns.push(
+			{ field: "chk", headerName: '', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, width: 28, sort: null },
+			{ field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"} },
+			{ field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "goods_nm", headerName: "상품명", width: 300 },
+			{ field: "goods_opt", headerName: "옵션", width: 150 },
+			{ field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
+			{ field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
+			{ width: "auto" }
+		);
+	}
 
-    this.grid = new HDGrid(document.querySelector( divId ), columns);
+	this.grid = new HDGrid(document.querySelector( divId ), columns);
 };
 
 SearchPrdcd.prototype.SetGridCond = async function() {
-    Object.keys(conds).forEach( async (cond_title) => {
-        let columns = [];
-        
-        columns.push(
-            { field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
-            { field: "item", headerName: conds[cond_title], width: "auto",
-                cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
-                editable: (params) => (params.data.key || '') === 'contain',
-                cellRenderer: (params) => {
-                    if((params.data.key || '') === 'contain') return params.value;
-                    return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
-                },
-                cellEditorSelector: function(params) {
-                    if((params.data.key || '') === 'contain') {
-                        return {
-                            component: 'agRichSelectCellEditor',
-                            params: { 
-                                values: ['포함', '미포함']
-                            },
-                        };
-                    }
-                    return false;
-                },
-            },
-        );
+	Object.keys(conds).forEach( async (cond_title) => {
+		let columns = [];
 
-        this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns, {
-            pinnedTopRowData: [{item: "포함", key: "contain"}],
-            getRowStyle: (params) => {
-                if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
-            },
-        });
-        document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '204px';
-    });
-    const { data: { body: res } } = await axios({ 
-        url: '/shop/api/prdcd/conds', 
-        method: 'get' 
-    });
-    Object.keys(res).forEach(r => {
-        this[r + '_grid'].gridOptions.api.setRowData(res[r]);
-    });
+		columns.push(
+			{ field: "chk", headerName: '', cellClass: 'hd-grid-code', checkboxSelection: true, width: 28, sort: null },
+			{ field: "item", headerName: conds[cond_title], width: "auto",
+				cellStyle: (params) => (params.data.key || '') === 'contain' ? {"color": params.data.item === '포함' ? "green" : "red"} : '',
+				editable: (params) => (params.data.key || '') === 'contain',
+				cellRenderer: (params) => {
+					if((params.data.key || '') === 'contain') return params.value;
+					return `${(params.data.code_id || '') != '' ? `[${params.data.code_id}] ` : ''}${params.data.code_val || ''}`;
+				},
+				cellEditorSelector: function(params) {
+					if((params.data.key || '') === 'contain') {
+						return {
+							component: 'agRichSelectCellEditor',
+							params: {
+								values: ['포함', '미포함']
+							},
+						};
+					}
+					return false;
+				},
+			},
+		);
+
+		this[cond_title + '_grid'] = await new HDGrid(document.querySelector( "#div-gd-prdcd-" + cond_title ), columns, {
+			pinnedTopRowData: [{item: "포함", key: "contain"}],
+			getRowStyle: (params) => {
+				if (params.node.rowPinned)  return { 'font-weight': 'bold', 'background': '#f2f2f2', 'border': 'none'};
+			},
+		});
+		document.querySelector( "#div-gd-prdcd-" + cond_title ).style.height = '204px';
+	});
+	const { data: { body: res } } = await axios({
+		url: '/shop/api/prdcd/conds',
+		method: 'get'
+	});
+	Object.keys(res).forEach(r => {
+		this[r + '_grid'].gridOptions.api.setRowData(res[r]);
+	});
 }
 
 SearchPrdcd.prototype.Search = function(e) {
-    const event_type = e?.type;
+	const event_type = e?.type;
 
-    const request = () => {
-        let data = $('form[name="search_prdcd"]').serialize();
+	const request = () => {
+		let data = $('form[name="search_prdcd"]').serialize();
 
-        Object.keys(conds).forEach(c => {
-            let rows = this[c + '_grid'].getSelectedRows();
-            rows.forEach(r => {
-                data += `&${c}[]=${r.code_id}`;
-            });
+		Object.keys(conds).forEach(c => {
+			let rows = this[c + '_grid'].getSelectedRows();
+			rows.forEach(r => {
+				data += `&${c}[]=${r.code_id}`;
+			});
 
-            let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
-            data += `&${c}_contain=${is_contain}`;
-            data += '&match='+this.isMatch;
-        });
-        if(this.isPrdCdP) {
-            this.grid.Request('/shop/api/prdcd/search_p', data, -1);
-        } else {
-            this.grid.Request('/shop/api/prdcd/search', data, -1);
-        }
-    }
+			let is_contain = this[c + '_grid'].gridOptions.api.getPinnedTopRow(0).data.item === "포함";
+			data += `&${c}_contain=${is_contain}`;
+			data += '&match='+this.isMatch;
+		});
+		if(this.isPrdCdP) {
+			this.grid.Request('/shop/api/prdcd/search_p', data, -1);
+		} else {
+			this.grid.Request('/shop/api/prdcd/search', data, -1);
+		}
+	}
 
-    if (event_type == 'keypress') {
-        if (e.key && e.key == 'Enter') {
-            request();
-        } else {
-            return false;
-        }
-    } else {
-        request();
-    }
+	if (event_type == 'keypress') {
+		if (e.key && e.key == 'Enter') {
+			request();
+		} else {
+			return false;
+		}
+	} else {
+		request();
+	}
 };
 
 SearchPrdcd.prototype.Choice = function() {
-    if(this.callback !== null){
-        this.callback(code, name);
-    } else {
-        let rows = this.grid.getSelectedRows();
-        if(rows.length < 1) return alert("항목을 선택해주세요.");
-        if(rows.length > 1) return alert("항목을 한 개만 선택해주세요.");
-        
-        if($('#prd_cd').length > 0){
-            $('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
-        }
+	if(this.callback !== null){
+		this.callback(code, name);
+	} else {
+		let rows = this.grid.getSelectedRows();
+		if($('#prd_cd').length > 0){
+			$('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
+		}
 
-        $('#goods_nm').val(rows.map(r => r.goods_nm));
-        $('#color').val(rows.map(r => r.color));
-        $('#size').val(rows.map(r => r.size));
-    }
+		$('#goods_nm').val(rows.map(r => r.goods_nm));
+		$('#color').val(rows.map(r => r.color));
+		$('#size').val(rows.map(r => r.size));
+	}
 
-    document.search_prdcd.reset();
-    this.grid.setRows([]);
-    Object.keys(conds).forEach(c => {
-        this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
-            node.setSelected(false);
-        });
-    });
+	document.search_prdcd.reset();
+	this.grid.setRows([]);
+	Object.keys(conds).forEach(c => {
+		this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
+			node.setSelected(false);
+		});
+	});
 
-    $('#gd-prdcd-total').html(0);
-    $('#SearchPrdcdModal').modal('toggle');
+	$('#gd-prdcd-total').html(0);
+	$('#SearchPrdcdModal').modal('toggle');
 };
 
 SearchPrdcd.prototype.ChoiceOne = function(value) {
-    let divId = this.isPrdCdP ? 'prd_cd_p' : 'prd_cd';
-    if($('#' + divId).length > 0) {
-        $('#' + divId).val(value).trigger("change");
-    }
+	let divId = this.isPrdCdP ? 'prd_cd_p' : 'prd_cd';
+	if($('#' + divId).length > 0) {
+		$('#' + divId).val(value).trigger("change");
+	}
 
-    document.search_prdcd.reset();
-    // this.grid.setRows([]);
-    // Object.keys(conds).forEach(c => {
-    //     this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
-    //         node.setSelected(false);
-    //     });
-    // });
+	document.search_prdcd.reset();
+	// this.grid.setRows([]);
+	// Object.keys(conds).forEach(c => {
+	//     this[c + '_grid'].gridOptions.api.forEachNodeAfterFilter(node => {
+	//         node.setSelected(false);
+	//     });
+	// });
 
-    // $('#gd-prdcd-total').html(0);
-    $('#SearchPrdcdModal').modal('toggle');
+	// $('#gd-prdcd-total').html(0);
+	$('#SearchPrdcdModal').modal('toggle');
 }
 
 let searchPrdcd = new SearchPrdcd();

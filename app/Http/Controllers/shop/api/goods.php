@@ -812,142 +812,147 @@ class goods extends Controller
         ]);
     }
 
-    public function search_prdcd(Request $request)
-    {
-        $prd_cd = $request->input('prd_cd', '');
-        $goods_nm = $request->input('goods_nm', '');
+	public function search_prdcd(Request $request)
+	{
+		$prd_cd = $request->input('prd_cd', '');
+		$goods_nm = $request->input('goods_nm', '');
 
-        $brand = $request->input('brand', []);
-        $brand_contain = $request->input('brand_contain', '');
-        $year = $request->input('year', []);
-        $year_contain = $request->input('year_contain', '');
-        $season = $request->input('season', []);
-        $season_contain = $request->input('season_contain', '');
-        $gender = $request->input('gender', []);
-        $gender_contain = $request->input('gender_contain', '');
-        $items = $request->input('item', []);
-        $items_contain = $request->input('item_contain', '');
-        $opt = $request->input('opt', []);
-        $opt_contain = $request->input('opt_contain', '');
-        $match = $request->input('match');
+		$brand = $request->input('brand', []);
+		$brand_contain = $request->input('brand_contain', '');
+		$year = $request->input('year', []);
+		$year_contain = $request->input('year_contain', '');
+		$season = $request->input('season', []);
+		$season_contain = $request->input('season_contain', '');
+		$gender = $request->input('gender', []);
+		$gender_contain = $request->input('gender_contain', '');
+		$items = $request->input('item', []);
+		$items_contain = $request->input('item_contain', '');
+		$opt = $request->input('opt', []);
+		$opt_contain = $request->input('opt_contain', '');
+		$match = $request->input('match');
 
-        $match_yn = $request->input('match_yn');
+		$match_yn = $request->input('match_yn');
 
 
-        $page = $request->input('page', 1);
-        $where = "";
+		$page = $request->input('page', 1);
+		$where = "";
 
-        if($prd_cd != '') $where .= " and pc.prd_cd like '%$prd_cd%'";
+		if($prd_cd != '') $where .= " and pc.prd_cd like '%$prd_cd%'";
 
-        if ($match == 'true') {
-            if($goods_nm != '') $where .= " and p.prd_nm like '%$goods_nm%'";
-        } else {
-            if($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%'";
-        }
+		if ($match == 'true') {
+			if($goods_nm != '') $where .= " and p.prd_nm like '%$goods_nm%'";
+		} else {
+			if($goods_nm != '') $where .= " and g.goods_nm like '%$goods_nm%'";
+		}
 
-        //상품 매칭
-        if($match != 'false') $where .= "and pc.type = 'N'";
+		//상품 매칭
+		if($match != 'false') $where .= "and pc.type = 'N'";
 
-        if($match != 'false') {
-            if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
-		    if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
-        }
+		if($match != 'false') {
+			if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
+			if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
+		}
 
-        if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
+		if($match_yn == 'Y') 	$where .= " and p.match_yn = 'Y'";
 		if($match_yn == 'N') 	$where .= " and p.match_yn = 'N'";
 
 
-        foreach(self::Conds as $key => $value)
-        {
-            if($key === 'item') $key = 'items';
-            if(count(${ $key }) > 0)
-            {
-                $where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
+		foreach(self::Conds as $key => $value)
+		{
+			if($key === 'item') $key = 'items';
+			if(count(${ $key }) > 0)
+			{
+				$where .= ${ $key . '_contain' } == 'true' ? " and (1!=1" : " and (1=1";
 
-                $col = $key === 'items' ? 'item' : $key;
-                foreach(${ $key } as $item) {
-                    if(${ $key . '_contain' } == 'true')
-                        $where .= " or pc.$col = '$item'";
-                    else
-                        $where .= " and pc.$col != '$item'";
-                }
-                $where .= ")";
-            }
-        }
+				$col = $key === 'items' ? 'item' : $key;
+				foreach(${ $key } as $item) {
+					if(${ $key . '_contain' } == 'true')
+						$where .= " or pc.$col = '$item'";
+					else
+						$where .= " and pc.$col != '$item'";
+				}
+				$where .= ")";
+			}
+		}
 
-        $page_size = 100;
-        $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
-        $total = 0;
-        $page_cnt = 0;
+		$page_size = 100;
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
+		$total = 0;
+		$page_cnt = 0;
 
 
-        $sql = "
+		$sql = "
             select 
                 *
             from product_code
             where prd_cd = '$prd_cd'
         ";
 
-        if ($match == 'false') {
-            $sql = "
+		if ($match == 'false') {
+			$sql = "
                 select 
                 pc.prd_cd
                 , pc.goods_no
                 , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
-                , concat(c.code_val, '^',d.code_val2) as goods_opt
+                , pc.goods_opt
                 , concat(pc.brand,pc.year, pc.season, pc.gender
                 , pc.item, pc.opt, pc.seq) as prd_cd1,
-                pc.color, pc.size, p.match_yn
+                pc.color, p.match_yn,
+				pc.size
                 from product_code pc
                     left outer join goods g on g.goods_no = pc.goods_no
                     inner join product p on pc.prd_cd = p.prd_cd
-                    inner join code c on pc.color = c.code_id
-			        inner join code d on pc.size = d.code_id
-                where 1=1 and c.code_kind_cd = 'PRD_CD_COLOR' and d.code_kind_cd = 'PRD_CD_SIZE_MATCH'
+                where 1=1
                 $where
             ";
-        } else {
-            // 상품매칭
-            $sql = "
+		} else {
+			// 상품매칭
+			$sql = "
                 select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt, pc.seq) as prd_cd1,
-                pc.color, pc.size, p.match_yn, pc.rt
+                pc.color, p.match_yn, pc.rt
+                , ifnull((
+					select s.size_cd from size s
+					where s.size_kind_cd = pc.size_kind
+					   and s.size_cd = pc.size
+					   and use_yn = 'Y'
+				),'') as size
                 from product_code pc
                     inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
                 order by pc.rt desc
             ";
-        }
+		}
 
 
-        $result = DB::select($sql);
+		$result = DB::select($sql);
 
-        // if ($page == 1) {
-        //     $sql = "
-        //         select count(*) as total
-        //         from product_code p
-        //             inner join goods g on g.goods_no = p.goods_no
-        //         where 1=1 $where
-        //     ";
-        //     $row = DB::select($sql);
-        //     $total = $row[0]->total;
-        //     $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        // }
+		// if ($page == 1) {
+		//     $sql = "
+		//         select count(*) as total
+		//         from product_code p
+		//             inner join goods g on g.goods_no = p.goods_no
+		//         where 1=1 $where
+		//     ";
+		//     $row = DB::select($sql);
+		//     $total = $row[0]->total;
+		//     $page_cnt = (int)(($total - 1) / $page_size) + 1;
+		// }
 
-        return response()->json([
-            "code" => '200',
-            "head" => [
-                "total" => count($result),
-                "page" => 1,
-                "page_cnt" => 1,
-                "page_total" => 1,
-                // "page" => $page,
-                // "page_cnt" => $page_cnt,
-                // "page_total" => count($result)
-            ],
-            "body" => $result
-        ]);
-    }
+		return response()->json([
+			"code" => '200',
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+				// "page" => $page,
+				// "page_cnt" => $page_cnt,
+				// "page_total" => count($result)
+			],
+			"body" => $result
+		]);
+	}
 
     /** 코드일련으로 해당 상품의 컬러옵션 리스트 조회 */
     public function search_color(Request $request)
