@@ -73,13 +73,14 @@ class sal03Controller extends Controller
 		$orderby = '';
 		$ord = $request->input('ord','desc');
 		$ord_field = $request->input('ord_field','p.goods_no');
+		
 
 		if ($best_worst == 'B') {
-			$orderby = sprintf("order by %s %s, total_sale_rate asc", $ord_field, "desc");
+			$orderby = sprintf("order by %s %s, pc.prd_cd_p asc", $ord_field, "desc");
 		} else if ($best_worst == 'W') {
-			$orderby = sprintf("order by %s %s, total_sale_rate asc" , $ord_field, "asc");
+			$orderby = sprintf("order by %s %s, pc.prd_cd_p asc" , $ord_field, "asc");
 		}else {
-			$orderby = sprintf("order by %s %s, total_sale_rate asc", $ord_field, $ord);
+			$orderby = sprintf("order by %s %s", $ord_field, $ord);
 		}
 
 		$where	= "";
@@ -118,7 +119,7 @@ class sal03Controller extends Controller
 			if (count($rows) > 0) {
 				// $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
 				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				$in_where .= " and pc2.$opt in ($opt_join) ";
+				$in_where .= " and pc.$opt in ($opt_join) ";
 			}
 		}
 
@@ -235,7 +236,6 @@ class sal03Controller extends Controller
 						g.brand,
 						brd.brand_nm,
 						g.style_no,
-						a.goods_opt,
 						if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
 							select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
 							from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -244,8 +244,6 @@ class sal03Controller extends Controller
 						g.goods_nm,
 						g.goods_nm_eng,
 						pc.prd_cd_p as prd_cd_p, 
-						pc.color, 
-						pc.size,
 						
 						-- 입고
 						0 as in_sum_qty,
@@ -291,7 +289,7 @@ class sal03Controller extends Controller
 							$in_where
 						group by pc.prd_cd_p
 						order by sum(oo.qty) desc
-						limit 10
+						-- limit 10
 					) as a
 					inner join goods g on a.goods_no = g.goods_no
 					left outer join brand brd on g.brand = brd.brand
@@ -300,10 +298,9 @@ class sal03Controller extends Controller
 					where
 						1=1
 						$where
-					order by ord_qty desc
-					
+					$orderby
+					$limit
 				";
-			
 		}
 
 		$pdo	= DB::connection()->getPdo();
@@ -361,7 +358,7 @@ class sal03Controller extends Controller
 			$tot_in_sum_qty	+= $tot_in->in_sum_qty;
 			$tot_in_sum_amt	+= $tot_in->in_sum_amt;
 
-			//출고 데이
+			//출고 데이터
 			$sql_out	= "
 				select 
 					sum(psr.qty) as qty,
@@ -389,67 +386,135 @@ class sal03Controller extends Controller
 		$page_cnt = 0;
 
 		if ( $page == 1 ) {
-			$query = "
-				select
-					sum(t.ord_qty) as ord_qty
-					, sum(t.ord_amt) as ord_amt
-					, sum(t.storage_wqty) as storage_wqty
-					, sum(t.store_wqty) as store_wqty
-				from (
-					select 
-						-- 입고
-						0 as in_sum_qty,
-						0 as in_sum_amt,
-					
-						-- 출고
-						0 as ex_sum_qty,
-						
-						-- 총판매
-						0 as total_ord_qty,
-						0 as total_ord_amt,
-						
-						-- 기간판매
-						sum(a.per_qty) as ord_qty,
-						sum(a.t_price) as ord_amt,
-					
-						-- 매장재고, 창고재고
-						sum(a.storage_wqty) as storage_wqty, 
-						sum(a.store_wqty) as store_wqty
-					from ( 
+			if($group_type_condition == 'color_and_size') {
+				$query = "
 						select
-							sum(oo.qty) as per_qty
-							, sum(oo.recv_amt) as t_price
-							, oo.prd_cd
-							, 0 as qty
-							, 0 as total_ord_amt
-							, sum(oo.price * oo.qty) as ord_amt
-							, oo.goods_no, oo.goods_opt
-							, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
-							, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
-							-- oow.*
-						from order_opt oo
-						left outer join store s on oo.store_cd = s.store_cd
-						inner join product_code pc on pc.prd_cd = oo.prd_cd
-						where
-							oo.ord_state in (30, 60, 61)
-							-- and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-							and oo.ord_date >= '$sdate2'
-							and oo.ord_date <= '$edate2'
-							$in_where
-							group by oo.prd_cd
-					) as a
-					inner join goods g on a.goods_no = g.goods_no
-					left outer join brand brd on g.brand = brd.brand
-					inner join product_code pc on pc.prd_cd = a.prd_cd
-					inner join product_stock ps on a.prd_cd = ps.prd_cd 
-					where
-						1=1
-						$where
-					group by a.prd_cd
-					order by ord_qty desc
-					limit 0, 10
-				) t
-			";
+							sum(t.ord_qty) as ord_qty
+							, sum(t.ord_amt) as ord_amt
+							, sum(t.storage_wqty) as storage_wqty
+							, sum(t.store_wqty) as store_wqty
+						from (
+							select 
+								-- 입고
+								0 as in_sum_qty,
+								0 as in_sum_amt,
+							
+								-- 출고
+								0 as ex_sum_qty,
+								
+								-- 총판매
+								0 as total_ord_qty,
+								0 as total_ord_amt,
+								
+								-- 기간판매
+								sum(a.per_qty) as ord_qty,
+								sum(a.t_price) as ord_amt,
+							
+								-- 매장재고, 창고재고
+								sum(a.storage_wqty) as storage_wqty, 
+								sum(a.store_wqty) as store_wqty
+							from ( 
+								select
+									sum(oo.qty) as per_qty
+									, sum(oo.recv_amt) as t_price
+									, oo.prd_cd
+									, 0 as qty
+									, 0 as total_ord_amt
+									, sum(oo.price * oo.qty) as ord_amt
+									, oo.goods_no, oo.goods_opt
+									, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
+									, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
+									-- oow.*
+								from order_opt oo
+								left outer join store s on oo.store_cd = s.store_cd
+								inner join product_code pc on pc.prd_cd = oo.prd_cd
+								where
+									oo.ord_state in (30, 60, 61)
+									-- and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
+									and oo.ord_date >= '$sdate2'
+									and oo.ord_date <= '$edate2'
+									$in_where
+									group by oo.prd_cd
+							) as a
+							inner join goods g on a.goods_no = g.goods_no
+							left outer join brand brd on g.brand = brd.brand
+							inner join product_code pc on pc.prd_cd = a.prd_cd
+							inner join product_stock ps on a.prd_cd = ps.prd_cd 
+							where
+								1=1
+								$where
+							group by a.prd_cd
+							$orderby
+							limit 0, 10
+						) t
+					";
+				} else {
+					$query = "
+						select
+						    sum(t.ord_qty) as ord_qty
+							, sum(t.ord_amt) as ord_amt
+							, sum(t.storage_wqty) as storage_wqty
+							, sum(t.store_wqty) as store_wqty
+						from (
+							select 
+								-- 입고
+								0 as in_sum_qty,
+								0 as in_sum_amt,
+								0 as in_sale_rate,
+							
+								-- 출고
+								0 as ex_sum_qty,
+								'' as ex_date,
+								
+								-- 총판매
+								a.qty as total_ord_qty,
+								0 as total_ord_amt,
+								ifnull(round((a.qty / ps.qty) * 100),0) as total_sale_rate,
+								
+								-- 기간판매
+								a.per_qty as ord_qty,
+								a.t_price as ord_amt,
+								if(ps.qty = 0, 0, round((a.per_qty / ps.qty) * 100)) as sale_rate,
+							
+								-- 매장재고, 창고재고
+								a.storage_wqty,
+								a.store_wqty
+							from (
+								select
+									sum(oo.qty) as per_qty
+									, sum(oo.recv_amt) as t_price
+									, pc.prd_cd
+									, pc.prd_cd_p
+									,0 as qty
+									,0 as total_ord_amt
+									, sum(oo.price * oo.qty) as ord_amt
+									, oo.goods_no, oo.goods_opt
+									, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
+									, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
+								from order_opt oo
+								left outer join store s on oo.store_cd = s.store_cd
+								inner join product_code pc on pc.prd_cd = oo.prd_cd
+								where
+									oo.ord_state in (30, 60, 61)
+									and oo.ord_date >= '$sdate2'
+									and oo.ord_date <= '$edate2'
+									$in_where
+								group by pc.prd_cd_p
+								order by sum(oo.qty) desc
+							) as a
+							inner join goods g on a.goods_no = g.goods_no
+							left outer join brand brd on g.brand = brd.brand
+							inner join product_code pc on pc.prd_cd = a.prd_cd
+							inner join product_stock ps on a.prd_cd = ps.prd_cd 
+							where
+								1=1
+								$where
+							$orderby
+							$limit
+						)t
+					";
+				}
+			
 
 			$row = DB::selectOne($query);
 			
@@ -464,7 +529,7 @@ class sal03Controller extends Controller
 			// if ($row) $total = $row->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
-
+		
 		return response()->json([
 			"code"	=> 200,
 			"head"	=> array(
