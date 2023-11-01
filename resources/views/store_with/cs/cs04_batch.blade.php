@@ -77,32 +77,24 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
+											<th>이동코드</th>
+											<td>
+												<div class="form-inline">
+													<p class="fs-14" id="sgr_idx"></p>
+												</div>
+											</td>
 	                                        <th>출고창고</th>
 	                                        <td>
 		                                        <div class="form-inline">
 			                                        <p class="fs-14" id="storage_nm"></p>
 		                                        </div>
 	                                        </td>
-	                                        <th>이동코드</th>
-	                                        <td>
-		                                        <div class="form-inline">
-			                                        <p class="fs-14" id="sgr_idx"></p>
-		                                        </div>
-	                                        </td>
-                                        </tr>
-                                        <tr>
-	                                        <th>이동창고</th>
-	                                        <td>
-		                                        <div class="form-inline">
-			                                        <p class="fs-14" id="target_nm"></p>
-		                                        </div>
-	                                        </td>
-                                            <th>메모</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <p class="fs-14" id="comment"></p>
-                                                </div>
-                                            </td>
+											<th>이동창고</th>
+											<td>
+												<div class="form-inline">
+													<p class="fs-14" id="target_nm"></p>
+												</div>
+											</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -139,7 +131,7 @@
             },
         },
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
+		{field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
         {field: "brand", headerName: "브랜드", width: 70, cellStyle: {"text-align": "center"}},
@@ -162,7 +154,11 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "이동금액", width: 80, type: 'currencyType'},
-		{width: 0}
+		{field: "comment", headerName: "메모", width: 250,
+			editable: (params) => checkIsEditable(params),
+			cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+		},
+		{width: "auto"}
     ];
 </script>
 
@@ -394,8 +390,6 @@
         let storage_cd = basic_info.storage_cd;
         let target_type = basic_info.target_type;
         let target_cd = basic_info.target_cd;
-        let comment = basic_info.comment;
-
         let zero_qtys = rows.filter(r => r.qty < 1);
         if(zero_qtys.length > 0) return alert("이동수량이 0개인 항목이 존재합니다.");
 
@@ -410,8 +404,7 @@
                 storage_cd,
                 target_type,
                 target_cd,
-                comment,
-                products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
+                products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty, comment : r.comment })),
             },
         }).then(function (res) {
             if(res.data.code === 200) {

@@ -45,6 +45,12 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
+											<th>이동코드</th>
+											<td>
+												<div class="form-inline">
+													<p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
+												</div>
+											</td>
 	                                        <th class="required">출고창고</th>
 	                                        <td>
 		                                        <div class="form-inline">
@@ -55,37 +61,23 @@
 			                                        </select>
 		                                        </div>
 	                                        </td>
-	                                        <th>이동코드</th>
-	                                        <td>
-		                                        <div class="form-inline">
-			                                        <p id="sgr_cd" class="fs-14">@if(@$sgr != null) {{ @$sgr->sgr_cd }} @else {{ @$new_sgr_cd }} @endif</p>
-		                                        </div>
-	                                        </td>
-                                        </tr>
-                                        <tr>
-	                                        <th class="required">이동창고</th>
-	                                        <td>
-		                                        <div class="form-inline inline_select_box">
-			                                        @if(@$cmd == 'add')
-				                                        <div class="d-flex w-100">
-					                                        <select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
-						                                        <option value="">선택</option>
-						                                        @foreach (@$storages as $storage)
-							                                        <option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->target_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
-						                                        @endforeach
-					                                        </select>
-				                                        </div>
-			                                        @else
-				                                        <input type="text" name="target_nm" id="target_nm" value="{{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
-			                                        @endif
-		                                        </div>
-	                                        </td>
-                                            <th>메모</th>
-                                            <td>
-                                                <div class="form-inline">
-                                                    <textarea name="comment" id="comment" class="w-100" rows="1">{{ @$sgr->comment }}</textarea>
-                                                </div>
-                                            </td>
+											<th class="required">이동창고</th>
+											<td>
+												<div class="form-inline inline_select_box">
+													@if(@$cmd == 'add')
+														<div class="d-flex w-100">
+															<select name="target_cd" id="target_cd" class="form-control form-control-sm w-100">
+																<option value="">선택</option>
+																@foreach (@$storages as $storage)
+																	<option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sgr->target_cd == $storage->storage_cd) selected @endif>{{ $storage->storage_nm }}</option>
+																@endforeach
+															</select>
+														</div>
+													@else
+														<input type="text" name="target_nm" id="target_nm" value="{{ @$sgr->target_nm }}" class="form-control form-control-sm w-100" readonly />
+													@endif
+												</div>
+											</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -161,6 +153,10 @@
             cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
         },
         {field: "total_return_price", headerName: "이동금액", width: 80, type: 'currencyType'},
+		{field: "comment", headerName: "메모", width: 250,
+			editable: (params) => checkIsEditable(params),
+			cellStyle: (params) => checkIsEditable(params) ? {"background-color": "#ffff99"} : {}
+		},
         {width: 0}
     ];
 </script>
@@ -223,7 +219,6 @@
     function Save(cmd) {
         if(!cmd) return;
 
-        let comment = document.f1.comment.value;
         let rows = gx.getRows();
 
         if(cmd === 'add') {
@@ -249,8 +244,7 @@
                     //sgr_date,
                     storage_cd,
                     target_cd,
-                    comment,
-                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty })),
+                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty, comment : r.comment })),
                 },
             }).then(function (res) {
                 if(res.data.code === 200) {
@@ -276,8 +270,7 @@
                 method: 'put',
                 data: {
                     sgr_cd,
-                    comment,
-                    products: rows.map(r => ({ sgr_prd_cd: r.sgr_prd_cd, return_price: r.return_price, return_qty: r.qty })),
+                    products: rows.map(r => ({ sgr_prd_cd: r.sgr_prd_cd, return_price: r.return_price, return_qty: r.qty, comment : r.comment })),
                 },
             }).then(function (res) {
                 if(res.data.code === 200) {

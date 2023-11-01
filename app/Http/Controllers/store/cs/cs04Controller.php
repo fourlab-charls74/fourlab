@@ -358,7 +358,8 @@ class cs04Controller extends Controller
                     ifnull(pss.wqty, 0) as storage_wqty, 
                     srp.return_qty as qty,
                     (srp.return_qty * srp.return_price) as total_return_price,
-                    true as isEditable
+                    true as isEditable,
+                	srp.comment as comment
                 from storage_return_product srp
                     inner join product_code pc on pc.prd_cd = srp.prd_cd
                     inner join product p on p.prd_cd = srp.prd_cd
@@ -397,7 +398,6 @@ class cs04Controller extends Controller
         $storage_cd = $request->input("storage_cd", "");
         $target_type = "S"; // 창고로 이동
         $target_cd = $request->input("target_cd", "");
-        $comment = $request->input("comment", "");
         $products = $request->input("products", []);
 
         try {
@@ -415,7 +415,6 @@ class cs04Controller extends Controller
                     'sgr_date' => $sgr_date,
                     'sgr_type' => $sgr_type,
                     'sgr_state' => $sgr_state,
-                    'comment' => $comment,
                     'rt' => now(),
                     'admin_id' => $admin_id,
                 ]);
@@ -440,6 +439,7 @@ class cs04Controller extends Controller
                         'price' => $product['price'], // 판매가
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
+						'comment' => $product['comment'], // 메모
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -545,7 +545,6 @@ class cs04Controller extends Controller
     {
         $admin_id = Auth('head')->user()->id;
         $sgr_cd = $request->input("sgr_cd", "");
-        $comment = $request->input("comment", "");
         $products = $request->input("products", []);
 
         try {
@@ -554,7 +553,6 @@ class cs04Controller extends Controller
             DB::table('storage_return')
                 ->where('sgr_cd', '=', $sgr_cd)
                 ->update([
-                    'comment' => $comment,
                     'ut' => now(),
                     'admin_id' => $admin_id,
                 ]);
@@ -565,6 +563,7 @@ class cs04Controller extends Controller
                     ->update([
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
+						'comment' => $product['comment'], // 메모
                         'ut' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -651,6 +650,7 @@ class cs04Controller extends Controller
             $return_price = $d['return_price'];
             $return_qty = $d['return_qty'];
             $count = $d['count'] ?? '';
+			$comment = $d['comment'] ?? '';
             $sql = "
                 select a.*, com.com_nm, com.com_type as com_type_d
                     , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
@@ -673,6 +673,7 @@ class cs04Controller extends Controller
                         , true as isEditable
                         , '$count' as count
                         , ('$return_price' * '$return_qty') as total_return_price
+                    	, '$comment' as comment
                     from product_code pc
                         inner join product p on p.prd_cd = pc.prd_cd
                         inner join product_stock s on pc.prd_cd = s.prd_cd
