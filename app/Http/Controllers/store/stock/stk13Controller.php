@@ -211,13 +211,14 @@ class stk13Controller extends Controller
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
 					inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
-					inner join store on store.store_cd = o.store_cd
+					inner join store store on store.store_cd = o.store_cd
 					left outer join goods g on g.goods_no = o.goods_no
 					left outer join brand b on b.brand = g.brand
 					left outer join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
 				where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 					and o.ord_state = 30 and o.clm_state in (90,-30,0)
 					and ($store_where)
+					and store.sale_dist_yn = 'Y'
 					$where
 				group by o.store_cd, o.prd_cd
 				order by $orderby
@@ -269,7 +270,7 @@ class stk13Controller extends Controller
 				inner join product_stock_storage pss on pss.prd_cd = o.prd_cd and pss.storage_cd = (select storage_cd from storage where default_yn = 'Y')
 				inner join product_stock_store ps on ps.prd_cd = o.prd_cd and ps.store_cd = o.store_cd
 				inner join (
-					select s.store_cd, s.store_channel, s.store_channel_kind, ifnull(c.code_seq, 999) as store_seq, c.code_id as store_seq_cd, c.code_val as store_seq_nm
+					select s.store_cd, s.store_channel, s.store_channel_kind, ifnull(c.code_seq, 999) as store_seq, c.code_id as store_seq_cd, c.code_val as store_seq_nm, s.sale_dist_yn
 					from store s
 						left outer join code c on c.code_kind_cd = 'PRIORITY' and c.code_id = s.priority
 				) store on store.store_cd = o.store_cd
@@ -280,6 +281,7 @@ class stk13Controller extends Controller
 			where o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59'
 				and o.ord_state = 30 and o.clm_state in (90,-30,0)
 				and ($store_where)
+				and store.sale_dist_yn = 'Y'
 				$where
 			group by o.store_cd, o.prd_cd
 			order by $orderby, store.store_seq asc
