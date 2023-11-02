@@ -345,46 +345,22 @@
             const row_index = params.rowIndex;
 			const rowNode = gx.gridOptions.api.getRowNode(row_index);
             const column_name = params.column.colId;
-
+			// 입력값에 문자가 들어가있는지 판단하는 정규식 ( value의 길이와 value에서 문자열을 제거한 길이가 다르면 문자가 들어가있는거임 )
+			let checkIncludeText;
+			if (value != "") {
+				checkIncludeText = value.replace(/\D/g, "");
+			}
 			let regExp = /(?=proj_amt_).+/i;
 			let arr = column_name.match(regExp);
 			let parseValue = parseInt(value);
 
 			if (arr) {
-				if (isNaN(parseValue) == true || parseValue == "") {
+				if (isNaN(parseValue) == true || parseValue == "" || checkIncludeText.length < value.length) {
 					alert("숫자만 입력가능합니다.");
 					startEditingCell(row_index, column_name);
 					rowNode.setDataValue(column_name, parseInt(0));
 					return false;
-				} else {
-
-					/* 목표 바꾸면 같이 바뀌는 부분 일괄저장을 하기 때문에 필요없어보이지만 혹시 몰라 주석처리 */
-
-					// prev_value = toInt(params.oldValue);
-					// value = toInt(params.newValue);
-
-					// regExp = new RegExp(/[proj_amt_]/, "g");
-					// const Ym = column_name.replace(regExp, "");
-
-					// // 목표 금액부터 반영
-					// row[column_name] = value;
-					// gx.gridOptions.api.applyTransaction({ update: [row] });
-
-					// // 목표 금액, 달성률 반영
-					// regExp = /(?=proj_amt_).+/i;
-					// const proj_keys = Object.keys(row).filter(key => {
-					// 	return key.match(regExp) ? true : false;
-					// });
-
-					// let total_proj = 0;
-					// proj_keys.map(key => {
-					// 	total_proj = total_proj + toInt(row[key]);
-					// });
-
-					// row['proj_amt'] = total_proj;
-					// row[`progress_proj_amt_${Ym}`] = row[`proj_amt_{{$month["val"]}}`] / row[`recv_amt_{{$month["val"]}}`] * 100;
-
-				}
+				} 
 			}
 		}
 	};
