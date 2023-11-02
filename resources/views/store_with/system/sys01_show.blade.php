@@ -359,6 +359,20 @@
             return false;
         }
 
+		if ($("input[name='iptype']:checked").val() == 'L') {
+			if ($('#ipfrom').val() === '') {
+				$('#ipfrom').focus();
+				alert('IP를 입력해주세요.');
+				return false;
+			}
+			if ($('#ipto').val() === '') {
+				$('#ipto').focus();
+				alert('IP를 입력해주세요.');
+				return false;
+			}
+		}
+		
+
         if (!confirm('저장하시겠습니까?')) {
             return false;
         }
@@ -487,7 +501,46 @@
             }
 
         });
-    });
+		
+		// IP타입 변경시 IP입력란 readonly처리, A일 경우 input 데이터 지우기
+		$("input[name='iptype']").change(function(){
+			let iptype = $("input[name='iptype']:checked").val();
+
+			if (iptype == 'L') {
+				$('#ipfrom').attr('readonly', false);
+				$('#ipto').attr('readonly', false);
+			} else {
+				$('#ipfrom').attr('readonly', true);
+				$('#ipfrom').val('');
+				$('#ipto').attr('readonly', true);
+				$('#ipto').val('');
+			}
+		});
+	});
+
+	function load_store_channel() {
+		$.ajax({
+			method: 'get',
+			url: '/store/system/sys01/store_channel',
+			dataType: 'json',
+			success: function(res) {
+				if (res.code == '200') {
+					let data = res.data;
+					let html = '<option value="">선택</option>';
+					for (let i = 0; i < data.length; i++) {
+						html += '<option value="' + data[i].store_cd + '">' + data[i].store_nm + '</option>';
+					}
+					$('#store_no').html(html);
+				} else {
+					alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					console.log(res.msg);
+				}
+			},
+			error: function(e) {
+				console.log(e.responseText)
+			}
+		});
+    };
 
     function initStore() {
         const store_cd = '{{ @$store->store_cd }}';
