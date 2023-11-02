@@ -503,6 +503,11 @@
         });
 		
 		// IP타입 변경시 IP입력란 readonly처리, A일 경우 input 데이터 지우기
+		if ($("input[name='iptype']").val() == "A") {
+			$('#ipfrom').attr('readonly', true);
+			$('#ipto').attr('readonly', true);
+		}
+		
 		$("input[name='iptype']").change(function(){
 			let iptype = $("input[name='iptype']:checked").val();
 
