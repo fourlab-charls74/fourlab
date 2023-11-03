@@ -401,7 +401,7 @@
                         // $('#sale_amt').val(res.body.sale_amt);
                         // $('#sale_kind').val(res.body.sale_kind);
                         // $('#tpl_kind').val(res.body.tpl_kind);
-						$('[name=sale_yn][value=' + res.body.sale_yn || 'N' + ']').prop('checked', true).trigger('change');
+						$('[name=sale_yn][value=' + (res.body.sale_yn || 'N') + ']').prop('checked', true).trigger('change');
 						$('#sale_kind').val(res.body.sale_kind || 'P');
                     } else {
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');

@@ -503,7 +503,6 @@ class prd12Controller extends Controller
 
         $d_cat_cd = $request->input('d_cat_cd','');
         $goods_nos = $request->input('goods_no');
-
         try {
             DB::transaction(function () use (&$result, $code,$d_cat_cd,$goods_nos) {
 
@@ -521,14 +520,14 @@ class prd12Controller extends Controller
                     $cnt = DB::table('category_goods')
                         ->where('cat_type','=',$cat_type)
                         ->where('d_cat_cd','=',$d_cat_cd)
-                        ->where('goods_no','=',$goods_nos[$i])
+                        ->where('goods_no','=',$goods_nos[$i]['goods_no'])
                         ->count();
 
                     if($cnt === 0){
                         $category_good = [
                             'cat_type' => $cat_type,
                             'd_cat_cd' => $d_cat_cd,
-                            'goods_no' => $goods_nos[$i],
+                            'goods_no' => $goods_nos[$i]['goods_no'],
                             'goods_sub' => 0,
                             'disp_yn' => 'Y',
                             'admin_id' => $id,
