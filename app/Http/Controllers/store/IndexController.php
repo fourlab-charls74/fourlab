@@ -172,8 +172,8 @@ class IndexController extends Controller
             inner join product p on oo.prd_cd = p.prd_cd
             where
                 oo.ord_state >= '10' and ( oo.clm_state = '' or oo.clm_state is null or oo.clm_state = '-30' or oo.clm_state = '90' )
-                and oo.ord_date >= date_add(now(), interval -1 month)
-            group by pc.prd_cd_p
+                and oo.ord_date >= '$sdate2' and oo.ord_date <= '$edate2'
+            group by pc.prd_cd
             order by sum(oo.recv_amt) desc
             limit 10
         ";
@@ -190,8 +190,8 @@ class IndexController extends Controller
             inner join product p on oo.prd_cd = p.prd_cd
             where
                 oo.ord_state >= '10' and ( oo.clm_state = '' or oo.clm_state is null or oo.clm_state = '-30' or oo.clm_state = '90' )
-                and oo.ord_date >= date_add(now(), interval -1 month)
-            group by pc.prd_cd_p
+                and oo.ord_date >= '$sdate2' and oo.ord_date <= '$edate2'
+            group by pc.prd_cd
             order by sum(oo.qty) desc
             limit 10
         ";
