@@ -271,9 +271,12 @@
 
     // 동종업계 세부정보 엑셀다운로드
     function downlaodExcel() {
+		const store_nm = $("#select_store_nm").text().replace(" - ", "");
+		
         gx2.gridOptions.api.exportDataAsExcel({
             skipHeader: false,
             skipPinnedTop: false,
+			fileName: `${store_nm} 동종업계 세부정보.xlsx`,
         });
     }
 
