@@ -270,6 +270,8 @@
                 orders,
             },
         }).then(async function (res) {
+
+			console.log(res.data.body);
             let success_list = splitOrder(res.data.body.success_list);
             let failed_list = splitOrder(res.data.body.failed_list);
             

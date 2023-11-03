@@ -1443,147 +1443,156 @@ class ord01Controller extends Controller
     }
 
     /** 수기 일괄등록 판매등록 */
-    public function batch_add(Request $request)
-    {
-        $store_cd = $request->input('store_cd', '');
-        $bank_code = $request->input('bank_code', '');
-        $apy_fee = $request->input('apy_fee', 'false');
-        $fee = $request->input('fee', 0);
-        $orders = $request->input('orders', []);
+	public function batch_add(Request $request)
+	{
+		$store_cd = $request->input('store_cd', '');
+		$bank_code = $request->input('bank_code', '');
+		$apy_fee = $request->input('apy_fee', 'false');
+		$fee = $request->input('fee', 0);
+		$orders = $request->input('orders', []);
 
-        $conf = new Conf();
-        $cfg_ratio = $conf->getConfigValue("point", "ratio");
-        $ord_type = 14; // 출고형태: 수기판매
-        $ord_kind = 20; // 출고구분: 출고가능
-        $ord_state = 30; // 주문상태 : 출고완료
-        $free_dlv_amt = $conf->getConfigValue('delivery', 'free_delivery_amt'); // 배송비무료 금액
-        $dlv_apply = 'Y'; // 배송비적용
-        $give_point = 'N'; // 적립금지급
-        $group_apply = 'N';
+		$conf = new Conf();
+		$cfg_ratio = $conf->getConfigValue("point", "ratio");
+		$ord_type = 14; // 출고형태: 수기판매
+		$ord_kind = 20; // 출고구분: 출고가능
+		$ord_state = 30; // 주문상태 : 출고완료
+		$free_dlv_amt = $conf->getConfigValue('delivery', 'free_delivery_amt'); // 배송비무료 금액
+		$dlv_apply = 'Y'; // 배송비적용
+		$give_point = 'N'; // 적립금지급
+		$group_apply = 'N';
 
-        $success_list = [];
-        $failed_list = [];
+		$success_list = [];
+		$failed_list = [];
+		$fail_check = true;
 
-        foreach ($orders as $order) {
-            $code = '200';
-            $cart = $order['cart'] ?? [];
+		DB::beginTransaction();
+		
+		foreach ($orders as $order) {
+			$code = '200';
+			$cart = $order['cart'] ?? [];
 
-            try {
-                DB::beginTransaction();
+			try {
+					// 상품정보 조회
+					foreach ($cart as $key => $item) {
+						if (!isset($item['prd_cd'])) {
+							$fail_check = false;
+							$code = '-101';
+							throw new Exception('바코드 없음');
+						} else if (!isset($item['qty'])) {
+							$fail_check = false;
+							$code = '-103';
+							throw new Exception('수량정보 없음');
+							// } else if (!isset($item['price'])) {
+							//     $code = '-104';
+							//     throw new Exception('판매가 부정확');
+						} else {
+							$sql = "
+								select
+									g.goods_no
+									, g.goods_sub
+									, g.goods_type as goods_type_cd
+									, g.point
+									, g.com_type
+									, p.prd_cd
+									, p.goods_opt
+								from product_code p
+									inner join goods g on g.goods_no = p.goods_no
+								where p.prd_cd = :prd_cd
+							";
+							$product = DB::selectOne($sql, ['prd_cd' => $item['prd_cd']]);
+	
+							if ($product == null) {
+								$fail_check = false;
+								$code = '-102';
+								throw new Exception('바코드 부정확');
+							} else {
+								$item['goods_no'] = $product->goods_no;
+								$item['goods_sub'] = $product->goods_sub;
+								$item['goods_type_cd'] = $product->goods_type_cd;
+								$item['point'] = $product->point;
+								$item['com_type'] = $product->com_type;
+								$item['goods_opt'] = $product->goods_opt;
+								$cart[$key] = $item;
+							}
+						}
+					}
 
-                // 상품정보 조회
-                foreach ($cart as $key => $item) {
-                    if (!isset($item['prd_cd'])) {
-                        $code = '-101';
-                        throw new Exception('바코드 없음');
-                    } else if (!isset($item['qty'])) {
-                        $code = '-103';
-                        throw new Exception('수량정보 없음');
-                    // } else if (!isset($item['price'])) {
-                    //     $code = '-104';
-                    //     throw new Exception('판매가 부정확');
-                    } else {
-                        $sql = "
-                            select
-                                g.goods_no
-                                , g.goods_sub
-                                , g.goods_type as goods_type_cd
-                                , g.point
-                                , g.com_type
-                                , p.prd_cd
-                                , p.goods_opt
-                            from product_code p
-                                inner join goods g on g.goods_no = p.goods_no
-                            where p.prd_cd = :prd_cd
-                        ";
-                        $product = DB::selectOne($sql, ['prd_cd' => $item['prd_cd']]);
+				$order_result = $this->_save_order([
+					'cfg_ratio' => $cfg_ratio,
+					'p_ord_opt_no' => '',
+					'ord_type' => $ord_type,
+					'ord_kind' => $ord_kind,
+					'ord_state' => $ord_state,
+					'store_cd' => $store_cd,
+					'cart' => $cart,
+					'base_dlv_amt' => $order['dlv_amt'] ?? 0,
+					'free_dlv_amt' => $free_dlv_amt,
+					'dlv_apply' => $dlv_apply,
+					'add_dlv_fee' => $order['add_dlv_amt'] ?? 0,
+					'coupon_no' => '',
+					'pay_type' => $order['pay_type'] ?? 1, // 결제타입: (default)현금
+					'bank_inpnm' => $order['bank_inpnm'] ?? '',
+					'bank_code' => $bank_code,
+					'user_id' => $order['user_id'] ?? '',
+					'user_nm' => $order['user_nm'] ?? '',
+					'phone' => $order['phone'] ?? '',
+					'mobile' => $order['mobile'] ?? '',
+					'r_nm' => $order['r_nm'] ?? '',
+					'r_phone' => $order['r_phone'] ?? '',
+					'r_mobile' => $order['r_mobile'] ?? '',
+					'r_zip_code' => $order['r_zipcode'] ?? '',
+					'r_addr1' => $order['r_addr1'] ?? '',
+					'r_addr2' => $order['r_addr2'] ?? '',
+					'dlv_msg' => $order['dlv_msg'] ?? '',
+					'give_point' => $give_point,
+					'group_apply' => $group_apply,
+					'dlv_cd' => $order['dlv_cd'] ?? '',
+					'dlv_no' => $order['dlv_no'] ?? '',
+					'user' => [
+						'id' => Auth('head')->user()->id,
+						'name' => Auth('head')->user()->name,
+					],
+					'out_ord_no' => $order['out_ord_no'] ?? '',
+					'ord_date' => $order['ord_date'] ?? date('Y-m-d'),
+					'fee_rate' => $order['fee_rate'] ?? ($apy_fee == 'true' ? $fee : 0),
+				]);
 
-                        if ($product == null) {
-                            $code = '-102';
-                            throw new Exception('바코드 부정확');
-                        } else {
-                            $item['goods_no'] = $product->goods_no;
-                            $item['goods_sub'] = $product->goods_sub;
-                            $item['goods_type_cd'] = $product->goods_type_cd;
-                            $item['point'] = $product->point;
-                            $item['com_type'] = $product->com_type;
-                            $item['goods_opt'] = $product->goods_opt;
-                            $cart[$key] = $item;
-                        }
-                    }
-                }
+				if ($order_result['code'] != '200') {
+					$fail_check = false;
+					$code = $order_result['code'];
+					if ($code == '-103') throw new Exception('수량 부정확');
+					if ($code == '-105') throw new Exception('재고 부족');
+				}
+				
+					$order['order_no'] = $order_result['ord_no'];
+					$order['code'] = $code;
+					array_push($success_list, $order);
+				
+			} catch (Exception $e) {
+				$fail_check = false;
+				$order['code'] = $code;
+				array_push($failed_list, $order);
+			}
+		}
 
-                $order_result = $this->_save_order([
-                    'cfg_ratio' => $cfg_ratio,
-                    'p_ord_opt_no' => '',
-                    'ord_type' => $ord_type,
-                    'ord_kind' => $ord_kind,
-                    'ord_state' => $ord_state,
-                    'store_cd' => $store_cd,
-                    'cart' => $cart,
-                    'base_dlv_amt' => $order['dlv_amt'] ?? 0,
-                    'free_dlv_amt' => $free_dlv_amt,
-                    'dlv_apply' => $dlv_apply,
-                    'add_dlv_fee' => $order['add_dlv_amt'] ?? 0,
-                    'coupon_no' => '',
-                    'pay_type' => $order['pay_type'] ?? 1, // 결제타입: (default)현금
-                    'bank_inpnm' => $order['bank_inpnm'] ?? '',
-                    'bank_code' => $bank_code,
-                    'user_id' => $order['user_id'] ?? '',
-                    'user_nm' => $order['user_nm'] ?? '',
-                    'phone' => $order['phone'] ?? '',
-                    'mobile' => $order['mobile'] ?? '',
-                    'r_nm' => $order['r_nm'] ?? '',
-                    'r_phone' => $order['r_phone'] ?? '',
-                    'r_mobile' => $order['r_mobile'] ?? '',
-                    'r_zip_code' => $order['r_zipcode'] ?? '',
-                    'r_addr1' => $order['r_addr1'] ?? '',
-                    'r_addr2' => $order['r_addr2'] ?? '',
-                    'dlv_msg' => $order['dlv_msg'] ?? '',
-                    'give_point' => $give_point,
-                    'group_apply' => $group_apply,
-                    'dlv_cd' => $order['dlv_cd'] ?? '',
-                    'dlv_no' => $order['dlv_no'] ?? '',
-                    'user' => [
-                        'id' => Auth('head')->user()->id,
-                        'name' => Auth('head')->user()->name,
-                    ],
-                    'out_ord_no' => $order['out_ord_no'] ?? '',
-                    'ord_date' => $order['ord_date'] ?? date('Y-m-d'),
-                    'fee_rate' => $order['fee_rate'] ?? ($apy_fee == 'true' ? $fee : 0),
-                ]);
+		if ($fail_check) {
+			DB::commit(); // 모든 주문이 성공한 경우에만 커밋
+		} else {
+			DB::rollback(); // 실패한 경우 롤백
+		}
 
-                if ($order_result['code'] != '200') {
-                    $code = $order_result['code'];
-                    if ($code == '-103') throw new Exception('수량 부정확');
-                    if ($code == '-105') throw new Exception('재고 부족');
-                }
-
-                $order['order_no'] = $order_result['ord_no'];
-                $order['code'] = $code;
-                array_push($success_list, $order);
-
-                DB::commit();
-            } catch (Exception $e) {
-                DB::rollback();
-
-                $order['code'] = $code;
-                array_push($failed_list, $order);
-            }
-        }
-
-        return response()->json([
-            "code" => "200",
-            "head" => [
-                "success_total" => count($success_list),
-                "failed_total" => count($failed_list),
-            ],
-            "body" => [
-                "success_list" => $success_list,
-                "failed_list" => $failed_list
-            ]
-        ]);
-    }
+		return response()->json([
+			"code" => $fail_check ? '200' : '500',
+			"head" => [
+				"success_total" => count($success_list),
+				"failed_total" => count($failed_list),
+			],
+			"body" => [
+				"success_list" => $success_list,
+				"failed_list" => $failed_list
+			]
+		]);
+	}
 
     /**
      * 전화번호 숫자에 '-' 넣어서 반환
