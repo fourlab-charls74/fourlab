@@ -2183,6 +2183,7 @@ class prd02Controller extends Controller
 			$gender = $d['gender'];
 			$item = $d['item'];
 			$sup_com = $d['sup_com'];
+			$origin = $d['origin'];
 
 			$sql = "
 				select
@@ -2204,6 +2205,7 @@ class prd02Controller extends Controller
 					, '$gender' as gender
 					, '$item' as item
 					, '$sup_com' as sup_com
+					, '$origin' as origin
 				from product_code
 				limit 1
 
@@ -2251,6 +2253,7 @@ class prd02Controller extends Controller
 				$wonga = $row['wonga'];
 				$tag_price = $row['tag_price'];
 				$price = $row['price'];
+				$origin = $row['origin'];
 
 				$unit = "";
 				$goods_no = "";
@@ -2273,6 +2276,7 @@ class prd02Controller extends Controller
 						'tag_price'		=> $tag_price,
 						'com_id'		=> $sup_com,
 						'unit'			=> $unit,
+						'origin'		=> $origin,
 						'rt'			=> now(),
 						'ut'			=> now(),
 						'admin_id'		=> $admin_id

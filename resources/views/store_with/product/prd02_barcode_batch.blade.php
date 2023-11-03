@@ -101,12 +101,11 @@
 			{field: "goods_nm",	headerName: "상품명", width: 220},
 			{field: "goods_nm_eng",	headerName: "상품명(영문)", width: 220},
 			{field: "style_no",	headerName: "스타일넘버", width: 80, cellStyle: {"text-align": "center"}},
+			{field: "tag_price", headerName: "정상가", type: 'currencyType', width: 80},
 			{field: "price", headerName: "현재가", type: 'currencyType', width: 80},
 			{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
-			{field: "tag_price", headerName: "정상가", type: 'currencyType', width: 80},
 			{field: "sup_com", headerName: "공급업체", width: 120, cellStyle: {"text-align": "center"}},
-
-
+			{field: "origin", headerName: "원산지", width: 90, cellStyle: {"text-align": "center"}},
 		];
 	</script>
 
@@ -219,10 +218,11 @@
 				'L': 'goods_nm',
 				'M': 'goods_nm_eng',
 				'N': 'style_no',
-				'O': 'price',
-				'P': 'wonga',
-				'Q': 'tag_price',
+				'O': 'tag_price',
+				'P': 'price',
+				'Q': 'wonga',
 				'R': 'sup_com',
+				'S': 'origin'
 			};
 
 			var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
