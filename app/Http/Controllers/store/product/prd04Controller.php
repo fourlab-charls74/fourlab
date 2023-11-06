@@ -219,10 +219,12 @@ class prd04Controller extends Controller
 					ifnull(sum(a.price * a.wqty + a.price * a.sqty),0) as total_price,
 					ifnull(sum(a.wonga * a.wqty + a.wonga * a.sqty),0) as total_wonga,
 					ifnull(sum(a.wqty),0) as total_wqty,
-					ifnull(sum(a.sqty),0) as total_sqty
+					ifnull(sum(a.sqty),0) as total_sqty,
+					ifnull(sum(a.qty),0) as total_qty
 				from (
 					select
 						pc.prd_cd
+						, sum(pss2.qty) as qty
 						, (sum(pss2.wqty) - ifnull((
 							select sum(qty) as qty
 							from product_stock_hst
@@ -288,6 +290,7 @@ class prd04Controller extends Controller
 				, pc.color, c.code_val as color_nm
 				, pc.size
 				, pc.goods_opt
+				, sum(pss2.qty) as qty
 				, (sum(pss2.wqty) - ifnull((
 					select sum(qty) as qty
 					from product_stock_hst

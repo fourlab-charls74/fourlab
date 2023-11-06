@@ -267,8 +267,8 @@
 	}
 </style>
 <script language="javascript">
-	const pinnedRowData = [{ goods_nm: '', goods_sh: 0, price: 0, wonga: 0, hwqty: 0, sqty: 0 }];
-		
+	// const pinnedRowData = [{ goods_nm: '', goods_sh: 0, price: 0, wonga: 0, hwqty: 0, sqty: 0}];
+	const pinnedRowData = [];
 	const columns = [
 		{headerName: '#', pinned: 'left', type: 'NumType', width:40, cellStyle: StyleLineHeight,
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
@@ -317,21 +317,41 @@
 		@if(true) // 슈퍼관리자 권한설정 필요 (추후)
 			{field: "wonga", headerName: "원가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		@endif
-		{field: "wqty", headerName: "창고재고", width:70, type: 'currencyType', 
-			aggFunc: (params) => {
-				return params.values.reduce((a,c) => a + (c * 1), 0);
-			},
-			cellRenderer: function(params) {
-				if (params.value === undefined) return "";
-				if (params.node.rowPinned === 'top') {
-                    return params.value;
-                } else if (params.data) {
-					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
-                } else if (params.node.aggData) {
-					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
-				}
-			}
+		{headerName: "창고재고",
+			children: [
+				{field: "qty", headerName: "실재고", width:70, type: 'currencyType',
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+					cellRenderer: function(params) {
+						if (params.value === undefined) return "";
+						if (params.node.rowPinned === 'top') {
+							return params.value;
+						} else if (params.data) {
+							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+						} else if (params.node.aggData) {
+							return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+						}
+					}
+				},
+				{field: "wqty", headerName: "보유재고", width:70, type: 'currencyType',
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+					cellRenderer: function(params) {
+						if (params.value === undefined) return "";
+						if (params.node.rowPinned === 'top') {
+							return params.value;
+						} else if (params.data) {
+							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+						} else if (params.node.aggData) {
+							return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+						}
+					}
+				},
+			]
 		},
+		
 		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
@@ -429,6 +449,7 @@
 				goods_sh: t.total_goods_sh, 
 				price: t.total_price, 
 				wonga: t.total_wonga,
+				qty: Comma(t.total_qty),
 				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
 			}]);
