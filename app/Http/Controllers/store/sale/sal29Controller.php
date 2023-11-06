@@ -151,16 +151,17 @@ class sal29Controller extends Controller
 				, s.store_nm
 				, g.goods_nm
 			from (
-				select p.type, p.store_cd, p.prd_cd, p.prd_cd_p, p.goods_no, p.color, p.size_kind
+				select p.type, p.store_cd, p.prd_cd, p.prd_cd_p, p.goods_no, p.color, p.size_kind, p.size_kind_nm as size_kind_nm_s
 					, sum(p.qty) as qty
 					$size_sum_sql
 				from (
 					select psr.type, psr.store_cd, psr.prd_cd, psr.goods_no, psr.qty
 						, if(pc.prd_cd_p <> '', pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
-						, pc.color, pc.size, pc.size_kind
+						, pc.color, pc.size, pc.size_kind, sk.size_kind_nm
 						$size_sql
 					from product_stock_release psr
 						inner join product_code pc on pc.prd_cd = psr.prd_cd
+						inner join size_kind sk on sk.size_kind_cd = pc.size_kind
 					where 1=1 $where $where2
 				) p
 					$groupby

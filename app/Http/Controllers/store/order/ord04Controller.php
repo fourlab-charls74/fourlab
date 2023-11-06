@@ -30,9 +30,12 @@ class ord04Controller extends Controller
 
 		$clm_state = [
 			(object)['code_id' => 40, 'code_val' => '교환요청'],
+			(object)['code_id' => 50, 'code_val' => '교환처리중'],
 			(object)['code_id' => 41, 'code_val' => '환불요청'],
+			(object)['code_id' => 51, 'code_val' => '환불처리중'],
 			(object)['code_id' => 60, 'code_val' => '교환완료'],
 			(object)['code_id' => 61, 'code_val' => '환불완료'],
+			(object)['code_id' => 90, 'code_val' => '클레임없음'],
 		];
 
 		$values = [
@@ -84,7 +87,7 @@ class ord04Controller extends Controller
 
 		/** 검색조건 필터링 */
 		$where = "";
-
+		
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		// if ($ord_state != '') $where .= " and o.ord_state = '" . $ord_state . "' ";
 		// if ($pay_stat != '') $where .= " and p.pay_stat = '" . $pay_stat . "' ";
@@ -223,7 +226,6 @@ class ord04Controller extends Controller
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
 				where $where_sql
-					and o.clm_state in (40,41,60,61)
 					$where
 				$orderby
 				$limit
@@ -252,7 +254,6 @@ class ord04Controller extends Controller
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
 				where $where_sql
-					and o.clm_state in (40,41,60,61)
 					$where
 			";
 			$row = DB::selectOne($sql);

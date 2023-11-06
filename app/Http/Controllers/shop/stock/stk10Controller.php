@@ -255,10 +255,12 @@ class stk10Controller extends Controller
 
 		// pagination
         $total = 0;
+		$total_data = 0;
         $page_cnt = 0;
         if($page == 1) {
             $sql = "
                 select count(*) as total
+                	, sum(psr.qty) as total_qty
                 from product_stock_release psr
                     inner join product_code pc on pc.prd_cd = psr.prd_cd
                     left outer join goods g on g.goods_no = psr.goods_no
@@ -271,6 +273,7 @@ class stk10Controller extends Controller
 
             $row = DB::selectOne($sql);
             $total = $row->total;
+			$total_data = $row->total_qty;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
@@ -278,6 +281,7 @@ class stk10Controller extends Controller
 			"code" => $code,
 			"head" => [
 				"total" => $total,
+				"total_data" => $total_data,
 				"page" => $page,
 				"page_cnt" => $page_cnt,
 				"page_total" => count($result)
