@@ -408,6 +408,9 @@
 														<input type="radio" class="custom-control-input" id="point_in_yn_N" name="point_in_yn" value="N" @if(@$store->point_in_yn != 'Y') checked @endif />
 														<label class="custom-control-label" for="point_in_yn_N">N</label>
 													</div>
+													<div id="point_ratio_view" style="padding-left:10px;">
+														<input type="text" name="point_ratio" id="point_ratio" value="{{ @$store->point_ratio }}" class="form-control form-control-sm w-25" /> %
+													</div>
 												</div>
 											</td>
 											<th hidden>오픈후한달 재고보기제외 여부</th>
@@ -425,6 +428,19 @@
 											</td>
 										</tr>
 										<tr>
+											<th>적립금사용(POS)여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_out_yn_Y" name="point_out_yn" value="Y" @if(@$store->point_out_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="point_out_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_out_yn_N" name="point_out_yn" value="N" @if(@$store->point_out_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="point_out_yn_N">N</label>
+													</div>
+												</div>
+											</td>
 											<th>온라인업체매칭</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -439,12 +455,14 @@
 													&nbsp;&nbsp;&nbsp;
 													<select name='com_id' id="com_id" class="form-control form-control-sm" style="width:70%;">
 														<option value=''>전체</option>
-															@foreach ($store_match as $sm)
-																<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') @if(@$store->com_id != $sm->com_id) disabled @endif style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
-															@endforeach
+														@foreach ($store_match as $sm)
+															<option value='{{ $sm->com_id }}' @if(@$store->com_id == $sm->com_id) selected @endif @if(@$sm->s_match != '') @if(@$store->com_id != $sm->com_id) disabled @endif style="background: #d2d2d2;" @endif>{{ $sm->com_nm }}</option>
+														@endforeach
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>중간관리여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -458,6 +476,8 @@
 													</div>
 												</div>
 											</td>
+											<th>&nbsp;</th>
+											<td>&nbsp;</td>
 										</tr>
 										<tr>
 											<th>이미지</th>
@@ -942,8 +962,6 @@
 		for(let form_data of form.entries()) {
 			form_data[0], form_data[1];
 		}
-
-		
 	
         if( !validation('add') )	return;
         if( !window.confirm("매장정보를 등록하시겠습니까?") )	return;
@@ -1114,6 +1132,11 @@
 		if ($("input[name='sale_place_match_yn']:checked").val() == 'Y' && $('#com_id').val() == '') {
 			return alert('매칭할 업체를 선택해주세요.');
 		}
+
+		// 지급할 적립 요율 입력 여부
+		if ($("input[name='point_in_yn']:checked").val() == 'Y' && $('#point_ratio').val() == '') {
+			return alert('지급할 적립금 요율을 입력해주세요.');
+		}
 		
 		return true;
 		
@@ -1124,6 +1147,12 @@
 		showSelectBox('sale_place_match_yn', 'com_id');
 		showSelectBox('account_yn', 'grade_cd');
 
+		if($(`input[name='point_in_yn']:checked`).val() == 'Y')	$('#point_ratio_view').show();
+		else{
+			$('#point_ratio').val('');
+			$('#point_ratio_view').hide();			
+		}
+		
         $("input[name='sale_place_match_yn']").change(function(){
 			showSelectBox('sale_place_match_yn', 'com_id');
         });
@@ -1131,6 +1160,14 @@
         $("input[name='account_yn']").change(function(){
 			showSelectBox('account_yn', 'grade_cd');
         });
+		
+		$("input[name='point_in_yn']").change(function(){
+			if($(`input[name='point_in_yn']:checked`).val() == 'Y')	$('#point_ratio_view').show();
+			else{
+				$('#point_ratio').val('');
+				$('#point_ratio_view').hide();
+			}
+		});
 
 		load_store_channel();
     });

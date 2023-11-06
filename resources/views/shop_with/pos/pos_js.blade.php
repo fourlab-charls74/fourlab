@@ -478,8 +478,10 @@
                     if (confirm("재고가 부족한 상품이 있습니다.\n예약판매하시겠습니까?")) {
                         sale('Y');
                     }
-                } else if (res.data.code === '-104') {
-                    alert("재고가 부족한 상품이 있습니다. 재고가 1개 이상 존재할 때는 예약판매할 수 없습니다.");
+				} else if (res.data.code === '-104') {
+					alert("재고가 부족한 상품이 있습니다. 재고가 1개 이상 존재할 때는 예약판매할 수 없습니다.");
+				} else if (res.data.code === '-102') {
+					alert("포인트를 사용할 수 없는 매장 입니다.");
                 } else {
                     alert(res.data.msg);
                 }

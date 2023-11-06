@@ -216,11 +216,21 @@
                                     <input type="hidden" name="cash_amt" value="0">
                                     <span class="d-block fs-14 fw-sb mt-1">현금</span>
                                 </button>
+								@if(@$store->point_out_yn == 'Y')
+								<!--적립금 사용 가능 매장 //-->	
                                 <button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-4" data-toggle="modal" data-target="#payModal" data-title="적립금 사용" data-pay-type="point_amt">
                                     <span id="point_amt">0</span>
                                     <input type="hidden" name="point_amt" value="0">
                                     <span class="d-block fs-14 fw-sb mt-1">적립금</span>
                                 </button>
+								@else
+								<!--적립금 사용 불가 매장 //-->
+								<button type="button" class="butt flex-1 fc-white fs-20 fw-b br-2 bg-gray p-4" onClick="alert('적립금을 사용할 수 없는 매장입니다.\r\n관리자에게 문의해 주십시요.');">
+									<span id="point_amt">0</span>
+									<input type="hidden" name="point_amt" value="0">
+									<span class="d-block fs-14 fw-sb mt-1">적립금</span>
+								</button>
+								@endif
                             </div>
                             <button type="button" class="butt flex-2 fc-white fs-20 fw-b br-2 bg-mint p-2" onclick="return sale();">판 매</button>
                         </div>

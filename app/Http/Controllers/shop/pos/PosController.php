@@ -51,7 +51,7 @@ class PosController extends Controller
         $pr_codes = DB::select($sql, [ 'store_cd' => $store_cd ]);
 
         $sql = "
-            select store_cd, store_nm
+            select store_cd, store_nm, point_out_yn
             from store
             where store_cd = :store_cd
         ";
@@ -490,7 +490,7 @@ class PosController extends Controller
         $ord_kind = 20; // 출고구분: 출고가능(20)
         $dlv_apply = 'N'; // 배송비적용여부
         $store_cd = Auth::guard('head')->user()->store_cd;
-        $store = DB::table('store')->select('store_cd', 'store_nm', 'point_in_yn')->where('store_cd', $store_cd)->first();
+        $store = DB::table('store')->select('store_cd', 'store_nm', 'point_in_yn', 'point_ratio', 'point_out_yn')->where('store_cd', $store_cd)->first();
 
         // set pay_type [ 무통장입금(1) / 카드(2) / 적립금(4) / 무통장입금+적립금(5) / 카드+적립금(6) ]
         $pay_type = 0;
@@ -515,6 +515,14 @@ class PosController extends Controller
 
         try {
             DB::beginTransaction();
+			
+			////////////////
+			//// 적립금 사용 매장이 맞는지 검토
+			if($store->point_out_yn !== 'Y' && $point_amt > 0){
+				$code = '-102';
+				throw new Exception("포인트를 사용 할 수 없는 매장입니다.");
+			}
+			////////////////
 
             #####################################################
             #   회원그룹별 포인트 지급여부 및 지급율 조회
@@ -658,6 +666,10 @@ class PosController extends Controller
                 else $item_point_amt = $point_amt - $used_point_amt;
 
                 ######################### 상품별 추가적립금 반영 ############################
+				if($store !== null && $store->point_in_yn == 'Y' && $store->point_ratio > 0 ){
+					$cfg_ratio	= $store->point_ratio;	// 매장별 포인트 적립률 적용
+				}
+				
                 $add_group_point = $ord_opt_add_point = 0;
 
                 if ($add_point_ratio > 0) $add_group_point = ($product->price * $add_point_ratio / 100) * $qty;
