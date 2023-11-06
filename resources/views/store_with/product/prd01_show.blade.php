@@ -374,7 +374,7 @@
                                                     <th class="required">스타일넘버</th>
                                                     <td>
                                                         <div class="input_box wd300">
-                                                            <input type='text' class="form-control form-control-sm ac-style-no search-all" name='style_no' id='style_no' value='{{ @$goods_info->style_no  }}'>
+                                                            <input type='text' class="form-control form-control-sm ac-style-no search-all" name='style_no' id='style_no' maxlength="8" oninput="handleInputLength(this, 8)" value='{{ @$goods_info->style_no  }}'>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -3983,6 +3983,13 @@
 		}
 
 		window.open(`https://${url}/app/product/detail/<?php echo e(@$goods_no); ?>`, '_blank');
+	}
+
+	//스타일넘버 8자리로 길이제한
+	function handleInputLength(el, max) {
+		if(el.value.length > max) {
+			el.value = el.value.substr(0, max);
+		}
 	}
 	
 	</script>

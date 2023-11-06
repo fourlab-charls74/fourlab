@@ -66,8 +66,8 @@
             <div class="card-header mb-0 pt-1 pb-1 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0">판매채널</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeqStoreChannel()" > 판매채널 순서변경</a>
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 ml-1" onclick="openAddPopup()" ><i class="bx bx-plus fs-16"></i> 판매채널 등록</a>
+					<button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeqStoreChannel()" > 판매채널 순서변경 </button>
+					<button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 ml-1" onclick="openAddPopup()" ><i class="bx bx-plus fs-16"></i> 판매채널 등록</button>
                     <!-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreChannel()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button> -->
                 </div>
             </div>
@@ -83,8 +83,18 @@
             <div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
                 <h5 class="m-0 mb-3 mb-sm-0"><span id="select_store_nm"></span>매장구분</h5>
                 <div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-                    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeqStoreType()" > 매장구분 순서변경</a>
-                    <button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 ml-1" onclick="openAddTypePopup()" ><i class="bx bx-plus fs-16"></i> 매장구분 등록</a>
+					<div class="mr-1">
+						<div class="flex_box">
+							<span style="font-size:small"><strong>사용여부 : </strong></span>&nbsp&nbsp
+							<select name='change_yn' id="change_yn" style="width:150px" class="form-control form-control-sm" onchange="changeUseYn();">
+								<option value="A" selected>전체</option>
+								<option value="Y">Y</option>
+								<option value="N">N</option>
+							</select>
+						</div>
+					</div>
+					<button type="button" class="btn btn-sm btn-primary shadow-sm pl-2" onclick="changeSeqStoreType()" > 매장구분 순서변경</button>
+					<button type="button" class="btn btn-sm btn-outline-primary shadow-sm pl-2 ml-1" onclick="openAddTypePopup()" ><i class="bx bx-plus fs-16"></i> 매장구분 등록</button>
                     <!-- <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="deleteStoreType()"><i class="fas fa-trash-alt fa-sm"></i> 삭제</button> -->
                 </div>
             </div>
@@ -133,6 +143,8 @@
 </script>
 <script type="text/javascript" charset="utf-8">
     let gx, gx2;
+	let cur_store_channel_cd = '';
+	let cur_store_channel = '';
 
     const pApp = new App('', { gridId: "#div-gd", height: 284 });
     const pApp2 = new App('', { gridId: "#div-gd-type" });
@@ -154,6 +166,7 @@
         gx2.gridOptions.rowDragManaged = true;
         gx2.gridOptions.animateRows = true;
 
+		$('#change_yn').val('Y');
         // 최초검색
         Search();
 
@@ -167,20 +180,32 @@
 
     function Search() {
         let data = $('form[name="search"]').serialize();
-        gx.Request('/store/standard/std09/search', data, -1, function(e){
-            // if (e.body.length > 0) {
-            //     SearchDetail(e.body[0].store_channel_cd, e.body[0].store_channel);
-            // }
-        });
+        gx.Request('/store/standard/std09/search', data, -1);
     }
 
-    function SearchDetail(store_channel_cd, store_channel) {
+    function SearchDetail(store_channel_cd, store_channel, use_yn) {
         if(store_channel_cd === '') return;
-        gx2.Request("/store/standard/std09/search-store-type/" + store_channel_cd, "", -1, function(e){
+		if (use_yn == undefined) {
+			use_yn = 'Y';
+			$('#change_yn').val('Y');
+		}
+		cur_store_channel_cd = store_channel_cd;
+		cur_store_channel = store_channel;
+
+		let data = "store_channel_cd=" + cur_store_channel_cd;
+		data += "&use_yn=" + use_yn;
+		
+        gx2.Request("/store/standard/std09/search-store-type",data, -1, function(e){
             $("#select_store_nm").text(`${store_channel} - `);
         });
     }
 
+	// 사용여부가 선택될때 바로 검색 후 리스트에 출력하는 부분
+	function changeUseYn() {
+		const use_yn = document.getElementById("change_yn").value;
+		SearchDetail(cur_store_channel_cd, cur_store_channel, use_yn);
+	}
+	
     function openAddPopup() {
         const url = '/store/standard/std09/show';
         const product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=420");
