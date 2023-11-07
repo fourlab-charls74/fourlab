@@ -91,7 +91,15 @@ class ord04Controller extends Controller
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		// if ($ord_state != '') $where .= " and o.ord_state = '" . $ord_state . "' ";
 		// if ($pay_stat != '') $where .= " and p.pay_stat = '" . $pay_stat . "' ";
-		if ($clm_state != '') $where .= " and o.clm_state = '" . $clm_state . "' ";
+		if ($clm_state != '') {
+			if ($clm_state == '90') {
+				$where .= " and o.clm_state in ('$clm_state', '0') ";
+			} else {
+				$where .= " and o.clm_state = '" . $clm_state . "' ";
+			}
+		}
+		
+		
 		if ($sale_place != '') $where .= " and o.sale_place = '" . $sale_place . "' ";
 
 		// 주문정보검색
@@ -210,18 +218,13 @@ class ord04Controller extends Controller
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, g.goods_nm, g.goods_nm_eng, g.style_no, g.price as goods_price, g.goods_sh
 					, ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p, pc.color
-					, ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size
+					, pc.size as size
 					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
 					, csc.comment
 					, csc.rt as csc_rt
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
-				    inner join claim c on c.ord_opt_no = o.ord_opt_no
+				    left outer join claim c on c.ord_opt_no = o.ord_opt_no
 					inner join goods g on g.goods_no = o.goods_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no
@@ -249,7 +252,7 @@ class ord04Controller extends Controller
 				select count(*) as total
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
-				    inner join claim c on c.ord_opt_no = o.ord_opt_no
+				    left outer join claim c on c.ord_opt_no = o.ord_opt_no
 					inner join goods g on g.goods_no = o.goods_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					left outer join claim_stock_check csc on csc.ord_opt_no = o.ord_opt_no

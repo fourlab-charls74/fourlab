@@ -102,7 +102,7 @@
 								<select name='clm_state' id="clm_state" class="form-control form-control-sm w-100">
 									<option value=''>전체</option>
 									@foreach (@$clm_states as $clm_state)
-										<option value='{{ $clm_state->code_id }}'>
+										<option value='{{ $clm_state->code_id }}'  @if( $clm_state->code_id == 41) selected @endif>
 											{{ $clm_state->code_val }}
 										</option>
 									@endforeach

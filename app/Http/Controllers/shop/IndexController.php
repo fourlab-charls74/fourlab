@@ -86,7 +86,8 @@ class IndexController extends Controller
 			$sum_taxation			= $row->sum_taxation_amt;
 			$sum_taxation_no_vat	= round($sum_taxation/1.1);
 			$vat 					= $sum_taxation - $sum_taxation_no_vat;
-			$sum_amt				= $sum_recv + $sum_point - $sum_fee;
+//			$sum_amt				= $sum_recv + $sum_point - $sum_fee;
+			$sum_amt				= $sum_recv;
 
 
 			$array = array(
