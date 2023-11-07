@@ -198,28 +198,41 @@ class stk16Controller extends Controller
 
         // pagination
         $total = 0;
+		$total_data = 0;
         $page_cnt = 0;
         if ($page == 1) {
             $sql = "
-                select count(*) as total
-                from sproduct_stock_release psr
-                    inner join product p on psr.prd_cd = p.prd_cd
-                    inner join product_code pc on p.prd_cd = pc.prd_cd
-                    left outer join product_image i on i.prd_cd = pc.prd_cd
-                    left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
-                    left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
-                    left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
-                    left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
-                    left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
-                    left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
-                    left outer join store s on s.store_cd = psr.store_cd
-                    left outer join storage sg on sg.storage_cd = psr.storage_cd
-                where 1=1 $where
-                order by psr.rt
+				select
+				    count(t.idx) as total
+					, sum(t.qty) as qty
+					, sum(t.rec_qty) as rec_qty
+					, sum(t.prc_qty) as prc_qty
+				from (
+					select 
+						psr.idx
+						, psr.qty
+						, ifnull(psr.rec_qty, psr.qty) as rec_qty
+						, ifnull(psr.prc_qty, psr.qty) as prc_qty
+					from sproduct_stock_release psr
+						inner join product p on psr.prd_cd = p.prd_cd
+						inner join product_code pc on p.prd_cd = pc.prd_cd
+						left outer join product_image i on i.prd_cd = pc.prd_cd
+						left outer join `code` c on c.code_kind_cd = 'PRD_MATERIAL_TYPE' and c.code_id = pc.brand
+						left outer join `code` c2 on c2.code_kind_cd = 'PRD_MATERIAL_OPT' and c2.code_id = pc.opt
+						left outer join `code` c3 on c3.code_kind_cd = 'PRD_CD_COLOR' and c3.code_id = pc.color
+						left outer join `code` c5 on c5.code_kind_cd = 'PRD_CD_UNIT' and c5.code_id = p.unit
+						left outer join `code` c6 on c6.code_kind_cd = 'REL_TYPE' and c6.code_id = psr.type
+						left outer join `code` c7 on c7.code_kind_cd = 'REL_ORDER' and c7.code_id = psr.rel_order
+						left outer join store s on s.store_cd = psr.store_cd
+						left outer join storage sg on sg.storage_cd = psr.storage_cd
+					where 1=1 $where
+					order by psr.rt
+				) t
             ";
 
             $row = DB::selectOne($sql);
             $total = $row->total;
+			$total_data = $row;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
         }
 
@@ -229,7 +242,8 @@ class stk16Controller extends Controller
                 "total" => $total,
                 "page" => $page,
                 "page_cnt" => $page_cnt,
-                "page_total" => count($result)
+                "page_total" => count($result),
+				"total_data" => $total_data,
             ],
             "body" => $result
         ]);

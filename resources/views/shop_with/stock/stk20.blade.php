@@ -301,15 +301,19 @@
         }
     }
 
+	const pinnedRowData = [{ dep_store_cd : "합계", qty : 0 }];
+
 	let columns = [
         {field: "idx", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"}},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {"text-align": "center"},
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+		},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, sort: null, width: 28,
             checkboxSelection: function(params) {
                 return params.data.state < 40 && params.data.state > 0;
             },
         },
-        {field: "type", headerName: "구분", pinned: 'left', cellStyle: StyleRtType, width: 70,
+        {field: "type", headerName: "RT구분", pinned: 'left', cellStyle: StyleRtType, width: 70,
             cellRenderer: function(params) {
                 return params.value === 'R' ? '본사요청RT' : params.value === 'G' ? '매장요청RT' : '';
             }
@@ -345,9 +349,11 @@
         {field: "price", headerName: "현재가", width: 60, type: "currencyType"},
         {field: "qty", headerName: "수량", type: "currencyType", width: 60, cellStyle: {"font-weight": "700"},
             cellRenderer: function(params) {
-                    if (params.value !== undefined) {
-                        return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
-                    }
+				if (params.node.rowPinned === 'top') {
+					return params.value ?? 0;
+				} else {
+					return '<a href="#" onclick="return openShopStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
+				}
             }
         },
         {field: "req_rt", headerName: "요청일시", type: "DateTimeType"},
@@ -389,6 +395,10 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle : (params) => {
+				if (params.node.rowPinned) return { "font-weight": "bold", 'background': '#eee', "border": 'none' };
+			},
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
                 if (e.column.colId == "qty") {
@@ -404,7 +414,15 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/shop/stock/stk20/search', data, 1);
+		gx.Request('/shop/stock/stk20/search', data, -1, function(d) {
+			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+			let total_data = d.head.total_data;
+			if (pinnedRow && total_data != '') {
+				gx.gridOptions.api.setPinnedTopRowData([
+					{...pinnedRow.data, ...total_data}
+				])
+			}
+		});
 	}
 
     // 접수 (10 -> 20)

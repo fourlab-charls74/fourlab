@@ -314,10 +314,14 @@
             }
         }
     }
+	
+	const pinnedRowData = [{ store_nm : "합계", qty : 0, rec_qty : 0, prc_qty : 0 }]
 
 	let columns = [
         {field: "idx", hide: true},
-        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellClass: 'hd-grid-code'},
+        {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellClass: 'hd-grid-code',
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+		},
         {field: "release_no", headerName: "출고번호",pinned:'left', hide:true},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         // 출고일자 값 : 출고상태가 요청/접수 일때 -> 출고예정일자(exp_dlv_day) | 출고상태가 출고/입고 일때 -> 출고처리일자(prc_rt)
@@ -356,27 +360,55 @@
 		{field: "price", headerName: "출고가", type: 'currencyType', width: 70,
 			editable: (params) => params.data.state > 0 && params.data.state < 30,
 			cellClass: (params) => ['hd-grid-number', params.data.state > 0 && params.data.state < 30 ? 'hd-grid-edit': ''],
-			cellRenderer: (params) => params.data.state < 0 ? '-' : Comma(params.value),
+			// cellRenderer: (params) => params.data.state < 0 ? '-' : Comma(params.value),
+			cellRenderer : function(params) {
+				if (params.node.rowPinned === 'top') {
+					return '';
+				} else {
+					return params.data.state < 0 ? '-' : Comma(params.value);
+				}
+			}
 		},
 		{field: "qty", headerName: "요청수량", type: "numberType", width: 60,
 			cellRenderer: (params) => {
-				if (params.value !== undefined) {
+				if (params.node.rowPinned === 'top') {
+					return params.value ?? 0;
+				} else {
 					return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
 				}
-				return params.value;
+				
+				
 			}
 		},
 		{field: "rec_qty", headerName: "접수수량", type: "numberType", width: 60,
 			editable: (params) => params.data.state === 10,
 			cellClass: (params) => ['hd-grid-number', params.data.state === 10 ? 'hd-grid-edit': ''],
-			cellRenderer: (params) => params.data.state < 0 ? '-' : params.value,
+			// cellRenderer: (params) => params.data.state < 0 ? '-' : params.value,
+			cellRenderer: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return params.value ?? 0;
+				} else {
+					return params.data.state < 0 ? '-' : params.value;
+				}
+
+
+			}
 		},
 		{field: "prc_qty", headerName: "출고수량", type: "numberType", width: 60,
 			editable: (params) => params.data.state === 20,
 			cellClass: (params) => ['hd-grid-number', params.data.state === 20 ? 'hd-grid-edit': ''],
-			cellRenderer: (params) => params.data.state < 0 ? '-' : params.data.state > 10 ? params.value : `<span class="text-secondary">(${params.value})</span>`,
+			// cellRenderer: (params) => params.data.state < 0 ? '-' : params.data.state > 10 ? params.value : `<span class="text-secondary">(${params.value})</span>`,
+			cellRenderer: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return params.value ?? 0;
+				} else {
+					return params.data.state < 0 ? '-' : params.data.state > 10 ? params.value : `<span class="text-secondary">(${params.value})</span>`;
+				}
+			}
 		},
-        {field: "amount", headerName: "합계", type: 'currencyType', width: 80, valueGetter: (params) => calAmount(params)},
+        {field: "amount", headerName: "합계", type: 'currencyType', width: 80, 
+			// valueGetter: (params) => calAmount(params)
+		},
 		{field: "exp_dlv_day", headerName: "출고예정일자", cellClass: 'hd-grid-code',
             // cellStyle: function(params) {return params.data.state === 10 ? {"background-color": "#ffFF99", "text-align": "center"} : {"text-align": "center"};},
             // cellRenderer: (params) => {
@@ -393,7 +425,11 @@
             //     };
             // },
             cellRenderer: function(params) {
-                return params.data.state < 20 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
+				if (params.node.rowPinned === 'top') {
+					return '';
+				} else {
+                	return params.data.state < 20 ? params.value : params.data.dlv_day?.replaceAll("-", "") + '-' + (params.value) || '' + (params.value || '');
+				}
             }
         },
         {field: "req_comment", headerName: "매장메모", width: 200},
@@ -432,14 +468,20 @@
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle : (params) => {
+				if (params.node.rowPinned) return { "font-weight": "bold", 'background': '#eee', "border": 'none' };
+			},
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
                 if (e.column.colId == "rec_qty" || e.column.colId == "prc_qty") {
                     if (isNaN(e.newValue) == true || e.newValue == "") {
                         alert("숫자만 입력가능합니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    }
-                }
+                    } else {
+						updatePinnedRow();
+					}
+				}
             }
         });
         Search();
@@ -450,7 +492,15 @@
 
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/store/stock/stk16/search', data, 1);
+		gx.Request('/store/stock/stk16/search', data, -1, function(d) {
+			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+			let total_data = d.head.total_data;
+			if (pinnedRow && total_data != '') {
+				gx.gridOptions.api.setPinnedTopRowData([
+					{...pinnedRow.data, ...total_data}
+				])
+			}
+		});
 	}
 
     function selectCurRow(fieldName, e, rowIndex) {
@@ -615,6 +665,23 @@
 			console.log(err);
 		});
 	}
+
+	const updatePinnedRow = () => {
+		let rec_qty = 0;
+		let prc_qty = 0;
+		const rows = gx.getRows();
+		if (rows && Array.isArray(rows) && rows.length > 0) {
+			rows.forEach((row, idx) => {
+				rec_qty += parseFloat(row.rec_qty);
+				prc_qty += parseFloat(row.prc_qty);
+			});
+		}
+
+		let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+		gx.gridOptions.api.setPinnedTopRowData([
+			{ ...pinnedRow.data, rec_qty: rec_qty, prc_qty: prc_qty }
+		]);
+	};
 
 </script>
 @stop

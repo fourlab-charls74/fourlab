@@ -154,12 +154,7 @@ class stk20Controller extends Controller
                 if(psr.goods_no > 0, g.goods_nm_eng, p.prd_nm_eng) as goods_nm_eng,
                 psr.prd_cd, 
                 pc.color,
-                ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+               	pc.size,
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
                 if(psr.goods_no > 0, psr.goods_opt, pc.goods_opt) as goods_opt,
                 if(psr.goods_no > 0, g.price, p.price) as price,
@@ -193,6 +188,7 @@ class stk20Controller extends Controller
 
         // pagination
         $total = 0;
+		$total_data = 0;
         $page_cnt = 0;
         if($page == 1) {
 //            $sql = "

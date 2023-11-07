@@ -20,10 +20,10 @@ const PRODUCT_STOCK_TYPE_STORE_RT = 15;
 class stk20Controller extends Controller
 {
     private $rt_states = [
-        '10' => '요청',
-        '20' => '접수',
-        '30' => '처리',
-        '40' => '완료',
+        '10' => 'RT요청',
+        '20' => 'RT접수',
+        '30' => 'RT처리중',
+        '40' => 'RT완료',
         '-10' => '거부',
     ];
 
@@ -199,19 +199,28 @@ class stk20Controller extends Controller
 
         // pagination
         $total = 0;
+		$total_data = 0;
         $page_cnt = 0;
         if($page == 1) {
             $sql = "
-                select count(*) as total
-                from product_stock_rotation psr
-                    inner join goods g on g.goods_no = psr.goods_no
-                    left outer join product_code pc on pc.prd_cd = psr.prd_cd
-                where 1=1 and psr.del_yn = 'N' $where
+				select 
+				    sum(t.qty) as qty
+					, count(*) as total
+				from (
+					select
+					    psr.idx
+					    , psr.qty
+					from product_stock_rotation psr
+						inner join goods g on g.goods_no = psr.goods_no
+						left outer join product_code pc on pc.prd_cd = psr.prd_cd
+					where 1=1 and psr.del_yn = 'N' $where
+				) t
             ";
 
             $row = DB::selectOne($sql);
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
+			$total_data = $row;
         }
 
 		return response()->json([
@@ -220,7 +229,8 @@ class stk20Controller extends Controller
 				"total" => $total,
 				"page" => $page,
 				"page_cnt" => $page_cnt,
-				"page_total" => count($result)
+				"page_total" => count($result),
+				"total_data" => $total_data
 			],
 			"body" => $result
 		]);
