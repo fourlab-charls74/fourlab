@@ -18,7 +18,7 @@
                 <div class="d-flex card-header justify-content-between">
                     <h4>수정항목</h4>
                     <div>
-                        <a href="#" onclick="addGoods()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>상품추가</a>
+{{--                        <a href="#" onclick="addGoods()" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="bx mr-1"></i>상품추가</a>--}}
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
@@ -695,11 +695,31 @@
                 ]
             },
             {field:"baesong_info_nm", headerName: "배송방식", cellStyle: DEFAULT_STYLE},
-            {field:"baesong_info", headerName: "배송업체", cellStyle: DEFAULT_STYLE},
+            {field:"baesong_info", headerName: "배송업체", cellStyle: DEFAULT_STYLE,
+				cellRenderer: (params) => {
+					if (params.value == '1') {
+						return '본사배송';
+					} else if (params.value == '2') {
+						return '입점업체배송';
+					} else {
+						return '';
+					}
+				}
+			},
             {field:"dlv_pay_type_nm", headerName: "배송비지불", cellStyle: DEFAULT_STYLE},
             {headerName:"배송비",
                 children: [
-                    {headerName: "설정", field: "dlv_fee_cfg", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
+                    {headerName: "설정", field: "dlv_fee_cfg", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'},
+						cellRenderer: (params) => {
+							if (params.value == 'S') {
+								return '쇼핑몰 설정';
+							} else if (params.value == 'G') {
+								return '상품 개별 설정';
+							} else {
+								return '';
+							}
+						}
+					},
                     {headerName: "지급", field: "dlv_fee_yn", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
                     {headerName: "금액", field: "baesong_price", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}, type:'currencyType'}
                 ]
@@ -710,10 +730,30 @@
             {field:"dlv_due_memo", headerName: "배송예정일 사유", cellStyle: DEFAULT_STYLE},
             {headerName:"적립금",
                 children: [
-                    {headerName: "설정", field: "point_cfg", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
+                    {headerName: "설정", field: "point_cfg", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'},
+						cellRenderer: (params) => {
+							if (params.value == 'S') {
+								return '쇼핑몰 설정';
+							} else if (params.value == 'G') {
+								return '상품 개별 설정';
+							} else {
+								return '';
+							}
+						}
+					},
                     {headerName: "지급", field: "point_yn", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
                     {headerName: "적립", field: "point", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}, type:'currencyType'},
-                    {headerName: "단위", field: "point_unit", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
+                    {headerName: "단위", field: "point_unit", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'},
+						cellRenderer: (params) => {
+							if (params.value == 'P') {
+								return '%';
+							} else if (params.value == 'W') {
+								return '원';
+							} else {
+								return '';
+							}
+						}
+					},
                     {headerName: "금액", field: "point_amt", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}, type:'currencyType'}
                 ]
             },
@@ -725,7 +765,17 @@
             {field:"baesong_desc", headerName: "예약/배송", cellStyle: {...DEFAULT_STYLE, ...CELL_STYLE.EDIT}, editable: true},
             {field:"opinion", headerName: "MD상품평", cellStyle: {...DEFAULT_STYLE, ...CELL_STYLE.EDIT}, editable: true},
             {field:"restock_yn", headerName: "재입고알림", cellStyle: DEFAULT_STYLE},
-            {field:"tax_yn", headerName: "과세구분", cellStyle: DEFAULT_STYLE},
+            {field:"tax_yn", headerName: "과세구분", cellStyle: DEFAULT_STYLE,
+				cellRenderer: (params) => {
+					if (params.value == 'Y') {
+						return '과세';
+					} else if (params.value == 'N') {
+						return '면세';
+					} else {
+						return '';
+					}
+				}
+			},
             {field:"goods_location", headerName: "상품위치", cellStyle: {...DEFAULT_STYLE, ...CELL_STYLE.EDIT}, editable: true},
             {field:"tags", headerName: "상품태그", cellStyle: {...DEFAULT_STYLE, ...CELL_STYLE.EDIT}, editable: true},
             {headerName:"신상품적응일",
