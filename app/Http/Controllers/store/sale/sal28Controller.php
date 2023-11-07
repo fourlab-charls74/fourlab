@@ -76,6 +76,7 @@ class sal28Controller extends Controller
 						select
 							hst.stock_state_date
 						from product_stock_hst hst
+						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N'
 						where
 							hst.location_type = 'STORAGE'
 							and hst.stock_state_date >= :sdate and hst.stock_state_date <= :edate
@@ -133,6 +134,7 @@ class sal28Controller extends Controller
 						sum(if(hst.type = 14, hst.qty * -1, 0)) as loss_qty,					-- LOSS
 						sum(hst.qty) as qty														-- 기간재고
 					from product_stock_hst hst
+						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N'
 						inner join storage s on s.storage_cd = hst.location_cd
 					where
 						hst.location_type = 'STORAGE'
