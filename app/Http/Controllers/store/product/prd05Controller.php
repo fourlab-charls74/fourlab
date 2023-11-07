@@ -792,7 +792,7 @@ class prd05Controller extends Controller
 			$prd_cd 			= $d['prd_cd'];
 			$price_kind 		= $d['price_kind'];
 			$change_kind 		= $d['change_kind'];
-			$change_val_rate 	= $d['change_val'];
+			$change_val_rate 	= preg_replace('/,/','', $d['change_val']);
 			
 			$sql = "select tag_price, price from product where prd_cd = :prd_cd";
 			$price = DB::selectOne($sql,['prd_cd' => $prd_cd]);

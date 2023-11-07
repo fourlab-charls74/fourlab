@@ -322,7 +322,10 @@
     function change_apply(is_zero = false) {
 
         let change_kind = $('#change_kind').val();
-        let change_price = parseInt($('#change_price').val()) ?? '';
+        
+		let change_price = $('#change_price').val();
+		change_price = change_price.replace(/,/g, '');
+		change_price = parseInt(change_price) ?? '';
         let price_kind = $('#price_kind').val();
         let rows = gx.getSelectedRows();
         let row = gx.getRows();
