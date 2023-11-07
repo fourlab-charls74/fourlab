@@ -471,16 +471,56 @@
             },
             {field: "head_desc", headerName: "상단홍보글", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "ad_desc", headerName: "하단홍보글", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "dlv_pay_type", headerName: "배송비지불"},
-            {field: "dlv_fee_cfg", headerName: "배송비설정"},
+            {field: "dlv_pay_type", headerName: "배송비지불",
+				cellRenderer: (params) => {
+					if (params.value == 'P') {
+						return '선불';
+					} else if (params.value == 'F') {
+						return '착불';
+					} else {
+						return '';
+					}
+				}
+			},
+            {field: "dlv_fee_cfg", headerName: "배송비설정",
+				cellRenderer: (params) => {
+					if (params.value == 'S') {
+						return '쇼핑몰 설정';
+					} else if (params.value == 'G') {
+						return '상품 개별 설정';
+					} else {
+						return '';
+					}
+				}
+			},
             {field: "bae_yn", headerName: "배송비여부"},
             {field: "baesong_price", headerName: "배송비"},
             {headerName: "적립금",
                 children: [
-                    {headerName: "설정", field: "point_cfg", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
+                    {headerName: "설정", field: "point_cfg", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'},
+						cellRenderer: (params) => {
+							if (params.value == 'S') {
+								return '쇼핑몰 설정';
+							} else if (params.value == 'G') {
+								return '상품 개별 설정';
+							} else {
+								return '';
+							}
+						}
+					},
                     {headerName: "지급", field: "point_yn", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
                     {headerName: "적립", field: "point", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}, type:'currencyType'},
-                    {headerName: "단위", field: "point_unit", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}},
+                    {headerName: "단위", field: "point_unit", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'},
+						cellRenderer: (params) => {
+							if (params.value == 'P') {
+								return '%';
+							} else if (params.value == 'W') {
+								return '원';
+							} else {
+								return '';
+							}
+						}
+					},
                     {headerName: "금액", field: "point_amt", width: 100, cellStyle:{...DEFAULT_STYLE, 'text-align': 'center'}, type:'currencyType'}
                 ]
             },
@@ -491,9 +531,29 @@
             {field: "spec_desc", headerName: "제품사양", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "baesong_desc", headerName: "예약/배송", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "opinion", headerName: "MD상품평", editable: true, cellStyle: CELL_STYLE.EDIT},
-            {field: "is_unlimited", headerName: "무한재고여부"},
+            {field: "is_unlimited", headerName: "무한재고여부",
+				cellRenderer: (params) => {
+					if (params.value == 'Y') {
+						return '수량관리 안함';
+					} else if (params.value == 'N') {
+						return '수량관리함';
+					} else {
+						return '';
+					}
+				}
+			},
             {field: "restock_yn", headerName: "재입고알림"},
-            {field: "tax_yn", headerName: "과세구분"},
+            {field: "tax_yn", headerName: "과세구분",
+				cellRenderer: (params) => {
+					if (params.value == 'Y') {
+						return '과세';
+					} else if (params.value == 'N') {
+						return '면세';
+					} else {
+						return '';
+					}
+				}
+			},
             {field: "goods_location", headerName: "상품위치", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "tags", headerName: "상품태그", editable: true, cellStyle: CELL_STYLE.EDIT},
             {field: "com_type", hide: true},
