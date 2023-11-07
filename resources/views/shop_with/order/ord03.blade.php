@@ -1,12 +1,12 @@
 @extends('shop_with.layouts.layout')
-@section('title','온라인출고등록')
+@section('title','온라인출고관리')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">온라인출고등록</h3>
+	<h3 class="d-inline-flex">온라인출고관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>/ 주문/배송처리</span>
-		<span>/ 온라인출고등록</span>
+		<span>/ 온라인출고관리</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -370,7 +370,7 @@
         },
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 135,
             cellRenderer: (params) => {
-                return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
+                return '<a href="javascript:void(0);" onclick="return openShopOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}, hide:true,
@@ -436,6 +436,7 @@
         {field: "pay_date", headerName: "입금일시", hide:true, width: 125, cellStyle: {'text-align': 'center'}},
         {field: "req_nm", headerName: "접수자", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "receipt_date", headerName: "접수일시", width: 125, cellStyle: {'text-align': 'center'}},
+        {field: "rel_date", headerName: "출고완료일시", width: 125, cellStyle: {'text-align': 'center'}},
         {field: "receipt_comment", headerName: "접수메모", hide:true, width: 150},
     ];
 </script>

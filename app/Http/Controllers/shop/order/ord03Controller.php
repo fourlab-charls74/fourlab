@@ -227,9 +227,8 @@ class ord03Controller extends Controller
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
 					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
-					
+					, o.dlv_end_date as rel_date
 					, om.r_zipcode, om.r_addr1, om.r_addr2, om.r_phone, om.r_mobile, om.dlv_msg
-					
 					$qty_sql
 				from order_receipt_product rcp
 					inner join order_receipt rc on rc.or_cd = rcp.or_cd
@@ -273,7 +272,7 @@ class ord03Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 				where rcp.reject_yn = 'N'
-					and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
 					$where
 			";

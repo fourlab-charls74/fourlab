@@ -261,6 +261,7 @@ class stk10Controller extends Controller
 
         // pagination
         $total = 0;
+		$total_data = 0;
         $page_cnt = 0;
         if($page == 1) {
             $sql = "

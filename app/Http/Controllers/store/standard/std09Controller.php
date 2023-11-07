@@ -205,12 +205,14 @@ class std09Controller extends Controller
 
     }
 
-    public function search_store_type($store_channel_cd, Request $request) {
+    public function search_store_type(Request $request) {
 
         $code = 200;
-        $store_kind     = $request->input('store_kind', '');
-
-		$rows = $this->_get_store_channel($store_channel_cd, $store_kind);
+		$store_channel_cd = $request->input('store_channel_cd', '');
+		$use_yn = $request->input('use_yn', 'Y');
+		
+		$rows = $this->_get_store_channel($store_channel_cd, $use_yn);
+		
 
 		return response()->json([
 			"code" => $code,
@@ -225,8 +227,16 @@ class std09Controller extends Controller
 
     }
 
-    public function _get_store_channel($store_channel_cd) 
+    public function _get_store_channel($store_channel_cd, $use_yn) 
 	{
+		$where = "";
+		if ($use_yn != "") {
+			if ($use_yn == 'Y') {
+				$where .= " and use_yn = 'Y' ";
+			} else if ($use_yn == 'N') {
+				$where .= " and use_yn = 'N' ";
+			}
+		}
 		$sql = "
             select 
                 idx
@@ -239,11 +249,10 @@ class std09Controller extends Controller
                 , dep
                 , use_yn
             from store_channel
-            where 1=1 and store_type = 'T' and dep = 2 and store_channel_cd = '$store_channel_cd'
+            where 1=1 and store_type = 'T' and dep = 2 and store_channel_cd = '$store_channel_cd' $where
             order by seq asc
 
 		";
-
 		$rows = DB::select($sql, ["store_channel_cd" => $store_channel_cd]);
 		return $rows;
 	}
