@@ -345,7 +345,7 @@
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
             depthExportChecker.Open({
-                depths: ['매장구분별', '매장별'],
+                depths: ['매장구분별', '매장별', '품번별'],
                 download: (level) => {
                     gx.Download('매장수불집계표_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
                 }
