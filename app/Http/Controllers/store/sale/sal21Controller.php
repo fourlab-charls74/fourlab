@@ -27,7 +27,7 @@ class sal21Controller extends Controller
 
     public function search(Request $request)
     {
-		ini_set('memory_limit', '512M');
+		ini_set('memory_limit', -1);
 		
         $sdate              = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
         $edate              = $request->input('edate', date('Y-m-d'));
