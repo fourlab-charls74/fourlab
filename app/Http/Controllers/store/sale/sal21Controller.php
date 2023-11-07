@@ -27,6 +27,8 @@ class sal21Controller extends Controller
 
     public function search(Request $request)
     {
+		ini_set('memory_limit', '512M');
+		
         $sdate              = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
         $edate              = $request->input('edate', date('Y-m-d'));
         $next_edate         = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
@@ -37,6 +39,10 @@ class sal21Controller extends Controller
         $ext_term_qty       = $request->input('ext_term_qty', ''); // 기간재고 0 제외여부
         $store_channel	    = $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
+
+		$sdate	= str_replace('-','', $sdate);
+		$edate	= str_replace('-','', $edate);
+		$next_edate	= str_replace('-','', $next_edate);
 
         $where = "";
         $store_where = "";
@@ -85,13 +91,23 @@ class sal21Controller extends Controller
 
         // having
         $having = "";
-        if ($ext_term_qty === 'true') $having .= " having 
-        (sum(ifnull(store_in.qty, 0)) != 0) 
-        or (sum(ifnull(store_return.qty, 0)) * -1 != 0) 
-        or (sum(ifnull(rt_in.qty, 0)) != 0)
-        or (sum(ifnull(rt_out.qty, 0)) * -1 != 0)
-        or (sum(ifnull(sale.qty, 0)) * -1 != 0)
-        ";
+        if ($ext_term_qty === 'true')
+			/*
+			$having .= " having 
+			(sum(ifnull(store_in.qty, 0)) != 0) 
+			or (sum(ifnull(store_return.qty, 0)) * -1 != 0) 
+			or (sum(ifnull(rt_in.qty, 0)) != 0)
+			or (sum(ifnull(rt_out.qty, 0)) * -1 != 0)
+			or (sum(ifnull(sale.qty, 0)) * -1 != 0)
+	        ";
+			*/
+			$having .= " having 
+			(store_in_qty != 0) 
+			or (store_return_qty * -1 != 0) 
+			or (rt_in_qty != 0)
+			or (rt_out_qty * -1 != 0)
+			or (sale_qty * -1 != 0)
+	        ";
         
         // ordreby
         $ord = $request->input('ord', 'desc');
@@ -109,6 +125,109 @@ class sal21Controller extends Controller
         //전체 데이터 보기(임시)
         if($page_size == -1)    $limit = "";
 
+		$sql = "
+            select 
+                p.store_cd, 
+                store.store_nm,
+                st.code_val as store_type_nm,
+                p.prd_cd, 
+                -- concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
+                pc.prd_cd_p as prd_cd_sm,
+                pc.color,
+                pc.size,
+                g.goods_no,
+                b.brand_nm, 
+                g.style_no,
+                stat.code_val as sale_stat_cl, 
+                g.goods_nm,
+                g.goods_nm_eng,
+                pc.goods_opt,
+                -- g.goods_sh,
+                p1.tag_price as goods_sh,
+                -- g.price,
+                p1.price,
+                -- g.wonga,
+                p1.wonga,
+                -- 이전재고
+                (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
+                (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * p1.tag_price as prev_sh,
+                (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * p1.price as prev_price,
+                (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * p1.wonga as prev_wonga,
+                -- 매장입고
+                sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) as store_in_qty,
+                sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) * p1.tag_price as store_in_sh,
+                sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) * p1.price as store_in_price,
+                sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) * p1.wonga as store_in_wonga,
+                -- 매장반품
+                sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 as store_return_qty,
+                sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 * p1.tag_price as store_return_sh,
+                sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 * p1.price as store_return_price,
+                sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 * p1.wonga as store_return_wonga,
+                -- 이동입고
+                sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) as rt_in_qty,
+                sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) * p1.tag_price as rt_in_sh,
+                sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) * p1.price as rt_in_price,
+                sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) * p1.wonga as rt_in_wonga,
+                -- 이동출고
+                sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 as rt_out_qty,
+                sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 * p1.tag_price as rt_out_sh,
+                sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 * p1.price as rt_out_price,
+                sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 * p1.wonga as rt_out_wonga,
+                -- 매장판매
+                sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 as sale_qty,
+                sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 * p1.tag_price as sale_sh,
+                sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 * p1.price as sale_price,
+                sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 * p1.wonga as sale_wonga,
+                -- loss
+                sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 as loss_qty,
+                sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 * p1.tag_price as loss_sh,
+                sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 * p1.price as loss_price,
+                sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 * p1.wonga as loss_wonga,
+                -- 기간재고
+                p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
+                (p.wqty - sum(ifnull(_next.qty, 0))) * p1.tag_price as term_sh,
+                (p.wqty - sum(ifnull(_next.qty, 0))) * p1.price as term_price,
+                (p.wqty - sum(ifnull(_next.qty, 0))) * p1.wonga as term_wonga,
+                -- 현재재고
+                p.wqty as current_qty
+            from product_stock_store p
+                inner join product_code pc on pc.prd_cd = p.prd_cd
+                inner join product p1 on p.prd_cd = p1.prd_cd
+                left outer join goods g on g.goods_no = p.goods_no
+                inner join store on store.store_cd = p.store_cd
+                inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = store.store_type
+                left outer join brand b on b.brand = g.brand
+                left outer join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
+                /*
+                left outer join (
+                    select idx, prd_cd, location_cd, type, qty, stock_state_date
+                    from product_stock_hst
+                    where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+                ) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
+                 */
+                left outer join product_stock_hst hst on hst.prd_cd = p.prd_cd and hst.location_cd = p.store_cd and hst.location_type = 'STORE' and hst.stock_state_date >= '$sdate' and hst.stock_state_date <= '$edate'
+                -- left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
+                -- left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
+                -- left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
+                -- left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
+                -- left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
+                -- left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
+                /*
+                left outer join (
+                    select idx, prd_cd, location_cd, type, qty, stock_state_date
+                    from product_stock_hst
+                    where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+                ) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
+                */
+                left outer join product_stock_hst _next on _next.prd_cd = p.prd_cd and _next.location_cd = p.store_cd and _next.location_type = 'STORE' and _next.stock_state_date >= '$next_edate' and _next.stock_state_date <= date_format(now(),'%Y%m%d')   
+            where ($store_where)
+                $where
+            group by p.store_cd, p.prd_cd
+            $having
+            $orderby
+            $limit
+        ";
+/*		
         $sql = "
             select 
                 p.store_cd, 
@@ -200,6 +319,7 @@ class sal21Controller extends Controller
             $orderby
             $limit
         ";
+*/
         $rows = DB::select($sql);
 
         // pagination
@@ -207,6 +327,128 @@ class sal21Controller extends Controller
         $total_data = '';
         $page_cnt = 0;
         if($page == 1) {
+			$sql = "
+                select 
+                    count(c.prd_cd) as total, 
+                    sum(goods_sh) as goods_sh,
+                    sum(price) as price,
+                    sum(wonga) as wonga,
+                    sum(prev_qty) as prev_qty,
+                    sum(prev_sh) as prev_sh,
+                    sum(prev_price) as prev_price,
+                    sum(prev_wonga) as prev_wonga,
+                    sum(store_in_qty) as store_in_qty,
+                    sum(store_in_sh) as store_in_sh,
+                    sum(store_in_price) as store_in_price,
+                    sum(store_in_wonga) as store_in_wonga,
+                    sum(store_return_qty) as store_return_qty,
+                    sum(store_return_sh) as store_return_sh,
+                    sum(store_return_price) as store_return_price,
+                    sum(store_return_wonga) as store_return_wonga,
+                    sum(rt_in_qty) as rt_in_qty,
+                    sum(rt_in_sh) as rt_in_sh,
+                    sum(rt_in_price) as rt_in_price,
+                    sum(rt_in_wonga) as rt_in_wonga,
+                    sum(rt_out_qty) as rt_out_qty,
+                    sum(rt_out_sh) as rt_out_sh,
+                    sum(rt_out_price) as rt_out_price,
+                    sum(rt_out_wonga) as rt_out_wonga,
+                    sum(sale_qty) as sale_qty,
+                    sum(sale_sh) as sale_sh,
+                    sum(sale_price) as sale_price,
+                    sum(sale_wonga) as sale_wonga,
+                    sum(loss_qty) as loss_qty,
+                    sum(loss_sh) as loss_sh,
+                    sum(loss_price) as loss_price,
+                    sum(loss_wonga) as loss_wonga,
+                    sum(term_qty) as term_qty,
+                    sum(term_sh) as term_sh,
+                    sum(term_price) as term_price,
+                    sum(term_wonga) as term_wonga
+                from (
+                    select 
+                        p.prd_cd, 
+                        -- g.goods_sh,
+                        p1.tag_price as goods_sh,
+                        -- g.price,
+                        p1.price,
+                        -- g.wonga,
+                        p1.wonga,
+                        -- 이전재고
+                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
+                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * p1.tag_price as prev_sh,
+                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * p1.price as prev_price,
+                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * p1.wonga as prev_wonga,
+                        -- 매장입고
+                        sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) as store_in_qty,
+                        sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) * p1.tag_price as store_in_sh,
+                        sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) * p1.price as store_in_price,
+                        sum(ifnull(if(hst.type = 1, hst.qty, 0), 0)) * p1.wonga as store_in_wonga,
+                        -- 매장반품
+                        sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 as store_return_qty,
+                        sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 * p1.tag_price as store_return_sh,
+                        sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 * p1.price as store_return_price,
+                        sum(ifnull(if(hst.type = 11, hst.qty, 0), 0)) * -1 * p1.wonga as store_return_wonga,
+                        -- 이동입고
+                        sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) as rt_in_qty,
+                        sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) * p1.tag_price as rt_in_sh,
+                        sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) * p1.price as rt_in_price,
+                        sum(ifnull(if(hst.type = 15 and hst.qty > 0, hst.qty, 0), 0)) * p1.wonga as rt_in_wonga,
+                        -- 이동출고
+                        sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 as rt_out_qty,
+                        sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 * p1.tag_price as rt_out_sh,
+                        sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 * p1.price as rt_out_price,
+                        sum(ifnull(if(hst.type = 15 and hst.qty < 0, hst.qty, 0), 0)) * -1 * p1.wonga as rt_out_wonga,
+                        -- 매장판매
+                        sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 as sale_qty,
+                        sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 * p1.tag_price as sale_sh,
+                        sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 * p1.price as sale_price,
+                        sum(ifnull(if(hst.type = '2' or hst.type = '5' or hst.type = '6', hst.qty, 0), 0)) * -1 * p1.wonga as sale_wonga,
+                        -- loss
+                        sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 as loss_qty,
+                        sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 * p1.tag_price as loss_sh,
+                        sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 * p1.price as loss_price,
+                        sum(ifnull(if(hst.type = 14, hst.qty, 0), 0)) * -1 * p1.wonga as loss_wonga,
+                        -- 기간재고
+                        p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
+                        (p.wqty - sum(ifnull(_next.qty, 0))) * p1.tag_price as term_sh,
+                        (p.wqty - sum(ifnull(_next.qty, 0))) * p1.price as term_price,
+                        (p.wqty - sum(ifnull(_next.qty, 0))) * p1.wonga as term_wonga,
+                        p.wqty as current_qty -- 현재재고
+                    from product_stock_store p
+                        inner join product_code pc on pc.prd_cd = p.prd_cd
+                        inner join product p1 on p1.prd_cd = p.prd_cd
+                        left outer join goods g on g.goods_no = p.goods_no
+                        inner join store on store.store_cd = p.store_cd
+                        /*
+                        left outer join (
+                            select idx, prd_cd, location_cd, type, qty, stock_state_date
+                            from product_stock_hst
+                            where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+                        ) hst on hst.location_cd = p.store_cd and hst.prd_cd = p.prd_cd
+                        */
+                        left outer join product_stock_hst hst on hst.prd_cd = p.prd_cd and hst.location_cd = p.store_cd and hst.location_type = 'STORE' and hst.stock_state_date >= '$sdate' and hst.stock_state_date <= '$edate'
+                        -- left outer join product_stock_hst store_in on store_in.idx = hst.idx and store_in.type = '1'
+                        -- left outer join product_stock_hst store_return on store_return.idx = hst.idx and store_return.type = '11'
+                        -- left outer join product_stock_hst rt_in on rt_in.idx = hst.idx and rt_in.type = '15' and rt_in.qty > 0
+                        -- left outer join product_stock_hst rt_out on rt_out.idx = hst.idx and rt_out.type = '15' and rt_out.qty < 0
+                        -- left outer join product_stock_hst sale on sale.idx = hst.idx and (sale.type = '2' or sale.type = '5' or sale.type = '6') -- 주문&교환&환불
+                        -- left outer join product_stock_hst loss on loss.idx = hst.idx and loss.type = '14'
+                        /*
+                        left outer join (
+                            select idx, prd_cd, location_cd, type, qty, stock_state_date
+                            from product_stock_hst
+                            where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+                        ) _next on _next.location_cd = p.store_cd and _next.prd_cd = p.prd_cd
+                        */
+                    	left outer join product_stock_hst _next on _next.prd_cd = p.prd_cd and _next.location_cd = p.store_cd and _next.location_type = 'STORE' and _next.stock_state_date >= '$next_edate' and _next.stock_state_date <= date_format(now(),'%Y%m%d')
+                    where ($store_where)
+                        $where
+                    group by p.store_cd, p.prd_cd
+                    $having
+                ) as c
+            ";
+/*
             $sql = "
                 select 
                     count(c.prd_cd) as total, 
@@ -318,6 +560,7 @@ class sal21Controller extends Controller
                     $having
                 ) as c
             ";
+*/
 
             $row = DB::selectOne($sql);
             $total_data = $row;
