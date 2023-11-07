@@ -283,8 +283,14 @@
 				}
 			}
 		},
-		{field: "color", headerName: "컬러", rowGroup: true, hide: true},
-		{headerName: '컬러', showRowGroup: 'color', cellRenderer: 'agGroupCellRenderer', minWidth: 80, maxWidth: 100, pinned: 'left'},
+		{field: "color", hide: true, aggFunc: 'first'},
+		{field: "prd_cd_p_color", headerName: "컬러", rowGroup: true, hide: true},
+		{headerName: '컬러', showRowGroup: 'prd_cd_p_color', minWidth: 80, maxWidth: 100, pinned: 'left',
+			cellRenderer: 'agGroupCellRenderer',
+			cellRendererParams: {
+				innerRenderer: (params) => params.node.level == 0 ? params.node?.aggData?.color : ''
+			},
+		},
 		{field: "color_nm", headerName: "컬러명", pinned:'left', width: 100, aggFunc: 'first',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
 		},
@@ -333,7 +339,8 @@
 			let data = $('form[name="search"]').serialize();
 			
 			let cols = gx.gridOptions.api.getColumnDefs().filter(c => !c.hide);
-			
+			let sort = cols.filter(col => col.sort)?.[0];
+
 			if ($("[name=ord_field]").val() === 'store') {
 				cols = cols
 					.map(c => c.showRowGroup === 'store_nm' ? c.showRowGroup : c.colId === 'store_nm' ? '' : c.colId)
@@ -345,6 +352,13 @@
 			}
 			data += "&columns=" + cols;
 			
+			if (sort) {
+				let colId = sort.colId;
+				if (colId === '0') colId = sort.showRowGroup || '';
+				data += "&sort_id=" + colId;
+				data += "&sort_type=" + sort.sort;
+			}
+
 			location.href = '/store/sale/sal29/download?' + data;
 		});
 	});

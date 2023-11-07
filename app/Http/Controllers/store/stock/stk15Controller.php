@@ -537,7 +537,10 @@ class stk15Controller extends Controller
             array_push($result, $row);
         }
 
+		$rows = [];
         foreach($result as $re) {
+			if ($re === null) continue;
+
             $prd_cd = $re->prd_cd;
             $sql = "
                 select s.storage_cd, p.prd_cd, p.wqty
@@ -547,18 +550,19 @@ class stk15Controller extends Controller
             ";
             $row = DB::select($sql);
             $re->storage_qty = $row;
+			array_push($rows, $re);
         }
 
 
         return response()->json([
             "code" => 200,
             "head" => [
-                "total" => count($result),
+                "total" => count($rows),
                 "page" => 1,
                 "page_cnt" => 1,
                 "page_total" => 1,
             ],
-            "body" => $result
+            "body" => $rows
         ]);
     }
 

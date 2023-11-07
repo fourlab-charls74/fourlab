@@ -46,7 +46,7 @@ class sal29Controller extends Controller
 		]);
 	}
 	
-	public function _get(Request $request) 
+	public function _get(Request $request, $sort_id = '', $sort_type = '') 
 	{
 		$rel 			= $request->input('rel');
 		$baebun_date 	= $request->input('baebun_date');
@@ -74,14 +74,6 @@ class sal29Controller extends Controller
 			}
 		} else {
 			$where2	.= " and ( psr.type < 0 ) ";
-		}
-
-		$groupby = "";
-
-		if ($ord_field === 'store') {
-			$groupby .= "group by p.store_cd, p.prd_cd_p, p.color";
-		} else if ($ord_field === 'product') {
-			$groupby .= "group by p.prd_cd_p, p.color, p.store_cd";
 		}
 
 		// 해당사이즈 조회 (FREE + 해당사이즈)
@@ -144,12 +136,41 @@ class sal29Controller extends Controller
 			}
 		}
 
+		$groupby = "";
+		if ($ord_field === 'store') {
+			$groupby .= "group by p.store_cd, p.prd_cd_p, p.color";
+		} else if ($ord_field === 'product') {
+			$groupby .= "group by p.prd_cd_p, p.color, p.store_cd";
+		}
+
+		$orderby = "";
+		if ($sort_id !== '') {
+			if ($ord_field === 'store') {
+				if ($sort_id === 'store_cd') {
+					$orderby = "order by store_cd " . $sort_type . ", prd_cd_p_color";
+				} else {
+					$orderby = "order by store_cd, " . $sort_id . " " . $sort_type . ", prd_cd_p_color";
+				}
+			} else if ($ord_field === 'product') {
+				if ($sort_id === 'prd_cd_p_color') {
+					$orderby = "order by prd_cd_p_color " . $sort_type . ", store_cd";
+				} else if ($sort_id === 'prd_cd_p') {
+					$orderby = "order by prd_cd_p " . $sort_type . ", color, store_cd";
+				} else if ($sort_id === 'goods_nm') {
+					$orderby = "order by goods_nm " . $sort_type . ", prd_cd_p_color, store_cd";
+				} else {
+					$orderby = "order by prd_cd_p_color, " . $sort_id . " " . $sort_type . ", store_cd";
+				}
+			}
+		}
+
 		$sql = "
 			select a.*
 				, type.code_val as baebun_type
 			    , color.code_val as color_nm
 				, s.store_nm
 				, g.goods_nm
+				, concat(a.prd_cd_p, a.color) as prd_cd_p_color
 			from (
 				select p.type, p.store_cd, p.prd_cd, p.prd_cd_p, p.goods_no, p.color, p.size_kind, p.size_kind_nm as size_kind_nm_s
 					, sum(p.qty) as qty
@@ -170,6 +191,7 @@ class sal29Controller extends Controller
 				inner join code type on type.code_kind_cd = 'REL_TYPE' and type.code_id = a.type
 				left outer join code color on color.code_kind_cd = 'PRD_CD_COLOR' and color.code_id = a.color
 				left outer join goods g on g.goods_no = a.goods_no
+			$orderby
 		";
 		$rows = DB::select($sql);
 
@@ -242,8 +264,11 @@ class sal29Controller extends Controller
 		$ord_field		= $request->input('ord_field', 'store');
 		$columns		= $request->input('columns', '');
 		$columns		= explode('^', $columns);
+		
+		$sort_id		= $request->input('sort_id', '');
+		$sort_type		= $request->input('sort_type', '');
 
-		$values = $this->_get($request);
+		$values = $this->_get($request, $sort_id, $sort_type);
 		$rows = $values['result'];
 		$size_cols = $values['sizes'];
 		
@@ -275,7 +300,7 @@ class sal29Controller extends Controller
 			return $a;
 		}, []);
 
-		$group_key = $ord_field === 'store' ? 'store_cd' : 'color';
+		$group_key = $ord_field === 'store' ? 'store_cd' : 'prd_cd_p_color';
 		$rows = array_reduce($rows, function ($a, $c) use ($group_key) {
 			if (isset($a[$c->{$group_key}])) array_push($a[$c->{$group_key}], $c);
 			else $a[$c->{$group_key}] = [$c];
@@ -318,7 +343,7 @@ class sal29Controller extends Controller
 		];
 
 		$view_url = Config::get('shop.store.view') . '/sale/sal29_excel';
-		$keys = [ 'list_key' => 'list', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 11, 'cell_height' => 25, 'freeze_row' => 'A13', 'sheet_name' => '배분현황' ];
+		$keys = [ 'list_key' => 'list', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 25, 'freeze_row' => 'A13', 'sheet_name' => '배분현황' ];
 
 		return Excel::download(new ExcelViewExport($view_url, $data, [], null, $keys), '배분현황_' . $baebun_date . '_' . $rel . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
