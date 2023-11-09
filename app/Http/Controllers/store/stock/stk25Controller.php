@@ -97,13 +97,8 @@ class stk25Controller extends Controller
                 g.goods_nm_eng,
                 o.goods_opt,
                 pc.color,
-                ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
-                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                pc.size,
+                pc.prd_cd_p as prd_cd_p,
                 (ow.qty * if(ow.ord_state = 61, -1, 1)) as qty,
                 o.price,
                 st.sale_per,
@@ -133,10 +128,11 @@ class stk25Controller extends Controller
             select 
                 sum(ow.price * ow.qty) as total_sale_amt,
                 cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt,
-                sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty) as dc_price,
-                (cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty)) as left_dc_price,
+                -- sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty) as dc_price,
+                (cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - (sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) - cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer))) as left_dc_price,
                 stas.apply_rate,
-                sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) as total_recv_amt -- 판매내역의 실결제금액
+                sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) as total_recv_amt, -- 판매내역의 실결제금액
+            	sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) - cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as dc_price
             from order_opt_wonga ow
                 inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
                 inner join order_mst om on om.ord_no = o.ord_no
