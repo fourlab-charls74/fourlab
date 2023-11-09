@@ -913,7 +913,7 @@ class cs01Controller extends Controller {
 				, ps.qty as total_qty
 				, ps.wqty as sg_qty
 				, s.unit_cost as unit_cost
-				, (s.unit_cost * s.qty) as unit_total_cost
+				, (s.unit_cost * s.exp_qty) as unit_total_cost
 				, s.cost as cost
 				, s.total_cost as total_cost
 				, s.total_cost * 1.1 as total_cost_novat
@@ -985,7 +985,7 @@ class cs01Controller extends Controller {
 			// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
 			$stk_ord_products = [];
 			if ($state == 40 && $cur_state == $state && $id == SUPER_ADMIN_ID) {
-				$stk_ord_products = DB::table('product_stock_order_product')->select('prd_cd', 'qty', 'cost', 'prd_tariff_rate')->where('stock_no', $stock_no)->get()->toArray();
+				$stk_ord_products = DB::table('product_stock_order_product')->select('prd_cd', 'exp_qty', 'qty', 'cost', 'prd_tariff_rate')->where('stock_no', $stock_no)->get()->toArray();
 			}
 
 			$ori_products = [];
@@ -1056,7 +1056,7 @@ class cs01Controller extends Controller {
 
 							// 최초 원가확정인 경우 (슈퍼권한)
 							if ($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID) {
-								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
+								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
 							}
 						} else if ($state >= 30 && $state <= 40) {
 							// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
@@ -1085,7 +1085,7 @@ class cs01Controller extends Controller {
 
 							if ($state == 40 && $cur_state < $state) {
 								// 최초 원가확정인 경우
-								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $invoice_no);
+								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
 							} else if ($state == 40 && $id == SUPER_ADMIN_ID) {
 								// 재원가확정
 								$stk_ord_product = array_reduce($stk_ord_products, function($a, $c) use ($prd_cd) { 
@@ -1093,7 +1093,7 @@ class cs01Controller extends Controller {
 									else return $a;
 								}, []);
 								if (count($stk_ord_product) > 0) $stk_ord_product = $stk_ord_product[0];
-								$this->updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product);
+								$this->updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product);
 							}
 						}
 					} else {
@@ -1245,12 +1245,12 @@ class cs01Controller extends Controller {
 		try {
 			if (
 				$stock != null
-				&& ($stk_ord_product->qty != $qty
+				&& ($stk_ord_product->exp_qty != $qty
 					|| $stk_ord_product->cost != $cost
 					|| $stk_ord_product->prd_tariff_rate != $prd_tariff_rate)
 			) {
 				// 1. 재고테이블 평균원가 및 재고총원가 값 업데이트
-				$total_old_wonga = ($ori_product_stock->wonga * $ori_product_stock->in_qty) - ($stk_ord_product->qty * $stk_ord_product->cost);
+				$total_old_wonga = ($ori_product_stock->wonga * $ori_product_stock->in_qty) - ($stk_ord_product->exp_qty * $stk_ord_product->cost);
 				$total_cur_wonga = $qty * $cost;
 				$total_wonga = $total_old_wonga + $total_cur_wonga;
 				$avg_wonga = round($total_wonga / ($stock->in_qty ?? 1));

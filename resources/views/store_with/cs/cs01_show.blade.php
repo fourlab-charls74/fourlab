@@ -375,12 +375,10 @@
         {field: "brand" ,headerName:"브랜드", width: 70, cellStyle: StyleCenter},
         {field: "total_qty", headerName: "총재고", type:'currencyType', width: 60},
         {field: "sg_qty", headerName: "창고재고", type:'currencyType', width: 60},
-        @if(@$state < 40)
         {field: "exp_qty", headerName: "수량(예정)", width: 70,
             editable: params => checkIsEditable(params),
             cellStyle: params => ({backgroundColor: checkIsEditable(params) ? '#ffff99' : 'none', textAlign: 'right'}),
         },
-        @endif
         {field: "qty", headerName: "수량(확정)", width: 70,
             editable: params => checkIsEditable(params),
             cellStyle: params => checkIsEditable(params) ? {backgroundColor: '#ffff99', textAlign: 'right'} : {textAlign: 'right', color: '#2aa876', fontWeight: 'bold'},
@@ -637,7 +635,7 @@
                     }
                     row.count = idx + 1;
                     row.income_amt = exchange_rate * row.unit_cost;
-                    row.income_total_amt = row.income_amt * row.qty;
+                    row.income_total_amt = row.income_amt * row.exp_qty;
                     return row;
                 });
                 gx.gridOptions.api.applyTransaction({ add : rows })
@@ -664,7 +662,7 @@
                     cost: a.cost + Number.parseFloat(c.cost),
                     total_cost: a.total_cost + Number.parseFloat(c.total_cost),
                     total_cost_novat: a.total_cost_novat + Number.parseFloat(c.total_cost_novat),
-                    p_custom_amt: a.p_custom_amt + Number.parseFloat((exchange_rate * (c.qty || 0) * (c.unit_cost || 0))),
+                    p_custom_amt: a.p_custom_amt + Number.parseFloat((exchange_rate * (c.exp_qty || 0) * (c.unit_cost || 0))),
                 }), { exp_qty: 0, qty: 0, unit_total_cost: 0, income_amt: 0, income_total_amt: 0, cost: 0, total_cost: 0, total_cost_novat: 0, p_custom_amt: 0 }
             );
         }
@@ -690,13 +688,14 @@
 
             let p_qty, income_total;
             const rd = gx.getRows().reduce((a, c) => {
-                if (STATE < 30) {
-                    p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
-                        : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
-                        : 0;
-                } else {
-                    p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
-                }
+				p_qty = !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) : 0;
+                // if (STATE < 30) {
+                //     p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
+                //         : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
+                //         : 0;
+                // } else {
+                //     p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
+                // }
                 income_total = (exchange_rate * (p_qty || 0) * (c.unit_cost || 0));
                 a[0] += income_total;
                 a[1] += income_total * (c.prd_tariff_rate / 100);
@@ -740,14 +739,14 @@
     async function calProduct(row, unit = "", exchange_rate = 0, freight_amt = 0, custom_amt = 0) {
         const ff = document.search;
 
-        let qty;
-        if (STATE < 30) {
-            qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) 
-                : !!(row.exp_qty != 0 && row.exp_qty) ? Number.parseInt(row.exp_qty) 
-                : 0; // 수량
-        } else {
-            qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) : 0;
-        }
+        let qty = !!(row.exp_qty != 0 && row.exp_qty) ? Number.parseInt(row.exp_qty) : 0;
+        // if (STATE < 30) {
+        //     qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) 
+        //         : !!(row.exp_qty != 0 && row.exp_qty) ? Number.parseInt(row.exp_qty) 
+        //         : 0; // 수량
+        // } else {
+        //     qty = !!(row.qty != 0 && row.qty) ? Number.parseInt(row.qty) : 0;
+        // }
         const unit_cost = Number.parseFloat(row.unit_cost || 0); // 단가
         const prd_tariff_rate = Number.parseFloat(row.prd_tariff_rate || 0); // 상품당 관세율
 
@@ -755,14 +754,14 @@
         if (exchange_rate == 0) exchange_rate = unComma(ff.exchange_rate.value || '0') || 0; // 환율
         if (freight_amt == 0) freight_amt = unComma(ff.freight_amt.value || '0') || 0; // 운임비
         if (custom_amt == 0) custom_amt = gx.getRows().reduce((a, c) => {
-            let p_qty;
-            if (STATE < 30) {
-                p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
-                    : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
-                    : 0;
-            } else {
-                p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
-            }
+            let p_qty = !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) : 0;
+            // if (STATE < 30) {
+            //     p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) 
+            //         : !!(c.exp_qty != 0 && c.exp_qty) ? Number.parseInt(c.exp_qty) 
+            //         : 0;
+            // } else {
+            //     p_qty = !!(c.qty != 0 && c.qty) ? Number.parseInt(c.qty) : 0;
+            // }
             return a + (exchange_rate * (p_qty || 0) * (c.unit_cost || 0));
         }, 0); // 신고금액
         const freight_rate = custom_amt < 1 ? 0 : Number.parseFloat(freight_amt / custom_amt); // 운임율
