@@ -260,7 +260,7 @@
 		},
 		{field: "color", headerName: "컬러", pinned:'left', width: 80, cellClass: 'hd-grid-code'},
 		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100},
-		{field: "size_kind_nm_s",	headerName: "사이즈구분", pinned:'left', width: 100, cellStyle: { "text-align": "center" }},
+		{field: "size_kind_nm_p",	headerName: "사이즈구분", pinned:'left', width: 100, cellStyle: { "text-align": "center" }},
 		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc: sumValuesFunc},
 	];
 	

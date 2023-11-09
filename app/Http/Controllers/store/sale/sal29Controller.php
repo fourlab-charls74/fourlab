@@ -172,7 +172,7 @@ class sal29Controller extends Controller
 				, g.goods_nm
 				, concat(a.prd_cd_p, a.color) as prd_cd_p_color
 			from (
-				select p.type, p.store_cd, p.prd_cd, p.prd_cd_p, p.goods_no, p.color, p.size_kind, p.size_kind_nm as size_kind_nm_s
+				select p.type, p.store_cd, p.prd_cd, p.prd_cd_p, p.goods_no, p.color, p.size_kind, p.size_kind_nm as size_kind_nm_p
 					, sum(p.qty) as qty
 					$size_sum_sql
 				from (
@@ -274,7 +274,7 @@ class sal29Controller extends Controller
 		
 		$headers = [];
 		if ($ord_field === 'store') {
-			$headers = [['배분구분', 'baebun_type'], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2], ['수량', 'qty']];
+			$headers = [['배분구분', 'baebun_type'], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2],['사이즈구분', 'size_kind_nm_p',3], ['수량', 'qty']];
 		} else if ($ord_field === 'product') {
 			$headers = [['배분구분', 'baebun_type'], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['수량', 'qty']];
 		}
