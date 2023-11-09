@@ -78,6 +78,7 @@ class ExcelOneSheetExport implements FromView, WithStyles, WithDrawings, WithTit
 
 	public function title(): string
 	{
+		if (!($this->keys['custom_sheet_name'] ?? true)) return $this->keys['sheet_name'] ?? 'Worksheet';
 		return ($this->keys['sheet_name'] ?? 'Worksheet') . '_' . (($this->data['sheet_num'] ?? 0) + 1);
 	}
 

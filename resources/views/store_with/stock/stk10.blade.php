@@ -768,7 +768,7 @@
 		axios({
 			url: '/store/stock/stk10/download-multi',
 			method: 'post',
-			data: { data: rows.map(row => ({ document_number: row.document_number, idx: row.idx })) },
+			data: { data: rows.map(row => ({ document_number: row.document_number, idx: row.idx, store_cd: row.store_cd })) },
 		}).then(function (res) {
 			window.location = '/' + res.data.file_path;
 		}).catch(function (err) {

@@ -817,11 +817,11 @@ class stk16Controller extends Controller
 					'vertical' => Alignment::VERTICAL_CENTER,
 					'horizontal' => Alignment::HORIZONTAL_CENTER
 				],
-				'font' => [ 'size' => 22, 'name' => '굴림' ]
+				'font' => [ 'size' => 11, 'name' => '굴림' ]
 			],
 			'A3:AH3' => [
 				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
-				'font' => [ 'size' => 25 ]
+				'font' => [ 'size' => 11 ]
 			],
 			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
 			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
@@ -839,25 +839,32 @@ class stk16Controller extends Controller
 			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
 			'F10:F45' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
 			'W10:AH46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
-			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 1 ] ],
-			'A46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 20 ] ],
-			'A47:A49' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 2 ] ],
-			'V5' => [ 'font' => [ 'size' => 22 ] ],
-			'V6' => [ 'font' => [ 'size' => 22 ] ],
-			'Q5' => [ 'font' => [ 'size' => 16 ] ],
-			'AH5' => [ 'font' => [ 'size' => 16 ] ],
-			'B10:Q45' => [ 'font' => [ 'size' => 18 ] ],
-			'Y10:AH45' => [ 'font' => [ 'size' => 19 ] ],
+			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'A46' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 30 ] ],
+			'A47:A49' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'V5' => [ 'font' => [ 'size' => 11 ] ],
+			'V6' => [ 'font' => [ 'size' => 11 ] ],
+			'Q5' => [ 'font' => [ 'size' => 11 ] ],
+			'AH5' => [ 'font' => [ 'size' => 11 ] ],
+			'B10:Q45' => [ 'font' => [ 'size' => 11 ] ],
+			'Y10:AH45' => [ 'font' => [ 'size' => 11 ] ],
 			'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
-			'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
+			'K1' => [ 'font' => [ 'size' => 30, 'bold' => true ] ],
 		];
 
 		$view_url = Config::get('shop.store.view') . '/stock/stk16_document';
-		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48, 'sheet_name' => ($data['store_nm'] ?? '') . '_' . $release_no ];
-		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 150 ]];
+		$keys = [
+			'list_key' => 'products',
+			'one_sheet_count' => $data['one_sheet_count'],
+			'cell_width' => 5,
+			'cell_height' => 25,
+			'sheet_name' => '(' . $release_no . ') ' . ($data['store_nm'] ?? ''),
+			'custom_sheet_name' => false
+		];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp_sample.png', 'cell' => 'P4', 'height' => 100 ]];
 
 		return new ExcelViewExport($view_url, $data, $style, $images, $keys);
 	}

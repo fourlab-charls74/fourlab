@@ -847,7 +847,7 @@ class stk10Controller extends Controller
 	{
 		$data = $request->input('data', []);
 		$data = array_reduce($data, function($a, $c) {
-			$is_already = in_array($c['document_number'], array_map(function($item) { return $item['document_number']; }, $a));
+			$is_already = in_array([$c['document_number'], $c['store_cd']], array_map(function($item) { return [$item['document_number'], $item['store_cd']]; }, $a));
 			if (!$is_already) return array_merge($a, [$c]);
 			return $a;
 		}, []);
@@ -996,11 +996,11 @@ class stk10Controller extends Controller
 					'vertical' => Alignment::VERTICAL_CENTER,
 					'horizontal' => Alignment::HORIZONTAL_CENTER
 				],
-				'font' => [ 'size' => 22, 'name' => '굴림' ]
+				'font' => [ 'size' => 11, 'name' => '굴림' ]
 			],
 			'A3:AH3' => [
 				'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ],
-				'font' => [ 'size' => 25 ]
+				'font' => [ 'size' => 11 ]
 			],
 			'A4' => [ 'alignment' => [ 'textRotation' => true ] ],
 			'R4' => [ 'alignment' => [ 'textRotation' => true ] ],
@@ -1022,21 +1022,28 @@ class stk10Controller extends Controller
 			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
 			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
 			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 70 ] ],
-			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 10 ] ],
-			'V5' => [ 'font' => [ 'size' => 18 ] ],
-			'V6' => [ 'font' => [ 'size' => 18 ] ],
-			'Q5' => [ 'font' => [ 'size' => 16 ] ],
-			'AH5' => [ 'font' => [ 'size' => 16 ] ],
-			'B10:Q47' => [ 'font' => [ 'size' => 18 ] ],
-			'Y10:AH47' => [ 'font' => [ 'size' => 19 ] ],
+			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 30 ] ],
+			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'V5' => [ 'font' => [ 'size' => 11 ] ],
+			'V6' => [ 'font' => [ 'size' => 11 ] ],
+			'Q5' => [ 'font' => [ 'size' => 11 ] ],
+			'AH5' => [ 'font' => [ 'size' => 11 ] ],
+			'B10:Q47' => [ 'font' => [ 'size' => 11 ] ],
+			'Y10:AH47' => [ 'font' => [ 'size' => 11 ] ],
 			'M2:V2' => [ 'borders' => [ 'bottom' => [ 'borderStyle' => Border::BORDER_THIN ] ] ],
-			'K1' => [ 'font' => [ 'size' => 50, 'bold' => true ] ],
+			'K1' => [ 'font' => [ 'size' => 30, 'bold' => true ] ],
 		];
 
 		$view_url = Config::get('shop.store.view') . '/stock/stk10_document';
-		$keys = [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48, 'sheet_name' => '출고거래명세서' . $document_number ];
-		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
+		$keys = [ 
+			'list_key' => 'products', 
+			'one_sheet_count' => $data['one_sheet_count'], 
+			'cell_width' => 5, 
+			'cell_height' => 25, 
+			'sheet_name' => '(출고' . $document_number . ') ' . ($data['store_nm'] ?? ''),
+			'custom_sheet_name' => false,
+		];
+		$images = [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 100 ]];
 
 		return new ExcelViewExport($view_url, $data, $style, $images, $keys);
 	}
