@@ -244,7 +244,7 @@ class ord02Controller extends Controller
 			from (
 				select
 					o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
-					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color
+					, pc.prd_cd, pc.prd_cd_p, pc.color
 					, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
@@ -270,7 +270,7 @@ class ord02Controller extends Controller
 					inner join goods g on g.goods_no = o.goods_no
 					left outer join payment p on p.ord_no = o.ord_no
 					left outer join (
-						select p.prd_cd, p.goods_no, p.goods_opt, p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt, p.color, c.code_val as color_nm
+						select p.prd_cd, p.goods_no, p.goods_opt, p.brand, p.year, p.season, p.gender, p.item, p.seq, p.opt, p.color, c.code_val as color_nm, p.prd_cd_p
 								, ifnull((
 									select s.size_cd from size s
 									where s.size_kind_cd = p.size_kind

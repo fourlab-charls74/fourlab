@@ -325,12 +325,12 @@
 							<input type="checkbox" name="send_sms_yn" id="send_sms_yn" class="custom-control-input" checked="" value="Y">
 							<label class="custom-control-label text-left" for="send_sms_yn" style="line-height:27px;justify-content:left">배송 문자 발송</label>
 						</div>
-                        <select id='u_dlvs' name='u_dlvs' class="form-control form-control-sm mr-2" style='width:120px;'>
-                            <option value="">전체</option>
-                            @foreach (@$dlvs as $dlv)
-                                <option value='{{ $dlv->code_id }}'{{ $dlv->code_id === $dlv_cd ? 'selected' : '' }}>{{ $dlv->code_val }}</option>
-                            @endforeach
-                        </select>
+{{--                        <select id='u_dlvs' name='u_dlvs' class="form-control form-control-sm mr-2" style='width:120px;'>--}}
+{{--                            <option value="">전체</option>--}}
+{{--                            @foreach (@$dlvs as $dlv)--}}
+{{--                                <option value='{{ $dlv->code_id }}'{{ $dlv->code_id === $dlv_cd ? 'selected' : '' }}>{{ $dlv->code_val }}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
                     </div>
                     <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 mr-1"></i> 온라인출고완료</a>
                     <span class="ml-2 mr-2 text-secondary">|</span>
@@ -356,13 +356,206 @@
 		</div>
 	</div>
 </div>
-
 <script language="javascript">
+
+	class GridAutoCompleteEditor {
+		constructor() {
+			this.apiUrl = '';
+			this.dataKey;
+			this.rows = [];
+			this.value = null;
+			this.params;
+			this.gridApi;
+			this.columnDefs;
+			this.colId;
+			this.cellValue;
+			this.isCanceled = true;
+
+			this.container;
+			this.input;
+			this.width = '100px';
+			this.height = '150px';
+		}
+
+		init(params) {
+			this.params = params;
+			if (params.rowData && Array.isArray(params.rowData)) this.rows = params.rowData;
+			if (params.url) this.apiUrl = params.url;
+			if (params.dataKey) this.dataKey = params.dataKey;
+
+			this.columnDefs = params.colDef;
+			this.colId = params.column?.colId;
+			this.cellValue = params.data[this.colId];
+
+			if (params.width) this.width = params.width;
+			if (params.height) this.height = params.height;
+
+			this.container = document.createElement('div');
+			this.container.setAttribute('class', 'w-100');
+			this.container.tabIndex = '0';
+
+			this.input = document.createElement('input');
+			this.input.setAttribute('class', 'border-0 p-1 h-100 form-control shadow-none');
+			this.input.style = 'width: ' + this.width;
+			if (params.value !== undefined) this.input.value = params.value;
+
+			this.gridDiv = document.createElement('div');
+			this.gridDiv.setAttribute('id', 'div-gd-auto-complete');
+			this.gridDiv.setAttribute('class', 'ag-theme-balham dark-grid');
+			this.gridDiv.style = 'height: ' + this.height;
+
+			this.pApp = new App('', { gridId: '#div-gd-auto-complete' });
+			this.gx = new HDGrid(
+				this.gridDiv,
+				[{ field: this.colId, headerName: "선택하세요.", width: "auto" }],
+				{
+					onGridReady: (e) => {
+						this.gridApi = e.api;
+						this.gridApi.sizeColumnsToFit();
+					},
+					onCellClicked: (e) => {
+						this.value = e.data;
+						this.isCanceled = false;
+						this.params.api.stopEditing();
+					}
+				}
+			);
+			this.searchValues().then(res => this.gx.setRows(res));
+
+			this.container.appendChild(this.input);
+			this.container.appendChild(this.gridDiv);
+
+			this.container.addEventListener('keydown', (event) => this.onEditorKeyDown(event));
+			this.container.addEventListener('keyup', (event) => this.onEditorKeyUp(event));
+		}
+
+		getValue() {
+			return this.value ? this.value?.[this.colId] : null;
+		}
+		getGui() {
+			return this.container;
+		}
+		isCancelAfterEnd() {
+			return this.isCanceled;
+		}
+		afterGuiAttached() {
+			this.container.focus();
+			this.input.focus();
+		}
+		destroy() {}
+		isPopup() {
+			return true;
+		}
+
+		async searchValues(keyword = '') {
+			if (this.apiUrl !== '' && keyword) {
+				return this.getResponse(this.apiUrl, keyword).then(res => {
+					return res.data.map(row => {
+						if (this.dataKey) row[this.colId] = row[this.dataKey];
+						return row;
+					});
+				}).catch(error => {
+					console.error(error);
+				});
+			}
+			if (!this.apiUrl && this.rows.length > 0) {
+				return this.rows.map(row => {
+					if (this.dataKey) row[this.colId] = row[this.dataKey];
+					return row;
+				}).filter(row => row[this.colId]?.includes(keyword));
+			}
+			return [];
+		}
+
+		async getResponse(url, keyword) {
+			return await axios({ method: 'get', url: this.apiUrl + '?keyword=' + keyword });
+		}
+
+		onEditorKeyDown(event) {
+			event.stopPropagation();
+			if (event.key === 'Enter') {
+				this.rowConfirmed();
+				return false;
+			}
+			if (event.target.nodeName === 'INPUT') {
+				if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+					if (!event.isComposing) {
+						event.preventDefault();
+						this.navigateGrid();
+					}
+				}
+			}
+			// mac os에서 전체선택(commend+A) -> 한글 한글자 입력 -> arrowdown키 입력 시 value가 강제로 변환(\u001f)되는 오류가 있습니다.
+		}
+
+		onEditorKeyUp(event) {
+			event.stopPropagation();
+			if (event.key === 'Escape') {
+				this.params.api.stopEditing();
+				this.onFocusOriginCell();
+				return false;
+			}
+			if (event.target.nodeName === 'INPUT') {
+				this.searchValues(event.target.value).then(res => this.gx.setRows(res));
+			}
+		}
+
+		rowConfirmed() {
+			if (this.gridApi.getDisplayedRowAtIndex(0)) {
+				if (this.gridApi.getFocusedCell() && this.gridApi.getFocusedCell().rowIndex !== undefined) {
+					this.value = this.gridApi.getDisplayedRowAtIndex(this.gridApi.getFocusedCell().rowIndex).data;
+				} else {
+					if (this.input.value === '') {
+						this.value = null;
+					} else {
+						this.value = this.gridApi.getDisplayedRowAtIndex(0).data;
+					}
+				}
+			} else {
+				this.value = null;
+			}
+			this.isCanceled = false;
+			this.params.api.stopEditing();
+			this.onFocusOriginCell();
+		}
+
+		navigateGrid() {
+			if (this.gridApi.getFocusedCell() === undefined || this.gridApi.getFocusedCell()?.rowIndex == undefined) {
+				this.gridApi.setFocusedCell(this.gridApi.getDisplayedRowAtIndex(0)?.rowIndex, this.colId);
+				this.gridApi.getDisplayedRowAtIndex(this.gridApi.getFocusedCell().rowIndex);
+			} else {
+				this.gridApi.setFocusedCell(this.gridApi.getFocusedCell()?.rowIndex, this.colId);
+				this.gridApi.getDisplayedRowAtIndex(this.gridApi.getFocusedCell().rowIndex);
+			}
+		}
+
+		onFocusOriginCell() {
+			let cell = this.params.api.getFocusedCell();
+			if (cell) {
+				this.params.api.setFocusedCell( cell.rowIndex, cell.column );
+			}
+		}
+	}
+	
+	const dlv_companies = <?= json_encode(@$dlv_companies) ?> ;
+	
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.data.state < 30, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {'text-align': 'center'}},
         {field: "dlv_no", headerName: "송장번호", pinned: 'left', width: 120, editable: (params) => params.data.state < 30, cellStyle: (params) => ({'text-align': 'center', 'background-color': params.data.state < 30 ? '#ffff99' : 'none'})},
-        {field: "dlv_location_cd", headerName: "배송처코드", pinned: 'left', width: 70, 
+		{field: "dlv_nm", headerName: "택배사", pinned: 'left', width: 100,
+			editable: (params) => params.data.state < 30,
+			cellStyle: (params) => ({'text-align': 'center', 'background-color': params.data.state < 30 ? '#ffff99' : 'none'}),
+			cellEditor: GridAutoCompleteEditor,
+			cellEditorPopup: true,
+			cellEditorParams: {
+				cellEditor: GridAutoCompleteEditor,
+				rowData: dlv_companies,
+				dataKey: "label",
+				width: "138px",
+			}
+		},
+		{field: "dlv_location_cd", headerName: "배송처코드", pinned: 'left', width: 70, 
             cellStyle: (params) => ({'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'}),
         },
         {field: "dlv_location_nm", headerName: "배송처명", pinned: 'left', width: 100, 
@@ -450,6 +643,14 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+			defaultColDef: {
+				suppressMenu: true,
+				resizable: false,
+				autoHeight: true,
+				suppressSizeToFit: false,
+				sortable:true,
+			},
+			suppressCopyRowsToClipboard: true,
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
             },
@@ -476,7 +677,8 @@
         let rows = gx.getSelectedRows();
 
         // validation
-        if(!$("#u_dlvs").val()) return alert("택배사를 선택해주세요.");
+        // if(!$("#u_dlvs").val()) return alert("택배사를 선택해주세요.");
+		if(rows.filter(r => !r.dlv_nm).length > 0) return alert("택배사를 선택해주세요.");
         if(rows.length < 1) return alert("출고완료처리할 주문건을 선택해주세요.");
         if(rows.filter(r => r.ord_state != 20).length > 0) return alert("출고처리중 상태의 주문건만 처리가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 처리할 수 없습니다.");
@@ -489,7 +691,7 @@
             method: 'post',
             data: { 
                 send_sms_yn: $("#send_sms_yn:checked").val(),
-                u_dlvs: $("#u_dlvs").val(),
+                // u_dlvs: $("#u_dlvs").val(),
                 data: rows
             },
         }).then(function (res) {

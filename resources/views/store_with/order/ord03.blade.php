@@ -393,12 +393,12 @@
 							<input type="checkbox" name="send_sms_yn" id="send_sms_yn" class="custom-control-input" checked="" value="Y">
 							<label class="custom-control-label text-left" for="send_sms_yn" style="line-height:27px;justify-content:left">배송 문자 발송</label>
 						</div>
-                        <select id='u_dlvs' name='u_dlvs' class="form-control form-control-sm mr-2" style='width:120px;'>
-                            <option value="">전체</option>
-                            @foreach (@$dlvs as $dlv)
-                                <option value='{{ $dlv->code_id }}'{{ $dlv->code_id === $dlv_cd ? 'selected' : '' }}>{{ $dlv->code_val }}</option>
-                            @endforeach
-                        </select>
+{{--                        <select id='u_dlvs' name='u_dlvs' class="form-control form-control-sm mr-2" style='width:120px;'>--}}
+{{--                            <option value="">전체</option>--}}
+{{--                            @foreach (@$dlvs as $dlv)--}}
+{{--                                <option value='{{ $dlv->code_id }}'{{ $dlv->code_id === $dlv_cd ? 'selected' : '' }}>{{ $dlv->code_val }}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
                     </div>
                     <a href="javascript:void(0);" onclick="return completeOrder();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-check fa-sm text-white-50 mr-1"></i> 온라인출고완료</a>
                     <span class="ml-2 mr-2 text-secondary">|</span>
@@ -426,10 +426,24 @@
 </div>
 
 <script language="javascript">
+	const dlv_companies = <?= json_encode(@$dlv_companies) ?> ;
+
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.data.state < 30, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {'text-align': 'center'}},
         {field: "dlv_no", headerName: "송장번호", pinned: 'left', width: 120, editable: (params) => params.data.state < 30, cellStyle: (params) => ({'text-align': 'center', 'background-color': params.data.state < 30 ? '#ffff99' : 'none'})},
+        {field: "dlv_nm", headerName: "택배사", pinned: 'left', width: 100,
+			editable: (params) => params.data.state < 30,
+			cellStyle: (params) => ({'text-align': 'center', 'background-color': params.data.state < 30 ? '#ffff99' : 'none'}),
+			cellEditor: GridAutoCompleteEditor,
+			cellEditorPopup: true,
+			cellEditorParams: {
+				cellEditor: GridAutoCompleteEditor,
+				rowData: dlv_companies,
+				dataKey: "label",
+				width: "138px",
+			}
+		},
         {field: "dlv_location_cd", headerName: "배송처코드", pinned: 'left', width: 70, 
             cellStyle: (params) => ({'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'}),
         },
@@ -508,8 +522,24 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+			defaultColDef: {
+				suppressMenu: true,
+				resizable: false,
+				autoHeight: true,
+				suppressSizeToFit: false,
+				sortable:true,
+			},
+			suppressCopyRowsToClipboard: true,
             onCellValueChanged: (e) => {
                 e.node.setSelected(true);
+				// if (e.column.colId == "dlv_nm") {
+				// 	let arr = dlv_companies.filter(s => s.code_val === e.newValue);
+				// 	e.data.code_id = arr.length > 0 ? arr[0].code_id : null;
+				// 	if (!e.data.code_id) {
+				// 		e.api.redrawRows({rowNodes:[e.node]});
+				// 		gx.setFocusedWorkingCell();
+				// 	}
+				// }
             },
             isRowSelectable: (params) => {
                 return params.data.state < 30;
@@ -534,7 +564,8 @@
         let rows = gx.getSelectedRows();
 
         // validation
-        if(!$("#u_dlvs").val()) return alert("택배사를 선택해주세요.");
+        // if(!$("#u_dlvs").val()) return alert("택배사를 선택해주세요.");
+		if(rows.filter(r => !r.dlv_nm).length > 0) return alert("택배사를 선택해주세요.");
         if(rows.length < 1) return alert("출고완료처리할 주문건을 선택해주세요.");
         if(rows.filter(r => r.ord_state != 20).length > 0) return alert("출고처리중 상태의 주문건만 처리가 가능합니다.");
         if(rows.filter(r => r.ord_kind > 20).length > 0) return alert("출고보류중인 주문건은 처리할 수 없습니다.");
@@ -547,7 +578,7 @@
             method: 'post',
             data: { 
                 send_sms_yn: $("#send_sms_yn:checked").val(),
-                u_dlvs: $("#u_dlvs").val(),
+                // u_dlvs: $("#u_dlvs").val(),
                 data: rows
             },
         }).then(function (res) {

@@ -42,6 +42,7 @@ class ord03Controller extends Controller
 		$dlv_storages = DB::select($dlv_storages_sql);
 
 		$dlv_locations = $this->_get_dlv_locations($user_group);
+		$dlv_companies = DB::table('code')->where('code_kind_cd', 'DELIVERY')->select('code_id as id', 'code_val as label')->get();
 
 		$conf   = new Conf();
         $cfg_dlv_cd = $conf->getConfigValue("delivery","dlv_cd");
@@ -59,6 +60,7 @@ class ord03Controller extends Controller
 			'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
 			'rel_reject_reasons'=> SLib::getCodes('REL_REJECT_REASON'), // 출고거부사유
 			'dlv_cd'			=> $cfg_dlv_cd,
+			'dlv_companies'		=> $dlv_companies,
 			'dlvs'				=> SLib::getCodes('DELIVERY'), // 택배사목록
 			'user_group'		=> $user_group,
 			'user_groups'		=> [
@@ -254,6 +256,7 @@ class ord03Controller extends Controller
 					, o.sale_kind, o.pr_code, o.sales_com_fee, o.ord_type, o.ord_kind, p.pay_stat, p.pay_date
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm, om.r_nm
 					, s.fee_12 as dlv_store_fee -- 판매수수료율
+					, c.code_val as dlv_nm
 					$qty_sql
 				from order_receipt_product rcp
 					inner join order_receipt rc on rc.or_cd = rcp.or_cd
@@ -267,6 +270,7 @@ class ord03Controller extends Controller
 						from store s
 							inner join store_grade sg on sg.grade_cd = s.grade_cd
 					) s on s.s_store_cd = rcp.dlv_location_cd and rcp.dlv_location_type = 'STORE'
+					left outer join code c on c.code_id = o.dlv_cd and c.code_kind_cd = 'DELIVERY'
 				where rcp.reject_yn = 'N'
 					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
@@ -382,7 +386,7 @@ class ord03Controller extends Controller
 		];
 		$ord_state = 30; // 출고완료
 		$send_sms_yn = $request->input('send_sms_yn', 'N');
-		$dlv_cd = $request->input('u_dlvs', $cfg_dlv_cd);
+//		$dlv_cd = $request->input('u_dlvs', $cfg_dlv_cd);
 		$rows = $request->input('data', []);
 		$failed_rows = [];
 
@@ -392,6 +396,9 @@ class ord03Controller extends Controller
 			$order = new Order($user);
 			
 			foreach ($rows as $row) {
+				$sql = "select code_id from code where code_kind_cd = 'DELIVERY' and code_val = :code_val";
+				$dlv_cd = DB::selectOne($sql, ['code_val' => $row['dlv_nm']])->code_id ?? $cfg_dlv_cd;
+				
 				if (!isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
 					array_push($failed_rows, $row['ord_no']);
 					continue;
