@@ -389,6 +389,9 @@ class ord03Controller extends Controller
 //		$dlv_cd = $request->input('u_dlvs', $cfg_dlv_cd);
 		$rows = $request->input('data', []);
 		$failed_rows = [];
+		
+		$type = $request->input('type', '');
+		$batch_dlv_cd = $request->input('u_dlvs', $cfg_dlv_cd);
 
 		try {
             DB::beginTransaction();
@@ -396,9 +399,12 @@ class ord03Controller extends Controller
 			$order = new Order($user);
 			
 			foreach ($rows as $row) {
-				$sql = "select code_id from code where code_kind_cd = 'DELIVERY' and code_val = :code_val";
-				$dlv_cd = DB::selectOne($sql, ['code_val' => $row['dlv_nm']])->code_id ?? $cfg_dlv_cd;
-				
+				if ($type !== 'batch') {
+					$sql = "select code_id from code where code_kind_cd = 'DELIVERY' and code_val = :code_val";
+					$dlv_cd = DB::selectOne($sql, ['code_val' => $row['dlv_nm']])->code_id ?? $cfg_dlv_cd;
+				} else {
+					$dlv_cd = $batch_dlv_cd;
+				}
 				if (!isset($row['ord_no']) || !isset($row['ord_opt_no'])) {
 					array_push($failed_rows, $row['ord_no']);
 					continue;

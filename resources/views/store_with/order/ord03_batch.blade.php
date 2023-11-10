@@ -356,6 +356,7 @@
             url: '/store/order/ord03/complete',
             method: 'post',
             data: { 
+				type: 'batch',
                 send_sms_yn: $("#send_sms_yn:checked").val(),
                 u_dlvs: $("#u_dlvs").val(),
                 data: rows
