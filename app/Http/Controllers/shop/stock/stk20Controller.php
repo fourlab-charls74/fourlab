@@ -249,6 +249,8 @@ class stk20Controller extends Controller
         try {
             DB::beginTransaction();
 
+			$msg_dep_store_cd = [];
+			$msg_rec_store_cd = [];
 			foreach($data as $d) {
                 if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
@@ -262,6 +264,11 @@ class stk20Controller extends Controller
                 $prd = DB::selectOne($sql, ['prd_cd' => $d['prd_cd']]);
                 if($prd == null) continue;
 
+				$dep_store_cd = $d['dep_store_cd'];
+				$rec_store_cd = $d['store_cd'];
+				array_push($msg_dep_store_cd, $dep_store_cd);
+				array_push($msg_rec_store_cd, $rec_store_cd);
+				
                 DB::table('product_stock_rotation')
                     ->where('idx', '=', $d['idx'])
                     ->update([
@@ -356,29 +363,65 @@ class stk20Controller extends Controller
                     ]);
 
                 //RT접수 알림 전송
-                $content = $d['dep_store_nm'] . '에서 ';
-                if ($d['type'] == 'R') $content .= '요청RT를 접수하였습니다.';
-                else if ($d['type'] == 'G') $content .= '일반RT를 접수하였습니다.';
-
-                $res = DB::table('msg_store')
-                    ->insertGetId([
-                        'msg_kind' => 'RT',
-                        'sender_type' => 'S',
-                        'sender_cd' => $d['dep_store_cd'] ?? '',
-                        'reservation_yn' => 'N',
-                        'content' => $content,
-                        'rt' => now()
-                    ]);
-                
-                DB::table('msg_store_detail')
-                    ->insert([
-                        'msg_cd' => $res,
-                        'receiver_type' => 'S',
-                        'receiver_cd' => $d['store_cd'] ?? '',
-                        'check_yn' => 'N',
-                        'rt' => now()
-                    ]);
+//                $content = $d['dep_store_nm'] . '에서 ';
+//                if ($d['type'] == 'R') $content .= '요청RT를 접수하였습니다.';
+//                else if ($d['type'] == 'G') $content .= '일반RT를 접수하였습니다.';
+//
+//                $res = DB::table('msg_store')
+//                    ->insertGetId([
+//                        'msg_kind' => 'RT',
+//                        'sender_type' => 'S',
+//                        'sender_cd' => $d['dep_store_cd'] ?? '',
+//                        'reservation_yn' => 'N',
+//                        'content' => $content,
+//                        'rt' => now()
+//                    ]);
+//                
+//                DB::table('msg_store_detail')
+//                    ->insert([
+//                        'msg_cd' => $res,
+//                        'receiver_type' => 'S',
+//                        'receiver_cd' => $d['store_cd'] ?? '',
+//                        'check_yn' => 'N',
+//                        'rt' => now()
+//                    ]);
             }
+
+			/**
+			 * RT접수 시 리스트에서 여러매장을 선택 후 접수를 하면 RT가 많을 시 한 매장에 엄청난 알리미가 발송되는 문제를 막는 부분
+			 * 매장 당 1개의 알리미로 몇 개의 RT가 접수되었는지 알리미를 발송하는 부분
+			 */
+			$msg_dep_store_cnt = array_count_values($msg_dep_store_cd);
+
+			$store_dup_cnt = [];
+			foreach ($msg_dep_store_cnt as $value => $count) {
+				array_push($store_dup_cnt, $value . '^' . $count);
+			}
+
+			foreach ($store_dup_cnt as $sd) {
+				$dep_store_cnt_data = explode('^', $sd);
+				$dep_store_cd = $dep_store_cnt_data[0];
+				$dep_store_msg_cnt = $dep_store_cnt_data[1];
+
+				$res = DB::table('msg_store')
+					->insertGetId([
+						'msg_kind' => 'RT',
+						'sender_type' => 'S',
+						'sender_cd' => $dep_store_cd ?? '',
+						'reservation_yn' => 'N',
+						'content' => '매장요청RT가 '. $dep_store_msg_cnt .'건 접수되었습니다.',
+						'rt' => now()
+					]);
+
+				DB::table('msg_store_detail')
+					->insert([
+						'msg_cd' => $res,
+						'receiver_type' => 'S',
+						'receiver_cd' => $msg_rec_store_cd[0] ?? '',
+						'check_yn' => 'N',
+						'rt' => now()
+					]);
+			}
 
 			DB::commit();
             $code = 200;
