@@ -397,7 +397,7 @@
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,
-			suppressDragLeaveHidesColumns: true,
+			//suppressDragLeaveHidesColumns: true, 20231113 ceduce 그리드 날리기 + 순서병경 가능하게 
 			suppressMakeColumnVisibleAfterUnGroup: true,
 			// rowGroupPanelShow: 'always',
 		});
