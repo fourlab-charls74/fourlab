@@ -242,12 +242,12 @@
                     price: row.price,
                     recv_amt: isNaN(row.qty * row.price) ? 0 : (row.qty * row.price),
                     dlv_amt: row.dlv_amt,
-                    dlv_comment: row.dlv_comment,
+                    // dlv_comment: row.dlv_comment,
                     fee_rate: row.fee_rate,
                 };
 
 				// 하나의 row를 하나의 주문건(order_mst)로 설정 (2023-09-15)
-				orders.push({...row, cart: [cart]});
+				orders.push({...row, cart: [cart], dlv_comment: row.dlv_comment});
                 // if(i > 0) {
                 //     orders = orders.map(order => ({...order, cart: order.cart.concat(cart)}));
                 // } else {
@@ -258,6 +258,7 @@
                 failed_list.push({...row, error_code: '-101'});
             }
         });
+		console.log(orders);
 
         axios({
             url: '/store/order/ord01/batch-add',
@@ -271,7 +272,6 @@
             },
         }).then(async function (res) {
 
-			console.log(res.data.body);
             let success_list = splitOrder(res.data.body.success_list);
             let failed_list = splitOrder(res.data.body.failed_list);
             

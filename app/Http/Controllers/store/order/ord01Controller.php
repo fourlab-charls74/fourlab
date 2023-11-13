@@ -406,6 +406,7 @@ class ord01Controller extends Controller
                 dlv_cd.code_val as dlv_cm,
                 a.state,
                 a.memo,
+                a.dlv_comment,
                 a.ord_date,
                 a.sale_kind,
                 (a.price - a.sale_kind_amt) as sale_price,
@@ -467,6 +468,7 @@ class ord01Controller extends Controller
                     o.dlv_cd,
                     m.state,
                     m.memo,
+                    o.dlv_comment,
                     o.sale_kind,
                     o.pr_code,
                     o.ord_date,
@@ -810,7 +812,6 @@ class ord01Controller extends Controller
     public function _save_order($data)
     {
         $code = '200';
-
         $cfg_ratio = $data['cfg_ratio'];
         $p_ord_opt_no = $data['p_ord_opt_no'];
         $ord_type = $data['ord_type']; // 출고형태
@@ -868,7 +869,7 @@ class ord01Controller extends Controller
         $r_zip_code = $data['r_zip_code']; // 수령 우편번호
         $r_addr1 = $data['r_addr1']; // 수령 주소1
         $r_addr2 = $data['r_addr2']; // 수령 주소2
-        $dlv_msg = $data['dlv_msg']; // 출고메시지
+        $dlv_msg = $data['dlv_comment']; // 출고메시지
 
         $group_apply = $data['group_apply'];
         $dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
@@ -885,6 +886,8 @@ class ord01Controller extends Controller
         $fee_rate = $data['fee_rate'] ?? 0;
 
         $reservation_yn = $data['reservation_yn'] ?? 'N';
+		
+		$dlv_comment = $data['dlv_comment'] ?? '';
 
         ################################
         #	수기 주문번호 생성
@@ -1111,7 +1114,7 @@ class ord01Controller extends Controller
                     'dlv_cancel_date' => null,
                     'dlv_series_no' => null,
                     'ord_date' => $ord_date,
-                    'dlv_comment' => null,
+                    'dlv_comment' => $dlv_comment,
                     'admin_id' => $c_admin_id,
                     'coupon_no' => $coupon_no,
                     'com_coupon_ratio' => $com_rat,
@@ -1555,6 +1558,7 @@ class ord01Controller extends Controller
 					'out_ord_no' => $order['out_ord_no'] ?? '',
 					'ord_date' => $order['ord_date'] ?? date('Y-m-d'),
 					'fee_rate' => $order['fee_rate'] ?? ($apy_fee == 'true' ? $fee : 0),
+					'dlv_comment' => $order['dlv_comment'] ?? '',
 				]);
 
 				if ($order_result['code'] != '200') {

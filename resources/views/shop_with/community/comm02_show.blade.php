@@ -220,9 +220,8 @@
 			user_id += rows2[i].id + ',';
 		}
 		const user_info = user_id.replace(/,\s*$/, "");
-        
 
-        if(rows.length > 1 && rows2.length > 1) {
+        if(rows.length < 1 && rows2.length < 1) {
 			alert('알리미를 보내려면 1개 이상의 매장이나 사용자를 선택해주세요.');
         } else {
             const url = '/shop/community/comm02/sendMsg?store_cd=' + sc + '&user_id=' + user_info +'&check=' + check_radio;
