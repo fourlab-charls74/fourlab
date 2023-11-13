@@ -434,6 +434,8 @@ class stk13Controller extends Controller
 						'rt' => now(),
 					]);
 
+				$release_no	= DB::getPdo()->lastInsertId();
+
 				// product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
 				$store_stock_cnt = 
 					DB::table('product_stock_store')
@@ -478,6 +480,7 @@ class stk13Controller extends Controller
 						'qty' => $rel_qty2,
 						'stock_state_date' => date('Ymd'),
 						'ord_opt_no' => '',
+						'release_no'	=> $release_no,
 						'comment' => '매장입고',
 						'rt' => now(),
 						'admin_id' => $admin_id,
@@ -515,6 +518,7 @@ class stk13Controller extends Controller
                         'qty' => $rel_qty2 * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'release_no'	=> $release_no,
                         'comment' => '창고출고',
                         'rt' => now(),
                         'admin_id' => $admin_id,
