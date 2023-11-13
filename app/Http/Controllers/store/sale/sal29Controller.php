@@ -193,7 +193,7 @@ class sal29Controller extends Controller
 				left outer join goods g on g.goods_no = a.goods_no
 			$orderby
 		";
-		$rows = DB::select($sql);dd($sql);
+		$rows = DB::select($sql);
 
 		foreach ($rows as $row) {
 			$arr = array_filter((array) $row, function ($v, $k) use ($row) {
