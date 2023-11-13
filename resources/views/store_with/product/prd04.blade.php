@@ -325,9 +325,11 @@
 					},
 					cellRenderer: function(params) {
 						if (params.value === undefined) return "";
+
 						if (params.node.rowPinned === 'top') {
 							return params.value;
 						} else if (params.data) {
+							console.log(params.value);
 							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
 						} else if (params.node.aggData) {
 							return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
@@ -360,10 +362,12 @@
 				if (params.value === undefined) return "";
 				if (params.node.rowPinned === 'top') {
                     return params.value;
-                } else if (params.data) {
+                } else if (params.data && params.data.prd_cd) {
 					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
                 } else if (params.node.aggData) {
 					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+				} else {
+					return 0;
 				}
 			}
 		},

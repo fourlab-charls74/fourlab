@@ -290,8 +290,8 @@ class prd04Controller extends Controller
 				, pc.color, c.code_val as color_nm
 				, pc.size
 				, pc.goods_opt
-				, sum(pss2.qty) as qty
-				, (sum(pss2.wqty) - ifnull((
+				, ifnull(sum(pss2.qty),0) as qty
+				, (ifnull(sum(pss2.wqty),0) - ifnull((
 					select sum(qty) as qty
 					from product_stock_hst
 					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
