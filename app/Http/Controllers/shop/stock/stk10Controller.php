@@ -513,6 +513,15 @@ class stk10Controller extends Controller
                         'qty' => DB::raw('qty + ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
+
+				DB::table('product_stock_hst')
+					->where('release_no', '=', $d['idx'])
+					->where('location_type', '=', 'STORAGE')
+					->update([
+						'r_stock_state_date' => DB::raw('stock_state_date'),
+						'ut'	=> now()
+					]);
+
             }
 
 			DB::commit();

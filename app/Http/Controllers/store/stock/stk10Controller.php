@@ -391,6 +391,7 @@ class stk10Controller extends Controller
                         'qty' => ($d['qty'] ?? 0) * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'release_no'	=> $d['idx'],
                         'comment' => '창고출고',
                         'rt' => now(),
                         'admin_id' => $admin_id,
@@ -441,6 +442,7 @@ class stk10Controller extends Controller
                         'qty' => $d['qty'] ?? 0,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'release_no'	=> $d['idx'],
                         'comment' => '매장입고',
                         'rt' => now(),
                         'admin_id' => $admin_id,
@@ -540,6 +542,7 @@ class stk10Controller extends Controller
 							'qty' => ($gap_qty ?? 0) * -1,
 							'stock_state_date' => date('Ymd'),
 							'ord_opt_no' => '',
+							'release_no'	=> $d['idx'],
 							'comment' => '창고출고',
 							'rt' => now(),
 							'admin_id' => $admin_id,
@@ -568,6 +571,7 @@ class stk10Controller extends Controller
 							'qty' => $gap_qty ?? 0,
 							'stock_state_date' => date('Ymd'),
 							'ord_opt_no' => '',
+							'release_no'	=> $d['idx'],
 							'comment' => '매장입고',
 							'rt' => now(),
 							'admin_id' => $admin_id,
@@ -600,6 +604,15 @@ class stk10Controller extends Controller
                         'qty' => DB::raw('qty - ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
+
+				// HST 실재고 등록일자 생성
+				DB::table('product_stock_hst')
+					->where('release_no', '=', $d['idx'])
+					->where('location_type', '=', 'STORAGE')
+					->update([
+						'r_stock_state_date' => DB::raw('stock_state_date'),
+						'ut'	=> now()
+					]);
             }
 
 			DB::commit();
@@ -646,6 +659,15 @@ class stk10Controller extends Controller
                         'qty' => DB::raw('qty + ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
+
+				DB::table('product_stock_hst')
+					->where('release_no', '=', $d['idx'])
+					->where('location_type', '=', 'STORE')
+					->update([
+						'r_stock_state_date' => DB::raw('stock_state_date'),
+						'ut'	=> now()
+					]);
+
             }
 
 			DB::commit();
