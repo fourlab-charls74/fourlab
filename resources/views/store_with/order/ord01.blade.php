@@ -480,7 +480,7 @@
         {field: "store_nm", headerName: "주문매장", width: 100},
         {field: "baesong_kind", headerName: "배송구분", width: 60},
         {field: "state", headerName: "처리현황", width: 80},
-        {field: "memo", headerName: "메모", width: 120},
+        {field: "dlv_comment", headerName: "메모", width: 120},
         {field: "ord_date", headerName: "주문일시", type: "DateTimeType"},
         {field: "pay_date", headerName: "입금일시", type: "DateTimeType"},
         {field: "dlv_end_date", headerName: "배송일시", type: "DateTimeType"},
