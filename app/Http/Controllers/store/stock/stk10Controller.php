@@ -81,6 +81,19 @@ class stk10Controller extends Controller
             and cast(if(psr.state > 20, psr.prc_rt, if(psr.state > 10, psr.exp_dlv_day, psr.req_rt)) as date) <= '$edate'
         ";
 
+		if( isset($r['exp_date_yn']) ){
+			$exp_sdate = str_replace("-", "", $r['exp_sdate'] ?? now()->sub(1, 'week')->format('ymd'));
+			$exp_edate = str_replace("-", "", $r['exp_edate'] ?? date("ymd"));
+
+			if(strlen($exp_sdate) > 6)	$exp_sdate = substr($exp_sdate,2,6);
+			if(strlen($exp_edate) > 6)	$exp_edate = substr($exp_edate,2,6);
+			
+			$where .= "
+				and psr.exp_dlv_day >= '$exp_sdate' 
+				and psr.exp_dlv_day <= '$exp_edate'
+			";
+		}
+		
 		if($r['rel_order'] != null)
 			$where .= " and psr.rel_order like '%" . $r['rel_order'] . "'";
 		if($r['rel_type'] != null) 
@@ -472,7 +485,7 @@ class stk10Controller extends Controller
 				$update_value	= "";
 				if( $stock_release->exp_dlv_day != $d['dlv_day'] ){
 					//$update_value .= " exp_dlv_day = '" . str_replace("-","",$d['dlv_day']) . "' ";	출고예정일자는 그대로 
-					$prc_rt	= $d['dlv_day'] . " 00:00:00";
+					//$prc_rt	= $d['dlv_day'] . " 00:00:00";	//231113 ceduce 출고일자는 변경되어야함
 				}
 				
 				//본사 메모 변경

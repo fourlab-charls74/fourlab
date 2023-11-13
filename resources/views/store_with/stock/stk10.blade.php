@@ -99,6 +99,41 @@
 					</div>
 				</div>
                 <div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<div class="form-group">
+								<label>
+									출고예정일
+									<input type="checkbox" name="exp_date_yn" value="Y" checked>
+								</label>
+								<div class="form-inline date-select-inbox">
+									<div class="docs-datepicker form-inline-inner input_box">
+										<div class="input-group">
+											<input type="text" class="form-control form-control-sm docs-date" name="exp_sdate" value="{{ $sdate }}" autocomplete="off" disable>
+											<div class="input-group-append">
+												<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
+													<i class="fa fa-calendar" aria-hidden="true"></i>
+												</button>
+											</div>
+										</div>
+										<div class="docs-datepicker-container"></div>
+									</div>
+									<span class="text_line">~</span>
+									<div class="docs-datepicker form-inline-inner input_box">
+										<div class="input-group">
+											<input type="text" class="form-control form-control-sm docs-date" name="exp_edate" value="{{ $edate }}" autocomplete="off">
+											<div class="input-group-append">
+												<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+													<i class="fa fa-calendar" aria-hidden="true"></i>
+												</button>
+											</div>
+										</div>
+										<div class="docs-datepicker-container"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="good_types">판매채널/매장구분</label>
@@ -133,22 +168,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="prd_cd">상품검색조건</label>
-                            <div class="form-inline">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="prd_cd_range" name='prd_cd_range'>
-                                        <input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
-                                        <a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="prd_cd">상품검색조건</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+										<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+										<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="prd_cd">바코드</label>
@@ -166,17 +201,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="goods_nm_eng">상품명(영문)</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="row">
-                    
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="item">품목</label>
@@ -232,6 +258,15 @@
                     </div>
                 </div>
                 <div class="row search-area-ext d-none">
+
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="goods_nm_eng">상품명(영문)</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="name">공급업체</label>
