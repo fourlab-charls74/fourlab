@@ -292,6 +292,9 @@
 				innerRenderer: (params) => params.node.level == 0 ? params.node?.aggData?.color : ''
 			},
 		},
+		{field: "color_cd", headerName: "컬러코드", pinned:'left', width: 60, aggFunc: 'first',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+		},
 		{field: "color_nm", headerName: "컬러명", pinned:'left', width: 100, aggFunc: 'first',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
 		},

@@ -166,6 +166,7 @@ class sal29Controller extends Controller
 
 		$sql = "
 			select a.*
+			    , a.color as color_cd
 			    , a.qty as qty_tot
 				, type.code_val as baebun_type
 			    , color.code_val as color_nm
@@ -277,7 +278,7 @@ class sal29Controller extends Controller
 		if ($ord_field === 'store') {
 			$headers = [['배분구분', 'baebun_type'], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2],['사이즈구분', 'size_kind_nm_p',3],['수량합계', 'qty_tot'], ['수량', 'qty']];
 		} else if ($ord_field === 'product') {
-			$headers = [['배분구분', 'baebun_type'], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color'], ['컬러명', 'color_nm', 2], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['수량', 'qty']];
+			$headers = [['배분구분', 'baebun_type'], ['품번', 'prd_cd_p', 2], ['상품명', 'goods_nm', 5], ['컬러', 'color_cd'], ['컬러명', 'color_nm', 2], ['매장코드', 'store_cd'], ['매장명', 'store_nm', 2], ['수량', 'qty']];
 		}
 
 		$headers = array_reduce($columns, function ($a, $c) use ($headers, $size_cols) {
