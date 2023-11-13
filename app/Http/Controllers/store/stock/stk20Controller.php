@@ -322,6 +322,7 @@ class stk20Controller extends Controller
                         'qty' => ($d['qty'] ?? 0) * -1,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'rt_no'	=> $d['idx'],
                         'comment' => 'RT출고',
                         'rt' => now(),
                         'admin_id' => $admin_id,
@@ -373,6 +374,7 @@ class stk20Controller extends Controller
                         'qty' => $d['qty'] ?? 0,
                         'stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'rt_no'	=> $d['idx'],
                         'comment' => 'RT입고',
                         'rt' => now(),
                         'admin_id' => $admin_id,
@@ -491,6 +493,15 @@ class stk20Controller extends Controller
                         'ut' => now(),
                     ]);
 
+				//RT 완료처리
+				DB::table('product_stock_hst')
+					->where('rt_no', '=', $d['idx'])
+					->where('location_cd', '=', $d['dep_store_cd'])
+					->update([
+						'r_stock_state_date' => DB::raw('stock_state_date'),
+						'ut'	=> now()
+					]);
+
                 //RT처리 알림 전송
                 $content = $d['dep_store_nm'] . '에서 ';
                 if ($d['type'] == 'R') $content .= '요청RT를 처리하였습니다.';
@@ -560,6 +571,15 @@ class stk20Controller extends Controller
                         'qty' => DB::raw('qty + ' . ($d['qty'] ?? 0)),
                         'ut' => now(),
                     ]);
+
+				//RT 완료처리
+				DB::table('product_stock_hst')
+					->where('rt_no', '=', $d['idx'])
+					->where('location_cd', '=', $d['store_cd'])
+					->update([
+						'r_stock_state_date' => DB::raw('stock_state_date'),
+						'ut'	=> now()
+					]);
             }
 
 			DB::commit();
