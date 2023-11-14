@@ -258,7 +258,6 @@
                 failed_list.push({...row, error_code: '-101'});
             }
         });
-		console.log(orders);
 
         axios({
             url: '/store/order/ord01/batch-add',
