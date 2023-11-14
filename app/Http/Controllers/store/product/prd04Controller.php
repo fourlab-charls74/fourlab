@@ -42,7 +42,8 @@ class prd04Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$store_type	= $request->input("store_type", "");
 		$store_no	= $request->input("store_no", "");
-		$ext_store_storage_qty	= $request->input("ext_store_storage_qty", "");
+		$ext_store_qty	= $request->input("ext_store_qty", ""); //매장재고 0 제외
+		$ext_storage_qty	= $request->input("ext_storage_qty", ""); // 창고재고 0 제외
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 		$storage_cd = $request->input('storage_no');
@@ -198,8 +199,12 @@ class prd04Controller extends Controller
 			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 
-		if($ext_store_storage_qty == 'true') {
-			$having .= "having (wqty) > 0 or (hqty - hwqty) > 0";
+		if($ext_store_qty == 'true' && $ext_storage_qty == 'true') {
+			$having .= "having (hqty - hwqty) > 0 and (wqty) > 0";
+		} else if ($ext_store_qty == 'true' && $ext_storage_qty != 'true') {
+			$having .= "having (hqty - hwqty) > 0";
+		} else if ($ext_store_qty != 'true' && $ext_storage_qty == 'true') {
+			$having .= "having (wqty) > 0";
 		}
 
 		$page_size	= $limit;
@@ -276,7 +281,7 @@ class prd04Controller extends Controller
 			"
 			select
 				pc.prd_cd
-				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+				, pc.prd_cd_p as prd_cd_p
 				, if(pc.goods_no = 0, '', ps.goods_no) as goods_no
 				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
