@@ -238,13 +238,13 @@
                     price: row.price,
                     recv_amt: isNaN(row.qty * row.price) ? 0 : (row.qty * row.price),
                     dlv_amt: row.dlv_amt,
-                    dlv_comment: row.dlv_comment,
+                    // dlv_comment: row.dlv_comment,
                     fee_rate: row.fee_rate,
                 };
                 if(i > 0 && row.out_ord_no === rows[i - 1].out_ord_no) {
                     orders = orders.map(order => order.out_ord_no === row.out_ord_no ? ({...order, cart: order.cart.concat(cart)}) : order);
                 } else {
-                    orders.push({...row, cart: [cart]});
+                    orders.push({...row, cart: [cart], dlv_comment: row.dlv_comment});
                 }
             } else {
                 // 매장 주문번호 미기입 시 실패처리

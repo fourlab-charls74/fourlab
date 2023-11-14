@@ -342,6 +342,7 @@ class ord01Controller extends Controller
                 dlv_cd.code_val as dlv_cm,
                 a.state,
                 a.memo,
+                a.dlv_comment,
                 a.ord_date,
                 a.sale_kind,
                 (a.price - a.sale_kind_amt) as sale_price,
@@ -405,6 +406,7 @@ class ord01Controller extends Controller
                     o.dlv_cd,
                     m.state,
                     m.memo,
+                    o.dlv_comment,
                     o.sale_kind,
                     o.pr_code,
                     o.ord_date,
@@ -782,6 +784,8 @@ class ord01Controller extends Controller
 
         $reservation_yn = $data['reservation_yn'] ?? 'N';
 
+		$dlv_comment = $data['dlv_comment'] ?? '';
+
         ################################
         #	수기 주문번호 생성
         ################################
@@ -995,7 +999,7 @@ class ord01Controller extends Controller
                     'dlv_cancel_date' => null,
                     'dlv_series_no' => null,
                     'ord_date' => $ord_date,
-                    'dlv_comment' => null,
+                    'dlv_comment' => $dlv_comment,
                     'admin_id' => $c_admin_id,
                     'coupon_no' => $coupon_no,
                     'com_coupon_ratio' => $com_rat,
@@ -1423,6 +1427,7 @@ class ord01Controller extends Controller
                     'out_ord_no' => $order['out_ord_no'] ?? '',
                     'ord_date' => $order['ord_date'] ?? date('Y-m-d'),
                     'fee_rate' => $order['fee_rate'] ?? ($apy_fee == 'true' ? $fee : 0),
+					'dlv_comment' => $order['dlv_comment'] ?? '',
                 ]);
 
                 if ($order_result['code'] != '200') {
