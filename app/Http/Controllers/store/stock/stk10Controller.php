@@ -610,7 +610,8 @@ class stk10Controller extends Controller
 					->where('release_no', '=', $d['idx'])
 					->where('location_type', '=', 'STORAGE')
 					->update([
-						'r_stock_state_date' => DB::raw('stock_state_date'),
+						//'r_stock_state_date' => DB::raw('stock_state_date'),
+						'r_stock_state_date' => date('ymd'),
 						'ut'	=> now()
 					]);
             }
@@ -664,7 +665,8 @@ class stk10Controller extends Controller
 					->where('release_no', '=', $d['idx'])
 					->where('location_type', '=', 'STORE')
 					->update([
-						'r_stock_state_date' => DB::raw('stock_state_date'),
+						//'r_stock_state_date' => DB::raw('stock_state_date'),
+						'r_stock_state_date' => date('Ymd'),
 						'ut'	=> now()
 					]);
 

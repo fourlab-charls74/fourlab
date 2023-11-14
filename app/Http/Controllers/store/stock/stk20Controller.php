@@ -498,7 +498,8 @@ class stk20Controller extends Controller
 					->where('rt_no', '=', $d['idx'])
 					->where('location_cd', '=', $d['dep_store_cd'])
 					->update([
-						'r_stock_state_date' => DB::raw('stock_state_date'),
+						//'r_stock_state_date' => DB::raw('stock_state_date'),
+						'r_stock_state_date' => date('Ymd'),
 						'ut'	=> now()
 					]);
 
@@ -577,7 +578,8 @@ class stk20Controller extends Controller
 					->where('rt_no', '=', $d['idx'])
 					->where('location_cd', '=', $d['store_cd'])
 					->update([
-						'r_stock_state_date' => DB::raw('stock_state_date'),
+						//'r_stock_state_date' => DB::raw('stock_state_date'),
+						'r_stock_state_date' => date('Ymd'),
 						'ut'	=> now()
 					]);
             }

@@ -440,7 +440,8 @@ class stk19Controller extends Controller
 						->where('release_no', '=', $release_no)
 						->where('location_type', '=', 'STORAGE')
 						->update([
-							'r_stock_state_date' => DB::raw('stock_state_date'),
+							//'r_stock_state_date' => DB::raw('stock_state_date'),
+							'r_stock_state_date' => date('Ymd'),
 							'ut'	=> now()
 						]);
 				}
@@ -798,7 +799,8 @@ class stk19Controller extends Controller
 						->where('release_no', '=', $release_no)
 						->where('location_type', '=', 'STORAGE')
 						->update([
-							'r_stock_state_date' => DB::raw('stock_state_date'),
+							//'r_stock_state_date' => DB::raw('stock_state_date'),
+							'r_stock_state_date' => date('Ymd'),
 							'ut'	=> now()
 						]);
 
