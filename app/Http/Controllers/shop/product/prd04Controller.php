@@ -64,7 +64,7 @@ class prd04Controller extends Controller
 		$where		= "";
 		$having = "";
 		$in_store_sql	= "";
-		$store_qty_sql	= "pss.wqty";
+		$store_qty_sql	= "ifnull(pss.wqty,0)";
 		$next_store_qty_sql = "";
 
 		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
@@ -148,7 +148,7 @@ class prd04Controller extends Controller
 			//$where	.= ")";
 
 			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "pss.wqty";
+			$store_qty_sql	= "ifnull(pss.wqty,0)";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -217,7 +217,7 @@ class prd04Controller extends Controller
 					where
 						-- c.code_kind_cd = 'PRD_CD_COLOR'
 						1=1
-						$where and pss.store_cd = '$store_cd'
+						$where
 					group by pc.prd_cd
 					$having
 				) a
@@ -285,7 +285,7 @@ class prd04Controller extends Controller
 			where
 				-- c.code_kind_cd = 'PRD_CD_COLOR'
 				1=1
-				$where and pss.store_cd = '$store_cd'
+				$where
 			group by pc.prd_cd
 			$having
 			$orderby

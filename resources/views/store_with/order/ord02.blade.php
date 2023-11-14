@@ -393,6 +393,14 @@
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + ord_no + '\',\'' + ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
+		{field: "user_nm", headerName: "주문자(아이디)", pinned: 'left', width: 120, cellStyle: {'text-align': 'center'},
+			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+		},
+		{field: "r_nm", headerName: "수령자", width: 70, pinned:'left', cellStyle: {'text-align': 'center'},
+			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+		},
         {field: "ord_state", headerName: "주문상태코드", hide: true,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
         },
@@ -499,14 +507,6 @@
                 }
             },
         @endforeach
-        {field: "user_nm", headerName: "주문자(아이디)", width: 120, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
-        {field: "r_nm", headerName: "수령자", width: 70, cellStyle: {'text-align': 'center'},
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-        },
         {field: "wonga", headerName: "원가", width: 60, type: "currencyType",
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			// cellRenderer: (params) => params.node.level == 0 ? Comma(params.value) : '',
