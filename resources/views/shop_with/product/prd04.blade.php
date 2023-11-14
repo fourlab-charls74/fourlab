@@ -328,7 +328,7 @@
 			groupDefaultExpanded: 0, // 0: close, 1: open
 			suppressAggFuncInHeader: true,
 			animateRows: true,
-			suppressDragLeaveHidesColumns: true,
+			// suppressDragLeaveHidesColumns: true,
 			suppressMakeColumnVisibleAfterUnGroup: true,
 			// rowGroupPanelShow: 'always',
 		});
