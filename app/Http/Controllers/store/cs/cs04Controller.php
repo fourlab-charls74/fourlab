@@ -175,7 +175,9 @@ class cs04Controller extends Controller
                             'wonga' => $row->wonga,
                             'qty' => ($row->return_qty ?? 0) * -1,
                             'stock_state_date' => date('Ymd'),
+							'r_stock_state_date'	=> date('Ymd'),
                             'ord_opt_no' => '',
+							'storage_return_no'	=> $row->sgr_prd_cd,
                             'comment' => '상품이동',
                             'rt' => now(),
                             'admin_id' => $admin_id,
@@ -224,8 +226,10 @@ class cs04Controller extends Controller
                                 'price' => $row->price,
                                 'wonga' => $row->wonga,
                                 'qty' => $row->return_qty ?? 0,
-                                'stock_state_date' => date('Ymd'),
+								'stock_state_date' => date('Ymd'),
+								'r_stock_state_date' => date('Ymd'),
                                 'ord_opt_no' => '',
+								'storage_return_no'	=> $row->sgr_prd_cd,
                                 'comment' => '상품이동',
                                 'rt' => now(),
                                 'admin_id' => $admin_id,
@@ -444,6 +448,8 @@ class cs04Controller extends Controller
                         'admin_id' => $admin_id,
                     ]);
 
+				$storage_return_no	= DB::getPdo()->lastInsertId();
+
                 if($sgr_type == 'B') { // 일괄등록의 경우 등록 시 완료처리
                     // 창고 재고 차감
                     DB::table('product_stock_storage')
@@ -467,8 +473,10 @@ class cs04Controller extends Controller
                         'price' => $prd->price,
                         'wonga' => $prd->wonga,
                         'qty' => ($product['return_qty'] ?? 0) * -1,
-                        'stock_state_date' => date('Ymd'),
+						'stock_state_date' => date('Ymd'),
+						'r_stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'storage_return_no'	=> $storage_return_no,
                         'comment' => '상품이동',
                         'rt' => now(),
                         'admin_id' => $admin_id,
@@ -518,7 +526,9 @@ class cs04Controller extends Controller
                             'wonga' => $prd->wonga,
                             'qty' => $product['return_qty'] ?? 0,
                             'stock_state_date' => date('Ymd'),
+							'r_stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
+							'storage_return_no'	=> $storage_return_no,
                             'comment' => '상품이동',
                             'rt' => now(),
                             'admin_id' => $admin_id,

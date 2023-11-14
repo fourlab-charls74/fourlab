@@ -190,6 +190,7 @@ class cs02Controller extends Controller
 							'stock_state_date' => date('Ymd'),
 							'r_stock_state_date' => date('Ymd'),
                             'ord_opt_no' => '',
+							'storage_return_no'	=> $row->sgr_prd_cd,
                             'comment' => '상품반품',
                             'rt' => now(),
                             'admin_id' => $admin_id,
@@ -444,6 +445,8 @@ class cs02Controller extends Controller
                         'admin_id' => $admin_id,
                     ]);
 
+				$storage_return_no	= DB::getPdo()->lastInsertId();
+
                 if($sgr_type == 'B') // 일괄등록의 경우 등록 시 완료처리
                 {
                     // 창고 재고 차감
@@ -471,6 +474,7 @@ class cs02Controller extends Controller
 						'stock_state_date' => date('Ymd'),
 						'r_stock_state_date' => date('Ymd'),
                         'ord_opt_no' => '',
+						'storage_return_no'	=> $storage_return_no,
                         'comment' => '상품반품',
                         'rt' => now(),
                         'admin_id' => $admin_id,
