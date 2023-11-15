@@ -217,7 +217,10 @@ class ord03Controller extends Controller
 		$orderby = sprintf("order by %s %s, om.r_nm asc", $ord_field, $ord);
 
 		// pagination
-		$page_size = $limit;
+		// pagination
+		$page = $page ?? 1;
+		if ($page < 1 or $page == "") $page = 1;
+		$page_size = $limit ?? 500;
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
 
@@ -295,24 +298,34 @@ class ord03Controller extends Controller
 		// pagination
 		$total = 0;
 		$page_cnt = 0;
+		$total_data = 0;
+		
 		if($page == 1) {
 			$sql = "
-				select count(*) as total
-				from order_receipt_product rcp
-					inner join order_receipt rc on rc.or_cd = rcp.or_cd
-					inner join order_opt o on o.ord_opt_no = rcp.ord_opt_no
-					inner join order_mst om on om.ord_no = o.ord_no
-					inner join product_code pc on pc.prd_cd = rcp.prd_cd
-					inner join goods g on g.goods_no = o.goods_no
-					left outer join payment p on p.ord_no = o.ord_no
-				where rcp.reject_yn = 'N'
-					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
-					and o.clm_state in (-30,1,90,0)
-					$where
+				select
+				    count(t.or_cd) as total
+					, sum(t.qty) as qty
+				from (
+					select 
+						rcp.or_cd
+						, rcp.qty
+					from order_receipt_product rcp
+						inner join order_receipt rc on rc.or_cd = rcp.or_cd
+						inner join order_opt o on o.ord_opt_no = rcp.ord_opt_no
+						inner join order_mst om on om.ord_no = o.ord_no
+						inner join product_code pc on pc.prd_cd = rcp.prd_cd
+						inner join goods g on g.goods_no = o.goods_no
+						left outer join payment p on p.ord_no = o.ord_no
+					where rcp.reject_yn = 'N'
+						-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
+						and o.clm_state in (-30,1,90,0)
+						$where
+					) t
 			";
 			
 			$row = DB::selectOne($sql);
 			$total = $row->total;
+			$total_data = $row;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
@@ -323,7 +336,8 @@ class ord03Controller extends Controller
                 "page" => $page,
                 "page_cnt" => $page_cnt,
                 "page_total" => count($result),
-				"dlv_locations" => $dlv_locations
+				"dlv_locations" => $dlv_locations,
+				"total_data" => $total_data
             ],
             "body" => $result,
         ]);
