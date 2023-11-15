@@ -394,6 +394,7 @@ class ord04Controller extends Controller
 				'wonga' => $data['wonga'],
 				'qty' => $qty,
 				'stock_state_date' => date('Ymd'),
+				'r_stock_state_date'	=> date('Ymd'),
 				'ord_opt_no' => $data['ord_opt_no'],
 				'comment' => '온라인교환환불 재고처리',
 				'rt' => now(),
