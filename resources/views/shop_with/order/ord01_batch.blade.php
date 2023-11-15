@@ -123,9 +123,12 @@
             cellRenderer: (params) => params.value == null ? '' : params.value  == '200' ? '성공' : ('실패(' + (out_order_errors[params.value] || '') + ')')
         },
         // {field: "ord_no", headerName: "주문번호", width: 100, cellStyle: StyleLineHeight},
-        {field: "out_ord_no", headerName: "매장 주문번호", width: 100, cellStyle: StyleLineHeight},
+        // {field: "out_ord_no", headerName: "매장 주문번호", width: 100, cellStyle: StyleLineHeight},
         {field: "ord_date", headerName: "판매일", width: 80, cellStyle: StyleLineHeight},
-        {field: "prd_cd", headerName: "상품코드", width: 120, cellStyle: StyleLineHeight},
+        {field: "prd_cd", headerName: "바코드", width: 120,
+			editable: (params) => params.data.result == "-102" || params.data.result == "-101" ? true : false,
+			cellStyle: (params) => params.data.result == "-102" || params.data.result == "-101" ? {"background-color": "#ffff99"} : {}
+		},
         {field: "goods_no", headerName: "상품번호", width: 60, cellStyle: StyleLineHeight},
         {field: "goods_nm", headerName: "상품명", width: 230, cellStyle: {"line-height": "30px"},
             cellRenderer: function (params) {
@@ -136,8 +139,14 @@
             }
         },
         {field: "goods_opt", headerName: "옵션", width: 180, cellStyle: {"line-height": "30px"}},
-        {field: "qty", headerName: "수량", width: 50, type: 'currencyType', cellStyle: {"line-height": "30px"}},
-        {field: "price", headerName: "판매가", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
+        {field: "qty", headerName: "수량", width: 50, type: 'currencyType',
+			editable: (params) => params.data.result == "-103" || params.data.result == "-105" ? true : false,
+			cellStyle: (params) => params.data.result == "-103" || params.data.result == "-105" ? {"background-color": "#ffff99"} : {}
+		},
+        {field: "price", headerName: "판매가", width: 60, type: 'currencyType',
+			editable: (params) => params.data.result == "-104" ? true : false,
+			cellStyle: (params) => params.data.result == "-104" ? {"background-color": "#ffff99"} : {}
+		},
         {field: "dlv_amt", headerName: "배송비", width: 60, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "add_dlv_amt", headerName: "추가배송비", width: 70, type: 'currencyType', cellStyle: {"line-height": "30px"}},
         {field: "pay_type", headerName: "결제방법", width: 60, cellStyle: StyleLineHeight,

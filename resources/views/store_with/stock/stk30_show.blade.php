@@ -348,8 +348,6 @@
             }
             if(rows.length < 1) return alert("반품등록할 상품을 선택해주세요.");
 
-			if (rows.filter(r => r.qty === 0).length > 0) return alert("요청수량이 0인 상품이 있습니다.");
-
             let excess_qtys = rows.filter(r => (r.qty * 1) > (r.store_wqty * 1));
             // if(excess_qtys.length > 0) return alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 
@@ -541,16 +539,21 @@
     function UpgradeState(new_state) {
 		let rows = gx.getRows();
 		let title = new_state === 30 ? '반품처리중' : new_state === 40 ? '반품완료' : '';
-		if (rows.filter(r => r.return_p_qty === 0).length > 0) return alert("처리수량이 0인 상품이 있습니다.");
-		if (new_state == 40) {
-			if (rows.filter(r => r.fixed_return_qty === 0).length > 0) return alert("확정수량이 0인 상품이 있습니다.");
+		
+		if(new_state == 30) {
+			if (rows.filter(r => r.return_p_qty == 0 || r.return_p_qty == '0').length > 0) {
+				if (!confirm("처리수량이 0인 상품이 있습니다. 그래도 반품처리하시겠습니까?")) return;
+			} else {
+				if(!confirm(title + " 상태로 변경하시겠습니까?")) return;
+			}
 		}
-		if(!confirm(title + " 상태로 변경하시겠습니까?")) return;
 
 		if (new_state == 40) {
 			let wrong_list = rows.filter(row => row.qty != row.fixed_return_qty);
 			if (wrong_list.length > 0 && !confirm("요청수량과 확정수량이 일치하지 않는 항목이 존재합니다.\n그래도 변경하시겠습니까?")) return;
-			if (rows.filter(r => r.fixed_return_qty === 0).length > 0) return alert("확정수량이 0인 상품이 있습니다.");
+			if (rows.filter(r => r.fixed_return_qty === 0).length > 0) {
+				if (!confirm("완료수량이 0인 상품이 있습니다. 그래도 반품완료하시겠습니까?")) return;
+			}
 		}
 		
 		

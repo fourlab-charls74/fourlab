@@ -1,43 +1,43 @@
 <script>
-    const out_order_errors = {
-        '-100': "매장 주문번호 없음",
-        '-101': "상품코드 없음",
-        '-102': "상품코드 부정확",
-        '-103': "수량정보 부정확",
-        '-104': "판매가 부정확",
-        '-105': "재고 부족",
-    };
+	const out_order_errors = {
+		'-100': "매장 주문번호 없음",
+		'-101': "바코드 없음",
+		'-102': "바코드 부정확",
+		'-103': "수량정보 부정확",
+		'-104': "판매가 부정확",
+		'-105': "재고 부족",
+	};
 
-    $(document).ready(function() {
-        // 파일선택 시 화면에 표기
-        $('#excel_file').on('change', function(e){
-            if (validateFile() === false) {
-                $('.custom-file-label').html("");
-                return;
-            }
-            $('.custom-file-label').html(this.files[0].name);
-        });
+	$(document).ready(function() {
+		// 파일선택 시 화면에 표기
+		$('#excel_file').on('change', function(e){
+			if (validateFile() === false) {
+				$('.custom-file-label').html("");
+				return;
+			}
+			$('.custom-file-label').html(this.files[0].name);
+		});
 
-        // 주문매장선택 시 매장정보 불러오기
-        $('#store_no').on('change', function(e) {
-            if(this.value != '') setStoreInfo(this.value);
-        })
-    });
-    
-    // 선택파일형식 검사
-    const validateFile = () => {
-        const target = $('#excel_file')[0].files;
+		// 주문매장선택 시 매장정보 불러오기
+		$('#store_no').on('change', function(e) {
+			if(this.value != '') setStoreInfo(this.value);
+		})
+	});
 
-        if (target.length > 1) return alert("파일은 1개만 올려주세요.");
+	// 선택파일형식 검사
+	const validateFile = () => {
+		const target = $('#excel_file')[0].files;
 
-        if (target === null || target.length === 0) return alert("업로드할 파일을 선택해주세요.");
+		if (target.length > 1) return alert("파일은 1개만 올려주세요.");
 
-        if (!/(.*?)\.(xlsx|XLSX)$/i.test(target[0].name)) return alert("Excel파일만 업로드해주세요.(xlsx)");
+		if (target === null || target.length === 0) return alert("업로드할 파일을 선택해주세요.");
 
-        return true;
-    };
+		if (!/(.*?)\.(xlsx|XLSX)$/i.test(target[0].name)) return alert("Excel파일만 업로드해주세요.(xlsx)");
 
-    const convertDataToWorkbook = (data) => {
+		return true;
+	};
+
+	const convertDataToWorkbook = (data) => {
 		/* convert data to binary string */
 		data = new Uint8Array(data);
 		const arr = new Array();
@@ -51,96 +51,99 @@
 		return XLSX.read(bstr, {type: "binary"});
 	};
 
-    const populateGrid = async (workbook) => {
+	const populateGrid = async (workbook) => {
 		var firstSheetName = workbook.SheetNames[0]; // our data is in the first sheet
 		var worksheet = workbook.Sheets[firstSheetName];
 
 		var excel_columns = {
-			'A': 'out_ord_no', // 매장 주문번호
+			// 'A': 'out_ord_no', // 매장 주문번호
 			'B': 'ord_date', // 주문일
-			'C': 'prd_cd', // 상품코드
-            'D': 'goods_no', // 상품번호
-            'E': 'goods_nm', // 상품명
-            'F': 'goods_opt', // 옵션
-            'G': 'qty', // 수량
-            'H': 'price', // 판매가
-            'I': 'dlv_amt', // 배송비
-            'J': 'add_dlv_amt', // 추가배송비
-            'K': 'pay_type', // 결제방법
-            'L': 'pay_date', // 입금일자
-            'M': 'bank_inpnm', // 입금자명
-            'N': 'user_id', // 주문자 ID
-            'O': 'user_nm', // 주문자명
-            'P': 'phone', // 주문자 전화
-            'Q': 'mobile', // 주문자 휴대전화
-            'R': 'r_nm', // 수령자명
-            'S': 'r_phone', // 수령자 전화
-            'T': 'r_mobile', // 수령자 휴대전화
-            'U': 'r_zipcode', // 수령 우편번호
-            'V': 'r_addr1', // 수령 주소
-            'W': 'r_addr2', // 수령 상세주소
-            'X': 'dlv_msg', // 배송메세지
-            'Y': 'dlv_cd', // 택배사
-            'Z': 'dlv_no', // 송장번호
-            'AA': 'dlv_comment', // 출고메세지
-            'AB': 'fee_rate', // 판매수수료율
+			'C': 'prd_cd', // 바코드
+			'D': 'goods_no', // 상품번호
+			'E': 'goods_nm', // 상품명
+			'F': 'goods_opt', // 옵션
+			'G': 'qty', // 수량
+			'H': 'price', // 판매가
+			'I': 'dlv_amt', // 배송비
+			'J': 'add_dlv_amt', // 추가배송비
+			'K': 'pay_type', // 결제방법
+			'L': 'pay_date', // 입금일자
+			'M': 'bank_inpnm', // 입금자명
+			'N': 'user_id', // 주문자 ID
+			'O': 'user_nm', // 주문자명
+			'P': 'phone', // 주문자 전화
+			'Q': 'mobile', // 주문자 휴대전화
+			'R': 'r_nm', // 수령자명
+			'S': 'r_phone', // 수령자 전화
+			'T': 'r_mobile', // 수령자 휴대전화
+			'U': 'r_zipcode', // 수령 우편번호
+			'V': 'r_addr1', // 수령 주소
+			'W': 'r_addr2', // 수령 상세주소
+			'X': 'dlv_msg', // 배송메세지
+			'Y': 'dlv_cd', // 택배사
+			'Z': 'dlv_no', // 송장번호
+			'AA': 'dlv_comment', // 출고메세지
+			'AB': 'fee_rate', // 판매수수료율
 		}
 
-        var firstRowIndex = 4; // 엑셀 4행부터 시작 (샘플데이터 참고)
-		var rowIndex = firstRowIndex; 
+		var firstRowIndex = 4; // 엑셀 4행부터 시작 (샘플데이터 참고)
+		var rowIndex = firstRowIndex;
 
-        let count = gx.gridOptions.api.getDisplayedRowCount();
-        let rows = [];
+		let count = gx.gridOptions.api.getDisplayedRowCount();
+		let rows = [];
 
-		while (worksheet['A' + rowIndex]) {
+		while (worksheet['C' + rowIndex]) {
 			let row = {};
 			Object.keys(excel_columns).forEach((column) => {
-                let item = worksheet[column + rowIndex];
+				let item = worksheet[column + rowIndex];
 				if(item !== undefined && item.w) {
 					row[excel_columns[column]] = item.w;
 				}
 			});
-        
-            rows.push({ ...row, count: ++count });
-            rowIndex++;
+
+			rows.push({ ...row, count: ++count });
+			rowIndex++;
 		}
 
-        if(rows.length < 1) return alert("한 개 이상의 주문건을 입력해주세요.");
+		if(rows.length < 1) return alert("한 개 이상의 주문건을 입력해주세요.");
 
-        rows = rows
-                .sort((a, b) => a.out_ord_no - b.out_ord_no)
-                .filter(r => Object.keys(r).length > 1);
+		rows = rows.filter(r => Object.keys(r).length > 1);
+		// .sort((a, b) => a.out_ord_no - b.out_ord_no)
 
-        rows.forEach((row, i) => {
-            let prev = rows[i - 1];
-            if(i > 0 && row.out_ord_no === prev.out_ord_no) {
-                rows[i] = {
-                    ...row, 
-                    ord_date: prev.ord_date,
-                    dlv_amt: prev.dlv_amt,
-                    add_dlv_amt: prev.add_dlv_amt,
-                    pay_type: prev.pay_type,
-                    pay_date: prev.pay_date,
-                    bank_inpnm: prev.bank_inpnm,
-                    user_id: prev.user_id,
-                    user_nm: prev.user_nm,
-                    phone: prev.phone,
-                    mobile: prev.mobile,
-                    r_nm: prev.r_nm,
-                    r_phone: prev.r_phone,
-                    r_mobile: prev.r_mobile,
-                    r_zipcode: prev.r_zipcode,
-                    r_addr1: prev.r_addr1,
-                    r_addr2: prev.r_addr2,
-                    dlv_msg: prev.dlv_msg,
-                    dlv_cd: prev.dlv_cd,
-                    dlv_no: prev.dlv_no,
-                    fee_rate: prev.fee_rate,
-                }
-            }
-        });
+		// 하나의 row를 하나의 주문건(order_mst)로 설정 (2023-09-15)
+		// rows.forEach((row, i) => {
+		//     let prev = rows[i - 1];
+		//     // if(i > 0 && row.out_ord_no === prev.out_ord_no) {
+		//     if(i > 0) {
+		//         rows[i] = {
+		//             ...row, 
+		//             ord_date: prev.ord_date,
+		//             price: row.price || 0,
+		//             dlv_amt: prev.dlv_amt,
+		//             add_dlv_amt: prev.add_dlv_amt,
+		//             pay_type: prev.pay_type,
+		//             pay_date: prev.pay_date,
+		//             bank_inpnm: prev.bank_inpnm,
+		//             user_id: prev.user_id,
+		//             user_nm: prev.user_nm,
+		//             phone: prev.phone,
+		//             mobile: prev.mobile,
+		//             r_nm: prev.r_nm,
+		//             r_phone: prev.r_phone,
+		//             r_mobile: prev.r_mobile,
+		//             r_zipcode: prev.r_zipcode,
+		//             r_addr1: prev.r_addr1,
+		//             r_addr2: prev.r_addr2,
+		//             dlv_msg: prev.dlv_msg,
+		//             dlv_cd: prev.dlv_cd,
+		//             dlv_no: prev.dlv_no,
+		//             dlv_comment: row.dlv_comment || '',
+		//             fee_rate: prev.fee_rate,
+		//         }
+		//     }
+		// });
 
-        await gx.gridOptions.api.applyTransaction({ add : rows });
+		await gx.gridOptions.api.applyTransaction({ add : rows });
 	};
 
 	const makeRequest = (method, url, success, error) => {
@@ -158,7 +161,7 @@
 		httpRequest.send();
 	};
 
-    const importExcel = async (url) => {
+	const importExcel = async (url) => {
 		await makeRequest('GET',
 			url,
 			// success
@@ -168,7 +171,7 @@
 			},
 			// error
 			(error) => {
-                console.log(error);
+				console.log(error);
 			}
 		);
 	};
@@ -227,30 +230,34 @@
         let orders = [];
         let failed_list = [];
 
-        rows.forEach((row, i) => {
-            if(row.out_ord_no) {
-                let cart = {
-                    prd_cd: row.prd_cd,
-                    goods_no: row.goods_no,
-                    goods_nm: row.goods_nm,
-                    goods_opt: row.goods_opt,
-                    qty: row.qty,
-                    price: row.price,
-                    recv_amt: isNaN(row.qty * row.price) ? 0 : (row.qty * row.price),
-                    dlv_amt: row.dlv_amt,
-                    // dlv_comment: row.dlv_comment,
-                    fee_rate: row.fee_rate,
-                };
-                if(i > 0 && row.out_ord_no === rows[i - 1].out_ord_no) {
-                    orders = orders.map(order => order.out_ord_no === row.out_ord_no ? ({...order, cart: order.cart.concat(cart)}) : order);
-                } else {
-                    orders.push({...row, cart: [cart], dlv_comment: row.dlv_comment});
-                }
-            } else {
-                // 매장 주문번호 미기입 시 실패처리
-                failed_list.push({...row, error_code: '-100'});
-            }
-        });
+		rows.forEach((row, i) => {
+			if(row.prd_cd) {
+				let cart = {
+					ord_date: row.ord_date,
+					prd_cd: row.prd_cd,
+					goods_no: row.goods_no,
+					goods_nm: row.goods_nm,
+					goods_opt: row.goods_opt,
+					qty: row.qty,
+					price: row.price,
+					recv_amt: isNaN(row.qty * row.price) ? 0 : (row.qty * row.price),
+					dlv_amt: row.dlv_amt,
+					// dlv_comment: row.dlv_comment,
+					fee_rate: row.fee_rate,
+				};
+
+				// 하나의 row를 하나의 주문건(order_mst)로 설정 (2023-09-15)
+				orders.push({...row, cart: [cart], dlv_comment: row.dlv_comment});
+				// if(i > 0) {
+				//     orders = orders.map(order => ({...order, cart: order.cart.concat(cart)}));
+				// } else {
+				//     orders.push({...row, cart: [cart]});
+				// }
+			} else {
+				// 바코드 미기입 시 실패처리
+				failed_list.push({...row, error_code: '-101'});
+			}
+		});
 
         axios({
             url: '/shop/order/ord01/batch-add',

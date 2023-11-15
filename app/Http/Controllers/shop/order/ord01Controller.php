@@ -709,78 +709,79 @@ class ord01Controller extends Controller
 
     public function _save_order($data)
     {
-        $code = '200';
-
-        $cfg_ratio = $data['cfg_ratio'];
-        $p_ord_opt_no = $data['p_ord_opt_no'];
-        $ord_type = $data['ord_type']; // 출고형태
-        $ord_kind = $data['ord_kind']; // 출고구분
-        $ord_state = $data['ord_state']; // 주문상태
-        $store_cd = $data['store_cd']; // 주문매장
-        $store_nm = "본사"; // 주문매장명
-        $give_point = "N"; // 적립금지급 여부
-        if ($store_cd != '') {
-            $row = DB::table('store')->select('store_nm', 'point_in_yn')->where('store_cd', '=', $store_cd)->first();
-            if ($row != null) {
-                $store_nm = $row->store_nm;
-                $give_point = $row->point_in_yn;
-            }
-        }
+		$code = '200';
+		$cfg_ratio = $data['cfg_ratio'];
+		$p_ord_opt_no = $data['p_ord_opt_no'];
+		$ord_type = $data['ord_type']; // 출고형태
+		$ord_kind = $data['ord_kind']; // 출고구분
+		$ord_state = $data['ord_state']; // 주문상태
+		$store_cd = $data['store_cd']; // 주문매장
+		$store_nm = "본사"; // 주문매장명
+		$give_point = "N"; // 적립금지급 여부
+		if ($store_cd != '') {
+			$row = DB::table('store')->select('store_nm', 'point_in_yn')->where('store_cd', '=', $store_cd)->first();
+			if ($row != null) {
+				$store_nm = $row->store_nm;
+				$give_point = $row->point_in_yn;
+			}
+		}
 
         $cart = $data['cart']; // 상품정보
 
-        $ord_amt = 0;
-        $recv_amt = 0;
-        $point_amt = 0;
-        $coupon_amt = 0;
-        $dc_amt = 0;
-        $pay_fee = 0;
-        $dlv_amt = 0;
+		$ord_amt = 0;
+		$ord_qty = 0;
+		$recv_amt = 0;
+		$point_amt = 0;
+		$coupon_amt = 0;
+		$dc_amt = 0;
+		$pay_fee = 0;
+		$dlv_amt = 0;
 
-        $base_dlv_amt = $data['base_dlv_amt']; // 기본배송비
-        $free_dlv_amt = $data['free_dlv_amt']; // 배송비무료 금액
-        $dlv_apply = $data['dlv_apply']; // 배송비적용 여부
-        $add_dlv_fee = $data['add_dlv_fee']; // 추가배송비
-        if($add_dlv_fee == '') $add_dlv_fee = 0;
+		$base_dlv_amt = $data['base_dlv_amt']; // 기본배송비
+		$free_dlv_amt = $data['free_dlv_amt']; // 배송비무료 금액
+		$dlv_apply = $data['dlv_apply']; // 배송비적용 여부
+		$add_dlv_fee = $data['add_dlv_fee']; // 추가배송비
+		if($add_dlv_fee == '') $add_dlv_fee = 0;
 
-        $coupon_no = $data['coupon_no'];
-        $pay_type = $data['pay_type']; // 결제방법
-        $bank_inpnm = $data['bank_inpnm']; // 입금자
-        $bank_code = $data['bank_code']; // 입금은행
-        $bank_number = ""; // 계좌번호
-        if ($bank_code != "") {
-            list($bank_code, $bank_number) = explode("_", $bank_code);
-        }
+		$coupon_no = $data['coupon_no'];
+		$pay_type = $data['pay_type']; // 결제방법
+		$bank_inpnm = $data['bank_inpnm']; // 입금자
+		$bank_code = $data['bank_code']; // 입금은행
+		$bank_number = ""; // 계좌번호
+		if ($bank_code != "") {
+			list($bank_code, $bank_number) = explode("_", $bank_code);
+		}
 
-        $user_id = $data['user_id']; // 주문자 ID
-        $user_nm = $data['user_nm']; // 주문자 이름
-        $phone = $data['phone']; // 주문자 전화
-        $mobile = $data['mobile']; // 주문자 휴대전화
-        $email = DB::table("member")->select("email")->where("user_id", "=", $user_id)->first(); // 주문자 이메일
-        if($email != null) $email = $email->email;
-        else $email = "";
+		$user_id = $data['user_id']; // 주문자 ID
+		$user_nm = $data['user_nm']; // 주문자 이름
+		$phone = $data['phone']; // 주문자 전화
+		$mobile = $data['mobile']; // 주문자 휴대전화
+		$email = DB::table("member")->select("email")->where("user_id", "=", $user_id)->first(); // 주문자 이메일
+		if($email != null) $email = $email->email;
+		else $email = "";
 
-        $r_nm = $data['r_nm']; // 수령자 이름
-        $r_phone = $data['r_phone']; // 수령자 전화
-        $r_mobile = $data['r_mobile']; // 수령자 휴대전화
+		$r_nm = $data['r_nm']; // 수령자 이름
+		$r_phone = $data['r_phone']; // 수령자 전화
+		$r_mobile = $data['r_mobile']; // 수령자 휴대전화
 
-        $r_zip_code = $data['r_zip_code']; // 수령 우편번호
-        $r_addr1 = $data['r_addr1']; // 수령 주소1
-        $r_addr2 = $data['r_addr2']; // 수령 주소2
-        $dlv_msg = $data['dlv_msg']; // 출고메시지
+		$r_zip_code = $data['r_zip_code']; // 수령 우편번호
+		$r_addr1 = $data['r_addr1']; // 수령 주소1
+		$r_addr2 = $data['r_addr2']; // 수령 주소2
+		$dlv_msg = $data['dlv_comment']; // 출고메시지
 
-        $group_apply = $data['group_apply'];
-        $dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
-        $dlv_no = $data['dlv_no']; // 출고완료시 송장번호
+		$group_apply = $data['group_apply'];
+		$dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
+		$dlv_no = $data['dlv_no']; // 출고완료시 송장번호
 
-        $sale_kind = "01"; // 판매유형 (01: 일반판매)
-        $pr_code = "JS"; // 행사구분 (JS: 정상)
-        $user = $data['user'];
+		$sale_kind = "00"; // 판매유형 (00: 일반판매_실)
+		$pr_code = "01"; // 행사구분 (01: 정상_실)
+		$user = $data['user'];
 
-        $out_ord_no = $data['out_ord_no'] ?? '';
-        $ord_date = $data['ord_date'] ?? date('Y-m-d H:i:s');
-        $ord_date = date_format(date_create($ord_date), 'Y-m-d H:i:s');
-        $fee_rate = $data['fee_rate'] ?? 0;
+		$out_ord_no = $data['out_ord_no'] ?? '';
+		$ord_date = $data['ord_date'] ?? date('Y-m-d H:i:s');
+		$ord_state_date = date_format(date_create($ord_date), 'Ymd');
+		$ord_date = date_format(date_create($ord_date), 'Y-m-d H:i:s');
+		$fee_rate = $data['fee_rate'] ?? 0;
 
         $reservation_yn = $data['reservation_yn'] ?? 'N';
 
@@ -831,28 +832,29 @@ class ord01Controller extends Controller
 
         $order_opt = [];
 
-        for ($i = 0; $i < count($cart); $i++) {
-            $goods_no = $cart[$i]['goods_no'] ?? '';
-            $goods_sub = $cart[$i]['goods_sub'] ?? '';
-            if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
-            $goods_type = $cart[$i]['goods_type_cd'] ?? '';
-            $goods_price = ($cart[$i]['price'] ?? 0) - ($cart[$i]['dc_amt'] ?? 0) - ($cart[$i]['coupon_amt'] ?? 0);
-            $point = $cart[$i]['point'] ?? '';
-            $com_type = $cart[$i]['com_type'] ?? '';
-            $prd_cd = $cart[$i]['prd_cd'] ?? '';
-            $goods_opt = $cart[$i]['goods_opt'] ?? '';
-            $qty = $cart[$i]['qty'] ?? 0; // 판매수량
-            $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
-            $order_addopt_amt = $addopt_amt * $qty;
+		for ($i = 0; $i < count($cart); $i++) {
+			$goods_no = $cart[$i]['goods_no'] ?? '';
+			$goods_sub = $cart[$i]['goods_sub'] ?? '';
+			if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
+			$goods_type = $cart[$i]['goods_type_cd'] ?? '';
+			$goods_price = ($cart[$i]['price'] ?? 0) - ($cart[$i]['dc_amt'] ?? 0) - ($cart[$i]['coupon_amt'] ?? 0);
+			$sugi_price = ($cart[$i]['price'] ?? 0) * 1;
+			$point = $cart[$i]['point'] ?? '';
+			$com_type = $cart[$i]['com_type'] ?? '';
+			$prd_cd = $cart[$i]['prd_cd'] ?? '';
+			$goods_opt = $cart[$i]['goods_opt'] ?? '';
+			$qty = ($cart[$i]['qty'] ?? 0) * 1; // 판매수량
+			$addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
+			$order_addopt_amt = $addopt_amt * $qty;
 
-            $opt_ord_type = 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
+			$opt_ord_type = 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
 
-            // 옵션가격
-            $a_goods_opt = explode("|", $goods_opt);
-            $opt_amt = $cart[$i]["opt_amt"] ?? 0;
-            $order_opt_amt = $opt_amt * $qty;
+			// 옵션가격
+			$a_goods_opt = explode("|", $goods_opt);
+			$opt_amt = $cart[$i]["opt_amt"] ?? 0;
+			$order_opt_amt = $opt_amt * $qty;
 
-            $sql = "
+			$sql = "
                 select
                     a.goods_nm, a.head_desc, a.md_id, a.md_nm, b.com_nm, a.com_id, a.baesong_kind,
                     a.baesong_price, b.pay_fee/100 as com_rate, a.com_type, a.goods_type, a.is_unlimited,
@@ -861,381 +863,412 @@ class ord01Controller extends Controller
                     left outer join company b on a.com_id  = b.com_id
                 where a.goods_no = :goods_no
             ";
-            $goods = DB::selectOne($sql, ["goods_no" => $goods_no]);
+			$goods = DB::selectOne($sql, ["goods_no" => $goods_no]);
 
-            // 위탁상품인 경우, 옵션가격이 있다면 수수료율에 맞춰 원가 재계산 > 정산 시 수수료율 보정
-            if ($goods_type == "P" && ($opt_amt + $addopt_amt) > 0) {
-                $goods->wonga = ($goods_price + $opt_amt + $addopt_amt) * (1 - $goods->margin_rate / 100);
-            }
+			$product = DB::table('product')->where('prd_cd', $prd_cd)->first();
+			$product_price = $product->price ?? 0;
+			$product_wonga = $product->wonga ?? 0;
 
-            $product_stock = 0;
-            if ($store_cd != '') {
-                $row = DB::table('product_stock_store')
-                    ->select('wqty')->where('prd_cd', '=', $prd_cd)->where('store_cd', '=', $store_cd)
-                    ->first();
-            } else {
-                $sql = "
+			// 판매가 지정되지 않은 경우, 현재판매가로 설정
+			if ($sugi_price == 0 || $sugi_price == '') {
+				$sugi_price = $product_price;
+			}
+
+			// 위탁상품인 경우, 옵션가격이 있다면 수수료율에 맞춰 원가 재계산 > 정산 시 수수료율 보정
+			if ($goods_type == "P" && ($opt_amt + $addopt_amt) > 0) {
+				// $goods->wonga = ($goods_price + $opt_amt + $addopt_amt) * (1 - $goods->margin_rate / 100);
+				$product_wonga = ($goods_price + $opt_amt + $addopt_amt) * (1 - $goods->margin_rate / 100);
+			}
+
+			$product_stock = 0;
+			if ($store_cd != '') {
+				$row = DB::table('product_stock_store')
+					->select('wqty')->where('prd_cd', '=', $prd_cd)->where('store_cd', '=', $store_cd)
+					->first();
+			} else {
+				$sql = "
                     select wqty
                     from product_stock_storage
                     where prd_cd = '$prd_cd' and storage_cd = (select storage_cd from storage where default_yn = 'Y')
                 ";
-                $row = DB::selectOne($sql);
-            }
-            if ($row != null) $product_stock = $row->wqty;
+				$row = DB::selectOne($sql);
+			}
+			if ($row != null) $product_stock = $row->wqty;
 
-            // 예약판매가 아닐 경우에만 재고부족 에러처리
-            if ($goods->is_unlimited == "Y") {
-                if ($product_stock < 1) {
-                    if ($reservation_yn === 'Y') {
-                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
-                    } else {
-                        $code = '-105';
-                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
-                    }
-                }
-            } else {
-                if ($qty > $product_stock) {
-                    if ($reservation_yn === 'Y') {
-                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
-                    } else {
-                        if ($product_stock > 0) {
-                            $code = '-104';
-                            // throw  new Exception("재고가 부족하여 판매할 수 없습니다. (재고 1개 이상 예약판매 불가)");
-                        } else {
-                            $code = '-105';
-                            // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
-                        }
-                    }
-                }
-            }
 
-            if ($code != '200') break;
+//            // 예약판매가 아닐 경우에만 재고부족 에러처리
+//            if ($goods->is_unlimited == "Y") {
+//                if ($product_stock < 1) {
+//                    if ($reservation_yn === 'Y') {
+//                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
+//                    } else {
+//                        $code = '-105';
+//                        // throw new Exception("재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+//                    }
+//                }
+//            } else {
+//                if ($qty > $product_stock) {
+//                    if ($reservation_yn === 'Y') {
+//                        $opt_ord_type = 4; // order_opt의 ord_type (수기판매:14 / 예약:4)
+//                    } else {
+//                        if ($product_stock > 0) {
+//                            $code = '-104';
+//                            // throw  new Exception("재고가 부족하여 판매할 수 없습니다. (재고 1개 이상 예약판매 불가)");
+//                        } else {
+//                            $code = '-105';
+//                            // throw new Exception("[상품코드 : $prd_cd] 재고가 부족하여 수기판매 처리를 할 수 없습니다.");
+//                        }
+//                    }
+//                }
+//            }
 
-            $com_rat = 0;
+			if ($qty === 0) $code = '-103'; // 판매수량 0일 경우 에러처리
+			if ($code != '200') break;
 
-            if (isset($cart[$i]["coupon_no"])) {
-                $coupon_no = $cart[$i]["coupon_no"];
-                // 쿠폰정보 얻기
-                $sql = "
+			$com_rat = 0;
+
+			if (isset($cart[$i]["coupon_no"])) {
+				$coupon_no = $cart[$i]["coupon_no"];
+				// 쿠폰정보 얻기
+				$sql = "
                     select com_rat
                     from coupon_company
                     where coupon_no = :coupon_no and com_id = :com_id
                 ";
-                $coupon = DB::selectOne($sql, ["coupon_no" => $coupon_no, "com_id" => $goods->com_id]);
-                if (!empty($coupon->com_rat)) {
-                    $com_rat = $coupon->com_rat;
-                }
-            }
+				$coupon = DB::selectOne($sql, ["coupon_no" => $coupon_no, "com_id" => $goods->com_id]);
+				if (!empty($coupon->com_rat)) {
+					$com_rat = $coupon->com_rat;
+				}
+			}
 
-            $add_group_point = 0;
-            if ($add_point_ratio > 0) {
-                $add_group_point = ($goods_price * ($add_point_ratio / 100)) * $qty;
-            }
+			$add_group_point = 0;
+			if ($add_point_ratio > 0) {
+				$add_group_point = ($goods_price * ($add_point_ratio / 100)) * $qty;
+			}
 
-            $ord_opt_add_point = 0;
-            if ($point_flag) {
-                if ($goods->point_yn == "Y") {
-                    if ($goods->point_cfg == "G") {
-                        if ($goods->point_unit == "P") {
-                            $ord_opt_add_point = round(($goods_price * $goods->point / 100) * $qty, 0) + $add_group_point;
-                        } else {
-                            //echo "($goods->point * $qty) + $add_group_point;";
-                            $ord_opt_add_point = ($goods->point * $qty) + $add_group_point;
-                        }
-                    } else {
-                        // 쇼핑몰 설정
-                        //echo "round(($cfg_ratio / 100) * $qty, 0) + $add_group_point";
-                        $ord_opt_add_point = round(($goods_price * $cfg_ratio / 100) * $qty, 0) + $add_group_point;
-                    }
-                }
-            }
-            $add_point += $ord_opt_add_point;
-            $ord_opt_point_amt = Lib::getValue($cart[$i], "point_amt", 0);
-            $ord_opt_coupon_amt = Lib::getValue($cart[$i], "coupon_amt", 0);
-            $ord_opt_dc_amt = Lib::getValue($cart[$i], "dc_amt", 0);
-            $ord_opt_dlv_amt = Lib::getValue($cart[$i], "dlv_amt", 0);
+			$ord_opt_add_point = 0;
+			if ($point_flag) {
+				if ($goods->point_yn == "Y") {
+					if ($goods->point_cfg == "G") {
+						if ($goods->point_unit == "P") {
+							$ord_opt_add_point = round(($goods_price * $goods->point / 100) * $qty, 0) + $add_group_point;
+						} else {
+							//echo "($goods->point * $qty) + $add_group_point;";
+							$ord_opt_add_point = ($goods->point * $qty) + $add_group_point;
+						}
+					} else {
+						// 쇼핑몰 설정
+						//echo "round(($cfg_ratio / 100) * $qty, 0) + $add_group_point";
+						$ord_opt_add_point = round(($goods_price * $cfg_ratio / 100) * $qty, 0) + $add_group_point;
+					}
+				}
+			}
+			$add_point += $ord_opt_add_point;
+			$ord_opt_point_amt = Lib::getValue($cart[$i], "point_amt", 0);
+			$ord_opt_coupon_amt = Lib::getValue($cart[$i], "coupon_amt", 0);
+			// $ord_opt_dc_amt = Lib::getValue($cart[$i], "dc_amt", 0);
+			$ord_opt_dc_amt = ($product_price - $sugi_price) * $qty;
+			$ord_opt_dlv_amt = Lib::getValue($cart[$i], "dlv_amt", 0);
 
-            $a_ord_amt = $cart[$i]["ord_amt"] ?? 0;
-            $a_recv_amt = $cart[$i]["recv_amt"] ?? ($a_ord_amt - $ord_opt_point_amt - $ord_opt_coupon_amt - $ord_opt_dc_amt);
-            if ($dlv_apply == 'N' || $a_ord_amt >= $free_dlv_amt) {
-                $ord_opt_dlv_amt = 0;
-            }
+			$a_ord_amt = $sugi_price * $qty;
+			$a_recv_amt = $a_ord_amt;
+			// $a_recv_amt = ($a_ord_amt - $ord_opt_point_amt - $ord_opt_coupon_amt - $ord_opt_dc_amt);
+			if ($dlv_apply == 'N' || $a_ord_amt >= $free_dlv_amt) {
+				$ord_opt_dlv_amt = 0;
+			}
 
-            array_push($order_opt, [
-                    'goods_no' => $goods_no,
-                    'goods_sub' => $goods_sub,
-                    'ord_no' => '',
-                    'ord_seq' => '0',
-                    'head_desc' => $goods->head_desc,
-                    'goods_nm' => $goods->goods_nm,
-                    'goods_opt' => $goods_opt,
-                    'qty' => $qty,
-                    'wonga' => $goods->wonga,
-                    'price' => $cart[$i]["price"] ?? 0,
-                    'dlv_amt' => $ord_opt_dlv_amt,
-                    'pay_type' => $pay_type,
-                    'point_amt' => $ord_opt_point_amt,
-                    'coupon_amt' => $ord_opt_coupon_amt,
-                    'dc_amt' => $ord_opt_dc_amt,
-                    'opt_amt' => $order_opt_amt,
-                    'addopt_amt' => $order_addopt_amt,
-                    'recv_amt' => $a_recv_amt,
-                    'p_ord_opt_no' => $p_ord_opt_no,
-                    'dlv_no' => $dlv_no,
-                    'dlv_cd' => $dlv_cd,
-                    'md_id' => $goods->md_id,
-                    'md_nm' => $goods->md_nm,
-                    'sale_place' => $store_nm,
-                    'ord_state' => $ord_state,
-                    'clm_state' => 0,
-                    'com_id' => $goods->com_id,
-                    'add_point' => $ord_opt_add_point,
-                    'ord_kind' => $ord_kind,
-                    'ord_type' => $opt_ord_type,
-                    'baesong_kind' => $goods->baesong_kind,
-                    'dlv_start_date' => null,
-                    'dlv_proc_date' => null,
-                    'dlv_end_date' => null,
-                    'dlv_cancel_date' => null,
-                    'dlv_series_no' => null,
-                    'ord_date' => $ord_date,
-                    'dlv_comment' => $dlv_comment,
-                    'admin_id' => $c_admin_id,
-                    'coupon_no' => $coupon_no,
-                    'com_coupon_ratio' => $com_rat,
-                    'sales_com_fee' => round($a_ord_amt * $fee_rate / 100, 2),
-                    'out_ord_opt_no' => $out_ord_no,
-                    'prd_cd' => $prd_cd,
-                    'store_cd' => $store_cd,
-                    'sale_kind' => $sale_kind,
-                    'pr_code' => $pr_code,
-            ]);
-            $ord_amt += $order_opt[$i]["price"] * $order_opt[$i]["qty"];
-            $point_amt += $ord_opt_point_amt;
-            $coupon_amt += $ord_opt_coupon_amt;
-            $dc_amt += $ord_opt_dc_amt;
-            // $dlv_amt += $ord_opt_dlv_amt;
-            $recv_amt += $order_opt[$i]["recv_amt"];
-        }
+			array_push($order_opt, [
+				'goods_no' => $goods_no,
+				'goods_sub' => $goods_sub,
+				'ord_no' => '',
+				'ord_seq' => '0',
+				'head_desc' => $goods->head_desc,
+				'goods_nm' => $goods->goods_nm,
+				'goods_opt' => $goods_opt,
+				'qty' => $qty,
+				'wonga' => $product_wonga,
+				'price' => $sugi_price,
+				'dlv_amt' => $ord_opt_dlv_amt,
+				'pay_type' => $pay_type,
+				'point_amt' => $ord_opt_point_amt,
+				'coupon_amt' => $ord_opt_coupon_amt,
+				'dc_amt' => $ord_opt_dc_amt,
+				'opt_amt' => $order_opt_amt,
+				'addopt_amt' => $order_addopt_amt,
+				'recv_amt' => $a_recv_amt,
+				'p_ord_opt_no' => $p_ord_opt_no,
+				'dlv_no' => $dlv_no,
+				'dlv_cd' => $dlv_cd,
+				'md_id' => $goods->md_id,
+				'md_nm' => $goods->md_nm,
+				'sale_place' => $store_nm,
+				'ord_state' => $ord_state,
+				'clm_state' => 0,
+				'com_id' => $goods->com_id,
+				'add_point' => $ord_opt_add_point,
+				'ord_kind' => $ord_kind,
+				'ord_type' => $opt_ord_type,
+				'baesong_kind' => $goods->baesong_kind,
+				'dlv_start_date' => null,
+				'dlv_proc_date' => null,
+				'dlv_end_date' => null,
+				'dlv_cancel_date' => null,
+				'dlv_series_no' => null,
+				'ord_date' => $ord_date,
+				'dlv_comment' => $dlv_comment,
+				'admin_id' => $c_admin_id,
+				'coupon_no' => $coupon_no,
+				'com_coupon_ratio' => $com_rat,
+				'sales_com_fee' => round($a_ord_amt * $fee_rate / 100, 2),
+				'out_ord_opt_no' => $out_ord_no,
+				'prd_cd' => $prd_cd,
+				'store_cd' => $store_cd,
+				'sale_kind' => $cart[$i]["sale_kind_cd"] ?? $sale_kind,
+				'pr_code' => $cart[$i]["pr_code_cd"] ?? $pr_code,
+			]);
+			$ord_amt += $order_opt[$i]["price"] * $order_opt[$i]["qty"];
+			$ord_qty += $order_opt[$i]["qty"] * 1;
+			$point_amt += $ord_opt_point_amt;
+			$coupon_amt += $ord_opt_coupon_amt;
+			$dc_amt += $ord_opt_dc_amt;
+			// $dlv_amt += $ord_opt_dlv_amt;
+			$recv_amt += $order_opt[$i]["recv_amt"];
+		}
 
-        if ($code != '200') {
-            return ['code' => $code, 'ord_no' => ''];
-        }
+		if ($code != '200') {
+			return ['code' => $code, 'ord_no' => ''];
+		}
 
-        $order = new Order($user, true);
-        $ord_no = $order->ord_no;
+		$order = new Order($user, true);
+		$ord_no = $order->ord_no;
 
-        if ($dlv_apply == 'Y' && $ord_amt < $free_dlv_amt) {
-            $dlv_amt = $base_dlv_amt;
-        }
+		if ($dlv_apply == 'Y' && $ord_amt < $free_dlv_amt) {
+			$dlv_amt = $base_dlv_amt;
+		}
 
-        DB::table('order_mst')->insert([
-            'ord_no' => $ord_no,
-            'ord_date' =>$ord_date,
-            'user_id' => $user_id,
-            'user_nm' => $user_nm,
-            'phone' => $phone,
-            'mobile' => $mobile,
-            'email' => $email,
-            'ord_amt' => $ord_amt,
-            'point_amt' => $point_amt,
-            'coupon_amt' => $coupon_amt,
-            'dc_amt' => $dc_amt,
-            'dlv_amt' => $dlv_amt,
-            'add_dlv_fee' => $add_dlv_fee,
-            'recv_amt' => $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt,
-            'r_nm' => $r_nm,
-            'r_zipcode' => $r_zip_code,
-            'r_addr1' => $r_addr1,
-            'r_addr2' => $r_addr2,
-            'r_phone' => $r_phone,
-            'r_mobile' => $r_mobile,
-            'dlv_msg' => $dlv_msg,
-            'ord_state' => $ord_state,
-            'upd_date' => DB::raw('now()'),
-            'dlv_end_date' => DB::raw('NULL'),
-            'ord_type' => $ord_type,
-            'ord_kind' => $ord_kind,
-            'out_ord_no' => $out_ord_no,
-            'store_cd' => $store_cd,
-            'sale_place' => $store_nm,
-            'chk_dlv_fee' => DB::raw('NULL'),
-            'admin_id' => $c_admin_id
-        ]);
+		DB::table('order_mst')->insert([
+			'ord_no' => $ord_no,
+			'ord_date' =>$ord_date,
+			'user_id' => $user_id,
+			'user_nm' => $user_nm,
+			'phone' => $phone,
+			'mobile' => $mobile,
+			'email' => $email,
+			'ord_amt' => $ord_amt,
+			'point_amt' => $point_amt,
+			'coupon_amt' => $coupon_amt,
+			'dc_amt' => $dc_amt,
+			'dlv_amt' => $dlv_amt,
+			'add_dlv_fee' => $add_dlv_fee,
+			'recv_amt' => $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt,
+			'r_nm' => $r_nm,
+			'r_zipcode' => $r_zip_code,
+			'r_addr1' => $r_addr1,
+			'r_addr2' => $r_addr2,
+			'r_phone' => $r_phone,
+			'r_mobile' => $r_mobile,
+			'dlv_msg' => $dlv_msg,
+			'ord_state' => $ord_state,
+			'upd_date' => DB::raw('now()'),
+			'dlv_end_date' => DB::raw('NULL'),
+			'ord_type' => $ord_type,
+			'ord_kind' => $ord_kind,
+			'out_ord_no' => $out_ord_no,
+			'store_cd' => $store_cd,
+			'sale_place' => $store_nm,
+			'chk_dlv_fee' => DB::raw('NULL'),
+			'admin_id' => $c_admin_id
+		]);
 
-        $pay_stat = 0;
-        $tno = '';
-        $pay_amt = $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt;
+		$pay_stat = 0;
+		$tno = '';
+		$pay_amt = $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt;
 
-        ##################################################
-        #	부모 결제 정보 복사
-        ##################################################
-        if ($p_ord_opt_no > 0) {
-            $sql = /** @lang text */
-                "
+		##################################################
+		#	부모 결제 정보 복사
+		##################################################
+		if ($p_ord_opt_no > 0) {
+			$sql = /** @lang text */
+				"
                 select p.tno, p.pay_type, p.pay_stat, p.pay_amt
                 from order_opt o inner join payment p on o.ord_no = p.ord_no
                 where ord_opt_no = :ord_opt_no
             ";
-            $row = DB::selectOne($sql, ["ord_opt_no" => $p_ord_opt_no]);
-            if (!empty($row->pay_type)) {
-                $ppay_type = $row->pay_type;
-                if ($row->tno != "" && (($pay_type & $ppay_type) == $pay_type || ($pay_type & $ppay_type) == $ppay_type)) {
-                    $tno = $row->tno;
-                    $pay_amt = $row->pay_amt;
-                    $pay_stat = $row->pay_stat;
-                }
-            }
-        }
+			$row = DB::selectOne($sql, ["ord_opt_no" => $p_ord_opt_no]);
+			if (!empty($row->pay_type)) {
+				$ppay_type = $row->pay_type;
+				if ($row->tno != "" && (($pay_type & $ppay_type) == $pay_type || ($pay_type & $ppay_type) == $ppay_type)) {
+					$tno = $row->tno;
+					$pay_amt = $row->pay_amt;
+					$pay_stat = $row->pay_stat;
+				}
+			}
+		}
 
-        $card_msg = "상품수기판매";
-        DB::table('payment')->insert([
-            "ord_no"		=> $ord_no,
-            "pay_type" 		=> $pay_type,
-            "pay_nm" 		=> $user_nm,
-            "pay_amt" 		=> $pay_amt,
-            "pay_stat" 		=> $pay_stat,
-            "tno"           => $tno,
-            "bank_inpnm" 	=> $bank_inpnm,
-            "bank_code" 	=> $bank_code,
-            "bank_number" 	=> $bank_number,
-            "card_msg"      => $card_msg,
-            "pay_ypoint"    => 0,
-            "pay_point"     => $point_amt,
-            "pay_baesong"   => $dlv_amt,
-            "coupon_amt"    => $coupon_amt,
-            "dc_amt"        => $dc_amt,
-            //"pay_fee"       => $pay_fee,
-            "ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
-            "upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
-        ]);
+		$card_msg = "상품수기판매";
+		DB::table('payment')->insert([
+			"ord_no"		=> $ord_no,
+			"pay_type" 		=> $pay_type,
+			"pay_nm" 		=> $user_nm,
+			"pay_amt" 		=> $pay_amt,
+			"pay_stat" 		=> $pay_stat,
+			"tno"           => $tno,
+			"bank_inpnm" 	=> $bank_inpnm,
+			"bank_code" 	=> $bank_code,
+			"bank_number" 	=> $bank_number,
+			"card_msg"      => $card_msg,
+			"pay_ypoint"    => 0,
+			"pay_point"     => $point_amt,
+			"pay_baesong"   => $dlv_amt,
+			"coupon_amt"    => $coupon_amt,
+			"dc_amt"        => $dc_amt,
+			//"pay_fee"       => $pay_fee,
+			"ord_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+			"upd_dm"        => DB::raw('date_format(now(),\'%Y%m%d%H%i%s\')'),
+		]);
 
-        for ($i = 0; $i < count($order_opt); $i++) {
-            $order_opt[$i]["ord_no"] = $ord_no;
-            DB::table('order_opt')->insert($order_opt[$i]);
-            $ord_opt_no = DB::getPdo()->lastInsertId();
+		for ($i = 0; $i < count($order_opt); $i++) {
+			$order_opt[$i]["ord_no"] = $ord_no;
+			DB::table('order_opt')->insert($order_opt[$i]);
+			$ord_opt_no = DB::getPdo()->lastInsertId();
 
-            $goods_addopt = Lib::getValue($cart[$i], "goods_addopt", "");
-            $a_goods_addopts = explode("^", $goods_addopt);
+			// 수기판매 시, 판매상품별 메모등록
+			$order_memo = $cart[$i]['memo'] ?? '';
+			if ($order_memo !== '') {
+				DB::table('order_opt_memo')->insert([
+					'ord_opt_no' => $ord_opt_no,
+					'ord_no' => $ord_no,
+					'memo' => $order_memo,
+					'admin_id' => $c_admin_id,
+					'admin_nm' => $c_admin_name,
+					'ut' => now(),
+				]);
+			}
 
-            foreach ($a_goods_addopts as $a_goods_addopt) {
-                if (!empty($a_goods_addopt)) {
-                    list($addopt_value, $addopt_goods_no, $addopt_goods_sub, $a_addopt_amt, $addopt_idx) = explode("|", $a_goods_addopt);
-                    $a_addopt_amt = $a_addopt_amt * $order_opt[$i]["qty"];
-                    DB::table('order_opt_addopt')->insert([
-                        "ord_opt_no" => $ord_opt_no,
-                        "goods_no" => $order_opt[$i]["goods_no"],
-                        "goods_sub" => $order_opt[$i]["goods_sub"],
-                        "addopt_idx" => $addopt_idx,
-                        "addopt" => $addopt_value,
-                        "addopt_amt" => $a_addopt_amt,
-                        "addopt_qty" => $order_opt[$i]["qty"],
-                    ]);
-                }
-            }
+			$goods_addopt = Lib::getValue($cart[$i], "goods_addopt", "");
+			$a_goods_addopts = explode("^", $goods_addopt);
 
-            #####################################################
-            #	재고 처리
-            #####################################################
-            $is_store_order = true;
-            $order->SetOrdOptNo($ord_opt_no);
-            $order->CompleteOrderSugi($ord_opt_no, $ord_state, $is_store_order);
+			foreach ($a_goods_addopts as $a_goods_addopt) {
+				if (!empty($a_goods_addopt)) {
+					list($addopt_value, $addopt_goods_no, $addopt_goods_sub, $a_addopt_amt, $addopt_idx) = explode("|", $a_goods_addopt);
+					$a_addopt_amt = $a_addopt_amt * $order_opt[$i]["qty"];
+					DB::table('order_opt_addopt')->insert([
+						"ord_opt_no" => $ord_opt_no,
+						"goods_no" => $order_opt[$i]["goods_no"],
+						"goods_sub" => $order_opt[$i]["goods_sub"],
+						"addopt_idx" => $addopt_idx,
+						"addopt" => $addopt_value,
+						"addopt_amt" => $a_addopt_amt,
+						"addopt_qty" => $order_opt[$i]["qty"],
+					]);
+				}
+			}
 
-            if ($ord_state == "10" || $ord_state == "30") {
+			#####################################################
+			#	재고 처리
+			#####################################################
+			$is_store_order = true;
+			$is_sugi = true;
+			$order->SetOrdOptNo($ord_opt_no);
+			$order->CompleteOrderSugi($ord_opt_no, $ord_state, $is_store_order, $is_sugi, $ord_state_date);
 
-                // 상품배송완료인경우 상태 변경
-                if ($ord_state == "30") {
-                    // 송장 정보 등록
-                    $order->DlvEnd($dlv_cd, $dlv_no, "30");
+			if ($ord_state == "10" || $ord_state == "30") {
 
-                    // 주문상태 로그
-                    $state_log = array(
-                        "ord_no" => $ord_no,
-                        "ord_state" => "30",
-                        "comment" => "수기판매",
-                        "admin_id" => $user["id"],
-                        "admin_nm" => $user["name"]
-                    );
-                    $order->AddStateLog($state_log);
+				// 상품배송완료인경우 상태 변경
+				if ($ord_state == "30") {
+					// 송장 정보 등록
+					$order->DlvEnd($dlv_cd, $dlv_no, "30");
 
-                    //	order_opt_wonga 정산건 반영
-                    $order->DlvLog("30");
+					// 주문상태 로그
+					$state_log = array(
+						"ord_no" => $ord_no,
+						"ord_state" => "30",
+						"comment" => "수기판매",
+						"admin_id" => $user["id"],
+						"admin_nm" => $user["name"]
+					);
+					$order->AddStateLog($state_log);
 
-                    // 추가 옵션 온라인 및 보유 재고 처리
-                    $sql_addopt = "
+					//	order_opt_wonga 정산건 반영
+					$order->DlvLog("30");
+
+					// 추가 옵션 온라인 및 보유 재고 처리
+					$sql_addopt = "
                         select addopt_idx, addopt_qty
                         from order_opt_addopt
                         where ord_opt_no = :ord_opt_no
                             and goods_no = :goods_no
                             and goods_sub = :goods_sub
                     ";
-                    $rows = DB::select($sql_addopt, [
-                        "ord_opt_no" => $ord_opt_no,
-                        "goods_no" => $order_opt[$i]["goods_no"],
-                        "goods_sub" => $order_opt[$i]["goods_sub"],
-                    ]);
+					$rows = DB::select($sql_addopt, [
+						"ord_opt_no" => $ord_opt_no,
+						"goods_no" => $order_opt[$i]["goods_no"],
+						"goods_sub" => $order_opt[$i]["goods_sub"],
+					]);
 
-                    foreach ($rows as $row) {
-                        $addopt_qty = $row->addopt_qty;
-                        DB::table('options')
-                            ->where("no","=", $row->addopt_idx)
-                            ->update([
-                            "qty" => DB::raw("ifnull(qty, 0) - $addopt_qty"),
-                            "wqty" => DB::raw("ifnull(wqty, 0) - $addopt_qty"),
-                        ]);
-                    }
-                } else if ($ord_state == "10") { // 출고요청
+					foreach ($rows as $row) {
+						$addopt_qty = $row->addopt_qty;
+						DB::table('options')
+							->where("no","=", $row->addopt_idx)
+							->update([
+								"qty" => DB::raw("ifnull(qty, 0) - $addopt_qty"),
+								"wqty" => DB::raw("ifnull(wqty, 0) - $addopt_qty"),
+							]);
+					}
+				} else if ($ord_state == "10") { // 출고요청
 
-                    if ($ord_kind != "30") { // 출고구분이 "보류"가 아닌경우 출고요청일 Update
-                        //	주문상태 로그
-                        $state_log = [
-                            "ord_no" => $ord_no,
-                            "ord_state" => "10",
-                            "comment" => "수기판매",
-                            "admin_id" => $user["id"],
-                            "admin_nm" => $user["name"]
-                        ];
-                        $order->AddStateLog($state_log);
-                    }
+					if ($ord_kind != "30") { // 출고구분이 "보류"가 아닌경우 출고요청일 Update
+						//	주문상태 로그
+						$state_log = [
+							"ord_no" => $ord_no,
+							"ord_state" => "10",
+							"comment" => "수기판매",
+							"admin_id" => $user["id"],
+							"admin_nm" => $user["name"]
+						];
+						$order->AddStateLog($state_log);
+					}
 
-                    // 추가 옵션 온라인 및 보유 재고 처리
-                    $sql_addopt = "
+					// 추가 옵션 온라인 및 보유 재고 처리
+					$sql_addopt = "
                         select addopt_idx, addopt_qty
                         from order_opt_addopt
                         where ord_opt_no = :ord_opt_no
                             and goods_no = :goods_no
                             and goods_sub = :goods_sub
                     ";
-                    $rows = DB::select($sql_addopt, [
-                        "ord_opt_no" => $ord_opt_no,
-                        "goods_no" => $order_opt[$i]["goods_no"],
-                        "goods_sub" => $order_opt[$i]["goods_sub"],
-                    ]);
+					$rows = DB::select($sql_addopt, [
+						"ord_opt_no" => $ord_opt_no,
+						"goods_no" => $order_opt[$i]["goods_no"],
+						"goods_sub" => $order_opt[$i]["goods_sub"],
+					]);
 
-                    foreach ($rows as $row) {
-                        $addopt_qty = $row->addopt_qty;
-                        DB::table('options')
-                            ->where("no","=", $row->addopt_idx)
-                            ->update([
-                                "qty" => DB::raw("ifnull(qty, 0) - $addopt_qty"),
-                                "wqty" => DB::raw("ifnull(wqty, 0) - $addopt_qty"),
-                            ]);
-                    }
-                }
-            }
-        }
+					foreach ($rows as $row) {
+						$addopt_qty = $row->addopt_qty;
+						DB::table('options')
+							->where("no","=", $row->addopt_idx)
+							->update([
+								"qty" => DB::raw("ifnull(qty, 0) - $addopt_qty"),
+								"wqty" => DB::raw("ifnull(wqty, 0) - $addopt_qty"),
+							]);
+					}
+				}
+			}
+		}
 
-        #####################################################
-        #	포인트 지급
-        #####################################################
-        if ($ord_state !== '1' && $user_id !== null && $point_flag === true) {
-            $point = new Point($user, $user_id);
-            $point->SetOrdNo($ord_no);
-            $point->StoreOrder();
-        }
+		#####################################################
+		#	포인트 지급
+		#####################################################
+		if ($ord_state != "1") {
+			if ($point_flag === true && $user_id != null) {
+				$point = new Point($user, $user_id);
+				$point->SetOrdNo($ord_no);
+				$point->StoreOrder();
+			}
+		}
 
-        return ['code' => $code, 'ord_no' => $ord_no];
-    }
+		return ['code' => $code, 'ord_no' => $ord_no];
+	}
 
     /**
      *
@@ -1246,7 +1279,7 @@ class ord01Controller extends Controller
     /** 수기 일괄등록 화면 */
     public function batch_create()
     {
-        $sql = "
+		$sql = "
             select
                 concat(code_val,'_',ifnull(code_val2, '')) as 'name',
                 concat(code_val,' [',ifnull(code_val2, ''),']') as 'value'
@@ -1256,9 +1289,9 @@ class ord01Controller extends Controller
                 and use_yn = 'Y'
             order by code_seq
         ";
-        $banks = DB::select($sql);
+		$banks = DB::select($sql);
 
-        $sql = "
+		$sql = "
             select
                 code_id, code_val
             from code
@@ -1267,7 +1300,7 @@ class ord01Controller extends Controller
                 and code_id in ('1','2','5','9','13','16','32','64')
             order by code_seq
         ";
-        $pay_types = DB::select($sql);
+		$pay_types = DB::select($sql);
 
         $store_cd = Auth('head')->user()->store_cd;
         $store_nm = DB::table('store')->where("store_cd", $store_cd)->value('store_nm');
@@ -1275,15 +1308,15 @@ class ord01Controller extends Controller
         $conf = new Conf();
 
         $values = [
-            'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
-            'pay_types'     => $pay_types,
-            'banks'         => $banks,
-            'dlv_cds'       => SLib::getCodes('DELIVERY'),
-            'dlv_fee'       => [
-                'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'),
-                'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'),
-                'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
-            ],
+			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
+			'pay_types'     => $pay_types,
+			'banks'         => $banks,
+			'dlv_cds'       => SLib::getCodes('DELIVERY'),
+			'dlv_fee'       => [
+				'base_dlv_fee'  => $conf->getConfigValue('delivery', 'base_delivery_fee'),
+				'add_dlv_fee'   => $conf->getConfigValue('delivery', 'add_delivery_fee'),
+				'free_dlv_amt'  => $conf->getConfigValue('delivery', 'free_delivery_amt'),
+			],
             'store_cd'      => $store_cd,
             'store_nm'      => $store_nm,
         ];
@@ -1291,8 +1324,8 @@ class ord01Controller extends Controller
     }
 
     /** Excel 파일 저장 후 ag-grid(front)에 사용할 응답을 JSON으로 반환 */
-    public function batch_import(Request $request)
-    {
+	public function batch_import(Request $request)
+	{
 		if (count($_FILES) > 0) {
 			if ( 0 < $_FILES['file']['error'] ) {
 				return response()->json(['code' => '0', 'message' => 'Error: ' . $_FILES['file']['error']], 200);
@@ -1306,7 +1339,7 @@ class ord01Controller extends Controller
 				$save_path = "data/store/ord01/";
 				$file_name = "${now}_${user_id}.${extension}";
 
-                if (!Storage::disk('public')->exists($save_path)) {
+				if (!Storage::disk('public')->exists($save_path)) {
 					Storage::disk('public')->makeDirectory($save_path);
 				}
 
@@ -1316,151 +1349,160 @@ class ord01Controller extends Controller
 				return response()->json(['code' => '1', 'file' => $file], 200);
 			}
 		}
-    }
+	}
 
-    /** 수기 일괄등록 판매등록 */
-    public function batch_add(Request $request)
-    {
-        $store_cd = $request->input('store_cd', '');
-        $bank_code = $request->input('bank_code', '');
-        $apy_fee = $request->input('apy_fee', 'false');
-        $fee = $request->input('fee', 0);
-        $orders = $request->input('orders', []);
+	/** 수기 일괄등록 판매등록 */
+	public function batch_add(Request $request)
+	{
+		$store_cd = $request->input('store_cd', '');
+		$bank_code = $request->input('bank_code', '');
+		$apy_fee = $request->input('apy_fee', 'false');
+		$fee = $request->input('fee', 0);
+		$orders = $request->input('orders', []);
 
-        $conf = new Conf();
-        $cfg_ratio = $conf->getConfigValue("point", "ratio");
-        $ord_type = 14; // 출고형태: 수기판매
-        $ord_kind = 20; // 출고구분: 출고가능
-        $ord_state = 30; // 주문상태 : 출고완료
-        $free_dlv_amt = $conf->getConfigValue('delivery', 'free_delivery_amt'); // 배송비무료 금액
-        $dlv_apply = 'Y'; // 배송비적용
-        $give_point = 'N'; // 적립금지급
-        $group_apply = 'N';
+		$conf = new Conf();
+		$cfg_ratio = $conf->getConfigValue("point", "ratio");
+		$ord_type = 14; // 출고형태: 수기판매
+		$ord_kind = 20; // 출고구분: 출고가능
+		$ord_state = 30; // 주문상태 : 출고완료
+		$free_dlv_amt = $conf->getConfigValue('delivery', 'free_delivery_amt'); // 배송비무료 금액
+		$dlv_apply = 'Y'; // 배송비적용
+		$give_point = 'N'; // 적립금지급
+		$group_apply = 'N';
 
-        $success_list = [];
-        $failed_list = [];
+		$success_list = [];
+		$failed_list = [];
+		$fail_check = true;
 
-        foreach ($orders as $order) {
-            $code = '200';
-            $cart = $order['cart'] ?? [];
+		DB::beginTransaction();
 
-            try {
-                DB::beginTransaction();
+		foreach ($orders as $order) {
+			$code = '200';
+			$cart = $order['cart'] ?? [];
 
-                // 상품정보 조회
-                foreach ($cart as $key => $item) {
-                    if (!isset($item['prd_cd'])) {
-                        $code = '-101';
-                        throw new Exception('상품코드 없음');
-                    } else if (!isset($item['qty']) || (int)$item['qty'] < 1) {
-                        $code = '-103';
-                        throw new Exception('수량정보 부정확');
-                    } else if (!isset($item['price'])) {
-                        $code = '-104';
-                        throw new Exception('판매가 부정확');
-                    } else {
-                        $sql = "
-                            select
-                                g.goods_no
-                                , g.goods_sub
-                                , g.goods_type as goods_type_cd
-                                , g.point
-                                , g.com_type
-                                , p.prd_cd
-                                , p.goods_opt
-                            from product_code p
-                                inner join goods g on g.goods_no = p.goods_no
-                            where p.prd_cd = :prd_cd
-                        ";
-                        $product = DB::selectOne($sql, ['prd_cd' => $item['prd_cd']]);
+			try {
+				// 상품정보 조회
+				foreach ($cart as $key => $item) {
+					if (!isset($item['prd_cd'])) {
+						$fail_check = false;
+						$code = '-101';
+						throw new Exception('바코드 없음');
+					} else if (!isset($item['qty'])) {
+						$fail_check = false;
+						$code = '-103';
+						throw new Exception('수량정보 없음');
+						// } else if (!isset($item['price'])) {
+						//     $code = '-104';
+						//     throw new Exception('판매가 부정확');
+					} else {
+						$sql = "
+								select
+									g.goods_no
+									, g.goods_sub
+									, g.goods_type as goods_type_cd
+									, g.point
+									, g.com_type
+									, p.prd_cd
+									, p.goods_opt
+								from product_code p
+									inner join goods g on g.goods_no = p.goods_no
+								where p.prd_cd = :prd_cd
+							";
+						$product = DB::selectOne($sql, ['prd_cd' => $item['prd_cd']]);
 
-                        if ($product == null) {
-                            $code = '-102';
-                            throw new Exception('상품코드 부정확');
-                        } else {
-                            $item['goods_no'] = $product->goods_no;
-                            $item['goods_sub'] = $product->goods_sub;
-                            $item['goods_type_cd'] = $product->goods_type_cd;
-                            $item['point'] = $product->point;
-                            $item['com_type'] = $product->com_type;
-                            $item['goods_opt'] = $product->goods_opt;
-                            $cart[$key] = $item;
-                        }
-                    }
-                }
+						if ($product == null) {
+							$fail_check = false;
+							$code = '-102';
+							throw new Exception('바코드 부정확');
+						} else {
+							$item['goods_no'] = $product->goods_no;
+							$item['goods_sub'] = $product->goods_sub;
+							$item['goods_type_cd'] = $product->goods_type_cd;
+							$item['point'] = $product->point;
+							$item['com_type'] = $product->com_type;
+							$item['goods_opt'] = $product->goods_opt;
+							$cart[$key] = $item;
+						}
+					}
+				}
 
-                $order_result = $this->_save_order([
-                    'cfg_ratio' => $cfg_ratio,
-                    'p_ord_opt_no' => '',
-                    'ord_type' => $ord_type,
-                    'ord_kind' => $ord_kind,
-                    'ord_state' => $ord_state,
-                    'store_cd' => $store_cd,
-                    'cart' => $cart,
-                    'base_dlv_amt' => $order['dlv_amt'] ?? 0,
-                    'free_dlv_amt' => $free_dlv_amt,
-                    'dlv_apply' => $dlv_apply,
-                    'add_dlv_fee' => $order['add_dlv_amt'] ?? 0,
-                    'coupon_no' => '',
-                    'pay_type' => $order['pay_type'] ?? 1, // 결제타입: (default)현금
-                    'bank_inpnm' => $order['bank_inpnm'] ?? '',
-                    'bank_code' => $bank_code,
-                    'user_id' => $order['user_id'] ?? '',
-                    'user_nm' => $order['user_nm'] ?? '',
-                    'phone' => $order['phone'] ?? '',
-                    'mobile' => $order['mobile'] ?? '',
-                    'r_nm' => $order['r_nm'] ?? '',
-                    'r_phone' => $order['r_phone'] ?? '',
-                    'r_mobile' => $order['r_mobile'] ?? '',
-                    'r_zip_code' => $order['r_zipcode'] ?? '',
-                    'r_addr1' => $order['r_addr1'] ?? '',
-                    'r_addr2' => $order['r_addr2'] ?? '',
-                    'dlv_msg' => $order['dlv_msg'] ?? '',
-                    'give_point' => $give_point,
-                    'group_apply' => $group_apply,
-                    'dlv_cd' => $order['dlv_cd'] ?? '',
-                    'dlv_no' => $order['dlv_no'] ?? '',
-                    'user' => [
-                        'id' => Auth('head')->user()->id,
-                        'name' => Auth('head')->user()->name,
-                    ],
-                    'out_ord_no' => $order['out_ord_no'] ?? '',
-                    'ord_date' => $order['ord_date'] ?? date('Y-m-d'),
-                    'fee_rate' => $order['fee_rate'] ?? ($apy_fee == 'true' ? $fee : 0),
+				$order_result = $this->_save_order([
+					'cfg_ratio' => $cfg_ratio,
+					'p_ord_opt_no' => '',
+					'ord_type' => $ord_type,
+					'ord_kind' => $ord_kind,
+					'ord_state' => $ord_state,
+					'store_cd' => $store_cd,
+					'cart' => $cart,
+					'base_dlv_amt' => $order['dlv_amt'] ?? 0,
+					'free_dlv_amt' => $free_dlv_amt,
+					'dlv_apply' => $dlv_apply,
+					'add_dlv_fee' => $order['add_dlv_amt'] ?? 0,
+					'coupon_no' => '',
+					'pay_type' => $order['pay_type'] ?? 1, // 결제타입: (default)현금
+					'bank_inpnm' => $order['bank_inpnm'] ?? '',
+					'bank_code' => $bank_code,
+					'user_id' => $order['user_id'] ?? '',
+					'user_nm' => $order['user_nm'] ?? '',
+					'phone' => $order['phone'] ?? '',
+					'mobile' => $order['mobile'] ?? '',
+					'r_nm' => $order['r_nm'] ?? '',
+					'r_phone' => $order['r_phone'] ?? '',
+					'r_mobile' => $order['r_mobile'] ?? '',
+					'r_zip_code' => $order['r_zipcode'] ?? '',
+					'r_addr1' => $order['r_addr1'] ?? '',
+					'r_addr2' => $order['r_addr2'] ?? '',
+					'dlv_msg' => $order['dlv_msg'] ?? '',
+					'give_point' => $give_point,
+					'group_apply' => $group_apply,
+					'dlv_cd' => $order['dlv_cd'] ?? '',
+					'dlv_no' => $order['dlv_no'] ?? '',
+					'user' => [
+						'id' => Auth('head')->user()->id,
+						'name' => Auth('head')->user()->name,
+					],
+					'out_ord_no' => $order['out_ord_no'] ?? '',
+					'ord_date' => $order['ord_date'] ?? date('Y-m-d'),
+					'fee_rate' => $order['fee_rate'] ?? ($apy_fee == 'true' ? $fee : 0),
 					'dlv_comment' => $order['dlv_comment'] ?? '',
-                ]);
+				]);
 
-                if ($order_result['code'] != '200') {
-                    $code = $order_result['code'];
-                    if ($code == '-104') throw new Exception('재고 부족 (예약판매 불가)');
-                    if ($code == '-105') throw new Exception('재고 부족');
-                }
+				if ($order_result['code'] != '200') {
+					$fail_check = false;
+					$code = $order_result['code'];
+					if ($code == '-103') throw new Exception('수량 부정확');
+					if ($code == '-105') throw new Exception('재고 부족');
+				}
 
-                $order['order_no'] = $order_result['ord_no'];
-                $order['code'] = $code;
-                array_push($success_list, $order);
+				$order['order_no'] = $order_result['ord_no'];
+				$order['code'] = $code;
+				array_push($success_list, $order);
 
-                DB::commit();
-            } catch (Exception $e) {
-                DB::rollback();
+			} catch (Exception $e) {
+				$fail_check = false;
+				$order['code'] = $code;
+				array_push($failed_list, $order);
+			}
+		}
 
-                $order['code'] = $code;
-                array_push($failed_list, $order);
-            }
-        }
+		if ($fail_check) {
+			DB::commit(); // 모든 주문이 성공한 경우에만 커밋
+		} else {
+			DB::rollback(); // 실패한 경우 롤백
+		}
 
-        return response()->json([
-            "code" => "200",
-            "head" => [
-                "success_total" => count($success_list),
-                "failed_total" => count($failed_list),
-            ],
-            "body" => [
-                "success_list" => $success_list,
-                "failed_list" => $failed_list
-            ]
-        ]);
-    }
+		return response()->json([
+			"code" => $fail_check ? '200' : '500',
+			"head" => [
+				"success_total" => count($success_list),
+				"failed_total" => count($failed_list),
+			],
+			"body" => [
+				"success_list" => $success_list,
+				"failed_list" => $failed_list
+			]
+		]);
+	}
 
      /**
      * 전화번호 숫자에 '-' 넣어서 반환
