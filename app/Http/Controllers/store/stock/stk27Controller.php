@@ -247,6 +247,8 @@ class stk27Controller extends Controller
                         'admin_id' => $admin_id,
                     ]);
 
+				$storage_loss_no	= DB::getPdo()->lastInsertId();
+				
 				// 창고재고처리
 				$sql	= " select count(*) as tot from product_stock_storage where storage_cd = :storage_cd and prd_cd = :prd_cd";
 				$tot	= DB::selectOne($sql,['storage_cd' => $storage_cd, 'prd_cd' => $product['prd_cd']])->tot;
@@ -306,7 +308,9 @@ class stk27Controller extends Controller
 							'wonga' => $wonga ?? 0,
 							'qty' => $loss_qty * -1,
 							'stock_state_date' => date('Ymd'),
+							'r_stock_state_date' => date('Ymd'),
 							'ord_opt_no' => '',
+							'storage_loss_no'	=> $storage_loss_no,
 							'comment' => '창고재고조정(' . ($product['loss_type_val'] ?? '') . ')',
 							'rt' => now(),
 							'admin_id' => $admin_id,
