@@ -1796,6 +1796,7 @@ class Order
 						'wonga' => $wonga,
 						'qty' => $ord_qty * -1,
 						'stock_state_date' => date_format(date_create($ord_date),"Ymd"),
+						'r_stock_state_date' => date("Ymd"),
 						'ord_opt_no' => $ord_opt_no,
 						'comment' => $is_sugi ? '수기판매' : '매장판매',
 						'rt' => now(),

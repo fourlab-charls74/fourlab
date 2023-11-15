@@ -875,6 +875,7 @@ class Claim
 					'wonga' => $ord->wonga,
 					'qty' => $qty,
 					'stock_state_date' => date('Ymd'),
+					'r_stock_state_date' => date('Ymd'),
 					'ord_opt_no' => $ord->ord_opt_no,
 					'comment' => '매장환불',
 					'rt' => now(),

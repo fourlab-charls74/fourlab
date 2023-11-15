@@ -538,6 +538,7 @@ class ord03Controller extends Controller
 				'wonga' => $wonga,
 				'qty' => $ord_qty,
 				'stock_state_date' => date('Ymd'),
+				'r_stock_state_date' => date('Ymd'),
 				'ord_opt_no' => $ord_opt_no,
 				'comment' => ($location_type === 'STORE' ? '매장RT' : '매장') . '입고(온라인배송)',
 				'rt' => now(),
@@ -557,11 +558,21 @@ class ord03Controller extends Controller
 				'wonga' => $wonga,
 				'qty' => $ord_qty * -1,
 				'stock_state_date' => date('Ymd'),
+				'r_stock_state_date' => date('Ymd'),
 				'ord_opt_no' => $ord_opt_no,
 				'comment' => '매장주문(온라인배송)',
 				'rt' => now(),
 				'admin_id' => $user['id'],
 				'admin_nm' => $user['name'],
+			]);
+
+		DB::table('product_stock_hst')
+			->where('ord_opt_no', '=', $ord_opt_no)
+			->where('location_cd', '=', $location_cd)
+			->where('type', '=', '15')			// 재고분류 : 매장RT출고(15)
+			->update([
+				'r_stock_state_date' => date('Ymd'),
+				'ut'	=> now()
 			]);
 	}
 
