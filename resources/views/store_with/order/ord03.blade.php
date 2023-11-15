@@ -585,10 +585,21 @@
 
 		Search();
 
-        $("[name=dlv_place_type]").on("change", function(e) {
-            $("#store_search").toggleClass("d-none", e.target.value === 'storage');
-            $("#storage_search").toggleClass("d-none", e.target.value === 'store');
-        });
+		$("[name=dlv_place_type]").on("change", function(e) {
+			if (e.target.value == 'storage') {
+				$("#store_search").hide();
+				$("#storage_search").show();
+			} else if (e.target.value == 'store') {
+				$("#storage_search").hide();
+				$("#store_search").show();
+			} else {
+				$("#store_search").hide();
+				$("#storage_search").show();
+			}
+			
+			$("#store_search").toggleClass("d-none", e.target.value === 'storage');
+			$("#storage_search").toggleClass("d-none", e.target.value === 'store');
+		});
 	});
 	
 	function Search() {

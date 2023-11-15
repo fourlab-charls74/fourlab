@@ -406,8 +406,8 @@
             // },
         },
         {field: "dlv_day", headerName: "출고일자", pinned: 'left', width: 80, cellStyle: {"text-align": "center"},
-			editable: function(params) {return params.data.state === 20;},
-			cellStyle: function(params) {return params.data.state === 20 ? {"background-color": "#ffFF99"} : {};},
+			// editable: function(params) {return params.data.state === 20;},
+			// cellStyle: function(params) {return params.data.state === 20 ? {"background-color": "#ffFF99"} : {};},
 			cellRenderer: function(params) {
                return params.data.state > 0 ? (params.value || '') : '';
             }
@@ -420,8 +420,10 @@
                 return rel_states[params.value];
             }
         },
-        {field: "exp_dlv_day", headerName: "출고예정일자", pinned:'left', cellStyle: {"text-align": "center"}, width: 90,
-           cellRenderer: function(params) {
+        {field: "exp_dlv_day_data", headerName: "출고예정일자", pinned:'left', width: 90,
+			editable: function(params) {return params.data.state === 20;},
+			cellStyle: function(params) {return params.data.state === 20 ? {"text-align": "center", "background-color": "#ffFF99"} : {"text-align": "center"};},
+			cellRenderer: function(params) {
                 return params.data.exp_dlv_day_data;
            }
         },
@@ -532,7 +534,13 @@
 						updatePinnedRow();
 
 					}
-                }
+                } else if (e.column.colId == "exp_dlv_day_data") {
+					const dateRegex = /^\d{6}$/;
+					if (!dateRegex.test(e.newValue)) {
+						alert("출고예정일자는 YYMMDD 형식으로 입력해주세요.");
+						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+					}
+				}
             }
         });
         Search();

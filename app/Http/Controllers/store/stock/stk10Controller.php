@@ -486,7 +486,7 @@ class stk10Controller extends Controller
 				//출고일 변경
 				$update_value	= "";
 				if( $stock_release->exp_dlv_day != $d['dlv_day'] ){
-					//$update_value .= " exp_dlv_day = '" . str_replace("-","",$d['dlv_day']) . "' ";	출고예정일자는 그대로 
+					$update_value .= " exp_dlv_day = '" . $d['exp_dlv_day_data'] . "' "; 
 					//$prc_rt	= $d['dlv_day'] . " 00:00:00";	//231113 ceduce 출고일자는 변경되어야함
 				}
 				
@@ -959,12 +959,7 @@ class stk10Controller extends Controller
 			     , type.code_val as type_nm
 			     , g.goods_nm
 			     , pc.color
-			     , ifnull((
-					 select s.size_cd from size s
-					 where s.size_kind_cd = pc.size_kind
-					    and s.size_cd = pc.size
-					    and use_yn = 'Y'
-				 ),'') as size
+			     , pc.size
 			     , p.qty
 			     , g.price
 			     , (g.price * p.qty) as total_price
@@ -1055,12 +1050,12 @@ class stk10Controller extends Controller
 			'V5:V6' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
 			'F10:F47' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_LEFT ] ],
 			'W10:AH48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_RIGHT ] ],
-			'B5:B8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'S5:S8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'J5:J8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'AA5:AA8' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
-			'A48' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 30 ] ],
-			'A49:A51' => [ 'alignment' => [ 'horizontal' => Alignment::HORIZONTAL_DISTRIBUTED, 'indent' => 4 ] ],
+			'B5:B8' => [ 'alignment' => [ 'indent' => 10 ] ],
+			'S5:S8' => [ 'alignment' => [ 'indent' => 10 ] ],
+			'J5:J8' => [ 'alignment' => [ 'indent' => 10 ] ],
+			'AA5:AA8' => [ 'alignment' => [ 'indent' => 10 ] ],
+			'A48' => [ 'alignment' => [ 'indent' => 30 ] ],
+			'A49:A51' => [ 'alignment' => [ 'indent' => 10 ] ],
 			'V5' => [ 'font' => [ 'size' => 11 ] ],
 			'V6' => [ 'font' => [ 'size' => 11 ] ],
 			'Q5' => [ 'font' => [ 'size' => 11 ] ],
