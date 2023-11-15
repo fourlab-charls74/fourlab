@@ -611,7 +611,7 @@ class stk10Controller extends Controller
 					->where('location_type', '=', 'STORAGE')
 					->update([
 						//'r_stock_state_date' => DB::raw('stock_state_date'),
-						'r_stock_state_date' => date('ymd'),
+						'r_stock_state_date' => date('Ymd'),
 						'ut'	=> now()
 					]);
             }
