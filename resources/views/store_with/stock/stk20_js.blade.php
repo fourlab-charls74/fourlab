@@ -21,28 +21,38 @@
                                     <div class="row">
                                         <div class="col-lg-12 inner-td">
                                             <div class="form-group">
-                                                <label style="min-width:60px;">매장구분</label>
-                                                <div class="flex_box">
-                                                    <div class="flex_box w-100 ">
-                                                        <select name='store_type' class="form-control form-control-sm search-enter">
-                                                            <option value=''>전체</option>
-                                                                @foreach ($store_types as $store_type)
-                                                                    <option value='{{ $store_type->code_id }}'>{{ $store_type->code_val }}</option>
-                                                                @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <div class="form-group">
-                                                <label style="min-width:60px;">매장명</label>
-                                                <div class="flex_box">
-                                                    <input type='text' class="form-control form-control-sm search-all" onkeypress="searchSendStore.Search(event);" name='store_nm'>
-                                                </div>
+												<label style="min-width:80px;">판매채널</label>
+												<div class="flax_box">
+													<select name='store_channel' class="form-control form-control-sm" id="search_store_channel">
+														<option value=''>전체</option>
+													</select>
+												</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+								<div class="row">
+									<div class="col-lg-12 inner-td">
+										<div class="form-group">
+											<label style="min-width:80px;">매장구분</label>
+											<div class="flax_box">
+												<select name='store_channel_kind' class="form-control form-control-sm" id="search_store_channel_kind">
+													<option value=''>전체</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-lg-12 inner-td">
+										<div class="form-group">
+											<label style="min-width:80px;">매장명</label>
+											<div class="flex_box">
+												<input type='text' class="form-control form-control-sm search-all" onkeypress="searchSendStore.Search(event);" name='store_nm' value=''>
+											</div>
+										</div>
+									</div>
+								</div>
                                 <div class="resul_btn_wrap" style="padding-top:7px;text-align:right;display:block;">
                                     <a href="javascript:void(0);" id="search_send_store_sbtn" onclick="return searchSendStore.Search();" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                                 </div>
@@ -76,6 +86,8 @@
     SearchSendStore.prototype.Open = function(callback = null){
         if(this.grid === null){
             this.SetGrid("#div-gd-send-store");
+			this.SetStoreChannelSelect();
+			this.SetStoreChannelKindSelect();
             $("#SearchSendStoreModal").draggable();
             if(this.isMultiple) $("#SearchSendStoreModal #search_send_store_cbtn").css("display", "block");
             this.callback = callback;
@@ -85,7 +97,56 @@
         });
     };
 
-    SearchSendStore.prototype.SetGrid = function(divId){
+	//판매채널 세팅
+	SearchSendStore.prototype.SetStoreChannelSelect = async function(){
+		const { data: { body: types } } = await axios({
+			url: `/store/api/stores/search-storechannel`,
+			method: 'get'
+		});
+		for(let type of types) {
+			$("#search_store_channel").append(`<option value="${type.store_channel_cd}">${type.store_channel}</option>`);
+		}
+	}
+
+	// 매장구분 세팅
+	SearchSendStore.prototype.SetStoreChannelKindSelect = async function() {
+		const storeChannelSelect = document.getElementById("search_store_channel");
+
+		storeChannelSelect.addEventListener("change", function () {
+
+			const sel_channel = document.getElementById("search_store_channel").value;
+
+			$.ajax({
+				method: 'post',
+				url: '/store/standard/std02/show/chg-store-channel',
+				data: {
+					'store_channel': sel_channel
+				},
+				dataType: 'json',
+				success: function (res) {
+					if (res.code == 200) {
+						$('#search_store_channel_kind').empty();
+						let select = $("<option value=''>전체</option>");
+						$('#search_store_channel_kind').append(select);
+
+						for (let i = 0; i < res.store_kind.length; i++) {
+							let option = $("<option value=" + res.store_kind[i].store_kind_cd + ">" + res.store_kind[i].store_kind + "</option>");
+							$('#search_store_channel_kind').append(option);
+						}
+
+					} else {
+						alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+					}
+				},
+				error: function (e) {
+					console.log(e.responseText)
+				}
+			});
+		});
+	}
+
+
+		SearchSendStore.prototype.SetGrid = function(divId){
         let columns = [
             { field:"store_cd", headerName:"매장코드", width:100, cellStyle: { "text-align": "center" }, hide: true },
             { field:"store_nm", headerName:"매장", width: "auto" },
@@ -103,18 +164,18 @@
     };
 
     SearchSendStore.prototype.Search = function(e) {
-        const event_type = e?.type;
-        if (event_type == 'keypress') {
-            if (e.key && e.key == 'Enter') {
-                let data = $('form[name="search_send_store"]').serialize();
-                this.grid.Request('/store/api/stores/search', data);
-            } else {
-                return false;
-            }
-        } else {
-            let data = $('form[name="search_send_store"]').serialize();
-            this.grid.Request('/store/api/stores/search', data);
-        }
+		const event_type = e?.type;
+		if (event_type == 'keypress') {
+			if (e.key && e.key == 'Enter') {
+				let data = $('form[name="search_send_store"]').serialize();
+				this.grid.Request('/store/api/stores/search', data);
+			} else {
+				return false;
+			}
+		} else {
+			let data = $('form[name="search_send_store"]').serialize();
+			this.grid.Request('/store/api/stores/search', data);
+		}
     };
 
     SearchSendStore.prototype.Choice = function(code,name){
