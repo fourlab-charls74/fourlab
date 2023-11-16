@@ -61,8 +61,8 @@ class prd03Controller extends Controller
 		$com_id	= $request->input("com_cd");
 		$com_nm	= $request->input("com_nm");
 		$store_no	= $request->input("store_no", "");
-		$ext_store_qty = $request->input("ext_store_qty", "");
-
+		$ext_storage_qty = $request->input("ext_storage_qty", "");
+		
 		$limit = $request->input("limit", 100);
 		$ord = $request->input('ord','desc');
 		$ord_field = $request->input('ord_field', 'p.prd_cd');
@@ -78,7 +78,7 @@ class prd03Controller extends Controller
 			}
 			$where .= ")";
 		}
-		if ($ext_store_qty == "Y") $where2 .= "and pss2.wqty > 0";
+		if ($ext_storage_qty == "true") $where2 .= "and pss.wqty > 0";
 		if ($type != "") $where .= " and pc.brand = '" . Lib::quote($type) . "'";
 		if ($prd_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($prd_nm) . "%' ";
 		// if ($com_id != "") $where .= " and p.com_id = '" . Lib::quote($com_id) . "'";

@@ -129,7 +129,7 @@ class ord06Controller extends Controller
 		$goods_nm_eng   = $request->input('goods_nm_eng', '');
 		$com_cd         = $request->input('com_cd', '');
 		$com_nm         = $request->input('com_nm', '');
-		$limit          = $request->input('limit', 100);
+		$limit          = $request->input('limit', 2000);
 		$ord            = $request->input('ord', 'desc');
 		$ord_field      = $request->input('ord_field', 'o.ord_date');
 		$page           = $request->input('page', 1);

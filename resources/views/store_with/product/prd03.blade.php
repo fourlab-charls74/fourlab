@@ -1,6 +1,30 @@
 @extends('store_with.layouts.layout')
 @section('title','원부자재상품관리')
 @section('content')
+<style>
+	.select2.select2-container .select2-selection {
+		border: 1px solid rgb(210, 210, 210);
+	}
+	::placeholder {
+		font-size: 13px;
+		font-family: "Montserrat","Noto Sans KR",'mg', Dotum,"돋움",Helvetica,AppleSDGothicNeo,sans-serif;
+		font-weight: 300;
+		padding: 0px 2px 1px;
+		color: black;
+	}
+</style>
+<script>
+	//멀티 셀렉트 박스2
+	$(document).ready(function() {
+		$('.multi_select').select2({
+			placeholder :'전체',
+			multiple: true,
+			width : "100%",
+			closeOnSelect: false,
+		});
+	});
+</script>
+
 	<div class="page_tit">
 		<h3 class="d-inline-flex">원부자재관리</h3>
 		<div class="d-inline-flex location">
@@ -9,29 +33,6 @@
 			<span>/ 원부자재관리</span>
 		</div>
 	</div>
-	<style>
-		.select2.select2-container .select2-selection {
-			border: 1px solid rgb(210, 210, 210);
-		}
-		::placeholder {
-			font-size: 13px;
-			font-family: "Montserrat","Noto Sans KR",'mg', Dotum,"돋움",Helvetica,AppleSDGothicNeo,sans-serif;
-			font-weight: 300;
-			padding: 0px 2px 1px;
-			color: black;
-		}
-	</style>
-	<script>
-		//멀티 셀렉트 박스2
-		$(document).ready(function() {
-			$('.multi_select').select2({
-				placeholder :'전체',
-				multiple: true,
-				width : "100%",
-				closeOnSelect: false,
-			});
-		});
-	</script>
 	<form method="get" name="search" id="search">
 		@csrf
 		<input type='hidden' name='goods_nos' value=''>
@@ -145,31 +146,33 @@
 				<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 			</div>
 		</div>
-	<!-- DataTales Example -->
-	<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
-		<div class="card-body">
-			<div class="card-title mb-3">
-				<div class="filter_wrap">
-					<div class="fl_box">
-						<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-					</div>
-					<div class="fr_box">
-						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-							<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
-							<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
+			<!-- DataTales Example -->
+		<form method="post" name="save" action="/head/stock/stk01">
+			@csrf
+			<div id="filter-area" class="card shadow-none mb-0 ty2 last-card">
+				<div class="card-body">
+					<div class="card-title mb-3">
+						<div class="filter_wrap">
+							<div class="fl_box">
+								<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+							</div>
+							<div class="fr_box flex_box">
+								<div class="fr_box">
+									<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+										<input type="checkbox" class="custom-control-input" name="ext_storage_qty" id="ext_storage_qty" value="Y">
+										<label class="custom-control-label font-weight-normal" for="ext_storage_qty">창고재고 0 제외</label>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
-			</div>
-		</form>	
-				<form method="post" name="save" action="/head/stock/stk01">
-					@csrf
 					<div class="table-responsive">
 						<div id="div-gd" style="min-height:300px;height:calc(100vh - 370px);width:100%;" class="ag-theme-balham gd-lh50 ty2"></div>
 					</div>
-				</form>
+				</div>
 			</div>
-		</div>
+		</form>
+		
 	<style>
 		/* 전시카테고리 상품 이미지 사이즈 픽스 */
 		.img {
@@ -270,6 +273,7 @@
 				headerName: '매장재고', 
 				type: "currencyType",
 				width: 80,
+				hide: true,
 				cellRenderer: function(params) {
                 	if (params.value !== undefined) {
 						return '<a href="#" onclick="return openStoreStock(\'' + params.data.prd_cd + '\');">' + params.value + '</a>';
@@ -307,7 +311,9 @@
 		});
 
 		function Search() {
+			let ischeck = $('#ext_storage_qty').is(':checked');
 			let data = $('form[name="search"]').serialize();
+			data += '&ext_storage_qty=' + ischeck;
 			gx.Request('/store/product/prd03/search', data, 1);
 		}
 
