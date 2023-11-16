@@ -566,6 +566,8 @@
                 return '<a href="javascript:void(0);" onclick="return openShopOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
             }
         },
+		{field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
+		{field: "clm_state_nm", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}, hide:true,
             cellRenderer: (params) => {
                 return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';

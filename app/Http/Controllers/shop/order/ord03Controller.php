@@ -205,6 +205,7 @@ class ord03Controller extends Controller
 		$sql = "
 			select a.*
 				, os.code_val as ord_state_nm
+			    , cm.code_val as clm_state_nm
 				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
@@ -217,13 +218,8 @@ class ord03Controller extends Controller
 					, rcp.state, rcp.dlv_location_type, rcp.dlv_location_cd, rcp.rt as receipt_date
 					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select store_nm from store where store_cd = rcp.dlv_location_cd)) as dlv_location_nm
 					, o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
-					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color
-					, (
-						select s.size_cd from size s
-						where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-							and s.size_cd = pc.size
-							and use_yn = 'Y'
-					) as size
+					, pc.prd_cd, pc.prd_cd_p as prd_cd_p, pc.color
+					, pc.size
 					, o.wonga, o.price, g.price as goods_price, g.goods_sh, o.qty, o.dlv_no
 					, o.pay_type, o.dlv_amt, o.point_amt, o.coupon_amt, o.dc_amt, o.recv_amt
 					, o.sale_place, o.store_cd, o.ord_state, o.clm_state, o.com_id, o.baesong_kind as dlv_baesong_kind, o.ord_date
@@ -244,6 +240,7 @@ class ord03Controller extends Controller
 				where rcp.reject_yn = 'N'
 					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
 					and o.clm_state in (-30,1,90,0)
+					-- 클레임상태 (-30 : 클레임무효, 1 : 임시저장, 90: 클레임없음, 0: 클레임없음)
 					$where
 				$orderby
 				$limit
@@ -251,6 +248,7 @@ class ord03Controller extends Controller
 				left outer join code sk on sk.code_kind_cd = 'SALE_KIND' and sk.code_id = a.sale_kind
 				left outer join code pr on pr.code_kind_cd = 'PR_CODE' and pr.code_id = a.pr_code
 				left outer join code os on os.code_kind_cd = 'G_ORD_STATE' and os.code_id = a.ord_state
+			    left outer join code cm on cm.code_kind_cd = 'G_CLM_STATE' and cm.code_id = a.clm_state
 				left outer join code ot on ot.code_kind_cd = 'G_ORD_TYPE' and ot.code_id = a.ord_type
 				left outer join code ok on ok.code_kind_cd = 'G_ORD_KIND' and ok.code_id = a.ord_kind
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = a.dlv_baesong_kind

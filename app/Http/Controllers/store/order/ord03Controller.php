@@ -245,7 +245,7 @@ class ord03Controller extends Controller
 					, rcp.state, rcp.dlv_location_type, rcp.dlv_location_cd, rcp.rt as receipt_date
 					, if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), (select code_val from code where code_kind_cd = 'ONLINE_ORDER_STORE' and code_id = rcp.dlv_location_cd)) as dlv_location_nm
 					, o.ord_no, o.ord_opt_no, o.goods_no, g.goods_nm, g.goods_nm_eng, g.style_no, o.goods_opt
-					, pc.prd_cd, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p, pc.color
+					, pc.prd_cd, pc.prd_cd_p as prd_cd_p, pc.color
 					-- , ifnull((
 					-- 	select s.size_cd from size s
 					-- 	where s.size_kind_cd = pc.size_kind
