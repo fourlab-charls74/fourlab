@@ -237,7 +237,7 @@ class prd04Controller extends Controller
 		"
 			select
 				pc.prd_cd
-				, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+				, pc.prd_cd_p as prd_cd_p
 				, if(pc.goods_no = 0, '', ps.goods_no) as goods_no
 				, b.brand_nm
 				, if(pc.goods_no = 0, p.style_no, g.style_no) as style_no
@@ -465,7 +465,7 @@ class prd04Controller extends Controller
 			 * 매장의 "타매장재고조회"항목이 'N'일 경우 => 해당매장재고만 조회
 			 */
 			$store = DB::table('store')->where('store_cd', $user_store)->first();
-			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_type = '$store->store_type'";
+			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_channel = '$store->store_channel' and s.store_channel_kind = '$store->store_channel_kind' and s.use_yn = 'Y'" ;
 			else $where .= " and s.store_cd = '$user_store'";
 
 			/**

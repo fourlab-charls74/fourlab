@@ -501,7 +501,7 @@ class prd04Controller extends Controller
 					select
 						p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
 						, p.match_yn, p.use_yn, pc.brand, b.brand_nm
-						, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+						, pc.prd_cd_p as prd_cd_p
 					from product p
 						inner join product_code pc on pc.prd_cd = p.prd_cd
 						left outer join company c on c.com_id = p.com_id
