@@ -91,6 +91,23 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="card shadow mb-2">
+		<div class="card-body">
+			<div class="card-title">
+				<h6 class="m-0 font-weight-bold text-primary fas fa-question-circle"> Help</h6>
+			</div>
+			<ul class="mb-0">
+				<li>입고 : 상품입고</li>
+				<li>이동입고 : 창고상품이동입고</li>
+				<li>출고 : 생산반품 + 매장출고</li>
+				<li>이동출고 : 창고상품이동출고</li>
+				<li>반품 : 매장반품</li>
+				<li>Loss : Loss</li>
+			</ul>
+		</div>
+	</div>
+	
 	<script>
 		const columns = [
 			{headerName: '#',	width:35,	type:'NumType',	cellStyle: {"background":"#F5F7F7", "text-align":"center"}},
@@ -113,7 +130,7 @@
 		let gx;
 
 		$(document).ready(function() {
-			pApp.ResizeGrid(275);
+			pApp.ResizeGrid(460);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			gx = new HDGrid(gridDiv, columns);
