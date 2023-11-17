@@ -461,13 +461,23 @@ class prd04Controller extends Controller
 			$where = "";
 
 			/**
-			 * 매장의 "타매장재고조회"항목이 'Y'일 경우 => 같은 매장구분값을 가지는 매장들의 재고 조회
-			 * 매장의 "타매장재고조회"항목이 'N'일 경우 => 해당매장재고만 조회
+			 * 매장의 "타매장재고조회(본 매장 외)"항목이 'Y'일 경우 => 같은 판매채널을 가지는 매장들의 재고 조회
+			 * 매장의 "타매장재고조회(본 매장 외)"항목이 'N'일 경우 => 해당매장재고만 조회
+			 * 
+			 * 매장의 "타매장재고조회" 항목이 'Y'일 경우 => 매장에서 'Y'인 매장재고만 조회 
+			 * 매장의 "타매장재고조회" 항목이 'N'일 경우 => 안보여주면됨
 			 */
 			$store = DB::table('store')->where('store_cd', $user_store)->first();
-			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_channel = '$store->store_channel'  and s.use_yn = 'Y'" ;
-			else $where .= " and s.store_cd = '$user_store'";
-
+			
+			// 삭제될 예정 2022-11-17
+//			if ($store->ostore_stock_yn === 'Y') {
+//				$where .= " and s.store_channel = '$store->store_channel'  and s.use_yn = 'Y'" ;
+//			} else {
+//				$where .= " and s.store_cd = '$user_store'";
+//			} 
+			
+			$where .= " and s.store_stock_yn = 'Y' and s.use_yn = 'Y'";
+ 
 			/**
              * "오픈후한달재고보기제외여부"항목이 'Y'인 모든 매장의 오픈달이 현재 해당될 때, 매장재고을 보여주지 않음
              */

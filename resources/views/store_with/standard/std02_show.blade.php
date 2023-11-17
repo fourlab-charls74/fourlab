@@ -356,7 +356,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th>타매장재고조회</th>
+											<th>타매장재고조회(본 매장 외)</th>
 											<td>
 												<div class="form-inline form-radio-box">
 													<div class="custom-control custom-radio">
@@ -369,6 +369,21 @@
 													</div>
 												</div>
 											</td>
+											<th>타매장재고조회</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="store_stock_yn_Y" name="store_stock_yn" value="Y" @if(@$store->store_stock_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="store_stock_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="store_stock_yn_N" name="store_stock_yn" value="N" @if(@$store->store_stock_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="store_stock_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th>판매분배분여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -382,8 +397,6 @@
 													</div>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>매장RT여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -394,22 +407,6 @@
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="rt_yn_N" name="rt_yn" value="N" @if(@$store->rt_yn == 'N') checked @endif />
 														<label class="custom-control-label" for="rt_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th>적립금지급여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="point_in_yn_Y" name="point_in_yn" value="Y" @if(@$store->point_in_yn == 'Y') checked @endif />
-														<label class="custom-control-label" for="point_in_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="point_in_yn_N" name="point_in_yn" value="N" @if(@$store->point_in_yn != 'Y') checked @endif />
-														<label class="custom-control-label" for="point_in_yn_N">N</label>
-													</div>
-													<div id="point_ratio_view" style="padding-left:10px;">
-														<input type="text" name="point_ratio" id="point_ratio" value="{{ @$store->point_ratio }}" class="form-control form-control-sm w-25" /> %
 													</div>
 												</div>
 											</td>
@@ -428,6 +425,22 @@
 											</td>
 										</tr>
 										<tr>
+											<th>적립금지급여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_in_yn_Y" name="point_in_yn" value="Y" @if(@$store->point_in_yn == 'Y') checked @endif />
+														<label class="custom-control-label" for="point_in_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="point_in_yn_N" name="point_in_yn" value="N" @if(@$store->point_in_yn != 'Y') checked @endif />
+														<label class="custom-control-label" for="point_in_yn_N">N</label>
+													</div>
+													<div id="point_ratio_view" style="padding-left:10px;">
+														<input type="text" name="point_ratio" id="point_ratio" value="{{ @$store->point_ratio }}" class="form-control form-control-sm w-25" /> %
+													</div>
+												</div>
+											</td>
 											<th>적립금사용(POS)여부</th>
 											<td>
 												<div class="form-inline form-radio-box">
@@ -438,6 +451,21 @@
 													<div class="custom-control custom-radio">
 														<input type="radio" class="custom-control-input" id="point_out_yn_N" name="point_out_yn" value="N" @if(@$store->point_out_yn != 'Y') checked @endif />
 														<label class="custom-control-label" for="point_out_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>중간관리여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="md_manage_yn_Y" name="md_manage_yn" value="Y" @if(@$store->md_manage_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="md_manage_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="md_manage_yn_N" name="md_manage_yn" value="N" @if(@$store->md_manage_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="md_manage_yn_N">N</label>
 													</div>
 												</div>
 											</td>
@@ -461,23 +489,6 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
-											<th>중간관리여부</th>
-											<td>
-												<div class="form-inline form-radio-box">
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="md_manage_yn_Y" name="md_manage_yn" value="Y" @if(@$store->md_manage_yn != 'N') checked @endif />
-														<label class="custom-control-label" for="md_manage_yn_Y">Y</label>
-													</div>
-													<div class="custom-control custom-radio">
-														<input type="radio" class="custom-control-input" id="md_manage_yn_N" name="md_manage_yn" value="N" @if(@$store->md_manage_yn == 'N') checked @endif />
-														<label class="custom-control-label" for="md_manage_yn_N">N</label>
-													</div>
-												</div>
-											</td>
-											<th>&nbsp;</th>
-											<td>&nbsp;</td>
 										</tr>
 										<tr>
 											<th>이미지</th>
