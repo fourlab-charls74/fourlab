@@ -44,7 +44,7 @@ class stk30Controller extends Controller
 		$date_yn	= $request->input('date_yn');
         $sdate      = $request->input("sdate", now()->sub(1, 'week')->format('Ymd'));
         $edate      = $request->input("edate", date("Ymd"));
-		$exp_date_yn	= $request->input('date_yn');
+		$exp_date_yn	= $request->input('exp_date_yn');
 		$exp_sdate      = $request->input("exp_sdate", now()->sub(1, 'week')->format('Ymd'));
 		$exp_edate      = $request->input("exp_edate", date("Ymd"));
         $sr_state   = $request->input("sr_state", "");
