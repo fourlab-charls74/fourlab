@@ -29,7 +29,10 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="">반품일자</label>
+                            <label for="">
+								반품일자
+								<input type="checkbox" name="date_yn" value="Y">
+							</label>
                             <div class="form-inline date-select-inbox">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -85,6 +88,39 @@
                     </div>
                 </div>
                 <div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="">
+								반품예정일자
+								<input type="checkbox" name="exp_date_yn" value="Y" checked>
+							</label>
+							<div class="form-inline date-select-inbox">
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="exp_sdate" value="{{ $sdate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+								<span class="text_line">~</span>
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="exp_edate" value="{{ $edate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">반품창고</label>
@@ -122,22 +158,22 @@
 			                </div>
 		                </div>
 	                </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="">매장명</label>
-                            <div class="form-inline inline_select_box">
-                                <div class="form-inline-inner input-box w-100">
-                                    <div class="form-inline inline_btn_box">
-                                        <input type='hidden' id="store_nm" name="store_nm">
-                                        <select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-                                        <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="">매장명</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner input-box w-100">
+									<div class="form-inline inline_btn_box">
+										<input type='hidden' id="store_nm" name="store_nm">
+										<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+										<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 	                <div class="col-lg-4 inner-td">
 		                <div class="form-group">
 			                <label for="">자료수/정렬</label>
@@ -227,7 +263,8 @@
                 return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.data.store_cd}_${return_date}_${return_code}</a>`;
             }
         },
-        {field: "sr_date", headerName: "반품일자", width: 90, cellClass: 'hd-grid-code'},
+		{field: "sr_date", headerName: "반품예정일자", width: 90, cellClass: 'hd-grid-code'},
+		{field: "sr_fin_date", headerName: "반품일자", width: 90, cellClass: 'hd-grid-code'},
         {field: "sr_state", hide: true},
         {field: "sr_state_nm", headerName: "반품상태", width: 65, cellStyle: StyleReturnState},
         {field: "sr_kind", hide: true},

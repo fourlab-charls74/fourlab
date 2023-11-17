@@ -41,8 +41,12 @@ class stk30Controller extends Controller
 
     public function search(Request $request)
     {
+		$date_yn	= $request->input('date_yn');
         $sdate      = $request->input("sdate", now()->sub(1, 'week')->format('Ymd'));
         $edate      = $request->input("edate", date("Ymd"));
+		$exp_date_yn	= $request->input('date_yn');
+		$exp_sdate      = $request->input("exp_sdate", now()->sub(1, 'week')->format('Ymd'));
+		$exp_edate      = $request->input("exp_edate", date("Ymd"));
         $sr_state   = $request->input("sr_state", "");
         $sr_reason  = $request->input("sr_reason", "");
         $storage_cd = $request->input("storage_cd", "");
@@ -54,12 +58,23 @@ class stk30Controller extends Controller
         // where
 		$where = "";
 
-        $sdate = str_replace("-", "", $sdate);
-        $edate = str_replace("-", "", $edate);
-        $where .= "
-            and cast(sr.sr_date as date) >= '$sdate' 
-            and cast(sr.sr_date as date) <= '$edate'
-        ";
+		if( $date_yn == "Y" ) {
+			$sdate = str_replace("-", "", $sdate);
+			$edate = str_replace("-", "", $edate);
+			$where .= "
+				and cast(sr.sr_fin_date as date) >= '$sdate' 
+				and cast(sr.sr_fin_date as date) <= '$edate'
+			";
+		}
+		if( $exp_date_yn == "Y" ) {
+			$exp_sdate = str_replace("-", "", $exp_sdate);
+			$exp_edate = str_replace("-", "", $exp_edate);
+			$where .= "
+				and cast(sr.sr_date as date) >= '$exp_sdate' 
+				and cast(sr.sr_date as date) <= '$exp_edate'
+        	";
+		}
+		
         if($sr_state != "")     $where .= " and sr.sr_state = '" . Lib::quote($sr_state) . "'";
         if($sr_reason != "")    $where .= " and sr.sr_reason = '" . Lib::quote($sr_reason) . "'";
         if($storage_cd != "")   $where .= " and sr.storage_cd = '" . Lib::quote($storage_cd) . "'";
@@ -92,6 +107,7 @@ class stk30Controller extends Controller
                 store.store_type,
                 sc.store_kind as store_type_nm,
                 sr.sr_date,
+                sr.sr_fin_date,
                 sr.sr_kind,
                 sr.sr_state,
                 c.code_val as sr_state_nm,
@@ -394,9 +410,13 @@ class stk30Controller extends Controller
 				'ut' => now(),
 				'admin_id' => $admin_id,
 			];
-			
+
 			if ($new_state != '') {
 				$sr_update = array_merge($sr_update, [ 'sr_state' => $new_state ]);
+			}
+
+			if ($new_state == '40') {
+				$sr_update = array_merge($sr_update, [ 'sr_fin_date' => date('Y-m-d') ]);
 			}
 
             DB::table('store_return')
