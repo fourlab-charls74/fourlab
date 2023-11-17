@@ -516,7 +516,7 @@ class stk10Controller extends Controller
 
 				DB::table('product_stock_hst')
 					->where('release_no', '=', $d['idx'])
-					->where('location_type', '=', 'STORAGE')
+					->where('location_type', '=', 'STORE')
 					->update([
 						//'r_stock_state_date' => DB::raw('stock_state_date'),
 						'r_stock_state_date' => date('Ymd'),
