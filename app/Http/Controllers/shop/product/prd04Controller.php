@@ -465,7 +465,7 @@ class prd04Controller extends Controller
 			 * 매장의 "타매장재고조회"항목이 'N'일 경우 => 해당매장재고만 조회
 			 */
 			$store = DB::table('store')->where('store_cd', $user_store)->first();
-			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_channel = '$store->store_channel' and s.store_channel_kind = '$store->store_channel_kind' and s.use_yn = 'Y'" ;
+			if ($store->ostore_stock_yn === 'Y') $where .= " and s.store_channel = '$store->store_channel'  and s.use_yn = 'Y'" ;
 			else $where .= " and s.store_cd = '$user_store'";
 
 			/**
