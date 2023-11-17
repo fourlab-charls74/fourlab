@@ -889,6 +889,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		//창고일자별 수불현황
 		Route::get('sal28', 'sal28Controller@index');
 		Route::get('sal28/search', 'sal28Controller@search');
+
+		//창고일자별 수불현황(실재고)
+		Route::get('sal30', 'sal30Controller@index');
+		Route::get('sal30/search', 'sal30Controller@search');
 		
         //배분현황
 		Route::get('sal29', 'sal29Controller@index');
