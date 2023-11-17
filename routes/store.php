@@ -330,6 +330,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd02/prd-edit-search', 'prd02Controller@prd_edit_search');
         Route::get('prd02/prd-edit-match-search', 'prd02Controller@prd_edit_match_search');
         Route::put('prd02/del-product-code', 'prd02Controller@del_product_code');
+        Route::put('prd02/del-prd-cd-not-matching', 'prd02Controller@del_prd_cd_not_matching');
         Route::put('prd02/edit-match-product-code', 'prd02Controller@edit_match_product_code');
         Route::put('prd02/del-mapping', 'prd02Controller@del_mapping');
 

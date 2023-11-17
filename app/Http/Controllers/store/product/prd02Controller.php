@@ -2591,6 +2591,62 @@ class prd02Controller extends Controller
 			],
 			"body"	=> $data
 		]);
+	}
 
+	// 비매칭 바코드 삭제
+	public function del_prd_cd_not_matching(Request $request)
+	{
+
+		$prd_cd	= $request->input('prd_cd');
+
+		try {
+			DB::beginTransaction();
+
+			$sql = "
+				select
+					qty
+					, wqty
+				from product_stock
+				where prd_cd = :prd_cd
+			";
+			$product_stock_cnt = DB::selectOne($sql,[ 'prd_cd' => $prd_cd ]);
+
+			if ($product_stock_cnt->qty == 0 && $product_stock_cnt->wqty == 0) {
+				DB::table('product')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
+				DB::table('product_code')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
+				DB::table('product_stock')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
+				DB::table('product_stock_storage')
+					->where('prd_cd', '=', $prd_cd)
+					->delete();
+
+				DB::commit();
+				$code = 200;
+				$msg = "바코드 삭제가 완료되었습니다.";
+
+			} else {
+				$code = 201;
+				$msg = "해당 상품의 재고가 남아있습니다.";
+			}
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 }

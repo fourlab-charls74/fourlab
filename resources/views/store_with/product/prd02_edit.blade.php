@@ -1,9 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @section('title', '바코드 매칭 정보')
 @section('content')
-
-
-
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
@@ -15,6 +12,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
+			@if($goods_no == '0')<a href="javascript:void(0)" onclick="delBarcode();" class="btn btn-danger mr-1"><i class="fas fa-trash fa-sm text-white-50 mr-1"></i>비매칭 바코드삭제</a>@endif
 			<a href="javascript:void(0)" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 			@if($goods_no == '0')<a href="javascript:void(0)" onclick="match();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>상품매핑</a>@endif
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
@@ -310,6 +308,34 @@
 		prd_cd	= '{{ $product->prd_cd_p }}';
 		var url = '/store/product/prd02/create?prd_cd=' + prd_cd;
 		var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1100,height=900");
+	}
+	
+	// 비매칭 바코드 삭제
+	function delBarcode() {
+		const prd_cd = $('#prd_cd').val();
+		if(!window.confirm("바코드를 삭제하면 기존 재고 정보도 함께 삭제됩니다.\r\n삭제하시겠습니까?")) return;
+
+		axios({
+			url: '/store/product/prd02/del-prd-cd-not-matching',
+			method: 'put',
+			data: {
+				prd_cd : prd_cd,
+				goods_no : $("#goods_no").val()
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				opener.Search();
+				window.close();
+			} else if (res.data.code === 201) {
+				alert("해당 바코드의 재고가 존재합니다. 삭제할 수 없습니다.");
+			} else {
+				console.log(res.data);
+				alert("바코드 삭제중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
 	}
 </script>
 @stop
