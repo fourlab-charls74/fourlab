@@ -293,7 +293,7 @@ class ord03Controller extends Controller
 				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place
 				inner join mgr_user mu on mu.id = a.req_id
 		";
-		$result = DB::select($sql);dd($sql);
+		$result = DB::select($sql); 
 
 		// pagination
 		$total = 0;
