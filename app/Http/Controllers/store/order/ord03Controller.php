@@ -276,7 +276,7 @@ class ord03Controller extends Controller
 					left outer join code c on c.code_id = o.dlv_cd and c.code_kind_cd = 'DELIVERY'
 				where rcp.reject_yn = 'N'
 					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
-					and o.clm_state in (-30,1,90,0)
+					-- and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
 				$limit
