@@ -162,7 +162,7 @@
             {headerName: '', headerCheckboxSelection: true, checkboxSelection: true, width:28, pinned:'left'},
             {headerName: "매장코드", field: "store_cd",width:100, cellStyle: {'text-align':'center' }},
             {headerName: "매장명", field: "store_nm",  width:200, cellClass: 'hd-grid-code'},
-            {headerName: "연락처", field: "mobile",  width:100, cellClass: 'hd-grid-code'},
+            {headerName: "연락처", field: "phone",  width:100, cellClass: 'hd-grid-code'},
             {headerName: "구분", field: "store", hide:true},
             {width: 'auto'}
         ];

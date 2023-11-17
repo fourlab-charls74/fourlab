@@ -44,8 +44,14 @@ class stk32Controller extends Controller
         $read_yn = $request->input('read_yn');
 
         $where = "";
+		$having = "";
         $orderby = "";
-        if ($sender != "") $where .= "and store_nm like '%" . Lib::quote($sender) . "%'  ";
+		
+		if ($msg_type == 'send') {
+        	if ($sender != "") $having .= "having receiver_nm like '%" . Lib::quote($sender) . "%'  ";
+		} else {
+			if ($sender != "") $having .= "having sender_nm like '%" . Lib::quote($sender) . "%'  ";			
+		}
         if ($content != "") $where .= " and m.content like '%" . Lib::quote($content) . "%' ";
         if ($read_yn != "") $where .= "and md.check_yn = '$read_yn'";
      
@@ -90,6 +96,7 @@ class stk32Controller extends Controller
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
                 $where
                 group by m.rt
+            	$having
                 $orderby
                 $limit
             ";
@@ -114,6 +121,7 @@ class stk32Controller extends Controller
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day)
                 $where
                 group by md.msg_cd
+                $having
                 $orderby
                 $limit
             ";
@@ -163,7 +171,7 @@ class stk32Controller extends Controller
                 select 
                     store_cd,
                     store_nm,
-                    mobile,
+                	phone,
                     '$div_store' as store,
                     store_type
                 from store
