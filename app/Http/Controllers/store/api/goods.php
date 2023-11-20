@@ -865,6 +865,7 @@ class goods extends Controller
                 , pc.item, pc.opt, pc.seq) as prd_cd1,
                 pc.color, p.match_yn,
 				pc.size
+                , pc.size_kind
                 from product_code pc
                     left outer join goods g on g.goods_no = pc.goods_no
                     inner join product p on pc.prd_cd = p.prd_cd
@@ -876,12 +877,8 @@ class goods extends Controller
             $sql = "
                 select pc.prd_cd, p.prd_nm, pc.goods_no, pc.goods_opt, concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt, pc.seq) as prd_cd1,
                 pc.color, p.match_yn, pc.rt
-                , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+                , pc.size
+                , pc.size_kind
                 from product_code pc
                     inner join product p on pc.prd_cd = p.prd_cd
                 where 1=1 $where
@@ -1264,5 +1261,27 @@ class goods extends Controller
 		$keys = [ 'list_key' => 'size_kinds', 'one_sheet_count' => $data['one_sheet_count'] ];
 
 		return \Maatwebsite\Excel\Facades\Excel::download(new ExcelViewExport($view_url, $data, [], [], $keys), '사이즈코드표.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+	}
+	
+	public function search_size(Request $request) {
+		$size_kind = $request->input('size_kind', '');
+		
+		foreach ($size_kind as $sk) {
+			$sql = "
+				select
+				    size_cd
+				    , size_nm
+				from size
+				where size_kind_cd = '$sk'
+					and use_yn = 'Y'
+				order by size_seq
+			";
+			$sizes = DB::select($sql);
+		}
+
+		return response()->json([
+			"body" => $sizes
+		]);
+		
 	}
 }

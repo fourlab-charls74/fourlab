@@ -79,6 +79,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 
         // 상품코드 조회
         Route::get('prdcd/conds', 'goods@search_product_conditions');
+        Route::get('prdcd/size', 'goods@search_size');
         Route::get('prdcd/search', 'goods@search_prdcd');
         Route::get('prdcd/conds_code', 'goods@search_product_conditions_code');
         Route::get('prdcd/search_code', 'goods@search_prdcd_code');

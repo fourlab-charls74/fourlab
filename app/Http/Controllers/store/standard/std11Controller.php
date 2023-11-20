@@ -49,7 +49,15 @@ class std11Controller extends Controller
 		$colors = DB::select($color_sql);
 		
 		//사이즈
-		$size_sql = "select code_id, code_val, code_val2 from code where code_kind_cd = 'prd_cd_size_match' order by code_id asc ";
+		$size_sql = "select 
+    					size_kind_cd
+     					, size_cd
+     					, size_nm
+					from size
+					where use_yn = 'Y' 
+					order by size_seq asc 
+					
+				";
 		$sizes = DB::select($size_sql);
 
 		//사이즈구분
@@ -61,7 +69,7 @@ class std11Controller extends Controller
 			where use_yn = 'Y' 
 			order by seq asc
 		";
-		$size_kind = DB::select($size_kind_sql);
+		$size_kinds = DB::select($size_kind_sql);
 
 		$values = [
             'sdate' 	=> $sdate,
@@ -71,7 +79,7 @@ class std11Controller extends Controller
 		    'as_states' => $as_states,
 			'colors'	=> $colors,
 			'sizes'		=> $sizes,
-			'size_kind' => $size_kind
+			'size_kinds' => $size_kinds
         ];
 		return view(Config::get('shop.store.view') . '/standard/std11_view', $values);
 	}
@@ -114,12 +122,8 @@ class std11Controller extends Controller
 				, a.prd_cd
 				, a.goods_nm
 				, a.color
-				, ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+				, a.size_kind_cd
+				, pc.size
 				, a.is_free
 				, a.as_amt
 				, a.content
@@ -178,10 +182,31 @@ class std11Controller extends Controller
 		//컬러
 		$color_sql = "select code_id, code_val from code where code_kind_cd = 'prd_cd_color' order by code_id asc ";
 		$colors = DB::select($color_sql);
+		
 
 		//사이즈
-		$size_sql = "select code_id, code_val, code_val2 from code where code_kind_cd = 'prd_cd_size_match' order by code_id asc ";
+		$size_sql = "select 
+    					size_kind_cd
+     					, size_cd
+     					, size_nm
+					from size
+					where use_yn = 'Y' 
+						and size_kind_cd = '$row->size_kind_cd'
+					order by size_seq asc 
+					
+				";
 		$sizes = DB::select($size_sql);
+
+		//사이즈구분
+		$size_kind_sql = "
+			select 
+				size_kind_cd
+				, size_kind_nm
+			from size_kind 
+			where use_yn = 'Y' 
+			order by seq asc
+		";
+		$size_kinds = DB::select($size_kind_sql);
 
 
 		$values = [ 
@@ -192,7 +217,8 @@ class std11Controller extends Controller
 			'store' => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $row->store_cd)->first(),
 			'as_states' => $as_states,
 			'colors'	=> $colors,
-			'sizes'		=> $sizes
+			'sizes'		=> $sizes,
+			'size_kinds' => $size_kinds
 		];
 		return view(Config::get('shop.store.view') . '/standard/std11_detail', $values);
 	}
@@ -393,6 +419,7 @@ class std11Controller extends Controller
 					'prd_cd' => $data['prd_cd'],
 					'goods_nm' => $data['goods_nm'],
 					'color' => $data['color'],
+					'size_kind_cd' => $data['size_kind'],
 					'size' => $data['size'],
 					'is_free' => $data['is_free'],
 					'as_amt' => $data['as_amt']??'',
@@ -460,6 +487,7 @@ class std11Controller extends Controller
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
+						'size_kind_cd' => $data['size_kind'],
 						'size' => $data['size'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
@@ -489,6 +517,7 @@ class std11Controller extends Controller
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
+						'size_kind_cd' => $data['size_kind'],
 						'size' => $data['size'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
@@ -518,6 +547,7 @@ class std11Controller extends Controller
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
+						'size_kind_cd' => $data['size_kind'],
 						'size' => $data['size'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
@@ -547,6 +577,7 @@ class std11Controller extends Controller
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
+						'size_kind_cd' => $data['size_kind'],
 						'size' => $data['size'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',
@@ -574,6 +605,7 @@ class std11Controller extends Controller
 							'prd_cd' => $data['prd_cd'],
 							'goods_nm' => $data['goods_nm'],
 							'color' => $data['color'],
+							'size_kind_cd' => $data['size_kind'],
 							'size' => $data['size'],
 							'is_free' => $data['is_free'],
 							'as_amt' => $data['as_amt']??'',
@@ -602,6 +634,7 @@ class std11Controller extends Controller
 						'prd_cd' => $data['prd_cd'],
 						'goods_nm' => $data['goods_nm'],
 						'color' => $data['color'],
+						'size_kind_cd' => $data['size_kind'],
 						'size' => $data['size'],
 						'is_free' => $data['is_free'],
 						'as_amt' => $data['as_amt']??'',

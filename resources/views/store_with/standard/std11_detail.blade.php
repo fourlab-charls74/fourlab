@@ -138,20 +138,13 @@
                                                     <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value='{{@$row->goods_nm}}'>
                                                 </div>
                                             </td>
-                                            <th class="required">컬러 / 사이즈</th>
+                                            <th class="required">컬러</th>
                                             <td>
                                                 <div class="flex_box">
-                                                    <select name='color' id='color' class="form-control form-control-sm" style="width:54%">
+                                                    <select name='color' id='color' class="form-control form-control-sm" style="width:100%">
 														<option value=''>선택</option>
 														@foreach ($colors as $color)
 														    <option value='{{ $color->code_id }}' @if ($row->color == $color->code_id) selected @endif>{{ $color->code_id }} : {{ $color->code_val }}</option>
-														@endforeach
-													</select>
-                                                    <span class="text_line mx-2">/</span>
-                                                    <select name='size' id='size' class="form-control form-control-sm"  style="width:40%">
-														<option value=''>선택</option>
-														@foreach ($sizes as $size)
-														    <option value='{{ $size->code_id }}'  @if ($row->size == $size->code_id) selected @endif >{{ $size->code_val }} : {{ $size->code_val2 }}</option>
 														@endforeach
 													</select>
                                                 </div>
@@ -164,6 +157,28 @@
                                                     <input type='text' class="form-control form-control-sm" name='qty' id="qty" value='{{@$row->qty}}' onkeyup="onlynum(this)">
                                                 </div>
                                             </td> -->
+											<th class="required">사이즈구분</th>
+											<td>
+												<div class="flex_box">
+													<select name='size_kind' id='size_kind' class="form-control form-control-sm"  style="width:100%" onchange="change_size();">
+														<option value=''>선택</option>
+														@foreach ($size_kinds as $size_kind)
+															<option value='{{ $size_kind->size_kind_cd }}'@if ($row->size_kind_cd == $size_kind->size_kind_cd) selected @endif>{{ $size_kind->size_kind_cd }} : {{ $size_kind->size_kind_nm }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">사이즈</th>
+											<td>
+												<div class="flex_box">
+													<select name='size' id='size' class="form-control form-control-sm"  style="width:100%">
+														<option value=''>선택</option>
+														@foreach ($sizes as $size)
+															<option value='{{ $size->size_cd }}' @if ($row->size == $size->size_cd) selected @endif>{{ $size->size_cd }} : {{ $size->size_nm }}</option>
+														@endforeach
+													</select>	
+												</div>
+											</td>
                                             <th class="required">수선 유료구분</th>
                                             <td>
                                                 <div class="flex_box">
@@ -182,17 +197,17 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <th></th>
-                                            <td>
-                                                <!-- <div class="flex_box">
-                                                    <select id="as_state" name="as_state" class="form-control form-control-sm">
-                                                        <option value="">선택</option>
-                                                        @foreach ($as_states as $as_state)
-                                                            <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div> -->
-                                            </td>
+{{--                                            <th></th>--}}
+{{--                                            <td>--}}
+{{--                                                <!-- <div class="flex_box">--}}
+{{--                                                    <select id="as_state" name="as_state" class="form-control form-control-sm">--}}
+{{--                                                        <option value="">선택</option>--}}
+{{--                                                        @foreach ($as_states as $as_state)--}}
+{{--                                                            <option value="{{ $as_state->code_id }}">{{ $as_state->code_val }}</option>--}}
+{{--                                                        @endforeach--}}
+{{--                                                    </select>--}}
+{{--                                                </div> -->--}}
+{{--                                            </td>--}}
                                         </tr>
                                         <tr>
                                             <th>
@@ -434,6 +449,37 @@
         }
 
     }
+	
+	//사이즈구분값에 따라 사이즈 값 다르게 출력
+	function change_size() {
+		let size_kind = $('#size_kind option:selected').val();
+
+		$.ajax({
+			method: 'post',
+			url: '/store/product/prd02/change-size',
+			data: {
+				size_kind : size_kind,
+			},
+			success: function (res) {
+				if(res.code == 200) {
+					$('#size').empty();
+
+					let option = '';
+					let sel =''
+					for(let i = 0; i < res.result.length;i++) {
+						sel = "<option value=''>선택</option>"
+						option += '<option value='+ res.result[i].size_cd +'>' + res.result[i].size_cd + ' : ' + res.result[i].size_nm+ '</option>';
+					}
+					$('#size').append(sel);
+					$('#size').append(option);
+
+				}
+			},
+			error: function(request, status, error) {
+				console.log("error")
+			}
+		});
+	}
 
     function change_state() {
         if (validate() === false) return;

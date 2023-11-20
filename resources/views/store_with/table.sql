@@ -1031,6 +1031,7 @@ CREATE TABLE `repair_service` (
   `prd_cd` varchar(50) DEFAULT NULL COMMENT '바코드',
   `goods_nm` varchar(100) DEFAULT NULL COMMENT '수선 상품명',
   `color` varchar(30) DEFAULT NULL COMMENT '컬러',
+  `size_kind_cd` varchar(20) DEFAULT NULL COMMENT '사이즈구분',
   `size` varchar(30) DEFAULT NULL COMMENT '사이즈',
   `qty` int(11) DEFAULT NULL COMMENT '수량',
   `is_free` char(1) DEFAULT NULL COMMENT '수선 유료구분',
