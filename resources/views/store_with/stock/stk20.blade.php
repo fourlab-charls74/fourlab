@@ -349,7 +349,8 @@
 		},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', headerCheckboxSelection: true, checkboxSelection: true, sort: null, width: 28,
             checkboxSelection: function(params) {
-                return params.data.state < 40 && params.data.state > 0;
+                // return params.data.state < 40 && params.data.state > 0;
+                return params.data.state < 40;
             },
         },
         {field: "type", headerName: "RT구분", pinned: 'left', cellStyle: StyleRtType,
@@ -406,11 +407,16 @@
         },
         {field: "del_rt", headerName: "RT 삭제", cellStyle: {"text-align": "center"},
             cellRenderer: function(params) {
-                if(params.data.state === 10 || params.data.state === -10) {
-                    return `<a href="javascript:void(0);" onclick="remove(${params.data.idx})" style="color:#ff4444;">삭제</a>`;
-                } else{
-                    return '-';
-                }
+				if (params.node.rowPinned === 'top') {
+					return '';
+				} else {
+					if(params.data.state != 40) {
+						return `<a href="javascript:void(0);" onclick="remove(${params.data.idx}, ${params.data.state})" style="color:#ff4444;">삭제</a>`;
+					} else{
+						return '-';
+					}
+				}
+               
             }
         },
 		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
@@ -566,18 +572,18 @@
     }
 
     // 삭제 (RT 삭제)
-    function remove(idx) {
+    function remove(idx, state) {
         let rows;
         if(!idx) {
             rows = gx.getSelectedRows();
             if(rows.length < 1) {
                 return alert("삭제할 RT를 선택해주세요.");
             }
-            if(rows.filter(r => (r.state !== 10 && r.state !== -10)).length > 0) {
-                return alert("'요청'상태나 '거부'상태의 항목만 삭제 가능합니다.");
+            if(rows.filter(r => (r.state == 40)).length > 0) {
+                return alert("'RT완료' 상태에서는 삭제를 할 수 없습니다.");
             }
         } else{
-            rows = [{idx}];
+            rows = [{idx, state}];
         }
         if(!confirm("선택한 항목을 삭제하시겠습니까?")) return;
 

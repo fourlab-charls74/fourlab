@@ -636,19 +636,89 @@ class stk20Controller extends Controller
     public function remove(Request $request) 
     {
         $data = $request->input("data", []);
-
+		
         try {
             DB::beginTransaction();
 
 			foreach($data as $d) {
+				
                 if($d['idx'] == "") continue;
+				
+				// 접수상태
+				if ($d['state'] == 20) {
+					// product_stock_store -> 보내는 매장 보유재고 플러스
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->where('store_cd', '=', $d['dep_store_cd']) 
+						->update([
+							'wqty' => DB::raw('wqty + ' . ($d['qty'] ?? 0)),
+							'ut' => now(),
+						]);
+					
+					// product_stock_store -> 받는 매장 보유재고 차감
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->where('store_cd', '=', $d['store_cd']) 
+						->update([
+							'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
+							'ut' => now(),
+						]);
 
-                DB::table('product_stock_rotation')
-                    ->where('idx', '=', $d['idx'])
-                    ->update([
-                        'del_yn' => "Y",
-                        'ut' => now(),
-                    ]);
+					//product_stock_hst -> rt_no가 같은 재고이력 삭제
+					DB::table('product_stock_hst')
+						->where('rt_no', '=', $d['idx'])
+						->delete();
+					
+					//product_stock_rotation -> RT 삭제
+					DB::table('product_stock_rotation')
+						->where('idx', '=', $d['idx'])
+						->update([
+							'del_yn' => "Y",
+							'ut' => now(),
+						]);
+					
+				// 처리중상태
+				} else if ($d['state'] == 30) {
+					// product_stock_store -> 보내는 매장 실재고, 보유재고 플러스
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->where('store_cd', '=', $d['dep_store_cd']) 
+						->update([
+							'qty' => DB::raw('qty + ' . ($d['qty'] ?? 0)),
+							'wqty' => DB::raw('wqty + ' . ($d['qty'] ?? 0)),
+							'ut' => now(),
+						]);
+					
+					//product_stock_store -> 받는 매장 보유재고 차감
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $d['prd_cd'])
+						->where('store_cd', '=', $d['store_cd'])
+						->update([
+							'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
+							'ut' => now(),
+						]);
+					
+					//product_stock_hst -> rt_no가 같은 재고이력 삭제
+					DB::table('product_stock_hst')
+						->where('rt_no', '=', $d['idx'])
+						->delete();
+					
+					//product_stock_rotation -> RT 삭제
+					DB::table('product_stock_rotation')
+						->where('idx', '=', $d['idx'])
+						->update([
+							'del_yn' => "Y",
+							'ut' => now(),
+						]);
+				//요청상태
+				} else if ($d['state'] == 10 || $d['state'] == -10) {
+					DB::table('product_stock_rotation')
+						->where('idx', '=', $d['idx'])
+						->update([
+							'del_yn' => "Y",
+							'ut' => now(),
+						]);
+				}
             }
 
 			DB::commit();
