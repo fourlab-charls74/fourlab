@@ -477,7 +477,7 @@ class ord01Controller extends Controller
                     c.last_up_date,
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
-                    if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
+                    ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
                     round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
@@ -1875,7 +1875,7 @@ class ord01Controller extends Controller
                     ), 0
                  ) as stock_qty
                 , o.point_amt, o.coupon_amt,o.dc_amt * -1 as dc_amt, o.dlv_amt, o.recv_amt
-			 	, if(st.amt_kind = 'per', round(o.price * o.qty * st.sale_per / 100), st.sale_amt) * -1 as sale_kind_amt
+			 	, ifnull(if(st.amt_kind = 'per', round(o.price * o.qty * st.sale_per / 100), st.sale_amt), 0) * -1 as sale_kind_amt
                 , c.refund_amt, o.add_point
                 , g.is_unlimited, g.goods_type
                 , o.opt_amt, o.addopt_amt, o.dlv_comment

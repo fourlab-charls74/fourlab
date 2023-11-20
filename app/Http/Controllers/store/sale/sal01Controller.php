@@ -660,7 +660,8 @@ class sal01Controller extends Controller
 				$order["baesong_kind"] =  $row["baesong_kind"];
 			} else {
 				// Lib::q($sql);
-				return ["code" => "-210"];
+				$code = '-210';
+				return $code;
 			}
 
 			$order["clm_state"] = 0;
@@ -1039,7 +1040,8 @@ class sal01Controller extends Controller
 				$order["baesong_kind"] =  $row["baesong_kind"];
 			} else {
 				// Lib::q($sql);
-				return ["code" => "-210"];
+				$code = '-210';
+				return $code;
 			}
 
 			$order["clm_state"] = 0;
