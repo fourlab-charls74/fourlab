@@ -710,7 +710,7 @@ class stk20Controller extends Controller
 							'del_yn' => "Y",
 							'ut' => now(),
 						]);
-				//요청상태
+				//요청상태, 거부상태
 				} else if ($d['state'] == 10 || $d['state'] == -10) {
 					DB::table('product_stock_rotation')
 						->where('idx', '=', $d['idx'])
