@@ -753,6 +753,7 @@ class ord01Controller extends Controller
             DB::beginTransaction();
 
             $order_result = $this->_save_order([
+				'type' => 'S',
                 'cfg_ratio' => $cfg_ratio,
                 'p_ord_opt_no' => $p_ord_opt_no,
                 'ord_type' => $ord_type,
@@ -814,6 +815,7 @@ class ord01Controller extends Controller
     public function _save_order($data)
     {
         $code = '200';
+        $type = $data['type'] ?? 'S'; // 개별(S) or 일괄(B)
         $cfg_ratio = $data['cfg_ratio'];
         $p_ord_opt_no = $data['p_ord_opt_no'];
         $ord_type = $data['ord_type']; // 출고형태
@@ -1077,6 +1079,11 @@ class ord01Controller extends Controller
             if ($dlv_apply == 'N' || $a_ord_amt >= $free_dlv_amt) {
                 $ord_opt_dlv_amt = 0;
             }
+			
+			$order_price = $sugi_price;
+			if ($type === 'S') {
+				$order_price = $product_price;
+			}
 
             array_push($order_opt, [
                     'goods_no' => $goods_no,
@@ -1088,7 +1095,7 @@ class ord01Controller extends Controller
                     'goods_opt' => $goods_opt,
                     'qty' => $qty,
                     'wonga' => $product_wonga,
-                    'price' => $sugi_price,
+                    'price' => $order_price,
                     'dlv_amt' => $ord_opt_dlv_amt,
                     'pay_type' => $pay_type,
                     'point_amt' => $ord_opt_point_amt,
@@ -1523,6 +1530,7 @@ class ord01Controller extends Controller
 					}
 
 				$order_result = $this->_save_order([
+					'type' => 'B',
 					'cfg_ratio' => $cfg_ratio,
 					'p_ord_opt_no' => '',
 					'ord_type' => $ord_type,
