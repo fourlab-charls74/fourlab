@@ -184,7 +184,7 @@ class ord05Controller extends Controller
 					, st.sale_type_nm as sale_kind_nm
 					, pr_code.code_val as pr_code_nm
 					, memo.memo
-					, if(st.amt_kind = 'per', round(a.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt
+					, ifnull(if(st.amt_kind = 'per', round(a.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt
 					, clm.code_val as clm_state_nm
 				from (
 					select o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng
@@ -201,7 +201,7 @@ class ord05Controller extends Controller
 					where o.ord_no = :ord_no 
 						-- and if(o.clm_state >= 60, :ord_state2 >= 60, 1=1)
 				) a
-					left outer join sale_type st on st.sale_kind = a.sale_kind_cd and st.use_yn = 'Y'
+					left outer join sale_type st on st.sale_kind = a.sale_kind_cd
 					left outer join code pr_code on (pr_code.code_id = a.pr_code_cd and pr_code.code_kind_cd = 'PR_CODE')
 					left outer join order_opt_memo memo on memo.ord_opt_no = a.ord_opt_no
 					left outer join code clm on clm.code_kind_cd = 'G_CLM_STATE' and clm.code_id = a.clm_state

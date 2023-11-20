@@ -423,7 +423,7 @@ class ord06Controller extends Controller
                     c.last_up_date,
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
-                    if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
+                    ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
                     round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
                 from order_opt_wonga w
                     inner join order_opt o on o.ord_opt_no = w.ord_opt_no
@@ -433,7 +433,9 @@ class ord06Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+					-- 2023-11-20 판매유형의 사용여부와 상관없이 판매유형의 할인금액을 적용하도록 함
+                    -- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+                    left outer join sale_type st on st.sale_kind = o.sale_kind
 					left outer join store store on store.store_cd = o.store_cd
                 where w.ord_state in (30,60,61) $where
                 $orderby
@@ -498,7 +500,7 @@ class ord06Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+                    left outer join sale_type st on st.sale_kind = o.sale_kind
                 	left outer join store store on store.store_cd = o.store_cd
                 where w.ord_state in (30,60,61) $where
             ";

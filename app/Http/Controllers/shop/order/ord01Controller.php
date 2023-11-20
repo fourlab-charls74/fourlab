@@ -415,7 +415,7 @@ class ord01Controller extends Controller
                     c.last_up_date,
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
-                    if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt) as sale_kind_amt,
+                    ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
                     round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
                 from order_opt_wonga w
                 	inner join order_opt o on o.ord_opt_no = w.ord_opt_no
@@ -425,7 +425,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+                    left outer join sale_type st on st.sale_kind = o.sale_kind
                 where w.ord_state in (30,60,61) $where
                 $orderby
                 $limit
@@ -489,7 +489,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                	left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+                	left outer join sale_type st on st.sale_kind = o.sale_kind
                 where w.ord_state in (30,60,61) $where
             ";
 
@@ -1799,7 +1799,7 @@ class ord01Controller extends Controller
                 left outer join code ord_kind on ord_kind.code_kind_cd = 'G_ORD_KIND' and o.ord_kind = ord_kind.code_id
                 left outer join order_opt_memo om on o.ord_opt_no = om.ord_opt_no
                 left outer join code dlv on dlv.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv.code_id
-				left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+				left outer join sale_type st on st.sale_kind = o.sale_kind
             where o.ord_no = '$ord_no' and g.goods_type <> 'O'
             order by com_id, o.ord_opt_no desc
         ";

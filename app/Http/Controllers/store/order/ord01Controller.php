@@ -486,7 +486,9 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+					-- 2023-11-20 판매유형의 사용여부와 상관없이 판매유형의 할인금액을 적용하도록 함
+                    -- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+                    left outer join sale_type st on st.sale_kind = o.sale_kind
 					left outer join store store on store.store_cd = o.store_cd
                 where 1=1 $where
                 $orderby
@@ -545,7 +547,7 @@ class ord01Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+                    left outer join sale_type st on st.sale_kind = o.sale_kind
                 	inner join store store on store.store_cd = o.store_cd
                 where 1=1 $where
             ";
@@ -869,7 +871,7 @@ class ord01Controller extends Controller
         $r_zip_code = $data['r_zip_code']; // 수령 우편번호
         $r_addr1 = $data['r_addr1']; // 수령 주소1
         $r_addr2 = $data['r_addr2']; // 수령 주소2
-        $dlv_msg = $data['dlv_comment']; // 출고메시지
+        $dlv_msg = $data['dlv_comment'] ?? ''; // 출고메시지
 
         $group_apply = $data['group_apply'];
         $dlv_cd = $data['dlv_cd']; // 출고완료시 택배업체
@@ -1840,8 +1842,7 @@ class ord01Controller extends Controller
         ###################################################################
         #	자식 주문건
         ###################################################################
-        $sql = /** @lang text */
-            "
+        $sql = "
             select
                 o.ord_opt_no, ord_state, o.clm_state
                 , if(ifnull(o.clm_state, 0) = 0
@@ -1892,7 +1893,9 @@ class ord01Controller extends Controller
                 left outer join code ord_kind on ord_kind.code_kind_cd = 'G_ORD_KIND' and o.ord_kind = ord_kind.code_id
                 left outer join order_opt_memo om on o.ord_opt_no = om.ord_opt_no
                 left outer join code dlv on dlv.code_kind_cd = 'DELIVERY' and o.dlv_cd = dlv.code_id
-                left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+				-- 2023-11-20 판매유형의 사용여부와 상관없이 판매유형의 할인금액을 적용하도록 함
+				-- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
+				left outer join sale_type st on st.sale_kind = o.sale_kind
             where o.ord_no = '$ord_no' and g.goods_type <> 'O'
             order by com_id, o.ord_opt_no desc
         ";
