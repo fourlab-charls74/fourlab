@@ -664,17 +664,50 @@ class stk30Controller extends Controller
 				]);
 		}
 
-		// 창고보유재고 재설정 (+ history) 및 실재고 증가
-		DB::table('product_stock_storage')
-			->where('prd_cd', '=', $row->prd_cd)
-			->where('storage_cd', '=', $row->storage_cd)
+		//
+		DB::table('product_stock_hst')
+			->where('store_return_no', '=', $sr_prd_cd)
+			->where('location_type', '=', $row->store_cd)
+			->where('type', '=', '11')
 			->update([
-				'qty' => DB::raw('qty + ' . $f_qty),
-				// 231110 ceduce
-				//'wqty' => DB::raw('wqty - ' . ($p_qty - $f_qty)),
-				'wqty' => DB::raw('wqty + ' . $f_qty),
-				'ut' => now(),
+				'r_stock_state_date' => date('Ymd'),
+				'ut'	=> now()
 			]);
+		
+		//해당 창고에 재고있는지 확인하는 부분
+		$storage_stock_cnt =
+			DB::table('product_stock_storage')
+				->where('storage_cd', '=', $row->storage_cd)
+				->where('prd_cd', '=', $row->prd_cd)
+				->count();
+
+		if($storage_stock_cnt < 1) {
+			// 해당 창고에 상품 기존재고가 없을 경우
+			DB::table('product_stock_storage')
+				->insert([
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'storage_cd' => $row->storage_cd,
+					'qty' => $f_qty,
+					'wqty' => $f_qty,
+					'goods_opt' => $row->goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now()
+				]);
+		} else {
+			// 창고보유재고 재설정 (+ history) 및 실재고 증가
+			DB::table('product_stock_storage')
+				->where('prd_cd', '=', $row->prd_cd)
+				->where('storage_cd', '=', $row->storage_cd)
+				->update([
+					'qty' => DB::raw('qty + ' . $f_qty),
+					// 231110 ceduce
+					//'wqty' => DB::raw('wqty - ' . ($p_qty - $f_qty)),
+					'wqty' => DB::raw('wqty + ' . $f_qty),
+					'ut' => now(),
+				]);
+		}
+
 		//if (($p_qty - $f_qty) > 0 || ($p_qty - $f_qty) < 0) {
 		if ($f_qty > 0 || $f_qty < 0) {
 			DB::table('product_stock_hst')
