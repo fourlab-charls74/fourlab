@@ -732,7 +732,6 @@ class ord03Controller extends Controller
 					'admin_id' => $user['id'],
 					'admin_nm' => $user['name'],
 				]);
-
 			return 1;
 		} catch (Exception $e) {
 			return 0;
