@@ -295,7 +295,7 @@
 			{field: "color_nm", headerName: "컬러명", width:90},
 			{field: "size", headerName: "사이즈", width:50, cellStyle: {"text-align": "center"}},
 			// {field: "size_nm", headerName: "사이즈명", width:100},
-			// {field: "goods_opt", headerName: "옵션", width:190},
+			{field: "goods_opt", headerName: "옵션", width:190},
 			// {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"},aggFunc: "first"},
 			{{--
