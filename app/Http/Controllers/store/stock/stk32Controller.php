@@ -1232,13 +1232,13 @@ class stk32Controller extends Controller
 		try {
 			DB::beginTransaction();
 
-			//그룹명 변경 쿼리문
 			DB::table('msg_store_detail')
 				->where('msg_cd', '=', $msg_cd)
 				->where('receiver_cd', '=', $user_store)
 				->orWhere('receiver_cd', '=', $user_id)
 				->update([
-					'check_yn' => 'Y'
+					'check_yn' => 'Y',
+					'check_date' => now()
 				]);
 
 			DB::commit();
