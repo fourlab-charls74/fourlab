@@ -96,7 +96,9 @@ class BizestStockBatch extends Command
 		//1. 창고 재고 데이터 시작
 		$sql    = "
 			select
-				pss.storage_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, pss.wqty as qty
+				pss.storage_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, 
+				-- pss.wqty as qty
+				if( pss.wqty > pss.qty, pss.qty, pss.wqty) as qty
 			from product_stock_storage pss
 			inner join product_code pc on pc.prd_cd = pss.prd_cd
 			inner join product p on pss.prd_cd = p.prd_cd
@@ -266,7 +268,7 @@ class BizestStockBatch extends Command
 			update goods g inner join _tmp_goods_xmd_stock b on g.goods_no = b.goods_no
 			set wonga = round(b.cost * 1.1)
 		";
-		DB::update($sql);
+		//DB::update($sql);
 
 		//가격 반영
 		if( $stock_conf->price_apply_yn == 'Y' ){
@@ -285,7 +287,7 @@ class BizestStockBatch extends Command
 				update goods g inner join _tmp_goods_xmd_stock_maxprice b on g.goods_no = b.goods_no
 				set g.price = b.max_price
 			";
-			DB::update($sql);
+			//DB::update($sql); 잠시 막아놓음
 		}
 
 		//stock update
