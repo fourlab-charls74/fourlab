@@ -726,6 +726,7 @@ class ord03Controller extends Controller
 					'wonga' => $wonga,
 					'qty' => $ord_qty,
 					'stock_state_date' => date('Ymd'),
+					'r_stock_state_date' => date('Ymd'),
 					'ord_opt_no' => $ord_opt_no,
 					'comment' => ($location_type === 'STORE' ? '매장RT' : '창고') . '출고취소(온라인배송)',
 					'rt' => now(),
