@@ -433,7 +433,7 @@ class std11Controller extends Controller
 					'prd_cd' => $data['prd_cd'],
 					'goods_nm' => $data['goods_nm'],
 					'color' => $data['color'],
-					'size_kind_cd' => $data['size_kind_cd'],
+					'size_kind_cd' => $data['size_kind'],
 					'size' => $data['size'],
 					'is_free' => $data['is_free'],
 					'as_amt' => $data['as_amt']??'',
