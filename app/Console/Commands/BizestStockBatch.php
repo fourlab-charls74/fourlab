@@ -105,7 +105,7 @@ class BizestStockBatch extends Command
 			where
 				pss.use_yn = 'Y'
 				and ( pss.storage_cd = :default_storage_cd or pss.storage_cd = :online_storage_cd )
-				and pss.wqty > 0
+				-- and pss.wqty > 0
 
 		";
 		$rows = DB::select($sql, ['default_storage_cd' => $stock_conf->default_storage_cd, 'online_storage_cd' => $stock_conf->online_storage_cd]);
