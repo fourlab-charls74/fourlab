@@ -896,9 +896,9 @@ class goods extends Controller
                 , pc.goods_no
                 , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                 , pc.goods_opt
-                , concat(pc.brand,pc.year, pc.season, pc.gender
-                , pc.item, pc.opt, pc.seq) as prd_cd1,
+                , pc.prd_cd_p as prd_cd1,
                 pc.color, p.match_yn,
+                pc.size_kind,
 				pc.size
                 from product_code pc
                     left outer join goods g on g.goods_no = pc.goods_no
@@ -923,7 +923,6 @@ class goods extends Controller
                 order by pc.rt desc
             ";
 		}
-
 
 		$result = DB::select($sql);
 
@@ -1246,4 +1245,27 @@ class goods extends Controller
             "body" => $result
         ]);
     }
+
+	//사이즈구분값이 같은 사이즈
+	public function search_size(Request $request) {
+		$size_kind = $request->input('size_kind', '');
+
+		foreach ($size_kind as $sk) {
+			$sql = "
+				select
+				    size_cd
+				    , size_nm
+				from size
+				where size_kind_cd = '$sk'
+					and use_yn = 'Y'
+				order by size_seq
+			";
+			$sizes = DB::select($sql);
+		}
+
+		return response()->json([
+			"body" => $sizes
+		]);
+
+	}
 }

@@ -861,8 +861,7 @@ class goods extends Controller
                 , pc.goods_no
                 , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                 , pc.goods_opt
-                , concat(pc.brand,pc.year, pc.season, pc.gender
-                , pc.item, pc.opt, pc.seq) as prd_cd1,
+                , pc.prd_cd_p as prd_cd1,
                 pc.color, p.match_yn,
 				pc.size
                 , pc.size_kind

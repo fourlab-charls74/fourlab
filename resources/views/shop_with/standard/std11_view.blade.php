@@ -115,7 +115,7 @@
 											<th class="required">바코드</th>
 											<td>
 												<div class="flex_box">
-													<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='' style="width:87%">
+													<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='' style="width:87%" readonly>
 													<a href="#" class="btn btn-sm ml-2 btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 												</div>
 											</td>
@@ -125,26 +125,41 @@
                                                     <input type='text' class="form-control form-control-sm ac-goods-nm search-enter" name='goods_nm' id="goods_nm" value=''>
                                                 </div>
                                             </td>
-                                            <th class="required">컬러 / 사이즈</th>
-                                            <td>
-                                                <div class="flex_box">
-                                                    <select name='color' id='color' class="form-control form-control-sm" style="width:54%">
+											<th class="required">컬러</th>
+											<td>
+												<div class="flex_box">
+													<select name='color' id='color' class="form-control form-control-sm" style="width:100%">
 														<option value=''>선택</option>
 														@foreach ($colors as $color)
-														    <option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
+															<option value='{{ $color->code_id }}'>{{ $color->code_id }} : {{ $color->code_val }}</option>
 														@endforeach
 													</select>
-                                                    <span class="text_line mx-2">/</span>
-                                                    <select name='size' id='size' class="form-control form-control-sm"  style="width:40%">
-														<option value=''>선택</option>
-														@foreach ($sizes as $size)
-														    <option value='{{ $size->code_id }}'>{{ $size->code_val }} : {{ $size->code_val2 }}</option>
-														@endforeach
-													</select>
-                                                </div>
-                                            </td>
+												</div>
+											</td>
                                         </tr>
                                         <tr>
+											<th class="required">사이즈구분</th>
+											<td>
+												<div class="flex_box">
+													<select name='size_kind' id='size_kind' class="form-control form-control-sm"  style="width:100%" onchange="change_size();">
+														<option value=''>선택</option>
+														@foreach ($size_kinds as $size_kind)
+															<option value='{{ $size_kind->size_kind_cd }}'>{{ $size_kind->size_kind_cd }} : {{ $size_kind->size_kind_nm }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th class="required">사이즈</th>
+											<td>
+												<div class="flex_box">
+													<select name='size' id='size' class="form-control form-control-sm"  style="width:100%">
+{{--														<option value=''>선택</option>--}}
+{{--														@foreach ($sizes as $size)--}}
+{{--															<option value='{{ $size->size_cd }}'>{{ $size->size_cd }} : {{ $size->size_nm }}</option>--}}
+{{--														@endforeach--}}
+													</select>
+												</div>
+											</td>
                                             <th class="required">수선 유료구분</th>
                                             <td>
                                                 <div class="flex_box">
@@ -162,9 +177,6 @@
                                                         <input type='text' class="form-control form-control-sm" name='as_amt' id="as_amt" style="width:100%" placeholder="금액을 입력해주세요." value='' onkeyup="onlynum(this)">
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <th></th>
-                                            <td>
                                             </td>
                                         </tr>
                                         <tr>
@@ -335,6 +347,36 @@
     function removeCommasAndSpaces(prd_cd) {
         return prd_cd.replace(/[\s,]+/g, '');
     }
+
+	function change_size() {
+		let size_kind = $('#size_kind option:selected').val();
+
+		$.ajax({
+			method: 'post',
+			url: '/shop/standard/std11/change-size',
+			data: {
+				size_kind : size_kind,
+			},
+			success: function (res) {
+				if(res.code == 200) {
+					$('#size').empty();
+
+					let option = '';
+					let sel =''
+					for(let i = 0; i < res.result.length;i++) {
+						sel = "<option value=''>선택</option>"
+						option += '<option value='+ res.result[i].size_cd +'>' + res.result[i].size_cd + ' : ' + res.result[i].size_nm+ '</option>';
+					}
+					$('#size').append(sel);
+					$('#size').append(option);
+
+				}
+			},
+			error: function(request, status, error) {
+				console.log("error")
+			}
+		});
+	}
         
 
 </script>

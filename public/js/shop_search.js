@@ -754,6 +754,7 @@ SearchPrdcd.prototype.SetGrid = function(divId){
 			{ field: "goods_opt", headerName: "옵션", width: 150 },
 			{ field: "prd_cd1", headerName: "품번", width: 120, cellStyle: {"text-align": "center"} },
 			{ field: "color", headerName: "컬러", width: 60, cellStyle: {"text-align": "center"} },
+			{ field: "size_kind", headerName: "사이즈구분", width: 100, cellStyle: {"text-align": "center"} },
 			{ field: "size", headerName: "사이즈", width: 60, cellStyle: {"text-align": "center"} },
 			{ field: "match_yn", headerName: '매칭여부', cellClass: 'hd-grid-code', width: 60},
 			{ width: "auto" }
@@ -850,8 +851,37 @@ SearchPrdcd.prototype.Choice = function() {
 			$('#prd_cd').val(rows.map(r => r.prd_cd).join(","));
 		}
 
+		const size_kind = rows.map(r => r.size_kind);
+		let sizes = [];
+		axios({
+			url: '/shop/api/prdcd/size',
+			params: { size_kind: size_kind },
+			method: 'get'
+		})
+			.then(response => {
+				sizes = response.data.body;
+				$('#size').empty();
+
+				let option = '';
+				let sel =''
+				for(let i = 0; i < sizes.length;i++) {
+					sel = "<option value=''>선택</option>"
+					option += '<option value='+ sizes[i].size_cd +'>' + sizes[i].size_cd + ' : ' + sizes[i].size_nm+ '</option>';
+				}
+				$('#size').append(sel);
+				$('#size').append(option);
+
+				if (sizes.length > 0) {
+					$('#size').val(rows.map(r => r.size));
+				}
+			})
+			.catch(error => {
+				console.error('Error fetching sizes:', error);
+			});
+
 		$('#goods_nm').val(rows.map(r => r.goods_nm));
 		$('#color').val(rows.map(r => r.color));
+		$('#size_kind').val(rows.map(r => r.size_kind));
 		$('#size').val(rows.map(r => r.size));
 	}
 

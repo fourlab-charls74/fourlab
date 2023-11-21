@@ -128,7 +128,7 @@
                                             <th class="required">바코드</th>
                                             <td>
                                                 <div class="flex_box">
-                                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='{{@$row->prd_cd}}' style="width:87%">
+                                                    <input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='{{@$row->prd_cd}}' style="width:87%" readonly>
                                                     <a href="#" class="btn btn-sm ml-2 btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
                                                 </div>
                                             </td>

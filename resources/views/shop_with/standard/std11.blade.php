@@ -274,6 +274,7 @@
         { field: "prd_cd", headerName: "바코드", width: 120, cellStyle: DEFAULT_STYLE, },
         { field: "goods_nm", headerName: "상품명", width: 300, cellStyle: DEFAULT_STYLE,  },
         { field: "color", headerName: "컬러", width: 60, cellStyle: DEFAULT_STYLE,  },
+		{ field: "size_kind_cd", headerName: "사이즈구분", width: 80, cellStyle: DEFAULT_STYLE,  },
         { field: "size", headerName: "사이즈", width: 60, cellStyle: DEFAULT_STYLE, },
         // { field: "qty", headerName: "수량", width: 60, cellStyle: DEFAULT_STYLE, },
         { field: "is_free", headerName: "수선 유료구분", width: 100, cellStyle: DEFAULT_STYLE, },

@@ -69,6 +69,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         // 상품코드 조회
         Route::get('prdcd/conds', 'goods@search_product_conditions');
         Route::get('prdcd/search', 'goods@search_prdcd');
+		Route::get('prdcd/size', 'goods@search_size');
         Route::get('prdcd/conds_code', 'goods@search_product_conditions_code');
         Route::get('prdcd/search_code', 'goods@search_prdcd_code');
         
@@ -186,7 +187,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
          Route::post('std11/create', 'std11Controller@create');
          Route::get('std11/view/{idx?}', 'std11Controller@view');
          Route::post('std11/delete', 'std11Controller@delete');
- 
+		 Route::post('std11/change-size', 'std11Controller@change_size');
          Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
          Route::post('std11/edit', 'std11Controller@edit');
          Route::post('std11/remove', 'std11Controller@remove');
