@@ -129,13 +129,13 @@ class BizestStockBatch extends Command
 				$row->qty	= floor($row->qty / 2);
 			//}
 
-			if( $row->qty > 0){
+			//if( $row->qty > 0){
 				if( $cnt > 0 )	$sql_insert .= ",";
 
 				$sql_insert	.= " ( '$idx', '$row->storage_cd', '$row->prd_cd', '$row->goods_no', '".Lib::quote($row->goods_opt)."', '$row->price', '$row->wonga', '$row->qty' ) ";
 
 				$cnt++;
-			}
+			//}
 		}
 
 		DB::insert($sql_insert);
