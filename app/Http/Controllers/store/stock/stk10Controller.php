@@ -982,9 +982,11 @@ class stk10Controller extends Controller
 				inner join store s on s.store_cd = p.store_cd
 				inner join code type on type.code_kind_cd = 'REL_TYPE' and type.code_id = p.type
 			where p.document_number = :document_number
-				and p.store_cd = (select store_cd from product_stock_release where idx = :idx)
+			  	and p.state <> -10 and p.state <> 10
+			  	-- and p.idx = '$idx'
+				and p.store_cd = (select store_cd from product_stock_release where idx = '$idx')
 		";
-		$rows = DB::select($sql, [ 'document_number' => $document_number, 'idx' => $idx ]);
+		$rows = DB::select($sql, [ 'document_number' => $document_number]);
 
 		$data = [
 			'one_sheet_count' => 38,
