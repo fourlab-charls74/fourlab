@@ -37,8 +37,8 @@ class  sal27Controller extends Controller
 		$today_day = date('Ymd');
 		$next_edate_day = date('Ymd', strtotime($edate_day . '+1 day'));
 
-		$store_channel = $request->input('store_channel', '');
-		$store_channel_kind = $request->input('store_channel_kind', '');
+		$store_channel = $request->input('store_channel', []);
+		$store_channel_kind = $request->input('store_channel_kind', []);
 		$store_cds = $request->input('store_no', []);
 		$prd_cd = $request->input('prd_cd', '');
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
@@ -60,11 +60,13 @@ class  sal27Controller extends Controller
 		// 매장검색
 		$store_where = "";
 		$store_where2 = "";
-		if ($store_channel != '') {
-			$store_where .= " and s.store_channel = '" . Lib::quote($store_channel) . "'";
+		if (count($store_channel) > 0) {
+//			$store_where .= " and s.store_channel = '" . Lib::quote($store_channel) . "'";
+			$store_where .= " and s.store_channel in ('" . implode("', '", $store_channel) . "')";
 		}
-		if ($store_channel_kind != '') {
-			$store_where .= " and s.store_channel_kind = '" . Lib::quote($store_channel_kind) . "'";
+		if (count($store_channel_kind) > 0) {
+//			$store_where .= " and s.store_channel_kind = '" . Lib::quote($store_channel_kind) . "'";
+			$store_where .= " and s.store_channel_kind in ('" . implode("', '", $store_channel_kind) . "')";
 		}
 		if (count($store_cds) > 0) {
 			$store_cds = join(',', array_map(function($s) { return "'" . Lib::quote($s) . "'"; }, $store_cds));
