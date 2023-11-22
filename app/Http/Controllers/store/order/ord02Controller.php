@@ -287,6 +287,7 @@ class ord02Controller extends Controller
 							inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = p.color
 					) pc on pc.goods_no = o.goods_no and lower(pc.color_nm) = lower(substring_index(o.goods_opt, '^', 1)) and lower(replace(pc.size_nm, ' ', '')) = lower(replace(substring_index(o.goods_opt, '^', -1), ' ', ''))
 					left outer join order_receipt_product rcp on rcp.ord_opt_no = o.ord_opt_no -- and rcp.reject_yn = 'Y'
+						and rcp.or_cd = (select max(or_cd) from order_receipt_product where ord_opt_no = o.ord_opt_no)
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 					and o.clm_state in (-30,1,90,0)
 					$where

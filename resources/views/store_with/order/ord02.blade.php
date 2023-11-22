@@ -426,8 +426,22 @@
         },
 		{field: "reject_reason_nm", headerName: "출고거부사유", width: 80, pinned: 'left',
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
-			cellRenderer: (params) => params.node.level == 0 ? `${params.value || ''}${params.data?.reject_location_nm ? ` (${params.data?.reject_location_nm})` : ''}` : '',
+			cellRenderer: (params) => {
+				return params.node.level == 0
+					? `${params.value || ''}${params.data
+						? (params.data?.reject_location_nm
+							? ` (${params.data?.reject_location_nm})`
+							: '')
+						: (params.node.aggData?.reject_location_nm
+							? ` (${params.node.aggData?.reject_location_nm})`
+							: '')}`
+					: '';
+			},
 			cellStyle: (params) => params.node.level == 0 && params.value !== null ? {'background-color': '#ff6666', 'color': '#ffffff'} : '',
+		},
+		{field: "reject_location_nm", headerName: "출고거부처", hide: true,
+			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
 		},
         {field: "sale_place", headerName: "판매처코드", hide: true,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
