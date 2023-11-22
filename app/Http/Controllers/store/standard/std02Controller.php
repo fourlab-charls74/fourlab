@@ -590,9 +590,9 @@ class std02Controller extends Controller
 
 		$store_channel = $request->input('store_channel');
 
-        try {
-            DB::beginTransaction();
-                $sql = "
+		try {
+			DB::beginTransaction();
+			$sql = "
 					select 
 						store_kind_cd
 						, store_kind
@@ -600,18 +600,51 @@ class std02Controller extends Controller
 					where store_channel_cd = '$store_channel' and dep = 2 and use_yn = 'Y' 
 					order by seq asc
                 ";
-            $store_kind = DB::select($sql);
+			$store_kind = DB::select($sql);
 
 			DB::commit();
-            $code = 200;
-            $msg = "";
+			$code = 200;
+			$msg = "";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
 			$msg = $e->getMessage();
 		}
 
-        return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind]);
+		return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind]);
+	}
+
+
+	//판매채널 셀렉트값이 변경되면 해당 판매채널의 매장구분을 가져오는 코드
+	public function change_store_channel_multi(Request $request) {
+
+		$store_channel = $request->input('store_channel');
+		$store_kinds = [];
+
+		try {
+			DB::beginTransaction();
+			foreach ($store_channel as $sc) {
+				$sql = "
+						select 
+							store_kind_cd
+							, store_kind
+						from store_channel
+						where store_channel_cd = '$sc' and dep = 2 and use_yn = 'Y' 
+						order by seq asc
+					";
+				$store_kind = DB::select($sql);
+				$store_kinds = array_merge($store_kinds, $store_kind);
+			}
+			DB::commit();
+			$code = 200;
+			$msg = "";
+		} catch (Exception $e) {
+			DB::rollback();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind, 'store_kinds' => $store_kinds]);
 	}
 
 	public function change_store_channel_kind(Request $request) {

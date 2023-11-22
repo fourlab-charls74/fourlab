@@ -1590,35 +1590,74 @@ function load_store_channel() {
 // 판매채널 검색
 function chg_store_channel() {
 
-    const sel_channel = document.getElementById("store_channel").value;
+	const sel_channel = document.getElementById("store_channel").value;
 
-    $.ajax({
-        method: 'post',
-        url: '/store/standard/std02/show/chg-store-channel',
-        data: {
-            'store_channel' : sel_channel
-            },
-        dataType: 'json',
-        success: function (res) {
-            if(res.code == 200){
-                $('#store_channel_kind').empty();
-                let select =  $("<option value=''>전체</option>");
-                $('#store_channel_kind').append(select);
+	$.ajax({
+		method: 'post',
+		url: '/store/standard/std02/show/chg-store-channel',
+		data: {
+			'store_channel' : sel_channel
+		},
+		dataType: 'json',
+		success: function (res) {
+			if(res.code == 200){
+				$('#store_channel_kind').empty();
+				let select =  $("<option value=''>전체</option>");
+				$('#store_channel_kind').append(select);
 
-                for(let i = 0; i < res.store_kind.length; i++) {
-                    let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
-                    $('#store_channel_kind').append(option);
-                }
+				for(let i = 0; i < res.store_kind.length; i++) {
+					let option = $("<option value="+ res.store_kind[i].store_kind_cd +">" + res.store_kind[i].store_kind + "</option>");
+					$('#store_channel_kind').append(option);
+				}
 
-            } else {
-                alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
-            }
-        },
-        error: function(e) {
-            console.log(e.responseText)
-        }
-    });
-}	
+			} else {
+				alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+			}
+		},
+		error: function(e) {
+			console.log(e.responseText)
+		}
+	});
+}
+//판매채널 다중선택
+function chg_store_channel_multi() {
+
+	const sel_channel = $('#store_channel').val();
+	const store_channel_kind = document.getElementById("store_channel_kind");
+
+	if (sel_channel.length > 0) {
+		store_channel_kind.disabled = false;
+	} else {
+		store_channel_kind.disabled = true;
+	}
+
+	$.ajax({
+		method: 'post',
+		url: '/store/standard/std02/show/chg-store-channel-multi',
+		data: {
+			'store_channel' : sel_channel
+		},
+		dataType: 'json',
+		success: function (res) {
+			if(res.code == 200){
+				$('#store_channel_kind').empty();
+				let select =  $("<option value=''>전체</option>");
+				$('#store_channel_kind').append(select);
+
+				for(let i = 0; i < res.store_kinds.length; i++) {
+					let option = $("<option value="+ res.store_kinds[i].store_kind_cd +">" + res.store_kinds[i].store_kind + "</option>");
+					$('#store_channel_kind').append(option);
+				}
+
+			} else {
+				alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
+			}
+		},
+		error: function(e) {
+			console.log(e.responseText)
+		}
+	});
+}
 
 /**
  * @param {Array} select2 초기화할 select2 css 선택자 이름 추가 - ex) ['.test_cd', '#test_cd']

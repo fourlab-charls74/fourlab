@@ -146,8 +146,8 @@ class stk12Controller extends Controller
 
         // search
         $store_cds = $r['store_no'] ?? [];
-        $store_channel = $r['store_channel'] ?? '';
-        $store_channel_kind = $r['store_channel_kind'] ?? '';
+        $store_channel = $r['store_channel'] ?? [];
+        $store_channel_kind = $r['store_channel_kind'] ?? [];
         $stores = [];
         $store_select_sql = "";
         $total_store_select_sql = "";
@@ -163,8 +163,9 @@ class stk12Controller extends Controller
             }
         }
         if(count($store_cds) < 1) {
-            if ($store_channel != "" && $store_channel_kind == "") {
-                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_channel', '=', $store_channel)->get();
+			//판매채널만 선택되어있고 매장구분이 선택되어있지않을 때
+            if (count($store_channel) > 0 && count($store_channel_kind) < 1) {
+                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->whereIn('store_channel', $store_channel)->get();
                 foreach($stores as $s) {
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
@@ -172,8 +173,9 @@ class stk12Controller extends Controller
                     $total_store_select_sql .= "sum((select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd)) as $store_cd" . "_qty,";
                     $total_store .= "$store_cd"."_qty,";
                 }
-            } elseif ($store_channel_kind != "" && $store_channel != "") {
-                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_channel', '=', $store_channel)->where('store_channel_kind','=',$store_channel_kind)->get();
+			//판매채널과 매장구분이 선택되어있을 때 
+            } elseif (count($store_channel_kind) > 0 && count($store_channel) > 0) {
+                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->whereIn('store_channel', $store_channel)->whereIn('store_channel_kind',$store_channel_kind)->get();
                 foreach($stores as $s) {
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
@@ -197,14 +199,9 @@ class stk12Controller extends Controller
                 stat.code_val as sale_stat_cl,
                 g.goods_nm,
                 g.goods_nm_eng,
-                concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                pc.prd_cd_p as prd_cd_p,
                 pc.color,
-                ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+                pc.size,
                 c.code_val as color_nm,
                 p.qty as storage_qty,
                 p.wqty as storage_wqty,

@@ -13,7 +13,6 @@
     <form method="get" name="search">
         <div id="search-area" class="search_cum_form">
             <div class="card mb-3">
-
                 <div class="d-flex card-header justify-content-between">
                     <h4>검색</h4>
                     <div class="flax_box">
@@ -23,7 +22,6 @@
                         <div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
                     </div>
                 </div>
-
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-4 inner-td">
@@ -31,7 +29,7 @@
 								<label for="good_types">판매채널/매장구분</label>
 								<div class="d-flex align-items-center">
 									<div class="flex_box w-100">
-										<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<select name='store_channel[]' id="store_channel" class="form-control form-control-sm multi_select" multiple onchange="chg_store_channel_multi();">
 											<option value=''>전체</option>
 										@foreach ($store_channel as $sc)
 											<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
@@ -40,7 +38,7 @@
 									</div>
 									<span class="mr-2 ml-2">/</span>
 									<div class="flex_box w-100">
-										<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<select id='store_channel_kind' name='store_channel_kind[]' class="form-control form-control-sm multi_select" multiple disabled>
 											<option value=''>전체</option>
 										@foreach ($store_kind as $sk)
 											<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
@@ -164,7 +162,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="name">공급업체</label>
@@ -179,7 +176,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-lg-4 inner-td">
                             <div class="form-group">
                                 <label for="brand_cd">브랜드</label>
@@ -195,12 +191,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="resul_btn_wrap mb-3">
                 <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 검색</a>
                 <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
             </div>
-
         </div>
     </form>
     <!-- DataTales Example -->
@@ -370,15 +364,16 @@
             });
 
             // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
-            load_store_channel();
+            // load_store_channel();
+			
         });
 
         let stores = [];
 
         function Search() {
-            let store_channel = $("[name=store_channel]").val();
+            let store_channel = $("#store_channel").val();
             let store_nos = $("[name='store_no[]']").val();
-            if(store_nos.length < 1 && store_channel === '') return alert("판매채널 또는 출고할 매장을 선택 후 검색해주세요.");
+            if(store_nos.length < 1 && store_channel.length < 1) return alert("판매채널 또는 출고할 매장을 선택 후 검색해주세요.");
 
             let data = $('form[name="search"]').serialize();
             data += "&ext_storage_qty=" + $("[name=ext_storage_qty]").is(":checked");
