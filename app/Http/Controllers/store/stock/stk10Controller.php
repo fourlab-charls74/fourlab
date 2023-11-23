@@ -888,7 +888,19 @@ class stk10Controller extends Controller
 			if (!$is_already) return array_merge($a, [$c]);
 			return $a;
 		}, []);
-		
+
+		$store_nms = [];
+		$document_numbers = [];
+		foreach ($data as $key => $row) {
+			$store_nms[$key] = $row['store_nm'];
+			$document_numbers[$key] = $row['document_number'];
+		}
+
+		$store_nms = array_column($data, 'store_nm');
+		$document_numbers = array_column($data, 'document_number');
+
+		array_multisort($store_nms, SORT_ASC, $document_numbers, SORT_DESC, $data);
+
 		$save_path = "data/store/stk10/";
 		$file_name = "출고거래명세서_일괄출력_" . date('YmdHis') . '.xlsx';
 		
@@ -985,6 +997,7 @@ class stk10Controller extends Controller
 			  	and p.state <> -10 and p.state <> 10
 			  	-- and p.idx = '$idx'
 				and p.store_cd = (select store_cd from product_stock_release where idx = '$idx')
+			order by prd_cd desc
 		";
 		$rows = DB::select($sql, [ 'document_number' => $document_number]);
 

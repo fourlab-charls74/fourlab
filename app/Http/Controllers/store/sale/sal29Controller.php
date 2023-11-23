@@ -147,20 +147,26 @@ class sal29Controller extends Controller
 		if ($sort_id !== '') {
 			if ($ord_field === 'store') {
 				if ($sort_id === 'store_cd') {
-					$orderby = "order by store_cd " . $sort_type . ", prd_cd_p_color";
+					$orderby = "order by store_nm " . $sort_type . ", prd_cd_p_color desc";
 				} else {
-					$orderby = "order by store_cd, " . $sort_id . " " . $sort_type . ", prd_cd_p_color";
+					$orderby = "order by store_nm, " . $sort_id . " " . $sort_type . ", prd_cd_p_color desc";
 				}
 			} else if ($ord_field === 'product') {
 				if ($sort_id === 'prd_cd_p_color') {
-					$orderby = "order by prd_cd_p_color " . $sort_type . ", store_cd";
+					$orderby = "order by prd_cd_p_color " . $sort_type . ", store_nm";
 				} else if ($sort_id === 'prd_cd_p') {
-					$orderby = "order by prd_cd_p " . $sort_type . ", color, store_cd";
+					$orderby = "order by prd_cd_p " . $sort_type . ", color, store_nm";
 				} else if ($sort_id === 'goods_nm') {
-					$orderby = "order by goods_nm " . $sort_type . ", prd_cd_p_color, store_cd";
+					$orderby = "order by goods_nm " . $sort_type . ", prd_cd_p_color desc, store_nm";
 				} else {
-					$orderby = "order by prd_cd_p_color, " . $sort_id . " " . $sort_type . ", store_cd";
+					$orderby = "order by prd_cd_p_color desc, " . $sort_id . " " . $sort_type . ", store_nm";
 				}
+			}
+		} else {
+			if ($ord_field === 'store') {
+				$orderby = "order by store_nm, prd_cd_p_color desc";
+			} else if ($ord_field === 'product') {
+				$orderby = "order by prd_cd_p_color desc, store_nm";
 			}
 		}
 

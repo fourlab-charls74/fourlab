@@ -807,11 +807,13 @@
 		if (rows.length < 1) return alert("일괄출력할 명세서를 선택해주세요.");
 
 		alert("명세서를 일괄출력하고 있습니다. 잠시만 기다려주세요.");
+		
+		const data = rows.map(row => ({ document_number: row.document_number, idx: row.idx, store_cd: row.store_cd, store_nm: row.store_nm }));
 
 		axios({
 			url: '/store/stock/stk10/download-multi',
 			method: 'post',
-			data: { data: rows.map(row => ({ document_number: row.document_number, idx: row.idx, store_cd: row.store_cd })) },
+			data: { data },
 		}).then(function (res) {
 			window.location = '/' + res.data.file_path;
 		}).catch(function (err) {
