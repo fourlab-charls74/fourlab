@@ -492,12 +492,15 @@ class PosController extends Controller
         $store_cd = Auth::guard('head')->user()->store_cd;
         $store = DB::table('store')->select('store_cd', 'store_nm', 'point_in_yn', 'point_ratio', 'point_out_yn')->where('store_cd', $store_cd)->first();
 
-        // set pay_type [ 무통장입금(1) / 카드(2) / 적립금(4) / 무통장입금+적립금(5) / 카드+적립금(6) ]
-        $pay_type = 0;
-        if ($ord_state === '1') $pay_type = 1;
-        else if ($cash_amt > 0) $pay_type = $point_amt > 0 ? 5 : 1;
-        else if ($card_amt > 0) $pay_type = $point_amt > 0 ? 6 : 2;
-        else $pay_type = 4;
+		// G_PAY_TYPE [ 무통장입금(1) / 카드(2) / 적립금(4) / 쿠폰(8) ]
+		$pay_type = 0;
+		$max_pay_type = 0;
+		if ($ord_state === '1') $pay_type = 1;
+		else {
+			if ($cash_amt > 0) $pay_type += 1;
+			if ($card_amt > 0) $pay_type += 2;
+			if ($point_amt > 0) $pay_type += 4;
+		}
 
         // set member
         $member = null;
@@ -565,6 +568,7 @@ class PosController extends Controller
                 $sale_kind = $item['sale_type'] ?? ''; // 판매유형
                 $pr_code = $item['pr_code'] ?? ''; // 행사명
                 $coupon_no = $item['c_no'] ?? ''; // 쿠폰아이디
+				$item_pay_type = $pay_type; // 상품별 결제방법 (쿠폰사용여부 추가)
 
                 $opt_ord_type = 15; // order_opt의 ord_type (정상:15 / 예약:4)
 
@@ -659,6 +663,9 @@ class PosController extends Controller
                         : ($cp->coupon_amt ?? 0);
                 }
 
+				if ($item_coupon_amt > 0) $item_pay_type += 8; // 쿠폰결제(8)
+				$max_pay_type = max($max_pay_type, $item_pay_type);
+
                 ######################### 상품별 적립금 반영 ############################
                 $item_point_amt = round($product->price / $a_ord_amt * $point_amt, 0); // 해당상품 적립금사용금액
 
@@ -714,7 +721,7 @@ class PosController extends Controller
                     'wonga'         => $product->wonga,
                     'price'         => $product->price,
                     'dlv_amt'       => 0,
-                    'pay_type'      => $pay_type,
+                    'pay_type'      => $item_pay_type,
                     'coupon_amt'    => $item_coupon_amt,
                     'dc_amt'        => $item_dc_amt,
                     'point_amt'     => $item_point_amt,
@@ -784,7 +791,7 @@ class PosController extends Controller
             ];
 
             $payment = [
-                "pay_type" 		=> $pay_type,
+                "pay_type" 		=> $max_pay_type,
                 "pay_nm" 		=> $member_nm,
                 "pay_amt" 		=> $recv_amt,
                 "pay_point"     => $point_amt,
