@@ -261,8 +261,7 @@
 		{field: "color", headerName: "컬러", pinned:'left', width: 80, cellClass: 'hd-grid-code'},
 		{field: "color_nm",	headerName: "컬러명", pinned:'left', width: 100},
 		{field: "size_kind_nm_p",	headerName: "사이즈구분", pinned:'left', width: 100, cellStyle: { "text-align": "center" }},
-		{field: "qty_tot",	headerName: "수량합계", pinned:'left', width: 100},
-		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+		{field: "qty",	headerName: "총수량", pinned:'left', width: 80, type: "currencyType", cellStyle: { "font-weight": "bold" }, aggFunc: sumValuesFunc},
 	];
 	
 	const columns_product = [
@@ -272,6 +271,7 @@
 		{field: "prd_cd_p",	headerName: "품번", width: 120, pinned:'left', aggFunc: 'first',
 			cellRenderer: (params) => params.node.rowPinned === 'top' ? '합계' : params.node.level == 0 ? params.value : '',
 		},
+		{field: "goods_no", hide: true, aggFunc: 'first'},
 		{field: "goods_nm",	headerName: "상품명", width: 200, pinned:'left', aggFunc: 'first',
 			cellRenderer: function (params) {
 				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
@@ -279,7 +279,7 @@
 				} else if (params.node?.level !== 0) {
 					return '';
 				} else {
-					let goods_no = params.data ? params.data.goods_no : params.node.aggData ? params.node.aggData.goods_no : '';
+					let goods_no = params.data ? params.data.goods_no : (params.node.aggData ? params.node.aggData.goods_no : '');
 					return '<a href="#" onclick="return openStoreProduct(\'' + goods_no + '\');">' + params.value + '</a>';
 				}
 			}
@@ -292,15 +292,13 @@
 				innerRenderer: (params) => params.node.level == 0 ? params.node?.aggData?.color : ''
 			},
 		},
-		{field: "color_cd", headerName: "컬러코드", pinned:'left', width: 60, aggFunc: 'first',
-			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
-		},
 		{field: "color_nm", headerName: "컬러명", pinned:'left', width: 100, aggFunc: 'first',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
 		},
 		{field: "store_cd",	headerName: "매장코드",	width: 80, pinned:'left', cellClass: 'hd-grid-code'},
 		{field: 'store_nm', headerName: '매장명', width: 120, pinned: 'left'},
-		{field: "qty",	headerName: "수량",	pinned:'left', width: 80, type: "currencyType", aggFunc: sumValuesFunc},
+		{field: "size_kind_nm_p",	headerName: "사이즈구분", pinned:'left', width: 100, cellStyle: { "text-align": "center" }},
+		{field: "qty", headerName: "총수량", pinned: 'left', width: 80, type: "currencyType", cellStyle: { "font-weight": "bold" }, aggFunc: sumValuesFunc},
 	];
 
 	const getCurrentColumn = () => $("[name=ord_field]").val() === 'store' ? columns_store : columns_product;
@@ -341,20 +339,21 @@
 			alert("엑셀다운로드가 진행되고있습니다.\n잠시만 기다려주세요.");
 
 			let data = $('form[name="search"]').serialize();
-			
-			let cols = gx.gridOptions.api.getColumnDefs().filter(c => !c.hide);
-			let sort = cols.filter(col => col.sort)?.[0];
+			let sort = [];
 
 			if ($("[name=ord_field]").val() === 'store') {
+				let cols = gx.gridOptions.api.getColumnDefs().filter(c => !c.hide);
+				sort = cols.filter(col => col.sort)?.[0];
 				cols = cols
 					.map(c => c.showRowGroup === 'store_nm' ? c.showRowGroup : c.colId === 'store_nm' ? '' : c.colId)
 					.join('^');
+				data += "&columns=" + cols;
 			} else {
-				cols = cols
-					.map(c => c.showRowGroup === 'color' ? c.showRowGroup : c.colId === 'color' ? '' : c.colId)
-					.join('^');
-			}
-			data += "&columns=" + cols;
+				let cols = gx.gridOptions.api.getColumnDefs().filter(c => !c.hide || c.colId === 'color');
+				sort = cols.filter(col => col.sort)?.[0];
+				cols = cols.map(c => c.colId).join('^');
+				data += "&columns=" + cols;
+			} 
 			
 			if (sort) {
 				let colId = sort.colId;
@@ -379,7 +378,10 @@
 	function setColumn(sizes) {
 		if(!sizes) return;
 		const columns = getCurrentColumn();
-		columns.splice(10);
+		const current_cols_type = $("[name=ord_field]").val();
+		
+		if (current_cols_type === 'store') columns.splice(10);
+		else columns.splice(12);
 		
 		let size_cols = sizes.map(size => size.map(s => s === 0 ? ({ empty_tag: ' ' }) : s));
 
