@@ -199,6 +199,12 @@ class cs03Controller extends Controller
 		$now = now();
 
 		if (count($prd_ord_nos) > 0) {
+			
+			$default_storage = DB::table('storage')->where('default_yn', '=', 'Y')->where('use_yn', '=', 'Y')->value('storage_cd');
+			if ($default_storage == null) {
+				return response()->json(['code' => 500, 'msg' => '대표 창고 없음']);
+			}
+			
 			try {
 				for ($i = 0; $i < count($prd_ord_nos); $i++) {
 					$prd_ord_no = $prd_ord_nos[$i];
@@ -248,25 +254,25 @@ class cs03Controller extends Controller
 
 							$sql = "
 								select wqty from product_stock_storage
-								where prd_cd = :prd_cd
+								where storage_cd = :storage_cd and prd_cd = :prd_cd
 							";
-							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+							$row = DB::selectOne($sql, [ 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 							if ($row != null) {
 								$wqty = $row->wqty + $change_qty;
 								$sql = "
-									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
+									update product_stock_storage set wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
-								DB::update($sql, ['wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								DB::update($sql, [ 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 							}
 							break;
 						case "30": // 입고완료
 							if ($prev_state == "20") { // 기존에 입고가 처리중인 경우 storage의 qty도 입고수량만큼 증가.
 								$sql = "
 									select qty from product_stock_storage
-									where prd_cd = :prd_cd
+									where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
-								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+								$row = DB::selectOne($sql, [ 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 							$fin_sql = "
 								update sproduct_stock_order_product set fin_id = '$admin_id' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
@@ -289,9 +295,9 @@ class cs03Controller extends Controller
 									$qty = $row->qty + $change_qty;
 
 									$sql = "
-										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
-									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+									DB::update($sql, [ 'qty' => $qty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 									$query = "
 										insert into 
@@ -333,17 +339,17 @@ class cs03Controller extends Controller
 
 								$sql = "
 									select qty, wqty from product_stock_storage
-									where prd_cd = :prd_cd
+									where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
-								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+								$row = DB::selectOne($sql, [ 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 								if ($row != null) {
 									$qty = $row->qty + $change_qty;
 									$wqty = $row->wqty + $change_qty;
 									$sql = "
-										update product_stock_storage set qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
-									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+									DB::update($sql, [ 'qty' => $qty, 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 								
 								}
 								break;
@@ -372,25 +378,25 @@ class cs03Controller extends Controller
 
 							$sql = "
 								select wqty from product_stock_storage
-								where prd_cd = :prd_cd
+								where storage_cd = :storage_cd and prd_cd = :prd_cd
 							";
-							$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+							$row = DB::selectOne($sql, [ 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 							if ($row != null) {
 								$wqty = $row->wqty - $change_qty;
 								$sql = "
-									update product_stock_storage set wqty = :wqty where prd_cd = :prd_cd
+									update product_stock_storage set wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
-								DB::update($sql, ['wqty' => $wqty, 'prd_cd' => $prd_cd]);
+								DB::update($sql, [ 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 							}
 							break;
 						case "-30": // 반품완료
 							if ($prev_state == "-20") { // 기존에 반품이 처리중인 경우 storage의 qty도 입고수량만큼 감소.
 								$sql = "
 									select qty from product_stock_storage
-									where prd_cd = :prd_cd
+									where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
-								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+								$row = DB::selectOne($sql, [ 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 								$prc_sql = "
 									update sproduct_stock_order_product set fin_id = '$admin_id' , fin_rt = '$now' where prd_ord_no = '$prd_ord_no'
@@ -414,9 +420,9 @@ class cs03Controller extends Controller
 									$qty = $row->qty - $change_qty;
 
 									$sql = "
-										update product_stock_storage set qty = :qty where prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
-									DB::update($sql, ['qty' => $qty, 'prd_cd' => $prd_cd]);
+									DB::update($sql, [ 'qty' => $qty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 									$query = "
 										insert into 
@@ -468,17 +474,17 @@ class cs03Controller extends Controller
 
 								$sql = "
 									select qty, wqty from product_stock_storage
-									where prd_cd = :prd_cd
+									where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
-								$row = DB::selectOne($sql, ['prd_cd' => $prd_cd]);
+								$row = DB::selectOne($sql, [ 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 								if ($row != null) {
 									$qty = $row->qty - $change_qty;
 									$wqty = $row->wqty - $change_qty;
 									$sql = "
-										update product_stock_storage set qty = :qty, wqty = :wqty where prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
-									DB::update($sql, ['qty' => $qty, 'wqty' => $wqty, 'prd_cd' => $prd_cd]);
+									DB::update($sql, [ 'qty' => $qty, 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
 									$query = "
 										insert into 
