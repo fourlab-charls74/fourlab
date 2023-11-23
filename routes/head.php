@@ -68,7 +68,7 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::get('/style-no2', 'AutoCompleteController@style_no2');
     });
 
-	Route::prefix("com01")->namespace('common')->group(function () {
+	Route::prefix("cmm01")->namespace('common')->group(function () {
 		Route::post('/save', 'com01Controller@save');
 		Route::get('/get', 'com01Controller@get');
 		Route::delete('/init', 'com01Controller@init');
