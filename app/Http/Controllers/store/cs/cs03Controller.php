@@ -261,7 +261,7 @@ class cs03Controller extends Controller
 							if ($row != null) {
 								$wqty = $row->wqty + $change_qty;
 								$sql = "
-									update product_stock_storage set wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
+									update product_stock_storage set wqty = :wqty, ut = now() where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
 								DB::update($sql, [ 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 							}
@@ -295,7 +295,7 @@ class cs03Controller extends Controller
 									$qty = $row->qty + $change_qty;
 
 									$sql = "
-										update product_stock_storage set qty = :qty where storage_cd = :storage_cd and prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, ut = now() where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
 									DB::update($sql, [ 'qty' => $qty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
@@ -347,7 +347,7 @@ class cs03Controller extends Controller
 									$qty = $row->qty + $change_qty;
 									$wqty = $row->wqty + $change_qty;
 									$sql = "
-										update product_stock_storage set qty = :qty, wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, wqty = :wqty, ut = now() where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
 									DB::update($sql, [ 'qty' => $qty, 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 								
@@ -385,7 +385,7 @@ class cs03Controller extends Controller
 							if ($row != null) {
 								$wqty = $row->wqty - $change_qty;
 								$sql = "
-									update product_stock_storage set wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
+									update product_stock_storage set wqty = :wqty, ut = now() where storage_cd = :storage_cd and prd_cd = :prd_cd
 								";
 								DB::update($sql, [ 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 							}
@@ -420,7 +420,7 @@ class cs03Controller extends Controller
 									$qty = $row->qty - $change_qty;
 
 									$sql = "
-										update product_stock_storage set qty = :qty where storage_cd = :storage_cd and prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, ut = now() where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
 									DB::update($sql, [ 'qty' => $qty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
@@ -482,7 +482,7 @@ class cs03Controller extends Controller
 									$qty = $row->qty - $change_qty;
 									$wqty = $row->wqty - $change_qty;
 									$sql = "
-										update product_stock_storage set qty = :qty, wqty = :wqty where storage_cd = :storage_cd and prd_cd = :prd_cd
+										update product_stock_storage set qty = :qty, wqty = :wqty, ut = now() where storage_cd = :storage_cd and prd_cd = :prd_cd
 									";
 									DB::update($sql, [ 'qty' => $qty, 'wqty' => $wqty, 'storage_cd' => $default_storage, 'prd_cd' => $prd_cd ]);
 
