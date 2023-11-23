@@ -74,7 +74,7 @@
                     <h6 class="m-0 font-weight-bold">상품 세부 정보</h6>
                 </div>
 				<div class="fr_box">
-					<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+					<button type="button" id="gd-setting" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
 				</div>
             </div>
         </div>
@@ -86,7 +86,7 @@
 
 <!-- <a href="https://bizest.netpx.co.kr/head/webapps/standard/std03.php">품목관리 링크</a> -->
 <script type="text/javascript" charset="utf-8">
-    const columns = [
+    const default_columns = [
         { field: 'seq', headerName: '#', width: 35, maxWidth: 100, valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: { "text-align": "center" } },
         { field: "opt_kind_cd", headerName: "품목코드", cellStyle: StyleGoodsTypeNM, width: 150,
             cellRenderer: function(params) {
@@ -110,24 +110,15 @@
     let gx;
     let _isloading = false;
     
-    $(document).ready(function() {
+    $(document).ready(async function() {
         pApp.ResizeGrid(270);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
 
-		let url_path_array = String(window.location.href).split('/');
-		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+		const my_columns = await getMyColumns(() => gx, gridDiv, default_columns);
+		gx = new HDGrid(gridDiv, my_columns, {});
 		
-		get_indiv_columns(pid, columns, function(data) {
-			gx = new HDGrid(gridDiv, data);
-			
-			setMyGridHeader.Init(gx,
-				indiv_grid_save.bind(this, pid, gx),
-				indiv_grid_init.bind(this, pid)
-			);
-
-			Search(1);
-		});
+		Search();
     });
 
     function onscroll(params) {

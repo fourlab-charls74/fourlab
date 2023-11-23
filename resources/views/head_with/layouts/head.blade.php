@@ -27,9 +27,9 @@
         <link href="{{ URL::asset('/with/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
         <link href="{{ URL::asset('/skin/libs/select2/select2.min.css')}}" type="text/css" rel="stylesheet" />
         <link href="{{ URL::asset('/with/css/datepicker.css')}}" type="text/css" rel="stylesheet" />
-
-        <link href="{{ URL::asset('/with/css/app.css')}}?v=2023082312" id="app-light" rel="stylesheet" type="text/css" />
-        <link href="{{ URL::asset('/with/css/app_dark.css')}}?v=2023082312" id="app-dark" rel="stylesheet" type="text/css" disabled />
+        <link href="{{ URL::asset('/with/css/app.css')}}?v=2023112312" id="app-light" rel="stylesheet" type="text/css" />
+        <link href="{{ URL::asset('/with/css/app_dark.css')}}?v=2023112312" id="app-dark" rel="stylesheet" type="text/css" disabled />
+		<script src="/handle/grid/grid_custom_editor.js?v=2023112312"></script>
         <script src="/handle/grid/grid.js?v=2020102717"></script>
         <script src="/handle/grid/head_functions.js?v=2023061615"></script>
         <script src="/handle/libs.js"></script>

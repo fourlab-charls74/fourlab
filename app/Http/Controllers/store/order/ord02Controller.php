@@ -674,4 +674,80 @@ class ord02Controller extends Controller
             return $tel;
         }
     }
+
+	/*
+	 * 
+	 * 출고거부 리스트 팝업
+	 *  
+	 * */
+	public function reject_list_view(Request $request)
+	{
+		$prd_cd_p = $request->input('prd_cd_p', '');
+		$sdate = $request->input('sdate', Carbon::now()->sub(1, 'month')->format("Y-m-d"));
+		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
+		if($sdate == '') $sdate = date('Y-m-d');
+		$color = $request->input('color', '');
+		$size = $request->input('size', '');
+
+
+		$values = [
+			'sdate' => $sdate,
+			'edate' => $edate,
+			'color' => $color ?? '',
+			'size' => $size ?? '',
+			// 'prd' => $rows[0] ?? '',
+			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
+			'store_channel'	=> SLib::getStoreChannel(),
+			'store_kind'	=> SLib::getStoreKind(),
+		];
+
+		return view(Config::get('shop.store.view') . '/order/ord02_reject_list', $values);
+	}
+	public function search_reject_list(Request $request)
+	{
+		$sdate = $request->input('sdate');
+		$edate = $request->input('edate');
+		$prd_cd = $request->input('prd_cd', '');
+		
+		$where = '';
+		
+		if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
+		
+		$sql = "
+			select
+				o.ord_no
+				, orr.ord_opt_no
+				, pc.prd_cd
+				, pc.prd_cd_p
+				, orr.qty
+				, orr.dlv_location_type
+				, orr.dlv_location_cd
+			    , if(orr.dlv_location_type = 'STORE', (select store_nm from store where store_cd = orr.dlv_location_cd),
+			        if(orr.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = orr.dlv_location_cd), '')) as dlv_location_nm
+				, orr.reject_yn
+				, c.code_val as reject_reason
+				, orr.admin_id
+			    , (select name from mgr_user where id = orr.admin_id) as admin_nm
+				, orr.rt
+			from order_receipt_reject orr
+			    inner join product_code pc on pc.prd_cd = orr.prd_cd
+				inner join order_receipt_product orp on orp.or_prd_cd = orr.or_prd_cd
+				inner join order_receipt orct on orct.or_cd = orp.or_cd
+				inner join code c on c.code_id = orr.reject_reason and c.code_kind_cd = 'REL_REJECT_REASON'
+				inner join order_opt o on o.ord_opt_no = orp.ord_opt_no
+			where 1=1 $where and orr.rt >= '$sdate 00:00:00' and orr.rt <= '$edate 23:59:59'
+		";
+		
+		$result = DB::select($sql);
+
+		return response()->json([
+			"code"	=> 200,
+			"head"	=> array(
+				"total"		=> count($result),
+			),
+			"body"	=> $result
+		]);
+		
+	}
+
 }
