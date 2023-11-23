@@ -457,7 +457,7 @@ class ord06Controller extends Controller
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
 		$stmt->execute();
-		$result	= [];
+		$result	= [];dd($sql);
 		
 		$ord_states = $this->_getOrdStates();
 		
