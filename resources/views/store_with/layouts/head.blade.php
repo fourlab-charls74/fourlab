@@ -17,9 +17,10 @@
         <link href="/handle/grid/ag-grid/community/dist/styles/ag-theme-alpine.css" rel="stylesheet" />
         <link href="{{ URL::asset('/skin/libs/select2/select2.min.css')}}" type="text/css" rel="stylesheet" />
         <link href="{{ URL::asset('/with/css/datepicker.css')}}" type="text/css" rel="stylesheet" />
-
-        <link href="{{ URL::asset('/with/css/app.css')}}?v=2023082312" id="app-light" rel="stylesheet" type="text/css" />
+        
+		<link href="{{ URL::asset('/with/css/app.css')}}?v=2023082312" id="app-light" rel="stylesheet" type="text/css" />
         <link href="{{ URL::asset('/with/css/app_dark.css')}}?v=2023082312" id="app-dark" rel="stylesheet" type="text/css" disabled />
+		<script src="/handle/grid/grid_custom_editor.js?v=2023100510"></script>
 
         @if (env('GRID_LICENSE') != "")
             <script src="/handle/grid/ag-grid/enterprise/dist/ag-grid-enterprise.min.js"></script>

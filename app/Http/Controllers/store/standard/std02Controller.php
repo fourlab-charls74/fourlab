@@ -618,7 +618,7 @@ class std02Controller extends Controller
 	//판매채널 셀렉트값이 변경되면 해당 판매채널의 매장구분을 가져오는 코드
 	public function change_store_channel_multi(Request $request) {
 
-		$store_channel = $request->input('store_channel');
+		$store_channel = $request->input('store_channel', []);
 		$store_kinds = [];
 
 		try {
@@ -644,7 +644,7 @@ class std02Controller extends Controller
 			$msg = $e->getMessage();
 		}
 
-		return response()->json(["code" => $code, "msg" => $msg, 'store_kind' => $store_kind, 'store_kinds' => $store_kinds]);
+		return response()->json(["code" => $code, "msg" => $msg, 'store_kinds' => $store_kinds]);
 	}
 
 	public function change_store_channel_kind(Request $request) {
