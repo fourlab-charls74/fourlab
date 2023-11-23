@@ -244,7 +244,7 @@
 							</select>
 							<a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
 						</div>
-						<div class="fr_box">
+						<div class="fr_box" hidden>
 							<button type="button" id="gd-setting" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
 						</div>
 					</div>
@@ -324,123 +324,43 @@
 			pApp.ResizeGrid(275);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
-
-			// let url_path_array = String(window.location.href).split('/');
-			// const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
-
-			// get_indiv_columns(pid, columns, function(data) {
-			// 	gx = new HDGrid(gridDiv, data, {
-			// 		pinnedTopRowData: pinnedRowData,
-			// 		getRowStyle: (params) => {
-			// 			if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
-			// 		},
-			// 		defaultColDef: {
-			// 			suppressMenu: true,
-			// 			resizable: false,
-			// 			sortable: true,
-			// 		},
-			// 		onCellValueChanged: (e) => {
-			// 			e.node.setSelected(true);
-			// 			if (e.column.colId.includes('rel_qty')) {
-			// 				if (isNaN(e.newValue) == true || e.newValue == "") {
-			// 					alert("숫자만 입력가능합니다.");
-			// 					gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-			// 				} else {
-			// 					updatePinnedRow();
-			// 					if (e.oldValue != undefined) {
-			// 						let oldValue = e.oldValue * 1;
-			// 						let newValue = e.newValue * 1;
-			// 						let qty = (parseInt(e.data.storage_wqty) + oldValue) - newValue;
-			// 						let total_qty = e.data.storage_wqty2 - qty;
-			// 						e.data.storage_wqty = qty + " (-" + total_qty + ")";
-			// 						gx.gridOptions.api.updateRowData({update: [e.data]});
-			// 					} else if (e.oldValue == undefined) {
-			// 						let newValue = e.newValue * 1;
-			// 						let qty = parseInt(e.data.storage_wqty) - newValue;
-			// 						let total_qty = e.data.storage_wqty2 - qty;
-			// 						e.data.storage_wqty = qty + " (-" + total_qty + ")";
-			// 						gx.gridOptions.api.updateRowData({update: [e.data]});
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	});
-
-				const my_columns = await getMyColumns(() => gx, gridDiv, columns);
-				gx = new HDGrid(gridDiv, my_columns, {
-					pinnedTopRowData: pinnedRowData,
-					getRowStyle: (params) => {
-						if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
-					},
-					defaultColDef: {
-						suppressMenu: true,
-						resizable: false,
-						sortable: true,
-					},
-					onCellValueChanged: (e) => {
-						e.node.setSelected(true);
-						if (e.column.colId.includes('rel_qty')) {
-							if (isNaN(e.newValue) == true || e.newValue == "") {
-								alert("숫자만 입력가능합니다.");
-								gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-							} else {
-								updatePinnedRow();
-								if (e.oldValue != undefined) {
-									let oldValue = e.oldValue * 1;
-									let newValue = e.newValue * 1;
-									let qty = (parseInt(e.data.storage_wqty) + oldValue) - newValue;
-									let total_qty = e.data.storage_wqty2 - qty;
-									e.data.storage_wqty = qty + " (-" + total_qty + ")";
-									gx.gridOptions.api.updateRowData({update: [e.data]});
-								} else if (e.oldValue == undefined) {
-									let newValue = e.newValue * 1;
-									let qty = parseInt(e.data.storage_wqty) - newValue;
-									let total_qty = e.data.storage_wqty2 - qty;
-									e.data.storage_wqty = qty + " (-" + total_qty + ")";
-									gx.gridOptions.api.updateRowData({update: [e.data]});
-								}
+			const my_columns = await getMyColumns(() => gx, gridDiv, columns);
+			gx = new HDGrid(gridDiv, my_columns, {
+				pinnedTopRowData: pinnedRowData,
+				getRowStyle: (params) => {
+					if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+				},
+				defaultColDef: {
+					suppressMenu: true,
+					resizable: false,
+					sortable: true,
+				},
+				onCellValueChanged: (e) => {
+					e.node.setSelected(true);
+					if (e.column.colId.includes('rel_qty')) {
+						if (isNaN(e.newValue) == true || e.newValue == "") {
+							alert("숫자만 입력가능합니다.");
+							gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+						} else {
+							updatePinnedRow();
+							if (e.oldValue != undefined) {
+								let oldValue = e.oldValue * 1;
+								let newValue = e.newValue * 1;
+								let qty = (parseInt(e.data.storage_wqty) + oldValue) - newValue;
+								let total_qty = e.data.storage_wqty2 - qty;
+								e.data.storage_wqty = qty + " (-" + total_qty + ")";
+								gx.gridOptions.api.updateRowData({update: [e.data]});
+							} else if (e.oldValue == undefined) {
+								let newValue = e.newValue * 1;
+								let qty = parseInt(e.data.storage_wqty) - newValue;
+								let total_qty = e.data.storage_wqty2 - qty;
+								e.data.storage_wqty = qty + " (-" + total_qty + ")";
+								gx.gridOptions.api.updateRowData({update: [e.data]});
 							}
 						}
 					}
-				});
-		
-			
-			// gx = new HDGrid(gridDiv, columns, {
-			// 	pinnedTopRowData: pinnedRowData,
-			// 	getRowStyle: (params) => {
-			// 		if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
-			// 	},
-			// 	defaultColDef: {
-			// 		suppressMenu: true,
-			// 		resizable: false,
-			// 		sortable: true,
-			// 	},
-			// 	onCellValueChanged: (e) => {
-			// 		e.node.setSelected(true);
-			// 		if (e.column.colId.includes('rel_qty')) {
-			// 			if (isNaN(e.newValue) == true || e.newValue == "") {
-			// 				alert("숫자만 입력가능합니다.");
-			// 				gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-			// 			} else {
-			// 				updatePinnedRow();
-			// 				if (e.oldValue != undefined) {
-			// 					let oldValue = e.oldValue * 1;
-			// 					let newValue = e.newValue * 1;
-			// 					let qty = (parseInt(e.data.storage_wqty) + oldValue) - newValue;
-			// 					let total_qty = e.data.storage_wqty2 - qty;
-			// 					e.data.storage_wqty = qty + " (-" + total_qty + ")";
-			// 					gx.gridOptions.api.updateRowData({update: [e.data]});
-			// 				} else if (e.oldValue == undefined) {
-			// 					let newValue = e.newValue * 1;
-			// 					let qty = parseInt(e.data.storage_wqty) - newValue;
-			// 					let total_qty = e.data.storage_wqty2 - qty;
-			// 					e.data.storage_wqty = qty + " (-" + total_qty + ")";
-			// 					gx.gridOptions.api.updateRowData({update: [e.data]});
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// });
+				}
+			});
 
 			// 매장검색
 			$( ".sch-store" ).on("click", function() {

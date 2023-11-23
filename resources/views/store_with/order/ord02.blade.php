@@ -334,8 +334,8 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
                 <div class="fr_box d-flex">
-                   
-                    <div class="d-flex">
+					<a href="javascript:void(0);" onclick="return rejectList();" class="btn btn-sm btn-warning shadow-sm">출고거부 리스트</a>
+                    <div class="d-flex ml-3">
                         <span class="mr-2">출고구분 :</span>
                         <select id='ord_kind' name='ord_kind' class="form-control form-control-sm mr-2"  style='width:120px;'>
                             @foreach (@$ord_kinds as $ord_kind)
@@ -438,6 +438,11 @@
 					: '';
 			},
 			cellStyle: (params) => params.node.level == 0 && params.value !== null ? {'background-color': '#ff6666', 'color': '#ffffff'} : '',
+			// onCellDoubleClicked: (params) => {
+			// 	if (params.node.level == 0 && params.value !== null) {
+			// 		rejectList();
+			// 	}
+			// }
 		},
 		{field: "reject_location_nm", headerName: "출고거부처", hide: true,
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
@@ -837,5 +842,11 @@
             console.log(err);
         });
     }
+	
+	//출고거부 리스트 팝업
+	function rejectList() {
+		const url = '/store/order/ord02/reject-list';
+		const reject_list = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
+	}
 </script>
 @stop
