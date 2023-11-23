@@ -280,6 +280,7 @@ class sal24Controller extends Controller
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
 						and o.ord_state >= '$ord_state'
+						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
 						$inner_where2 $inner_where
 						$where
 					group by w.ord_state_date, w.ord_state
