@@ -245,7 +245,7 @@
 							<a href="#" onclick="requestRelease();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-sm text-white-50"></i>출고요청</a>
 						</div>
 						<div class="fr_box">
-							<button type="button" class="gd-setting ml-2"><i class="fas fa-cog text-primary"></i></button>
+							<button type="button" id="gd-setting" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
 						</div>
 					</div>
 				</div>
