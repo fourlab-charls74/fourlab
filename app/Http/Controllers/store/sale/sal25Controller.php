@@ -230,6 +230,7 @@ class sal25Controller extends Controller
 						and w.ord_state_date <= concat('$edate', '31') 
 						and w.ord_state in ('$ord_state',60,61)
 						and o.ord_state >= '$ord_state'
+						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
 						$inner_where2 $inner_where $where
 					group by sale_date, w.ord_state
 				) b group by b.sale_date

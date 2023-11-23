@@ -571,3 +571,120 @@ $(document).ready(function() {
         closeOnSelect: false
     });
 });
+
+function filter_pid (str) {
+	return str.replace('/^[A-Za-z0-9+]*$/', '');
+}
+
+function get_indiv_columns(pid, columns, callback) {
+	$.ajax({
+		method: 'get',
+		url: `/head/com01/get?pid=${pid}`,
+		success: function (data) {
+			let parseData = null;
+			let resData = [];
+
+			if(data.body.indiv_columns.length > 0) {
+				parseData = JSON.parse(data.body.indiv_columns);
+				parseData.forEach((value) => {
+					columns.forEach((col) => {
+						if(value['field'] === col['field']) {
+							if(value['children'].length > 0) {
+								let value_children = value['children'];
+								let col_children = col['children'];
+								let new_children = [];
+
+								if(value['hide'] === true) {
+									resData.push(Object.assign(clone(col), {'hide': true }));
+								} else {
+									Object.keys(value_children).forEach((key) => {
+										if(value_children[key]['hide'] === true) {
+											new_children.push(Object.assign(col_children[key], {'hide': true }));
+										} else {
+											new_children.push(col_children[key]);
+										}
+									});
+
+									col['children'] = new_children;
+									resData.push(col);
+								}
+							} else {
+								if(value['hide'] === true) {
+									resData.push(Object.assign(clone(col), {'hide': true }));
+								} else {
+									resData.push(clone(col));
+								}
+							}
+						}
+
+					})
+				});
+			}
+
+			if(resData.length === 0) {
+				callback.call(this, columns);
+			} else {
+				callback.call(this, resData);
+			}
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+
+function indiv_grid_save (pid, gx) {
+	let column_datalist = gx.gridOptions.api.getColumnDefs();
+	let new_column_datalist = [];
+
+	column_datalist.forEach((value) => {
+		let value_children = value['children'];
+		let newchildren = [];
+
+		if(value['children'] !== undefined) {
+			value_children.forEach((val) => {
+				newchildren.push({'field': val['field'], 'hide': val['hide']});
+			});
+		}
+
+		new_column_datalist.push({'field': value['field'], 'hide': value['hide'], 'children': newchildren});
+	});
+
+	let data = {
+		'pid'	 : pid,
+		'indiv_columns' : JSON.stringify(new_column_datalist)
+	}
+
+	$.ajax({
+		method: 'post',
+		url: '/head/com01/save',
+		data: data,
+		success: function (data) {
+			console.log(data);
+			window.location.reload();
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}
+
+function indiv_grid_init (pid) {
+	let data = {
+		'pid' : pid
+	}
+
+	$.ajax({
+		method: 'delete',
+		url: '/head/com01/init',
+		data: data,
+		success: function (data) {
+			console.log(data);
+			window.location.reload();
+		},
+		error: function(request, status, error) {
+			console.log("error")
+		}
+	});
+}

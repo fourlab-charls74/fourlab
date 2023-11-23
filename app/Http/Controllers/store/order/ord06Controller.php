@@ -437,7 +437,10 @@ class ord06Controller extends Controller
                     -- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
                     left outer join sale_type st on st.sale_kind = o.sale_kind
 					left outer join store store on store.store_cd = o.store_cd
-                where w.ord_state in (30,60,61) $where
+                where 
+                    w.ord_state in (30,60,61) 
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+                    $where
                 $orderby
                 $limit
             ) a
@@ -502,7 +505,10 @@ class ord06Controller extends Controller
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                     left outer join sale_type st on st.sale_kind = o.sale_kind
                 	left outer join store store on store.store_cd = o.store_cd
-                where w.ord_state in (30,60,61) $where
+                where 
+                    w.ord_state in (30,60,61)
+                    and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1) 
+                    $where
             ";
 
 			$row = DB::selectOne($sql);

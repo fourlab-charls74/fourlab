@@ -2,7 +2,6 @@
  * GridCustomSettingEditor
  * Grid Header 개인설정 조회 시, 생성하는 인스턴스입니다.
  * 개인설정버튼에 팝오버를 생성하고, 저장/초기화 기능을 수행합니다.
- * 
  * @param button_id
  * @param idx
  * @param grid_callback
