@@ -113,7 +113,8 @@
                                                 <span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
                                                 @endif
                                             </td>
-                                        @else
+										</tr>
+										<tr>
                                             @if(($user->attach_file_url != '' && $user->attach_file_url !== null) && count(explode(',', $user->attach_file_url)) >= 5)
                                                 <th>파일 다운로드</th>
                                                 <td>

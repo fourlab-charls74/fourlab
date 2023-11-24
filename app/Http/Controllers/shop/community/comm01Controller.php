@@ -99,7 +99,7 @@ class comm01Controller extends Controller
                     select code_id from code c2 where c2.code_kind_cd  = 'STORE_NOTICE_TYPE' and c2.code_val = '$notice_id'
                 )
                 $where
-                and (s.all_store_yn = 'Y' or d.store_cd = 'S0007')
+                and (s.all_store_yn = 'Y' or d.store_cd = '$store_no')
             group by s.ns_cd
             $orderby
             $limit
@@ -156,6 +156,13 @@ class comm01Controller extends Controller
         $user = DB::table('notice_store')->where('ns_cd', "=", $no)->first();
         $user->name = $user->admin_nm;
 
+		$sql = "
+            update notice_store set
+                cnt = cnt + 1
+            where ns_cd = $no
+        ";
+		DB::update($sql);
+
         $sql = "
             select
                 d.check_yn,
@@ -164,8 +171,8 @@ class comm01Controller extends Controller
                 d.store_cd,
                 store.store_nm
             from notice_store s 
-                left outer join notice_store_detail d on s.ns_cd = d.ns_cd
-                left outer join store on store.store_cd = d.store_cd
+                inner join notice_store_detail d on s.ns_cd = d.ns_cd
+                inner join store on store.store_cd = d.store_cd
             where s.ns_cd = $no
         ";
         $storeCodes = DB::select($sql);
