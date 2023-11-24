@@ -388,7 +388,15 @@
 		{field: "sale_place_nm", headerName: "판매처", pinned: 'left', width: 80},
 	@if (@$user_group === 'N')
 		{field: "store_cd", hide: true}, // 판매매장
-		{field: "store_nm", headerName: "판매매장", pinned: 'left', width: 80, type: 'StoreNameType'},
+		{field: "store_nm", headerName: "판매매장", pinned: 'left', width: 80, type: 'StoreNameType',
+			cellRenderer: (params) => {
+				if (params.value == null) {
+					return '';
+				} else {
+					return params.value;
+				}
+			}
+		},
 	@endif
 		{field: "goods_no", headerName: "온라인코드", pinned: "left", width: 70, cellClass: 'hd-grid-code'},
 		{field: "prd_cd", headerName: "바코드", pinned: 'left', width: 125, cellClass: 'hd-grid-code'},

@@ -292,6 +292,11 @@ class ord04Controller extends Controller
 		$return_storage_cd = DB::table('storage')->where('storage_cd', 'S0007')->value('storage_cd');
 
 		try {
+			// 이미 트랜잭션이 처리중이라면 에러처리
+			if (DB::transactionLevel() > 0) {
+				throw new Exception("이미 검수완료가 진행중입니다. 잠시만 기다려주세요.");
+			}
+			
 			DB::beginTransaction();
 
 			foreach ($rows as $row) {
