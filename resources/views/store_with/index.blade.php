@@ -169,14 +169,23 @@
                 }
             },
             cellRenderer: function(params){
-                if(params.data.stores == null){
+                if(params.data.all_store_yn == 'Y'){
                     return params.data.all_store_yn = "Y";
                 }else{
                     return params.data.all_store_yn = "N";
                 }
             }
         },
-        {headerName: "공지매장", field: "store_nm", width: 0, cellRenderer: (params) => params.data.stores},
+        {headerName: "공지매장", field: "store_nm", width: 0, 
+			cellRenderer: (params) => {
+				if (params.data.all_store_yn == 'Y') {
+					return '';
+				} else {
+				 	return params.data.stores
+				}
+			
+			}
+		},
         {headerName: "글번호", field: "ns_cd", hide:true },
     ];
 
