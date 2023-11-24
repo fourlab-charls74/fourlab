@@ -54,6 +54,8 @@ class stk13Controller extends Controller
 		$store_where = "";
         $orderby = "";
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
+		$store_channel = $request->input('store_channel', []);
+		$store_channel_kind = $request->input('store_channel_kind', []);
 		
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
@@ -143,9 +145,16 @@ class stk13Controller extends Controller
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 		if(($r['ext_storage_qty'] ?? 'false') == 'true')
 			$where .= " and (pss.wqty != '' and pss.wqty != '0')";
-
-		if ($r['store_channel'] != '') $where .= "and store.store_channel ='" . Lib::quote($r['store_channel']). "'";
-		if ($r['store_channel_kind'] ?? '' != '') $where .= "and store.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
+		
+		if ($store_channel != '') {
+			$store_channel = join("','", $store_channel);
+			$where .= " and store.store_channel in ('$store_channel')";
+		}
+		
+		if ($store_channel_kind) {
+			$store_channel_kind = join("','", $store_channel_kind);
+			$where .= " and store.store_channel_kind in ('$store_channel_kind')";
+		}
 
         // orderby
         $ord = $r['ord'] ?? 'desc';
