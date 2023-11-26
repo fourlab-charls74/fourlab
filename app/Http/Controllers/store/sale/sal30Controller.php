@@ -48,7 +48,7 @@ class sal30Controller extends Controller
 			// 창고 총재고 정보 where
 			$where_storage	.= " and (1!=1";
 			foreach($storage_cd as $sc) {
-				$where_storage .= " or storage_cd = '$sc' ";
+				$where_storage .= " or pss.storage_cd = '$sc' ";
 			}
 			$where_storage	.= ")";
 		}
@@ -92,7 +92,13 @@ class sal30Controller extends Controller
 		}
 
 		//창고 총재고 정보
-		$sql	= " select sum(qty) as period_out_qty from product_stock_storage where 1=1 $where_storage ";
+		$sql	= " 
+			select sum(pss.qty) as period_out_qty 
+			from product_stock_storage pss 
+			inner join product_code pc on pss.prd_cd = pc.prd_cd and pc.type = 'N'
+			where 
+			    1=1 $where_storage 
+		";
 		$row	= DB::selectOne($sql);
 		$total_qty	= $row->period_out_qty;
 
@@ -101,6 +107,7 @@ class sal30Controller extends Controller
 			select
 				ifnull(sum(hst.qty), 0) as period_out_qty
 			from product_stock_hst hst
+			inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N'
 			where
 				hst.location_type = 'STORAGE'
 				and hst.r_stock_state_date >= :sdate
