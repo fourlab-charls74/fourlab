@@ -63,7 +63,15 @@ class prd04Controller extends Controller
 		$store_where2	= "";
 		$having = "";
 		$in_store_sql	= "";
-		$store_qty_sql	= "(ps.qty - ps.wqty)";
+		//$store_qty_sql	= "(ps.qty - ps.wqty)";
+		$store_qty_sql	= "
+			(
+				select sum(pss.qty) 
+				from product_stock_store pss 
+				inner join store s on pss.store_cd = s.store_cd and s.use_yn = 'Y'
+				where pss.prd_cd = pc.prd_cd
+			)
+		";
 		$next_store_qty_sql = "";
 
 		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
@@ -260,7 +268,7 @@ class prd04Controller extends Controller
 						inner join brand b on b.br_cd = pc.brand
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where
-						1=1
+						pc.type = 'N'
 						$where
 					group by pc.prd_cd
 					$having
@@ -336,7 +344,7 @@ class prd04Controller extends Controller
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 				left outer join product_orderby ob on pc.size = ob.size_cd
 			where
-				1=1
+				pc.type = 'N'
 				$where
 			group by pc.prd_cd
 			$having
