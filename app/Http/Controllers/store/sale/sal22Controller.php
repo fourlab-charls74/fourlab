@@ -258,10 +258,10 @@ class sal22Controller extends Controller
                         g.price,
                         g.wonga,
                         -- 이전재고
-                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
-                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * g.goods_sh as prev_sh,
-                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * g.price as prev_price,
-                        (p.wqty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * g.wonga as prev_wonga,
+                        (p.qty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) as prev_qty,
+                        (p.qty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * g.goods_sh as prev_sh,
+                        (p.qty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * g.price as prev_price,
+                        (p.qty - sum(ifnull(_next.qty, 0)) - sum(ifnull(hst.qty, 0))) * g.wonga as prev_wonga,
 
                         -- 생산입고
                         ifnull(storage_in.qty, 0) as storage_in_qty,
@@ -306,11 +306,11 @@ class sal22Controller extends Controller
                         sum(ifnull(loss.qty, 0)) * -1 * g.wonga as loss_wonga,
                         
                         -- 기간재고
-                        p.wqty - sum(ifnull(_next.qty, 0)) as term_qty,
-                        (p.wqty - sum(ifnull(_next.qty, 0))) * g.goods_sh as term_sh,
+                        p.qty - sum(ifnull(_next.qty, 0)) as term_qty,
+                        (p.qty - sum(ifnull(_next.qty, 0))) * g.goods_sh as term_sh,
                         (p.wqty - sum(ifnull(_next.qty, 0))) * g.price as term_price,
-                        (p.wqty - sum(ifnull(_next.qty, 0))) * g.wonga as term_wonga,
-                        p.wqty as current_qty -- 현재재고
+                        (p.qty - sum(ifnull(_next.qty, 0))) * g.wonga as term_wonga,
+                        p.qty as current_qty -- 현재재고
                     from product_stock_storage p
                         inner join product_code pc on pc.prd_cd = p.prd_cd and pc.type = 'N'
                         left outer join product pd on pd.prd_cd = p.prd_cd
