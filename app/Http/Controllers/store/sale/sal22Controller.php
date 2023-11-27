@@ -193,7 +193,7 @@ class sal22Controller extends Controller
             $orderby
             $limit
         ";
-        $rows = DB::select($sql);dd($sql);
+        $rows = DB::select($sql);
 
 
         // pagination
