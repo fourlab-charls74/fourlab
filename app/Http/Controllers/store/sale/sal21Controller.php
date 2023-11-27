@@ -223,7 +223,7 @@ class sal21Controller extends Controller
 							-- 이동출고
 							sum(if(hst.type = 15 and hst.qty < 0, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as rt_out_qty,
 							-- 매장판매
-							sum(if(hst.type = '2' or hst.type = '5' or hst.type = '6' and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
+							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
 							-- loss
 							sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
 					
@@ -377,7 +377,7 @@ class sal21Controller extends Controller
 									-- 이동출고
 									sum(if(hst.type = 15 and hst.qty < 0, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as rt_out_qty,
 									-- 매장판매
-									sum(if(hst.type = '2' or hst.type = '5' or hst.type = '6' and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
+									sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
 									-- loss
 									sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
 							
