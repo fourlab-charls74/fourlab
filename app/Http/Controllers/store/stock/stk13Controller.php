@@ -54,6 +54,8 @@ class stk13Controller extends Controller
 		$store_where = "";
 		$orderby = "";
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
+		$store_channel = $request->input("store_channel",[]);
+		$store_channel_kind = $request->input("store_channel_kind",[]);
 
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
@@ -144,8 +146,18 @@ class stk13Controller extends Controller
 		if(($r['ext_storage_qty'] ?? 'false') == 'true')
 			$where .= " and (pss.wqty != '' and pss.wqty != '0')";
 
-		if ($r['store_channel'] != '') $where .= "and store.store_channel ='" . Lib::quote($r['store_channel']). "'";
-		if ($r['store_channel_kind'] ?? '' != '') $where .= "and store.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
+//		if ($r['store_channel'] != '') $where .= "and store.store_channel ='" . Lib::quote($r['store_channel']). "'";
+//		if ($r['store_channel_kind'] ?? '' != '') $where .= "and store.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
+
+		if (count($store_channel) > 0) {
+			$store_channel = join("','", $store_channel);
+			$where .= " and store.store_channel in ('$store_channel')";
+		}
+
+		if (count($store_channel_kind) > 0) {
+			$store_channel_kind = join("','", $store_channel_kind);
+			$where .= " and store.store_channel_kind in ('$store_channel_kind')";
+		}
 
 		// orderby
 		$ord = $r['ord'] ?? 'desc';
@@ -183,12 +195,6 @@ class stk13Controller extends Controller
 					o.prd_cd,
 					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 					pc.color,
-					-- ifnull((
-					-- 	select s.size_cd from size s
-					-- 	where s.size_kind_cd = pc.size_kind
-					-- 	   and s.size_cd = pc.size
-					-- 	   and use_yn = 'Y'
-					-- ),'') as size,
 					pc.size,
 					o.goods_no,
 					op.opt_kind_nm,

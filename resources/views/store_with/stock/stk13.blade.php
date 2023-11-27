@@ -62,7 +62,7 @@
 								<label for="good_types">판매채널/매장구분</label>
 								<div class="d-flex align-items-center">
 									<div class="flex_box w-100">
-										<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
+										<select name='store_channel[]' id="store_channel" class="form-control form-control-sm multi_select" multiple onchange="chg_store_channel_multi();">
 											<option value=''>전체</option>
 											@foreach ($store_channel as $sc)
 												<option value='{{ $sc->store_channel_cd }}'>{{ $sc->store_channel }}</option>
@@ -71,7 +71,7 @@
 									</div>
 									<span class="mr-2 ml-2">/</span>
 									<div class="flex_box w-100">
-										<select id='store_channel_kind' name='store_channel_kind' class="form-control form-control-sm" disabled>
+										<select id='store_channel_kind' name='store_channel_kind[]' class="form-control form-control-sm multi_select" multiple disabled>
 											<option value=''>전체</option>
 											@foreach ($store_kind as $sk)
 												<option value='{{ $sk->store_kind_cd }}'>{{ $sk->store_kind }}</option>
