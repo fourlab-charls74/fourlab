@@ -173,7 +173,7 @@ class sal22Controller extends Controller
                 left outer join (
                     select idx, prd_cd, location_cd, type, qty, stock_state_date
                     from product_stock_hst
-                    where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+                    where location_type = 'STORAGE' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
                 ) hst on hst.location_cd = p.storage_cd and hst.prd_cd = p.prd_cd
                 left outer join product_stock_hst storage_in on storage_in.idx = hst.idx and storage_in.type = '1' -- 상품입고
                 left outer join product_stock_hst storage_return on storage_return.idx = hst.idx and storage_return.type = '9' -- 상품반품
@@ -185,7 +185,7 @@ class sal22Controller extends Controller
                 left outer join (
                     select idx, prd_cd, location_cd, type, qty, stock_state_date
                     from product_stock_hst
-                    where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+                    where location_type = 'STORAGE' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') <= now()
                 ) _next on _next.location_cd = p.storage_cd and _next.prd_cd = p.prd_cd
             where ($store_where)
                 $where
@@ -320,7 +320,7 @@ class sal22Controller extends Controller
                         left outer join (
                             select idx, prd_cd, location_cd, type, qty, stock_state_date
                             from product_stock_hst
-                            where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
+                            where location_type = 'STORAGE' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') >= '$sdate 00:00:00' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') <= '$edate 23:59:59'
                         ) hst on hst.location_cd = p.storage_cd and hst.prd_cd = p.prd_cd
                         left outer join product_stock_hst storage_in on storage_in.idx = hst.idx and storage_in.type = '1' -- 상품입고
                         left outer join product_stock_hst storage_return on storage_return.idx = hst.idx and storage_return.type = '9' -- 상품반품
@@ -332,7 +332,7 @@ class sal22Controller extends Controller
                         left outer join (
                             select idx, prd_cd, location_cd, type, qty, stock_state_date
                             from product_stock_hst
-                            where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+                            where location_type = 'STORAGE' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(r_stock_state_date, '%Y%m%d%H%i%s') <= now()
                         ) _next on _next.location_cd = p.storage_cd and _next.prd_cd = p.prd_cd
                     where ($store_where)
                         $where
