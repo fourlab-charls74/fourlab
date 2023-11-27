@@ -99,12 +99,7 @@ class sal22Controller extends Controller
                 , p.prd_cd
                 , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                 , pc.color
-                , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+                , pc.size
                 , pc.goods_no
                 , b.brand_nm 
                 , g.style_no
@@ -170,7 +165,7 @@ class sal22Controller extends Controller
                 , (p.wqty - sum(ifnull(_next.qty, 0))) * g.wonga as term_wonga
                 
             from product_stock_storage p
-                inner join product_code pc on pc.prd_cd = p.prd_cd
+                inner join product_code pc on pc.prd_cd = p.prd_cd and pc.type = 'N'
                 inner join product pd on pd.prd_cd = p.prd_cd
                 left outer join goods g on g.goods_no = p.goods_no
                 inner join storage storage on storage.storage_cd = p.storage_cd
@@ -198,7 +193,7 @@ class sal22Controller extends Controller
             $orderby
             $limit
         ";
-        $rows = DB::select($sql);
+        $rows = DB::select($sql);dd($sql);
 
 
         // pagination
@@ -317,7 +312,7 @@ class sal22Controller extends Controller
                         (p.wqty - sum(ifnull(_next.qty, 0))) * g.wonga as term_wonga,
                         p.wqty as current_qty -- 현재재고
                     from product_stock_storage p
-                        inner join product_code pc on pc.prd_cd = p.prd_cd
+                        inner join product_code pc on pc.prd_cd = p.prd_cd and pc.type = 'N'
                         left outer join product pd on pd.prd_cd = p.prd_cd
                         left outer join goods g on g.goods_no = p.goods_no
                         inner join storage storage on storage.storage_cd = p.storage_cd
