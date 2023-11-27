@@ -480,8 +480,13 @@ class stk10Controller extends Controller
 				
 				//***** 출고일, 본사메모, 수량 변경 수정 시작
 				//=====
-				$sql	= " select exp_dlv_day, qty, comment from product_stock_release where idx = :idx ";
+				$sql	= " select exp_dlv_day, qty, comment, state from product_stock_release where idx = :idx ";
 				$stock_release	= DB::selectOne($sql,['idx' => $d['idx']]);
+				
+				//출고상태 확인후 문제 있으면 패스
+				if( $stock_release->state == $new_state ){
+					throw new Exception("이미 출고처리된 정보입니다.");
+				}
 
 				//출고일 변경
 				$update_value	= "";
