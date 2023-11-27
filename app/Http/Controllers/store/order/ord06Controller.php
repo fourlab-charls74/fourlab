@@ -369,7 +369,9 @@ class ord06Controller extends Controller
                 a.dlv_end_date,
                 a.last_up_date,
                 if(a.opt_ord_state <= 10 and a.clm_state = 0 and ord_opt_cnt = 0, 'Y', 'N') as ord_del_yn,
-                '2' as depth
+                '2' as depth,
+                sc.store_channel as store_channel,
+                sc2.store_kind as store_channel_kind
             from (
                 select
                     om.ord_no,
@@ -454,6 +456,8 @@ class ord06Controller extends Controller
                 left outer join store s on s.store_cd = a.store_cd
                 left outer join code sale_kind on (sale_kind.code_id = a.sale_kind and sale_kind.code_kind_cd = 'SALE_KIND')
                 left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
+           		left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
         ";
 		// $result = DB::select($sql);
 
