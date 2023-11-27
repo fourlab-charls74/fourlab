@@ -200,14 +200,17 @@ class stk21Controller extends Controller
                 ifnull(ps.qty, 0) as qty,
                 ifnull(ps.wqty, 0) as wqty,
                 ifnull(pss.qty, 0) as storage_qty,
-                ifnull(pss.wqty, 0) as storage_wqty
+                ifnull(pss.wqty, 0) as storage_wqty,
+                sum(ifnull(o.qty, 0)) as total_dep_store_sale_qty
             from store s
                 left outer join product_stock_store ps on s.store_cd = ps.store_cd and ps.prd_cd = '$prd_cd'
                 left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
+            	left outer join order_opt o on o.store_cd = s.store_cd and o.prd_cd = '$prd_cd' and o.ord_state in (30, 60, 61)
             where
                 s.use_yn = 'Y'
                 and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
                 $where
+            group by s.store_cd
 		";
 
 		$result = DB::select($sql);
@@ -264,7 +267,9 @@ class stk21Controller extends Controller
 		
 		$stock = DB::table('product_stock_store')->where('store_cd', $store_cd)->where('prd_cd', $prd_cd)->select('qty', 'wqty')->first();
 		
-		return response()->json([ 'code' => 200, 'stock' => $stock ], 200);
+		$sale_qty = DB::table('order_opt')->where('store_cd', $store_cd)->where('prd_cd', $prd_cd)->whereIn('ord_state', [30, 60, 61])->sum('qty');
+		
+		return response()->json([ 'code' => 200, 'stock' => $stock, 'total_store_sale_qty' => $sale_qty], 200);
 	}
 
     // 요청RT 등록
