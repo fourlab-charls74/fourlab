@@ -15,7 +15,7 @@ const PRODUCT_STOCK_TYPE_STORAGE_OUT = 17; // 출고
 
 class stk13Controller extends Controller
 {
-    public function index()
+	public function index()
 	{
 		$sql = "
 			select
@@ -24,56 +24,56 @@ class stk13Controller extends Controller
 			where code_kind_cd = 'rel_order' and code_id like 'S_%'
 		";
 		$rel_order_res = DB::select($sql);
-		
-        $storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
+
+		$storages = DB::table("storage")->where('use_yn', '=', 'Y')->select('storage_cd', 'storage_nm_s as storage_nm', 'default_yn')->orderBy('default_yn')->get();
 
 		$values = [
-            'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
-            'edate'         => date("Y-m-d"),
-            'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-            'style_no'		=> "", // 스타일넘버
-            'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
-            'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
-            'items'			=> SLib::getItems(), // 품목
-            // 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
-            'storages'      => $storages, // 창고리스트
+			'sdate'         => now()->sub(1, 'week')->format('Y-m-d'),
+			'edate'         => date("Y-m-d"),
+			'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
+			'style_no'		=> "", // 스타일넘버
+			'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'), // 상품상태
+			'com_types'     => SLib::getCodes('G_COM_TYPE'), // 업체구분
+			'items'			=> SLib::getItems(), // 품목
+			// 'rel_orders'    => SLib::getCodes("REL_ORDER"), // 출고차수
+			'storages'      => $storages, // 창고리스트
 			'rel_order_res'	=> $rel_order_res, //판매분 출고차수
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
 
-        return view(Config::get('shop.store.view') . '/stock/stk13', $values);
+		return view(Config::get('shop.store.view') . '/stock/stk13', $values);
 	}
 
 	public function search(Request $request)
 	{
 		$r = $request->all();
-		
+
 		$code = 200;
 		$where = "";
 		$store_where = "";
-        $orderby = "";
+		$orderby = "";
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
-		$store_channel = $request->input('store_channel', []);
-		$store_channel_kind = $request->input('store_channel_kind', []);
-		
+		$store_channel = $request->input("store_channel",[]);
+		$store_channel_kind = $request->input("store_channel_kind",[]);
+
 		$sdate = $r['sdate'] ?? '';
 		$edate = $r['edate'] ?? '';
 
-        $store_cds = $r['store_no'] ?? [];
+		$store_cds = $r['store_no'] ?? [];
 
-		 // 상품옵션 범위검색
-		 $range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
-		 parse_str($prd_cd_range_text, $prd_cd_range);
-		 foreach ($range_opts as $opt) {
-			 $rows = $prd_cd_range[$opt] ?? [];
-			 if (count($rows) > 0) {
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
 				//  $in_query = $prd_cd_range[$opt . '_contain'] == 'true' ? 'in' : 'not in';
-				 $opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
-				 $where .= " and pc.$opt in ($opt_join) ";
-			 }
-		 }
-		 
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+
 		// store_where
 		foreach($store_cds as $key => $cd) {
 			if ($key === 0) {
@@ -86,7 +86,7 @@ class stk13Controller extends Controller
 			$store_where = "1=1";
 		}
 
-        // where
+		// where
 		// if($r['store_type'] != null)
 		// 	$where .= " and store.store_type = '" . $r['store_type'] . "'";
 		if($r['prd_cd'] != null) {
@@ -99,75 +99,78 @@ class stk13Controller extends Controller
 		} else {
 			$where .= " and o.prd_cd != ''";
 		}
-        if(isset($r['goods_stat'])) {
-            $goods_stat = $r['goods_stat'];
-            if(is_array($goods_stat)) {
-                if (count($goods_stat) == 1 && $goods_stat[0] != "") {
-                    $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
-                } else if (count($goods_stat) > 1) {
-                    $where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
-                }
-            } else if($goods_stat != ""){
-                $where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
-            }
-        } 
-        if($r['style_no'] != null) 
-            $where .= " and g.style_no = '" . $r['style_no'] . "'";
+		if(isset($r['goods_stat'])) {
+			$goods_stat = $r['goods_stat'];
+			if(is_array($goods_stat)) {
+				if (count($goods_stat) == 1 && $goods_stat[0] != "") {
+					$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat[0]) . "' ";
+				} else if (count($goods_stat) > 1) {
+					$where .= " and g.sale_stat_cl in (" . join(",", $goods_stat) . ") ";
+				}
+			} else if($goods_stat != ""){
+				$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+			}
+		}
+		if($r['style_no'] != null)
+			$where .= " and g.style_no = '" . $r['style_no'] . "'";
 
-        $goods_no = $r['goods_no'];
-        $goods_nos = $request->input('goods_nos', '');
-        if($goods_nos != '') $goods_no = $goods_nos;
-        $goods_no = preg_replace("/\s/",",",$goods_no);
-        $goods_no = preg_replace("/\t/",",",$goods_no);
-        $goods_no = preg_replace("/\n/",",",$goods_no);
-        $goods_no = preg_replace("/,,/",",",$goods_no);
+		$goods_no = $r['goods_no'];
+		$goods_nos = $request->input('goods_nos', '');
+		if($goods_nos != '') $goods_no = $goods_nos;
+		$goods_no = preg_replace("/\s/",",",$goods_no);
+		$goods_no = preg_replace("/\t/",",",$goods_no);
+		$goods_no = preg_replace("/\n/",",",$goods_no);
+		$goods_no = preg_replace("/,,/",",",$goods_no);
 
-        if($goods_no != ""){
-            $goods_nos = explode(",", $goods_no);
-            if(count($goods_nos) > 1) {
-                if(count($goods_nos) > 500) array_splice($goods_nos, 500);
-                $in_goods_nos = join(",", $goods_nos);
-                $where .= " and g.goods_no in ( $in_goods_nos ) ";
-            } else {
-                if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
-            }
-        }
+		if($goods_no != ""){
+			$goods_nos = explode(",", $goods_no);
+			if(count($goods_nos) > 1) {
+				if(count($goods_nos) > 500) array_splice($goods_nos, 500);
+				$in_goods_nos = join(",", $goods_nos);
+				$where .= " and g.goods_no in ( $in_goods_nos ) ";
+			} else {
+				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+			}
+		}
 
-        if($r['com_cd'] != null) 
-            $where .= " and g.com_id = '" . $r['com_cd'] . "'";
-        if($r['item'] != null) 
-            $where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
-        if(isset($r['brand_cd']))
-            $where .= " and g.brand = '" . $r['brand_cd'] . "'";
-        if($r['goods_nm'] != null) 
-            $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
-        if($r['goods_nm_eng'] != null) 
-            $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+		if($r['com_cd'] != null)
+			$where .= " and g.com_id = '" . $r['com_cd'] . "'";
+		if($r['item'] != null)
+			$where .= " and g.opt_kind_cd = '" . $r['item'] . "'";
+		if(isset($r['brand_cd']))
+			$where .= " and g.brand = '" . $r['brand_cd'] . "'";
+		if($r['goods_nm'] != null)
+			$where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
+		if($r['goods_nm_eng'] != null)
+			$where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
 		if(($r['ext_storage_qty'] ?? 'false') == 'true')
 			$where .= " and (pss.wqty != '' and pss.wqty != '0')";
-		
-		if ($store_channel != '') {
+
+//		if ($r['store_channel'] != '') $where .= "and store.store_channel ='" . Lib::quote($r['store_channel']). "'";
+//		if ($r['store_channel_kind'] ?? '' != '') $where .= "and store.store_channel_kind ='" . Lib::quote($r['store_channel_kind']). "'";
+
+		if (count($store_channel) > 0) {
 			$store_channel = join("','", $store_channel);
 			$where .= " and store.store_channel in ('$store_channel')";
 		}
-		
-		if ($store_channel_kind) {
+
+		if (count($store_channel_kind) > 0) {
 			$store_channel_kind = join("','", $store_channel_kind);
 			$where .= " and store.store_channel_kind in ('$store_channel_kind')";
 		}
 
-        // orderby
-        $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "store_cd";
+		// orderby
+		$ord = $r['ord'] ?? 'desc';
+		$ord_field = $r['ord_field'] ?? "store_cd";
 		$ord_field = 'o.' . $ord_field;
-        $orderby = sprintf("%s %s", $ord_field, $ord);
+		$orderby = sprintf("%s %s", $ord_field, $ord);
 
-        // pagination
-        $page = $r['page'] ?? 1;
-        if ($page < 1 or $page == "") $page = 1;
-        $page_size = $r['limit'] ?? 1000;
-        $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
+		// pagination
+		$page = $r['page'] ?? 1;
+		if ($page < 1 or $page == "") $page = 1;
+		$page_size = $r['limit'] ?? 1000;
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 		$total = 0;
 		$page_cnt = 0;
 		$total_data = 0;
@@ -192,12 +195,6 @@ class stk13Controller extends Controller
 					o.prd_cd,
 					concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_sm,
 					pc.color,
-					-- ifnull((
-					-- 	select s.size_cd from size s
-					-- 	where s.size_kind_cd = pc.size_kind
-					-- 	   and s.size_cd = pc.size
-					-- 	   and use_yn = 'Y'
-					-- ),'') as size,
 					pc.size,
 					o.goods_no,
 					op.opt_kind_nm,
@@ -239,7 +236,7 @@ class stk13Controller extends Controller
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
 
-        // search
+		// search
 		$sql = "
 			select 
 				o.store_cd,
@@ -320,7 +317,7 @@ class stk13Controller extends Controller
 				$releases[$row->prd_cd][$row->store_cd]['rel_qty'] = $rel_qty;
 			}
 		}
-		
+
 		foreach ((array) $releases as $key => $value) {
 			$sort_arr = [];
 			$seq_sort_arr = [];
@@ -355,7 +352,7 @@ class stk13Controller extends Controller
 			$row->rel_qty2 = $releases[$row->prd_cd][$row->store_cd];
 			$row->already_cnt = $row->storage_wqty - $releases[$row->prd_cd]['storage_wqty'];
 		}
-		
+
 		return response()->json([
 			"code" => $code,
 			"head" => [
@@ -371,7 +368,7 @@ class stk13Controller extends Controller
 	}
 
 	// 판매분출고 요청 (요청과 동시에 접수완료 처리됩니다.)
-	public function request_release(Request $request) 
+	public function request_release(Request $request)
 	{
 		$r = $request->all();
 
@@ -382,7 +379,7 @@ class stk13Controller extends Controller
 		$exp_dlv_day = $request->input("exp_dlv_day", '');
 		$rel_order = $request->input("rel_order", '');
 		$exp_day = str_replace("-", "", $exp_dlv_day);
-        $exp_dlv_day_data = substr($exp_day,2,6);
+		$exp_dlv_day_data = substr($exp_day,2,6);
 
 		$data = $request->input("products", []);
 		$failed_result = [];
@@ -446,7 +443,7 @@ class stk13Controller extends Controller
 				$release_no	= DB::getPdo()->lastInsertId();
 
 				// product_stock_store -> 재고 존재여부 확인 후 보유재고 플러스
-				$store_stock_cnt = 
+				$store_stock_cnt =
 					DB::table('product_stock_store')
 						->where('store_cd', '=', $store_cd)
 						->where('prd_cd', '=', $prd->prd_cd)
@@ -468,7 +465,7 @@ class stk13Controller extends Controller
 					// 해당 매장에 상품 기존재고가 이미 존재할 경우
 					DB::table('product_stock_store')
 						->where('prd_cd', '=', $prd->prd_cd)
-						->where('store_cd', '=', $store_cd) 
+						->where('store_cd', '=', $store_cd)
 						->update([
 							'wqty' => DB::raw('wqty + ' . ($rel_qty2)),
 							'ut' => now(),
@@ -495,7 +492,7 @@ class stk13Controller extends Controller
 						'admin_id' => $admin_id,
 						'admin_nm' => $admin_nm,
 					]);
-	
+
 				// product_stock -> 창고보유재고 차감
 				DB::table('product_stock')
 					->where('prd_cd', '=', $prd->prd_cd)
@@ -513,26 +510,26 @@ class stk13Controller extends Controller
 						'ut' => now(),
 					]);
 
-                // 재고이력 등록
-                DB::table('product_stock_hst')
-                    ->insert([
-                        'goods_no' => $prd->goods_no,
-                        'prd_cd' => $prd->prd_cd,
-                        'goods_opt' => $prd->goods_opt,
-                        'location_cd' => $storage_cd,
-                        'location_type' => 'STORAGE',
-                        'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
-                        'price' => $prd->price,
-                        'wonga' => $prd->wonga,
-                        'qty' => $rel_qty2 * -1,
-                        'stock_state_date' => date('Ymd'),
-                        'ord_opt_no' => '',
+				// 재고이력 등록
+				DB::table('product_stock_hst')
+					->insert([
+						'goods_no' => $prd->goods_no,
+						'prd_cd' => $prd->prd_cd,
+						'goods_opt' => $prd->goods_opt,
+						'location_cd' => $storage_cd,
+						'location_type' => 'STORAGE',
+						'type' => PRODUCT_STOCK_TYPE_STORAGE_OUT, // 재고분류 : (창고)출고
+						'price' => $prd->price,
+						'wonga' => $prd->wonga,
+						'qty' => $rel_qty2 * -1,
+						'stock_state_date' => date('Ymd'),
+						'ord_opt_no' => '',
 						'release_no'	=> $release_no,
-                        'comment' => '창고출고',
-                        'rt' => now(),
-                        'admin_id' => $admin_id,
-                        'admin_nm' => $admin_nm,
-                    ]);
+						'comment' => '창고출고',
+						'rt' => now(),
+						'admin_id' => $admin_id,
+						'admin_nm' => $admin_nm,
+					]);
 			}
 
 			DB::commit();
