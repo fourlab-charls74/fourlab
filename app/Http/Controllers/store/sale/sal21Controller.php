@@ -77,7 +77,7 @@ class sal21Controller extends Controller
 		}
 
         // store_where
-		if( $store_cds != ''){
+		if(count($store_cds) > 0){
 			$where	.= " and (";
 			$hst_where	.= " and (";
 			
