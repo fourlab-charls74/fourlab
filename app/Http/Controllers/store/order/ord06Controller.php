@@ -438,7 +438,7 @@ class ord06Controller extends Controller
                     left outer join sale_type st on st.sale_kind = o.sale_kind
 					left outer join store store on store.store_cd = o.store_cd
                 where 
-                    w.ord_state in (30,60,61) 
+                    w.ord_state in (30,60,61)  and o.ord_state = '30'
 					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
                     $where
                 $orderby
