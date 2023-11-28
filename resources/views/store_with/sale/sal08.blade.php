@@ -221,9 +221,9 @@
 		{headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 100},
 		{field: "pr_code", headerName: "판매처수수료코드", width: 100, cellStyle: {"text-align": "center"}},
 		{field: "pr_code_nm", headerName: "판매처수수료명", width: 100, cellStyle: {"text-align": "center"}},
-		{field: "sale_amt", headerName: "판매금액(-VAT)", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "sale_amt", headerName: "판매금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "recv_amt", headerName: "실입금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
-		{field: "wonga_amt", headerName: "원가금액(-VAT)", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "wonga_amt", headerName: "원가금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_amt", headerName: "이익금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_rate", headerName: "이익율(%)", width: 70, type: "currencyType",
 			aggFunc: (params) => {
