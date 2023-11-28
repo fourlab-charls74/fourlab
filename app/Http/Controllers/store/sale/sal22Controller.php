@@ -308,7 +308,7 @@ class sal22Controller extends Controller
                         -- 기간재고
                         p.qty - sum(ifnull(_next.qty, 0)) as term_qty,
                         (p.qty - sum(ifnull(_next.qty, 0))) * g.goods_sh as term_sh,
-                        (p.wqty - sum(ifnull(_next.qty, 0))) * g.price as term_price,
+                        (p.qty - sum(ifnull(_next.qty, 0))) * g.price as term_price,
                         (p.qty - sum(ifnull(_next.qty, 0))) * g.wonga as term_wonga,
                         p.qty as current_qty -- 현재재고
                     from product_stock_storage p
