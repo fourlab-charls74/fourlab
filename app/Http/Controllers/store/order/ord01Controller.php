@@ -1153,6 +1153,7 @@ class ord01Controller extends Controller
         if ($dlv_apply == 'Y' && $ord_amt < $free_dlv_amt) {
             $dlv_amt = $base_dlv_amt;
         }
+		
 
         DB::table('order_mst')->insert([
             'ord_no' => $ord_no,
@@ -1168,7 +1169,7 @@ class ord01Controller extends Controller
             'dc_amt' => $dc_amt,
             'dlv_amt' => $dlv_amt,
             'add_dlv_fee' => $add_dlv_fee,
-            'recv_amt' => $recv_amt + $dlv_amt + $add_dlv_fee - $point_amt - $coupon_amt - $dc_amt,
+            'recv_amt' => $recv_amt,
             'r_nm' => $r_nm,
             'r_zipcode' => $r_zip_code,
             'r_addr1' => $r_addr1,
