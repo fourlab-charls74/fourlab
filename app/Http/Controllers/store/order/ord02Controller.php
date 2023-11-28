@@ -688,7 +688,7 @@ class ord02Controller extends Controller
 		if($sdate == '') $sdate = date('Y-m-d');
 		$color = $request->input('color', '');
 		$size = $request->input('size', '');
-
+		$ord_opt_no = $request->input('ord_opt_no', '');
 
 		$values = [
 			'sdate' => $sdate,
@@ -699,19 +699,25 @@ class ord02Controller extends Controller
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
+			'ord_opt_no' => $ord_opt_no ?? '',
 		];
 
 		return view(Config::get('shop.store.view') . '/order/ord02_reject_list', $values);
 	}
-	public function search_reject_list(Request $request)
+	public function search_reject_list(Request $request, $ord_opt_no = '')
 	{
+		
 		$sdate = $request->input('sdate');
 		$edate = $request->input('edate');
 		$prd_cd = $request->input('prd_cd', '');
 		
 		$where = '';
 		
-		if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
+		if ($ord_opt_no != '') {
+			$where .= " and orr.ord_opt_no = '$ord_opt_no'";
+		} else {
+			if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
+		}
 		
 		$sql = "
 			select
@@ -731,11 +737,11 @@ class ord02Controller extends Controller
 				, orr.rt
 			from order_receipt_reject orr
 			    inner join product_code pc on pc.prd_cd = orr.prd_cd
-				inner join order_receipt_product orp on orp.or_prd_cd = orr.or_prd_cd
-				inner join order_receipt orct on orct.or_cd = orp.or_cd
+				left outer join order_receipt_product orp on orp.or_prd_cd = orr.or_prd_cd
 				inner join code c on c.code_id = orr.reject_reason and c.code_kind_cd = 'REL_REJECT_REASON'
-				inner join order_opt o on o.ord_opt_no = orp.ord_opt_no
+				left outer join order_opt o on o.ord_opt_no = orr.ord_opt_no
 			where 1=1 $where and orr.rt >= '$sdate 00:00:00' and orr.rt <= '$edate 23:59:59'
+			order by orr.rt desc
 		";
 		
 		$result = DB::select($sql);

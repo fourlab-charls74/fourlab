@@ -438,11 +438,11 @@
 					: '';
 			},
 			cellStyle: (params) => params.node.level == 0 && params.value !== null ? {'background-color': '#ff6666', 'color': '#ffffff'} : '',
-			// onCellDoubleClicked: (params) => {
-			// 	if (params.node.level == 0 && params.value !== null) {
-			// 		rejectList();
-			// 	}
-			// }
+			onCellDoubleClicked: (params) => {
+				if (params.node.level == 0 && params.value !== null) {
+					rejectList(params.node.aggData.ord_opt_no, params.node.aggData.prd_cd);
+				}
+			}
 		},
 		{field: "reject_location_nm", headerName: "출고거부처", hide: true,
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
@@ -844,9 +844,9 @@
     }
 	
 	//출고거부 리스트 팝업
-	function rejectList() {
-		const url = '/store/order/ord02/reject-list';
-		const reject_list = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
+	function rejectList(ord_opt_no = '') {
+		const url = `/store/order/ord02/reject-list?ord_opt_no=${ord_opt_no}`;
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
 	}
 </script>
 @stop

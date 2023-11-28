@@ -133,11 +133,14 @@
 			if (gridDiv !== null) {
 				gx = new HDGrid(gridDiv, columns, {});
 			}
+			
+			Search();
 		});
 
 		function Search() {
+			let ord_opt_no = '{{ @$ord_opt_no }}';
 			let data = $("form[name=search]").serialize();
-			gx.Request('/store/order/ord02/search-reject-list', data);
+			gx.Request('/store/order/ord02/search-reject-list/' + ord_opt_no , data);
 		}
 	</script>
 @stop

@@ -777,7 +777,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('ord02/receipt','ord02Controller@receipt');
         Route::post('ord02/update/ord-kind','ord02Controller@update_ord_kind');
 		Route::get('ord02/reject-list','ord02Controller@reject_list_view');
-		Route::get('ord02/search-reject-list','ord02Controller@search_reject_list');
+		Route::get('ord02/search-reject-list/{ord_opt_no?}','ord02Controller@search_reject_list');
         
         // 온라인 배송처리
         Route::get('ord03','ord03Controller@index');
