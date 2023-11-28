@@ -1081,7 +1081,12 @@ class ord01Controller extends Controller
             }
 			
 			$order_price = $sugi_price;
+			//개별
 			if ($type === 'S') {
+				$order_price = $product_price;
+			}
+			//일괄
+			if ($type === 'B') {
 				$order_price = $product_price;
 			}
 
