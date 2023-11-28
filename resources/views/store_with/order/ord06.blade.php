@@ -474,6 +474,7 @@
 		},
 		{field: "ord_amt", headerName: "판매금액", width: 80, type: "currencyType"},
 		{field: "recv_amt", headerName: "실결제금액", width: 80, type: "currencyType"},
+		{field: "acc_amt", headerName: "정산금액", width: 80, type: "currencyType"},
 		{field: "pr_code_nm", headerName: "판매처수수료", width: 80},
 		{field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
 		{field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
