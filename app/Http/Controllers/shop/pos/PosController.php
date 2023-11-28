@@ -965,7 +965,7 @@ class PosController extends Controller
 
         $sql = "
             select
-                o.ord_no, o.ord_date, o.user_id, o.user_nm, o.phone, o.mobile, o.ord_amt, o.recv_amt,
+                o.ord_no, o.ord_date, o.user_id, o.user_nm, o.phone, o.mobile, o.ord_amt, oo.recv_amt,
                 o.ord_state, o.ord_type, o.ord_kind, o.clm_type, pay.pay_type, pt.code_val as pay_type_nm,
                 oo.ord_opt_no, oo.clm_state
             from order_opt oo
