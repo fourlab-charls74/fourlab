@@ -792,7 +792,7 @@
             $("#od_dc_amt").text(Comma(ord.total_dc_amt * -1));
             $("#od_coupon_amt").text(Comma(ord.total_coupon_amt * -1));
             $("#od_point_amt").text(Comma(ord.total_point_amt * -1));
-            $("#od_recv_amt").text(Comma(ord.total_recv_amt));
+            $("#od_recv_amt").text(Comma(ord.total_recv_amt * 1));
             $("#od_ord_qty").text(Comma(data.reduce((a,c) =>c.qty + a, 0)));
 
             $("#od_pay_type").text(ord.pay_type_nm.replaceAll("무통장", "현금"));

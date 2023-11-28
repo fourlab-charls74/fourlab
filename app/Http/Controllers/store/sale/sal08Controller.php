@@ -107,26 +107,34 @@ class sal08Controller extends Controller
 			    , concat(sc.store_channel, '/', sc.store_kind) as store_kind_nm
 				, a.pr_code, prc.code_val as pr_code_nm
 				, a.brand, b.brand_nm
-				, sum(a.sale_amt) as sale_amt
-				, sum(a.recv_amt) as recv_amt
+				, sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1)) as sale_amt
+			    , sum(a.recv_amt * if(a.ord_state > 30, -1, 1)) as recv_amt
 				, sum(a.wonga_amt) as wonga_amt
 				, sum(a.margin_amt) as margin_amt
-				, (sum(a.margin_amt) / sum(a.sale_amt) * 100) as margin_rate
+				, (sum(a.margin_amt) / sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1)) * 100) as margin_rate
+				-- , sum(if(a.ord_state = '10', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '60', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '61', ifnull(a.taxation_amt, 0), 0)) as taxation_amt
+				-- , (sum(if(a.ord_state = '10', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '60', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '61', ifnull(a.taxation_amt, 0), 0))) / 1.1 as taxation_amt
 			from (
 				select
 					o.ord_opt_no
-					, o.store_cd, s.store_nm, s.store_channel, s.store_channel_kind
+					, o.store_cd, s.store_nm, s.store_channel, s.store_channel_kind, w.qty, o.price
 					, o.prd_cd, pc.brand, o.pr_code
-					, (w.qty * w.price / :vat1) as sale_amt
-					, w.recv_amt
-					, (w.qty * w.wonga / :vat2) as wonga_amt
-					, (w.qty * (w.price - w.wonga) / :vat3) as margin_amt
+					, (w.qty * w.price ) as sale_amt
+					, o.recv_amt
+					-- , (w.qty * w.wonga / :vat2) as wonga_amt
+				    , (w.qty * w.wonga) as wonga_amt
+					-- , (w.qty * (w.price - w.wonga)) as margin_amt
+				    , (o.recv_amt - (w.qty * w.wonga)) as margin_amt
 					, o.ord_state, o.goods_no, o.ord_date, o.sale_kind
+					, ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt
+					-- , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
 				from order_opt o
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					inner join store s on s.store_cd = o.store_cd
-				where w.ord_state in (30,60,61) and o.store_cd <> '' $where
+				    -- inner join goods g on o.goods_no = g.goods_no
+					left outer join sale_type st on st.sale_kind = o.sale_kind
+				where w.ord_state in (30,60,61) and o.ord_state = '30' and o.store_cd <> '' $where
 			) a
 			    inner join store_channel sc on sc.store_channel_cd = a.store_channel and sc.store_kind_cd = a.store_channel_kind and sc.dep = 2 and sc.use_yn = 'Y'
 				left outer join goods g on g.goods_no = a.goods_no
@@ -136,7 +144,8 @@ class sal08Controller extends Controller
 			group by a.store_cd, a.brand, a.pr_code
 			order by a.store_channel, a.store_channel_kind, a.store_cd, a.brand, prc.code_seq
 		";
-		$result = DB::select($sql, [ 'vat1' => $vat, 'vat2' => $vat, 'vat3' => $vat ]);
+		$result = DB::select($sql);
+
 
 		return response()->json([
 			'code'	=> 200,
