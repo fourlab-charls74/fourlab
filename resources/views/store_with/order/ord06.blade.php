@@ -557,6 +557,7 @@
 				// dc_rate: t.avg_dc_rate,
 				ord_amt: t.total_ord_amt,
 				recv_amt: t.total_recv_amt,
+				acc_amt: t.total_acc_amt,
 				dlv_amt: t.total_dlv_amt
 			}]);
 		});
