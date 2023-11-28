@@ -143,7 +143,7 @@ class sal21Controller extends Controller
 			select
 				pss.store_cd
 				,store.store_nm
-				,st.code_val as store_type_nm
+				,st.store_channel as store_type_nm
 				,pss.prd_cd
 				,pc.prd_cd_p as prd_cd_sm
 				,pc.color
@@ -214,18 +214,18 @@ class sal21Controller extends Controller
 					hst.location_cd as store_cd, pc.prd_cd_p, hst.prd_cd, 
 					sum(if( hst.stock_state_date <= '$edate', hst.qty, 0)) as qty,
 			
-							-- 매장입고
+					-- 매장입고
 					sum(if(hst.type = 1 and hst.stock_state_date <= '$edate', hst.qty, 0)) as store_in_qty,
-							-- 매장반품
-							sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as store_return_qty,
-							-- 이동입고
-							sum(if(hst.type = 15 and hst.qty > 0, hst.qty and hst.stock_state_date <= '$edate', 0)) as rt_in_qty,
-							-- 이동출고
-							sum(if(hst.type = 15 and hst.qty < 0, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as rt_out_qty,
-							-- 매장판매
-							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
-							-- loss
-							sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
+					-- 매장반품
+					sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as store_return_qty,
+					-- 이동입고
+					sum(if(hst.type = 15 and hst.qty > 0, hst.qty and hst.stock_state_date <= '$edate', 0)) as rt_in_qty,
+					-- 이동출고
+					sum(if(hst.type = 15 and hst.qty < 0, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as rt_out_qty,
+					-- 매장판매
+					sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
+					-- loss
+					sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
 					
 					sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 				from product_stock_hst hst
@@ -239,10 +239,11 @@ class sal21Controller extends Controller
 			) hst on pss.store_cd = hst.store_cd and pss.prd_cd = hst.prd_cd
 			inner join product_code pc on pss.prd_cd = pc.prd_cd and pc.type = 'N'
 			inner join product p on pss.prd_cd = p.prd_cd
-			inner join store on store.store_cd = pss.store_cd
+			inner join store store on store.store_cd = pss.store_cd
 			left outer join goods g on g.goods_no = pss.goods_no
 			left outer join brand b on b.br_cd = pc.brand
-			inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = store.store_type
+			inner join store_channel st on st.store_channel_cd = store.store_channel and st.store_kind_cd = store.store_channel_kind
+			-- inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = store.store_type
 			where
 			    1=1
 			    $where
@@ -297,7 +298,7 @@ class sal21Controller extends Controller
 					select
 						pss.store_cd
 						,store.store_nm
-						,st.code_val as store_type_nm
+						,st.store_channel as store_type_nm
 						,pss.prd_cd
 						,pc.prd_cd_p as prd_cd_sm
 						,pc.color
@@ -368,18 +369,18 @@ class sal21Controller extends Controller
 							hst.location_cd as store_cd, pc.prd_cd_p, hst.prd_cd, 
 							sum(if( hst.stock_state_date <= '$edate', hst.qty, 0)) as qty,
 					
-									-- 매장입고
+							-- 매장입고
 							sum(if(hst.type = 1 and hst.stock_state_date <= '$edate', hst.qty, 0)) as store_in_qty,
-									-- 매장반품
-									sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as store_return_qty,
-									-- 이동입고
-									sum(if(hst.type = 15 and hst.qty > 0, hst.qty and hst.stock_state_date <= '$edate', 0)) as rt_in_qty,
-									-- 이동출고
-									sum(if(hst.type = 15 and hst.qty < 0, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as rt_out_qty,
-									-- 매장판매
-									sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
-									-- loss
-									sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
+							-- 매장반품
+							sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as store_return_qty,
+							-- 이동입고
+							sum(if(hst.type = 15 and hst.qty > 0, hst.qty and hst.stock_state_date <= '$edate', 0)) as rt_in_qty,
+							-- 이동출고
+							sum(if(hst.type = 15 and hst.qty < 0, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as rt_out_qty,
+							-- 매장판매
+							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
+							-- loss
+							sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
 							
 							sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 						from product_stock_hst hst
@@ -393,10 +394,11 @@ class sal21Controller extends Controller
 					) hst on pss.store_cd = hst.store_cd and pss.prd_cd = hst.prd_cd
 					inner join product_code pc on pss.prd_cd = pc.prd_cd and pc.type = 'N'
 					inner join product p on pss.prd_cd = p.prd_cd
-					inner join store on store.store_cd = pss.store_cd
+					inner join store store on store.store_cd = pss.store_cd
 					left outer join goods g on g.goods_no = pss.goods_no
 					left outer join brand b on b.br_cd = pc.brand
-					inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = store.store_type
+					inner join store_channel st on st.store_channel_cd = store.store_channel and st.store_kind_cd = store.store_channel_kind
+--					inner join code st on st.code_kind_cd = 'STORE_TYPE' and st.code_id = store.store_type
 					where
 					    1=1
 						$where
