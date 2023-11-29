@@ -114,14 +114,27 @@
 				<div class="row">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="formrow-inputZip">판매처</label>
-							<div class="flax_box">
-								<select name='sale_place' class="form-control form-control-sm">
-									<option value=''>전체</option>
-									@foreach (@$sale_places as $sale_place)
-										<option value='{{ $sale_place->id }}'>{{ $sale_place->val }}</option>
-									@endforeach
-								</select>
+							<label for="dlv_place_type">출고처</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width: 100%;">
+									<div class="form-group">
+										<select name="dlv_place_type" id="dlv_place_type" class="form-control form-control-sm">
+											<option value="">전체</option>
+											<option value="STORE">매장</option>
+											<option value="STORAGE">창고</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>출고매장</label>
+							<div class="form-inline inline_btn_box">
+								<input type='hidden' id="store_nm" name="store_nm">
+								<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
@@ -146,33 +159,6 @@
 								<div class="form-inline-inner input_box" style="width: 63%;">
 									<div class="form-group">
 										<input type='text' class="form-control form-control-sm search-all search-enter" name='ord_info_value' value=''>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label>결제방법</label>
-							<div class="form-inline">
-								<div class="form-inline-inner w-100">
-									<div class="form-group flax_box">
-										<div style="width:calc(100% - 62px);">
-											<select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
-												<option value="">전체</option>
-												@foreach ($stat_pay_types as $stat_pay_type)
-													<option value='{{ $stat_pay_type->code_id }}'>
-														{{ $stat_pay_type->code_val }}
-													</option>
-												@endforeach
-											</select>
-										</div>
-										<div style="height:30px;margin-left:5px;">
-											<div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
-												<input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
-												<label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>
@@ -330,6 +316,48 @@
 										<input type="hidden" id="com_cd" name="com_cd" />
 										<input onclick="" type="text" id="com_nm" name="com_nm" class="form-control form-control-sm search-all search-enter sch-sup-company" style="width:100%;" autocomplete="off" />
 										<a href="#" class="btn btn-sm btn-outline-primary sch-sup-company"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row search-area-ext d-none">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="formrow-inputZip">판매처</label>
+							<div class="flax_box">
+								<select name='sale_place' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach (@$sale_places as $sale_place)
+										<option value='{{ $sale_place->id }}'>{{ $sale_place->val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>결제방법</label>
+							<div class="form-inline">
+								<div class="form-inline-inner w-100">
+									<div class="form-group flax_box">
+										<div style="width:calc(100% - 62px);">
+											<select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
+												<option value="">전체</option>
+												@foreach ($stat_pay_types as $stat_pay_type)
+													<option value='{{ $stat_pay_type->code_id }}'>
+														{{ $stat_pay_type->code_val }}
+													</option>
+												@endforeach
+											</select>
+										</div>
+										<div style="height:30px;margin-left:5px;">
+											<div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
+												<input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
+												<label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>

@@ -79,6 +79,8 @@ class ord04Controller extends Controller
 		$goods_nm_eng = $request->input('goods_nm_eng', '');
 		$stock_check_yn = $request->input('stock_check_yn', 'N');
 		$search_date_type = $request->input('search_date_type', '');
+		$dlv_place_type = $request->input('dlv_place_type', '');
+		$store_no = $request->input('store_no', []);
 
 		$ord_field = $request->input('ord_field', 'o.ord_date');
 		$ord = $request->input('ord', 'desc');
@@ -87,6 +89,7 @@ class ord04Controller extends Controller
 
 		/** 검색조건 필터링 */
 		$where = "";
+		$where2 = "";
 		
 		if ($ord_no != '') $where .= " and o.ord_no like '" . $ord_no . "%' ";
 		// if ($ord_state != '') $where .= " and o.ord_state = '" . $ord_state . "' ";
@@ -184,6 +187,28 @@ class ord04Controller extends Controller
 					return "'$r'";
 				}, $rows));
 				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+		
+		if ($dlv_place_type != '') {
+			if ($dlv_place_type == 'STORE') {
+				if (count($store_no) > 0) {
+					$store_no_join = join(',', array_map(function ($s) {
+						return "'$s'";
+					}, $store_no));
+					$where .= " and o.dlv_place_type = 'STORE' and o.dlv_place_cd in ($store_no_join) ";
+				} else {
+					$where .= " and o.dlv_place_type = 'STORE' ";
+				}
+			} else {
+				$where .= " and o.dlv_place_type = 'STORAGE' ";
+			}
+		} else {
+			if (count($store_no) > 0) {
+				$store_no_join = join(',', array_map(function ($s) {
+					return "'$s'";
+				}, $store_no));
+				$where .= " and o.dlv_place_type = 'STORE' and o.dlv_place_cd in ($store_no_join) ";
 			}
 		}
 		
