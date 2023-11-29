@@ -239,7 +239,7 @@ class ord03Controller extends Controller
 					left outer join code c on c.code_id = o.dlv_cd and c.code_kind_cd = 'DELIVERY'
 				where rcp.reject_yn = 'N'
 					-- and (o.store_cd is null or o.store_cd = 'HEAD_OFFICE') 
-					and o.clm_state in (-30,1,90,0)
+					-- and o.clm_state in (-30,1,90,0)
 					-- 클레임상태 (-30 : 클레임무효, 1 : 임시저장, 90: 클레임없음, 0: 클레임없음)
 					$where
 				$orderby
