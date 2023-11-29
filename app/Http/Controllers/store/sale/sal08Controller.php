@@ -151,7 +151,7 @@ class sal08Controller extends Controller
 			group by a.store_cd, a.brand, a.pr_code
 			order by a.store_channel, a.store_channel_kind, a.store_cd, a.brand, prc.code_seq
 		";
-		$result = DB::select($sql);dd($sql);
+		$result = DB::select($sql);
 
 
 		return response()->json([
