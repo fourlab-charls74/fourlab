@@ -31,6 +31,9 @@ class prd02Controller extends Controller
 		$conf = new Conf();
 		$domain		= $conf->getConfigValue("shop", "domain");
 
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y' order by seq";
+		$size_kind = DB::select($size_kind_sql);
+
 		$values = [
 			'sdate'         => $sdate,
 			'edate'         => date("Y-m-d"),
@@ -45,6 +48,7 @@ class prd02Controller extends Controller
 			'items'			=> SLib::getItems(),
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
+			'size_kind'		=> $size_kind,
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02',$values);
@@ -67,6 +71,7 @@ class prd02Controller extends Controller
 		$goods_nm_eng	= $request->input("goods_nm_eng");
 		$ext_storage_qty = $request->input('ext_storage_qty');
 		$store_no	= $request->input("store_no", "");
+		$size_kind	= $request->input("size_kind", "");
 
 		$prd_cd		= $request->input("prd_cd", "");
 		$com_id		= $request->input("com_cd");
@@ -135,6 +140,8 @@ class prd02Controller extends Controller
 			}
 			$where	.= ")";
 		}
+		
+		if ($size_kind != "") $where .= " and pc.size_kind = '" . Lib::quote($size_kind) . "' ";
 
 		if( is_array($goods_stat)) {
 			if (count($goods_stat) == 1 && $goods_stat[0] != "") {
@@ -267,8 +274,7 @@ class prd02Controller extends Controller
 				, g.upd_dm
 				, p.match_yn
 				, p.origin as org_nm
-				, go.name as goods_option1
-				, go2.name as goods_option2
+				, pc.size_kind as size_kind
 			from product_code pc
 				inner join product_stock ps on ps.prd_cd = pc.prd_cd
 				inner join product p on p.prd_cd = pc.prd_cd
@@ -284,8 +290,6 @@ class prd02Controller extends Controller
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 				inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 				inner join brand b on b.br_cd = pc.brand
-				inner join goods_option go on go.goods_no = g.goods_no and go.option_no = 0
-				inner join goods_option go2 on go2.goods_no = g.goods_no and go2.option_no = 1
 			where 1 = 1
 			$where
 			group by pc.prd_cd
