@@ -438,11 +438,11 @@
 					: '';
 			},
 			cellStyle: (params) => params.node.level == 0 && params.value !== null ? {'background-color': '#ff6666', 'color': '#ffffff'} : '',
-			onCellDoubleClicked: (params) => {
-				if (params.node.level == 0 && params.value !== null) {
-					rejectList(params.node.aggData.ord_opt_no, params.node.aggData.prd_cd);
-				}
-			}
+			// onCellDoubleClicked: (params) => {
+			// 	if (params.node.level == 0 && params.value !== null) {
+			// 		rejectList(params.node.aggData.ord_opt_no);
+			// 	}
+			// }
 		},
 		{field: "reject_location_nm", headerName: "출고거부처", hide: true,
 			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
@@ -458,6 +458,9 @@
         },
         {field: "prd_cd", headerName: "바코드", width: 125, pinned: "left",
 	        cellStyle: (params) => params.data?.prd_match === 'N' || params.data?.goods_price !== params.data?.product_price ? ({ 'color': '#ff0000' }) : ({}),
+			onCellDoubleClicked: (params) => {
+				rejectList(params.value);
+			}
         },
         {field: "prd_cd_p", headerName: "품번", width: 100, cellClass: 'hd-grid-code',
 	        cellStyle: (params) => params.data?.prd_match === 'N' || params.data?.goods_price !== params.data?.product_price ? ({ 'color': '#ff0000' }) : ({}),
@@ -844,8 +847,8 @@
     }
 	
 	//출고거부 리스트 팝업
-	function rejectList(ord_opt_no = '') {
-		const url = `/store/order/ord02/reject-list?ord_opt_no=${ord_opt_no}`;
+	function rejectList(product_code = '') {
+		const url = `/store/order/ord02/reject-list?product_code=${product_code}`;
 		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1024,height=900");
 	}
 </script>

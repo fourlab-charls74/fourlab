@@ -725,6 +725,34 @@ class ord03Controller extends Controller
 				where or_prd_cd in ($or_prd_cds_join)
 			";
 			DB::update($sql, [ 'reject_reason' => $reject_reason, 'now' => now() ]);
+			
+			//거부 시 order_receipt_reject 테이블에 추가
+			foreach ($or_prd_cds as $op) {
+				$sql = "
+					select 
+						orp.or_cd, orp.or_prd_cd, orp.ord_opt_no, orp.prd_cd, orp.qty
+						, orp.dlv_location_type, orp.dlv_location_cd
+					from order_receipt_product orp
+						inner join product_code pc on pc.prd_cd = orp.prd_cd
+					where or_prd_cd = :or_prd_cd
+				";
+
+				$reject_sql = DB::select($sql, ['or_prd_cd' => $op]);
+
+				DB::table('order_receipt_reject')
+					->insert([
+						'or_prd_cd' => $reject_sql[0]->or_prd_cd,
+						'ord_opt_no' => $reject_sql[0]->ord_opt_no,
+						'prd_cd' => $reject_sql[0]->prd_cd,
+						'qty' => $reject_sql[0]->qty,
+						'dlv_location_type' => $reject_sql[0]->dlv_location_type,
+						'dlv_location_cd' => $reject_sql[0]->dlv_location_cd,
+						'reject_yn' => 'Y',
+						'reject_reason' => $reject_reason,
+						'admin_id' => $user['id'],
+						'rt' => now(),
+					]);
+			}
 
 			DB::commit();
 			$code = 200;

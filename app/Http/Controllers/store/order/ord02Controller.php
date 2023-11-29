@@ -688,7 +688,7 @@ class ord02Controller extends Controller
 		if($sdate == '') $sdate = date('Y-m-d');
 		$color = $request->input('color', '');
 		$size = $request->input('size', '');
-		$ord_opt_no = $request->input('ord_opt_no', '');
+		$product_code = $request->input('product_code', '');
 
 		$values = [
 			'sdate' => $sdate,
@@ -699,12 +699,12 @@ class ord02Controller extends Controller
 			'store_types' => SLib::getCodes("STORE_TYPE"), // 매장구분
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
-			'ord_opt_no' => $ord_opt_no ?? '',
+			'product_code' => $product_code ?? '',
 		];
 
 		return view(Config::get('shop.store.view') . '/order/ord02_reject_list', $values);
 	}
-	public function search_reject_list(Request $request, $ord_opt_no = '')
+	public function search_reject_list(Request $request, $product_code = '')
 	{
 		
 		$sdate = $request->input('sdate');
@@ -712,12 +712,7 @@ class ord02Controller extends Controller
 		$prd_cd = $request->input('prd_cd', '');
 		
 		$where = '';
-		
-		if ($ord_opt_no != '') {
-			$where .= " and orr.ord_opt_no = '$ord_opt_no'";
-		} else {
-			if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
-		}
+		if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
 		
 		$sql = "
 			select
