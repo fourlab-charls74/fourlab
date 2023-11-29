@@ -140,6 +140,19 @@
 					<div class="row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="size_kind">사이즈구분</label>
+								<div class="flax_box">
+									<select name="size_kind" id="size_kind" class="form-control form-control-sm">
+										<option value=''> 선택 </option>
+										@foreach ($size_kind as $sk)
+											<option value='{{ $sk->size_kind_cd }}'>{{ $sk->size_kind_cd }} : {{ $sk->size_kind_nm }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 							<label for="formrow-email-input">매칭여부</label>
 								<div class="form-inline form-radio-box">
 									<div class="custom-control custom-radio">
@@ -295,14 +308,7 @@
 			{field: "color_nm", headerName: "컬러명", width:90},
 			{field: "size", headerName: "사이즈", width:50, cellStyle: {"text-align": "center"}},
 			// {field: "size_nm", headerName: "사이즈명", width:100},
-			{field: "goods_option", headerName: "옵션구분", width:120, cellStyle: {"text-align": "center"},
-				cellRenderer : (params) => {
-					let goods_option1 = params.data.goods_option1
-					let goods_option2 = params.data.goods_option2
-					
-					return goods_option1 + '^' + goods_option2;
-				}
-			},
+			{field: "size_kind", headerName: "사이즈구분", width:90, cellStyle: {"text-align": "center"}},
 			{field: "goods_opt", headerName: "옵션", width:190},
 			// {field: "opt_kind_nm", headerName: "품목", width:70, cellStyle: {"line-height": "30px", "text-align": "center"}},
 			{field: "brand_nm", headerName: "브랜드", cellStyle: {"line-height": "30px", "text-align": "center"},aggFunc: "first"},
