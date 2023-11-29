@@ -267,6 +267,8 @@ class prd02Controller extends Controller
 				, g.upd_dm
 				, p.match_yn
 				, p.origin as org_nm
+				, go.name as goods_option1
+				, go2.name as goods_option2
 			from product_code pc
 				inner join product_stock ps on ps.prd_cd = pc.prd_cd
 				inner join product p on p.prd_cd = pc.prd_cd
@@ -282,6 +284,8 @@ class prd02Controller extends Controller
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
 				inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 				inner join brand b on b.br_cd = pc.brand
+				inner join goods_option go on go.goods_no = g.goods_no and go.option_no = 0
+				inner join goods_option go2 on go2.goods_no = g.goods_no and go2.option_no = 1
 			where 1 = 1
 			$where
 			group by pc.prd_cd
