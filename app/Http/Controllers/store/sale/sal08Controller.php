@@ -107,7 +107,7 @@ class sal08Controller extends Controller
 			    , concat(sc.store_channel, '/', sc.store_kind) as store_kind_nm
 				, a.pr_code, prc.code_val as pr_code_nm
 				, a.brand, b.brand_nm
-				, sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1)) as sale_amt
+				, sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.w_ord_state > 30, -1, 1)) as sale_amt
 			    , sum(a.recv_amt * if(a.ord_state > 30, -1, 1)) as recv_amt
 				, sum(a.wonga_amt) as wonga_amt
 				, sum(a.margin_amt) as margin_amt
@@ -127,14 +127,16 @@ class sal08Controller extends Controller
 				    -- , (o.recv_amt - (w.qty * w.wonga)) as margin_amt
 					, if(w.ord_state = '30', (o.recv_amt - (w.qty * w.wonga)), (o.recv_amt - (w.qty * w.wonga * -1)) * -1) as margin_amt    
 				     
-					, o.ord_state, o.goods_no, o.ord_date, o.sale_kind
+					, o.ord_state
+				    , w.ord_state as w_ord_state
+				    , o.goods_no, o.ord_date, o.sale_kind
 					, ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt
 					-- , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
 				from order_opt o
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
 					inner join store s on s.store_cd = o.store_cd
-				    -- inner join goods g on o.goods_no = g.goods_no
+				    inner join goods g on o.goods_no = g.goods_no
 					left outer join sale_type st on st.sale_kind = o.sale_kind
 				where 
 				    w.ord_state in (30,60,61) and o.ord_state = '30' and o.store_cd <> ''
@@ -149,7 +151,7 @@ class sal08Controller extends Controller
 			group by a.store_cd, a.brand, a.pr_code
 			order by a.store_channel, a.store_channel_kind, a.store_cd, a.brand, prc.code_seq
 		";
-		$result = DB::select($sql);
+		$result = DB::select($sql);dd($sql);
 
 
 		return response()->json([
