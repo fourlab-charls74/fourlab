@@ -440,7 +440,7 @@ class ord06Controller extends Controller
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
 					-- 2023-11-20 판매유형의 사용여부와 상관없이 판매유형의 할인금액을 적용하도록 함
                     -- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
-                    left outer join sale_type st on st.sale_kind = o.sale_kind
+                    left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
 					left outer join store store on store.store_cd = o.store_cd
                 where 
                     w.ord_state in (30,60,61)  and o.ord_state = '30'
@@ -511,7 +511,7 @@ class ord06Controller extends Controller
                     left outer join payment pay on om.ord_no = pay.ord_no
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = o.sale_kind
+                    left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
                 	left outer join store store on store.store_cd = o.store_cd
                 where 
                     w.ord_state in (30,60,61) and o.ord_state = '30'
