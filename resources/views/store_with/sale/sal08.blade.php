@@ -254,7 +254,7 @@
 			animateRows: true,
 		});
 
-		Search();
+		//Search();
 
 		// 매장 다중검색
 		$( ".sch-store" ).on("click", function() {
