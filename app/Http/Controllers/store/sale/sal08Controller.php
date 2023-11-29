@@ -124,7 +124,9 @@ class sal08Controller extends Controller
 					-- , (w.qty * w.wonga / :vat2) as wonga_amt
 				    , (w.qty * w.wonga) as wonga_amt
 					-- , (w.qty * (w.price - w.wonga)) as margin_amt
-				    , (o.recv_amt - (w.qty * w.wonga)) as margin_amt
+				    -- , (o.recv_amt - (w.qty * w.wonga)) as margin_amt
+					, if(w.ord_state = '30', (o.recv_amt - (w.qty * w.wonga)), (o.recv_amt - (w.qty * w.wonga * -1)) * -1) as margin_amt    
+				     
 					, o.ord_state, o.goods_no, o.ord_date, o.sale_kind
 					, ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt
 					-- , sum(if( if(ifnull(g.tax_yn,'')='','Y', g.tax_yn) = 'Y', w.recv_amt + w.point_apply_amt - w.sales_com_fee, 0)) as taxation_amt
