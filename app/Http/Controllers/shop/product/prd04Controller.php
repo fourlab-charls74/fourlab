@@ -169,7 +169,7 @@ class prd04Controller extends Controller
 		}
 
 		if($ext_store_qty == 'true') {
-			$having .= "having sqty > 0";
+			$having .= "having sqty <> 0";
 		}
 
 

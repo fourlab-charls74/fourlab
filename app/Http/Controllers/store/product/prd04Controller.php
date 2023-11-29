@@ -208,11 +208,11 @@ class prd04Controller extends Controller
 		}
 
 		if($ext_store_qty == 'true' && $ext_storage_qty == 'true') {
-			$having .= "having (hqty - hwqty) > 0 and (wqty) > 0";
+			$having .= "having (hqty - hwqty) <> 0 and (wqty) <> 0";
 		} else if ($ext_store_qty == 'true' && $ext_storage_qty != 'true') {
-			$having .= "having (hqty - hwqty) > 0";
+			$having .= "having (hqty - hwqty) <> 0";
 		} else if ($ext_store_qty != 'true' && $ext_storage_qty == 'true') {
-			$having .= "having (wqty) > 0";
+			$having .= "having (wqty) <> 0";
 		}
 
 		$page_size	= $limit;
