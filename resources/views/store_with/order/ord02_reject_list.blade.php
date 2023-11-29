@@ -138,9 +138,9 @@
 		});
 
 		function Search() {
-			let ord_opt_no = '{{ @$ord_opt_no }}';
+			let product_code = '{{ @$product_code }}';
 			let data = $("form[name=search]").serialize();
-			gx.Request('/store/order/ord02/search-reject-list/' + ord_opt_no , data);
+			gx.Request('/store/order/ord02/search-reject-list/' + product_code , data);
 		}
 	</script>
 @stop
