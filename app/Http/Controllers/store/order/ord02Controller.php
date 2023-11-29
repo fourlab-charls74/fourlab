@@ -712,12 +712,7 @@ class ord02Controller extends Controller
 		$prd_cd = $request->input('prd_cd', '');
 		
 		$where = '';
-		
-		if ($product_code != '') {
-			$where .= " and orr.prd_cd = '$product_code'";
-		} else {
-			if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
-		}
+		if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
 		
 		$sql = "
 			select

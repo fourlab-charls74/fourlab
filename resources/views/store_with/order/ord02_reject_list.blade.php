@@ -60,7 +60,7 @@
 								<div class="form-group">
 									<label for="prd_cd">바코드</label>
 									<div class="flax_box">
-										<input type='text' class="form-control form-control-sm search-enter" name='prd_cd' id="prd_cd" value=''>
+										<input type='text' class="form-control form-control-sm search-enter" name='prd_cd' id="prd_cd" value='{{ @$product_code }}'>
 									</div>
 								</div>
 							</div>
@@ -127,7 +127,7 @@
 		let gx;
 	
 		$(document).ready(async function() {
-			pApp.ResizeGrid(275);
+			pApp.ResizeGrid(170);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			if (gridDiv !== null) {
