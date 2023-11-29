@@ -477,6 +477,8 @@ class ord02Controller extends Controller
 					$order->AddStateLog($state_log);
 					$order->DlvProc($dlv_series_no, $ord_state, $row['prd_cd'] ?? '');
 					
+					$this->update_order_store($row);
+					
 					// 기존에 등록된 이력이 있는 해당 주문건에 대한 출고요청건 삭제
 					$rel_ords = DB::table('order_receipt_product')->where('ord_opt_no', $row['ord_opt_no'])->where('reject_yn', 'Y');
 					$cur_or_cd = $rel_ords->value('or_cd');
@@ -749,6 +751,49 @@ class ord02Controller extends Controller
 			"body"	=> $result
 		]);
 		
+	}
+
+	// 매장관리 데이터 업데이트 (원가 및 행사구분 처리)
+	private function update_order_store($row){
+		// 20231129 ceduce
+		// 행사구분 하드코딩 처리 추후 자동화 예정
+		// 정상 : JS ( 판매가 >= 택가 )
+		// 균일 : GL ( 택가보다 저렴한 판매가 )
+		// 용품 : J1 ( 피엘라벤 이외 상품 )
+		
+		$error_chk	= "";
+
+		if( $row['prd_cd'] != "" ){
+			$sql	= "
+				select p.tag_price, p.price, p.wonga, pc.brand
+				from product p
+				inner join product_code pc on p.prd_cd = pc.prd_cd
+				where
+					p.prd_cd = :prd_cd
+			";
+			$product	= DB::selectOne($sql, ['prd_cd'=>$row['prd_cd']]);
+
+			if( isset($product->wonga) ){
+				if( $product->brand != 'F')						$pr_code = "J1";
+				else{
+					if( $product->tag_price <= $row['price'])	$pr_code = "JS";
+					else										$pr_code = "GL";
+				}
+
+				$sql	= " update order_opt set wonga = :wonga, pr_code = :pr_code where ord_opt_no = :ord_opt_no ";
+				DB::update($sql, ['wonga' => $product->wonga, 'pr_code' => $pr_code, 'ord_opt_no' => $row['ord_opt_no']]);
+
+				$sql	= " update order_opt_wonga set wonga = :wonga where ord_opt_no = :ord_opt_no ";
+				DB::update($sql, ['wonga' => $product->wonga, 'ord_opt_no' => $row['ord_opt_no']]);
+			}else{
+				$error_chk	= "Y";
+			}
+		}else{
+			$error_chk	= "Y";
+		}
+		
+		//if($error_chk == "")	return true;
+		//else					return false;
 	}
 
 }
