@@ -134,7 +134,10 @@ class sal08Controller extends Controller
 					inner join store s on s.store_cd = o.store_cd
 				    -- inner join goods g on o.goods_no = g.goods_no
 					left outer join sale_type st on st.sale_kind = o.sale_kind
-				where w.ord_state in (30,60,61) and o.ord_state = '30' and o.store_cd <> '' $where
+				where 
+				    w.ord_state in (30,60,61) and o.ord_state = '30' and o.store_cd <> ''
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+				    $where
 			) a
 			    inner join store_channel sc on sc.store_channel_cd = a.store_channel and sc.store_kind_cd = a.store_channel_kind and sc.dep = 2 and sc.use_yn = 'Y'
 				left outer join goods g on g.goods_no = a.goods_no
