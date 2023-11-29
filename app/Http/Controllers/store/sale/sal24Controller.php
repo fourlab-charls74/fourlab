@@ -237,8 +237,8 @@ class sal24Controller extends Controller
 					, sum(if(ord_state = 60, ifnull(b.recv_amt, 0), 0)) * -1 as recv_amt_60
 					, sum(if(ord_state = 60, ifnull(b.point_amt, 0), 0)) * -1 as point_amt_60
 					, sum(if(ord_state = 60, ifnull(b.coupon_amt, 0), 0)) * -1 as coupon_amt_60
-					, sum(if(ord_state = 60, ifnull(b.fee_amt,0), 0)) * 1 as fee_amt_60
-					, sum(if(ord_state = 60, ifnull(b.wonga, 0), 0)) * -1 as wonga_60
+					, sum(if(ord_state = 60, ifnull(b.fee_amt,0), 0)) as fee_amt_60
+					, sum(if(ord_state = 60, ifnull(b.wonga, 0), 0)) as wonga_60
 					, sum(if(ord_state = 60, ifnull(b.dc_amt, 0), 0)) * -1 as dc_amt_60
 					, sum(if(ord_state = 60, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_60
 					, sum(if(ord_state = 60, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_60
@@ -248,7 +248,7 @@ class sal24Controller extends Controller
 					, sum(if(ord_state = 61, ifnull(b.point_amt, 0), 0)) * -1 as point_amt_61
 					, sum(if(ord_state = 61, ifnull(b.coupon_amt, 0), 0)) * -1  as coupon_amt_61
 					, sum(if(ord_state = 61, ifnull(b.fee_amt,0), 0)) * 1 as fee_amt_61
-					, sum(if(ord_state = 61, ifnull(b.wonga, 0), 0)) * -1  as wonga_61
+					, sum(if(ord_state = 61, ifnull(b.wonga, 0), 0))  as wonga_61
 					, sum(if(ord_state = 61, ifnull(b.dc_amt, 0), 0)) * -1  as dc_amt_61
 					, sum(if(ord_state = 61, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_61
 					, sum(if(ord_state = 61, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_61					
