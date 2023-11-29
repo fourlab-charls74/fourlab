@@ -318,9 +318,12 @@ class prd04Controller extends Controller
 					and prd_cd = ps.prd_cd $store_where1
 					group by prd_cd
 				), 0)) as sqty
-				, if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
-				, if(pc.goods_no = 0, p.price, g.price) as price
-				, if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+				-- , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+				-- , if(pc.goods_no = 0, p.price, g.price) as price
+				-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
+				, p.tag_price as goods_sh
+				, p.price
+				, p.wonga
 				, round(((g.goods_sh - g.price) / g.goods_sh) * 100, 2) as sale_rate
 				, p.match_yn
 				, ps.qty as hqty

@@ -320,7 +320,7 @@
 		{field: "price", headerName: "현재가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "sale_rate", headerName: "할인율", width: 70, cellStyle:{'text-align':'right'}},
 		@if(true) // 슈퍼관리자 권한설정 필요 (추후)
-			{field: "wonga", headerName: "원가", type: 'currencyType', width: 100, aggFunc: 'first'},
+			{field: "wonga", headerName: "원가(VAT별도)", type: 'currencyType', width: 100, aggFunc: 'first'},
 		@endif
 		{headerName: "창고재고",
 			children: [
