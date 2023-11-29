@@ -210,6 +210,8 @@ class ord04Controller extends Controller
 				, ok.code_val as ord_kind_nm, pt.code_val as pay_type_nm
 				, bk.code_val as baesong_kind
 			    , sp.com_nm as sale_place_nm, s.store_nm
+				, if(a.dlv_place_type = 'STORE', s1.store_nm, st.storage_nm) as dlv_place_cd
+				
 			from (
 				select o.ord_no, o.ord_opt_no, o.goods_no, o.prd_cd, o.goods_opt
 					, o.wonga, o.price, o.qty, o.pay_type, o.dlv_amt, o.sale_place, o.store_cd
@@ -222,6 +224,8 @@ class ord04Controller extends Controller
 					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
 					, csc.comment
 					, csc.rt as csc_rt
+					, o.dlv_place_type
+					, o.dlv_place_cd
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
 				    left outer join claim c on c.ord_opt_no = o.ord_opt_no
@@ -241,6 +245,8 @@ class ord04Controller extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = a.dlv_baesong_kind
 				left outer join company sp on sp.com_type = '4' and sp.use_yn = 'Y' and sp.com_id = a.sale_place
 				left outer join store s on s.store_cd = a.store_cd
+				left outer join store s1 on s1.store_cd = a.dlv_place_cd
+				left outer join storage st on st.storage_cd = a.dlv_place_cd
 		";
 		$result = DB::select($sql);
 

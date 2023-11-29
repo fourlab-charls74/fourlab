@@ -429,6 +429,16 @@
 		{field: "dlv_end_date", headerName: "배송일시", type: 'DateTimeType'},
 		{field: "last_up_date", headerName: "클레임일시", type: 'DateTimeType'},
 		{field: "csc_rt", headerName: "검수일시", type: 'DateTimeType'},
+		{field: "dlv_place_type", headerName: "출고처타입", width: 80, cellClass: 'hd-grid-code', hide:true},
+		{field: "dlv_place_cd", headerName: "출고창고 / 매장", width: 100, cellClass: 'hd-grid-code',
+			cellRenderer : (params) => {
+				if (params.value == null) {
+					return '';
+				} else {
+					return params.value;
+				}
+			}
+		},
 	];
 
 	const pApp = new App('', { gridId:"#div-gd", height: 265 });
