@@ -108,7 +108,7 @@ class sal08Controller extends Controller
 				, a.pr_code, prc.code_val as pr_code_nm
 				, a.brand, b.brand_nm
 				, sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.w_ord_state > 30, -1, 1)) as sale_amt
-			    , sum(a.recv_amt * if(a.ord_state > 30, -1, 1)) as recv_amt
+			    , sum(a.recv_amt * if(a.w_ord_state > 30, -1, 1)) as recv_amt
 				, sum(a.wonga_amt) as wonga_amt
 				, sum(a.margin_amt) as margin_amt
 				, (sum(a.margin_amt) / sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1)) * 100) as margin_rate
