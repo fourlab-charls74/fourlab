@@ -168,7 +168,8 @@ class  sal27Controller extends Controller
 			 	, round(a.sale_qty / a.term_in_qty * 100) as sale_ratio
 			    , round((1 - (a.sale_recv_price / (a.sale_qty * a.price))) * 100) as discount_ratio
 			from (
-				select pc.*
+				select 
+				    pc.*
 					, ps.in_qty as total_in_qty
 					, date_format((
 						select min(ord_state_date)
@@ -221,8 +222,10 @@ class  sal27Controller extends Controller
 						, pc.size
 						-- , ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
 				  		, pc.prd_cd_p
-						, g.goods_nm, g.goods_nm_eng, g.goods_sh, g.price, g.wonga, g.com_id
+						, g.goods_nm, g.goods_nm_eng, g.com_id -- , g.goods_sh, g.price, g.wonga
+						, p.tag_price as goods_sh, p.price, p.wonga
 					from product_code pc
+						inner join product p on p.prd_cd = pc.prd_cd
 						inner join goods g on g.goods_no = pc.goods_no
 					where 1=1 
 						$product_where 
