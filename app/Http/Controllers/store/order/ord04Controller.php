@@ -201,7 +201,15 @@ class ord04Controller extends Controller
 					$where .= " and o.dlv_place_type = 'STORE' ";
 				}
 			} else {
-				$where .= " and o.dlv_place_type = 'STORAGE' ";
+				if (count($store_no) > 0) {
+					$store_no_join = join(',', array_map(function ($s) {
+						return "'$s'";
+					}, $store_no));
+					$where .= " and o.dlv_place_type = 'STORAGE' and o.dlv_place_cd in ($store_no_join) ";
+				} else {
+					$where .= " and o.dlv_place_type = 'STORAGE' ";
+				}
+				
 			}
 		} else {
 			if (count($store_no) > 0) {
