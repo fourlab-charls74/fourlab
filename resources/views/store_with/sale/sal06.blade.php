@@ -259,8 +259,8 @@
                 { headerName: "매출액", field: "amt", width: 90, type: 'currencyMinusColorType' },
                 { headerName: "할인", field: "discount", width: 80, type: 'currencyMinusColorType' },
                 { headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType' }, // 판매금액 + 포인트 합친게 결제(주문) 금액.
-                { headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType' }, // 0 처리
-                { headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType' }, // 0 처리
+                { headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType', hide:true }, // 0 처리
+                { headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType', hide:true }, // 0 처리
             ]
         },
         { field: "sum_wonga", headerName: "원가", width: 80, type: 'currencyMinusColorType' },

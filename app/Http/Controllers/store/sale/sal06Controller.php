@@ -129,10 +129,10 @@ class sal06Controller extends Controller
 
 		$sql = /** @lang text */
 		"
-			select s.store_nm, c.code_val as store_type_nm, a.*
+			select s.store_nm, c.store_channel as store_type_nm, a.*
 			from store s left outer join ( 
 				select 
-					m.store_cd,count(*) as cnt,
+					o.store_cd,count(*) as cnt,
 					$sale_kinds_query
 					sum(w.qty) as qty,
 					sum(w.qty * w.price) as amt,
@@ -145,22 +145,22 @@ class sal06Controller extends Controller
 					(sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
 					g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
 					o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
-				from order_mst m 
-					inner join order_opt o on m.ord_no = o.ord_no 
+				from order_opt o 
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join goods g on o.goods_no = g.goods_no
 					left outer join product_code pc on pc.prd_cd = o.prd_cd
-					left outer join store s on m.store_cd = s.store_cd
+					left outer join store s on o.store_cd = s.store_cd
 					left outer join brand b on g.brand = b.brand
 					left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
 					left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
 				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
-					and m.store_cd <> '' 
+					and o.store_cd <> '' 
 					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
 					$where
-				group by m.store_cd
+				group by o.store_cd
 			) as a on s.store_cd = a.store_cd
-				left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
+					inner join store_channel c on c.store_channel_cd = s.store_channel and c.store_kind_cd = s.store_channel_kind
+				-- left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = s.store_type
 			where 1=1 $where2
 		";
 
