@@ -216,6 +216,9 @@
 <script language="javascript">
     const pinnedRowData = [{ store_cd: 'total' }];
     const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+	const firstValuesFunc = (params) => {
+		if (params.rowNode.level == 2) return params.values[0] || '';
+	}
 
     let AlignCenter = {"text-align": "center"};
     let columns = [
@@ -229,17 +232,27 @@
 		{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
 		{headerName: '품번', showRowGroup: 'prd_cd_sm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
         {field: "prd_cd", headerName: "바코드", width: 130, cellStyle: AlignCenter, pinned: 'left'},
-        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: AlignCenter, pinned: 'left'},
-        {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter},
-        {field: "goods_nm", headerName: "상품명", width: 200, type: "HeadGoodsNameType"},
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
+        {field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: AlignCenter, pinned: 'left', aggFunc: firstValuesFunc},
+        {field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter, aggFunc: firstValuesFunc},
+        {field: "goods_nm", headerName: "상품명", width: 200, aggFunc: firstValuesFunc,
+			cellRenderer: function (params) {
+				if (params.node.level === 2) {
+					if (params.node.aggData.goods_no == null) return '존재하지 않는 상품입니다.';
+					return '<a href="#" onclick="return openHeadProduct(\'' + params.node.aggData.goods_no + '\');">' + params.value + '</a>';
+				} else if (params.value !== undefined) {
+					if (params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+					return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+        },
+        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 200, aggFunc: firstValuesFunc},
         {field: "prd_cd_sm", headerName: "품번", width: 100, cellStyle: AlignCenter, rowGroup: true, hide: true},
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
         {field: "goods_opt", headerName: "옵션", width: 150},
-        {field: "wonga", headerName: "원가", width: 100, type: "currencyType"},
-        {field: "goods_sh", headerName: "TAG가", width: 100, type: "currencyType"},
-        {field: "price", headerName: "판매가", width: 100, type: "currencyType"},
+        {field: "wonga", headerName: "원가", width: 100, type: "currencyType", aggFunc: firstValuesFunc},
+        {field: "goods_sh", headerName: "TAG가", width: 100, type: "currencyType", aggFunc: firstValuesFunc},
+        {field: "price", headerName: "판매가", width: 100, type: "currencyType", aggFunc: firstValuesFunc},
         {
             headerName: "이전재고",
             children: [
