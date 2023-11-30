@@ -227,7 +227,8 @@
 		{field: "margin_amt", headerName: "이익금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_rate", headerName: "이익율(%)", width: 70, type: "currencyType",
 			aggFunc: (params) => {
-				return params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_rate * 1) + a, 0) / params.rowNode.allLeafChildren.length;
+				//return params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_rate * 1) + a, 0) / params.rowNode.allLeafChildren.length;
+				return Math.round((params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_amt * 1) + a, 0) / params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.sale_amt * 1) + a, 0) ) * 100);
 			},
 		},
 		{width: "auto"}
