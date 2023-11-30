@@ -169,7 +169,13 @@ class sal02Controller extends Controller
 					  inner join order_mst m on m.ord_no = o.ord_no
 					  inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
 					  left outer join product_code pc on pc.prd_cd = o.prd_cd
-				   where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and o.store_cd <> '' $where
+				   where 
+						w.ord_state in(30, 60, 61) 
+						and w.ord_state_date >= :sdate 
+						and w.ord_state_date < :edate 
+						and o.store_cd <> '' 
+						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+						$where
 				   group by o.store_cd
 				) a on s.store_cd = a.store_cd
 				left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
@@ -211,7 +217,13 @@ class sal02Controller extends Controller
 						 inner join goods g on o.goods_no = g.goods_no
 						 left outer join brand b on g.brand = b.brand
 						 left outer join product_code pc on pc.prd_cd = o.prd_cd
-					  where w.ord_state in(30, 60, 61) and w.ord_state_date >= :sdate and w.ord_state_date < :edate and o.store_cd <> '' $where
+					  where 
+							w.ord_state in(30, 60, 61) 
+					    	and w.ord_state_date >= :sdate 
+					    	and w.ord_state_date < :edate 
+					    	and o.store_cd <> ''
+					    	and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1) 
+					    	$where
 					  group by o.store_cd
 				   ) a on s.store_cd = a.store_cd
 				   left outer join store_sales_projection p on p.ym = :ym and s.`store_cd` = p.`store_cd`
