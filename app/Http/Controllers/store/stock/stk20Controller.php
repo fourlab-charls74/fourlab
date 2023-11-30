@@ -250,11 +250,7 @@ class stk20Controller extends Controller
             DB::beginTransaction();
 
 			$msg_dep_store_cd = [];
-			$dep_store_arr = [];
 			$msg_rec_store_cd = [];
-			$rec_store_cd = [];
-			$store_cnt = [];
-			$store = [];
 			
 			foreach($data as $d) {
                 if($d['idx'] == "") continue;
@@ -732,6 +728,65 @@ class stk20Controller extends Controller
 
         return response()->json(["code" => $code, "msg" => $msg]);
     }
+	
+	public function update_state(Request $request)
+	{
+		$data = $request->input("data", []);
+		
+		try {
+			DB::beginTransaction();
+			
+			foreach ($data as $d) {
+				
+				//product_stock_rotation state 20 -> 10, 접수 시 업데이트했던 데이터들 삭제
+				DB::table('product_stock_rotation')
+					->where('idx', '=', $d['idx'])
+					->update([
+						'exp_dlv_day' => '',
+						'state' => 10,
+						'rec_comment' => '',
+						'rec_id' => '',
+						'rec_rt' => null,
+						'ut' => '',
+					]);
+
+				// 보내는 매장
+				// product_stock_store -> 접수시 차감됐던 보유재고 증가
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $d['prd_cd'])
+					->where('store_cd', '=', $d['dep_store_cd'])
+					->update([
+						'wqty' => DB::raw('wqty + ' . ($d['qty'] ?? 0)),
+						'ut' => now(),
+					]);
+
+				// 받는 매장
+				// product_stock_store -> 접수시 증가됐던 보유재고 차감
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $d['prd_cd'])
+					->where('store_cd', '=', $d['store_cd'])
+					->update([
+						'wqty' => DB::raw('wqty - ' . ($d['qty'] ?? 0)),
+						'ut' => now(),
+					]);
+
+				// 재고이력 삭제 (rt_no가 같은 재고이력 전부)
+				DB::table('product_stock_hst')
+					->where('rt_no', '=', $d['idx'])
+					->delete();
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "원복처리가 정상적으로 완료되었습니다.";
+		} catch (Exception $e) {
+			DB::rollBack();
+			$code = 500;
+			$msg = $e->getMessage();
+		}
+		
+		return response()->json(['code' => $code, 'msg' => $msg]);
+	}
 	
 	// 전표출력
 	public function download(Request $request)

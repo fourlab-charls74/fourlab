@@ -285,13 +285,13 @@
                                 <div class="docs-datepicker-container"></div>
                             </div>
                         </div>--}}
-{{--						<div class="d-flex mr-2 mb-1 mb-lg-0">--}}
-{{--							<select id="update_state_select" name="update_state_select" class="form-control form-control-sm" style="width: 150px;">--}}
-{{--								<option value="10">RT요청(원복)</option>--}}
-{{--							</select>--}}
-{{--						</div>--}}
-{{--                        <a href="javascript:void(0);" onclick="updateState()" class="btn btn-sm btn-primary shadow-sm">RT상태변경</a>--}}
-{{--						<span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>--}}
+						<div class="d-flex mr-2 mb-1 mb-lg-0">
+							<select id="update_state_select" name="update_state_select" class="form-control form-control-sm" style="width: 150px;">
+								<option value="10">RT요청(원복)</option>
+							</select>
+						</div>
+                        <a href="javascript:void(0);" onclick="updateState()" class="btn btn-sm btn-primary shadow-sm">RT상태변경</a>
+						<span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">RT처리중</a>
