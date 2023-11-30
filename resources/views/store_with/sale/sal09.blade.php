@@ -272,7 +272,7 @@
 				{ headerName: "온라인", field: "online", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
 				{ headerName: "판매수량", field: "qty", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
 				// { headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
-				{ headerName: "판매금액", field: "recv_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' }
+				{ headerName: "실결제금액", field: "recv_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' }
 			]
 		},
 	];
