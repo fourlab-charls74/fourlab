@@ -296,7 +296,8 @@
 				cnt += row !== undefined ? 1 : 0;
             });
         }
-		margin_rate = margin_rate / (cnt || 1);
+		margin_rate	= Math.round((margin_amt / sale_amt) * 100);
+		//margin_rate = margin_rate / (cnt || 1);
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
