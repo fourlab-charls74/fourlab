@@ -18,12 +18,12 @@ class  sal27Controller extends Controller
 		$edate = $request->input('edate', now()->format("Y-m-d"));
 
 		$values = [
-            'sdate' => $sdate,
-            'edate' => $edate,
+			'sdate' => $sdate,
+			'edate' => $edate,
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
-        return view(Config::get('shop.store.view') . '/sale/sal27', $values);
+		return view(Config::get('shop.store.view') . '/sale/sal27', $values);
 	}
 
 	public function search(Request $request)
@@ -37,18 +37,18 @@ class  sal27Controller extends Controller
 		$today_day = date('Ymd');
 		$next_edate_day = date('Ymd', strtotime($edate_day . '+1 day'));
 
-		$store_channel = $request->input('store_channel', []);
-		$store_channel_kind = $request->input('store_channel_kind', []);
+		$store_channel = $request->input('store_channel', '');
+		$store_channel_kind = $request->input('store_channel_kind', '');
 		$store_cds = $request->input('store_no', []);
 		$prd_cd = $request->input('prd_cd', '');
 		$prd_cd_range_text = $request->input("prd_cd_range", '');
 		$storage_cds = $request->input('storage_no', []);
-			
+
 		// $limit = $request->input('limit', 500);
 		// $ord_field = $request->input('ord_field', 'pc.prd_cd');
 		// $ord = $request->input('ord', 'desc');
 		// $page = $request->input('page', 1);
-		
+
 		// 일자검색
 		$date_where1 = " and ord_state_date <= '" . $edate_day . "'";
 		$date_where2 = " and stock_state_date <= '" . $edate_day . "'";
@@ -60,20 +60,18 @@ class  sal27Controller extends Controller
 		// 매장검색
 		$store_where = "";
 		$store_where2 = "";
-		if (count($store_channel) > 0) {
-//			$store_where .= " and s.store_channel = '" . Lib::quote($store_channel) . "'";
-			$store_where .= " and s.store_channel in ('" . implode("', '", $store_channel) . "')";
+		if ($store_channel != '') {
+			$store_where .= " and s.store_channel = '" . Lib::quote($store_channel) . "'";
 		}
-		if (count($store_channel_kind) > 0) {
-//			$store_where .= " and s.store_channel_kind = '" . Lib::quote($store_channel_kind) . "'";
-			$store_where .= " and s.store_channel_kind in ('" . implode("', '", $store_channel_kind) . "')";
+		if ($store_channel_kind != '') {
+			$store_where .= " and s.store_channel_kind = '" . Lib::quote($store_channel_kind) . "'";
 		}
 		if (count($store_cds) > 0) {
 			$store_cds = join(',', array_map(function($s) { return "'" . Lib::quote($s) . "'"; }, $store_cds));
 			$store_where .= " and s.store_cd in (" . $store_cds . ")";
 			$store_where2 .= " and h.location_cd in (" . $store_cds . ")";
 		}
-		
+
 		// 창고검색
 		$storage_where1 = "";
 		$storage_where2 = "";
@@ -82,7 +80,7 @@ class  sal27Controller extends Controller
 			$storage_where1 .= " and storage_cd in (" . $storage_cds . ")";
 			$storage_where2 .= " and h.location_cd in (" . $storage_cds . ")";
 		}
-		
+
 		// 바코드검색
 		$product_where = "";
 		// 바코드검색
@@ -104,10 +102,10 @@ class  sal27Controller extends Controller
 				}
 				$product_where .= " and pc.prd_cd in ($prd_cds_str) ";
 			} else {
-				$product_where .= " and pc.prd_cd like '" . Lib::quote($prd_cd) . "%' ";
+				$product_where .= " and pc.prd_cd = '" . Lib::quote($prd_cd) . "' ";
 			}
 		}
-		
+
 		// 상품조건검색
 		parse_str($prd_cd_range_text, $prd_cd_range);
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
@@ -118,7 +116,7 @@ class  sal27Controller extends Controller
 				$product_where .= " and pc." . $opt . " in (" . $opt_join . ")";
 			}
 		}
-		
+
 		// 월별판매내역검색
 		$month_sale_sql = "";
 		$month_sale_cols = [];
@@ -168,8 +166,7 @@ class  sal27Controller extends Controller
 			 	, round(a.sale_qty / a.term_in_qty * 100) as sale_ratio
 			    , round((1 - (a.sale_recv_price / (a.sale_qty * a.price))) * 100) as discount_ratio
 			from (
-				select 
-				    pc.*
+				select pc.*
 					, ps.in_qty as total_in_qty
 					, date_format((
 						select min(ord_state_date)
@@ -222,10 +219,8 @@ class  sal27Controller extends Controller
 						, pc.size
 						-- , ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
 				  		, pc.prd_cd_p
-						, g.goods_nm, g.goods_nm_eng, g.com_id -- , g.goods_sh, g.price, g.wonga
-						, p.tag_price as goods_sh, p.price, p.wonga
+						, g.goods_nm, g.goods_nm_eng, g.goods_sh, g.price, g.wonga, g.com_id
 					from product_code pc
-						inner join product p on p.prd_cd = pc.prd_cd
 						inner join goods g on g.goods_no = pc.goods_no
 					where 1=1 
 						$product_where 
