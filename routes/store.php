@@ -632,6 +632,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('stk20/release','stk20Controller@release'); // 출고
         Route::post('stk20/receive','stk20Controller@receive'); // 매장입고
         Route::post('stk20/reject','stk20Controller@reject'); // 거부
+        Route::post('stk20/update-state','stk20Controller@update_state'); // 원복
         Route::delete('stk20','stk20Controller@remove'); // 삭제
 
         // 요청RT

@@ -611,30 +611,31 @@
         });
     }
 	
-	// function updateState() {
-	// 	let update_state = $('#update_state_select').val();
-	// 	let rows = gx.getSelectedRows();
-	// 	if(rows.length < 1) return alert("RT요청상태로 원복하려는 RT를 선택해주세요.");
-	// 	if(rows.filter(r => r.state !== 20).length > 0) return alert("'RT접수'상태의 항목만 RT요청상태로 원복 가능합니다.");
-	//	
-	// 	if(!confirm("선택한 RT를 RT요청상태로 원복하시겠습니까?")) return;
-	//
-	// 	axios({
-	// 		url: '/store/stock/stk20/update-state',
-	// 		method: 'post',
-	// 		data: {data: rows},
-	// 	}).then(function (res) {
-	// 		if(res.data.code === 200) {
-	// 			alert(res.data.msg);
-	// 			Search();
-	// 		} else {
-	// 			console.log(res.data);
-	// 			alert("원복 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-	// 		}
-	// 	}).catch(function (err) {
-	// 		console.log(err);
-	// 	});
-	// }
+	// RT요청상태로 원복 (20 -> 10)
+	function updateState() {
+		let update_state = $('#update_state_select').val();
+		let rows = gx.getSelectedRows();
+		if(rows.length < 1) return alert("RT요청상태로 원복하려는 RT를 선택해주세요.");
+		if(rows.filter(r => r.state !== 20).length > 0) return alert("'RT접수'상태의 항목만 RT요청상태로 원복 가능합니다.");
+
+		if(!confirm("선택한 RT를 RT요청상태로 원복하시겠습니까?")) return;
+
+		axios({
+			url: '/store/stock/stk20/update-state',
+			method: 'post',
+			data: {data: rows},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				Search();
+			} else {
+				console.log(res.data);
+				alert("원복 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
 	
 	// RT전표 출력
     function printRT(document_number, idx) {

@@ -472,7 +472,7 @@ class prd04Controller extends Controller
 				    	s.size_cd
 				from size s
 					inner join product_code pc on pc.size = s.size_cd
-				where s.size_kind_cd = pc.size_kind and s.size_cd = pc.size and use_yn = 'Y' and pc.prd_cd like '$prd_cd_p%'
+				where s.size_cd = pc.size and use_yn = 'Y' and pc.prd_cd like '$prd_cd_p%'
 				group by s.size_cd
 				order by s.size_seq asc
 			";
