@@ -183,12 +183,12 @@
         { field: "color_nm", headerName: "컬러명", rowGroup: true, hide: true },
 
         { field: "item", headerName: "품목", width: 60, pinned: 'left', cellClass: 'hd-grid-code',
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+            aggFunc: 'first',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 0 ? params.value : '',
         },
         { headerName: '품목명', showRowGroup: 'item_nm', cellRenderer: 'agGroupCellRenderer', width: 130, pinned: 'left' },
         { field: "brand", headerName: "브랜드", pinned: 'left', width: 60, cellClass: 'hd-grid-code',
-            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+            aggFunc: (params) => params.rowNode.level > 0 && params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
         },
         { headerName: '브랜드명', showRowGroup: 'brand_nm', cellRenderer: 'agGroupCellRenderer', width: 130, pinned: 'left' },
@@ -220,7 +220,7 @@
             }
         },
         { field: "color", headerName: "컬러", width: 50, cellClass: 'hd-grid-code',
-			aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			aggFunc: (params) => params.rowNode.level > 2 && params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 3 ? params.value : '',
         },
 		{ headerName: '컬러명', showRowGroup: 'color_nm', cellRenderer: 'agGroupCellRenderer', width: 130 },
