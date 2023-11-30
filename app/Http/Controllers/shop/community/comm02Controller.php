@@ -325,6 +325,7 @@ class comm02Controller extends Controller
                     inner join msg_store_detail md on md.msg_cd = m.msg_cd
                     left outer join store s on s.store_cd = md.receiver_cd
                 	left outer join mgr_user mu on mu.id = md.receiver_cd
+                where m.msg_cd = '$msg_cd'
                 group by m.msg_cd
                 ";
 			
@@ -379,7 +380,7 @@ class comm02Controller extends Controller
                 'edate' 		=> date("Y-m-d"),
                 'msg_cd' 		=> $msg_cd,
                 'content' 		=> $res->content,
-				'receiver_nm' 	=> $result->receiver_nm,
+				'receiver_nm' 	=> $result->receiver_nm?? '',
 				'admin_id' 		=> $admin_id,
 				'admin_nm' 		=> $admin_nm,
 				'user_store_nm' => $user_store_nm
