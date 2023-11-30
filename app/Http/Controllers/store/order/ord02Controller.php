@@ -54,6 +54,7 @@ class ord02Controller extends Controller
 			'rel_orders'		=> $rel_orders, // 온라인출고차수
 			'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
 			'dlv_locations'		=> $dlv_locations, // 배송처
+			'clm_states'    => SLib::getCodes('G_CLM_STATE'), // 클레임상태
 		];
         return view( Config::get('shop.store.view') . '/order/ord02', $values );
 	}
@@ -101,6 +102,7 @@ class ord02Controller extends Controller
 		$prd_cd_range_text = $request->input('prd_cd_range', '');
 		$goods_nm = $request->input('goods_nm', '');
 		$goods_nm_eng = $request->input('goods_nm_eng', '');
+		$clm_state = $request->input('clm_state', ''); // 클레임상태
 
 		$ord_field = $request->input('ord_field', 'o.ord_date');
 		$ord = $request->input('ord', 'desc');
@@ -117,6 +119,15 @@ class ord02Controller extends Controller
 		if ($pay_stat != '') $where .= " and p.pay_stat = '" . $pay_stat . "' ";
 		if ($sale_place != '') $where .= " and o.sale_place = '" . $sale_place . "' ";
 		if ($ord_kind != '') $where .= " and o.ord_kind = '$ord_kind' ";
+		
+		//클레임상태
+		if ($clm_state != '') {
+			if ($clm_state == '90') {
+				$where .= " and o.clm_state in (-30, 90, 0)"; // 클레임상태가 90이면 90, 0, -30 모두 조회
+			} else {
+				$where .= " and o.clm_state = '$clm_state' ";
+			}
+		}
 
 		// 주문정보검색
 		if ($ord_info_value != '') {
@@ -231,9 +242,11 @@ class ord02Controller extends Controller
 
 		$sql = "
 			select a.*
+			    , a.clm_state as clm_state_cd
 			    , p.price as product_price
 				, os.code_val as ord_state_nm
 				, round((1 - (a.price * (1 - if(st.amt_kind = 'per', st.sale_per, 0) / 100)) / a.goods_sh) * 100) as dc_rate
+			    , clm_state.code_val as clm_state
 				, sk.code_val as sale_kind_nm, pr.code_val as pr_code_nm
 				, ot.code_val as ord_type_nm, ok.code_val as ord_kind_nm
 				, bk.code_val as baesong_kind, com.com_nm as sale_place_nm
@@ -289,7 +302,7 @@ class ord02Controller extends Controller
 					left outer join order_receipt_product rcp on rcp.ord_opt_no = o.ord_opt_no -- and rcp.reject_yn = 'Y'
 						and rcp.or_cd = (select max(or_cd) from order_receipt_product where ord_opt_no = o.ord_opt_no)
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
-					and o.clm_state in (-30,1,90,0)
+					-- and o.clm_state in (-30,1,90,0)
 					$where
 				$orderby
 				$limit
@@ -306,6 +319,7 @@ class ord02Controller extends Controller
 				left outer join code rcpr on rcpr.code_kind_cd = 'REL_REJECT_REASON' and rcpr.code_id = a.reject_reason
 				left outer join sale_type st on st.sale_kind = a.sale_kind and st.use_yn = 'Y'
 				left outer join company com on com.com_type = '4' and com.use_yn = 'Y' and com.com_id = a.sale_place
+			 	left outer join code clm_state on (a.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE')
 		";
 		$result = DB::select($sql);
 
@@ -362,7 +376,7 @@ class ord02Controller extends Controller
 								inner join size s on s.size_kind_cd = size_kind and s.size_cd = size                   
 						) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
 					where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
-						and o.clm_state in (-30,1,90,0)
+						-- and o.clm_state in (-30,1,90,0)
 						$where
 					group by o.ord_opt_no
 				) a

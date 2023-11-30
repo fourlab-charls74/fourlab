@@ -155,19 +155,21 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="pr_code">판매유형</label>
-                            <div class="flax_box">
-                                <select id="sale_kind" name="sale_kind[]" class="form-control form-control-sm multi_select w-100" multiple>
-                                    <option value=''>전체</option>
-                                    @foreach (@$sale_kinds as $sale_kind)
-                                    <option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>클레임상태</label>
+							<div class="flex_box">
+								<select name='clm_state' class="form-control form-control-sm">
+									<option value=''>전체</option>
+									@foreach (@$clm_states as $clm_state)
+										<option value='{{ $clm_state->code_id }}' @if($clm_state->code_id == '90') selected @endif>
+											{{ $clm_state->code_val }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
 					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="pr_code">출고구분</label>
@@ -313,6 +315,19 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="pr_code">판매유형</label>
+							<div class="flax_box">
+								<select id="sale_kind" name="sale_kind[]" class="form-control form-control-sm multi_select w-100" multiple>
+									<option value=''>전체</option>
+									@foreach (@$sale_kinds as $sale_kind)
+										<option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -405,6 +420,10 @@
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
         },
         {field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState,
+            aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
+        },
+		{field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.node.level == 0 ? params.value : '',
         },
