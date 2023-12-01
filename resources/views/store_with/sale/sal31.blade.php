@@ -105,7 +105,7 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
-								<label for="prd_cd">바코드</label>
+								<label for="prd_cd">품번</label>
 								<div class="flex_box">
 									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
 									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
@@ -129,7 +129,7 @@
 									<div class="form-inline-inner input_box" style="width:45%;">
 										<select name="ord_field" class="form-control form-control-sm">
 											<option value="pss.store_cd">매장코드</option>
-											<option value="pss.prd_cd">바코드</option>
+											<option value="pc.prd_cd_p">품번</option>
 										</select>
 									</div>
 									<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
