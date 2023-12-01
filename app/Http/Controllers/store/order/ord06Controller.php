@@ -406,7 +406,7 @@ class ord06Controller extends Controller
                     o.wonga,
                     o.price,
                     o.recv_amt,
-                    w.point_apply_amt,
+                    ifnull(w.point_apply_amt, 0) as point_apply_amt,
                     w.coupon_apply_amt,
                     o.dlv_amt,
                     o.sales_com_fee,
@@ -463,6 +463,8 @@ class ord06Controller extends Controller
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
         ";
 		// $result = DB::select($sql);
+		
+		dd($sql);
 
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
