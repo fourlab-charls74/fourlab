@@ -185,10 +185,10 @@
 								<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
 								<label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
 							</div>
-							<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-								<input type="checkbox" class="custom-control-input" name="prd_cd_p_grid_expand" id="prd_cd_p_grid_expand" onchange="return RowExpand('prd_cd_p',this.checked);">
-								<label class="custom-control-label font-weight-normal" for="prd_cd_p_grid_expand">품번별 접기</label>
-							</div>
+{{--							<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">--}}
+{{--								<input type="checkbox" class="custom-control-input" name="prd_cd_p_grid_expand" id="prd_cd_p_grid_expand" onchange="return RowExpand('prd_cd_p',this.checked);">--}}
+{{--								<label class="custom-control-label font-weight-normal" for="prd_cd_p_grid_expand">품번별 접기</label>--}}
+{{--							</div>--}}
 							<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
 								<input type="checkbox" class="custom-control-input" name="store_grid_expand" id="store_grid_expand" onchange="return RowExpand('store', this.checked);">
 								<label class="custom-control-label font-weight-normal" for="store_grid_expand">매장별 접기</label>
@@ -210,7 +210,6 @@
 	<style>
 		.ag-row-level-1 {background-color: #f2f2f2 !important;}
 		.ag-row-level-2 {background-color: #e2e2e2 !important;}
-		.ag-row-level-3 {background-color: #edf4fd !important;}
 	</style>
 
 	<script language="javascript">
@@ -226,33 +225,29 @@
 			{field: "store_nm" , headerName: "매장명", rowGroup: true, hide: true},
 			{headerName: '매장구분', showRowGroup: 'store_type_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 130, pinned: 'left'},
 			{field: "store_cd" , headerName: "매장코드", width: 60, cellStyle: {"text-align": "center"}, pinned: 'left',
-				aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
+				aggFunc: (params) => params.rowNode.level > 0 && params.values.length > 0 ? params.values[0] : '',
 				cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
 			},
 			{headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
-			{headerName: '품번', showRowGroup: 'prd_cd_sm', cellRenderer: 'agGroupCellRenderer', minWidth: 150, pinned: 'left'},
-			{field: "prd_cd", headerName: "바코드", width: 130, cellStyle: AlignCenter, pinned: 'left'},
-			{field: "goods_no", headerName: "온라인코드", width: 60, cellStyle: AlignCenter, pinned: 'left', aggFunc: firstValuesFunc},
+			{field: "prd_cd", headerName: "바코드", width: 130, cellStyle: AlignCenter, pinned: 'left', hide: true},
+			{field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: AlignCenter, pinned: 'left', aggFunc: firstValuesFunc},
+			{field: "prd_cd_sm", headerName: "품번", width: 100, cellStyle: AlignCenter, pinned: 'left'},
 			{field: "brand_nm", headerName: "브랜드", width: 60, cellStyle: AlignCenter, aggFunc: firstValuesFunc},
-			{field: "goods_nm", headerName: "상품명", width: 200, aggFunc: firstValuesFunc,
+			{field: "goods_nm", headerName: "상품명", width: 200,
 				cellRenderer: function (params) {
-					if (params.node.level === 2) {
-						if (params.node.aggData.goods_no == null) return '존재하지 않는 상품입니다.';
-						return '<a href="#" onclick="return openHeadProduct(\'' + params.node.aggData.goods_no + '\');">' + params.value + '</a>';
-					} else if (params.value !== undefined) {
+					if (params.value !== undefined) {
 						if (params.data.goods_no == null) return '존재하지 않는 상품입니다.';
 						return '<a href="#" onclick="return openHeadProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
 					}
 				}
 			},
-			{field: "goods_nm_eng", headerName: "상품명(영문)", width: 200, aggFunc: firstValuesFunc},
-			{field: "prd_cd_sm", headerName: "품번", width: 100, cellStyle: AlignCenter, rowGroup: true, hide: true},
-			{field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
-			{field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
-			{field: "goods_opt", headerName: "옵션", width: 150},
-			{field: "wonga", headerName: "원가", width: 100, type: "currencyType", aggFunc: firstValuesFunc},
-			{field: "goods_sh", headerName: "TAG가", width: 100, type: "currencyType", aggFunc: firstValuesFunc},
-			{field: "price", headerName: "판매가", width: 100, type: "currencyType", aggFunc: firstValuesFunc},
+			{field: "goods_nm_eng", headerName: "상품명(영문)", width: 200},
+			{field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter, hide: true},
+			{field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter, hide: true},
+			{field: "goods_opt", headerName: "옵션", width: 150, hide: true},
+			{field: "wonga", headerName: "원가", width: 100, type: "currencyType"},
+			{field: "goods_sh", headerName: "TAG가", width: 100, type: "currencyType"},
+			{field: "price", headerName: "판매가", width: 100, type: "currencyType"},
 			{
 				headerName: "이전재고",
 				children: [
@@ -358,7 +353,7 @@
 			// 엑셀다운로드 레이어 오픈
 			$(".export-excel").on("click", function (e) {
 				depthExportChecker.Open({
-					depths: ['매장구분별', '매장별', '품번별'],
+					depths: ['매장구분별', '매장별'],
 					download: (level) => {
 						gx.Download('매장수불집계표_{{ date('YmdH') }}.xlsx', { type: 'excel', level: level });
 					}
@@ -405,7 +400,7 @@
 				let total_data = d.head.total_data;
 				if(pinnedRow && total_data != '') {
 					gx.gridOptions.api.setPinnedTopRowData([
-						{ ...pinnedRow.data, ...total_data }
+						{ ...pinnedRow.data, ...total_data, wonga: '', goods_sh: '', price: '' }
 					]);
 				}
 			});
