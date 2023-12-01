@@ -464,8 +464,6 @@ class ord06Controller extends Controller
         ";
 		// $result = DB::select($sql);
 		
-		dd($sql);
-
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
 		$stmt->execute();
