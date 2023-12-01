@@ -267,7 +267,7 @@ class prd04Controller extends Controller
 						$in_store_sql
 						inner join product p on p.prd_cd = pc.prd_cd
 						left outer join goods g on pc.goods_no = g.goods_no
-						inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
+						left outer join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
 						inner join brand b on b.br_cd = pc.brand
 						left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 					where
@@ -345,7 +345,7 @@ class prd04Controller extends Controller
 				$in_store_sql
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on pc.goods_no = g.goods_no
-				inner join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
+				left outer join code c on pc.color = c.code_id and c.code_kind_cd = 'PRD_CD_COLOR'
 				inner join brand b on b.br_cd = pc.brand
 				left outer join product_stock_storage pss2 on pss2.prd_cd = pc.prd_cd
 				left outer join product_orderby ob on pc.size = ob.size_cd
