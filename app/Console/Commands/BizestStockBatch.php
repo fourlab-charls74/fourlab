@@ -70,8 +70,8 @@ class BizestStockBatch extends Command
 		$chk_date_cnt	= DB::selectOne($sql,['exp_date' => $today])->tot;
 		
 		if( $chk_date_cnt > 0 ){
-			return 1;
-			exit;
+			//return 1;
+			//exit;
 		}
 		// 재고 등록 예외 일자 처리 종료
 
