@@ -379,7 +379,7 @@ class sal22Controller extends Controller
                 ) as c
             ";
 
-            $row = DB::selectOne($sql);dd($sql);
+            $row = DB::selectOne($sql);
             $total_data = $row;
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
