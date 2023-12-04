@@ -580,6 +580,7 @@
 				}
 			}
         },
+		{field: "r_nm", headerName: "수령자명", pinned: 'left', width: 65, cellStyle: {'text-align': 'center'}},
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 135,
             cellRenderer: (params) => {
 				if (params.node.rowPinned === 'top') {
