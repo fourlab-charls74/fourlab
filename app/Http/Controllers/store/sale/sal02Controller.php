@@ -137,7 +137,7 @@ class sal02Controller extends Controller
 			$day = $i + 1;
 			$comma = ($day == $max_day) ? "" : ",";
 			$sum .= "sum(if(day(w.ord_state_date) = ${day} ,if(w.ord_state > 30, ${sum_true} * -1, ${sum_true}),0)) as ${day}_val${comma}";
-			$total_sum .= ", sum(t.${day}_val) as ${day}_val";
+			$total_sum .= ", ifnull(sum(t.${day}_val),0) as ${day}_val";
 
 			// 해당 월의 모든 요일 구하기
 			$day = sprintf("%02d", $day);
@@ -163,12 +163,15 @@ class sal02Controller extends Controller
 					  sum(o.price*o.qty) as ord_amt,
 					  sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
 					  w.ord_state,
+					  sum(case when o.sale_kind = 81 then o.qty else 0 end) as online,
+    				  sum(case when o.sale_kind <> 81 then o.qty else 0 end) as offline,
 					  ${sum}
 				   from order_opt_wonga w
 					  inner join order_opt o on w.ord_opt_no = o.ord_opt_no
 					  inner join order_mst m on m.ord_no = o.ord_no
 					  inner join goods g on g.goods_no = o.goods_no and g.goods_sub = o.goods_sub
 					  left outer join product_code pc on pc.prd_cd = o.prd_cd
+					  left outer join code c on c.code_id = o.sale_kind and c.code_kind_cd = 'SALE_KIND'
 				   where 
 						w.ord_state in(30, 60, 61) 
 						and w.ord_state_date >= :sdate 
@@ -195,14 +198,16 @@ class sal02Controller extends Controller
 					, round(sum(t.recv_amt) / sum(t.proj_amt) * 100, 0) as progress_proj_amt
 				   , sum(t.qty) as qty
 				   , sum(t.ord_amt) as ord_amt
+				   , sum(t.online) as online
+				   , sum(t.offline) as offline
 				   ${total_sum}
 			from (
 				select
-				   s.store_nm
-				   , a.*
-				   , ifnull(p.amt,0) as proj_amt
-				   , sc.store_channel as store_channel
-				   , sc2.store_kind as store_channel_kind
+					s.store_nm
+					, a.*
+					, ifnull(p.amt,0) as proj_amt
+					, sc.store_channel as store_channel
+					, sc2.store_kind as store_channel_kind
 				from store s
 				   left outer join (
 					  select
@@ -210,6 +215,8 @@ class sal02Controller extends Controller
 						 sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty, 
 						 sum(o.price*o.qty) as ord_amt,
 						 sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,  
+						 sum(case when o.sale_kind = 81 then o.qty else 0 end) as online,
+						 sum(case when o.sale_kind <> 81 then o.qty else 0 end) as offline,
 						 ${sum}
 					  from order_opt_wonga w
 						 inner join order_opt o on w.ord_opt_no = o.ord_opt_no
@@ -217,6 +224,7 @@ class sal02Controller extends Controller
 						 inner join goods g on o.goods_no = g.goods_no
 						 left outer join brand b on g.brand = b.brand
 						 left outer join product_code pc on pc.prd_cd = o.prd_cd
+					  	 left outer join code c on c.code_id = o.sale_kind and c.code_kind_cd = 'SALE_KIND'
 					  where 
 							w.ord_state in(30, 60, 61) 
 					    	and w.ord_state_date >= :sdate 

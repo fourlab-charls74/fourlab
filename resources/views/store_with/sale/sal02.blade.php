@@ -267,8 +267,8 @@
 		},
 		{ field: "summary",	headerName: "합계",
 			children: [
-				{ headerName: "오프라인", field: "offline", type: 'numberType' },
-				{ headerName: "온라인", field: "online", type: 'currencyType', type: 'currencyMinusColorType'},
+				{ headerName: "오프라인", field: "offline", type: 'numberType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc },
+				{ headerName: "온라인", field: "online", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc},
 				{ headerName: "판매수량", field: "qty", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc },
 				// { headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
 				{ headerName: "실결제금액", field: "recv_amt", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc }
