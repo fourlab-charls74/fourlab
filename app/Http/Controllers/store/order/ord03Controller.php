@@ -226,9 +226,15 @@ class ord03Controller extends Controller
 
 		$dlv_locations = $this->_get_dlv_locations($user_group);
 		$qty_sql = "";
+		$sum_qty_sql = "";
 		foreach ($dlv_locations as $loc) {
 			$qty_sql .= ", (select qty from product_stock_$loc->location_type where " . $loc->location_type . "_cd = '$loc->location_cd' and prd_cd = pc.prd_cd) as "  . $loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty ";
 		}
+
+		foreach ($dlv_locations as $loc) {
+			$sum_qty_sql .= ", sum(t."  . $loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty) as " . $loc->seq . "_" . $loc->location_type . "_" . $loc->location_cd . "_qty";
+		}
+		
 
 		$sql = "
 			select a.*
@@ -305,10 +311,12 @@ class ord03Controller extends Controller
 				select
 				    count(t.or_cd) as total
 					, sum(t.qty) as qty
+					$sum_qty_sql
 				from (
 					select 
 						rcp.or_cd
 						, rcp.qty
+						$qty_sql
 					from order_receipt_product rcp
 						inner join order_receipt rc on rc.or_cd = rcp.or_cd
 						inner join order_opt o on o.ord_opt_no = rcp.ord_opt_no

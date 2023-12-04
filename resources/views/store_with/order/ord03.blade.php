@@ -427,7 +427,13 @@
 
 <script language="javascript">
 	const dlv_companies = <?= json_encode(@$dlv_companies) ?> ;
-	const pinnedRowData = [{ dlv_location_nm : "합계", qty : 0 }];
+	const dlv_locations = <?= json_encode(@$dlv_locations) ?> ;
+	const pinnedRowData = [{ dlv_location_nm : "합계", qty : 0
+		@foreach($dlv_locations as $dlv_location)
+		, '{{ $dlv_location->seq . "_" . $dlv_location->location_type . "_" . $dlv_location->location_cd . "_qty" }}' : 0
+		@endforeach
+	
+	}];
 
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.data.state < 30, headerCheckboxSelection: true, sort: null, width: 28},

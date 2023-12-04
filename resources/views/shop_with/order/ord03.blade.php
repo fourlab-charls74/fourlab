@@ -538,6 +538,13 @@
 	}
 	
 	const dlv_companies = <?= json_encode(@$dlv_companies) ?> ;
+	const dlv_locations = <?= json_encode(@$dlv_locations) ?> ;
+	const pinnedRowData = [{ dlv_location_nm : "합계", qty : 0
+		@foreach($dlv_locations as $dlv_location)
+		, '{{ $dlv_location->seq . "_" . $dlv_location->location_type . "_" . $dlv_location->location_cd . "_qty" }}' : 0
+		@endforeach
+
+	}];
 	
     let columns = [
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: (params) => params.data.state < 30, headerCheckboxSelection: true, sort: null, width: 28},
@@ -556,21 +563,41 @@
 			}
 		},
 		{field: "dlv_location_cd", headerName: "배송처코드", pinned: 'left', width: 70, 
-            cellStyle: (params) => ({'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'}),
+            cellStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return {'text-align' : 'center'};
+				} else {
+					return {'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'};
+				}
+			}
         },
         {field: "dlv_location_nm", headerName: "배송처명", pinned: 'left', width: 100, 
-            cellStyle: (params) => ({'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'}),
+            cellStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return {'text-align' : 'center'};
+				} else {
+					return {'text-align': 'center', 'color': params.data.dlv_location_type === 'STORAGE' ? '#0000ff' : '#ff0000', 'background-color': params.data.dlv_location_type === 'STORAGE' ? '#D9E3FF' : '#FFE9E9'};
+				}
+			}
         },
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 135,
             cellRenderer: (params) => {
-                return '<a href="javascript:void(0);" onclick="return openShopOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
+				if (params.node.rowPinned === 'top') {
+					return '';
+				} else {
+                	return '<a href="javascript:void(0);" onclick="return openShopOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
+				}
             }
         },
 		{field: "ord_state_nm", headerName: "주문상태", pinned: 'left', width: 70, cellStyle: StyleOrdState},
 		{field: "clm_state_nm", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}, hide:true,
             cellRenderer: (params) => {
-                return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
+				if (params.node.rowPinned === 'top') {
+					return '';
+				} else {
+                	return '<a href="javascript:void(0);" onclick="return openStoreOrder(\'' + params.data?.ord_no + '\',\'' + params.data?.ord_opt_no +'\');">'+ params.value +'</a>';
+				}
             }
         },
         {field: "ord_state_nm", headerName: "주문상태", width: 70, hide:true, cellStyle: StyleOrdState},
@@ -584,14 +611,26 @@
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
         {field: "goods_nm", headerName: "상품명", width: 150,
             cellRenderer: function (params) {
-                return '<a href="#" onclick="return openShopProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
+				if (params.node.rowPinned === 'top') {
+					return '';
+				} else {
+                	return '<a href="#" onclick="return openShopProduct(\'' + params.data?.goods_no + '\');">' + params.value + '</a>';
+				}
 			}
         },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
         {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 130},
-        {field: "qty", headerName: "수량", width: 50, type: "currencyType", cellStyle: {"font-weight": "bold", 'background-color': '#D5FFDA'}, aggFunc: "first"},
+        {field: "qty", headerName: "수량", width: 50, type: "currencyType", aggFunc: "first",
+			cellStyle: (params) => {
+				if (params.node.rowPinned === 'top') {
+					return {};
+				} else {
+					return {"font-weight": "bold", 'background-color': '#D5FFDA'};
+				}
+			}
+		},
         @foreach (@$dlv_locations as $loc)
             {field: "{{ $loc->seq }}_{{ $loc->location_type }}_{{ $loc->location_cd }}_qty", headerName: "{{ $loc->location_nm }}", width: 100, type: "currencyType",
                 cellStyle: (params) => (
@@ -645,6 +684,10 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns, {
+			pinnedTopRowData: pinnedRowData,
+			getRowStyle : (params) => {
+				if (params.node.rowPinned) return {'font-weight': 'bold', 'background' : "#eee", "border" : "none"};
+			},
 			defaultColDef: {
 				suppressMenu: true,
 				resizable: false,
@@ -671,7 +714,13 @@
 	
 	function Search() {
 		let data = $('form[name="search"]').serialize();
-		gx.Request('/shop/order/ord03/search', data, 1);
+		gx.Request('/shop/order/ord03/search', data, -1, function(d) {
+			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
+			let total_data = d.head.total_data;
+			if (pinnedRow && total_data != '') {
+				gx.gridOptions.api.setPinnedTopRowData([{...pinnedRow.data, ...total_data}]);
+			}
+		});
 	}
 
     // 출고완료처리
