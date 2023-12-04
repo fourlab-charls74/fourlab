@@ -368,5 +368,25 @@ class comm01Controller extends Controller
             "code" => $code,
             "msg" => $msg
         ]);
-    }   
+    }
+
+	public function download_file($path) {
+
+		if (file_exists(storage_path('\\app\\public\\data\\community\\comm01\\'.$path))) {
+
+			try{
+				return response()->download(public_path('\\data\\community\\comm01\\'.$path));
+			} catch(Exception $e){
+				return response()->json([
+					"code" => '500',
+					"msg" => $e->getMessage()
+				]);
+			}
+		}
+
+		return response()->json([
+			"code" => '400',
+			"msg" => 'file not found'
+		]);
+	}
 }

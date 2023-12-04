@@ -336,6 +336,7 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::get('comm01/popup_chk', 'comm01Controller@popup_chk');
         Route::get('comm01/popup_notice/{no}', 'comm01Controller@show_notice');
         Route::put('comm01/notice_read', 'comm01Controller@notice_read');
+		Route::get('comm01/file/download/{path}', 'comm01Controller@download_file');
         // Route::put('comm01/store', 'comm01Controller@store');
         // Route::put('comm01/edit/{no}', 'comm01Controller@update');
         // Route::post('comm01/del_store', 'comm01Controller@del_store');

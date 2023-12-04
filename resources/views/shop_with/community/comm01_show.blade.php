@@ -90,6 +90,7 @@
 													@if($user->attach_file_url != '' && $user->attach_file_url !== null)
 														@foreach(explode(',', $user->attach_file_url) as $file_url)
 															<a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+															<br>
 														@endforeach
 													@endif
 												</td>
@@ -127,6 +128,59 @@
     $(document).ready(function() {
         document.getElementById('div_content2').innerHTML = $('#div_content1').val();
     });
+
+	function getFileName (contentDisposition) {
+		let fileName = contentDisposition
+			.split(';')
+			.filter(function(ele) {
+				return ele.indexOf('filename') > -1
+			})
+			.map(function(ele) {
+				return ele
+					.replace(/"/g, '')
+					.split('=')[1]
+			});
+		return fileName[0] ? fileName[0] : null
+	}
+
+	function downloadFile(path) {
+		$.ajax({
+			url: `/shop/community/comm01/file/download/${path.split('/').reverse()[0]}`,
+			type: 'GET',
+			cache: false,
+			xhrFields: {
+				responseType: 'blob'
+			},
+		})
+			.done(function (data, status, jqXhr) {
+				if (!data) {
+					return;
+				}
+
+				try {
+					let blob = new Blob([data], { type: jqXhr.getResponseHeader('content-type') });
+					let fileName = getFileName(jqXhr.getResponseHeader('content-disposition'));
+					fileName = decodeURI(fileName);
+
+					//익스플로어
+					if (window.navigator.msSaveOrOpenBlob) {
+						window.navigator.msSaveOrOpenBlob(blob, fileName);
+					} else {
+						let link = document.createElement('a');
+						let url = window.URL.createObjectURL(blob);
+						link.href = url;
+						link.target = '_self';
+						link.download = fileName;
+						document.body.append(link);
+						link.click();
+						link.remove();
+						window.URL.revokeObjectURL(url);
+					}
+				} catch (e) {
+					console.error(e);
+				}
+			});
+	}
         
 </script>
 @stop
