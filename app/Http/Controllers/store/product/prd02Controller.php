@@ -266,8 +266,8 @@ class prd02Controller extends Controller
 				, p.tag_price as goods_sh
 				, p.price as price
 				, p.wonga as wonga
-				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - p.wonga))) as margin_rate
-				, (if(pc.goods_no = 0, p.price, g.price) - p.wonga) as margin_amt
+				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - (p.wonga * 1.1)))) as margin_rate
+				, (if(pc.goods_no = 0, p.price, g.price) - (p.wonga * 1.1)) as margin_amt
 				, g.org_nm
 				, com.com_nm
 				, g.reg_dm
