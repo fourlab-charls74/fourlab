@@ -288,8 +288,6 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
             let ord_field = $('#ord_field').val();
             let ord = $('input[name="ord"]:checked').val();
 
-            console.log(ord_field, ord);
-
             gx.gridOptions.api.setSortModel([{ colId: 'sale_date', sort: 'desc' }]);
             gx.gridOptions.api.setSortModel([{ colId: 'sale_amt', sort: 'desc' }]);
 

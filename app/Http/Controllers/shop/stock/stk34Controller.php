@@ -45,17 +45,16 @@ class stk34Controller extends Controller
         $sdate = $request->input('sdate');
         $edate = $request->input('edate');
         $store_no = $request->input('store_no', '');
-        $store_type    = $request->input("store_type", '');
+		$user_store = Auth('head')->user()->store_cd;
 
         $where = "";
         $orderby = "";
         if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
-        if ($store_type != "") $where .= " and s.store_type = '$store_type'";
 
         // ordreby
-        $ord = $r['ord'] ?? 'desc';
-        $ord_field = $r['ord_field'] ?? "s.rt";
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+//        $ord = $r['ord'] ?? 'desc';
+//        $ord_field = $r['ord_field'] ?? "s.rt";
+//        $orderby = sprintf("order by %s %s", $ord_field, $ord);
 
         $page = $request->input('page', 1);
         if ($page < 1 or $page == "") $page = 1;
@@ -75,12 +74,11 @@ class stk34Controller extends Controller
                     , sum(cs.sale_amt) as sale_amt
                     , cs.sale_memo
                 from competitor_sale cs
-                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
-                    left outer join store s on s.store_cd = cs.store_cd
+                    inner join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    inner join store s on s.store_cd = cs.store_cd
                 where 1=1 and cs.sale_date >= '$sdate-01' and cs.sale_date <= '$edate-31' and cs.sale_amt > 0
                 $where
                 group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd, cs.competitor_cd
-                $orderby
                 $limit
             ";
 
@@ -119,18 +117,55 @@ class stk34Controller extends Controller
             $total_data = $row;
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
-            
-        return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => $total,
-                "page" => $page,
-                "page_cnt" => $page_cnt,
-                "page_total" => count($rows),
-                "total_data" => $total_data
-            ),
-            "body" => $rows
-        ]);
+
+		$sql = "
+                select 
+                    date_format(cs.sale_date, '%Y-%m') as sale_date
+                    , s.store_nm
+                    , cs.store_cd
+                from competitor_sale cs
+                    left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
+                    left outer join store s on s.store_cd = cs.store_cd
+                where 1=1 and cs.sale_date >= '$sdate-01' and cs.sale_date <= '$edate-31' and cs.sale_amt > 0 and cs.store_cd = '$user_store'
+                group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd
+            ";
+
+		$res = DB::select($sql);
+
+		$store_amt = [];
+
+		foreach ($res as $r) {
+			$sql = "
+                    select
+                        ifnull(sum(o.recv_amt * if(w.ord_state > 30, -1, 1)),0) as store_amt
+                        , '$r->store_cd' as store_cd
+                        , '$r->sale_date' as sale_date
+                        , '$r->store_nm' as store_nm
+                        , '피엘라벤' as competitor
+                    from order_opt_wonga w
+                    	inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                    where w.ord_state in(30, 60, 61) and o.store_cd = '$r->store_cd' and o.ord_state = '30' 
+                        and w.ord_state_date >= replace(concat('$r->sale_date','-01'), '-','')
+                        and w.ord_state_date <= replace(concat('$r->sale_date','-31'),'-','')
+                ";
+
+			$result = DB::select($sql);
+			$store_amt[] = $result;
+
+		}
+
+		return response()->json([
+			"code" => 200,
+			"head" => array(
+				"total" => $total,
+				"page" => $page,
+				"page_cnt" => $page_cnt,
+				"page_total" => count($rows),
+				"total_data" => $total_data,
+				"store_amt" => $store_amt
+			),
+			"body" => $rows
+		]);
     }
 
     public function create()

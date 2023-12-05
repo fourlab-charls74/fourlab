@@ -1,13 +1,13 @@
 @extends('shop_with.layouts.layout')
-@section('title','동종업계 월별매출관리')
+@section('title','동종업계월별매출관리')
 @section('content')
 
 <div class="page_tit">
-    <h3 class="d-inline-flex">동종업계 월별매출관리</h3>
+    <h3 class="d-inline-flex">동종업계월별매출관리</h3>
     <div class="d-inline-flex location">
         <span class="home"></span>
         <span>/ 매장관리</span>
-        <span>/ 동종업계 월별매출관리</span>
+        <span>/ 동종업계월별매출관리</span>
     </div>
 </div>
 
@@ -176,18 +176,33 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
         },
         {headerName: "매장명", field: "store_nm", rowGroup: true, hide:true},
         {headerName: '매출월', showRowGroup: 'sale_date', cellRenderer: 'agGroupCellRenderer', width: 130, pinned:'left', sortable: false},
-        { field: "store_cd", headerName: "매장코드", pinned:'left', width:60, cellStyle: { 'text-align': "center" },
+        { field: "store_cd", headerName: "매장코드", pinned:'left', width:60, cellStyle: { 'text-align': "center" }, groupDepth: 1,
             aggFunc: (params) => params.values.length > 0 ? params.values[0] : '',
 			cellRenderer: (params) => params.value == 'total' ? '합계' : params.node.level == 1 ? params.value : '',
         },
         {headerName: '매장명', showRowGroup: 'store_nm', cellRenderer: 'agGroupCellRenderer', width: 180, pinned:'left'},
         {headerName: "동종업계코드", field: "competitor_cd",  pinned:'left', width: 80, cellClass: 'hd-grid-code', hide:true},
-        {headerName: "동종업계명", field: "competitor",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
-        {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'text-align': "right" }, aggFunc: sumValuesFunc},
+        {headerName: "동종업계명", field: "competitor",  pinned:'left', width: 120, cellClass: 'hd-grid-code',
+			cellStyle : (params) => {
+				if(params.value == '피엘라벤') {
+					return {'background' : '#FA8072'};
+				} else {
+					return {};
+				}
+			}
+		},
+        {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', aggFunc: sumValuesFunc,
+			cellStyle : (params) => {
+				if (params.node.level == 2 && params.data.competitor == '피엘라벤') {
+					return {'text-align': 'right', 'background' : '#FA8072'};
+				} else {
+					return {'text-align': 'right'};
+				}
+			}
+		},
         {headerName: "매장코드", field: "store_cd",  pinned:'left', width: 70, cellClass: 'hd-grid-code' , hide:true},
         {headerName: "매장구분", field: "store_type",  pinned:'left', width: 70, cellClass: 'hd-grid-code', hide:true},
         {headerName: "동종업계 메모", field: "sale_memo",  pinned:'left', width: 120, cellClass: 'hd-grid-code'},
-        // {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
         {width: 'auto'}
     ];
 
@@ -231,8 +246,34 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
     function Search() {
         let data = $('form[name="search"]').serialize();
         gx.Request('/shop/stock/stk34/search', data, 1, function(e){
+			let store_amt = e.head.store_amt;
+			
+			let rowData = [];
+			store_amt.forEach(store => {
+				let sale_amt = store[0].store_amt;
+				let store_cd = store[0].store_cd;
+				let store_nm = store[0].store_nm;
+				let sale_date = store[0].sale_date;
+				let competitor = store[0].competitor;
+				
+				rowData.push({
+					sale_date,
+					store_cd,
+					store_nm,
+					sale_amt,
+					competitor
+				});
+			});
+			
+			gx.gridOptions.api.applyTransaction({add: rowData});
             updatePinnedRow();
             setAllRowGroupExpanded($("#grid_expand").is(":checked"))
+			
+			let ord_field = $('#ord_field').val();
+			let ord = $('input[name="ord"]:checked').val();
+
+			gx.gridOptions.api.setSortModel([{ colId: 'sale_date', sort: 'desc' }]);
+			gx.gridOptions.api.setSortModel([{ colId: 'sale_amt', sort: 'desc' }]);
         });
 
     }
