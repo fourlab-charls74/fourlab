@@ -130,15 +130,16 @@ class stk34Controller extends Controller
             foreach ($res as $r) {
                 $sql = "
                     select
-                        if(ord_state = 60 or ord_state = 61, sum(recv_amt * -1) , sum(recv_amt)) as store_amt
+                        ifnull(sum(o.recv_amt * if(w.ord_state > 30, -1, 1)),0) as store_amt
                         , '$r->store_cd' as store_cd
                         , '$r->sale_date' as sale_date
                         , '$r->store_nm' as store_nm
                         , '피엘라벤' as competitor
-                    from order_opt_wonga
-                    where ord_state in(30, 60, 61) and store_cd = '$r->store_cd' 
-                        and ord_state_date >= replace(concat('$r->sale_date','-01'), '-','')
-                        and ord_state_date <= replace(concat('$r->sale_date','-31'),'-','')
+                    from order_opt_wonga w
+                    	inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                    where w.ord_state in(30, 60, 61) and o.store_cd = '$r->store_cd' and o.ord_state = '30' 
+                        and w.ord_state_date >= replace(concat('$r->sale_date','-01'), '-','')
+                        and w.ord_state_date <= replace(concat('$r->sale_date','-31'),'-','')
                 ";
 
                 $result = DB::select($sql);
