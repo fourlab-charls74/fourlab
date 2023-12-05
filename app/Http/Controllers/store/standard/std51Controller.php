@@ -263,12 +263,14 @@ class std51Controller extends Controller
                     ->where('code_id', '=', $data['code_id'])
                     ->update($data_code);
 
-                    DB::table('sale_type')
-                        ->where('sale_kind','=',$data['code_id'])
-                        ->update([
-                            'sale_type_nm' => $data['code_val'],
-                            'mod_date' => now()
-                        ]);
+					if ($code == "SALE_KIND") {
+						DB::table('sale_type')
+							->where('sale_kind','=',$data['code_id'])
+							->update([
+								'sale_type_nm' => $data['code_val'],
+								'mod_date' => now()
+							]);
+					}
                 }
             });
             $code = 200;
