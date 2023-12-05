@@ -95,7 +95,7 @@
 												</div>
 											</td>
 											<th>샘플파일</th>
-											<td><a href="/sample/sample_prd05.xlsx"> sample_prd05.xlsx</a></td>
+											<td><a href="/sample/sample_prd05_batch.xlsx"> sample_prd05_batch.xlsx</a></td>
 										</tr>
 										<tr>
 											<th class="required">파일</th>
@@ -145,18 +145,9 @@
 			{field: "goods_opt", headerName: "옵션", width: 153},
 			{field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
 			{field: "price", headerName: "현재가", type: "currencyType", width: 65},
-			{field: "price_kind", headerName: "가격기준", width: 65, cellStyle: {"text-align": "center"}},
-			{field: "change_kind", headerName: "변경기준", width: 65, cellStyle: {"text-align": "center"}},
-			{field: "change_val_rate", headerName: "변경금액(율)", width: 80, type: "currencyType", cellStyle: {"text-align": "center"},
-				cellRenderer : function(params) {
-					if (params.data.change_kind == '%') {
-						return params.data.change_val_rate + '%';
-					} else {
-						return Comma(params.data.change_val_rate);
-					}
-				}
-			},
-			{field: "change_val", headerName: "가격", type: "currencyType", width: 80, cellStyle: {'background' : '#FFDFDF'}},
+			// {field: "price_kind", headerName: "가격기준", width: 65, cellStyle: {"text-align": "center"}},
+			// {field: "change_kind", headerName: "변경기준", width: 65, cellStyle: {"text-align": "center"}},
+			{field: "change_val", headerName: "변경금액", type: "currencyType", width: 80, cellStyle: {'background' : '#ffff00'}, editable:true},
 			{width : 'auto'}
 		];
 	</script>
@@ -170,7 +161,17 @@
 			pApp.ResizeGrid(430);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
-			gx = new HDGrid(gridDiv, columns);
+			gx = new HDGrid(gridDiv, columns, {
+				onCellValueChanged: (e) => {
+					e.node.setSelected(true);
+					if (e.column.colId == "change_val") {
+						if (isNaN(e.newValue) == true || e.newValue == "") {
+							alert("숫자만 입력가능합니다.");
+							gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+						}
+					}
+				}
+			});
 			$('#cur_date').hide();
 		});
 	</script>
@@ -192,7 +193,7 @@
 
 			if(rows.length < 1)	return alert('가격을 변경할 상품을 선택해주세요.');
 
-			if(!confirm("등록한 상품의 가격을 변경하시겠습니까?")) return;
+			if(!confirm("선택한 상품의 가격을 변경하시겠습니까?")) return;
 
 			axios({
 				url: '/store/product/prd05/batch-update',
@@ -270,9 +271,7 @@
 
 			let columns	= {
 				'A': 'prd_cd',
-				'B': 'price_kind',
-				'C': 'change_kind',
-				'D': 'change_val'
+				'B': 'change_val'
 			};
 			
 			let firstRowIndex = 6; // 엑셀 2행부터 시작 (샘플데이터 참고)

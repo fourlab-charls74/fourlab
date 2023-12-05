@@ -133,31 +133,31 @@
                 <div class="d-flex">
                     <div class="d-flex mr-1 mb-1 mb-lg-0">
                         @if ($cmd == 'update' && $res->apply_yn == 'N')
-                        <select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>
-                            <option value="">선택</option>
-                            <option value="tag_price" @if($res->price_kind == 'T') selected @endif>정상가</option>
-                            <option value="price" @if($res->price_kind == 'P') selected @endif>현재가</option>
-                        </select>
-                        <select id='change_kind' name='change_kind' class="form-control form-control-sm mr-1"  style='width:70px;display:inline;'>
-                                <option value=''>선택</option>
-                                <option value='P' @if($res->change_kind == 'P') selected @endif>%</option>
-                                <option value='W' @if($res->change_kind == 'W') selected @endif>금액</option>
-                        </select>
-                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;" value="{{@$res->change_val}}">
-                        <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
+{{--                        <select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>--}}
+{{--                            <option value="">선택</option>--}}
+{{--                            <option value="tag_price" @if($res->price_kind == 'T') selected @endif>정상가</option>--}}
+{{--                            <option value="price" @if($res->price_kind == 'P') selected @endif>현재가</option>--}}
+{{--                        </select>--}}
+{{--                        <select id='change_kind' name='change_kind' class="form-control form-control-sm mr-1"  style='width:70px;display:inline;'>--}}
+{{--                                <option value=''>선택</option>--}}
+{{--                                <option value='P' @if($res->change_kind == 'P') selected @endif>%</option>--}}
+{{--                                <option value='W' @if($res->change_kind == 'W') selected @endif>금액</option>--}}
+{{--                        </select>--}}
+                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:150px;" value="{{@$res->change_val}}">
+                        <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 일괄적용</button>
                         @elseif ($cmd == 'add')
-                        <select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>
-                            <option value="">선택</option>
-                            <option value="tag_price">정상가</option>
-                            <option value="price">현재가</option>
-                        </select>
-                        <select id='change_kind' name='change_kind' class="form-control form-control-sm mr-1"  style='width:70px;display:inline;'>
-                                <option value=''>선택</option>
-                                <option value='P'>%</option>
-                                <option value='W'>금액</option>
-                        </select>
-                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;">
-                        <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
+{{--                        <select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>--}}
+{{--                            <option value="">선택</option>--}}
+{{--                            <option value="tag_price">정상가</option>--}}
+{{--                            <option value="price">현재가</option>--}}
+{{--                        </select>--}}
+{{--                        <select id='change_kind' name='change_kind' class="form-control form-control-sm mr-1"  style='width:70px;display:inline;'>--}}
+{{--                                <option value=''>선택</option>--}}
+{{--                                <option value='P'>%</option>--}}
+{{--                                <option value='W'>금액</option>--}}
+{{--                        </select>--}}
+                        <input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:150px;">
+                        <button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 일괄적용</button>
                         <button type="button" onclick="change_return(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_return"> 정상가로 환원하기</button>
                         @endif
                     </div>
@@ -202,7 +202,7 @@
         {field: "goods_opt", headerName: "옵션", width: 153},
         {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 65},
         {field: "price", headerName: "현재가", type: "currencyType", width: 65},
-        {field: "change_val", headerName: "가격", type: "currencyType", width: 80, cellStyle: {'background' : '#FFDFDF'}},
+        {field: "change_val", headerName: "변경금액", type: "currencyType", width: 80, cellStyle: {'background' : '#ffff00'}, editable:true},
 		{width : 'auto'}
     ];
 </script>
@@ -216,9 +216,19 @@
         pApp.ResizeGrid(380);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
+        gx = new HDGrid(gridDiv, columns, {
+			onCellValueChanged: (e) => {
+				e.node.setSelected(true);
+				if (e.column.colId == "change_val") {
+					if (isNaN(e.newValue) == true || e.newValue == "") {
+						alert("숫자만 입력가능합니다.");
+						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+					}
+				}
+			}
+		});
         if('{{ @$cmd }}' === 'update') GetProducts();
-        $('#cur_date').hide();
+        $('#sel_date').hide();
     });
     
 
@@ -301,18 +311,18 @@
             return alert('가격을 변경할 상품을 선택해주세요.');
         }
 
-        if ($('#price_kind').val() === '') {
-            alert('정상가 또는 현재가 기준으로 변경할 것인지 선택해주세요.');
-            return false;
-        }
-
-        if ($('#change_kind').val() === '') {
-            alert('변경종류를 선택해주세요.');
-            return false;
-        }
+        // if ($('#price_kind').val() === '') {
+        //     alert('정상가 또는 현재가 기준으로 변경할 것인지 선택해주세요.');
+        //     return false;
+        // }
+		//
+        // if ($('#change_kind').val() === '') {
+        //     alert('변경종류를 선택해주세요.');
+        //     return false;
+        // }
 
         if ($('#change_price').val() === '') {
-            alert('변경금액(율)을 입력해주세요.');
+            alert('변경금액을 입력해주세요.');
             return false;
         }
 
@@ -321,111 +331,40 @@
 
     function change_apply(is_zero = false) {
 
-        let change_kind = $('#change_kind').val();
-        
 		let change_price = $('#change_price').val();
 		change_price = change_price.replace(/,/g, '');
 		change_price = parseInt(change_price) ?? '';
-        let price_kind = $('#price_kind').val();
         let rows = gx.getSelectedRows();
-        let row = gx.getRows();
 
-        if(row.length < 1) return alert('상품가격을 변경할 상품을 추가해주세요.');
+        if(rows.length < 1) return alert('상품가격을 변경할 상품을 추가해주세요.');
+		if(isNaN(change_price)) return alert('일괄적용할 금액을 숫자로 입력해주세요.');
 
         if (!validate()) return;
-       
-        if (change_kind == 'W') {
-            let change_rows = [];
-            if(price_kind == 'tag_price') {
-                change_rows = gx.getSelectedRows().map(row => ({
-                    ...row, 
-                    change_val : row.goods_sh + change_price 
-                }));
-            } else {
-                change_rows = gx.getSelectedRows().map(row => ({
-                    ...row, 
-                    change_val : row.price + change_price 
-                }));
-            }
-            
-            for (let i = 0; i < rows.length; i++) {
-                gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
-            }
-            gx.gridOptions.api.applyTransaction({ add : change_rows });
-            gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
 
-        } else if (change_kind == 'P') {
-            /**
-             * 할인율  = 판매가 - (판매가 * 할인율)
-             */
-            let change_rate = [];
-            if (change_price >= 100) {
-                let sale = change_price/100;
-            
-                if(price_kind == 'tag_price') {
-                    change_rate = gx.getSelectedRows().map(row => ({
-                        ...row, 
-                        change_val : 0 
-                    }));
-                } else {
-                    change_rate = gx.getSelectedRows().map(row => ({
-                        ...row, 
-                        change_val : 0
-                    }));
-                }
+		let change_rows = [];
+		change_rows = gx.getSelectedRows().map(row => ({
+			...row, 
+			change_val : change_price 
+		}));
 
-                for (let i = 0; i < rows.length; i++) {
-                    gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
-                }
-                gx.gridOptions.api.applyTransaction({ add : change_rate });
-                gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
-                
-            } else if (change_price < 100) {
-                let sale = change_price/100;
-
-                if(price_kind == 'tag_price') {
-                    change_rate = gx.getSelectedRows().map(row => ({
-                        ...row, 
-                        change_val : row.goods_sh - (row.goods_sh * sale)
-                    }));
-                } else {
-                    change_rate = gx.getSelectedRows().map(row => ({
-                        ...row, 
-                        change_val : row.price - (row.price * sale)
-                    }));
-                }
-
-                for (let i = 0; i < rows.length; i++) {
-                    gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
-                }
-                gx.gridOptions.api.applyTransaction({ add : change_rate });
-                gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
-            }
-                
-        }
+		for (let i = 0; i < rows.length; i++) {
+			gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+		}
+		gx.gridOptions.api.applyTransaction({ add : change_rows });
+		gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero)); 
        
     }
 
     function Save() {
 		let change_date_res	= $('#change_date_res').val();
 		let change_date_now	= document.getElementById('change_date_now').innerText;
-		let change_price	= parseInt($('#change_price').val());
-		let change_kind		= $('#change_kind').val();
 		let type			= $("input[name='product_price_type']:checked").val();
 		let rows			= gx.getSelectedRows();
 		let change_cnt		= rows.length;
-		let price_kind		= $('#price_kind').val();
 		let plan_category	= $('#plan_category').val();
-
-		console.log(plan_category);
-
-        if(rows.length < 1)		return alert('저장할 상품을 선택해주세요.');
-
-		if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
-		if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
-		if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
-
-        if(!confirm("선택한 상품의 가격을 저장하시겠습니까?")) return;
+		
+        if(rows.length < 1)		return alert('가격을 변경할 상품을 선택해주세요.');
+        if(!confirm("선택한 상품의 가격을 변경하시겠습니까?")) return;
 
         axios({
             url: '/store/product/prd05/change-price',
@@ -434,13 +373,9 @@
                 data: rows,
                 change_date_res : change_date_res,
                 change_date_now : change_date_now,
-                change_kind : change_kind,
-                change_price : change_price,
                 change_cnt : change_cnt,
                 type : type,
-                price_kind : price_kind,
 				plan_category : plan_category
-                
             },
         }).then(function (res) {
             if(res.data.code === 200) {
@@ -516,7 +451,7 @@
     // 정상가로 환원하기
     function change_return(is_zero = false) {
         let rows = gx.getSelectedRows();
-        change_return_price = gx.getSelectedRows().map(row => ({
+        let change_return_price = gx.getSelectedRows().map(row => ({
             ...row, 
             change_val : row.goods_sh 
         }));
@@ -526,10 +461,8 @@
         }
         gx.gridOptions.api.applyTransaction({ add : change_return_price });
         gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
-
-		$('#price_kind').val('tag_price').prop("selected", true);
-		$('#change_kind').val('P').prop("selected", true);
-		$('#change_price').val('0');
+		
+		$('#change_price').val('');
     }
 
 </script>

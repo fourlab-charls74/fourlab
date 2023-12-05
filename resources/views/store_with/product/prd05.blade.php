@@ -189,15 +189,15 @@
 					return Comma(params.data.org_price) + '원';
 				}
 			},
-            {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
-				cellRenderer:function(params) {
-					if (params.data.change_kind == 'P'){
-						return '(' + params.data.price_kind + ')' +  params.data.change_val + '%'
-					} else {
-						return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
-					}
-				}
-			},
+            // {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
+			// 	cellRenderer:function(params) {
+			// 		if (params.data.change_kind == 'P'){
+			// 			return '(' + params.data.price_kind + ')' +  params.data.change_val + '%'
+			// 		} else {
+			// 			return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
+			// 		}
+			// 	}
+			// },
 			{field: "change_price", headerName: "변경후가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
 				cellRenderer:function(params) {
 					return Comma(params.data.change_price) + '원';
