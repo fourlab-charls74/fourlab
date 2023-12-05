@@ -20,7 +20,7 @@
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
 						<a href="#" onclick="Add('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 등록</a>
 						<a href="#" onclick="Add('batch_add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 일괄등록</a>
-                        <!-- <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a> -->
+						<!-- <a href="#" onclick="Instant('add');" class="btn btn-sm btn-outline-primary shadow-sm pl-2"><i class="bx bx-plus fs-16"></i> 가격변경 즉시 추가</a> -->
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -48,7 +48,7 @@
 												<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
 												<div class="input-group-append">
 													<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-													<i class="fa fa-calendar" aria-hidden="true"></i>
+														<i class="fa fa-calendar" aria-hidden="true"></i>
 													</button>
 												</div>
 											</div>
@@ -133,26 +133,26 @@
 			</div>
 		</div>
 	</form>
-	
-<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
-    <div class="card-body shadow">
-        <div class="card-title mb-3">
-            <div class="filter_wrap">
-                <div class="fl_box">
-                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
-                </div>
-                <div class="fr_box">
-					<button type="button" onclick="del_product_price();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
-                </div>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
-        </div>
-    </div>
-</div>
-<script>
-    let columns = [
+
+	<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
+		<div class="card-body shadow">
+			<div class="card-title mb-3">
+				<div class="filter_wrap">
+					<div class="fl_box">
+						<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
+					</div>
+					<div class="fr_box">
+						<button type="button" onclick="del_product_price();" class="btn btn-sm btn-outline-primary shadow-sm" id="add_row_btn"><i class="bx bx-trash"></i> 삭제</button>
+					</div>
+				</div>
+			</div>
+			<div class="table-responsive">
+				<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+			</div>
+		</div>
+	</div>
+	<script>
+		let columns = [
 			{field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code',  headerCheckboxSelection: true, sort: null, width: 29,
 				checkboxSelection: params => {
 					if(params.data.apply_yn == 'Y') {
@@ -162,51 +162,51 @@
 					}
 				}
 			},
-            {field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code', hide:true,
+			{field: "idx", headerName: "가격변경 코드", width: 100, cellClass: 'hd-grid-code', hide:true,
 				cellRenderer: function(params) {
 					if (params.value !== undefined && params.data.idx != "") {
 						return '<a href="#" onclick="cmd(\''+ params.value +'\');" >'+ params.value+'</a>';
 					}
 				}
 			},
-            {field: "change_date", headerName: "변경일자", width: 100, cellClass: 'hd-grid-code'},
-            {field: "prd_cd", headerName: "바코드", width: 120, cellClass: 'hd-grid-code'},
-            {field: "style_no", headerName: "스타일넘버", width: 80, cellClass: 'hd-grid-code'},
-            {field: "goods_no", headerName: "온라인코드", width: 80, cellClass: 'hd-grid-code'},
-            {field: "brand", headerName: "브랜드", width: 80, cellClass: 'hd-grid-code'},
-            {field: "opt_kind_nm", headerName: "품목", width: 70, cellClass: 'hd-grid-code'},
-            {field: "goods_nm", headerName: "상품명", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType", cellStyle: {"text-align": "left"}},
-            {field: "goods_nm_eng", headerName: "상품명(영문)", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType", cellStyle: {"text-align": "left"}},
-            {field: "color", headerName: "컬러", width: 100, cellClass: 'hd-grid-code'},
-            {field: "size", headerName: "사이즈", width: 60, cellClass: 'hd-grid-code'},
-            {field: "goods_sh", headerName: "정상가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+			{field: "change_date", headerName: "변경일자", width: 100, cellClass: 'hd-grid-code'},
+			{field: "prd_cd", headerName: "바코드", width: 120, cellClass: 'hd-grid-code'},
+			{field: "style_no", headerName: "스타일넘버", width: 80, cellClass: 'hd-grid-code'},
+			{field: "goods_no", headerName: "온라인코드", width: 80, cellClass: 'hd-grid-code'},
+			{field: "brand", headerName: "브랜드", width: 80, cellClass: 'hd-grid-code'},
+			{field: "opt_kind_nm", headerName: "품목", width: 70, cellClass: 'hd-grid-code'},
+			{field: "goods_nm", headerName: "상품명", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType", cellStyle: {"text-align": "left"}},
+			{field: "goods_nm_eng", headerName: "상품명(영문)", width: 180, cellClass: 'hd-grid-code', type:"HeadGoodsNameType", cellStyle: {"text-align": "left"}},
+			{field: "color", headerName: "컬러", width: 100, cellClass: 'hd-grid-code'},
+			{field: "size", headerName: "사이즈", width: 60, cellClass: 'hd-grid-code'},
+			{field: "goods_sh", headerName: "정상가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
 				cellRenderer:function(params) {
 					return Comma(params.data.goods_sh) + '원';
 				}
 			},
-            {field: "org_price", headerName: "변경전가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
+			{field: "org_price", headerName: "변경전가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
 				cellRenderer:function(params) {
 					return Comma(params.data.org_price) + '원';
 				}
 			},
-            // {field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
-			// 	cellRenderer:function(params) {
-			// 		if (params.data.change_kind == 'P'){
-			// 			return '(' + params.data.price_kind + ')' +  params.data.change_val + '%'
-			// 		} else {
-			// 			return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
-			// 		}
-			// 	}
-			// },
+			{field: "change_val", headerName: "변경금액(율)", type: "currencyType", width: 100, cellClass: 'hd-grid-code',
+				cellRenderer:function(params) {
+					if (params.data.change_kind == 'P'){
+						return '(' + params.data.price_kind + ')' +  params.data.change_val + '%'
+					} else {
+						return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
+					}
+				}
+			},
 			{field: "change_price", headerName: "변경후가", width: 90, cellClass: 'hd-grid-code', type: "currencyType",
 				cellRenderer:function(params) {
 					return Comma(params.data.change_price) + '원';
 				}
 			},
 			{field: "plan_category", headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},
-            {field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
-            {field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
-            {field: "change_type", headerName: "적용구분", width: 80, cellClass: 'hd-grid-code',
+			{field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
+			{field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
+			{field: "change_type", headerName: "적용구분", width: 80, cellClass: 'hd-grid-code',
 				cellStyle: params => {
 					if (params.data.change_type == 'A') {
 						return { "background-color": "#FFDFDF" }
@@ -222,14 +222,14 @@
 					}
 				}
 			},
-            {field: "apply_yn", headerName: "적용여부", width: 80, cellClass: 'hd-grid-code',
+			{field: "apply_yn", headerName: "적용여부", width: 80, cellClass: 'hd-grid-code',
 				cellStyle: params => {
-                        if(params.data.apply_yn == 'Y'){
-							return {'color' : 'blue'}
-						} else {
-							return {'color' : 'red'}
-						}
-                    },
+					if(params.data.apply_yn == 'Y'){
+						return {'color' : 'blue'}
+					} else {
+						return {'color' : 'red'}
+					}
+				},
 				cellRenderer: params => {
 					if(params.data.apply_yn == 'Y') {
 						return '적용';
@@ -238,100 +238,100 @@
 					}
 				}
 			},
-            {field: "rt", headerName: "등록일자", width: 120, cellClass: 'hd-grid-code'},
-            {field: "ut", headerName: "수정일자", width: 120, cellClass: 'hd-grid-code'},
-            {width : 'auto'}
-            
-        ];
-</script>
+			{field: "rt", headerName: "등록일자", width: 120, cellClass: 'hd-grid-code'},
+			{field: "ut", headerName: "수정일자", width: 120, cellClass: 'hd-grid-code'},
+			{width : 'auto'}
 
-<script type="text/javascript" charset="utf-8">
-    const pApp = new App('', {
-        gridId: "#div-gd",
-    });
-    let gx;
+		];
+	</script>
 
-    $(document).ready(function() {
-        pApp.ResizeGrid(275);
-        pApp.BindSearchEnter();
-        let gridDiv = document.querySelector(pApp.options.gridId);
-        gx = new HDGrid(gridDiv, columns);
-        Search();
-    });
-
-    function Search() {
-        let data = $('form[name="search"]').serialize();
-        gx.Request('/store/product/prd05/search', data,1);
-    }
-
-    function Add(cmd) {
-		if (cmd == 'add') {
-			const url = '/store/product/prd05/show/';
-			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-		}else if (cmd == 'batch_add') {
-			const url = '/store/product/prd05/batch-import/';
-			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-		}
-    };
-
-	function cmd(code) {
-		const url = '/store/product/prd05/show/' + code;
-		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-    };
-
-	// function cmd2 (code) {
-	// 	const url = '/store/product/prd05/view/' + code;
-	// 	window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-    // };
-
-	function del_product_price() {
-		let rows = gx.getSelectedRows();
-
-		if(rows.length < 1) return alert('삭제할 상품가격변경 정보를 선택해주세요.');
-
-		if(!confirm("선택한 상품가격변경 정보를 삭제하시겠습니까?")) return;
-
-		axios({
-			url: '/store/product/prd05/del-product-price',
-			method: 'put',
-			data: {
-				data: rows
-			},
-		}).then(function (res) {
-			if(res.data.code === 200) {
-				alert(res.data.msg);
-				Search();
-			} else {
-				console.log(res.data);
-				alert("상품가격변경 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
-			}
-		}).catch(function (err) {
-			console.log(err);
+	<script type="text/javascript" charset="utf-8">
+		const pApp = new App('', {
+			gridId: "#div-gd",
 		});
-	}
+		let gx;
 
-	// 가격변경 즉시 
-	function Instant(cmd) {
-		if (cmd == 'add') {
-			const url = '/store/product/prd05/view/';
+		$(document).ready(function() {
+			pApp.ResizeGrid(275);
+			pApp.BindSearchEnter();
+			let gridDiv = document.querySelector(pApp.options.gridId);
+			gx = new HDGrid(gridDiv, columns);
+			Search();
+		});
+
+		function Search() {
+			let data = $('form[name="search"]').serialize();
+			gx.Request('/store/product/prd05/search', data,1);
+		}
+
+		function Add(cmd) {
+			if (cmd == 'add') {
+				const url = '/store/product/prd05/show/';
+				window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+			}else if (cmd == 'batch_add') {
+				const url = '/store/product/prd05/batch-import/';
+				window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+			}
+		};
+
+		function cmd(code) {
+			const url = '/store/product/prd05/show/' + code;
 			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
-		}
-	}
+		};
 
-	//변경일자 사용 on/off
-	function ManualNotUseData()
-	{
-		if( $("[name=s_nud]").is(":checked") == true )
-		{
-			$("[name=sdate]").prop("disabled", false);
-			$("[name=edate]").prop("disabled", false);
+		// function cmd2 (code) {
+		// 	const url = '/store/product/prd05/view/' + code;
+		// 	window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+		// };
+
+		function del_product_price() {
+			let rows = gx.getSelectedRows();
+
+			if(rows.length < 1) return alert('삭제할 상품가격변경 정보를 선택해주세요.');
+
+			if(!confirm("선택한 상품가격변경 정보를 삭제하시겠습니까?")) return;
+
+			axios({
+				url: '/store/product/prd05/del-product-price',
+				method: 'put',
+				data: {
+					data: rows
+				},
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					alert(res.data.msg);
+					Search();
+				} else {
+					console.log(res.data);
+					alert("상품가격변경 삭제 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
 		}
-		else
-		{
-			$("[name=sdate]").prop("disabled", true);
-			$("[name=edate]").prop("disabled", true);
+
+		// 가격변경 즉시 
+		function Instant(cmd) {
+			if (cmd == 'add') {
+				const url = '/store/product/prd05/view/';
+				window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1000,height=880");
+			}
 		}
-	}
-</script>
-	
+
+		//변경일자 사용 on/off
+		function ManualNotUseData()
+		{
+			if( $("[name=s_nud]").is(":checked") == true )
+			{
+				$("[name=sdate]").prop("disabled", false);
+				$("[name=edate]").prop("disabled", false);
+			}
+			else
+			{
+				$("[name=sdate]").prop("disabled", true);
+				$("[name=edate]").prop("disabled", true);
+			}
+		}
+	</script>
+
 @stop
