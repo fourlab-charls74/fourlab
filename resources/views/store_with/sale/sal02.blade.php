@@ -221,7 +221,7 @@
 		codes: [],
 		format: ["일", "월", "화", "수", "목", "금", "토"],
 	};
-	const pinnedRowData = [{ store_cd: '합계', progress_proj_amt : 0, offline : 0, online: 0}];
+	const pinnedRowData = [{ store_cd: '합계', progress_proj_amt : 0, offline : 0, online: 0, offline_online_rate: 0}];
 	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0)??0;
 	var columns = [
 		{headerName: '판매채널', showRowGroup: 'store_channel', cellRenderer: 'agGroupCellRenderer', minWidth: 130, pinned: 'left'},
@@ -270,8 +270,57 @@
 				{ headerName: "판매수량", field: "qty", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc },
 				{ headerName: "오프라인", field: "offline", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc },
 				{ headerName: "온라인", field: "online", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc},
+				{ headerName: "실결제금액", field: "recv_amt", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc },
+				{ headerName: "오프 : 온(%)", field: "offline_online_rate", type: 'currencyType', cellStyle: { 'text-align': "center" },
+					cellRenderer : (params) => {
+						if (params.node.rowPinned === 'top') {
+							let offline_online_rate = params.data.offline_online_rate;
+							if (offline_online_rate == null || offline_online_rate == undefined || offline_online_rate == '') {
+								return ' : ';
+							} else {
+								return params.data.offline_online_rate;
+							}
+						} else if (params.data != undefined && params.node.level == 2) {
+							let offline = params.data.offline ?? 0;
+							let online = params.data.online ?? 0;
+							let recv_amt = params.data.recv_amt ?? 0;
+							let offline_online_rate = 0;
+							offline = toInt(offline);
+							online = toInt(online);
+							if (isNaN((offline / recv_amt) * 100) || isNaN(recv_amt) || isNaN((online / recv_amt) * 100)) {
+								return ' : ';
+							} else {
+								return Math.round((offline / recv_amt) * 100) + ' : ' + Math.round((online / recv_amt) * 100);
+							}
+						} else if (params.node.level == 1 && params.node.aggData != undefined) {
+							let offline = params.node.aggData.offline ?? 0;
+							let online = params.node.aggData.online ?? 0;
+							let recv_amt = params.node.aggData.recv_amt ?? 0;
+							let offline_online_rate = 0;
+							offline = toInt(offline);
+							online = toInt(online);
+							if (isNaN((offline / recv_amt) * 100) || isNaN(recv_amt) || isNaN((online / recv_amt) * 100)) {
+								return ' : ';
+							} else {
+								return Math.round((offline / recv_amt) * 100) + ' : ' + Math.round((online / recv_amt) * 100);
+							}
+						} else if (params.node.level == 0 && params.node.aggData != undefined) {
+							let offline = params.node.aggData.offline ?? 0;
+							let online = params.node.aggData.online ?? 0;
+							let recv_amt = params.node.aggData.recv_amt ?? 0;
+							let offline_online_rate = 0;
+							offline = toInt(offline);
+							online = toInt(online);
+							if (isNaN((offline / recv_amt) * 100) || isNaN(recv_amt) || isNaN((online / recv_amt) * 100)) {
+								return ' : ';
+							} else {
+								return Math.round((offline / recv_amt) * 100) + ' : ' + Math.round((online / recv_amt) * 100);
+							}
+						}
+					}
+				
+				}
 				// { headerName: "주문금액", field: "ord_amt", type: 'currencyType', aggregation: true, type: 'currencyMinusColorType' },
-				{ headerName: "실결제금액", field: "recv_amt", type: 'currencyType', type: 'currencyMinusColorType', aggFunc: sumValuesFunc }
 			]
 		}
 	];
@@ -382,6 +431,8 @@
 			setAllRowGroupExpanded($("#grid_expand").is(":checked"));
 			let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
             let total_data = d.head.total_data;
+
+			console.log(total_data);
 			if(pinnedRow && total_data != '') {
 				gx.gridOptions.api.setPinnedTopRowData([
 					{ ...pinnedRow.data, ...total_data }
