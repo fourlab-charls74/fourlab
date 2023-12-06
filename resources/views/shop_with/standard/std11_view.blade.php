@@ -316,6 +316,7 @@
     function Save() {
         if (validate() === false) return;
         let prd_cd = $('#prd_cd').val();
+		prd_cd = prd_cd.replace(/[\s,]+/g, '');
         const prd = prd_cd.split(/\s|,/).map(prd_cd => removeCommasAndSpaces(prd_cd));
 
         if (prd.length > 1) {

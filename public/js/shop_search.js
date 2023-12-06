@@ -872,7 +872,11 @@ SearchPrdcd.prototype.Choice = function() {
 				$('#size').append(option);
 
 				if (sizes.length > 0) {
-					$('#size').val(rows.map(r => r.size));
+					let size = rows.map(r => r.size);
+					size = size.map(function(size) {
+						return size.replace(/\s/g, "");
+					});
+					$('#size').val(size);
 				}
 			})
 			.catch(error => {
