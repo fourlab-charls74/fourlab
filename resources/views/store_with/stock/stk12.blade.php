@@ -320,12 +320,11 @@
 		let gx;
 		const pApp = new App('', { gridId: "#div-gd" });
 
-		$(document).ready(async function() {
+		$(document).ready(function() {
 			pApp.ResizeGrid(275);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
-			const my_columns = await getMyColumns(() => gx, gridDiv, columns);
-			gx = new HDGrid(gridDiv, my_columns, {
+			gx = new HDGrid(gridDiv, columns, {
 				pinnedTopRowData: pinnedRowData,
 				getRowStyle: (params) => {
 					if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};

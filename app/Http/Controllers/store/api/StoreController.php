@@ -31,6 +31,10 @@ class StoreController extends Controller {
         $store_channel = $request->input('store_channel','');
         $store_channel_kind = $request->input('store_channel_kind','');
         $where = "";
+		
+		if($store_nm != '') {
+			$where .= " and store_nm like '%" . Lib::quote($store_nm) . "%'";
+		}
 
         if($store_channel != '') {
             $where .= " and store_channel = '$store_channel'";
@@ -43,8 +47,8 @@ class StoreController extends Controller {
         $sql = "
             select store_cd, store_nm 
             from store 
-            where store_nm like '%" . Lib::quote($store_nm) . "%'
-                and store_cd like '%" . Lib::quote($store_cd) . "%'
+            where 1=1
+            	and use_yn = 'Y'
                 $where
         ";
         $rows = DB::select($sql);
