@@ -138,8 +138,8 @@ class sal02Controller extends Controller
 						sum(o.price*o.qty) as ord_amt,
 						sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
 						w.ord_state,
-						sum(case when o.sale_kind = 81 then o.qty else 0 end) as online,
-						sum(case when o.sale_kind <> 81 then o.qty else 0 end) as offline,
+						sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end) as online,
+    				  	sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end) as offline,
 						${sum}
 					from order_opt_wonga w 
 						inner join order_opt o on w.ord_opt_no = o.ord_opt_no 
