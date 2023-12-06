@@ -80,16 +80,6 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>창고명</label>
-                            <div class="form-inline inline_btn_box">
-                                <input type='hidden' id="storage_nm" name="storage_nm">
-                                <select id="storage_no" name="storage_no[]" class="form-control form-control-sm select2-storage multi_select" multiple></select>
-                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-storage"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
                             <label for="">자료수/정렬</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner input_box" style="width:24%;">
@@ -105,9 +95,7 @@
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
 										<option value="pc.rt">등록일</option>
-										<option value="pc.prd_cd">바코드</option>
-										<option value="pc.goods_no">온라인코드</option>
-										<option value="g.goods_nm">상품명</option>
+										<option value="ps.prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -139,7 +127,7 @@
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
                     <div class="d-flex">
                         <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
-                            <input type="checkbox" class="custom-control-input" name="ext_current_qty" id="ext_current_qty" value="Y" checked>
+                            <input type="checkbox" class="custom-control-input" name="ext_current_qty" id="ext_current_qty" value="Y">
                             <label class="custom-control-label font-weight-normal" for="ext_current_qty">현재재고 0 제외</label>
                         </div>
                         <div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
@@ -284,7 +272,7 @@
 			animateRows: true,
         });
 
-        Search();
+        //Search();
 
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
