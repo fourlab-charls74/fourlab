@@ -379,8 +379,8 @@
     function Save() {
         if (validate() === false) return;
         let prd_cd = $('#prd_cd').val();
+		prd_cd = prd_cd.replace(/[\s,]+/g, '');
         const prd = prd_cd.split(/\s|,/).map(prd_cd => removeCommasAndSpaces(prd_cd));
-
         if (prd.length > 1) {
             alert("상품은 1개씩만 가능합니다. 새로 접수해주세요.");
             return false;
