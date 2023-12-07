@@ -372,6 +372,7 @@ class std02Controller extends Controller
 				'point_in_yn'			=> $request->input('point_in_yn', 'N'),
 				'point_ratio'			=> $request->input('point_ratio'),
 				'point_out_yn'			=> $request->input('point_out_yn'),
+				'online_only_yn'		=> $request->input('online_only_yn'),
 				'com_id'				=> $com_id,
 				'reg_date'				=> now(),
 				'mod_date'				=> now(),

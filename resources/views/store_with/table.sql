@@ -360,6 +360,7 @@ CREATE TABLE `store` (
 	`sale_place_match_yn` char(1) DEFAULT 'N' COMMENT '업체매칭여부',
 	`account_yn` char(1) DEFAULT 'N' COMMENT '정산관리여부',
 	`com_id` varchar(20) DEFAULT '' COMMENT '업체ID',
+	`online_only_yn` char(1) DEFAULT 'N' COMMENT '온라인전용여부',
 	`reg_date` datetime DEFAULT NULL COMMENT '등록일',
 	`mod_date` datetime DEFAULT NULL COMMENT '수정일',
 	`admin_id` varchar(30) DEFAULT NULL COMMENT '관리자 아이디',

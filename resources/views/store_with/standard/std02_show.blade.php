@@ -112,8 +112,19 @@
 													</div>
 												</div>
 											</td>
-											<th></th>
-											<td></td>
+											<th class="required">온라인전용여부</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="online_only_yn_Y" name="online_only_yn" value="Y" @if(@$store->online_only_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="online_only_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="online_only_yn_N" name="online_only_yn" value="N" @if(@$store->online_only_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="online_only_yn_N">N</label>
+													</div>
+												</div>
+											</td>
 											<th class="required" hidden>매장명(약칭)</th>
 											<td hidden>
 												<div class="form-inline">

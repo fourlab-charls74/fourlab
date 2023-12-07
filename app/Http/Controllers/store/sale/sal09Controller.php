@@ -231,12 +231,13 @@ class sal09Controller extends Controller
 					select 
 						o.store_cd, sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty,
 						sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
-						sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end) as online,
-    				  	sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end) as offline,
+						if (s.online_only_yn = 'Y', sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)) as online,
+						if (s.online_only_yn = 'Y', sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end))  as offline,
 						${sum_month_prev}
 						${sum_month_others}
 					from order_opt_wonga w
 						inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					    inner join store s on s.store_cd = o.store_cd
 					    inner join order_mst m on m.ord_no = o.ord_no
 						inner join goods g on o.goods_no = g.goods_no and g.goods_sub = o.goods_sub
 						left outer join product_code pc on pc.prd_cd = o.prd_cd
