@@ -426,6 +426,7 @@ class prd10Controller extends Controller
                     , cg.goods_sub
                     , g.style_no
                     , g.goods_nm
+                    , g.head_desc
                     , gs.code_val as sale_stat_cl
                     , g.price
                     , cg.disp_yn

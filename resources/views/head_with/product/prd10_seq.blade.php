@@ -256,6 +256,7 @@
         { field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: CENTER },
         { field: "style_no", headerName: "스타일넘버", width: 90, cellStyle: CENTER },
         { field: "goods_nm", headerName: "상품명", width: 235, cellStyle: LINE_HEIGHT },
+		{ field: "head_desc", headerName: "상단홍보글", width: 90, cellStyle: LINE_HEIGHT },
         { field: "sale_stat_cl", headerName: "상품상태", width: 70,
             cellStyle: function(params) {
                 if (params.value !== undefined && SALE_STATE[params.value]) {
@@ -263,7 +264,7 @@
                 }
             }
         },
-        { field: "price", headerName: "판매가", width: 70, type: 'currencyType', cellStyle: LINE_HEIGHT },
+		{ field: "price", headerName: "판매가", width: 70, type: 'currencyType', cellStyle: LINE_HEIGHT },
         { field: "disp_yn", headerName: '전시상태', width: 60,
             cellRenderer: (params) => params.value === 'Y' ? '활성' : '비활성',
             cellStyle: (params) => ({ ...CENTER, 'color':params.value === 'Y' ? '#4444ff' : '#666666' }),
