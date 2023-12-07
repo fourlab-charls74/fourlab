@@ -379,6 +379,14 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">판매처 주문번호</label>
+							<div class="flax_box">
+								<input type="text" name="out_ord_opt_no" id="out_ord_opt_no" class="form-control form-control-sm search-enter">
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -491,6 +499,7 @@
 		{field: "pay_date", headerName: "입금일시", type: "DateTimeType"},
 		{field: "dlv_end_date", headerName: "배송일시", type: "DateTimeType"},
 		{field: "last_up_date", headerName: "클레임일시", type: "DateTimeType"},
+		{field: "out_ord_no", headerName: "판매처주문번호", width: 100},
 	];
 
 	let gx;

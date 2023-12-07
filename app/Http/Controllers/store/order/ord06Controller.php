@@ -138,6 +138,7 @@ class ord06Controller extends Controller
 		$sell_type      = $request->input('sell_type');
 		$store_channel		= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
+		$out_ord_opt_no 		= $request->input("out_ord_opt_no", '');
 
 		if ($page < 1 or $page == '') $page = 1;
 
@@ -300,6 +301,11 @@ class ord06Controller extends Controller
 			}
 			$where	.= ")";
 		}
+		
+		//판매처 주문번호 검색
+		if ($out_ord_opt_no != "") {
+			$where .= " and o.out_ord_opt_no = '$out_ord_opt_no' ";
+		}
 
 		// 판매채널/매장구분 검색
 		if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
@@ -372,7 +378,8 @@ class ord06Controller extends Controller
                 if(a.opt_ord_state <= 10 and a.clm_state = 0 and ord_opt_cnt = 0, 'Y', 'N') as ord_del_yn,
                 '2' as depth,
                 sc.store_channel as store_channel,
-                sc2.store_kind as store_channel_kind
+                sc2.store_kind as store_channel_kind,
+                a.out_ord_opt_no
             from (
                 select
                     om.ord_no,
@@ -429,7 +436,8 @@ class ord06Controller extends Controller
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
                     ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
-                    round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
+                    round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate,
+                    o.out_ord_opt_no
                 from order_opt_wonga w
                     inner join order_opt o on o.ord_opt_no = w.ord_opt_no
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
@@ -442,6 +450,7 @@ class ord06Controller extends Controller
                     -- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
                     left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
 					left outer join store store on store.store_cd = o.store_cd
+                    left outer join shop_sabangnet_order sso on sso.ord_opt_no = o.ord_opt_no
                 where 
                     w.ord_state in (30,60,61)  and o.ord_state = '30'
 					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
