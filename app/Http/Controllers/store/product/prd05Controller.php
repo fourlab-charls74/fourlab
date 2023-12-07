@@ -234,12 +234,7 @@ class prd05Controller extends Controller
 				, g.goods_nm
 				, g.goods_nm_eng
 				, c.code_val as color
-				, ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+				, pc.size as size
 				, g.price
 				, g.goods_sh
 			from product_price_list ppl
@@ -311,12 +306,7 @@ class prd05Controller extends Controller
 				, g.goods_nm_eng as goods_nm_eng
 				, pc.prd_cd_p as prd_cd_p
 				, pc.color as color
-				, ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+				, pc.size as size
 				, pc.goods_opt as goods_opt
 				, p.tag_price as goods_sh
 				, p.price as price
@@ -384,6 +374,7 @@ class prd05Controller extends Controller
 		$admin_id			= Auth('head')->user()->id;
 		$price_kind			= $request->input('price_kind');
 		$plan_category		= $request->input('plan_category', '00');
+		$change_price_type	= $request->input('change_price_type');
 
 		$change_date	= '';
 		$change_type	= '';
@@ -399,11 +390,13 @@ class prd05Controller extends Controller
 			$change_type = 'A';
 			$apply_yn = 'Y';
 		}
-
-		if ($price_kind == 'tag_price') {
-			$price_kind = 'T';
-		} else {
-			$price_kind = 'P';
+		
+		if ($change_price_type == 'B') {
+			if ($price_kind == 'tag_price') {
+				$price_kind = 'T';
+			} else {
+				$price_kind = 'P';
+			}
 		}
 
 		try {
@@ -422,15 +415,15 @@ class prd05Controller extends Controller
 				DB::table('product_price_list')
 					->insert([
 						'change_date'		=> $change_date,
-						'change_kind'		=> $change_kind,
-						'change_val'		=> $change_price,
-						'price_kind'		=> $price_kind,
+						'change_kind'		=> $change_kind??'',
+						'change_val'		=> $d['change_val']??'',
+						'price_kind'		=> $price_kind??'',
 						'apply_yn'			=> $apply_yn,
 						'change_type'		=> $change_type,
 						'plan_category'		=> $plan_category,
 						'product_price_cd'	=> $product_price_cd,
 						'prd_cd'			=> $d['prd_cd'],
-						'org_price'			=> $d['price'],
+						'org_price'			=> ($price_kind == "T") ? $d['goods_sh'] : $d['price'],
 						'change_price'		=> $d['change_val'],
 						'admin_id'			=> $admin_id,
 						'rt' => now(),
@@ -733,18 +726,36 @@ class prd05Controller extends Controller
 				]);
 
 			foreach ($data as $d) {
+				$change_kind = $d['change_kind'];
+				$price_kind = $d['price_kind'];
+				if($change_kind == "금액") {
+					$change_kind = "W";
+				} else if($change_kind == "%") {
+					$change_kind = "P";
+				} else if ($change_kind == "" || $change_kind == null) {
+					$change_kind = "";
+				}
+				
+				if($price_kind == "정상가") {
+					$price_kind = "T";
+				} else if($price_kind == "현재가") {
+					$price_kind = "P";
+				} else if ($price_kind == "" || $price_kind == null) {
+					$price_kind = "";
+				}
+				
 				DB::table('product_price_list')
 					->insert([
 						'change_date'		=> $change_date,
-						'change_kind'		=> $d['change_kind'] == '금액'? 'W' : 'P',
+						'change_kind'		=> $change_kind,
 						'change_val'		=> $d['change_val_rate'],
-						'price_kind'		=> $d['price_kind'] == '정상가'? 'T': 'P',
+						'price_kind'		=> $price_kind,
 						'apply_yn'			=> $apply_yn,
 						'change_type'		=> $change_type,
 						'plan_category'		=> $plan_category,
 						'product_price_cd'	=> $product_price_cd,
 						'prd_cd'			=> $d['prd_cd'],
-						'org_price'			=> $d['price'],
+						'org_price'			=> ($d['price_kind'] == "정상가") ? $d['goods_sh'] : $d['price'],
 						'change_price'		=> $d['change_val'],
 						'admin_id'			=> $admin_id,
 						'rt' => now(),
@@ -757,22 +768,30 @@ class prd05Controller extends Controller
 						->where('goods_no', '=', $d['goods_no'])
 						->update(['price' => $d['change_val']]);
 
-					//product 테이블 price 가격변경
-					DB::table('product')
-						->where('prd_cd', '=', $d['prd_cd'])
-						->update(['price'=> $d['change_val']]);
+					$sql = " select prd_cd, prd_cd_p from product_code where prd_cd = :prd_cd ";
+					$product_result = DB::select($sql,['prd_cd' => $d['prd_cd']]);
 
-					if($plan_category != '00'){
-						DB::table('product_code')
-							->where('prd_cd', '=', $d['prd_cd'])
-							->update(['plan_category' => $plan_category]);
+					foreach ($product_result as $pr) {
+						//product 테이블 price 가격변경
+						DB::table('product')
+							->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+							->update([
+								'price'		=> $d['change_val'],
+								'admin_id'	=> $admin_id,
+								'ut'		=> now()
+							]);
+
+						if($plan_category != '00'){
+							DB::table('product_code')
+								->where('prd_cd', 'like', $pr->prd_cd_p . '%')
+								->update(['plan_category' => $plan_category]);
+						}
 					}
 				}
 			}
-
 			DB::commit();
 			$code = 200;
-			$msg = "변경한 상품 가격이 저장되었습니다.";
+			$msg = "선택한 상품 가격이 저장되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = 500;
@@ -790,8 +809,8 @@ class prd05Controller extends Controller
 
 		foreach ($data as $key => $d) {
 			$prd_cd 			= $d['prd_cd'];
-			$price_kind 		= $d['price_kind'];
-			$change_kind 		= $d['change_kind'];
+			$price_kind 		= $d['price_kind']??'';
+			$change_kind 		= $d['change_kind']??'';
 			$change_val_rate 	= preg_replace('/,/','', $d['change_val']);
 
 			$sql = "select tag_price, price from product where prd_cd = :prd_cd";
@@ -827,6 +846,8 @@ class prd05Controller extends Controller
 						$change_val = (int)$price - ((int)$price * $sale);
 					}
 				}
+			} else if ($change_kind == "" && $price_kind == "") {
+				$change_val = (int)$change_val_rate;
 			}
 
 			$sql = "
@@ -840,12 +861,7 @@ class prd05Controller extends Controller
                     , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
                     , pc.prd_cd_p as prd_cd_p
                     , pc.color
-                    , ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size
+                    , pc.size as size
                     , pc.goods_opt
                     , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
                     , if(g.goods_no <> '0', g.price, p.price) as price

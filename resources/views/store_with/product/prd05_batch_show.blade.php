@@ -192,7 +192,7 @@
 
 				if(rows.length < 1)	return alert('가격을 변경할 상품을 선택해주세요.');
 
-				if(!confirm("등록한 상품의 가격을 변경하시겠습니까?")) return;
+				if(!confirm("선택한 상품의 가격을 변경하시겠습니까?")) return;
 
 				axios({
 					url: '/store/product/prd05/batch-update',

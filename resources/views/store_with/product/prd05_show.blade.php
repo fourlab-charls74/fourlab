@@ -133,6 +133,10 @@
 					<div class="d-flex">
 						<div class="d-flex mr-1 mb-1 mb-lg-0">
 							@if ($cmd == 'update' && $res->apply_yn == 'N')
+								<select id='change_price_type' name='change_price_type' class="form-control form-control-sm mr-1" style='width:60px;display:inline;' onchange="changePriceType();">
+									<option value="O" selected>임의</option>
+									<option value="B">일괄</option>
+								</select>
 								<select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>
 									<option value="">선택</option>
 									<option value="tag_price" @if($res->price_kind == 'T') selected @endif>정상가</option>
@@ -146,6 +150,10 @@
 								<input type='text' id="change_price" name='change_price' class="form-control form-control-sm" style="width:90px;" value="{{@$res->change_val}}">
 								<button type="button" onclick="change_apply(false);" class="btn btn-sm btn-primary shadow-sm ml-1" id="change_btn"> 적용</button>
 							@elseif ($cmd == 'add')
+								<select id='change_price_type' name='change_price_type' class="form-control form-control-sm mr-1"  style='width:60px;display:inline;'>
+									<option value="O" selected>임의</option>
+									<option value="B">일괄</option>
+								</select>
 								<select id='price_kind' name='price_kind' class="form-control form-control-sm mr-1"  style='width:80px;display:inline;'>
 									<option value="">선택</option>
 									<option value="tag_price">정상가</option>
@@ -218,7 +226,10 @@
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			gx = new HDGrid(gridDiv, columns);
 			if('{{ @$cmd }}' === 'update') GetProducts();
-			$('#cur_date').hide();
+			$('#sel_date').hide();
+			$('#price_kind').prop("disabled", true);
+			$('#change_kind').prop("disabled", true);
+			$('#change_price_type').on('change', changePriceType);
 		});
 
 
@@ -300,130 +311,152 @@
 			if(rows.length < 1) {
 				return alert('가격을 변경할 상품을 선택해주세요.');
 			}
+			
+			if ($("#change_price_type").val() == 'B') {
+				if ($('#price_kind').val() === '') {
+					alert('정상가 또는 현재가 기준으로 변경할 것인지 선택해주세요.');
+					return false;
+				}
 
-			if ($('#price_kind').val() === '') {
-				alert('정상가 또는 현재가 기준으로 변경할 것인지 선택해주세요.');
-				return false;
+				if ($('#change_kind').val() === '') {
+					alert('변경종류를 선택해주세요.');
+					return false;
+				}
+
+				if ($('#change_price').val() === '') {
+					alert('변경금액(율)을 입력해주세요.');
+					return false;
+				}
+				
+			} else {
+				if ($('#change_price').val() === '') {
+					alert('변경금액을 입력해주세요.');
+					return false;
+				}
 			}
-
-			if ($('#change_kind').val() === '') {
-				alert('변경종류를 선택해주세요.');
-				return false;
-			}
-
-			if ($('#change_price').val() === '') {
-				alert('변경금액(율)을 입력해주세요.');
-				return false;
-			}
-
 			return true;
 		}
 
 		function change_apply(is_zero = false) {
 
+			let change_price_type = $('#change_price_type').val();
 			let change_kind = $('#change_kind').val();
-
+			let price_kind = $('#price_kind').val();
 			let change_price = $('#change_price').val();
 			change_price = change_price.replace(/,/g, '');
 			change_price = parseInt(change_price) ?? '';
-			let price_kind = $('#price_kind').val();
 			let rows = gx.getSelectedRows();
 			let row = gx.getRows();
 
+			if(rows.length < 1) return alert('상품가격을 변경할 상품을 추가해주세요.');
 			if(row.length < 1) return alert('상품가격을 변경할 상품을 추가해주세요.');
 
 			if (!validate()) return;
-
-			if (change_kind == 'W') {
-				let change_rows = [];
-				if(price_kind == 'tag_price') {
-					change_rows = gx.getSelectedRows().map(row => ({
-						...row,
-						change_val : row.goods_sh + change_price
-					}));
-				} else {
-					change_rows = gx.getSelectedRows().map(row => ({
-						...row,
-						change_val : row.price + change_price
-					}));
-				}
+			
+			let change_rows = [];
+			
+			if (change_price_type == "O") {
+				change_rows = gx.getSelectedRows().map(row => ({
+					...row,
+					change_val : change_price
+				}));
 
 				for (let i = 0; i < rows.length; i++) {
 					gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
 				}
 				gx.gridOptions.api.applyTransaction({ add : change_rows });
 				gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
-
-			} else if (change_kind == 'P') {
-				/**
-				 * 할인율  = 판매가 - (판매가 * 할인율)
-				 */
-				let change_rate = [];
-				if (change_price >= 100) {
-					let sale = change_price/100;
-
+			} else {
+				if (change_kind == 'W') {
+					let change_rows = [];
 					if(price_kind == 'tag_price') {
-						change_rate = gx.getSelectedRows().map(row => ({
+						change_rows = gx.getSelectedRows().map(row => ({
 							...row,
-							change_val : 0
+							change_val : row.goods_sh + change_price
 						}));
 					} else {
-						change_rate = gx.getSelectedRows().map(row => ({
+						change_rows = gx.getSelectedRows().map(row => ({
 							...row,
-							change_val : 0
+							change_val : row.price + change_price
 						}));
 					}
 
 					for (let i = 0; i < rows.length; i++) {
 						gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
 					}
-					gx.gridOptions.api.applyTransaction({ add : change_rate });
+					gx.gridOptions.api.applyTransaction({ add : change_rows });
 					gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
 
-				} else if (change_price < 100) {
-					let sale = change_price/100;
+				} else if (change_kind == 'P') {
+					/**
+					 * 할인율  = 판매가 - (판매가 * 할인율)
+					 */
+					let change_rate = [];
+					if (change_price >= 100) {
+						let sale = change_price/100;
 
-					if(price_kind == 'tag_price') {
-						change_rate = gx.getSelectedRows().map(row => ({
-							...row,
-							change_val : row.goods_sh - (row.goods_sh * sale)
-						}));
-					} else {
-						change_rate = gx.getSelectedRows().map(row => ({
-							...row,
-							change_val : row.price - (row.price * sale)
-						}));
-					}
+						if(price_kind == 'tag_price') {
+							change_rate = gx.getSelectedRows().map(row => ({
+								...row,
+								change_val : 0
+							}));
+						} else {
+							change_rate = gx.getSelectedRows().map(row => ({
+								...row,
+								change_val : 0
+							}));
+						}
 
-					for (let i = 0; i < rows.length; i++) {
-						gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+						for (let i = 0; i < rows.length; i++) {
+							gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+						}
+						gx.gridOptions.api.applyTransaction({ add : change_rate });
+						gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
+
+					} else if (change_price < 100) {
+						let sale = change_price/100;
+
+						if(price_kind == 'tag_price') {
+							change_rate = gx.getSelectedRows().map(row => ({
+								...row,
+								change_val : row.goods_sh - (row.goods_sh * sale)
+							}));
+						} else {
+							change_rate = gx.getSelectedRows().map(row => ({
+								...row,
+								change_val : row.price - (row.price * sale)
+							}));
+						}
+
+						for (let i = 0; i < rows.length; i++) {
+							gx.gridOptions.api.applyTransaction({ remove : [rows[i]] });
+						}
+						gx.gridOptions.api.applyTransaction({ add : change_rate });
+						gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
 					}
-					gx.gridOptions.api.applyTransaction({ add : change_rate });
-					gx.gridOptions.api.forEachNode(node => node.setSelected(!is_zero));
 				}
-
 			}
-
 		}
 
 		function Save() {
-			let change_date_res	= $('#change_date_res').val();
-			let change_date_now	= document.getElementById('change_date_now').innerText;
-			let change_price	= parseInt($('#change_price').val());
-			let change_kind		= $('#change_kind').val();
-			let type			= $("input[name='product_price_type']:checked").val();
-			let rows			= gx.getSelectedRows();
-			let change_cnt		= rows.length;
-			let price_kind		= $('#price_kind').val();
-			let plan_category	= $('#plan_category').val();
+			let change_date_res		= $('#change_date_res').val();
+			let change_date_now		= document.getElementById('change_date_now').innerText;
+			let change_price		= parseInt($('#change_price').val());
+			let change_kind			= $('#change_kind').val();
+			let type				= $("input[name='product_price_type']:checked").val();
+			let rows				= gx.getSelectedRows();
+			let change_cnt			= rows.length;
+			let price_kind			= $('#price_kind').val();
+			let plan_category		= $('#plan_category').val();
+			let change_price_type 	= $('#change_price_type').val();
 
-			console.log(plan_category);
-
-			if(rows.length < 1)		return alert('저장할 상품을 선택해주세요.');
-
-			if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
-			if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
-			if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
+			if(rows.length < 1)		return alert('가격을 변경할 상품을 선택해주세요.');
+			
+			if (change_price_type == 'B') {
+				if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
+				if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
+				if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
+			}
 
 			if(!confirm("선택한 상품의 가격을 저장하시겠습니까?")) return;
 
@@ -439,8 +472,8 @@
 					change_cnt : change_cnt,
 					type : type,
 					price_kind : price_kind,
-					plan_category : plan_category
-
+					plan_category : plan_category,
+					change_price_type : change_price_type,
 				},
 			}).then(function (res) {
 				if(res.data.code === 200) {
@@ -529,7 +562,22 @@
 
 			$('#price_kind').val('tag_price').prop("selected", true);
 			$('#change_kind').val('P').prop("selected", true);
-			$('#change_price').val('0');
+			$('#change_price').val('');
+		}
+		
+		function changePriceType() {
+			console.log('here');
+			let type = $('#change_price_type').val();
+			if (type == 'O') {
+				$('#price_kind').prop("disabled", true);
+				$('#change_kind').prop("disabled", true);
+				$('#price_kind').val('');
+				$('#change_kind').val('');
+				$('#change_price').val('');
+			} else {
+				$('#price_kind').prop("disabled", false);
+				$('#change_kind').prop("disabled", false);
+			}
 		}
 
 	</script>

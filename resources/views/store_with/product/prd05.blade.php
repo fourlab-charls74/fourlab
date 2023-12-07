@@ -194,7 +194,11 @@
 					if (params.data.change_kind == 'P'){
 						return '(' + params.data.price_kind + ')' +  params.data.change_val + '%'
 					} else {
-						return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
+						if (params.data.price_kind == null) {
+							return Comma(params.data.change_val) + '원'
+						} else {
+							return '(' + params.data.price_kind + ')' +  Comma(params.data.change_val) + '원'
+						}
 					}
 				}
 			},
