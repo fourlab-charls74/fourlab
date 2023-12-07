@@ -351,19 +351,14 @@ class goods extends Controller
             select
                 a.prd_cd, a.style_no, a.prd_cd_p, a.goods_no, a.brand_cd, a.color, a.size, a.goods_opt, a.opt, a.reg_dm, a.s_qty, 
                 a.sg_qty, a.total_qty, a.goods_nm, a.goods_nm_eng, a.goods_sh, a.price, a.wonga, a.margin_rate, a.margin_amt, a.com_id,
-                a.org_nm, a.make, a.opt_kind_cd, a.img, a.brand, a.color_nm
+                a.org_nm, a.make, a.opt_kind_cd, a.img, a.brand, a.color_nm, a.color_cd
                 , com.com_nm
                 , if (a.goods_no = 0, a.opt, a.opt_kind_cd) as opt_kind_cd
                 , if (a.goods_no = 0, c.code_val, opt.opt_kind_nm) as opt_kind_nm
             from (
                 select p.prd_cd, p.style_no
                     , pc.prd_cd_p, pc.goods_no, pc.brand as brand_cd, pc.color, pc.goods_opt, pc.opt, pc.rt as reg_dm
-                    , ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size
+                    , pc.size
                     , (ps.qty - ps.wqty) as s_qty, ps.wqty as sg_qty, ps.qty as total_qty
                     , if(pc.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
                     , if(pc.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
@@ -380,6 +375,7 @@ class goods extends Controller
                     )) as img
                     , b.brand_nm as brand
                     , c.code_val as color_nm
+                	, c.code_val2 as color_cd
                 from product p
                     inner join product_code pc on pc.prd_cd = p.prd_cd
                     inner join product_stock ps on ps.prd_cd = p.prd_cd
@@ -430,7 +426,7 @@ class goods extends Controller
         $sql = "
             select
                 pc.prd_cd
-                , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                , pc.prd_cd_p as prd_cd_p
                 , pc.goods_no
                 , g.style_no
                 , g.opt_kind_cd
@@ -444,12 +440,8 @@ class goods extends Controller
                 , pc.brand as brand_cd
                 , b.brand_nm as brand
                 , pc.color, c.code_val as color_nm
-                , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+                , c.code_val2 as color_cd
+                , pc.size
                 , pc.goods_opt
                 , sum(ifnull(pss.qty, 0)) as store_qty
                 , sum(ifnull(pss.wqty, 0)) as store_wqty

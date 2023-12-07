@@ -366,10 +366,9 @@
                 }
             }   
         },
-       
-        
         {field: "color", headerName: "컬러", width: 55, cellStyle: StyleCenter},
         {field: "color_nm", headerName: "컬러명", width: 100, cellStyle: StyleCenter},
+        {field: "color_cd", headerName: "컬러코드", width: 70, cellStyle: StyleCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: StyleCenter},
         {field: "item" ,headerName: "품목", width: 70, cellStyle: StyleCenter},
         {field: "brand" ,headerName:"브랜드", width: 70, cellStyle: StyleCenter},
