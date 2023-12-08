@@ -12,7 +12,7 @@
             <div class="d-inline-flex location">
                 <span class="home"></span>
                 <span>/ 매장관리</span>
-                <span>/ 매장반품관리</span>
+                <span>/ 매장반품관리(매장)</span>
                 <span>/ 매장일괄반품</span>
             </div>
         </div>
