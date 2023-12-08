@@ -499,7 +499,7 @@
 		{field: "pay_date", headerName: "입금일시", type: "DateTimeType"},
 		{field: "dlv_end_date", headerName: "배송일시", type: "DateTimeType"},
 		{field: "last_up_date", headerName: "클레임일시", type: "DateTimeType"},
-		{field: "out_ord_no", headerName: "판매처주문번호", width: 100},
+		{field: "out_ord_opt_no", headerName: "판매처주문번호", width: 100},
 	];
 
 	let gx;
