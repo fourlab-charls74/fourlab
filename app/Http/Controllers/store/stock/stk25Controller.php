@@ -61,13 +61,24 @@ class stk25Controller extends Controller
                     st.sale_apply, 
                     st.amt_kind,
                     st.sale_amt, 
-                    st.sale_per
+                    st.sale_per,
+                    st.sale_kind
                 from sale_type_apply
                     inner join sale_type st on st.idx = sale_type_cd
                 where apply_date = :apply_date and apply_yn = 'Y'
             ";
             $sale_types = DB::select($sql, ['apply_date' => $sale_month]);
         }
+		
+		$sale_kinds = array_column($sale_types, 'sale_kind');
+		$sale_kind = implode(',', $sale_kinds);
+		
+		$dc_search = "";
+		if ($sale_kind != "") {
+			$dc_search = "sum(case when c.code_id in ($sale_kind) then cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty else 0 end)";
+		} else {
+			$dc_search = "'0'";
+		}
 
         // 매장별 할인율 조회
         if($store_cd != '') {
@@ -87,6 +98,7 @@ class stk25Controller extends Controller
                 DATE_FORMAT(ow.ord_state_date, '%Y-%m-%d') as ord_date,
                 o.sale_kind,
                 c.code_val as sale_kind_nm,
+                c.code_id as sale_kind_cd,
                 o.prd_cd,
                 o.goods_no,
                 op.opt_kind_nm,
@@ -128,11 +140,10 @@ class stk25Controller extends Controller
             select 
                 sum(ow.price * ow.qty) as total_sale_amt,
                 cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt,
-                -- sum(cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty) as dc_price,
-                (cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - (sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) - cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer))) as left_dc_price,
+                cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - $dc_search as left_dc_price,
                 stas.apply_rate,
                 sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) as total_recv_amt, -- 판매내역의 실결제금액
-            	sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) - cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as dc_price
+				$dc_search as dc_price
             from order_opt_wonga ow
                 inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
                 inner join order_mst om on om.ord_no = o.ord_no
@@ -140,15 +151,17 @@ class stk25Controller extends Controller
                 inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
                 inner join goods g on g.goods_no = o.goods_no
                 inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                -- inner join brand b on b.brand = g.brand
+                inner join brand b on b.brand = g.brand
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join sale_type st on st.sale_kind = o.sale_kind
                 left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
             where 1=1 
-                and ow.ord_state in (30, 60, 61)
+                and ow.ord_state = 30
                 and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
                 $where
         ";
+		
+//		dd($sql);
 		
         $row = DB::selectOne($sql);
 		
