@@ -113,7 +113,8 @@ class Pay
 		if(($type & 2) == 2){		// 카드
 
 			if($PG_ISSUBCANCEL == "Y" && $appdate > 0){
-				if($card != "외환카드") return 2;
+				//if($card != "외환카드") return 2;
+				return 2;
 			}
 
 			return 1;
