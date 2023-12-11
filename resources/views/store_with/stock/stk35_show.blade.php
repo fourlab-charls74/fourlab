@@ -78,24 +78,24 @@
 													@endif
 												</div>
 											</td>
-											<th class="required">보내는 매장</th>
-											<td>
-												<div class="form-inline inline_select_box">
-													@if(@$cmd == 'add')
-														<div class="form-inline-inner input-box w-100">
-															<div class="form-inline inline_btn_box">
-																<input type='hidden' id="store_nm" name="store_nm">
-																<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-															</div>
-														</div>
-													@else
-														<input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />
-														<input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" />
-														<input type="hidden" name="store_no" id="store_no" value="{{ @$sr->store_cd }}" />
-													@endif
-												</div>
-											</td>
+{{--											<th class="required">보내는 매장</th>--}}
+{{--											<td>--}}
+{{--												<div class="form-inline inline_select_box">--}}
+{{--													@if(@$cmd == 'add')--}}
+{{--														<div class="form-inline-inner input-box w-100">--}}
+{{--															<div class="form-inline inline_btn_box">--}}
+{{--																<input type='hidden' id="store_nm" name="store_nm">--}}
+{{--																<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>--}}
+{{--																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>--}}
+{{--															</div>--}}
+{{--														</div>--}}
+{{--													@else--}}
+{{--														<input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />--}}
+{{--														<input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" />--}}
+{{--														<input type="hidden" name="store_no" id="store_no" value="{{ @$sr->store_cd }}" />--}}
+{{--													@endif--}}
+{{--												</div>--}}
+{{--											</td>--}}
 											<th class="required">반품창고</th>
 											<td>
 												<div class="form-inline">
@@ -107,8 +107,6 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th class="required">반품사유</th>
 											<td>
 												<div class="form-inline">
@@ -119,6 +117,8 @@
 													</select>
 												</div>
 											</td>
+										</tr>
+										<tr>
 											<th>메모</th>
 											<td>
 												<div class="form-inline">
@@ -131,6 +131,8 @@
 													<p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_code }} @endif</p>
 												</div>
 											</td>
+											<th></th>
+											<td></td>
 										</tr>
 										</tbody>
 									</table>

@@ -441,12 +441,7 @@ class ord01Controller extends Controller
                     )) as img,
                     '' as img_view,
                     pc.color,
-                    ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size,
+                    pc.size,
                     o.qty,
                     om.user_id,
                     om.user_nm,
@@ -548,7 +543,7 @@ class ord01Controller extends Controller
                     left outer join claim c on c.ord_opt_no = o.ord_opt_no
                     left outer join order_opt_memo m on o.ord_opt_no = m.ord_opt_no
                     left outer join sale_type st on st.sale_kind = o.sale_kind
-                	inner join store store on store.store_cd = o.store_cd
+                	left outer join store store on store.store_cd = o.store_cd
                 where 1=1 $where
             ";
 
