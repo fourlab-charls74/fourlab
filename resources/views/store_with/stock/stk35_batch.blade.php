@@ -412,7 +412,6 @@
 			let comment = document.f1.comment.value;
 
 			let rows = gx.getRows();
-			console.log(rows);
 			if(rows.length < 1) return alert("일괄등록할 상품을 추가해주세요.");
 
 			if(!confirm("등록하시겠습니까?")) return;

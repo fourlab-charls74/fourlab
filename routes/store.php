@@ -763,6 +763,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::get('stk35/batch', 'stk35Controller@show_batch');
 		Route::post('stk35/batch-import', 'stk35Controller@import_excel');
 		Route::post('stk35/batch-getgoods', 'stk35Controller@get_goods');
+		Route::put('stk35/addrow', 'stk35Controller@add_row');
     });
 
     // 주문/배송관리

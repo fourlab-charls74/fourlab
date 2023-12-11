@@ -242,12 +242,7 @@ class stk35Controller extends Controller
                 g.goods_nm_eng,
                 if(pc.prd_cd_p = '', concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt), pc.prd_cd_p) as prd_cd_p,
                 pc.color,
-				ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+				pc.size,
                 pc.goods_opt,
                 g.goods_sh,
                 srp.price,
@@ -306,7 +301,8 @@ class stk35Controller extends Controller
 		$sr_reason = $request->input("sr_reason", "");
 		$comment = $request->input("comment", "");
 		$products = $request->input("products", []);
-
+		$store_cd = $request->input("store_cd", []);
+		
 		try {
 			DB::beginTransaction();
 
@@ -998,6 +994,66 @@ class stk35Controller extends Controller
 			],
 			"body" => $result,
 		]);
+	}
+	
+	public function add_row(Request $request) {
+		$prd_cd = $request->input('prd_cd', []);
+		$store_cd = $request->input('store_cd', []);
+
+		$prd_cds = explode(',', $prd_cd);
+		$result = [];
+
+		foreach ($prd_cds as $key => $pc) {
+
+			$store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
+
+			$sql = "
+                select
+                    pc.prd_cd
+                    , pc.goods_no
+                    , opt.opt_kind_nm
+                    , b.brand_nm as brand
+                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
+                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
+                    , pc.prd_cd_p as prd_cd_p
+                    , pc.color
+                    , pc.size
+                    , pc.goods_opt
+                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                    , if(g.goods_no <> '0', g.price, p.price) as price
+                    , p.price as return_price
+                    , '$store_cd' as store_cd
+                    , '$store->store_nm' as store_nm
+                    , ifnull(pss.qty,0) as store_qty
+                    , ifnull(pss.wqty,0) as store_wqty
+                    , '0' as qty
+                    , true as isEditable
+                from product_code pc
+                    inner join product p on p.prd_cd = pc.prd_cd
+                    left outer join goods g on g.goods_no = pc.goods_no
+                    left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
+                    left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+                    left outer join brand b on b.br_cd = pc.brand
+                where pc.prd_cd = '$pc'
+                limit 1
+            ";
+
+			$row = DB::selectOne($sql);
+			array_push($result, $row);
+		}
+
+		return response()->json([
+			"code" => 200,
+			"head" => [
+				"total" => count($result),
+				"page" => 1,
+				"page_cnt" => 1,
+				"page_total" => 1,
+			],
+			"body" => $result,
+		]);
+		
 	}
 
 	// 창고반품 거래명세서 출력

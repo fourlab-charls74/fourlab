@@ -78,24 +78,33 @@
 													@endif
 												</div>
 											</td>
-{{--											<th class="required">보내는 매장</th>--}}
-{{--											<td>--}}
-{{--												<div class="form-inline inline_select_box">--}}
-{{--													@if(@$cmd == 'add')--}}
-{{--														<div class="form-inline-inner input-box w-100">--}}
-{{--															<div class="form-inline inline_btn_box">--}}
-{{--																<input type='hidden' id="store_nm" name="store_nm">--}}
-{{--																<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>--}}
-{{--																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>--}}
-{{--															</div>--}}
-{{--														</div>--}}
-{{--													@else--}}
-{{--														<input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />--}}
-{{--														<input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" />--}}
-{{--														<input type="hidden" name="store_no" id="store_no" value="{{ @$sr->store_cd }}" />--}}
-{{--													@endif--}}
-{{--												</div>--}}
-{{--											</td>--}}
+											<th class="required">바코드</th>
+											<td>
+												<div class="flex_box">
+													<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='prd_cd' id="prd_cd" value='' style="width:87%">
+													<a href="#" class="btn btn-sm ml-2 btn-outline-primary sch-prdcd"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+												</div>
+											</td>
+											<th class="required">보내는 매장</th>
+											<td>
+												<div class="form-inline inline_select_box">
+													@if(@$cmd == 'add')
+														<div class="form-inline-inner input-box w-100">
+															<div class="form-inline inline_btn_box">
+																<input type='hidden' id="store_nm" name="store_nm">
+																<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+															</div>
+														</div>
+													@else
+														<input type="text" name="store_nm" id="store_nm" value="{{ @$sr->store_nm }}" class="form-control form-control-sm w-100" readonly />
+														<input type="hidden" name="store_cd" id="store_cd" value="{{ @$sr->store_cd }}" />
+														<input type="hidden" name="store_no" id="store_no" value="{{ @$sr->store_cd }}" />
+													@endif
+												</div>
+											</td>
+										</tr>
+										<tr>
 											<th class="required">반품창고</th>
 											<td>
 												<div class="form-inline">
@@ -117,22 +126,18 @@
 													</select>
 												</div>
 											</td>
-										</tr>
-										<tr>
 											<th>메모</th>
 											<td>
 												<div class="form-inline">
 													<textarea name="comment" id="comment" class="form-control w-100" rows="1">{{ @$sr->comment }}</textarea>
 												</div>
 											</td>
-											<th>반품코드</th>
-											<td>
-												<div class="form-inline">
-													<p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_code }} @endif</p>
-												</div>
-											</td>
-											<th></th>
-											<td></td>
+{{--											<th>반품코드</th>--}}
+{{--											<td>--}}
+{{--												<div class="form-inline">--}}
+{{--													<p id="sr_cd" class="fs-14">@if(@$sr != null) {{ @$sr->sr_code }} @endif</p>--}}
+{{--												</div>--}}
+{{--											</td>--}}
 										</tr>
 										</tbody>
 									</table>
@@ -153,7 +158,7 @@
 							</div>
 							<span class="mx-2">|</span>
 							<div class="d-flex">
-								<button type="button" onclick="return addGoods();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="bx bx-plus"></i> 상품추가</button>
+								<button type="button" onclick="return add();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="bx bx-plus"></i> 추가</button>
 								<button type="button" onclick="return delGoods();" class="btn btn-sm btn-outline-primary shadow-sm"><i class="bx bx-trash"></i> 상품삭제</button>
 							</div>
 						@endif
@@ -211,6 +216,10 @@
 				editable: (params) => checkIsEditable(params) && now_state < 30,
 				cellStyle: (params) => checkIsEditable(params) && now_state < 30 ? {"background-color": "#ffff99"} : {}
 			},
+			{field: "store_cd", headerName: "매장코드", width: 100, style:{"text-align": "center"}, hide:true},
+			@if(@$cmd == 'add')
+				{field: "store_nm", headerName: "매장명", width: 100, style:{"text-align": "center"}},
+			@endif
 			{headerName: "매장재고", children: [
 					{field: "store_qty", headerName: "재고", width: 60, type: 'currencyType'},
 					{field: "store_wqty", headerName: "보유재고", width: 60, type: 'currencyType'},
@@ -317,10 +326,10 @@
 			});
 			if(cmd === 'update') GetProducts();
 
-			$("#store_no").on("change", function(e) {
-				gx.gridOptions.api.setRowData([]);
-				updatePinnedRow();
-			});
+			// $("#store_no").on("change", function(e) {
+			// 	gx.gridOptions.api.setRowData([]);
+			// 	updatePinnedRow();
+			// });
 		});
 
 		// 등록된 상품리스트 가져오기
@@ -361,10 +370,17 @@
 					data: {
 						sr_date,
 						storage_cd,
-						store_cd,
 						sr_reason,
 						comment,
-						products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty, store_wqty: r.store_wqty })),
+						store_cd : rows.map(r => r.store_cd),
+						products: rows.map(r => ({ 
+							prd_cd: r.prd_cd,
+							store_cd : r.store_cd,
+							price: r.price, 
+							return_price: r.return_price, 
+							return_qty: r.qty, 
+							store_wqty: r.store_wqty 
+						})),
 					},
 				}).then(function (res) {
 					if(res.data.code === 200) {
@@ -458,10 +474,10 @@
 		// 상품 추가
 		function addGoods() {
 			const ff = document.f1;
-			if (ff.store_no.value == '') {
-				$(".sch-store").click();
-				return alert('매장을 선택해주세요.');
-			}
+			// if (ff.store_no.value == '') {
+			// 	$(".sch-store").click();
+			// 	return alert('매장을 선택해주세요.');
+			// }
 
 			const url = `/store/api/goods/show?store_cd=` + ff.store_no.value;
 			window.open(url, "_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1800,height=1000");
@@ -586,6 +602,80 @@
 			}).catch(function (err) {
 				console.log(err);
 			});
+		}
+		
+		function add () {
+			const ff = document.f1;
+			const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
+
+			if (ff.store_no.value == '') {
+				$(".sch-store").click();
+				return alert('매장을 선택해주세요.');
+			}
+			
+			if (ff.prd_cd.value == '') {
+				$(".sch-prd").click();
+				return alert('바코드를 선택해주세요.');
+			}
+
+			axios({
+				url: '/store/stock/stk35/addrow',
+				method: 'put',
+				data: {
+					store_cd: ff.store_no.value,
+					prd_cd: ff.prd_cd.value,
+					count: count + 1,
+				},
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					let rows = res.data.body;
+					const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
+					
+					for (let i= 0; i < rows.length; i++) {
+						// let newRow = {
+						// 	...rows[i],
+						// 	item: rows[i].opt_kind_nm,
+						// 	qty: 0,
+						// 	return_price: rows[i].price,
+						// 	return_amt: 0,
+						// 	return_p_amt: 0,
+						// 	return_p_qty: 0,
+						// 	fixed_return_price: 0,
+						// 	fixed_return_qty: 0,
+						// 	isEditable: true,
+						// 	count: count + 1,
+						// };
+						// callbaackRows.push(newRow);
+						// setStoreQty();
+						goodsCallback(rows[i]);
+					}
+					
+				} else {
+					console.log(res.data);
+					alert("상품추가 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
+			
+			
+
+			
+			//
+			// const row = {
+			// 	item: '',
+			// 	qty: 0,
+			// 	return_price: 0,
+			// 	return_amt: 0,
+			// 	return_p_amt: 0,
+			// 	return_p_qty: 0,
+			// 	fixed_return_price: 0,
+			// 	fixed_return_qty: 0,
+			// 	isEditable: true,
+			// 	count: count + 1,
+			// };
+			// callbaackRows.push(row);
+			// setStoreQty();
 		}
 	</script>
 @stop
