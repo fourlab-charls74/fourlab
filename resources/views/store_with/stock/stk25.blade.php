@@ -148,6 +148,7 @@
         {field: "ord_date", headerName: "주문일자", pinned: "left", width: 80, cellStyle: {"text-align": "center"}},
         {field: "ord_state_cd", hide: true},
         {field: "ord_state", headerName: "주문상태", pinned: "left", cellStyle: StyleOrdState},
+        {field: "clm_state", headerName: "클레임상태", pinned: "left", cellStyle: StyleClmState},
         {field: "prd_cd", headerName: "바코드", pinned: "left", width: 110, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", pinned: "left", width: 60, cellStyle: {"text-align": "center"}},
         // {field: "goods_type_nm", headerName: "상품구분", width: 60, cellStyle: StyleGoodsType},
