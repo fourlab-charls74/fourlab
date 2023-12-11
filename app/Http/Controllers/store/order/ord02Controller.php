@@ -103,6 +103,7 @@ class ord02Controller extends Controller
 		$goods_nm = $request->input('goods_nm', '');
 		$goods_nm_eng = $request->input('goods_nm_eng', '');
 		$clm_state = $request->input('clm_state', ''); // 클레임상태
+		$sd_deliv	= $request->input('sd_deliv','');
 
 		$ord_field = $request->input('ord_field', 'o.ord_date');
 		$ord = $request->input('ord', 'desc');
@@ -180,6 +181,7 @@ class ord02Controller extends Controller
 		if ($brand_cd != '') $where .= " and g.brand = '" . $brand_cd . "' ";
 		if ($goods_nm != '') $where .= " and g.goods_nm like '%" . $goods_nm . "%' ";
 		if ($goods_nm_eng != '') $where .= " and g.goods_nm_eng like '%" . $goods_nm_eng . "%' ";
+		if ($sd_deliv == 'Y')	$where .= " and zd.zipcode is not null ";
 
 		// 상품번호 검색
         $goods_no = preg_replace("/\s/",",",$goods_no);
@@ -220,20 +222,31 @@ class ord02Controller extends Controller
 		$limit = " limit $startno, $page_size ";
 
 		// get list
-		$dlv_locations_sql = "
-            (
-				select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq, 0 as location_seq
-				from storage
-				where online_yn = 'Y' or default_yn = 'Y'
-			)
-			union all
-			(
-				select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq, c.code_seq as location_seq
-				from store s
-					inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
-			)
-			order by seq, location_seq
-		";
+		if( $sd_deliv != 'Y'){
+			$dlv_locations_sql = "
+				(
+					select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq, 0 as location_seq
+					from storage
+					where online_yn = 'Y' or default_yn = 'Y'
+				)
+				union all
+				(
+					select 'store' as location_type, s.store_cd as location_cd, c.code_val as location_nm, 2 as seq, c.code_seq as location_seq
+					from store s
+						inner join code c on c.code_kind_cd = 'ONLINE_ORDER_STORE' and c.code_id = s.store_cd
+				)
+				order by seq, location_seq
+			";
+		}else{
+			$dlv_locations_sql = "
+				(
+					select 'storage' as location_type, storage_cd as location_cd, storage_nm as location_nm, if(online_yn = 'Y', 0, 1) as seq, 0 as location_seq
+					from storage
+					where online_yn = 'Y' or default_yn = 'Y'
+				)
+				order by seq, location_seq
+			";
+		}
 		$dlv_locations = DB::select($dlv_locations_sql);
 		$qty_sql = "";
 		foreach ($dlv_locations as $loc) {
@@ -277,6 +290,7 @@ class ord02Controller extends Controller
 					, if(rcp.reject_yn = 'Y', ifnull(rcp.reject_reason, ''), '') as reject_reason
 					, if(rcp.reject_yn = 'Y', if(rcp.dlv_location_type = 'STORAGE', (select storage_nm from storage where storage_cd = rcp.dlv_location_cd), if(rcp.dlv_location_type = 'STORE', (select store_nm from store where store_cd = rcp.dlv_location_cd), '')), '') as reject_location_nm
 					, if(rcp.reject_yn = 'N', rcp.dlv_location_cd, '') as order_proc_location_cd
+					, if(zd.zipcode is not null, 'Y', 'N') as sd_deliv_chk
 					$qty_sql
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
@@ -301,6 +315,7 @@ class ord02Controller extends Controller
 					) pc on pc.goods_no = o.goods_no and lower(pc.color_nm) = lower(substring_index(o.goods_opt, '^', 1)) and lower(replace(pc.size_nm, ' ', '')) = lower(replace(substring_index(o.goods_opt, '^', -1), ' ', ''))
 					left outer join order_receipt_product rcp on rcp.ord_opt_no = o.ord_opt_no -- and rcp.reject_yn = 'Y'
 						and rcp.or_cd = (select max(or_cd) from order_receipt_product where ord_opt_no = o.ord_opt_no)
+					left outer join zipcode_delivus zd on zd.zipcode = replace(om.r_zipcode,'-','')
 				where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 					-- and o.clm_state in (-30,1,90,0)
 					$where
@@ -375,6 +390,7 @@ class ord02Controller extends Controller
 								-- inner join code cs on if(gender = 'M', cs.code_kind_cd = 'PRD_CD_SIZE_MEN', if(gender = 'W', cs.code_kind_cd = 'PRD_CD_SIZE_WOMEN', if(gender = 'U', cs.code_kind_cd = 'PRD_CD_SIZE_UNISEX', cs.code_kind_cd = 'PRD_CD_SIZE_MATCH' ))) and cs.code_id = size
 								inner join size s on s.size_kind_cd = size_kind and s.size_cd = size                   
 						) pc on pc.goods_no = o.goods_no and pc.color_nm = substring_index(o.goods_opt, '^', 1) and replace(pc.size_nm, ' ', '') = replace(substring_index(o.goods_opt, '^', -1), ' ', '')
+						left outer join zipcode_delivus zd on zd.zipcode = replace(om.r_zipcode,'-','')
 					where (o.store_cd is null or o.store_cd = 'HEAD_OFFICE')
 						-- and o.clm_state in (-30,1,90,0)
 						$where

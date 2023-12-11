@@ -128,26 +128,14 @@
                     </div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label>결제방법</label>
+                            <label>당일배송</label>
                             <div class="form-inline">
                                 <div class="form-inline-inner w-100">
                                     <div class="form-group flax_box">
-                                        <div style="width:calc(100% - 62px);">
-                                            <select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
-                                                <option value="">전체</option>
-                                                @foreach ($stat_pay_types as $stat_pay_type)
-                                                    <option value='{{ $stat_pay_type->code_id }}'>
-                                                        {{ $stat_pay_type->code_val }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div style="height:30px;margin-left:5px;">
-                                            <div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
-                                                <input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
-                                                <label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
-                                            </div>
-                                        </div>
+										<select name="sd_deliv" class="form-control form-control-sm mr-2" style="width:100%;">
+											<option value="">전체</option>
+											<option value="Y">서울,경기</option>
+										</select>
                                     </div>
                                 </div>
                             </div>
@@ -325,6 +313,33 @@
 										<option value='{{ $sale_kind->code_id }}'>{{ $sale_kind->code_val }}</option>
 									@endforeach
 								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>결제방법</label>
+							<div class="form-inline">
+								<div class="form-inline-inner w-100">
+									<div class="form-group flax_box">
+										<div style="width:calc(100% - 62px);">
+											<select name="stat_pay_type" class="form-control form-control-sm mr-2" style="width:100%;">
+												<option value="">전체</option>
+												@foreach ($stat_pay_types as $stat_pay_type)
+													<option value='{{ $stat_pay_type->code_id }}'>
+														{{ $stat_pay_type->code_val }}
+													</option>
+												@endforeach
+											</select>
+										</div>
+										<div style="height:30px;margin-left:5px;">
+											<div class="custom-control custom-switch date-switch-pos" data-toggle="tooltip" data-placement="top" data-original-title="복합결제 제외">
+												<input type="checkbox" class="custom-control-input" id="not_complex" name="not_complex" value="Y">
+												<label for="not_complex" data-on-label="ON" data-off-label="OFF" style="margin-top:2px;"></label>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -692,7 +707,7 @@
 			},
         });
 
-		Search();
+		//Search();
 
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
