@@ -1339,7 +1339,7 @@ class ord03Controller extends Controller
 					, o.pay_type
 					, concat(ifnull(om.user_nm, ''), '(', ifnull(om.user_id, ''), ')') as user_nm
 					, om.r_nm
-					, om.r_zipcode
+					, replace(om.r_zipcode, '-','') as r_zipcode
 					, concat(om.r_addr1, ' ', ifnull(om.r_addr2, '')) as r_addr
 					, om.r_phone
 					, om.r_mobile
