@@ -3,7 +3,6 @@
 namespace App\Exports;
 
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -13,7 +12,6 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class ExcelExport extends DefaultValueBinder implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents, WithCustomValueBinder
@@ -93,11 +91,13 @@ class ExcelExport extends DefaultValueBinder implements FromCollection, WithHead
 
     public function bindValue(Cell $cell, $value)
     {
-        if (is_numeric($value)) {
-            $cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
-            return true;
-        }
-
-        return parent::bindValue($cell, $value);
+		if (is_string($value) && is_numeric($value)) {
+			$cell->setValueExplicit($value, DataType::TYPE_STRING);
+		} else if (is_numeric($value)) {
+			$cell->setValueExplicit($value, DataType::TYPE_NUMERIC);
+		} else {
+			parent::bindValue($cell, $value);
+		}
+		return true;
     }
 }
