@@ -214,6 +214,7 @@ class BizestStockBatch extends Command
 				";
 				$rows	= DB::select($sql);
 
+				$cnt	= 0;
 				foreach ($rows as $row) {
 
 					//매장 개별 버퍼링 처리
