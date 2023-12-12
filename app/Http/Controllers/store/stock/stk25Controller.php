@@ -94,7 +94,12 @@ class stk25Controller extends Controller
                 a.ord_opt_no,
                 DATE_FORMAT(a.ord_state_date, '%Y-%m-%d') as ord_date,
                 a.ord_state as ord_state_cd,
-                a.ord_state,
+                -- a.ord_state,
+                case
+                    when w_ord_state = '30' then '출고완료'
+                    when w_ord_state = '60' then '교환완료'
+                    when w_ord_state = '61' then '환불완료'
+                end as ord_state,
                 clm_state.code_val as clm_state,
                 a.prd_cd,
 			 	a.goods_no,	
@@ -137,6 +142,7 @@ class stk25Controller extends Controller
                     o.sale_kind,
                     b.brand_nm,
                     ord_state.code_val as ord_state,
+                    w.ord_state as w_ord_state,
                     d.code_val as opt_kind_nm,
                     ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
                     (o.recv_amt * if(w.ord_state > 30, -1, 1)) as dc_price
