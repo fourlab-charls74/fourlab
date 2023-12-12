@@ -233,9 +233,9 @@ class BizestStockBatch extends Command
 
 			}
 
-		}
+			DB::insert($sql_insert);
 
-		DB::insert($sql_insert);
+		}
 		//2. 매장 재고 데이터 종료
 
 		//로그파일 업데이트
