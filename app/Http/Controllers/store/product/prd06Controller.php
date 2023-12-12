@@ -422,6 +422,7 @@ class prd06Controller extends Controller
 	{
 		$code	= "200";
 		$msg	= "";
+		$id		= Auth('head')->user()->id;
 		
 		try {
 
@@ -461,7 +462,7 @@ class prd06Controller extends Controller
 					'store_cnt'			=> $stock_store_cnt	,
 					'match_y_cnt'		=> 0,
 					'match_n_cnt'		=> 0,
-					'id'				=> 'admin',
+					'id'				=> $id,
 					'rt'				=> now(),
 					'ut'				=> now()
 				]
