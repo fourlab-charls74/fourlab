@@ -165,7 +165,7 @@ class stk25Controller extends Controller
 				select
 					-- sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as total_recv_amt
 	                sum(if(w.ord_state > 30, (o.recv_amt + w.point_apply_amt) * -1, (o.recv_amt + w.point_apply_amt))) as total_recv_amt
-					, cast((sum(w.recv_amt * if(w.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt
+					, cast((sum(if(w.ord_state > 30, (o.recv_amt + w.point_apply_amt) * -1, (o.recv_amt + w.point_apply_amt))) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt
 				    , stas.apply_rate
                     , $dc_search as dc_price
 					, cast((sum(w.recv_amt * if(w.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - $dc_search as left_dc_price
