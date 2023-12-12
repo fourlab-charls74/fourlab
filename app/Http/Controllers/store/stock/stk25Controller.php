@@ -93,7 +93,7 @@ class stk25Controller extends Controller
                 a.ord_no,
                 a.ord_opt_no,
                 DATE_FORMAT(a.ord_state_date, '%Y-%m-%d') as ord_date,
-                a.ord_state as ord_state_cd,
+                a.w_ord_state as ord_state_cd,
                 -- a.ord_state,
                 case
                     when w_ord_state = '30' then '출고완료'
