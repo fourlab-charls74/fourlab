@@ -137,7 +137,7 @@ class stk25Controller extends Controller
                     o.sale_kind,
                     b.brand_nm,
                     ord_state.code_val as ord_state,
-                    op.opt_kind_nm,
+                    d.code_val as opt_kind_nm,
                     ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
                     (o.recv_amt * if(w.ord_state > 30, -1, 1)) as dc_price
                 from order_opt_wonga w
@@ -147,8 +147,7 @@ class stk25Controller extends Controller
                     inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
                     inner join goods g on o.goods_no = g.goods_no
 					left outer join brand b on b.brand = g.brand
-					inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                    left outer join claim clm on clm.ord_opt_no = o.ord_opt_no
+                    inner join code d on d.code_id = pc.item and d.code_kind_cd = 'prd_cd_item'
                     left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
 					left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
                 	left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
@@ -175,11 +174,10 @@ class stk25Controller extends Controller
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
                     inner join goods g on o.goods_no = g.goods_no
-					left outer join brand b on b.brand = g.brand
-					inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                    left outer join claim clm on clm.ord_opt_no = o.ord_opt_no
-                    left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
-					left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
+					-- left outer join brand b on b.brand = g.brand
+					-- inner join code d on d.code_id = pc.item and d.code_kind_cd = 'prd_cd_item'
+                    -- left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
+					-- left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
                 	left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
                 where 
                     w.ord_state in (30,60,61)  and o.ord_state = '30'
