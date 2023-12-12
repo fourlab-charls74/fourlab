@@ -431,7 +431,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::put('prd06/prd_update', 'prd06Controller@prd_update');
         Route::put('prd06/prd_delete', 'prd06Controller@prd_delete');
         Route::get('prd06/prd_add', 'prd06Controller@add_show');
-        Route::post('prd06/prd_add', 'prd06Controller@add_save');
+		Route::post('prd06/prd_add', 'prd06Controller@add_save');
+		Route::put('prd06/stock-batch', 'prd06Controller@stock_batch');
 
         // 상품관리 - 일괄등록
         Route::get('prd07', 'prd07Controller@index');

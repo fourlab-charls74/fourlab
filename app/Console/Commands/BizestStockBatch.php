@@ -126,7 +126,7 @@ class BizestStockBatch extends Command
 			
 			//임시
 			//if( $row->storage_cd == $stock_conf->default_storage_cd ){
-				$row->qty	= floor($row->qty / 2);
+				//$row->qty	= floor($row->qty / 2);
 			//}
 
 			//if( $row->qty > 0){
