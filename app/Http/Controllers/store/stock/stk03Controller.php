@@ -1992,6 +1992,50 @@ class stk03Controller extends Controller
                 $point->Refund($ord->ord_opt_no, $ord->add_point, '61');
             }
 
+			// 사용된 쿠폰 반납처리
+			if ($ord->coupon_no != '' && $ord->coupon_amt > 0 && $ord->user_id != '') {
+
+				DB::table('coupon')->where('coupon_no', $ord->coupon_no)->update([
+					'coupon_use_cnt' => DB::raw('coupon_use_cnt - 1'),
+					'coupon_order_cnt' => DB::raw('coupon_order_cnt - 1'),
+				]);
+
+				//오프라인 쿠폰 사용 초기화
+				$sql_coupon_info	= " select serial from coupon_member where coupon_no = :coupon_no and user_id = :user_id and ord_opt_no = :ord_opt_no ";
+				$coupon_info		= DB::selectOne($sql_coupon_info, ["coupon_no" => $ord->coupon_no, "user_id" => $ord->user_id, "ord_opt_no" => $ord_opt_no]);
+
+				if(isset($coupon_info->serial)){
+					if( $coupon_info->serial != ''){
+						DB::table('coupon_serial')
+							->where('coupon_no', $ord->coupon_no)->where('serial', $coupon_info->serial)
+							->update([
+								'use_date' => null,
+								'use_yn' => '',
+								'ut' => now(),
+							]);
+					}
+				}
+
+				DB::table('coupon_member')
+					->where('user_id', $ord->user_id)->where('coupon_no', $ord->coupon_no)->where('ord_opt_no', $ord_opt_no)
+					->update([
+						'use_date' => null,
+						'use_yn' => 'N',
+						'ut' => now(),
+					]);
+
+				DB::table('coupon_use_log_t')->insert([
+					'coupon_no' => $ord->coupon_no,
+					'user_id' => $ord->user_id,
+					'ord_opt_no' => $ord->ord_opt_no,
+					'ord_no' => $ord->ord_no,
+					'order_amt' => $ord->refund_price,
+					'coupon_amt' => $ord->coupon_amt * -1,
+					'regi_date' => now(),
+					'use_gubun' => '1',
+				]);
+			}
+
             $msg = '매장환불처리가 완료되었습니다.';
             DB::commit();
         } catch (Exception $e) {
