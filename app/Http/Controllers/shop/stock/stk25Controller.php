@@ -75,7 +75,7 @@ class stk25Controller extends Controller
 
 		$dc_search = "";
 		if ($sale_kind != "") {
-			$dc_search = "sum(case when c.code_id in ($sale_kind) then cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty else 0 end)";
+			$dc_search = "sum(case when c.code_id in ($sale_kind) then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)";
 		} else {
 			$dc_search = "'0'";
 		}
@@ -85,80 +85,107 @@ class stk25Controller extends Controller
             $where .= " and o.store_cd = '$store_cd'";
         }
         if($sale_month != '') {
-            $where .= " and ow.ord_state_date >= '$sale_month" . "01' and ow.ord_state_date <= '$sale_month" . "31'";
+            $where .= " and w.ord_state_date >= '$sale_month" . "01' and w.ord_state_date <= '$sale_month" . "31'";
         }
 
         $sql = "
-            select 
-                o.ord_state as ord_state_cd,
-                ord_state.code_val as ord_state,
-                o.store_cd,
-                o.ord_opt_no,
-                o.ord_no,
-                DATE_FORMAT(ow.ord_state_date, '%Y-%m-%d') as ord_date,
-                o.sale_kind,
-                c.code_val as sale_kind_nm,
-                c.code_id as sale_kind_cd,
-                o.prd_cd,
-                o.goods_no,
-                op.opt_kind_nm,
-                b.brand_nm,
-                g.style_no,
-                stat.code_val as sale_stat_cl,
-                o.goods_nm,
-                g.goods_nm_eng,
-                o.goods_opt,
-                pc.color,
-                pc.size,
-                pc.prd_cd_p as prd_cd_p,
-                (ow.qty * if(ow.ord_state = 61, -1, 1)) as qty,
-                o.price,
-                st.sale_per,
-                cast((ow.price * st.sale_per / 100) AS signed integer) * ow.qty as dc_price,
-                ow.recv_amt
-            from order_opt_wonga ow
-                inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
-                inner join order_mst om on om.ord_no = o.ord_no
-                inner join product_code pc on pc.prd_cd = o.prd_cd
-                inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
-                inner join goods g on g.goods_no = o.goods_no
-                inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                inner join brand b on b.brand = g.brand
-                inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                left outer join sale_type st on st.sale_kind = o.sale_kind
-                left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
-            where 1=1 
-                and ow.ord_state = 30
-                and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
-                $where
-            order by ow.ord_state_date
+			select
+                a.ord_no,
+                a.ord_opt_no,
+                DATE_FORMAT(a.ord_state_date, '%Y-%m-%d') as ord_date,
+                a.ord_state as ord_state_cd,
+                a.ord_state,
+                clm_state.code_val as clm_state,
+                a.prd_cd,
+			 	a.goods_no,	
+                a.opt_kind_nm,
+                a.brand_nm,
+                a.style_no,
+                a.goods_nm,
+                a.goods_nm_eng,
+                a.prd_cd_p,
+                a.color,
+                a.size,
+                a.goods_opt,
+			 	if(a.ord_state > 30, a.qty * -1, a.qty) as qty,
+                (a.price * a.qty) as price,
+                a.recv_amt,
+            	(if(a.ord_state > 30, a.qty * -1, a.qty) * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1) as ord_amt,
+                a.sale_per,
+                a.dc_price,
+                sale_kind.code_val as sale_kind_nm
+            from (
+                select
+                    om.ord_no,
+                    o.ord_opt_no,
+                    o.ord_state as opt_ord_state,
+                    w.ord_state_date,
+                    o.clm_state,
+                    o.prd_cd,
+                    g.goods_no,
+                    g.style_no,
+                    g.goods_nm_eng,
+                    o.goods_nm,
+                    o.goods_opt,
+                    pc.color,
+                    pc.size,
+                    pc.prd_cd_p,
+                    w.qty,
+                    o.price,
+                    (o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
+                    st.sale_per,
+                    o.sale_kind,
+                    b.brand_nm,
+                    ord_state.code_val as ord_state,
+                    op.opt_kind_nm,
+                    ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
+                    (o.recv_amt * if(w.ord_state > 30, -1, 1)) as dc_price
+                from order_opt_wonga w
+                    inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                    inner join order_mst om on o.ord_no = om.ord_no
+                    left outer join product_code pc on pc.prd_cd = o.prd_cd
+                    inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
+                    inner join goods g on o.goods_no = g.goods_no
+					left outer join brand b on b.brand = g.brand
+					inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+                    left outer join claim clm on clm.ord_opt_no = o.ord_opt_no
+                    left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
+					left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
+                	left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
+                where 
+                    w.ord_state in (30,60,61)  and o.ord_state = '30'
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+                    $where
+            ) a
+                left outer join code clm_state on (a.clm_state = clm_state.code_id and clm_state.code_kind_cd = 'G_CLM_STATE')
+                left outer join code sale_kind on (sale_kind.code_id = a.sale_kind and sale_kind.code_kind_cd = 'SALE_KIND')
         ";
-        // -- where (ow.ord_state = 30 or ow.ord_state = 61 or ow.ord_state = 60) $where
+		
         $result = DB::select($sql);
 
         $sql = "
-            select 
-                sum(ow.price * ow.qty) as total_sale_amt,
-                cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt,
-                cast((sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - $dc_search as left_dc_price,
-                stas.apply_rate,
-                sum(ow.recv_amt * if(ow.ord_state > 30, -1, 1)) as total_recv_amt, -- 판매내역의 실결제금액
-            	$dc_search as dc_price
-            from order_opt_wonga ow
-                inner join order_opt o on o.ord_opt_no = ow.ord_opt_no
-                inner join order_mst om on om.ord_no = o.ord_no
-                inner join product_code pc on pc.prd_cd = o.prd_cd
-                inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
-                inner join goods g on g.goods_no = o.goods_no
-                inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
-                inner join brand b on b.brand = g.brand
-                inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
-                left outer join sale_type st on st.sale_kind = o.sale_kind
-                left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
-            where 1=1 
-                and ow.ord_state = 30
-                and (o.clm_state = 90 or o.clm_state = -30 or o.clm_state = 0)
-                $where
+			select
+				sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as total_recv_amt
+				, cast((sum(w.recv_amt * if(w.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) as total_dc_amt
+				, stas.apply_rate
+				, $dc_search as dc_price
+				, cast((sum(w.recv_amt * if(w.ord_state > 30, -1, 1)) * (ifnull(stas.apply_rate, 0) / 100)) as signed integer) - $dc_search as left_dc_price
+			from order_opt_wonga w
+				inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+				inner join order_mst om on o.ord_no = om.ord_no
+				left outer join product_code pc on pc.prd_cd = o.prd_cd
+				inner join code c on c.code_kind_cd = 'sale_kind' and c.code_id = o.sale_kind
+				inner join goods g on o.goods_no = g.goods_no
+				left outer join brand b on b.brand = g.brand
+				inner join opt op on op.opt_kind_cd = g.opt_kind_cd and op.opt_id = 'K'
+				left outer join claim clm on clm.ord_opt_no = o.ord_opt_no
+				left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
+				left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
+				left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
+			where 
+				w.ord_state in (30,60,61)  and o.ord_state = '30'
+				and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+				$where
         ";
         $row = DB::selectOne($sql);
 		

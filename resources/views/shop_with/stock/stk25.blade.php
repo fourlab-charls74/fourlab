@@ -154,7 +154,7 @@
             }
         },
         {field: "goods_nm_eng", headerName: "상품명(영문)", width: 230},
-        {field: "prd_cd_p", headerName: "코드일련", width: 100, cellStyle: {"text-align": "center"}	},
+        {field: "prd_cd_p", headerName: "품번", width: 100, cellStyle: {"text-align": "center"}	},
 		{field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
 		{field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 150},

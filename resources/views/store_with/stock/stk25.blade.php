@@ -163,6 +163,7 @@
         {field: "goods_opt", headerName: "옵션", width: 150},
         {field: "qty", headerName: "판매수량", width: 60, type: "currencyType"},
         {field: "price", headerName: "판매가", width: 60, type: "currencyType"},
+        // {field: "recv_amt", headerName: "실결재금액", width: 60, type: "currencyType"},
         {field: "sale_per", headerName: "할인율(%)", width: 70, type: "currencyType"},
         {field: "dc_price", headerName: "할인가", width: 60, type: "currencyType"},
         {field: "sale_kind_cd", hide: true},
