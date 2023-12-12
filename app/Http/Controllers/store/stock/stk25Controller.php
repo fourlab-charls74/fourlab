@@ -75,7 +75,8 @@ class stk25Controller extends Controller
 		
 		$dc_search = "";
 		if ($sale_kind != "") {
-			$dc_search = "sum(case when c.code_id in ($sale_kind) then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)";
+			//$dc_search = "sum(case when c.code_id in ($sale_kind) then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)";
+			$dc_search = "cast(sum(case when c.code_id in ($sale_kind) then (o.qty * o.price * ( 100 - st.sale_per) / 100 * if(w.ord_state > 30, -1, 1)) else 0 end) as signed integer)";
 		} else {
 			$dc_search = "'0'";
 		}
@@ -145,7 +146,8 @@ class stk25Controller extends Controller
                     w.ord_state as w_ord_state,
                     d.code_val as opt_kind_nm,
                     ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
-                    (o.recv_amt * if(w.ord_state > 30, -1, 1)) as dc_price
+                    -- (o.recv_amt * if(w.ord_state > 30, -1, 1)) as dc_price
+                    (o.qty * o.price * ( 100 - st.sale_per) / 100 * if(w.ord_state > 30, -1, 1)) as dc_price
                 from order_opt_wonga w
                     inner join order_opt o on o.ord_opt_no = w.ord_opt_no
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -183,7 +185,7 @@ class stk25Controller extends Controller
                     inner join goods g on o.goods_no = g.goods_no
 					-- left outer join brand b on b.brand = g.brand
 					-- inner join code d on d.code_id = pc.item and d.code_kind_cd = 'prd_cd_item'
-                    -- left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
+                    left outer join sale_type st on st.sale_kind = ifnull(o.sale_kind,'00')
 					-- left outer join code ord_state on (o.ord_state = ord_state.code_id and ord_state.code_kind_cd = 'G_ORD_STATE')
                 	left outer join sale_type_apply_store stas on stas.apply_date = '$sale_month' and stas.store_cd = '$store_cd'
                 where 
