@@ -383,8 +383,12 @@
 				<div class="fl_box">
 					<h6 class="m-0 font-weight-bold">총 : <span id="gd-total" class="text-primary">0</span>건</h6>
 				</div>
-				<div class="fr_box d-flex">
-					<p class="text-secondary fs-12 mr-2">* 검수완료 시, <span class="text-danger font-weight-bold">'온라인반품창고'</span>로 설정된 창고로 재고처리됩니다.</p>
+				<div class="fr_box d-flex" style="width:220px;">
+					<!--<p class="text-secondary fs-12 mr-2">* 검수완료 시, <span class="text-danger font-weight-bold">'온라인반품창고'</span>로 설정된 창고로 재고처리됩니다.</p>//-->
+					<select name="target_storage" id="target_storage" class="form-control form-control-sm mr-1 w-50">
+						<option value="S0007" selected>온라인반품창고</option>
+						<option value="C0005">불량반품창고</option>
+					</select>
 					<a href="javascript:completeCheckStock();" class="btn btn-sm btn-primary shadow-sm">검수완료</a>
 				</div>
 			</div>
@@ -490,6 +494,7 @@
 	// 검수완료 처리
 	const completeCheckStock = () => {
 		const rows = gx.getSelectedRows();
+
 		if (rows.length < 1) return alert('검수완료할 클레임건을 선택해주세요.');
 		
 		if (!confirm("선택한 클레임건을 검수완료하시겠습니까?")) return;
@@ -497,7 +502,10 @@
 		axios({
 			url: '/store/order/ord04/complete-check',
 			method: 'post',
-			data: { data: rows },
+			data: { 
+				data: rows,
+				target_storage : document.getElementById("target_storage").value
+			},
 		}).then(function (res) {
 			if(res.data.code === 200) {
 				alert(res.data.msg);

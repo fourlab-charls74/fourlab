@@ -318,17 +318,20 @@ class ord04Controller extends Controller
 	/** 클레임 재고 검수완료 */
 	public function completeStockCheck(Request $request)
 	{
-		$state = 30; // 검수완료
-		$rows = $request->input('data', []);
+		$state	= 30; // 검수완료
+		$rows	= $request->input('data', []);
+		$return_storage_cd	= $request->input('target_storage');
 		$user = [
-			'id' => Auth('head')->user()->id,
-			'name' => Auth('head')->user()->name
+			'id'	=> Auth('head')->user()->id,
+			'name'	=> Auth('head')->user()->name
 		];
 
 		// 온라인클레임으로 반품되는 창고는 온라인창고로 설정된 창고입니다. (2023-09-07)
 		// 추후 온라인창고가 아닌 대표창고로 반품할 경우, 아래 'online_yn'을 'default_yn'으로 변경하십시오.
 		// 온라인클레임으로 반품되는 창고는 온라인창고에서 온라인반품창고로 변경되었습니다 (2023-10-13)
-		$return_storage_cd = DB::table('storage')->where('storage_cd', 'S0007')->value('storage_cd');
+		if( $return_storage_cd == ''){
+			$return_storage_cd = DB::table('storage')->where('storage_cd', 'S0007')->value('storage_cd');
+		}
 
 		try {
 			// 이미 트랜잭션이 처리중이라면 에러처리
