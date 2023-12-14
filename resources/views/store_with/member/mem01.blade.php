@@ -97,11 +97,11 @@
                                     <label class="custom-control-label" for="type_nb">전체</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="type" id="type_n" class="custom-control-input" value="N">
+                                    <input type="radio" name="type" id="type_n" class="custom-control-input" value="on">
                                     <label class="custom-control-label" for="type_n">온라인</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
+                                    <input type="radio" name="type" id="type_b" class="custom-control-input" value="off">
                                     <label class="custom-control-label" for="type_b">오프라인</label>
                                 </div>
                             </div>

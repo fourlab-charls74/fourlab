@@ -868,7 +868,8 @@ class mem01Controller extends Controller
 		if($birth_edate != "")	$where .= " and a.yyyy <= $birth_edate";
 		if($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
-		if($store_cd != "") $where .= "and a.store_cd = '$store_cd'";
+		if($store_cd != "")		$where .= "and a.store_cd = '$store_cd'";
+		if($user_store != "")	$where .= "and a.store_cd = '$user_store'";
 
 		if($age != "") {
 			if($age == '10')	$where .= " and  a.yyyy > YEAR(CURDATE())-7 and a.yyyy <= YEAR(CURDATE()) ";	// 초등학생미만
@@ -902,7 +903,9 @@ class mem01Controller extends Controller
 		}
 		
 		if($type != ""){
-			$where .= " and a.type = '$type' ";
+			//$where .= " and a.type = '$type' ";
+			if($type == "on")	$where .= " and ( a.store_cd = '' or a.store_cd is null ) ";
+			if($type == "off")	$where .= " and a.store_cd <> '' ";
 		}
 
 		if($site != ""){

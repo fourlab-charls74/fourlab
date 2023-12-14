@@ -99,52 +99,6 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label>매장명</label>
-							<div class="form-inline inline_btn_box">
-								<input type='hidden' id="store_nm" name="store_nm">
-								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
-								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-send-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-							</div>
-						</div>
-					</div>
-					{{--
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">인증방식</label>
-							<div class="flax_box">
-								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
-									<option value="">전체</option>
-									@foreach($auth_type as $val)
-										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
-					--}}
-				</div>
-				<div class="row">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="dlv_kind">회원가입 종류</label>
-							<div class="form-inline form-radio-box">
-								<div class="custom-control custom-radio">
-									<input type="radio" name="type" id="type_nb" class="custom-control-input" checked="" value="">
-									<label class="custom-control-label" for="type_nb">전체</label>
-								</div>
-								<div class="custom-control custom-radio">
-									<input type="radio" name="type" id="type_n" class="custom-control-input" value="N">
-									<label class="custom-control-label" for="type_n">온라인</label>
-								</div>
-								<div class="custom-control custom-radio">
-									<input type="radio" name="type" id="type_b" class="custom-control-input" value="B">
-									<label class="custom-control-label" for="type_b">오프라인</label>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
 							<label for="item">자료수/정렬</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box" style="width:24%;">
@@ -177,7 +131,57 @@
 							</div>
 						</div>
 					</div>
+					<!--
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label>매장명</label>
+							<div class="form-inline inline_btn_box">
+								<input type='hidden' id="store_nm" name="store_nm">
+								<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+								<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-send-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							</div>
+						</div>
+					</div>
+					//-->
+					{{--
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="">인증방식</label>
+							<div class="flax_box">
+								<select name="auth_type" id="auth_type" class="form-control form-control-sm">
+									<option value="">전체</option>
+									@foreach($auth_type as $val)
+										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					--}}
 				</div>
+				<!--	
+				<div class="row">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="dlv_kind">회원가입 종류</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="type" id="type_nb" class="custom-control-input" checked="" value="">
+									<label class="custom-control-label" for="type_nb">전체</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="type" id="type_n" class="custom-control-input" value="on">
+									<label class="custom-control-label" for="type_n">온라인</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" name="type" id="type_b" class="custom-control-input" value="off">
+									<label class="custom-control-label" for="type_b">오프라인</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				//-->
 				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
@@ -490,7 +494,7 @@
 	
 	//페이지를 로드할 때 본인의 매장으로 먼저 검색되는 부분
 	initStore();
-	Search();
+	//Search();
 	
 	
 	

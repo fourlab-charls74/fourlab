@@ -268,7 +268,8 @@ class mem01Controller extends Controller
 		}
 		
 		if($type != ""){
-			$where .= " and a.type = '$type' ";
+			if($type == "on")	$where .= " and ( a.store_cd = '' or a.store_cd is null ) ";
+			if($type == "off")	$where .= " and a.store_cd <> '' ";
 		}
 
 		if($site != ""){
