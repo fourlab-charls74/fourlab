@@ -769,6 +769,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		//new월별동종업계매출관리
 		Route::get('stk36','stk36Controller@index');
 		Route::get('stk36/search', 'stk36Controller@search');
+		Route::get('stk36/total-search', 'stk36Controller@total_search');
 		Route::get('stk36/create', 'stk36Controller@create');
 		Route::get('stk36/com_search', 'stk36Controller@com_search');
 		Route::post('stk36/save_amt', 'stk36Controller@save_amt');

@@ -105,18 +105,15 @@
     </div>
 </form>
 <!-- DataTales Example -->
-
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
 	<div class="card-body shadow">
-		<div class="card-title">
-            <div class="filter_wrap">
-{{--                <div class="fl_box">--}}
-{{--                    <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>--}}
-{{--                </div>--}}
-            </div>
-        </div>
 		<div class="table-responsive">
-			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
+			<div id="div-gd2" style="height:100%;min-height:150px " class="ag-theme-balham"></div>
+		</div>
+	</div>
+	<div class="card-body shadow">
+		<div class="table-responsive">
+			<div id="div-gd" style="width:100%;" class="ag-theme-balham"></div>
 		</div>
 	</div>
 </div>
@@ -127,17 +124,46 @@
         {width: 'auto'}
     ];
 
+	let columns2 = [
+		{headerName: "브랜드", field: "brand", width: 130},
+		{headerName: "매장수", field: "store_cnt", width: 130, cellStyle : {'text-align' : 'center'}},
+		{headerName: "전체매출", field: "total_amt", width: 130, type: "currencyType"},
+		{headerName: "매장평균매출", field: "store_avg_amt", width: 130, type: "currencyType",
+			cellRenderer: function (params) {
+				let store_cnt = params.data.store_cnt;
+				let total_amt = params.data.total_amt;
+				let avg = total_amt / store_cnt;
+				return Comma(Math.round(avg));
+			}
+		},
+		{headerName: "최저매출매장", field: "worst_amt_store", width: 130},
+		{headerName: "최저매출매장", field: "worst_amt", width: 130, type: "currencyType"},
+		{headerName: "최고매출매장", field: "best_amt_store", width: 130},
+		{headerName: "최고매출매장", field: "best_amt", width: 130, type: "currencyType"},
+		{width: 'auto'}
+	];
+
     const pApp = new App('',{
         gridId:"#div-gd",
     });
+	const pApp2 = new App('',{
+		gridId:"#div-gd2",
+	});
     let gx;
+	let gx2;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(265);
+        pApp.ResizeGrid(300);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns);
+
+		pApp2.ResizeGrid(1100);
+		pApp2.BindSearchEnter();
+		let gridDiv2 = document.querySelector(pApp2.options.gridId);
+		gx2 = new HDGrid(gridDiv2, columns2);
         Search();
+		totalSearch();
 
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
@@ -166,8 +192,33 @@
 				headerName: nm + '(피엘라벤)',
 				minWidth : 600,
 				children: [
-					{field: cd + '_brand', headerName: '브랜드', minWidth: 150},
-					{field: cd + '_amt', headerName: '매출', type: "currencyType", minWidth: 170},
+					{field: cd + '_brand', headerName: '브랜드', minWidth: 150, maxWidth: 150,
+						cellStyle: function(params) {
+							if(params.value == '피엘라벤') {
+								return {color: '#2E64FE'};
+							} else if (params.value == '아크테릭스') {
+								return {color: '#FA5858'};
+							} else if (params.value == '파타고니아') {
+								return {color: '#04B431'};
+							}
+						},
+						cellRenderer: function (params) {
+							let rightCellElement = params.eGridCell.nextElementSibling;
+							if(params.value == '피엘라벤') {
+								rightCellElement.style.color = '#2E64FE';
+								return params.value;
+							} else if (params.value == '아크테릭스') {
+								rightCellElement.style.color = '#FA5858';
+								return params.value;
+							} else if (params.value == '파타고니아') {
+								rightCellElement.style.color = '#04B431';
+								return params.value;
+							} else {
+								return params.value;
+							}
+						},
+					},
+					{field: cd + '_amt', headerName: '매출', type: "currencyType", minWidth: 170, maxWidth: 170,}
 				],
 			});
 		}
@@ -182,7 +233,13 @@
         gx.Request('/store/stock/stk36/search', data, 1, function(e) {
 			setColumn(e.head.stores, e.body);
 		});
+		totalSearch();
     }
+
+	function totalSearch() {
+		let data = $('form[name="search"]').serialize();
+		gx2.Request('/store/stock/stk36/total-search', data);
+	}
 
 
     // 매출액 등록 팝업
