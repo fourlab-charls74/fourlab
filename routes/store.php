@@ -765,6 +765,13 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::post('stk35/batch-import', 'stk35Controller@import_excel');
 		Route::post('stk35/batch-getgoods', 'stk35Controller@get_goods');
 		Route::put('stk35/addrow', 'stk35Controller@add_row');
+
+		//new월별동종업계매출관리
+		Route::get('stk36','stk36Controller@index');
+		Route::get('stk36/search', 'stk36Controller@search');
+		Route::get('stk36/create', 'stk36Controller@create');
+		Route::get('stk36/com_search', 'stk36Controller@com_search');
+		Route::post('stk36/save_amt', 'stk36Controller@save_amt');
     });
 
     // 주문/배송관리
