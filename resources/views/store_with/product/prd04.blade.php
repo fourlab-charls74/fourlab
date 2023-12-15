@@ -358,24 +358,47 @@
 				},
 			]
 		},
-		
-		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
-			aggFunc: (params) => {
-				return params.values.reduce((a,c) => a + (c * 1), 0);
-			},
-			cellRenderer: function(params) {
-				if (params.value === undefined) return "";
-				if (params.node.rowPinned === 'top') {
-                    return params.value;
-                } else if (params.data && params.data.prd_cd) {
-					return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
-                } else if (params.node.aggData) {
-					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
-				} else {
-					return 0;
-				}
-			}
+
+		{headerName: "매장재고",
+			children: [
+				{field: "sqty", headerName: "실재고", width:70, type: 'currencyType',
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+					cellRenderer: function(params) {
+						if (params.value === undefined) return "";
+						if (params.node.rowPinned === 'top') {
+							return params.value;
+						} else if (params.data && params.data.prd_cd) {
+							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+						} else if (params.node.aggData) {
+							return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+						} else {
+							return 0;
+						}
+					}
+				},
+				{field: "swqty", headerName: "보유재고", width:70, type: 'currencyType',
+					aggFunc: (params) => {
+						return params.values.reduce((a,c) => a + (c * 1), 0);
+					},
+					cellRenderer: function(params) {
+						if (params.value === undefined) return "";
+						if (params.node.rowPinned === 'top') {
+							return params.value;
+						} else if (params.data && params.data.prd_cd) {
+							return '<a href="#" onclick="return openStoreStock(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+						} else if (params.node.aggData) {
+							return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+						} else {
+							return 0;
+						}
+					}
+				},
+			]
 		},
+		
+		
 		{field: "match_yn", headerName: "매칭여부", hide:true},
 		{width:"auto"}
 	];
@@ -463,6 +486,7 @@
 				qty: Comma(t.total_qty),
 				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
+				swqty: Comma(t.total_swqty),
 			}]);
 			setAllRowGroupExpanded($("#grid_expand").is(":checked"));
 		});

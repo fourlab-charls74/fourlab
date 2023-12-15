@@ -58,6 +58,9 @@ class prd04Controller extends Controller
 		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
 
+		$sdate 		= str_replace('-', '', $sdate);
+		$next_edate = str_replace('-', '', $next_edate);
+
 		$where		= "";
 		$store_where1	= "";
 		$store_where2	= "";
@@ -67,6 +70,14 @@ class prd04Controller extends Controller
 		$store_qty_sql	= "
 			(
 				select sum(pss.qty) 
+				from product_stock_store pss 
+				inner join store s on pss.store_cd = s.store_cd and s.use_yn = 'Y'
+				where pss.prd_cd = pc.prd_cd
+			)
+		";
+		$store_wqty_sql	= "
+			(
+				select sum(pss.wqty) 
 				from product_stock_store pss 
 				inner join store s on pss.store_cd = s.store_cd and s.use_yn = 'Y'
 				where pss.prd_cd = pc.prd_cd
@@ -161,7 +172,8 @@ class prd04Controller extends Controller
 
 			//$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			//$store_qty_sql	= "pss.wqty";
-			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
+			$store_qty_sql	= " select sum(qty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
+			$store_wqty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -183,7 +195,8 @@ class prd04Controller extends Controller
 
 			//$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			//$store_qty_sql	= "sum(pss.wqty)";
-			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
+			$store_qty_sql	= " select sum(qty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
+			$store_wqty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 
 		if( $store_no == "" && $store_channel != "" && $store_channel_kind ){
@@ -204,7 +217,8 @@ class prd04Controller extends Controller
 
 			//$next_store_qty_sql = " and location_cd = pss.store_cd ";
 			//$store_qty_sql	= "sum(pss.wqty)";
-			$store_qty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
+			$store_qty_sql	= " select sum(qty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
+			$store_wqty_sql	= " select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd " . $store_where2;
 		}
 
 		if($ext_store_qty == 'true' && $ext_storage_qty == 'true') {
@@ -233,25 +247,39 @@ class prd04Controller extends Controller
 					ifnull(sum(a.wonga * a.wqty + a.wonga * a.sqty),0) as total_wonga,
 					ifnull(sum(a.wqty),0) as total_wqty,
 					ifnull(sum(a.sqty),0) as total_sqty,
+					ifnull(sum(a.swqty),0) as total_swqty,
 					ifnull(sum(a.qty),0) as total_qty
 				from (
 					select
 						pc.prd_cd
-						, sum(pss2.qty) as qty
+						, (sum(pss2.qty) - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORAGE' and r_stock_state_date >= '$next_edate' and r_stock_state_date <= date_format(now(), '%Y%m%d')
+							and prd_cd = ps.prd_cd
+							group by prd_cd
+						), 0)) as qty
 						, (sum(pss2.wqty) - ifnull((
 							select sum(qty) as qty
 							from product_stock_hst
-							where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							where location_type = 'STORAGE' and stock_state_date >= '$next_edate' and stock_state_date <= date_format(now(), '%Y%m%d')
 							and prd_cd = ps.prd_cd
 							group by prd_cd
 						), 0)) as wqty
 						, (ifnull(($store_qty_sql),0) - ifnull((
 							select sum(qty) as qty
 							from product_stock_hst
-							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							where location_type = 'STORE' and r_stock_state_date >= '$next_edate' and r_stock_state_date <= date_format(now(), '%Y%m%d')
 							and prd_cd = ps.prd_cd $store_where1
 							group by prd_cd
 						), 0)) as sqty
+						, (ifnull(($store_wqty_sql),0) - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORE' and stock_state_date >= '$next_edate' and stock_state_date <= date_format(now(), '%Y%m%d')
+							and prd_cd = ps.prd_cd $store_where1
+							group by prd_cd
+						), 0)) as swqty
 						-- , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						-- , if(pc.goods_no = 0, p.price, g.price) as price
 						-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -306,21 +334,34 @@ class prd04Controller extends Controller
 				, pc.color, c.code_val as color_nm
 				, pc.size
 				, pc.goods_opt
-				, ifnull(sum(pss2.qty),0) as qty
+				, (ifnull(sum(pss2.qty),0) - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORAGE' and r_stock_state_date >= '$next_edate' and r_stock_state_date <= date_format(now(), '%Y%m%d')
+					and prd_cd = ps.prd_cd
+					group by prd_cd
+				), 0)) as qty
 				, (ifnull(sum(pss2.wqty),0) - ifnull((
 					select sum(qty) as qty
 					from product_stock_hst
-					where location_type = 'STORAGE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					where location_type = 'STORAGE' and stock_state_date >= '$next_edate' and stock_state_date <= date_format(now(), '%Y%m%d')
 					and prd_cd = ps.prd_cd
 					group by prd_cd
 				), 0)) as wqty
 				, (ifnull(($store_qty_sql),0) - ifnull((
 					select sum(qty) as qty
 					from product_stock_hst
-					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					where location_type = 'STORE' and r_stock_state_date >= '$next_edate' and r_stock_state_date <= date_format(now(), '%Y%m%d')
 					and prd_cd = ps.prd_cd $store_where1
 					group by prd_cd
 				), 0)) as sqty
+				, (ifnull(($store_wqty_sql),0) - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORE' and stock_state_date >= '$next_edate' and stock_state_date <= date_format(now(), '%Y%m%d')
+					and prd_cd = ps.prd_cd $store_where1
+					group by prd_cd
+				), 0)) as swqty
 				-- , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				-- , if(pc.goods_no = 0, p.price, g.price) as price
 				-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
