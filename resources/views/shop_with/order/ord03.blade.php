@@ -691,7 +691,7 @@
 			},
 			defaultColDef: {
 				suppressMenu: true,
-				resizable: false,
+				resizable: true,
 				autoHeight: true,
 				suppressSizeToFit: false,
 				sortable:true,
