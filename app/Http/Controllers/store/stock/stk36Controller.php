@@ -12,16 +12,15 @@ use Carbon\Carbon;
 use Exception;
 use App\Models\Conf;
 use Mockery\Undefined;
+use mysql_xdevapi\XSession;
 
 class stk36Controller extends Controller
 {
     public function index()
     {
         $values = [
-            'store_types' => SLib::getCodes("STORE_TYPE"),
             'competitors' => SLib::getCodes("COMPETITOR"),
             'sdate' => date("Y-m"),
-            'edate' => date("Y-m"),
             'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
         ];
@@ -33,7 +32,6 @@ class stk36Controller extends Controller
     {
         $r = $request->all();
         $sdate = $request->input('sdate');
-        $edate = $request->input('edate');
         $store_no = $request->input('store_no', '');
         $store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
@@ -41,7 +39,7 @@ class stk36Controller extends Controller
 
         $where = "";
         // $orderby = "";
-        if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
+        if ($store_no != "") $where .= " and s.store_cd ='" . Lib::quote($store_no). "'";
         if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
@@ -62,11 +60,13 @@ class stk36Controller extends Controller
      			, s.store_nm
      		from store s
      			inner join competitor_sale c on s.store_cd = c.store_cd
-     		where 1=1 and c.sale_date >= :sdate and c.sale_date <= :edate
+     		where 1=1 and c.sale_date >= :sdate and c.sale_date <= :edate 
+     		$where
      		group by c.store_cd
+     		order by s.store_nm
      	";
 		 
-		 $rows = DB::select($sql, ['sdate' => $sdate.'-01', 'edate' => $edate.'-31']);
+		 $rows = DB::select($sql, ['sdate' => $sdate.'-01', 'edate' => $sdate.'-31']);
 		 
 		 $stores[] = $rows;
 		
@@ -81,6 +81,7 @@ class stk36Controller extends Controller
 					cs.store_cd
 					, c.code_val as $competitor_nm
 					, sum(cs.sale_amt) as $competitor_amt
+					, sum(cs.sale_amt) as sale_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
 				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd'
@@ -88,26 +89,50 @@ class stk36Controller extends Controller
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
 			 ";
 
-			 $result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
+			 $result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
 			 
 			 $sql = "
 				select 
 					'$store_cd' as store_cd
 					, '피엘라벤' as $competitor_nm
 					, ifnull(sum(o.recv_amt * if(w.ord_state > 30, -1, 1)),0) as $competitor_amt
+					, ifnull(sum(o.recv_amt * if(w.ord_state > 30, -1, 1)),0) as sale_amt
 				from order_opt_wonga w 
 					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
 				where w.ord_state in (30, 60, 61) and o.store_cd = '$store_cd' and o.ord_state = '30'
 					and w.ord_state_date >= replace(concat('$sdate','-01'), '-', '')
-					and w.ord_state_date <= replace(concat('$edate','-31'), '-', '') 
+					and w.ord_state_date <= replace(concat('$sdate','-31'), '-', '') 
 			 ";
 			 
 			 $recv_amt = DB::select($sql);
-			 
 			  array_push($result,$recv_amt[0]);
 			 $res[] = $result;
 		 }
-			 
+		 
+		 // 배열을 amt기준으로 내림차순으로 정렬하는 부분
+		 for ($i = 0; $i < count($res); $i++) {
+			 usort($res[$i], function ($a, $b) {
+				 return $b->sale_amt - $a->sale_amt;
+			 });
+		 }
+
+		$targetBrand = '피엘라벤';
+
+		$rank = -1; // 초기 순위를 -1로 설정
+		$rank_data = [];
+
+		for ($i = 0; $i < count($res); $i++) {
+			$row = $res[$i];
+			for ($j = 0; $j < count($row); $j++) {
+				if ($row[$j]->{$row[$j]->store_cd . '_brand'} == $targetBrand) {
+					$cnt = count($row);
+					$rank = $j + 1;
+					$rank_data[$row[$j]->store_cd] = $rank.'/'.$cnt;
+					break;
+				}
+			}
+		}
+		
 		$arr = [];
 		for ($i = 0; $i < count($res); $i++) {
 			$row = $res[$i];
@@ -121,14 +146,13 @@ class stk36Controller extends Controller
 			}
 		}
 		
-		rsort($arr);
-		
         return response()->json([
             "code" => 200,
             "head" => array(
                 "total" => 0,
                 "page" => $page,
-                "stores" => $stores
+                "stores" => $stores,
+				"rank_data" => $rank_data,
             ),
             "body" => $arr
         ]);
@@ -137,10 +161,14 @@ class stk36Controller extends Controller
 	public function total_search(Request $request)
 	{
 		$sdate = $request->input('sdate');
-		$edate = $request->input('edate');
 		$store_no = $request->input('store_no', '');
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
+		
+		$where = "";
+		if ($store_no != "") $where .= " and s.store_cd ='" . Lib::quote($store_no). "'";
+		if ($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+		if ($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
 		//피엘라벤의 매장의 개수를 구하는 부분
 		$sql = "
@@ -150,10 +178,11 @@ class stk36Controller extends Controller
      		from store s
      			inner join competitor_sale c on s.store_cd = c.store_cd
      		where 1=1 and c.sale_date >= :sdate and c.sale_date <= :edate
+     		$where
      		group by c.store_cd
      	";
 
-		$store_rows = DB::select($sql, ['sdate' => $sdate.'-01', 'edate' => $edate.'-31']);
+		$store_rows = DB::select($sql, ['sdate' => $sdate.'-01', 'edate' => $sdate.'-31']);
 		$store_cnt = count($store_rows);
 
 		$stores[] = $store_rows;
@@ -179,7 +208,7 @@ class stk36Controller extends Controller
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
 			 ";
 
-			$result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
+			$result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
 			
 			$res[] = $result;
 
@@ -190,12 +219,12 @@ class stk36Controller extends Controller
 					, sum(cs.sale_amt) as $competitor_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
-				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and c.code_val = '아크테릭스'
+				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and c.code_val = '파타고니아'
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
 			 ";
 
-			$result2 = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
+			$result2 = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
 			$res2[] = $result2;
 			
 		}
@@ -226,7 +255,7 @@ class stk36Controller extends Controller
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
 			 ";
-			$result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
+			$result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
 			$res3[] = $result;
 
 			$sql = "
@@ -240,7 +269,7 @@ class stk36Controller extends Controller
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
 			 ";
-			$result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
+			$result = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
 			$res4[] = $result;
 		}
 
@@ -249,7 +278,6 @@ class stk36Controller extends Controller
 			$row = $res3[$i];
 			for ($j = 0; $j < count($row); $j++) {
 				$store_cd = $row[$j]->store_cd;
-				$brand = $store_cd . '_brand';
 				$amt = $store_cd . '_amt';
 
 				$arr[$j][$amt] = (int)$row[$j]->{$store_cd. '_amt'};
@@ -261,54 +289,84 @@ class stk36Controller extends Controller
 			$row = $res4[$i];
 			for ($j = 0; $j < count($row); $j++) {
 				$store_cd = $row[$j]->store_cd;
-				$brand = $store_cd . '_brand';
 				$amt = $store_cd . '_amt';
 
 				$arr2[$j][$amt] = (int)$row[$j]->{$store_cd. '_amt'};
 			}
 		}
 		
-		$arcteryx_total_amt = array_sum($arr[0]);
-		$patagonia_total_amt = array_sum($arr2[0]);
+		if (!empty($arr)) {
+			$arcteryx_total_amt = array_sum($arr[0]);
+		} else {
+			$arcteryx_total_amt = 0;
+		}
+		
+		if(!empty($arr2)) {
+			$patagonia_total_amt = array_sum($arr2[0]);
+		} else {
+			$patagonia_total_amt = 0;
+		}
 
 		//아크테릭스 최저매출매장
 		$arcteryx_flatArr = call_user_func_array('array_merge', $arr);
-		$arcteryx_worst_amt = min($arcteryx_flatArr);
-		$arcteryx_min_key = array_search($arcteryx_worst_amt, $arcteryx_flatArr);
-		$worst_store_cd = str_replace("_amt", "", $arcteryx_min_key);
-		$worst_store_nm = DB::table('store')->select( 'store_nm')->where('store_cd', $worst_store_cd)->first();
+		if (!empty($arcteryx_flatArr)) {
+			$arcteryx_worst_amt = min($arcteryx_flatArr);
+			$arcteryx_min_key = array_search($arcteryx_worst_amt, $arcteryx_flatArr);
+			$worst_store_cd = str_replace("_amt", "", $arcteryx_min_key);
+			$worst_store_nm = DB::table('store')->select( 'store_nm')->where('store_cd', $worst_store_cd)->first();
+			$worst_store_nm = $worst_store_nm->store_nm;
+		} else {
+			$arcteryx_worst_amt = 0;
+			$worst_store_nm = "매장없음";
+		}
 
 		//파타고니아 최저매출매장
 		$patagonia_flatArr = call_user_func_array('array_merge', $arr2);
-		$patagonia_worst_amt = min($patagonia_flatArr);
-		$patagonia_min_key = array_search($patagonia_worst_amt, $patagonia_flatArr);
-		$worst_store_cd2 = str_replace("_amt", "", $patagonia_min_key);
-		$worst_store_nm2 = DB::table('store')->select( 'store_nm')->where('store_cd', $worst_store_cd2)->first();
+		if (!empty($patagonia_flatArr)) {
+			$patagonia_worst_amt = min($patagonia_flatArr);
+			$patagonia_min_key = array_search($patagonia_worst_amt, $patagonia_flatArr);
+			$worst_store_cd2 = str_replace("_amt", "", $patagonia_min_key);
+			$worst_store_nm2 = DB::table('store')->select( 'store_nm')->where('store_cd', $worst_store_cd2)->first();
+			$worst_store_nm2 = $worst_store_nm2->store_nm;
+		} else {
+			$patagonia_worst_amt = 0;
+			$worst_store_nm2 = "매장없음";
+		}
 
 		//아크테릭스 최고매출매장
-		$arcteryx_best_amt = max($arcteryx_flatArr);
-		$arcteryx_best_key = array_search($arcteryx_best_amt, $arcteryx_flatArr);
-		$best_store_cd = str_replace("_amt", "", $arcteryx_best_key);
-		$best_store_nm = DB::table('store')->select( 'store_nm')->where('store_cd', $best_store_cd)->first();
+		if (!empty($arcteryx_flatArr)) {
+			$arcteryx_best_amt = max($arcteryx_flatArr);
+			$arcteryx_best_key = array_search($arcteryx_best_amt, $arcteryx_flatArr);
+			$best_store_cd = str_replace("_amt", "", $arcteryx_best_key);
+			$best_store_nm = DB::table('store')->select( 'store_nm')->where('store_cd', $best_store_cd)->first();
+			$best_store_nm = $best_store_nm->store_nm;
+		} else {
+			$arcteryx_best_amt = 0;
+			$best_store_nm = "매장없음";
+		}
 
-		//파타고니아 최저매출매장
-		$patagonia_best_amt = max($patagonia_flatArr);
-		$patagonia_best_key = array_search($patagonia_best_amt, $patagonia_flatArr);
-		$best_store_cd2 = str_replace("_amt", "", $patagonia_best_key);
-		$best_store_nm2 = DB::table('store')->select( 'store_nm')->where('store_cd', $best_store_cd2)->first();
-		
-		
-		
-		
-		
-		
+		//파타고니아 최고매출매장
+		if (!empty($patagonia_flatArr)) {
+			$patagonia_best_amt = max($patagonia_flatArr);
+			$patagonia_best_key = array_search($patagonia_best_amt, $patagonia_flatArr);
+			$best_store_cd2 = str_replace("_amt", "", $patagonia_best_key);
+			$best_store_nm2 = DB::table('store')->select( 'store_nm')->where('store_cd', $best_store_cd2)->first();
+			$best_store_nm2 = $best_store_nm2->store_nm;
+		} else {
+			$patagonia_best_amt = 0;
+			$best_store_nm2 = "매장없음";
+		}
 		
 		// 피엘라벤의 전체매출데이터 부분
 		$store_cds = array_map(function ($store_rows) {
 			return "'".$store_rows->store_cd."'";
 		}, $store_rows);
 
-		$storecds = implode(', ', $store_cds);
+		if (!empty($store_cds)) {
+			$storecds = implode(', ', $store_cds);
+		} else {
+			$storecds = "''";
+		}
 		
 		$sql = "
 			select
@@ -323,8 +381,8 @@ class stk36Controller extends Controller
 				and w.ord_state_date >= replace(:sdate, '-', '')
 				and w.ord_state_date <= replace(:edate, '-', '') 
 		";
-		$total_amt = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
-		$total_amt = $total_amt[0]->total_amt;
+		$total_amt = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
+		$fjallraven_total_amt = $total_amt[0]->total_amt??0;
 
 
 		$sql = "
@@ -343,29 +401,62 @@ class stk36Controller extends Controller
 			group by o.store_cd
 		";
 
-		$fjallraven_best_worst_amt = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $edate . '-31']);
+		$fjallraven_best_worst_amt = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
 
 		$min_total_amt = PHP_INT_MAX;
 		$min_total_store_cd = null;
 		$max_total_amt = 0;
 		$max_total_store_cd = null;
+		
+		if (!empty($fjallraven_best_worst_amt)) {
+			foreach ($fjallraven_best_worst_amt as $result) {
+				$store_cd = $result->store_cd;
+				$total_amt = $result->total_amt;
 
-		foreach ($fjallraven_best_worst_amt as $result) {
-			$store_cd = $result->store_cd;
-			$total_amt = $result->total_amt;
+				if ($total_amt < $min_total_amt) {
+					$min_total_amt = $total_amt;
+					$min_total_store_cd = $store_cd;
+				}
 
-			if ($total_amt < $min_total_amt) {
-				$min_total_amt = $total_amt;
-				$min_total_store_cd = $store_cd;
-			}
-
-			if ($total_amt > $max_total_amt) {
-				$max_total_amt = $total_amt;
-				$max_total_store_cd = $store_cd;
+				if ($total_amt > $max_total_amt) {
+					$max_total_amt = $total_amt;
+					$max_total_store_cd = $store_cd;
+				}
 			}
 		}
-		$worst_store_nm3 = DB::table('store')->select( 'store_nm')->where('store_cd', $min_total_store_cd)->first();
-		$best_store_nm3 = DB::table('store')->select( 'store_nm')->where('store_cd', $max_total_store_cd)->first();
+		
+		if ($min_total_store_cd === null) {
+			$min_total_amt = 0;
+			if (!empty($store_rows)) {
+				$min_total_store_cd = $store_rows[0]->store_cd;
+			} else {
+				$min_total_store_cd = "";
+			}
+		}
+
+		if ($max_total_store_cd === null) {
+			$max_total_amt = 0;
+			if (!empty($store_rows)) {
+				$max_total_store_cd = $store_rows[0]->store_cd;
+			} else {
+				$max_total_store_cd = "";
+			}
+		}
+		
+		if ($min_total_store_cd == "") {
+			$worst_store_nm3 = "매장없음";
+		} else {
+			$worst_store_nm3 = DB::table('store')->select( 'store_nm')->where('store_cd', $min_total_store_cd)->first();
+			$worst_store_nm3 = $worst_store_nm3->store_nm;
+		}
+		
+		if ($max_total_store_cd == "") {
+			$best_store_nm3 = "매장없음";
+		} else {
+			$best_store_nm3 = DB::table('store')->select( 'store_nm')->where('store_cd', $max_total_store_cd)->first();
+			$best_store_nm3 = $best_store_nm3->store_nm;
+		}
+	
 		
 		// 종합 데이터 출력부분
 		$sql = "
@@ -382,9 +473,9 @@ class stk36Controller extends Controller
 					c.code_val as brand
 					, if(c.code_val = '아크테릭스', '$arcteryx_cnt', if(c.code_val = '파타고니아', '$patagonia_cnt' ,0)) as store_cnt
 					, if(c.code_val = '아크테릭스', '$arcteryx_total_amt', if(c.code_val = '파타고니아', '$patagonia_total_amt' ,0)) as total_amt
-					, if(c.code_val = '아크테릭스', '$worst_store_nm->store_nm', if(c.code_val = '파타고니아', '$worst_store_nm2->store_nm' ,0)) as worst_amt_store
+					, if(c.code_val = '아크테릭스', '$worst_store_nm', if(c.code_val = '파타고니아', '$worst_store_nm2' ,0)) as worst_amt_store
 					, if(c.code_val = '아크테릭스', '$arcteryx_worst_amt', if(c.code_val = '파타고니아', '$patagonia_worst_amt' ,0)) as worst_amt
-					, if(c.code_val = '아크테릭스', '$best_store_nm->store_nm', if(c.code_val = '파타고니아', '$best_store_nm2->store_nm' ,0)) as best_amt_store
+					, if(c.code_val = '아크테릭스', '$best_store_nm', if(c.code_val = '파타고니아', '$best_store_nm2' ,0)) as best_amt_store
 					, if(c.code_val = '아크테릭스', '$arcteryx_best_amt', if(c.code_val = '파타고니아', '$patagonia_best_amt' ,0)) as best_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
@@ -395,17 +486,17 @@ class stk36Controller extends Controller
 				select
 					'피엘라벤' as brand
 					, ifnull('$store_cnt', 0) as store_cnt
-					, ifnull('$total_amt', 0) as total_amt
-					, '$worst_store_nm3->store_nm' as worst_amt_store
-					, '$min_total_amt' as worst_amt
-					, '$best_store_nm3->store_nm' as best_amt_store
-					, '$max_total_amt' as best_amt
+					, ifnull('$fjallraven_total_amt', 0) as total_amt
+					, ifnull('$worst_store_nm3', '롯데명동본점') as worst_amt_store
+					, ifnull('$min_total_amt', 0) as worst_amt
+					, ifnull('$best_store_nm3', '롯데명동본점') as best_amt_store
+					, ifnull('$max_total_amt', 0) as best_amt
 					
 			) a
 			order by case brand when '피엘라벤' then 1 when '아크테릭스' then 2 when '파타고니아' then 3 else 4 end
 		";
 		
-		$row = DB::select($sql, ['sdate' => $sdate.'-01', 'edate' => $edate.'-31']);
+		$row = DB::select($sql, ['sdate' => $sdate.'-01', 'edate' => $sdate.'-31']);
 
 		return response()->json([
 			"code" => 200,
