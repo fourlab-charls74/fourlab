@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class sal07Controller extends Controller
+class sal32Controller extends Controller
 {
-	public function index() 
+	public function index()
 	{
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
+		$mutable	= now();
+		$sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
 
 		// 매장구분
 		$sql = " 
@@ -27,18 +27,18 @@ class sal07Controller extends Controller
 		$store_types = DB::select($sql);
 
 		$values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-            'style_no'		=> "",
+			'sdate'         => $sdate,
+			'edate'         => date("Y-m-d"),
+			'style_no'		=> "",
 			'store_types'   => $store_types,
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'items'			=> SLib::getItems(),
-            // 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+			'com_types'     => SLib::getCodes('G_COM_TYPE'),
+			'items'			=> SLib::getItems(),
+			// 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+			// 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
-        return view( Config::get('shop.store.view') . '/sale/sal07', $values);
+		return view( Config::get('shop.store.view') . '/sale/sal32', $values);
 	}
 
 	public function search(Request $request)
@@ -57,16 +57,16 @@ class sal07Controller extends Controller
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 
-        $style_no = $request->input("style_no");
-        $goods_no = $request->input("goods_no");
-        $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
-        $item = $request->input("item");
-        $brand_nm = $request->input("brand_nm");
-        $brand_cd = $request->input("brand_cd");
-        $goods_nm = $request->input("goods_nm");
-        $goods_nm_eng = $request->input("goods_nm_eng");
+		$style_no = $request->input("style_no");
+		$goods_no = $request->input("goods_no");
+		$goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
+		$item = $request->input("item");
+		$brand_nm = $request->input("brand_nm");
+		$brand_cd = $request->input("brand_cd");
+		$goods_nm = $request->input("goods_nm");
+		$goods_nm_eng = $request->input("goods_nm_eng");
 
-        $page = $request->input('page', 1);
+		$page = $request->input('page', 1);
 		if ( $page < 1 or $page == "" )	$page = 1;
 		$limit = $request->input('limit', 100);
 
@@ -96,9 +96,9 @@ class sal07Controller extends Controller
 						$prd_cds_str .= ",";
 					}
 				}
-				$where .= " and o.prd_cd in ($prd_cds_str) ";
+				$where .= " and pc.prd_cd in ($prd_cds_str) ";
 			} else {
-				$where .= " and o.prd_cd like '" . Lib::quote($prd_cd) . "%' ";
+				$where .= " and pc.prd_cd like '" . Lib::quote($prd_cd) . "%' ";
 			}
 		}
 
@@ -117,15 +117,15 @@ class sal07Controller extends Controller
 		if ($com_id != "") $where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 		if ($com_nm != "") $where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 
-		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
+		if ($style_no != "") $where .= " and pc.style_no like '" . Lib::quote($style_no) . "%' ";
 		if ($item != "") $where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
 		if ($brand_cd != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
 		} else if ($brand_cd == "" && $brand_nm != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
 		}
-		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
-		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
+		if ($goods_nm != "") $where .= " and p.prd_nm like '%" . Lib::quote($goods_nm) . "%' ";
+		if ($goods_nm_eng != "") $where .= " and p.prd_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
 		if ($goods_nos != "") {
 			$goods_no = $goods_nos;
@@ -155,7 +155,7 @@ class sal07Controller extends Controller
 
 		if ( $page == 1 ) {
 			$query = /** @lang text */
-            	"
+				"
 				select
 				count(cnt) as total
 				from
@@ -164,12 +164,13 @@ class sal07Controller extends Controller
 						count(*) as cnt
 					from order_opt_wonga w
 						inner join order_opt o on o.ord_opt_no = w.ord_opt_no
-						inner join goods g on o.goods_no = g.goods_no
 						inner join product_code pc on pc.prd_cd = o.prd_cd
+						inner join product p on o.prd_cd = p.prd_cd
+						left outer join goods g on o.goods_no = g.goods_no
 						left outer join store s on o.store_cd = s.store_cd
 					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
 						and o.prd_cd <> '' $where
-					group by o.prd_cd
+					group by pc.prd_cd_p
 				) a
 			";
 			$row = DB::selectOne($query);
@@ -177,11 +178,11 @@ class sal07Controller extends Controller
 			if ($row) $total = $row->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
-		
+
 		$sql = /** @lang text */
-            "
+			"
 			select 
-				o.prd_cd,count(*) as cnt,
+				pc.prd_cd_p,count(*) as cnt,
 				sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty,
 				sum(w.qty * w.price) as amt,
 				-- sum(w.recv_amt + w.point_apply_amt) as recv_amt,
@@ -207,19 +208,20 @@ class sal07Controller extends Controller
 				 as profit_rate,
 
 				-- (sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
-				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng,
+				o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, p.prd_nm as goods_nm, p.prd_nm_eng as goods_nm_eng,
 				item.code_val as opt_kind_nm,
 				pc.color, pc.prd_cd_p, pc.size
 			from order_opt_wonga w 
 				inner join order_opt o on o.ord_opt_no = w.ord_opt_no 
-				inner join goods g on o.goods_no = g.goods_no
 				inner join product_code pc on pc.prd_cd = o.prd_cd
+				inner join product p on o.prd_cd = p.prd_cd
+				left outer join goods g on o.goods_no = g.goods_no
 				inner join code item on item.code_kind_cd = 'PRD_CD_ITEM' and item.code_id = pc.item
 				left outer join store s on o.store_cd = s.store_cd
 				left outer join brand b on pc.brand = b.br_cd
 			where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
 				and o.prd_cd <> '' $where
-			group by o.prd_cd
+			group by pc.prd_cd_p
 			$orderby 
 			$limit
 		";

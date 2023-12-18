@@ -165,8 +165,8 @@
                                 <span class="text_line">/</span>
                                 <div class="form-inline-inner input_box" style="width:45%;">
                                     <select name="ord_field" class="form-control form-control-sm">
+										<option value="prd_cd">바코드</option>
                                         <option value="goods_no">온라인코드</option>
-                                        <option value="prd_cd">바코드</option>
                                     </select>
                                 </div>
                                 <div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
@@ -266,7 +266,7 @@
                 }
             }
         },
-        {field: "opt_kind_nm", headerName: "품목", width: 60},
+        {field: "opt_kind_nm", headerName: "아이템", width: 80},
 		{field: "brand_nm", headerName: "브랜드", width: 80},
         {field: "style_no", headerName: "스타일넘버", width: 80},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, surl:"{{config('shop.front_url')}}"},
@@ -281,15 +281,16 @@
         {field: "s",	headerName: "판매현황",
             children: [
                 {headerName: "수량", field: "qty", type: 'currencyMinusColorType'},
-                {headerName: "단가", field: "wonga", type: 'numberType'},
+                {headerName: "판매가", field: "avg_price", type: 'numberType', hide:true},
                 {headerName: "매출액", field: "amt", type: 'currencyMinusColorType'},
                 {headerName: "할인", field: "discount", type: 'currencyMinusColorType'},
-                {headerName: "결제금액", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
-                {headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
-                {headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType'}, // 0 처리
+                {headerName: "실결제금액", field: "recv_amt", type: 'currencyMinusColorType'}, // 판매금액 + 포인트 합친게 결제(주문) 금액.
+                {headerName: "매장수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType', hide:true}, // 0 처리
+                {headerName: "중간관리수수료", field: "", cellRenderer: (params) => 0, type: 'currencyMinusColorType', hide:true}, // 0 처리
             ]
         },
-        {field: "sum_wonga", headerName: "원가", type: 'currencyMinusColorType'},
+		{field: "recv_amt_novat", headerName: "실결제금액(VAT별도)", type: 'currencyMinusColorType'},
+		{field: "sum_wonga", headerName: "원가", type: 'currencyMinusColorType'},
         {field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType'}, // 매출이익 = 결제금액 - 원가 합계금액
         {field: "profit_rate",	headerName: "이익율(%)", type:'percentType'}, // 매출이익 분의 매출액 = 이익율
         {headerName: "", field: "nvl", width: "auto"}
@@ -305,7 +306,7 @@
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
 		gx = new HDGrid(gridDiv, columns);
-		Search();
+		//Search();
 
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
         load_store_channel();
