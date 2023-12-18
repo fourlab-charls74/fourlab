@@ -284,7 +284,22 @@
 		{field: "goods_sh", headerName: "정상가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "price", headerName: "현재가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "sale_rate", headerName: "할인율", width: 70, cellStyle:{'text-align':'right'}},
-		{field: "sqty", headerName: "매장재고", width:70, type: 'currencyType',
+		{field: "sqty", headerName: "재고", width:70, type: 'currencyType',
+			aggFunc: (params) => {
+				return params.values.reduce((a,c) => a + (c * 1), 0);
+			},
+			cellRenderer: function(params) {
+				if (params.value === undefined) return "";
+				if (params.node.rowPinned === 'top') {
+					return params.value;
+				} else if (params.data) {
+					return '<a href="#" onclick="return OpenShopStockPopup(\'' + (params.data.prd_cd || '') + '\', \'' + $("[name=sdate]").val() + '\');">' + Comma(params.value) + '</a>';
+				} else if (params.node.aggData) {
+					return `<a href="#" onclick="return OpenStockPopup('${params.node.key}', '${$("[name=sdate]").val() || ''}');">${Comma(params.value)}</a>`;
+				}
+			}
+		},
+		{field: "swqty", headerName: "가용재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
 			},
@@ -383,6 +398,7 @@
 				wonga: t.total_wonga,
 				wqty: Comma(t.total_wqty),
 				sqty: Comma(t.total_sqty),
+				swqty: Comma(t.total_swqty),
 			}]);
 			setAllRowGroupExpanded($("#grid_expand").is(":checked"));
 		});

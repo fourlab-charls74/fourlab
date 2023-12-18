@@ -61,10 +61,14 @@ class prd04Controller extends Controller
 		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
 
+		$sdate 		= str_replace('-', '', $sdate);
+		$next_edate = str_replace('-', '', $next_edate);
+
 		$where		= "";
 		$having = "";
 		$in_store_sql	= "";
-		$store_qty_sql	= "ifnull(pss.wqty,0)";
+		$store_qty_sql	= "ifnull(pss.qty,0)";
+		$store_wqty_sql	= "ifnull(pss.wqty,0)";
 		$next_store_qty_sql = "";
 
 		if($plan_category != '')	$where .= " and pc.plan_category = '" . Lib::quote($plan_category) . "' ";
@@ -148,7 +152,8 @@ class prd04Controller extends Controller
 			//$where	.= ")";
 
 			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "ifnull(pss.wqty,0)";
+			$store_qty_sql	= "ifnull(pss.qty,0)";
+			$store_wqty_sql	= "ifnull(pss.wqty,0)";
 		}
 		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%' ";
 
@@ -165,7 +170,8 @@ class prd04Controller extends Controller
 			$where	.= ")";
 
 			$next_store_qty_sql = " and location_cd = pss.store_cd ";
-			$store_qty_sql	= "pss.wqty";
+			$store_qty_sql	= "pss.qty";
+			$store_wqty_sql	= "pss.wqty";
 		}
 
 		if($ext_store_qty == 'true') {
@@ -189,17 +195,25 @@ class prd04Controller extends Controller
 					sum(a.goods_sh * a.sqty) as total_goods_sh,
 					sum(a.price * a.sqty) as total_price,
 					sum(a.wonga * a.sqty) as total_wonga,
-					sum(a.sqty) as total_sqty
+					sum(a.sqty) as total_sqty,
+					sum(a.swqty) as total_swqty
 				from (
 					select
 						pc.prd_cd
 						, ($store_qty_sql - ifnull((
 							select sum(qty) as qty
 							from product_stock_hst
-							where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+							where location_type = 'STORE' and r_stock_state_date >= '$next_edate' and r_stock_state_date <= date_format(now(), '%Y%m%d')
 							and prd_cd = ps.prd_cd $next_store_qty_sql
 							group by prd_cd
 						), 0)) as sqty
+						, ($store_wqty_sql - ifnull((
+							select sum(qty) as qty
+							from product_stock_hst
+							where location_type = 'STORE' and stock_state_date >= '$next_edate' and stock_state_date <= date_format(now(), '%Y%m%d')
+							and prd_cd = ps.prd_cd $next_store_qty_sql
+							group by prd_cd
+						), 0)) as swqty
 						-- , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 						-- , if(pc.goods_no = 0, p.price, g.price) as price
 						-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
@@ -257,10 +271,17 @@ class prd04Controller extends Controller
 				, ($store_qty_sql - ifnull((
 					select sum(qty) as qty
 					from product_stock_hst
-					where location_type = 'STORE' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') >= '$next_edate 00:00:00' and STR_TO_DATE(stock_state_date, '%Y%m%d%H%i%s') <= now()
+					where location_type = 'STORE' and r_stock_state_date >= '$next_edate' and r_stock_state_date <= date_format(now(), '%Y%m%d')
 					and prd_cd = ps.prd_cd $next_store_qty_sql
 					group by prd_cd
 				), 0)) as sqty
+				, ($store_wqty_sql - ifnull((
+					select sum(qty) as qty
+					from product_stock_hst
+					where location_type = 'STORE' and stock_state_date >= '$next_edate' and stock_state_date <= date_format(now(), '%Y%m%d')
+					and prd_cd = ps.prd_cd $next_store_qty_sql
+					group by prd_cd
+				), 0)) as swqty
 				-- , if(pc.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
 				-- , if(pc.goods_no = 0, p.price, g.price) as price
 				-- , if(pc.goods_no = 0, p.wonga, g.wonga) as wonga
