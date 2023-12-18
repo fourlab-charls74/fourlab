@@ -92,7 +92,7 @@
 														<div class="form-inline-inner input-box w-100">
 															<div class="form-inline inline_btn_box">
 																<input type='hidden' id="store_nm" name="store_nm">
-																<select id="store_no" name="store_no" class="form-control form-control-sm select2-store"></select>
+																<select id="store_no" name="store_no" class="form-control form-control-sm select2-store multi_select" multiple></select>
 																<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 															</div>
 														</div>
@@ -325,6 +325,10 @@
 				}
 			});
 			if(cmd === 'update') GetProducts();
+			
+			$( ".sch-store" ).on("click", function() {
+				searchStore.Open(null, "multiple");
+			});
 
 			// $("#store_no").on("change", function(e) {
 			// 	gx.gridOptions.api.setRowData([]);
@@ -351,7 +355,6 @@
 			if(cmd === 'add') {
 				let sr_date = document.f1.sdate.value;
 				let storage_cd = document.f1.storage_cd.value;
-				let store_cd = document.f1.store_no.value;
 
 				if(store_cd === '') {
 					$(".sch-store").click();
@@ -607,22 +610,24 @@
 		function add () {
 			const ff = document.f1;
 			const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
-
-			if (ff.store_no.value == '') {
-				$(".sch-store").click();
-				return alert('매장을 선택해주세요.');
-			}
+			let store_cd = $("#store_no").val();
 			
+
 			if (ff.prd_cd.value == '') {
 				$(".sch-prd").click();
 				return alert('바코드를 선택해주세요.');
+			}
+			
+			if (store_cd.length < 1) {
+				$(".sch-store").click();
+				return alert('매장을 선택해주세요.');
 			}
 
 			axios({
 				url: '/store/stock/stk35/addrow',
 				method: 'put',
 				data: {
-					store_cd: ff.store_no.value,
+					store_cd: store_cd,
 					prd_cd: ff.prd_cd.value,
 					count: count + 1,
 				},
@@ -632,21 +637,6 @@
 					const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
 					
 					for (let i= 0; i < rows.length; i++) {
-						// let newRow = {
-						// 	...rows[i],
-						// 	item: rows[i].opt_kind_nm,
-						// 	qty: 0,
-						// 	return_price: rows[i].price,
-						// 	return_amt: 0,
-						// 	return_p_amt: 0,
-						// 	return_p_qty: 0,
-						// 	fixed_return_price: 0,
-						// 	fixed_return_qty: 0,
-						// 	isEditable: true,
-						// 	count: count + 1,
-						// };
-						// callbaackRows.push(newRow);
-						// setStoreQty();
 						goodsCallback(rows[i]);
 					}
 					
@@ -657,25 +647,6 @@
 			}).catch(function (err) {
 				console.log(err);
 			});
-			
-			
-
-			
-			//
-			// const row = {
-			// 	item: '',
-			// 	qty: 0,
-			// 	return_price: 0,
-			// 	return_amt: 0,
-			// 	return_p_amt: 0,
-			// 	return_p_qty: 0,
-			// 	fixed_return_price: 0,
-			// 	fixed_return_qty: 0,
-			// 	isEditable: true,
-			// 	count: count + 1,
-			// };
-			// callbaackRows.push(row);
-			// setStoreQty();
 		}
 	</script>
 @stop
