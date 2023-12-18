@@ -43,16 +43,39 @@ class stk30Controller extends Controller
         $sr_reason  = $request->input("sr_reason", "");
         $storage_cd = $request->input("storage_cd", "");
         $store_cd   = Auth('head')->user()->store_cd;
-        
+		$date_type 	= $request->input("date_type", "");
+		$date_yn 	= $request->input("date_yn", "");
+
         // where
 		$where = "";
+		
+		if ($date_yn == "Y") {
+			if ($date_type == 'exp_date') {
+				$sdate = str_replace("-", "", $sdate);
+				$edate = str_replace("-", "", $edate);
+				$where .= "
+					and cast(sr.sr_date as date) >= '$sdate' 
+					and cast(sr.sr_date as date) <= '$edate'
+				";
+			}
+			if ($date_type == 'pro_date') {
+				$sdate = str_replace("-", "", $sdate);
+				$edate = str_replace("-", "", $edate);
+				$where .= "
+					and cast(sr.sr_pro_date as date) >= '$sdate' 
+					and cast(sr.sr_pro_date as date) <= '$edate'
+				";
+			}
+			if ($date_type == 'fin_date') {
+				$sdate = str_replace("-", "", $sdate);
+				$edate = str_replace("-", "", $edate);
+				$where .= "
+					and cast(sr.sr_fin_date as date) >= '$sdate' 
+					and cast(sr.sr_fin_date as date) <= '$edate'
+				";
+			}
+		}
 
-        $sdate = str_replace("-", "", $sdate);
-        $edate = str_replace("-", "", $edate);
-        $where .= "
-            and cast(sr.sr_date as date) >= '$sdate' 
-            and cast(sr.sr_date as date) <= '$edate'
-        ";
         if($sr_state != "")     $where .= " and sr.sr_state = '" . Lib::quote($sr_state) . "'";
         if($sr_reason != "")    $where .= " and sr.sr_reason = '" . Lib::quote($sr_reason) . "'";
         if($storage_cd != "")   $where .= " and sr.storage_cd = '" . Lib::quote($storage_cd) . "'";

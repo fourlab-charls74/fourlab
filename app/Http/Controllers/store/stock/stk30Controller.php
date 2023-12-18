@@ -47,6 +47,9 @@ class stk30Controller extends Controller
 		$exp_date_yn	= $request->input('exp_date_yn');
 		$exp_sdate      = $request->input("exp_sdate", now()->sub(1, 'week')->format('Ymd'));
 		$exp_edate      = $request->input("exp_edate", date("Ymd"));
+		$pro_date_yn	= $request->input('pro_date_yn');
+		$pro_sdate      = $request->input("pro_sdate", now()->sub(1, 'week')->format('Ymd'));
+		$pro_edate      = $request->input("pro_edate", date("Ymd"));
         $sr_state   = $request->input("sr_state", "");
         $sr_reason  = $request->input("sr_reason", "");
         $storage_cd = $request->input("storage_cd", "");
@@ -72,6 +75,15 @@ class stk30Controller extends Controller
 			$where .= "
 				and cast(sr.sr_date as date) >= '$exp_sdate' 
 				and cast(sr.sr_date as date) <= '$exp_edate'
+        	";
+		}
+
+		if( $pro_date_yn == "Y" ) {
+			$pro_sdate = str_replace("-", "", $pro_sdate);
+			$pro_edate = str_replace("-", "", $pro_edate);
+			$where .= "
+				and cast(sr.sr_pro_date as date) >= '$pro_sdate' 
+				and cast(sr.sr_pro_date as date) <= '$pro_edate'
         	";
 		}
 		

@@ -27,39 +27,39 @@
 
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="">
-								반품완료일
-								<input type="checkbox" name="date_yn" value="Y">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="">
+								반품요청일
+								<input type="checkbox" name="exp_date_yn" value="Y" checked>
 							</label>
-                            <div class="form-inline date-select-inbox">
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                                <span class="text_line">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+							<div class="form-inline date-select-inbox">
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="exp_sdate" value="{{ $sdate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+								<span class="text_line">~</span>
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="exp_edate" value="{{ $edate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">반품상태</label>
@@ -91,13 +91,13 @@
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="">
-								반품요청일
-								<input type="checkbox" name="exp_date_yn" value="Y" checked>
+								반품처리일
+								<input type="checkbox" name="pro_date_yn" value="Y">
 							</label>
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="exp_sdate" value="{{ $sdate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date" name="pro_sdate" value="{{ $sdate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -109,7 +109,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date" name="exp_edate" value="{{ $edate }}" autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date" name="pro_edate" value="{{ $edate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -160,6 +160,39 @@
 	                </div>
                 </div>
                 <div class="row">
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="">
+								반품완료일
+								<input type="checkbox" name="date_yn" value="Y">
+							</label>
+							<div class="form-inline date-select-inbox">
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+								<span class="text_line">~</span>
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="">매장명</label>

@@ -22,39 +22,49 @@
 					<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 				</div>
 			</div>
-
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="">반품요청일</label>
-                            <div class="form-inline date-select-inbox">
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                                <span class="text_line">~</span>
-                                <div class="docs-datepicker form-inline-inner input_box">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-                                                <i class="fa fa-calendar" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="docs-datepicker-container"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4">
+						<div class="form-group">
+							<label for="">
+								<div class="flax_box">
+									<select id="date_type" name="date_type" class="form-control form-control-sm" style="width:100px">
+										<option value="exp_date" selected>반품요청일</option>
+										<option value="pro_date">반품처리일</option>
+										<option value="fin_date">반품완료일</option>
+									</select>
+									&nbsp;
+									<input type="checkbox" name="date_yn" id="date_yn" value="Y" checked>
+									
+								</div>
+							</label>
+							<div class="form-inline date-select-inbox">
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="sdate" value="{{ $sdate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+								<span class="text_line">~</span>
+								<div class="docs-datepicker form-inline-inner input_box">
+									<div class="input-group">
+										<input type="text" class="form-control form-control-sm docs-date" name="edate" value="{{ $edate }}" autocomplete="off">
+										<div class="input-group-append">
+											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+												<i class="fa fa-calendar" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+									<div class="docs-datepicker-container"></div>
+								</div>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="">반품상태</label>
@@ -235,7 +245,7 @@
         gx = new HDGrid(gridDiv, columns);
         Search();
     });
-
+	
 	function Search() {
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/shop/stock/stk30/search', data, 1);
