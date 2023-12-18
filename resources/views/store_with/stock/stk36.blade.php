@@ -247,7 +247,41 @@
 
         // 엑셀다운로드 레이어 오픈
         $(".export-excel").on("click", function (e) {
-			gx.Download('월별동종업계매출_{{ date('YmdH') }}.xlsx', { type: 'excel' });
+			
+			let gridOptions = gx.gridOptions;
+
+			let processCellCallback = function(params) {
+				if (params.node.rowPinned === 'top') {
+					return processPinnedTopRowCell(params);
+				} else {
+					return processNormalRowCell(params);
+				}
+				
+				return params.value;
+			};
+
+			let processPinnedTopRowCell = function(params) {
+				if (params.node.rowIndex == 0 && params.column.colId == 'rank_idx') {
+					return '랭크';
+				}
+				
+				return (params.value != null) ? (params.value) : null;
+			};
+
+			let processNormalRowCell = function(params) {
+				if (params.column.getColId() === 'rank_idx') {
+					return parseInt(params.value) + 1;
+				}
+				return params.value;
+			};
+
+			let excelParams = {
+				fileName: '월별동종업계매출_{{ date('YmdH') }}.xlsx',
+				sheetName: 'Sheet1',
+				processCellCallback: processCellCallback
+			};
+
+			gridOptions.api.exportDataAsExcel(excelParams);
         });
 
         // 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
