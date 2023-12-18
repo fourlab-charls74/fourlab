@@ -422,8 +422,8 @@ class sal03Controller extends Controller
 								sum(a.store_wqty) as store_wqty
 							from ( 
 								select
-									sum(oo.qty) as per_qty
-									, sum(oo.recv_amt) as t_price
+									sum(if(ow.ord_state = '30', ow.qty, ow.qty * -1)) as per_qty
+									, sum(if(ow.ord_state = '30', ow.recv_amt, ow.recv_amt * -1)) as t_price
 									, oo.prd_cd
 									, 0 as qty
 									, 0 as total_ord_amt
@@ -432,14 +432,16 @@ class sal03Controller extends Controller
 									, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
 									, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
 									-- oow.*
-								from order_opt oo
+								from order_opt_wonga ow
+								inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
 								left outer join store s on oo.store_cd = s.store_cd
 								inner join product_code pc on pc.prd_cd = oo.prd_cd
 								where
-									oo.ord_state in (30, 60, 61)
+									ow.ord_state in (30, 60, 61)
 									-- and ( oo.clm_state = 0 or oo.clm_state = -30 or oo.clm_state = 90)
-									and oo.ord_date >= '$sdate2'
-									and oo.ord_date <= '$edate2'
+									and ow.ord_state_date >= '$sdate2'
+									and ow.ord_state_date <= '$edate2'
+									and if( ow.ord_state_date <= '20231109', oo.sale_kind is not null, 1=1)
 									$in_where
 									group by oo.prd_cd
 							) as a
@@ -488,8 +490,8 @@ class sal03Controller extends Controller
 								a.store_wqty
 							from (
 								select
-									sum(oo.qty) as per_qty
-									, sum(oo.recv_amt) as t_price
+									sum(if(ow.ord_state = '30', ow.qty, ow.qty * -1)) as per_qty
+									, sum(if(ow.ord_state = '30', ow.recv_amt, ow.recv_amt * -1)) as t_price
 									, pc.prd_cd
 									, pc.prd_cd_p
 									,0 as qty
@@ -498,13 +500,15 @@ class sal03Controller extends Controller
 									, oo.goods_no, oo.goods_opt
 									, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
 									, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
-								from order_opt oo
+								from order_opt_wonga ow
+								inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
 								left outer join store s on oo.store_cd = s.store_cd
 								inner join product_code pc on pc.prd_cd = oo.prd_cd
 								where
-									oo.ord_state in (30, 60, 61)
-									and oo.ord_date >= '$sdate2'
-									and oo.ord_date <= '$edate2'
+									ow.ord_state in (30, 60, 61)
+									and ow.ord_state_date >= '$sdate2'
+									and ow.ord_state_date <= '$edate2'
+									and if( ow.ord_state_date <= '20231109', oo.sale_kind is not null, 1=1)
 									$in_where
 								group by pc.prd_cd_p
 								order by sum(oo.qty) desc
