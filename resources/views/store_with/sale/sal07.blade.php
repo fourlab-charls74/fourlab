@@ -290,7 +290,7 @@
             ]
         },
 		{field: "recv_amt_novat", headerName: "실결제금액(VAT별도)", type: 'currencyMinusColorType'},
-		{field: "sum_wonga", headerName: "원가", type: 'currencyMinusColorType'},
+		{field: "sum_wonga", headerName: "원가", type: 'currencyMinusColorType', width:80},
         {field: "sales_profit",	headerName: "매출이익", type: 'currencyMinusColorType'}, // 매출이익 = 결제금액 - 원가 합계금액
         {field: "profit_rate",	headerName: "이익율(%)", type:'percentType'}, // 매출이익 분의 매출액 = 이익율
         {headerName: "", field: "nvl", width: "auto"}
