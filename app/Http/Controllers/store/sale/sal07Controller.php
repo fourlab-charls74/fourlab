@@ -168,6 +168,7 @@ class sal07Controller extends Controller
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 						left outer join store s on o.store_cd = s.store_cd
 					where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
+						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
 						and o.prd_cd <> '' $where
 					group by o.prd_cd
 				) a
@@ -218,6 +219,7 @@ class sal07Controller extends Controller
 				left outer join store s on o.store_cd = s.store_cd
 				left outer join brand b on pc.brand = b.br_cd
 			where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
+				and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
 				and o.prd_cd <> '' $where
 			group by o.prd_cd
 			$orderby 
