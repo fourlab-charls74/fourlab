@@ -48,7 +48,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">반품일자</th>
+                                            <th class="required">반품요청일</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <p class="fs-14">{{ $sr->sr_date }}</p>

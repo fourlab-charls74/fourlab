@@ -80,6 +80,8 @@ class stk30Controller extends Controller
                 sr.store_cd,
                 store.store_nm,
                 sr.sr_date,
+                sr.sr_pro_date,
+                sr.sr_fin_date,
                 sr.sr_kind,
                 sr.sr_state,
                 c.code_val as sr_state_nm,
@@ -272,16 +274,31 @@ class stk30Controller extends Controller
 		try {
 			DB::beginTransaction();
 
+			$sr_update = [
+				'ut' => now(),
+				'admin_id' => $admin_id,
+			];
+
 			if ($new_state != '') {
-				DB::table('store_return')->where('sr_cd', $sr_cd)->update([
-					'sr_state' => $new_state,
-					'ut' => now(),
-					'admin_id' => $admin_id,
-				]);
+				$sr_update = array_merge($sr_update, [ 'sr_state' => $new_state ]);
 			}
 
+			if ($new_state == '30') {
+				$sr_update = array_merge($sr_update, [ 'sr_pro_date' => date('Y-m-d') ]);
+			}
+
+			if ($new_state == '40') {
+				$sr_update = array_merge($sr_update, [ 'sr_fin_date' => date('Y-m-d') ]);
+			}
+
+			DB::table('store_return')
+				->where('sr_cd', $sr_cd)
+				->update($sr_update);
+
+			$now_state = DB::table('store_return')->where('sr_cd', $sr_cd)->value('sr_state');
+
 			foreach($products as $product) {
-				if ($product['store_wqty'] < $product['return_p_qty']) {
+				if ($product['store_wqty'] < $product['return_p_qty'] && $now_state < 30) {
 					$code = 501;
 					throw new Exception('매장보유재고보다 많은 수량을 반품처리할 수 없습니다.');
 				}

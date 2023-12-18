@@ -107,6 +107,7 @@ class stk35Controller extends Controller
                 store.store_type,
                 sc.store_kind as store_type_nm,
                 sr.sr_date,
+                sr.sr_pro_date,
                 sr.sr_fin_date,
                 sr.sr_kind,
                 sr.sr_state,
@@ -410,6 +411,10 @@ class stk35Controller extends Controller
 
 			if ($new_state != '') {
 				$sr_update = array_merge($sr_update, [ 'sr_state' => $new_state ]);
+			}
+			
+			if ($new_state == '30') {
+				$sr_update = array_merge($sr_update, [ 'sr_pro_date' => date('Y-m-d') ]);
 			}
 
 			if ($new_state == '40') {

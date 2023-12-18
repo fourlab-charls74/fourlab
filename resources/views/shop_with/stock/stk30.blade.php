@@ -27,7 +27,7 @@
                 <div class="row">
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
-                            <label for="">반품일자</label>
+                            <label for="">반품요청일</label>
                             <div class="form-inline date-select-inbox">
                                 <div class="docs-datepicker form-inline-inner input_box">
                                     <div class="input-group">
@@ -192,7 +192,9 @@
 				return `<a href="javascript:void(0);" onclick="openDetailPopup(${params.value})">${params.data.store_cd}_${return_date}_${return_code}</a>`;
 			}
 		},
-        {field: "sr_date", headerName: "반품일자", width: 90, cellClass: 'hd-grid-code'},
+        {field: "sr_date", headerName: "반품요청일", width: 90, cellClass: 'hd-grid-code'},
+        {field: "sr_pro_date", headerName: "반품처리일", width: 90, cellClass: 'hd-grid-code'},
+        {field: "sr_fin_date", headerName: "반품완료일", width: 90, cellClass: 'hd-grid-code'},
         {field: "sr_state", hide: true},
         {field: "sr_state_nm", headerName: "반품상태", width: 65, cellStyle: StyleReturnState},
         {field: "sr_kind", hide: true},

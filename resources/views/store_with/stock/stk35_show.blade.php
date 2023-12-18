@@ -58,7 +58,7 @@
 									<table class="table incont table-bordered" width="100%" cellspacing="0">
 										<tbody>
 										<tr>
-											<th class="required">반품예정일자</th>
+											<th class="required">반품요청일</th>
 											<td>
 												<div class="form-inline">
 													@if(@$cmd == 'add')
@@ -351,12 +351,13 @@
 			let sr_reason = document.f1.sr_reason.value;
 			let comment = document.f1.comment.value;
 			let rows = gx.getRows();
+			let store_cd = $('#store_no').val();
 
 			if(cmd === 'add') {
 				let sr_date = document.f1.sdate.value;
 				let storage_cd = document.f1.storage_cd.value;
 
-				if(store_cd === '') {
+				if(store_cd.length < 1) {
 					$(".sch-store").click();
 					return alert("매장을 선택해주세요.");
 				}
