@@ -61,15 +61,15 @@ Login
 					</ul> -->--}}
 
                     <!-- QA 기간동안의 임시 URL 정보 노출 시작 //-->
-					@if($_SERVER['SERVER_NAME'] != 'devel.fjallraven.co.kr')
+					@if($_SERVER['SERVER_NAME'] == 'devel.fjallraven.co.kr')
 					<div class="pt50" style="font-size:15px;color:#FF0000;font-weight:bold;">
-						@if($_SERVER['SERVER_NAME'] == 'handle.fjallraven.co.kr')
-							※ 현재페이지는 실 데이터 입니다.<br>
+						@if($_SERVER['SERVER_NAME'] == 'devel.fjallraven.co.kr')
+							※ 현재페이지는 개발 페이지 입니다.<br>
 						@endif
-						※ 테스트 페이지는 아래 링크를 이용해 주십시요.
+						※ 업무 페이지는 아래 링크를 이용해 주십시요.
 					</div>
 					<div class="txtc pt10" style="font-size:15px;">
-						테스트 페이지 URL : <a href="https://devel.fjallraven.co.kr/" style="font-weight:bold;text-decoration:underline !important;">https://devel.fjallraven.co.kr/</a>
+						테스트 페이지 URL : <a href="https://handle.fjallraven.co.kr/" style="font-weight:bold;text-decoration:underline !important;">https://handle.fjallraven.co.kr/</a>
 					</div>
 					@endif
                     <!-- QA 기간동안의 임시 URL 정보 노출 종료 //-->
