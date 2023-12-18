@@ -313,6 +313,7 @@ class prd04Controller extends Controller
 			where
 				-- c.code_kind_cd = 'PRD_CD_COLOR'
 				1=1
+				and pc.type = 'N'
 				$where
 			group by pc.prd_cd
 			$having
