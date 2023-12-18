@@ -454,7 +454,7 @@ class sal03Controller extends Controller
 								$where
 							group by a.prd_cd
 							$orderby
-							limit 0, 10
+							$limit
 						) t
 					";
 				} else {
