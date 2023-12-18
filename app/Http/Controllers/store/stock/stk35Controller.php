@@ -309,18 +309,20 @@ class stk35Controller extends Controller
 			if(count($products) < 1) {
 				throw new Exception("반품등록할 상품을 선택해주세요.");
 			}
-
-			foreach($products as $product) {
-
-				if ($product['store_wqty'] < $product['return_qty']) {
-					$code = 501;
-					throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
+			
+			$group_store_cd = collect($products)->groupBy('store_cd');
+			
+			foreach ($group_store_cd as $store_cd => $store_product) {
+				if(count($store_product) < 1) {
+					continue;
 				}
-
+				
+				$store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
+				
 				$sr_cd = DB::table('store_return')
 					->insertGetId([
 						'storage_cd' => $storage_cd,
-						'store_cd' => $product['store_cd'],
+						'store_cd' => $store_cd,
 						'sr_date' => $sr_date,
 						'sr_kind' => $sr_kind,
 						'sr_state' => $sr_state,
@@ -330,34 +332,33 @@ class stk35Controller extends Controller
 						'admin_id' => $admin_id,
 					]);
 
-				DB::table('store_return_product')
-					->insert([
-						'sr_cd' => $sr_cd,
-						'prd_cd' => $product['prd_cd'],
-						'price' => $product['price'], // 판매가
-						'return_price' => $product['return_price'], // 반품단가
-						'return_qty' => $product['return_qty'], // 요청수량
-						'rt' => now(),
-						'admin_id' => $admin_id,
-					]);
+				foreach($store_product as $product) {
 
+					if ($product['store_wqty'] < $product['return_qty']) {
+						$code = 501;
+						throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
+					}
+
+					DB::table('store_return_product')
+						->insert([
+							'sr_cd' => $sr_cd,
+							'prd_cd' => $product['prd_cd'],
+							'price' => $product['price'], // 판매가
+							'return_price' => $product['return_price'], // 반품단가
+							'return_qty' => $product['return_qty'], // 요청수량
+							'rt' => now(),
+							'admin_id' => $admin_id,
+						]);
+
+				}
 				//상품반품 등록 시 매장에 내역 확인 알림 표시
-				$sql = "
-					select
-						store_nm
-					from store
-					where store_cd = :store_cd
-				";
-
-				$store_nm = DB::selectOne($sql, ['store_cd' => $product['store_cd']]);
-
 				$res = DB::table('msg_store')
 					->insertGetId([
 						'msg_kind' => 'STORE_RETURN',
 						'sender_type' => 'H',
 						'sender_cd' => $admin_id ?? '',
 						'reservation_yn' => 'N',
-						'content' => '본사에서 ' . $store_nm->store_nm . '에 매장반품 요청하였습니다.',
+						'content' => '본사에서 ' . $store->store_nm . '에 매장반품 요청하였습니다.',
 						'rt' => now()
 					]);
 
@@ -365,10 +366,11 @@ class stk35Controller extends Controller
 					->insert([
 						'msg_cd' => $res,
 						'receiver_type' => 'S',
-						'receiver_cd' => $product['store_cd'] ?? '',
+						'receiver_cd' => $store_cd ?? '',
 						'check_yn' => 'N',
 						'rt' => now()
 					]);
+				
 			}
 
 			DB::commit();
@@ -1004,43 +1006,45 @@ class stk35Controller extends Controller
 		$result = [];
 
 		foreach ($prd_cds as $key => $pc) {
+			
+			foreach($store_cd as $sc) {
+				$store = DB::table('store')->where('store_cd', $sc)->select('store_cd', 'store_nm')->first();
 
-			$store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
+				$sql = "
+					select
+						pc.prd_cd
+						, pc.goods_no
+						, opt.opt_kind_nm
+						, b.brand_nm as brand
+						, if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
+						, if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
+						, if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
+						, pc.prd_cd_p as prd_cd_p
+						, pc.color
+						, pc.size
+						, pc.goods_opt
+						, if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+						, if(g.goods_no <> '0', g.price, p.price) as price
+						, p.price as return_price
+						, '$sc' as store_cd
+						, '$store->store_nm' as store_nm
+						, ifnull(pss.qty,0) as store_qty
+						, ifnull(pss.wqty,0) as store_wqty
+						, '0' as qty
+						, true as isEditable
+					from product_code pc
+						inner join product p on p.prd_cd = pc.prd_cd
+						left outer join goods g on g.goods_no = pc.goods_no
+						left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$sc'
+						left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
+						left outer join brand b on b.br_cd = pc.brand
+					where pc.prd_cd = '$pc'
+					limit 1
+				";
 
-			$sql = "
-                select
-                    pc.prd_cd
-                    , pc.goods_no
-                    , opt.opt_kind_nm
-                    , b.brand_nm as brand
-                    , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
-                    , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
-                    , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
-                    , pc.prd_cd_p as prd_cd_p
-                    , pc.color
-                    , pc.size
-                    , pc.goods_opt
-                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
-                    , if(g.goods_no <> '0', g.price, p.price) as price
-                    , p.price as return_price
-                    , '$store_cd' as store_cd
-                    , '$store->store_nm' as store_nm
-                    , ifnull(pss.qty,0) as store_qty
-                    , ifnull(pss.wqty,0) as store_wqty
-                    , '0' as qty
-                    , true as isEditable
-                from product_code pc
-                    inner join product p on p.prd_cd = pc.prd_cd
-                    left outer join goods g on g.goods_no = pc.goods_no
-                    left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$store_cd'
-                    left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
-                    left outer join brand b on b.br_cd = pc.brand
-                where pc.prd_cd = '$pc'
-                limit 1
-            ";
-
-			$row = DB::selectOne($sql);
-			array_push($result, $row);
+				$row = DB::selectOne($sql);
+				array_push($result, $row);
+			}
 		}
 
 		return response()->json([
