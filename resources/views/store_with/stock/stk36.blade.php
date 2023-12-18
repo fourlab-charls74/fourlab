@@ -27,37 +27,6 @@
             </div>
             <div class="card-body">
                 <div class="row">
-{{--                    <div class="col-lg-4 inner-td">--}}
-{{--                        <div class="form-group">--}}
-{{--                            <label for="formrow-firstname-input">매출기간</label>--}}
-{{--                            <div class="form-inline">--}}
-{{--                                <div class="docs-datepicker form-inline-inner input_box">--}}
-{{--                                    <div class="input-group">--}}
-{{--                                        <input type="text" class="form-control form-control-sm docs-date month" name="sdate" value="{{ $sdate }}" autocomplete="off">--}}
-{{--                                        <div class="input-group-append">--}}
-{{--                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable="">--}}
-{{--                                                <i class="fa fa-calendar" aria-hidden="true"></i>--}}
-{{--                                            </button>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="docs-datepicker-container"></div>--}}
-{{--                                </div>--}}
-{{--                                <span class="text_line">~</span>--}}
-{{--                                <div class="docs-datepicker form-inline-inner input_box">--}}
-{{--                                    <div class="input-group">--}}
-{{--                                        <input type="text" class="form-control form-control-sm docs-date month" name="edate" value="{{ $edate }}" autocomplete="off">--}}
-{{--                                        <div class="input-group-append">--}}
-{{--                                            <button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">--}}
-{{--                                                <i class="fa fa-calendar" aria-hidden="true"></i>--}}
-{{--                                            </button>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                    <div class="docs-datepicker-container"></div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-
 					<div class="col-lg-4">
 						<div class="form-group">
 							<label for="">매출기간</label>
@@ -125,12 +94,12 @@
 <div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
 	<div class="card-body shadow">
 		<div class="table-responsive">
-			<div id="div-gd2" style="height:100%;min-height:150px " class="ag-theme-balham"></div>
+			<div id="div-gd2" style="height:100%;min-height:120px " class="ag-theme-balham"></div>
 		</div>
 	</div>
 	<div class="card-body shadow">
 		<div class="table-responsive">
-			<div id="div-gd" style="width:100%;" class="ag-theme-balham"></div>
+			<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 		</div>
 	</div>
 </div>
@@ -259,18 +228,13 @@
 	let gx2;
 
     $(document).ready(function() {
-        pApp.ResizeGrid(300);
+        pApp.ResizeGrid(390);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
         gx = new HDGrid(gridDiv, columns, {
 			pinnedTopRowData : pinnedRowData,
 			getRowStyle: (params) => {
 				if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
-			},
-			defaultColDef: {
-				suppressMenu: true,
-				resizable: false,
-				sortable: true,
 			},
 		});
 
@@ -313,7 +277,7 @@
 				headerName: nm + '(피엘라벤)',
 				minWidth : 600,
 				children: [
-					{field: cd + '_brand', headerName: '브랜드', minWidth: 150, maxWidth: 150,
+					{field: cd + '_brand', headerName: '브랜드', minWidth : 100,
 						cellStyle: function(params) {
 							if(params.value == '피엘라벤') {
 								return {color: '#2E64FE'};
@@ -341,7 +305,7 @@
 							}
 						},
 					},
-					{field: cd + '_amt', headerName: '매출', type: "currencyType", minWidth: 170, maxWidth: 170,
+					{field: cd + '_amt', headerName: '매출', type: "currencyType", minWidth : 100,
 						cellStyle: function(params) {
 							if (params.node.rowPinned === 'top') {
 								return { 'text-align' : 'left' };
@@ -353,7 +317,6 @@
 		}
 		columns.push({ width: "auto" });
 		gx.gridOptions.api.setColumnDefs(columns);
-		gx.gridOptions.api.setRowData(data);
 	}
 
     //검색
@@ -364,8 +327,6 @@
 			
 			let rank = e.head.rank_data;
 			let stores = e.head.stores;
-
-			console.log(rank['G0003']);
 
 			const pinnedRowData = {
 				rank_idx : "랭크"	

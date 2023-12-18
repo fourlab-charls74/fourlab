@@ -36,6 +36,8 @@ class stk36Controller extends Controller
         $store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 		$stores = [];
+		$replace_sdate = str_replace('-', '', $sdate.'-01');
+		$replace_edate = str_replace('-', '', $sdate.'-31');
 
         $where = "";
         // $orderby = "";
@@ -100,12 +102,12 @@ class stk36Controller extends Controller
 				from order_opt_wonga w 
 					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
 				where w.ord_state in (30, 60, 61) and o.store_cd = '$store_cd' and o.ord_state = '30'
-					and w.ord_state_date >= replace(concat('$sdate','-01'), '-', '')
-					and w.ord_state_date <= replace(concat('$sdate','-31'), '-', '') 
+					and w.ord_state_date >= :ord_state_sdate
+					and w.ord_state_date <= :ord_state_edate
 			 ";
 			 
-			 $recv_amt = DB::select($sql);
-			  array_push($result,$recv_amt[0]);
+			 $recv_amt = DB::select($sql, ['ord_state_sdate' => $replace_sdate, 'ord_state_edate' => $replace_edate]);
+			 array_push($result,$recv_amt[0]);
 			 $res[] = $result;
 		 }
 		 
@@ -164,6 +166,8 @@ class stk36Controller extends Controller
 		$store_no = $request->input('store_no', '');
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
+		$replace_sdate = str_replace('-', '', $sdate.'-01');
+		$replace_edate = str_replace('-', '', $sdate.'-31');
 		
 		$where = "";
 		if ($store_no != "") $where .= " and s.store_cd ='" . Lib::quote($store_no). "'";
@@ -378,10 +382,10 @@ class stk36Controller extends Controller
 			where 
 				w.ord_state in (30,60,61) and o.ord_state = '30' and o.store_cd in ($storecds)
 				and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
-				and w.ord_state_date >= replace(:sdate, '-', '')
-				and w.ord_state_date <= replace(:edate, '-', '') 
+				and w.ord_state_date >= :sdate
+				and w.ord_state_date <= :edate
 		";
-		$total_amt = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
+		$total_amt = DB::select($sql, ['sdate' => $replace_sdate, 'edate' => $replace_edate]);
 		$fjallraven_total_amt = $total_amt[0]->total_amt??0;
 
 
@@ -396,12 +400,12 @@ class stk36Controller extends Controller
 			where 
 				w.ord_state in (30,60,61) and o.ord_state = '30' and o.store_cd in ($storecds)
 				and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
-				and w.ord_state_date >= replace(:sdate, '-', '')
-				and w.ord_state_date <= replace(:edate, '-', '') 
+				and w.ord_state_date >= :sdate
+				and w.ord_state_date <= :edate
 			group by o.store_cd
 		";
 
-		$fjallraven_best_worst_amt = DB::select($sql, ['sdate' => $sdate . '-01', 'edate' => $sdate . '-31']);
+		$fjallraven_best_worst_amt = DB::select($sql, ['sdate' => $replace_sdate, 'edate' => $replace_edate]);
 
 		$min_total_amt = PHP_INT_MAX;
 		$min_total_store_cd = null;
