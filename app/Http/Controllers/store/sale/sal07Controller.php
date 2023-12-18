@@ -186,7 +186,7 @@ class sal07Controller extends Controller
 				sum(w.qty * w.price) as amt,
 				-- sum(w.recv_amt + w.point_apply_amt) as recv_amt,
 				sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as recv_amt,
-				sum(w.qty * w.price - w.recv_amt) as discount,
+				sum(w.qty * w.price - if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as discount,
 				avg(w.price) as avg_price,
 				avg(w.wonga) as wonga,
 				sum(w.wonga * w.qty) as sum_wonga,
