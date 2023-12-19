@@ -333,34 +333,29 @@
         gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });
     };
 
-	
-
 	const evtAfterEdit = async (params) => {
+		let value = params.newValue;
 
-		let prev_value = parseInt(params.oldValue);
-        let value = params.newValue;
+		// 입력값에 문자열이 포함되었는지 확인하는 정규식
+		let checkIncludeText;
+		if (value !== "") {
+			checkIncludeText = value.replace(/[^0-9,-]/g, "");
+		}
 
-		if (prev_value !== value) {
-			let row = params.data;
-            const row_index = params.rowIndex;
-			const rowNode = gx.gridOptions.api.getRowNode(row_index);
-            const column_name = params.column.colId;
-			// 입력값에 문자가 들어가있는지 판단하는 정규식 ( value의 길이와 value에서 문자열을 제거한 길이가 다르면 문자가 들어가있는거임 )
-			let checkIncludeText;
-			if (value != "") {
-				checkIncludeText = value.replace(/\D/g, "");
-			}
-			let regExp = /(?=proj_amt_).+/i;
-			let arr = column_name.match(regExp);
-			let parseValue = parseInt(value);
+		const row_index = params.rowIndex;
+		const rowNode = gx.gridOptions.api.getRowNode(row_index);
+		const column_name = params.column.colId;
 
-			if (arr) {
-				if (isNaN(parseValue) == true || parseValue == "" || checkIncludeText.length < value.length) {
-					alert("숫자만 입력가능합니다.");
-					startEditingCell(row_index, column_name);
-					rowNode.setDataValue(column_name, parseInt(0));
-					return false;
-				} 
+		let regExp = /(?=proj_amt_).+/i;
+		let arr = column_name.match(regExp);
+		let parseValue = parseInt(value);
+
+		if (arr) {
+			if (isNaN(parseValue) || checkIncludeText.length < value.length) {
+				alert("숫자만 입력 가능합니다.");
+				startEditingCell(row_index, column_name);
+				rowNode.setDataValue(column_name, parseInt(0));
+				return false;
 			}
 		}
 	};
