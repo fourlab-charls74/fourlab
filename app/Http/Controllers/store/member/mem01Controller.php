@@ -68,7 +68,7 @@ class mem01Controller extends Controller
 					left outer join user_group_member b on a.user_id = b.user_id
 					left outer join user_group c on b.group_no = c.group_no
 					-- left outer join code d ON d.code_kind_cd = 'G_SEX_TYPE' AND a.sex = d.code_id
-					-- left outer join member_stat e ON a.user_id = e.user_id
+					left outer join member_stat e ON a.user_id = e.user_id
 				where 1=1 and out_yn <> 'I' $where
 			";
 			$row = DB::selectOne($sql);
