@@ -260,7 +260,7 @@
 						return 0;
 					}
 
-					if (progress == -Infinity) progress = 0;
+					if (progress == -Infinity || progress == Infinity) progress = 0;
 
 					return progress;
 				}
