@@ -255,7 +255,7 @@
 					{field: "sale_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc },
 					{field: "sale_goods_sh", headerName: "정상가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
 					{field: "sale_price", headerName: "현재가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
-					{field: "sale_recv_price", headerName: "실판매가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
+					{field: "sale_recv_price", headerName: "실결제가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
 					{field: "sale_wonga", headerName: "원가", width: 80, type: "currencyType", aggFunc: sumValuesFunc },
 					{field: "sale_ratio", headerName: "판매율", width: 80, cellStyle: {'text-align' : 'right'},
 						aggFunc: (params) => {

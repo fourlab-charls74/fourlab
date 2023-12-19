@@ -28,6 +28,8 @@ class  sal27Controller extends Controller
 
 	public function search(Request $request)
 	{
+		ini_set('memory_limit', -1);
+		
 		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m-d"));
 		$edate = $request->input('edate', now()->format("Y-m-d"));
 		$sdate_day = date('Ymd', strtotime($sdate));
@@ -51,9 +53,9 @@ class  sal27Controller extends Controller
 
 		// 일자검색
 		$date_where1 = " and ord_state_date <= '" . $edate_day . "'";
-		$date_where2 = " and stock_state_date <= '" . $edate_day . "'";
+		$date_where2 = " and r_stock_state_date <= '" . $edate_day . "'";
 		$date_where3 = " and replace(sr_date, '-', '') <= '" . $edate_day . "'";
-		$date_where4 = " and rec_rt <= '" . $edate_time . "'";
+		$date_where4 = " and prc_rt <= '" . $edate_time . "'";
 		$date_where5 = " and h.stock_state_date >= '" . $next_edate_day . "' and h.stock_state_date <= '" . $today_day . "'";
 		$date_where6 = " and ord_state_date >= '" . $sdate_day . "' and ord_state_date <= '" . $edate_day . "'";
 
@@ -151,8 +153,10 @@ class  sal27Controller extends Controller
 				, (a.term_in_qty * a.price) as term_in_price
 				, (a.term_in_qty * a.wonga) as term_in_wonga
 				, (a.sale_qty * a.goods_sh) as sale_goods_sh
-				, (a.sale_qty * a.price) as sale_price
-				, (a.sale_qty * a.wonga) as sale_wonga
+				-- , (a.sale_qty * a.sale_price) as sale_price
+			    , a.sale_price as sale_price
+				-- , (a.sale_qty * a.wonga) as sale_wonga
+			    , a.sale_wonga as sale_wonga
 				, (a.term_storage_qty * a.goods_sh) as term_storage_goods_sh
 				, (a.term_storage_qty * a.price) as term_storage_price
 				, (a.term_storage_qty * a.wonga) as term_storage_wonga
@@ -164,7 +168,8 @@ class  sal27Controller extends Controller
 				, ((a.term_storage_qty * a.price) + (a.term_store_qty * a.price)) as term_total_price
 				, ((a.term_storage_qty * a.wonga) + (a.term_store_qty * a.wonga)) as term_total_wonga
 			 	, round(a.sale_qty / a.term_in_qty * 100) as sale_ratio
-			    , round((1 - (a.sale_recv_price / (a.sale_qty * a.price))) * 100) as discount_ratio
+			    -- , round((1 - (a.sale_recv_price / (a.sale_qty * a.price))) * 100) as discount_ratio
+			    , round((1 - (a.sale_recv_price / a.sale_price)) * 100) as discount_ratio
 			from (
 				select pc.*
 					, ps.in_qty as total_in_qty
@@ -183,6 +188,22 @@ class  sal27Controller extends Controller
 							and ord_state in (30,60,61)
 							and prd_cd = pc.prd_cd
 					) as sale_qty
+					, (
+						select ifnull(sum(price * qty), 0) as sale_price 
+						from order_opt_wonga
+						where 1=1 
+							$date_where1
+							and ord_state in (30,60,61)
+							and prd_cd = pc.prd_cd
+					) as sale_price
+					, (
+						select ifnull(sum(wonga * qty), 0) as sale_wonga 
+						from order_opt_wonga
+						where 1=1 
+							$date_where1
+							and ord_state in (30,60,61)
+							and prd_cd = pc.prd_cd
+					) as sale_wonga
 					, (
 						select ifnull(sum(recv_amt), 0) as price
 						from order_opt_wonga
@@ -205,7 +226,9 @@ class  sal27Controller extends Controller
 						from product_stock_hst h
 						where prd_cd = pc.prd_cd
 							$date_where2
-							and type in (1,9) and location_type = 'STORE'
+							and type in (1,9) 
+							-- and location_type = 'STORE'
+							and if( h.stock_state_date <= '20231109', (h.location_type = 'STORE' or h.location_type = 'STORAGE') , h.location_type = 'STORAGE')
 							$store_where2
 					) as term_in_qty
 					, ifnull(date_format(first_release_date, '%Y-%m-%d'), '') as first_release_date
@@ -219,12 +242,14 @@ class  sal27Controller extends Controller
 						, pc.size
 						-- , ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p
 				  		, pc.prd_cd_p
-						, g.goods_nm, g.goods_nm_eng, g.goods_sh, g.price, g.wonga, g.com_id
+						, g.goods_nm, g.goods_nm_eng, p.tag_price as goods_sh, p.price as price, p.wonga as wonga, g.com_id
 					from product_code pc
-						inner join goods g on g.goods_no = pc.goods_no
+					inner join product p on pc.prd_cd = p.prd_cd
+					inner join goods g on g.goods_no = pc.goods_no
 					where 1=1 
 						$product_where 
 						and pc.goods_no <> 0
+						and pc.type = 'N'
 					order by pc.item, pc.brand, pc.prd_cd_p desc, pc.color, pc.prd_cd desc
 				) pc
 					inner join product_stock ps on ps.prd_cd = pc.prd_cd
@@ -242,14 +267,14 @@ class  sal27Controller extends Controller
 						group by ss.prd_cd
 					) pss on pss.prd_cd = pc.prd_cd
 					left outer join (
-						select r.prd_cd, sum(r.qty) as qty, min(r.rec_rt) as first_release_date
+						select r.prd_cd, sum(r.qty) as qty, min(r.prc_rt) as first_release_date
 						from product_stock_release r
 							inner join store s on s.store_cd = r.store_cd
 							inner join (
 								select idx
 								from product_stock_release
 								where 1=1 $storage_where1
-									and state > 10
+									and state > 20
 									$date_where4
 							) rr on rr.idx = r.idx
 						where 1=1 $store_where
@@ -289,7 +314,7 @@ class  sal27Controller extends Controller
 						group by h.prd_cd
 					) store_hst on store_hst.prd_cd = pc.prd_cd
 			) a
-				inner join code clr on clr.code_kind_cd = 'PRD_CD_COLOR' and clr.code_id = a.color
+				left outer join code clr on clr.code_kind_cd = 'PRD_CD_COLOR' and clr.code_id = a.color
 				left outer join code c on c.code_kind_cd = 'PRD_CD_ITEM' and c.code_id = a.item
 				left outer join brand b on b.br_cd = a.brand
 				left outer join company com on com.com_id = a.com_id
