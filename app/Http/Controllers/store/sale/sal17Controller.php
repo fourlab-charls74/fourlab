@@ -116,10 +116,10 @@ class sal17Controller extends Controller
 			$comma = ($i == $months_count) ? "" : ",";
 
 			// sdate 기준 저번 달 주문금액, 결제금액 가져오기
-			$sum_month_prev .= "
-				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.price*o.qty,0)) as prev_ord_amt_${Ym}, 
-				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.recv_amt,0)) as prev_recv_amt_${Ym},
-			";
+//			$sum_month_prev .= "
+//				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.price*o.qty,0)) as prev_ord_amt_${Ym}, 
+//				sum(if(date_format(m.ord_date,'%Y%m') = '${prev_sdate}', o.recv_amt,0)) as prev_recv_amt_${Ym},
+//			";
 
 			// 기간 이내의 주문금액, 결제금액 가져오기
 			$sum_month_others .= " 
@@ -163,6 +163,7 @@ class sal17Controller extends Controller
 		$ym_s = str_replace("-", "", $sdate);
 		$ym_e = str_replace("-", "", $edate);
 		$prev_sdate = Carbon::parse($sdate)->subMonth()->format("Y-m");
+		
 		$next_edate = Carbon::parse($edate)->addMonth()->format("Y-m");
 
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format("Y-m");
@@ -175,11 +176,10 @@ class sal17Controller extends Controller
 				left outer join
 				( 
 					select m.store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
-						${sum_month_prev}
 						${sum_month_others}
 					from order_mst m 
 						inner join order_opt o on m.ord_no = o.ord_no 
-					where m.ord_date >= '${prev_sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
+					where m.ord_date > '${sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
 					group by m.store_cd
 				) a on s.store_cd = a.store_cd 
 				left outer join 
@@ -207,7 +207,6 @@ class sal17Controller extends Controller
 			where 1=1 ${where}
 			order by scd
 		";
-            //echo "<pre>$sql</pre>";
 
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
 
