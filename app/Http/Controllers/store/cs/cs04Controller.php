@@ -443,7 +443,7 @@ class cs04Controller extends Controller
                         'price' => $product['price'], // 판매가
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
-						'comment' => $product['comment'], // 메모
+						'comment' => $product['comment']??'', // 메모
                         'rt' => now(),
                         'admin_id' => $admin_id,
                     ]);
@@ -573,7 +573,7 @@ class cs04Controller extends Controller
                     ->update([
                         'return_price' => $product['return_price'], // 반품단가
                         'return_qty' => $product['return_qty'], // 반품수량
-						'comment' => $product['comment'], // 메모
+						'comment' => $product['comment']??'', // 메모
                         'ut' => now(),
                         'admin_id' => $admin_id,
                     ]);
