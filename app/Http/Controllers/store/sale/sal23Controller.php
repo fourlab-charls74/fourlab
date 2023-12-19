@@ -205,6 +205,10 @@ class sal23Controller extends Controller
             $sql = "	
                 select 
                     count(a.prd_cd) as total
+                    , sum(prev_qty) as prev_qty
+                    , sum(prev_sh) as prev_tag_price
+                    , sum(prev_price) as prev_price
+                    , sum(prev_wonga) as prev_wonga
                     , sum(stock_in_qty) as stock_in_qty
                     , sum(stock_in_sh) as stock_in_tag_price
                     , sum(stock_in_price) as stock_in_price
