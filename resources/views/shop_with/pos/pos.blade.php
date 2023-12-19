@@ -939,11 +939,12 @@
     let gx3;
 
     const member_columns = [
-        {field: "user_id", headerName: "아이디", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'}),
+        {field: "user_id", headerName: "아이디", width: 100, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'}),
             cellRenderer: (params) => `<a href="javascript:void(0);" onclick="return setMember('${params.value}')">${params.value}</a>`,
         },
-        {field: "user_nm", headerName: "이름", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
-        {field: "mobile", headerName: "연락처", width: 160, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {field: "user_nm", headerName: "이름", width: 80, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {field: "mobile", headerName: "연락처", width: 120, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
+        {field: "group_nm", headerName: "고객등급", width: 100, cellStyle: (params) => ({...AlignCenter, ...LineHeight50, "background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})},
         {width: "auto", cellStyle: (params) => ({"background-color": params.data.store_member == 'Y' ? '#c9f9f9 !important' : 'none'})}
     ];
 

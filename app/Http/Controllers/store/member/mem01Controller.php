@@ -65,7 +65,8 @@ class mem01Controller extends Controller
 					count(*) as cnt
 				from
 					member a
-					$join
+					left outer join user_group_member b on a.user_id = b.user_id
+					left outer join user_group c on b.group_no = c.group_no
 					-- left outer join code d ON d.code_kind_cd = 'G_SEX_TYPE' AND a.sex = d.code_id
 					-- left outer join member_stat e ON a.user_id = e.user_id
 				where 1=1 and out_yn <> 'I' $where
@@ -120,11 +121,12 @@ class mem01Controller extends Controller
 				a.auth_type, f.code_val as auth_type_str, a.auth_yn,
 				e.ord_date, e.ord_cnt, e.ord_amt,
 				a.email_chk, a.mobile_chk, a.yn, ifnull(cm.com_nm,a.site) as site,
-				a.name_chk, a.addr, a.zip
+				a.name_chk, a.addr, a.zip , c.group_nm
 				${group_sql}
 			from
 				member a
-				$join
+				left outer join user_group_member b on a.user_id = b.user_id
+				left outer join user_group c on b.group_no = c.group_no
 				left outer join code d on d.code_kind_cd = 'G_SEX_TYPE' and a.sex = d.code_id
 				left outer join member_stat e on a.user_id = e.user_id
 				left outer join code f on f.code_kind_cd = 'G_AUTH_TYPE' and a.auth_type = f.code_id
@@ -276,11 +278,11 @@ class mem01Controller extends Controller
 			$where .= " and a.site = '$site' ";
 		}
 
-		$join = "";
 		if($user_group != ""){
-			$join = " inner join user_group_member b on a.user_id = b.user_id ";
-			$join .= " inner join user_group c on b.group_no = c.group_no and c.group_no in ($user_group) ";
+			$where .= " and c.group_no in ($user_group) ";
 		}
+		
+		$join = "";
 
 		$page = Request("page",1);
 		if ($page < 1 or $page == "") $page = 1;

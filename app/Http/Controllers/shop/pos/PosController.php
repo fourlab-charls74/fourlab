@@ -300,19 +300,22 @@ class PosController extends Controller
 
         $sql = "
             select
-                user_id
-                , name as user_nm
-                , mobile
-                , email
-                , if(sex = 'F', '여', if(sex = 'M', '남', '-')) as gender
-                , yyyy
-                , mm
-                , dd
-                , point
-                , addr
-                , addr2
-                , if(store_cd = '$store_cd', 'Y', 'N') as store_member
-            from member
+                a.user_id
+                , a.name as user_nm
+                , a.mobile
+                , a.email
+                , if(a.sex = 'F', '여', if(a.sex = 'M', '남', '-')) as gender
+                , a.yyyy
+                , a.mm
+                , a.dd
+                , a.point
+                , a.addr
+                , a.addr2
+                , if(a.store_cd = '$store_cd', 'Y', 'N') as store_member
+            	, c.group_nm
+            from member a
+            	left outer join user_group_member b on a.user_id = b.user_id
+				left outer join user_group c on b.group_no = c.group_no
             where 1=1 $where
             order by
                 (case when store_cd = '$store_cd' then 1 else 2 end),
@@ -326,7 +329,9 @@ class PosController extends Controller
         if ($page == 1) {
             $sql = "
                 select count(*) as total
-                from member
+                from member a
+					left outer join user_group_member b on a.user_id = b.user_id
+					left outer join user_group c on b.group_no = c.group_no
                 where 1=1 $where
 			";
             $row = DB::selectOne($sql);

@@ -447,6 +447,7 @@
 		{field:"email", headerName:"이메일", width:150, cellStyle:{"text-align": "center"}},
 		{field:"point", headerName:"적립금", type:'currencyType', width:60},
 		{field:"regdate", headerName:"가입일", width:70, cellStyle:{"text-align": "center"}},
+		{field:"group_nm", headerName:"고객등급", width:70, cellStyle:{"text-align": "center"}},
 		{field:"store_nm", headerName:"가입 매장명", width:170},
 		{field:"lastdate", headerName:"최근로그인", width:130},
 		{field:"visit_cnt", headerName:"로그인횟수", type:'currencyType', width:80},
