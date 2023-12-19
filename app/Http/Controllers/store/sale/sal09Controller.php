@@ -222,7 +222,7 @@ class sal09Controller extends Controller
 			    a.*
 			    , s.store_nm
 			    , s.store_cd
-				, ifnull(p.amt,0) as proj_amt
+				, p.proj_amt
 				, (a.recv_amt / p.amt) * 100 as progress_rate
 				, sc.store_channel as store_channel
 				, sc2.store_kind as store_channel_kind
@@ -233,7 +233,6 @@ class sal09Controller extends Controller
 						sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,
 						if (s.online_only_yn = 'Y', sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)) as online,
 						if (s.online_only_yn = 'Y', sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end))  as offline,
-						${sum_month_prev}
 						${sum_month_others}
 					from order_opt_wonga w
 						inner join order_opt o on w.ord_opt_no = o.ord_opt_no
@@ -254,15 +253,15 @@ class sal09Controller extends Controller
 				left outer join 
 				(
 					select 
-						ssp.store_cd, sum(amt) as proj_amt, ssp.amt,
-						${sum_proj_amt}
-					from store_sales_projection ssp
+						store_cd, sum(amt) as proj_amt, amt
+					from store_sales_projection
 					where ym >= '${ym_s}' and ym <= '${ym_e}'
-					group by ssp.store_cd
+					group by store_cd
 				) p on s.store_cd = p.store_cd 
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
             where 1=1 and s.use_yn = 'Y' and (p.amt <> '' or a.qty is not null or a.recv_amt <> '0') $where2
+            order by s.store_cd
 		";
 		
 		$rows = DB::select($sql, ['sdate' => $sdate, 'edate' => $edate]);
