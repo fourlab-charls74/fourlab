@@ -84,6 +84,7 @@ class delivery_xmlController extends Controller
 			"CJ대한통운"		=> "055",
 			"CJ대한통운택배"	=> "055",
 			"대한통운택배"		=> "055",
+			"딜리래빗"		=> "156",
 			"기타"          	=> "999"
 		);
 
