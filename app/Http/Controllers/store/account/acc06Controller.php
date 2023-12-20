@@ -648,7 +648,12 @@ class acc06Controller extends Controller
 				, odt.code_val as ord_type_nm
 				, prc.code_val as pr_code_nm
 				, pyt.code_val as pay_type_nm
-				, ods.code_val as ord_state_nm
+				,case 
+					when a.ord_state = '30' then '출고완료'
+					when a.ord_state = '60' then '교환완료'
+					when a.ord_state = '61' then '환불완료'
+				end as ord_state_nm
+				-- , ods.code_val as ord_state_nm
 				, com.com_nm as sale_place_nm
 			from (
 				select o.ord_no, w.ord_opt_no
@@ -684,7 +689,7 @@ class acc06Controller extends Controller
 				left outer join code act on act.code_kind_cd = 'G_ACC_TYPE' and act.code_id = a.ord_state
 				left outer join code odt on odt.code_kind_cd = 'G_ORD_TYPE' and odt.code_id = a.ord_type
 				left outer join code pyt on pyt.code_kind_cd = 'G_PAY_TYPE' and pyt.code_id = a.pay_type
-				left outer join code ods on ods.code_kind_cd = 'G_ORD_STATE' and ods.code_id = a.ord_state
+				-- left outer join code ods on ods.code_kind_cd = 'G_ORD_STATE' and ods.code_id = a.ord_state
 				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = a.pr_code
 				left outer join company com on com.com_id = a.sale_place
 		";
