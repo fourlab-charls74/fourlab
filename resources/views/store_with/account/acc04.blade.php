@@ -395,7 +395,7 @@
 			let url = '/store/account/acc07/show/' + acc_idx;
 			window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=2100,height=1200");
 		} else {
-			utl = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
+			url = '/store/account/acc06/show-online?store_cd=' + store_cd + '&sdate=' + sdate;
 			window.open(url,"_blank","toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=100,left=100,width=1200,height=800");
 		}
 	}
