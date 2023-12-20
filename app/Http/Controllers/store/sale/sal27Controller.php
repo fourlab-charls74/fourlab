@@ -181,12 +181,13 @@ class  sal27Controller extends Controller
 							and prd_cd = pc.prd_cd
 					), '%Y-%m-%d') as first_sale_date
 					, (
-						select ifnull(sum(ifnull(qty, 0) * if(ord_state = 30, 1, -1)), 0) as sale_qty 
-						from order_opt_wonga
+						select ifnull(sum(ifnull(aa.qty, 0) * if(aa.ord_state = 30, 1, -1)), 0) as sale_qty 
+						from order_opt_wonga aa 
+						inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
 						where 1=1 
 							$date_where1
-							and ord_state in (30,60,61)
-							and prd_cd = pc.prd_cd
+							and aa.ord_state in (30,60,61)
+							and bb.prd_cd = pc.prd_cd
 					) as sale_qty
 					, (
 						select ifnull(sum(price * qty), 0) as sale_price 
