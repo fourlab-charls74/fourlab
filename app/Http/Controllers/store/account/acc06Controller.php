@@ -661,7 +661,8 @@ class acc06Controller extends Controller
 					, w.ord_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
 					, s.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price
 					, w.ord_kind, w.ord_type
-					, if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
+					-- , if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
+					, (w.qty * w.price) as sale_amt
 					-- , ((g.goods_sh - abs(w.price)) * w.qty * -1) as dc_amt
 					, (w.dc_apply_amt * if(w.ord_state = 30 and w.recv_amt > 0, -1, 1)) as dc_amt
 					, (w.coupon_apply_amt * if(w.ord_state = 30, -1, 1)) as coupon_amt
