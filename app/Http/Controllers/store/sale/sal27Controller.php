@@ -133,11 +133,12 @@ class  sal27Controller extends Controller
 
 			$month_sale_sql .= "
 				, (
-					select ifnull(sum(ifnull(qty, 0) * if(ord_state = 30, 1, -1)), 0) as sale_qty 
-					from order_opt_wonga
-					where ord_state_date >= '" . $from . "' and ord_state_date <= '" . $to . "'
-						and ord_state in (30,60,61)
-						and prd_cd = pc.prd_cd
+					select ifnull(sum(ifnull(aa.qty, 0) * if(aa.ord_state = 30, 1, -1)), 0) as sale_qty 
+					from order_opt_wonga aa
+					inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
+					where aa.ord_state_date >= '" . $from . "' and aa.ord_state_date <= '" . $to . "'
+						and aa.ord_state in (30,60,61)
+						and bb.prd_cd = pc.prd_cd
 				) as sale_qty_" . $from
 			;
 			$month_sale_cols[] = [ 'key' => "sale_qty_" . $from, 'kor_nm' => date('Y년 m월', strtotime($from)) ];
