@@ -945,11 +945,12 @@ class stk30Controller extends Controller
     /** 일괄등록 상품 개별 조회 */
     public function get_goods(Request $request) {
         $storage_cd = $request->input('storage_cd', '');
+		$store_cd = $request->input('store_cd', '');
 
         $data = $request->input('data', []);
         $result = [];
-        
-        
+		
+		$store = DB::table('store')->where('store_cd', $store_cd)->select('store_cd', 'store_nm')->first();
         $storage = DB::table('storage')->where('storage_cd', $storage_cd)->select('storage_cd', 'storage_nm')->first();
 
         if ($store == null || $storage== null) {
@@ -972,12 +973,7 @@ class stk30Controller extends Controller
                     , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
                     , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                     , pc.color
-                    , ifnull((
-						select s.size_cd from size s
-						where s.size_kind_cd = pc.size_kind
-						   and s.size_cd = pc.size
-						   and use_yn = 'Y'
-					),'') as size
+                    , pc.size
                     , pc.goods_opt
                     , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
                     , if(g.goods_no <> '0', g.price, p.price) as price
@@ -1023,12 +1019,7 @@ class stk30Controller extends Controller
             select srp.prd_cd
 				, g.goods_nm
                 , pc.color
-                , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+                , pc.size
                 , if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1 as qty
                 , g.price
                 , (g.price * if(sr.sr_state = 10, srp.return_qty, if(sr.sr_state = 30, srp.return_p_qty, srp.fixed_return_qty)) * -1) as total_price
