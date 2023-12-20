@@ -136,8 +136,8 @@
                                     <label class="custom-control-label" for="color_and_size">컬러, 사이즈</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="online_code" id="online_code" class="custom-control-input">
-                                    <label class="custom-control-label" for="online_code">온라인코드</label>
+                                    <input type="radio" name="group_type_condition" value="product_code_p" id="product_code_p" class="custom-control-input">
+                                    <label class="custom-control-label" for="product_code_p">품번</label>
                                 </div>
                             </div>
                         </div>
@@ -208,37 +208,39 @@
 <script language="javascript">
 
     const pinnedRowData = [{ 
-                        prd_cd : '합계' 
-                        , "total_ord_amt" : 0 
-                        , "total_ord_qty" : 0
+                        goods_no : '합계' 
                         , "in_sum_qty": 0 
-                        , "ord_amt" : 0 
-                        , "ord_qty" : 0
                         , "in_sum_amt" : 0
-                        , "stock_qty" : 0
-                        , "stock_wqty" : 0
                         , "ex_sum_qty" : 0
+                        , "total_ord_qty" : 0
+                        , "total_ord_amt" : 0 
+                        , "ord_qty" : 0
+                        , "ord_amt" : 0 
+                        , "store_wqty" : 0
+                        , "storage_wqty" : 0
                     }];
 
 	var columns = [
-		{headerName: '#', pinned: 'left', type: 'NumType', width: 40, cellStyle: StyleLineHeight,
-            cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
-        },
+		{headerName: '#', width:40, pinned: 'left', valueGetter: 'node.id', cellRenderer: 'loadingRenderer', cellStyle: StyleLineHeight,
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : parseInt(params.value) + 1,
+		},
 		{field: "prd_cd", headerName: "바코드", width: 120, pinned: "left", cellStyle: StyleLineHeight},
 		{
             field: "goods_no",
             headerName: "온라인코드",
-            hide: true,
-            width: 58,
+            width: 70,
             pinned: 'left',
             cellStyle: StyleLineHeight,
             cellRenderer: function (params) {
-                if (params.value) {
-                    return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
-                }
+				if(params.node.rowPinned === 'top') {
+					return '합계'
+				} else {
+					if (params.value) {
+						return `<a href="{{config('shop.front_url')}}/app/product/detail/${params.value}" target="_blank">${params.value}</a>`
+					}
+				}
             }
         },
-        {field: "goods_no", headerName: "온라인코드", cellStyle: StyleLineHeight, width: 70},
 		{field: "brand_nm", headerName: "브랜드", cellStyle: StyleLineHeight, width: 70},
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
@@ -283,8 +285,8 @@
                 {headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
-        {field: "stock_qty", headerName: "매장재고", type: 'numberType', width: 60},
-        {field: "stock_wqty", headerName: "창고재고", type: 'numberType', width: 60},
+        {field: "store_wqty", headerName: "매장재고", type: 'numberType', width: 60},
+        {field: "storage_wqty", headerName: "창고재고", type: 'numberType', width: 60},
         {width: "auto"}
 	];
 </script>
@@ -305,9 +307,16 @@
                 if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
             },
         });
+
+		gx.gridOptions.defaultColDef = {
+			suppressMenu: true,
+			resizable: true,
+			sortable: true,
+		};
 		Search();
 	});
-	function Search() {
+	async function Search() {
+		await setColumn();
 		let data = $('form[name="search"]').serialize();
 		gx.Request('/shop/sale/sal03/search', data, -1, function(e) {
             let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
@@ -319,6 +328,23 @@
 				]);
 			}
         });
+	}
+
+	function setColumn() {
+		let view  = $("input[name='group_type_condition']:checked").val();
+		if (view === 'product_code_p') {
+			let prd_columns = columns.map(c => c.field === "prd_cd_p"
+				? ({...c, pinned: "left"})
+				: c.headerName === "바코드" ? ({...c, hide: true})
+					: c.field === "goods_no" ? ({...c, pinned: "auto"}) : c);
+			gx.gridOptions.api.setColumnDefs(prd_columns);
+		} else {
+			let prd_columns = columns.map(c => c.field === "prd_cd_p"
+				? ({...c, pinned: "auto"})
+				: c.headerName === "바코드" ? ({...c, hide: false})
+					: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
+			gx.gridOptions.api.setColumnDefs(prd_columns);
+		}
 	}
 
     //상품범위검색 input창 클릭시 자동으로 상품옵션 범위검색 API 오픈
