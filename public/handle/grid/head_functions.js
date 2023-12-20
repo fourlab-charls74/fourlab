@@ -337,7 +337,9 @@ function StyleOrdState(params) {
         출고완료: "#0000ff",
         주문취소: "#0000ff",
         결제오류: "#ff0000",
-        구매확정: "#0000ff"
+        구매확정: "#0000ff",
+		환불완료:"#ff0000",
+		교환완료:"#ff0000",
     };
 
     var state_bd = {
@@ -348,7 +350,9 @@ function StyleOrdState(params) {
         출고완료: "900",
         주문취소: "",
         결제오류: "",
-        구매확정: ""
+        구매확정: "",
+		환불완료:"900",
+		교환완료:"900",
     };
 
     var color = state[params.value];

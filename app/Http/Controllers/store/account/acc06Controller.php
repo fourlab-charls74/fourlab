@@ -659,7 +659,7 @@ class acc06Controller extends Controller
 				select o.ord_no, w.ord_opt_no
 					, w.ord_state_date, date_format(w.ord_state_date, '%Y-%m-%d') as state_date, if(w.ord_state = 30, date_format(o.ord_date, '%Y-%m-%d'), '') as ord_date
 					, w.ord_state, date_format(o.dlv_end_date, '%Y-%m-%d') as dlv_end_date
-					, s.store_cd, w.prd_cd, w.goods_no, w.goods_opt, w.qty, w.price
+					, s.store_cd, w.prd_cd, w.goods_no, w.goods_opt, if(w.ord_state = '30', w.qty, w.qty * -1) as qty, w.price
 					, w.ord_kind, w.ord_type
 					-- , if(w.ord_state = 30, (w.qty * w.price), 0) as sale_amt
 					, (w.qty * w.price) as sale_amt
