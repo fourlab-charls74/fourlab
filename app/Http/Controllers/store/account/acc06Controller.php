@@ -672,8 +672,12 @@ class acc06Controller extends Controller
 					inner join store s on s.store_cd = o.dlv_place_cd
 					inner join goods g on g.goods_no = w.goods_no
 					left outer join product_code pc on pc.prd_cd = w.prd_cd
-				where w.ord_state_date >= :sdate and w.ord_state_date <= :edate
-					and w.ord_state = 30 and o.dlv_place_type = 'STORE' and o.dlv_place_cd = :store_cd
+				where 
+				    w.ord_state_date >= :sdate and w.ord_state_date <= :edate
+					and w.ord_state in (30, 60, 61)
+					and o.ord_state = '30'
+				  	and o.dlv_place_type = 'STORE' 
+					and o.dlv_place_cd = :store_cd
 				order by w.ord_state_date, w.ord_opt_no, w.ord_state
 			) a
 				left outer join code act on act.code_kind_cd = 'G_ACC_TYPE' and act.code_id = a.ord_state
