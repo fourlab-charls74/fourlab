@@ -57,7 +57,7 @@ class  sal27Controller extends Controller
 		$date_where3 = " and replace(sr_date, '-', '') <= '" . $edate_day . "'";
 		$date_where4 = " and prc_rt <= '" . $edate_time . "'";
 		$date_where5 = " and h.stock_state_date >= '" . $next_edate_day . "' and h.stock_state_date <= '" . $today_day . "'";
-		$date_where6 = " and ord_state_date >= '" . $sdate_day . "' and ord_state_date <= '" . $edate_day . "'";
+		$date_where6 = " and aa.ord_state_date >= '" . $sdate_day . "' and aa.ord_state_date <= '" . $edate_day . "'";
 
 		// 매장검색
 		$store_where = "";
@@ -214,12 +214,13 @@ class  sal27Controller extends Controller
 					) as sale_recv_price
 				    $month_sale_sql
 					, (
-						select ifnull(sum(ifnull(qty, 0) * if(ord_state = 30, 1, -1)), 0) as sale_qty 
-						from order_opt_wonga
+						select ifnull(sum(ifnull(aa.qty, 0) * if(aa.ord_state = 30, 1, -1)), 0) as sale_qty 
+						from order_opt_wonga aa
+						inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
 						where 1=1 
 							$date_where6
-							and ord_state in (30,60,61)
-							and prd_cd = pc.prd_cd
+							and aa.ord_state in (30,60,61)
+							and bb.prd_cd = pc.prd_cd
 					) as term_sale_qty
 					, (
 						select ifnull(sum(qty), 0)
