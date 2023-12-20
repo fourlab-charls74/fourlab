@@ -674,6 +674,7 @@ class acc06Controller extends Controller
 					left outer join product_code pc on pc.prd_cd = w.prd_cd
 				where 
 				    w.ord_state_date >= :sdate and w.ord_state_date <= :edate
+				  	and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)	-- 피엘라벤 초기화 
 					and w.ord_state in (30, 60, 61)
 					and o.ord_state = '30'
 				  	and o.dlv_place_type = 'STORE' 
