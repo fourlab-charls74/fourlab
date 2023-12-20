@@ -19,9 +19,9 @@ function openStoreProduct(prd_no){
 
 function openOrder(ord_no,ord_opt_no = ''){
     if(ord_opt_no !== ''){
-        var url = '/partner/order/ord01/' + ord_no + '/' + ord_opt_no;
+        var url = '/headorder/ord01/' + ord_no + '/' + ord_opt_no;
     } else {
-        var url = '/partner/order/ord01/' + ord_no;
+        var url = '/head/order/ord01/' + ord_no;
     }
     var order = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
 }
