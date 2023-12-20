@@ -743,7 +743,9 @@ class ord02Controller extends Controller
 		$edate = $request->input('edate');
 		$prd_cd = $request->input('prd_cd', '');
 		
-		$where = '';
+		$exp_kind	= "11";	// 익일처리건은 거부사유에 나타나지 않게 작업
+		
+		$where = " and orr.reject_reason != '$exp_kind' ";
 		if($prd_cd != '') $where.= " and pc.prd_cd like '$prd_cd%'";
 		
 		$sql = "

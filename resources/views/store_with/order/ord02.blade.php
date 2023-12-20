@@ -471,7 +471,8 @@
 							: '')}`
 					: '';
 			},
-			cellStyle: (params) => params.node.level == 0 && params.value !== null ? {'background-color': '#ff6666', 'color': '#ffffff'} : '',
+			//231220 : 익일처리에 관해 거부 색상 제거
+			cellStyle: (params) => params.node.level == 0 && params.value !== null && params.value !== '익일처리' ? {'background-color': '#ff6666', 'color': '#ffffff'} : '',
 			// onCellDoubleClicked: (params) => {
 			// 	if (params.node.level == 0 && params.value !== null) {
 			// 		rejectList(params.node.aggData.ord_opt_no);

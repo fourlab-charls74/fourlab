@@ -343,7 +343,9 @@
                         </select>
 	                    <select id='rel_reject_reason' name='rel_reject_reason' class="form-control form-control-sm mr-2" style='width:120px;'>
 		                    @foreach (@$rel_reject_reasons as $rel_reject_reason)
+								@if ($rel_reject_reason->code_val2 == '')
 			                    <option value='{{ $rel_reject_reason->code_id }}'>{{ $rel_reject_reason->code_val }}</option>
+								@endif
 		                    @endforeach
 	                    </select>
                     </div>
