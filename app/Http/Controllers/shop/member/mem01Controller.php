@@ -155,22 +155,23 @@ class mem01Controller extends Controller
 				'' as chkbox, a.user_id, a.name,
 				d.code_val as sex, concat(ifnull(a.yyyy, ''),ifnull(a.mm, ''),ifnull(a.dd, '')) as birth_day,
 				ifnull(a.jumin1, '') as jumin,
-				a.phone, a.mobile, a.email, a.point, a.store_nm, a.store_cd,
+				a.phone, a.mobile, a.email, a.point, a.store_nm,
 				date_format(a.regdate,'%Y-%m-%d') as regdate,
 				a.lastdate as lastdate, a.visit_cnt,
 				a.auth_type, f.code_val as auth_type_str, a.auth_yn,
 				e.ord_date, e.ord_cnt, e.ord_amt,
 				a.email_chk, a.mobile_chk, a.yn, ifnull(cm.com_nm,a.site) as site,
-				a.name_chk, a.addr, a.zip
+				a.name_chk, a.addr, a.zip, c.group_nm
 				, sc.store_channel as store_channel
 				, sc2.store_kind as store_channel_kind
 				${group_sql}
 			from
 				member a
-				$join
 				left outer join store s on s.store_cd = a.store_cd
 				left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+				left outer join user_group_member b on a.user_id = b.user_id
+				left outer join user_group c on b.group_no = c.group_no
 				left outer join code d on d.code_kind_cd = 'G_SEX_TYPE' and a.sex = d.code_id
 				left outer join member_stat e on a.user_id = e.user_id
 				left outer join code f on f.code_kind_cd = 'G_AUTH_TYPE' and a.auth_type = f.code_id
@@ -869,7 +870,6 @@ class mem01Controller extends Controller
 		if($store_channel != "") $where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if($store_channel_kind != "") $where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		if($store_cd != "")		$where .= "and a.store_cd = '$store_cd'";
-		if($user_store != "")	$where .= "and a.store_cd = '$user_store'";
 
 		if($age != "") {
 			if($age == '10')	$where .= " and  a.yyyy > YEAR(CURDATE())-7 and a.yyyy <= YEAR(CURDATE()) ";	// 초등학생미만

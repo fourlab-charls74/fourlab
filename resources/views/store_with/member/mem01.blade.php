@@ -81,14 +81,6 @@
 						</div>
 					</div>
 					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">휴대전화</label>
-							<div class="flax_box">
-								<input type="text" name="mobile" id="mobile" class="form-control form-control-sm search-enter">
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="dlv_kind">회원가입 종류</label>
                             <div class="form-inline form-radio-box">
@@ -107,6 +99,42 @@
                             </div>
                         </div>
                     </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="item">자료수/정렬</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:24%;">
+									<select name="limit" class="form-control form-control-sm">
+										<option value="100" >100</option>
+										<option value="500" >500</option>
+										<option value="1000" >1000</option>
+										<option value="2000" >2000</option>
+										<option value="5000" >5000</option>
+										<option value="10000" >10000</option>
+									</select>
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input_box" style="width:45%;">
+									<select name="ord_field" class="form-control form-control-sm">
+										<option value="a.user_id" selected>아이디</option>
+										<option value="a.name" >이름</option>
+										<option value="a.regdate" selected >가입일</option>
+										<option value="a.lastdate" >최근로그인</option>
+										<option value="e.ord_date" >최근주문일</option>
+										<option value="e.ord_amt" >구매금액</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
+									<div class="btn-group" role="group">
+										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
+										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
+									</div>
+									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
+									<input type="radio" name="ord" id="sort_asc" value="asc">
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
@@ -171,33 +199,6 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">기념일 기간(년)/월일</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width:17%">
-									<div class="form-group">
-										<input type="text" name="birth_sdate" id="birth_sdate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1980">
-									</div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="form-inline-inner input_box" style="width:17%">
-									<div class="form-group">
-										<input type="text" name="birth_edate" id="birth_edate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1982">
-									</div>
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input_box" style="width:54%">
-									<div class="flax_box inline_btn_box" style="padding-right:60px;">
-										<input type="text" name="mmdd" id="mmdd"  class="form-control form-control-sm text-center" maxlength="8" placeholder="예)1224">
-										<a href="#" onClick="getToday();" class="btn btn-sm btn-secondary now-btn" style="width:50px;">금일</a> 
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="search-area-ext row d-none align-items-center">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
 							<label for="">최근주문일</label>
 							<div class="form-inline">
 								<div class="docs-datepicker form-inline-inner input_box">
@@ -205,7 +206,7 @@
 										<input type="text" class="form-control form-control-sm docs-date" name="order_sdate" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
-											<i class="fa fa-calendar" aria-hidden="true"></i>
+												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>
 									</div>
@@ -217,7 +218,7 @@
 										<input type="text" class="form-control form-control-sm docs-date" name="order_edate" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
-											<i class="fa fa-calendar" aria-hidden="true"></i>
+												<i class="fa fa-calendar" aria-hidden="true"></i>
 											</button>
 										</div>
 									</div>
@@ -226,57 +227,84 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">구입금액</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<div class="form-group">
-										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_from' value='' onkeyup="currency(this)">
-									</div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="form-inline-inner input_box">
-									<div class="form-group">
-										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_to' value='' onkeyup="currency(this)">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">구매수량</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<div class="form-group">
-										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_from' value='' onkeyup="currency(this)">
-									</div>
-								</div>
-								<span class="text_line">~</span>
-								<div class="form-inline-inner input_box">
-									<div class="form-group">
-										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_to' value='' onkeyup="currency(this)">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">기념일 기간(년)/월일</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box" style="width:17%">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type="text" name="birth_sdate" id="birth_sdate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1980">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">~</span>--}}
+{{--								<div class="form-inline-inner input_box" style="width:17%">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type="text" name="birth_edate" id="birth_edate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1982">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">/</span>--}}
+{{--								<div class="form-inline-inner input_box" style="width:54%">--}}
+{{--									<div class="flax_box inline_btn_box" style="padding-right:60px;">--}}
+{{--										<input type="text" name="mmdd" id="mmdd"  class="form-control form-control-sm text-center" maxlength="8" placeholder="예)1224">--}}
+{{--										<a href="#" onClick="getToday();" class="btn btn-sm btn-secondary now-btn" style="width:50px;">금일</a> --}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
 				</div>
 				<div class="search-area-ext row d-none align-items-center">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="">메일수신</label>
-							<div class="flax_box">
-								<select name="mail" id="mail" class="form-control form-control-sm">
-									<option value="">전체</option>
-									@foreach($mail as $val)
-										<option value="{{$val->code_id}}">{{$val->code_val}}</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
-					</div>
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">구입금액</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_from' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">~</span>--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_to' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">구매수량</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_from' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">~</span>--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_to' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+				</div>
+				<div class="search-area-ext row d-none align-items-center">
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">메일수신</label>--}}
+{{--							<div class="flax_box">--}}
+{{--								<select name="mail" id="mail" class="form-control form-control-sm">--}}
+{{--									<option value="">전체</option>--}}
+{{--									@foreach($mail as $val)--}}
+{{--										<option value="{{$val->code_id}}">{{$val->code_val}}</option>--}}
+{{--									@endforeach--}}
+{{--								</select>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">SMS수신/성별/연령</label>
@@ -318,34 +346,42 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="">승인/가입판매처</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<div class="form-group">
-										<select name="yn" id="yn" class="form-control form-control-sm">
-											<option value="">전체</option>
-											@foreach($yn as $val)
-												<option value="{{$val->code_id}}">{{$val->code_val}}</option>
-											@endforeach
-										</select>
-									</div>
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input_box">
-									<div class="form-group">
-										<select name="site" id="site" class="form-control form-control-sm">
-											<option value="">전체</option>
-											@foreach($sites as $val)
-												<option value="{{$val->code_id}}">{{$val->code_val}}</option>
-											@endforeach
-										</select>
-									</div>
-								</div>
+							<label for="">휴대전화</label>
+							<div class="flax_box">
+								<input type="text" name="mobile" id="mobile" class="form-control form-control-sm search-enter">
 							</div>
 						</div>
 					</div>
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">승인/가입판매처</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<select name="yn" id="yn" class="form-control form-control-sm">--}}
+{{--											<option value="">전체</option>--}}
+{{--											@foreach($yn as $val)--}}
+{{--												<option value="{{$val->code_id}}">{{$val->code_val}}</option>--}}
+{{--											@endforeach--}}
+{{--										</select>--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">/</span>--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<select name="site" id="site" class="form-control form-control-sm">--}}
+{{--											<option value="">전체</option>--}}
+{{--											@foreach($sites as $val)--}}
+{{--												<option value="{{$val->code_id}}">{{$val->code_val}}</option>--}}
+{{--											@endforeach--}}
+{{--										</select>--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
 				</div>
-				<div class="row">
+				<div class="search-area-ext row d-none align-items-center">
 					{{--
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
@@ -361,42 +397,6 @@
 						</div>
 					</div>
 					--}}
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="item">자료수/정렬</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box" style="width:24%;">
-									<select name="limit" class="form-control form-control-sm">
-										<option value="100" >100</option>
-										<option value="500" >500</option>
-										<option value="1000" >1000</option>
-										<option value="2000" >2000</option>
-										<option value="5000" >5000</option>
-										<option value="10000" >10000</option>
-									</select>
-								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input_box" style="width:45%;">
-									<select name="ord_field" class="form-control form-control-sm">
-										<option value="a.user_id" selected>아이디</option>
-										<option value="a.name" >이름</option>
-										<option value="a.regdate" selected >가입일</option>
-										<option value="a.lastdate" >최근로그인</option>
-										<option value="e.ord_date" >최근주문일</option>
-										<option value="e.ord_amt" >구매금액</option>
-									</select>
-								</div>
-								<div class="form-inline-inner input_box sort_toggle_btn" style="width:24%;margin-left:1%;">
-									<div class="btn-group" role="group">
-										<label class="btn btn-primary primary" for="sort_desc" data-toggle="tooltip" data-placement="top" title="" data-original-title="내림차순"><i class="bx bx-sort-down"></i></label>
-										<label class="btn btn-secondary" for="sort_asc" data-toggle="tooltip" data-placement="top" title="" data-original-title="오름차순"><i class="bx bx-sort-up"></i></label>
-									</div>
-									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
-									<input type="radio" name="ord" id="sort_asc" value="asc">
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
