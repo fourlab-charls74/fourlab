@@ -303,6 +303,7 @@ class stk35Controller extends Controller
 	// 매장반품 등록
 	public function save(Request $request)
 	{
+		ini_set('memory_limit', '-1');
 		$code = 200;
 		$msg = "";
 
@@ -1016,16 +1017,18 @@ class stk35Controller extends Controller
 	}
 	
 	public function add_row(Request $request) {
+		ini_set('memory_limit', '-1');
 		$prd_cd = $request->input('prd_cd', []);
 		$store_cd = $request->input('store_cd', []);
 
 		$prd_cds = explode(',', $prd_cd);
+		
 		$result = [];
 
-		foreach ($prd_cds as $key => $pc) {
 			
 			foreach($store_cd as $sc) {
 				$store = DB::table('store')->where('store_cd', $sc)->select('store_cd', 'store_nm')->first();
+				$product_codes = empty($prd_cds) ? "''" : "'" . implode("','", $prd_cds) . "'";
 
 				$sql = "
 					select
@@ -1055,24 +1058,30 @@ class stk35Controller extends Controller
 						left outer join product_stock_store pss on pss.prd_cd = pc.prd_cd and pss.store_cd = '$sc'
 						left outer join opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
 						left outer join brand b on b.br_cd = pc.brand
-					where pc.prd_cd = '$pc'
-					limit 1
+					where pc.prd_cd in ($product_codes)
 				";
 
-				$row = DB::selectOne($sql);
-				array_push($result, $row);
+				$row = DB::select($sql);
+				
+				$result[] = $row;
 			}
-		}
+			
+			$res = [];
+			for ($i = 0; $i < count($result); $i++) {
+				for ($j = 0; $j < count($result[$i]); $j++) {
+					$res[] = $result[$i][$j];
+				}
+			}
 
 		return response()->json([
 			"code" => 200,
 			"head" => [
-				"total" => count($result),
+				"total" => count($res),
 				"page" => 1,
 				"page_cnt" => 1,
 				"page_total" => 1,
 			],
-			"body" => $result,
+			"body" => $res,
 		]);
 		
 	}
