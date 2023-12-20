@@ -242,6 +242,33 @@
 							</div>
 						</div>
 					</div>
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">기념일 기간(년)/월일</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box" style="width:17%">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type="text" name="birth_sdate" id="birth_sdate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1980">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">~</span>--}}
+{{--								<div class="form-inline-inner input_box" style="width:17%">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type="text" name="birth_edate" id="birth_edate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1982">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">/</span>--}}
+{{--								<div class="form-inline-inner input_box" style="width:54%">--}}
+{{--									<div class="flax_box inline_btn_box" style="padding-right:60px;">--}}
+{{--										<input type="text" name="mmdd" id="mmdd"  class="form-control form-control-sm text-center" maxlength="8" placeholder="예)1224">--}}
+{{--										<a href="#" onClick="getToday();" class="btn btn-sm btn-secondary now-btn" style="width:50px;">금일</a> --}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+				</div>
+				<div class="search-area-ext row d-none align-items-center">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">최근주문일</label>
@@ -272,84 +299,6 @@
 							</div>
 						</div>
 					</div>
-{{--					<div class="col-lg-4 inner-td">--}}
-{{--						<div class="form-group">--}}
-{{--							<label for="">기념일 기간(년)/월일</label>--}}
-{{--							<div class="form-inline">--}}
-{{--								<div class="form-inline-inner input_box" style="width:17%">--}}
-{{--									<div class="form-group">--}}
-{{--										<input type="text" name="birth_sdate" id="birth_sdate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1980">--}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--								<span class="text_line">~</span>--}}
-{{--								<div class="form-inline-inner input_box" style="width:17%">--}}
-{{--									<div class="form-group">--}}
-{{--										<input type="text" name="birth_edate" id="birth_edate" class="form-control form-control-sm text-center" maxlength="4" placeholder="ex)1982">--}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--								<span class="text_line">/</span>--}}
-{{--								<div class="form-inline-inner input_box" style="width:54%">--}}
-{{--									<div class="flax_box inline_btn_box" style="padding-right:60px;">--}}
-{{--										<input type="text" name="mmdd" id="mmdd"  class="form-control form-control-sm text-center" maxlength="8" placeholder="예)1224">--}}
-{{--										<a href="#" onClick="getToday();" class="btn btn-sm btn-secondary now-btn" style="width:50px;">금일</a> --}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--							</div>--}}
-{{--						</div>--}}
-{{--					</div>--}}
-				</div>
-				<div class="search-area-ext row d-none align-items-center">
-{{--					<div class="col-lg-4 inner-td">--}}
-{{--						<div class="form-group">--}}
-{{--							<label for="">구입금액</label>--}}
-{{--							<div class="form-inline">--}}
-{{--								<div class="form-inline-inner input_box">--}}
-{{--									<div class="form-group">--}}
-{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_from' value='' onkeyup="currency(this)">--}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--								<span class="text_line">~</span>--}}
-{{--								<div class="form-inline-inner input_box">--}}
-{{--									<div class="form-group">--}}
-{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_to' value='' onkeyup="currency(this)">--}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--							</div>--}}
-{{--						</div>--}}
-{{--					</div>--}}
-{{--					<div class="col-lg-4 inner-td">--}}
-{{--						<div class="form-group">--}}
-{{--							<label for="">구매수량</label>--}}
-{{--							<div class="form-inline">--}}
-{{--								<div class="form-inline-inner input_box">--}}
-{{--									<div class="form-group">--}}
-{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_from' value='' onkeyup="currency(this)">--}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--								<span class="text_line">~</span>--}}
-{{--								<div class="form-inline-inner input_box">--}}
-{{--									<div class="form-group">--}}
-{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_to' value='' onkeyup="currency(this)">--}}
-{{--									</div>--}}
-{{--								</div>--}}
-{{--							</div>--}}
-{{--						</div>--}}
-{{--					</div>--}}
-				</div>
-				<div class="search-area-ext row d-none align-items-center">
-{{--					<div class="col-lg-4 inner-td">--}}
-{{--						<div class="form-group">--}}
-{{--							<label for="">메일수신</label>--}}
-{{--							<div class="flax_box">--}}
-{{--								<select name="mail" id="mail" class="form-control form-control-sm">--}}
-{{--									<option value="">전체</option>--}}
-{{--									@foreach($mail as $val)--}}
-{{--										<option value="{{$val->code_id}}">{{$val->code_val}}</option>--}}
-{{--									@endforeach--}}
-{{--								</select>--}}
-{{--							</div>--}}
-{{--						</div>--}}
-{{--					</div>--}}
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="">SMS수신/성별/연령</label>
@@ -391,6 +340,57 @@
 					</div>
 {{--					<div class="col-lg-4 inner-td">--}}
 {{--						<div class="form-group">--}}
+{{--							<label for="">구입금액</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_from' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">~</span>--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_amt_to' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">구매수량</label>--}}
+{{--							<div class="form-inline">--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_from' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--								<span class="text_line">~</span>--}}
+{{--								<div class="form-inline-inner input_box">--}}
+{{--									<div class="form-group">--}}
+{{--										<input type='text' class="form-control form-control-sm search-all search-enter text-right" name='cond_cnt_to' value='' onkeyup="currency(this)">--}}
+{{--									</div>--}}
+{{--								</div>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+				</div>
+{{--				<div class="search-area-ext row d-none align-items-center">--}}
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
+{{--							<label for="">메일수신</label>--}}
+{{--							<div class="flax_box">--}}
+{{--								<select name="mail" id="mail" class="form-control form-control-sm">--}}
+{{--									<option value="">전체</option>--}}
+{{--									@foreach($mail as $val)--}}
+{{--										<option value="{{$val->code_id}}">{{$val->code_val}}</option>--}}
+{{--									@endforeach--}}
+{{--								</select>--}}
+{{--							</div>--}}
+{{--						</div>--}}
+{{--					</div>--}}
+{{--					<div class="col-lg-4 inner-td">--}}
+{{--						<div class="form-group">--}}
 {{--							<label for="">승인/가입판매처</label>--}}
 {{--							<div class="form-inline">--}}
 {{--								<div class="form-inline-inner input_box">--}}
@@ -417,7 +417,7 @@
 {{--							</div>--}}
 {{--						</div>--}}
 {{--					</div>--}}
-				</div>
+{{--				</div>--}}
 			</div>
 		</div>
 		<div class="resul_btn_wrap mb-3">
