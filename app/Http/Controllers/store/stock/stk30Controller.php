@@ -255,12 +255,7 @@ class stk30Controller extends Controller
                 g.goods_nm_eng,
                 if(pc.prd_cd_p = '', concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt), pc.prd_cd_p) as prd_cd_p,
                 pc.color,
-				ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+				pc.size,
                 pc.goods_opt,
                 g.goods_sh,
                 srp.price,
