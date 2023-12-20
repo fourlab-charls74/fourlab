@@ -506,21 +506,30 @@ class PosController extends Controller
 			if ($card_amt > 0) $pay_type += 2;
 			if ($point_amt > 0) $pay_type += 4;
 		}
-
-        // set member
-        $member = null;
-        $member_nm = '비회원';
-        $phone = $mobile = $email = '';
-        if ($member_id !== '') {
-            $member = DB::table('member')->select('user_id', 'name', 'phone', 'mobile', 'email')->where('user_id', $member_id)->first();
-            if ($member !== null) {
-                $member_nm = $member->name;
-                $phone = $member->phone;
-                $mobile = $member->mobile;
-                $email = $member->email;
-            }
-        }
-
+		
+		// 판매유형이 온라인판매일 때 비회원으로 저장
+		foreach ($cart as $c) {
+			if ($c['sale_type'] === '81') {
+				$member_id = '';
+				$member = null;
+				$member_nm = '비회원';
+				$phone = $mobile = $email = '';
+			} else {
+				$member = null;
+				$member_nm = '비회원';
+				$phone = $mobile = $email = '';
+				if ($member_id !== '') {
+					$member = DB::table('member')->select('user_id', 'name', 'phone', 'mobile', 'email')->where('user_id', $member_id)->first();
+					if ($member !== null) {
+						$member_nm = $member->name;
+						$phone = $member->phone;
+						$mobile = $member->mobile;
+						$email = $member->email;
+					}
+				}
+			}
+		}
+		
         try {
             DB::beginTransaction();
 			
