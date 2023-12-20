@@ -168,8 +168,11 @@ class acc04Controller extends Controller
                                         , w.qty, w.price, (w.qty * w.wonga * if(w.ord_state = 30, 1, -1)) as wonga, (w.recv_amt * if(w.ord_state = 30, 1, -1)) as recv_amt
                                     from order_opt_wonga w
                                         inner join order_opt o on o.ord_opt_no = w.ord_opt_no
-                                    where w.ord_state_date >= '$f_sdate' and w.ord_state_date <= '$f_edate'
+                                    where 
+                                    	w.ord_state_date >= '$f_sdate' and w.ord_state_date <= '$f_edate'
                                         and w.ord_state in (30,60,61)
+                                        and o.ord_state = '30'
+                                        and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
                                 )
                                 union all
                                 (
@@ -180,6 +183,8 @@ class acc04Controller extends Controller
                                     where w.ord_state_date >= '$f_sdate' and w.ord_state_date <= '$f_edate'
                                         and w.ord_state in (30,60,61)
                                         and o.dlv_place_type = 'STORE' and o.dlv_place_cd <> ''
+                                        and o.ord_state = '30'
+                                        and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
                                 )
                             ) ww
                                 inner join goods g on g.goods_no = ww.goods_no
