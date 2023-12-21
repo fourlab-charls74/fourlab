@@ -179,6 +179,7 @@
 								<a href="#">기본 정보</a>
 							</div>
 							<div style="display: inline-block;float:right">
+								<a href="javascript:void(0)" onclick="createSaveOnlineProductOptions();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>온라인상품 옵션 생성 후 저장</a>
 								<a href="javascript:void(0)" onclick="addPrdCd_product();" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i>저장</a>
 							</div>
 							<div class="card-body">
@@ -456,6 +457,37 @@
 		}).catch(function (err) {
 			console.log(err);
 		});
+	}
+
+	//온라인상품 옵션 생성 후 저장
+	function createSaveOnlineProductOptions() {
+		let rows = gx2.getRows();
+		let error_code = rows.filter(r => r.err_code == '1');
+
+		if (error_code.length < 1) {
+			return alert('이미 매칭이 되어있거나 이미 등록되어있는 옵션입니다.');
+		}
+
+		axios({
+			url: '/store/product/prd02/create-save-online-product-options',
+			method: 'put',
+			data: {
+				data: error_code,
+			},
+		}).then(function (res) {
+			if(res.data.code === 200) {
+				alert(res.data.msg);
+				opener.Search();
+				self.close();
+			} else {
+				console.log(res.data);
+				alert("온라인상품 옵션 생성 후 저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+
+
 	}
 
 	// 바코드별 매칭 

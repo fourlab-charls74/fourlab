@@ -326,6 +326,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd02/prd-search-code', 'prd02Controller@prd_search_code');
         Route::put('prd02/add-product-code', 'prd02Controller@add_product_code');
         Route::put('prd02/add-product-product', 'prd02Controller@add_product_product');
+        Route::put('prd02/create-save-online-product-options', 'prd02Controller@create_save_online_product_options');
 
         Route::get('prd02/edit-goods-no/{product_code}/{goods_no}/', 'prd02Controller@edit_goods_no');
         Route::get('prd02/edit-goods-no/{product_code}', 'prd02Controller@match_goods_no');

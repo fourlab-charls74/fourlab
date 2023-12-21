@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Models\Conf;
+use Exception;
 use PDO;
 
 class prd02Controller extends Controller
@@ -738,6 +739,127 @@ class prd02Controller extends Controller
 		} catch (\Exception $e) {
 			DB::rollback();
 			$code = 500;
+			$msg = $e->getMessage();
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+	
+	public function create_save_online_product_options(Request $request) {
+		$data = $request->input("data", []);
+		$code = 200;
+		$msg = "";
+
+		try {
+			DB::beginTransaction();
+			
+			foreach ($data as $d) {
+				$prd_cd = $d['prd_cd'];
+				$goods_no = $d['goods_no'];
+				$goods_opt = $d['goods_opt'];
+				
+				/*
+				 * goods_good 테이블에 해당되는 상품이 있는지 확인
+				 * goods_summary 테이블에 해당되는 상품이 있는지 확인
+				 * 둘 다 없다면 goods_good, goods_summary 테이블에 해당 goods_opt값을 insert
+				 * 있다면 에러처리
+				 * 
+				 * */
+				$goods_good_sql = "
+					select
+						count(*) as cnt
+					from goods_good
+					where goods_no = :goods_no and goods_opt = :goods_opt
+				";
+				
+				$select_goods_good = DB::selectOne($goods_good_sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				
+				$goods_summary_sql = "
+					select
+						count(*) as cnt
+					from goods_summary
+					where goods_no = :goods_no and goods_opt = :goods_opt
+				";
+				
+				$select_goods_summary = DB::selectOne($goods_summary_sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				
+				if ($select_goods_good->cnt == 0 && $select_goods_summary->cnt == 0) {
+					$goods_good_insert_sql = "
+						insert into goods_good (goods_no, goods_opt, regi_date)
+						values(:goods_no, :goods_opt, now())
+					";
+					DB::insert($goods_good_insert_sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+					
+					$goods_summary_insert_sql = "
+						insert into goods_summary (goods_no, opt_name, goods_opt, soldout_yn, use_yn, rt, ut)
+						values (:goods_no, '컬러^사이즈', :goods_opt, 'N', 'Y', now(), now())
+					";
+					DB::insert($goods_summary_insert_sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				} else {
+					$code = 500;
+					throw new Exception("이미 매칭이 되어있거나 이미 등록되어있는 옵션입니다.");
+				}
+				
+				/*
+				 * 매칭관련 테이블 update 및 insert
+				 * 
+				 * */
+
+				$product_sql = "
+					update product 
+					set match_yn = 'Y', ut = 'now()'
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_sql);
+
+				$product_code_sql = "
+					update product_code
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_code_sql);
+
+				$product_stock_sql = "
+					update product_stock 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_stock_sql);
+
+				$product_stock_sql = "
+					update product_stock_storage 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_stock_sql);
+
+				$product_stock_sql = "
+					update product_stock_store 
+					set goods_no = '$goods_no', goods_opt = '$goods_opt', ut = now()
+					where prd_cd = '$prd_cd'
+				";
+				DB::update($product_stock_sql);
+
+				//기존 상품 매핑 정보 테이블 정보 추가
+				$sql	= " select count(*) as tot from goods_xmd where cd = :prd_cd ";
+				$tot	= DB::selectOne($sql,['prd_cd' => $prd_cd])->tot;
+
+				if( $tot == 0 ){
+					$sql	= " insert into goods_xmd(cd, goods_no, goods_sub, goods_opt, rt, ut) values ( :prd_cd, :goods_no, '0', :goods_opt, now(), now() ) ";
+					DB::insert($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				}else{
+					$sql	= " update goods_xmd set goods_no = :goods_no, goods_opt = :goods_opt, ut = now() where cd = :prd_cd ";
+					DB::update($sql, ['prd_cd' => $prd_cd, 'goods_no' => $goods_no, 'goods_opt' => $goods_opt]);
+				}
+			}
+
+			DB::commit();
+			$code = 200;
+			$msg = "온라인상품 옵션 생성 후 바코드 매칭이 완료되었습니다.";
+
+		} catch (\Exception $e) {
+			DB::rollback();
+			$code = $code === 200 ? 500 : $code;
 			$msg = $e->getMessage();
 		}
 
