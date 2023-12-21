@@ -492,6 +492,7 @@
             headerName: "품질보증기준",
             cellStyle: {'background' : '#ffff99'},
             editable: true,
+			width : 600,
         },
         {
             field: "item_009",
@@ -540,12 +541,12 @@
     $(document).ready(function() {
         pApp.ResizeGrid(275);
         let gridDiv = document.querySelector(pApp.options.gridId);
-		let style = { ...getDeleteCellColumnObject(), ...getCopyFocusedCellToClipboardObject() };
+		// let style = { ...getDeleteCellColumnObject(), ...getCopyFocusedCellToClipboardObject() };
         pApp.BindSearchEnter();
         // style['suppressColumnVirtualisation'] = true;
         // style['skipHeaderOnAutoSize'] = true;
-        let options = cloneObject(style);
-        gx = new HDGrid(gridDiv, columns, options);
+        // let options = cloneObject(style);
+        gx = new HDGrid(gridDiv, columns);
         Search(1);
 
         $("select[name='class']").on("change", function() {
@@ -811,7 +812,7 @@
                         headerName: col_arr[i][1],
                         editable: true,
                         minWidth: cellWidth || 100,
-                        maxWidth: 400,
+                        maxWidth: 800,
                         lockPosition: true,
                         cellStyle: {'background' : '#ffff99', 'white-space': 'normal'},
                     };
