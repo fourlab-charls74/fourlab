@@ -204,7 +204,7 @@
                                             </td>
                                             <th>송장번호</th>
                                             <td>
-                                                <div class="txt_box">{{ @$ord->dlv_no }}</div>
+												<div class="txt_box"><a href="{{ @$ord->dlv_homepage }}{{ @$ord->dlv_no }}" target="_blank">{{ @$ord->dlv_no }}</a></div>
                                             </td>
                                             <th>배송완료일</th>
                                             <td>
