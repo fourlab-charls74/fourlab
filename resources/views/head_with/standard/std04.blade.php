@@ -154,7 +154,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
 				<div class="fr_box">
-					<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+					<button type="button" id="gd-setting" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
 				</div>
             </div>
         </div>
@@ -301,21 +301,26 @@
 	});
 	const gridDiv = document.querySelector(pApp.options.gridId);
 	
-    $(function() {
+    $(async function() {
 
-		let url_path_array = String(window.location.href).split('/');
-		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+		const my_columns = await getMyColumns(() => gx, gridDiv, columns);
+		gx = new HDGrid(gridDiv, my_columns, {});
+		Search(1);
 
-		get_indiv_columns(pid, columns, function(data) {
-			gx = new HDGrid(gridDiv, data);
 
-			setMyGridHeader.Init(gx,
-				indiv_grid_save.bind(this, pid, gx),
-				indiv_grid_init.bind(this, pid)
-			);
-
-			Search(1);
-		});
+		// let url_path_array = String(window.location.href).split('/');
+		// const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+		//
+		// get_indiv_columns(pid, columns, function(data) {
+		// 	gx = new HDGrid(gridDiv, data);
+		//
+		// 	setMyGridHeader.Init(gx,
+		// 		indiv_grid_save.bind(this, pid, gx),
+		// 		indiv_grid_init.bind(this, pid)
+		// 	);
+		//
+		// 	Search(1);
+		// });
 		
         $("[name=cat_name]").on("keypress", function(e) {
             if(e.which == 13) {

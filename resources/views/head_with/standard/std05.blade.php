@@ -96,7 +96,7 @@
                     <h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
                 </div>
                 <div class="fr_box">
-	                <button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+					<button type="button" id="gd-setting" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
                 </div>
             </div>
         </div>
@@ -183,7 +183,7 @@
     });
 	
     let gx;
-    $(document).ready(function() {
+    $(document).ready(async function() {
         pApp.ResizeGrid(275);
         pApp.BindSearchEnter();
         let gridDiv = document.querySelector(pApp.options.gridId);
@@ -193,16 +193,21 @@
 
 		//gx = new HDGrid(gridDiv, columns);
 
-		get_indiv_columns(pid, columns, function(data) {
-			gx = new HDGrid(gridDiv, data);
+		const my_columns = await getMyColumns(() => gx, gridDiv, columns);
+		gx = new HDGrid(gridDiv, my_columns, {});
 
-			setMyGridHeader.Init(gx,
-				indiv_grid_save.bind(this, pid, gx),
-				indiv_grid_init.bind(this, pid)
-			);
+		Search();
 
-			Search();
-		});
+		// get_indiv_columns(pid, columns, function(data) {
+		// 	gx = new HDGrid(gridDiv, data);
+		//
+		// 	setMyGridHeader.Init(gx,
+		// 		indiv_grid_save.bind(this, pid, gx),
+		// 		indiv_grid_init.bind(this, pid)
+		// 	);
+		//
+		// 	Search();
+		// });
 		
     });
 	
