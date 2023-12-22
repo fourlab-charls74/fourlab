@@ -23,6 +23,16 @@
     .custm_tb3 tr {
         padding: 0px 12px 7px 12px;
     }
+	
+	body {
+		font-weight : 500;
+	}
+	
+	#border_sharp {
+		border-left : 1px solid #999;
+		border-right : 1px solid #999;
+		border-bottom : 1px solid #999;
+	}
 </style>
 
 <div class="container-fluid show_layout py-3">
@@ -46,7 +56,7 @@
                 <a href="#" class="m-0 font-weight-bold">주문번호</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -83,7 +93,7 @@
                 <a href="#" class="m-0 font-weight-bold">주문자 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -117,8 +127,7 @@
                                         <tr>
                                             <th>주문상태</th>
                                             <td>
-                                                <div class="txt_box">{{ @$ord->ord_state_nm }}
-                                                    <div>
+                                                <div class="txt_box">{{ @$ord->ord_state_nm }}</div>
                                             </td>
                                             <th>주문시간</th>
                                             <td>
@@ -156,7 +165,7 @@
                 <a href="#" class="m-0 font-weight-bold">수령자 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -225,98 +234,12 @@
                 </div>
             </div>
         </div>
-        @if ($track)
-        <div class="card shadow">
-            <div class="card-header mb-0">
-                <a href="#" class="m-0 font-weight-bold">유입 정보</a>
-            </div>
-            <div class="card-body">
-                <div class="row_wrap">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-box-ty2 mobile">
-                                <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <colgroup>
-                                        <col width="9%">
-                                        <col width="25%">
-                                        <col width="9%">
-                                        <col width="25%">
-                                        <col width="9%">
-                                        <col width="25%">
-                                    </colgroup>
-                                    <tbody>
-                                        <tr>
-                                            <th class="ty2">유입경로</th>
-                                            <td class="ty2" colspan="5">
-                                                <div class="txt_box">
-                                                    {{ @$track->name }}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="ty2">방문주기</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->vp }} 일</div>
-                                            </td>
-                                            <th class="ty2">방문시간/횟수</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ gmdate('H:i:s', @$track->vt) }}초/{{ @$track->vc }}회</div>
-                                            </td>
-                                            <th class="ty2">방문 페이지 주기</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->pageview }} 페이지</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="ty2">광고</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->ad }}</div>
-                                            </td>
-                                            <th class="ty2">키워드</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->kw }}</div>
-                                            </td>
-                                            <th class="ty2">내부컨텐츠</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->track }}</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="ty2">도메인</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->domain }}</div>
-                                            </td>
-                                            <th class="ty2">브라우저</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->browser }}</div>
-                                            </td>
-                                            <th class="ty2">모바일 여부</th>
-                                            <td class="ty2">
-                                                <div class="txt_box">{{ @$track->browser }}</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="ty2">Agent</th>
-                                            <td class="ty2" colspan="5">
-                                                <div class="txt_box">{{ @$track->agent }}</div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-
         <div class="card shadow">
             <div class="card-header mb-0">
                 <a href="#" class="m-0 font-weight-bold">출고메시지 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -380,7 +303,7 @@
                 <a href="#" class="m-0 font-weight-bold">결제 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
@@ -523,7 +446,7 @@
                 @endif
             </div>
             <div id = "goods" class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
@@ -666,7 +589,7 @@
 					</div>
 				</div>
 				<div class="card-body">
-					<div class="row_wrap">
+					<div class="row_wrap" id="border_sharp">
 						<div class="row">
 							<div class="col-12">
 								<div class="table-responsive">
@@ -797,7 +720,7 @@
                 <div class="row_wrap">
                     <div class="row">
                         <div class="col-12">
-                            <div class="table-responsive">
+                            <div class="table-responsive" style="border-left: 1px solid #999;border-right: 1px solid #999;border-bottom: 1px solid #999;">
                                 <table class="table table-bordered th_border_none custm_tb1">
                                     <thead>
                                         <tr>
@@ -911,7 +834,7 @@
                             <input type="hidden" name="clm_no" value="{{ @$claim_info->clm_no }}">
                             <input type="hidden" name="PREV_CLM_STATE" value="{{ @$claim_info->clm_state }}">
 
-                            <div class="table-box-ty2 mobile mb-2">
+                            <div class="table-box-ty2 mobile mb-2" style="border: 1px solid #999;">
                                 <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <colgroup>
                                         <col width="9%">
@@ -970,7 +893,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="table-responsive">
+                            <div class="table-responsive" style="border: 1px solid #999;">
                                 <table class="table table-bordered th_border_none custm_tb1">
                                     <thead>
                                         <tr>
@@ -984,7 +907,7 @@
                                     <tbody>
                                         @if (count($claim_memos) > 0)
                                         @foreach($claim_memos as $claim_memo)
-                                        <tr>
+                                        <tr @if ($claim_memo->ord_opt_no == $ord_opt_no) style="background-color: yellow" @endif>
                                             <td>{{@$claim_memo->cs_form}}</td>
                                             <td><a href="#goods">{{@$claim_memo->clm_state}}</a></td>
                                             <td>{{@$claim_memo->regi_date}}</td>
@@ -1000,7 +923,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="table-box-ty2 mt-2">
+                            <div class="table-box-ty2 mt-2" style="border: 1px solid #999;">
                                 <table class="table incont table-bordered custm_tb1" id="dataTable" width="100%" cellspacing="0">
                                     <colgroup>
                                         <col width="9%">
@@ -1130,7 +1053,7 @@
                 <a href="#" class="m-0 font-weight-bold">주문 처리일자 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -1161,8 +1084,7 @@
                                         <tr>
                                             <th>출고요청</th>
                                             <td>
-                                                <div class="txt_box">{{@$ord->dlv_start_date}}
-                                                    <div>
+                                                <div class="txt_box">{{@$ord->dlv_start_date}}</div>
                                             </td>
                                             <th>출고처리중</th>
                                             <td>
@@ -1186,7 +1108,7 @@
                 <a href="#" class="m-0 font-weight-bold">주문상태 로그 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
@@ -1231,7 +1153,7 @@
                 <a href="#" class="m-0 font-weight-bold">공급업체 정보</a>
             </div>
             <div class="card-body">
-                <div class="row_wrap">
+                <div class="row_wrap" id="border_sharp">
                     <div class="row">
                         <div class="col-12">
                             <div class="table-box-ty2 mobile">
@@ -1294,6 +1216,91 @@
                 </div>
             </div>
         </div>
+		@if ($track)
+			<div class="card shadow">
+				<div class="card-header mb-0">
+					<a href="#" class="m-0 font-weight-bold">유입 정보</a>
+				</div>
+				<div class="card-body">
+					<div class="row_wrap" id="border_sharp">
+						<div class="row">
+							<div class="col-12">
+								<div class="table-box-ty2 mobile">
+									<table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
+										<colgroup>
+											<col width="9%">
+											<col width="25%">
+											<col width="9%">
+											<col width="25%">
+											<col width="9%">
+											<col width="25%">
+										</colgroup>
+										<tbody>
+										<tr>
+											<th class="ty2">유입경로</th>
+											<td class="ty2" colspan="5">
+												<div class="txt_box">
+													{{ @$track->name }}
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="ty2">방문주기</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->vp }} 일</div>
+											</td>
+											<th class="ty2">방문시간/횟수</th>
+											<td class="ty2">
+												<div class="txt_box">{{ gmdate('H:i:s', @$track->vt) }}초/{{ @$track->vc }}회</div>
+											</td>
+											<th class="ty2">방문 페이지 주기</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->pageview }} 페이지</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="ty2">광고</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->ad }}</div>
+											</td>
+											<th class="ty2">키워드</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->kw }}</div>
+											</td>
+											<th class="ty2">내부컨텐츠</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->track }}</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="ty2">도메인</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->domain }}</div>
+											</td>
+											<th class="ty2">브라우저</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->browser }}</div>
+											</td>
+											<th class="ty2">모바일 여부</th>
+											<td class="ty2">
+												<div class="txt_box">{{ @$track->browser }}</div>
+											</td>
+										</tr>
+										<tr>
+											<th class="ty2">Agent</th>
+											<td class="ty2" colspan="5">
+												<div class="txt_box">{{ @$track->agent }}</div>
+											</td>
+										</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		@endif
     </div>
 </div>
 

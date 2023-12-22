@@ -1,6 +1,18 @@
 @extends('head_with.layouts.layout-nav')
 @section('title','거래명세표')
 @section('content')
+<style>
+	.row_wrap {
+		border-left : 1px solid #999;
+		border-right : 1px solid #999;
+		border-bottom : 1px solid #999;
+	}
+	
+	body {
+		font-weight : 500;
+	}
+	
+</style>
 <div class="container-fluid show_layout py-3">
     <div class="page_tit mb-3 d-flex align-items-center justify-content-between">
         <div>
