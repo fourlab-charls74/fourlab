@@ -218,7 +218,7 @@ class SMS
 		$sms['testmode_yn']	= "";									// Y 인경우 실제문자 전송X , 자동취소(환불) 처리
 		$sms['title']		= "";									//  LMS, MMS 제목 (미입력시 본문중 44Byte 또는 엔터 구분자 첫라인)
 		// $sms['image']	= '/tmp/pic_57f358af08cf7_sms_.jpg';	// MMS 이미지 파일 위치 (저장된 경로)
-		$sms['msg_type']	= "SMS";								//  SMS, LMS, MMS등 메세지 타입을 지정
+		$sms['msg_type']	= "LMS";								//  SMS, LMS, MMS등 메세지 타입을 지정
 		// ※ msg_type 미지정시 글자수/그림유무가 판단되어 자동변환됩니다. 단, 개행문자/특수문자등이 2Byte로 처리되어 SMS 가 LMS로 처리될 가능성이 존재하므로 반드시 msg_type을 지정하여 사용하시기 바랍니다.
 		/****************** 전송정보 설정끝 ***************/
 
