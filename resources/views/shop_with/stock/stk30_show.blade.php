@@ -226,9 +226,9 @@
                     } else if(e.newValue < 0) {
                         alert("음수는 입력할 수 없습니다.");
                         gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-					} else if(e.column.colId === "return_p_qty" && e.data.store_wqty < parseInt(e.data.return_p_qty)) {
-						alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
-						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+					// } else if(e.column.colId === "return_p_qty" && e.data.store_wqty < parseInt(e.data.return_p_qty)) {
+						// alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+						// gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     } else {
 						e.node.setDataValue('return_p_amt', parseInt(e.data.return_p_qty) * parseInt(e.data.return_price));
                         updatePinnedRow();

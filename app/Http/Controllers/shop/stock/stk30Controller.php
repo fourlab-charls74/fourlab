@@ -231,12 +231,7 @@ class stk30Controller extends Controller
                 g.goods_nm_eng,
                 if(pc.prd_cd_p = '', concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt), pc.prd_cd_p) as prd_cd_p,
                 pc.color,
-                (
-                    select s.size_cd from size s
-                    where s.size_kind_cd = if(pc.size_kind != '', pc.size_kind, if(pc.gender = 'M', 'PRD_CD_SIZE_MEN', if(pc.gender = 'W', 'PRD_CD_SIZE_WOMEN', 'PRD_CD_SIZE_UNISEX')))
-                        and s.size_cd = pc.size
-                        and use_yn = 'Y'
-                ) as size,
+                pc.size,
                 pc.goods_opt,
                 g.goods_sh,
                 srp.price,
@@ -321,10 +316,10 @@ class stk30Controller extends Controller
 			$now_state = DB::table('store_return')->where('sr_cd', $sr_cd)->value('sr_state');
 
 			foreach($products as $product) {
-				if ($product['store_wqty'] < $product['return_p_qty'] && $now_state < 30) {
-					$code = 501;
-					throw new Exception('매장보유재고보다 많은 수량을 반품처리할 수 없습니다.');
-				}
+//				if ($product['store_wqty'] < $product['return_p_qty'] && $now_state < 30) {
+//					$code = 501;
+//					throw new Exception('매장보유재고보다 많은 수량을 반품처리할 수 없습니다.');
+//				}
 
 				DB::table('store_return_product')
 					->where('sr_prd_cd', '=', $product['sr_prd_cd'])
@@ -376,14 +371,37 @@ class stk30Controller extends Controller
 
 		$qty = $row->return_qty ?? 0;
 
-		// 매장보유재고 차감 (+ history)
-		DB::table('product_stock_store')
-			->where('prd_cd', '=', $row->prd_cd)
-			->where('store_cd', '=', $row->store_cd)
-			->update([
-				'wqty' => DB::raw('wqty - ' . $qty),
-				'ut' => now(),
-			]);
+		//해당 매장에 데이터가있는지 확인하는 부분
+		$store_stock_cnt =
+			DB::table('product_stock_store')
+				->where('store_cd', '=', $row->store_cd)
+				->where('prd_cd', '=', $row->prd_cd)
+				->count();
+		
+		if ($store_stock_cnt < 1) {
+			// 해당 매장에 상품 기존재고가 없을 경우
+			DB::table('product_stock_store')
+				->insert([
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'store_cd' => $row->store_cd,
+					'qty' => 0,
+					'wqty' => $qty * -1,
+					'goods_opt' => $row->goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now()
+				]);
+		} else {
+			// 매장보유재고 차감 (+ history)
+			DB::table('product_stock_store')
+				->where('prd_cd', '=', $row->prd_cd)
+				->where('store_cd', '=', $row->store_cd)
+				->update([
+					'wqty' => DB::raw('wqty - ' . $qty),
+					'ut' => now(),
+				]);
+		}
+
 		if ($qty > 0 || $qty < 0) {
 			DB::table('product_stock_hst')
 				->insert([
@@ -423,15 +441,24 @@ class stk30Controller extends Controller
 					'storage_cd' => $row->storage_cd,
 					'qty' => 0,
 					//'wqty' => $qty, 231110 ceduce
-					'wqty' => 0,
+					'wqty' => $qty,
 					'goods_opt' => $row->goods_opt,
 					'use_yn' => 'Y',
 					'rt' => now()
 				]);
+		} else {
+			// 해당 창고에 상품 기존재고가 이미 존재할 경우
+			// 창고보유재고 증가
+			DB::table('product_stock_storage')
+				->where('prd_cd', '=', $row->prd_cd)
+				->where('storage_cd', '=', $row->storage_cd)
+				->update([
+					'wqty' => DB::raw('wqty + ' . ($qty)),
+					'ut' => now(),
+				]);
 		}
 
 		if ($qty > 0 || $qty < 0) {
-		/*	
 			DB::table('product_stock_hst')
 				->insert([
 					'goods_no' => $row->goods_no,
@@ -450,18 +477,15 @@ class stk30Controller extends Controller
 					'admin_id' => $admin_id,
 					'admin_nm' => $admin_nm,
 				]);
-		*/
 		}
 
 		// 전체재고 중 창고재고 업데이트
-		/*
 		DB::table('product_stock')
 			->where('prd_cd', '=', $row->prd_cd)
 			->update([
 				'wqty' => DB::raw('wqty + ' . $qty),
 				'ut' => now(),
 			]);
-		*/
 		
 		return 1;
 	}

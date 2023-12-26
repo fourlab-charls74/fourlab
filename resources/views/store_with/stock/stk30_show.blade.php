@@ -292,8 +292,8 @@
 	                    // 아래코드 주석처리 (확정수량은 처리 이후 현재의 보유재고보다 많을 수 있습니다.)
 						// || (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty))
                     ) {
-						alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
-						gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+						// alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
+						// gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                     } else {
 						if (e.column.colId === "return_price") {
 							e.node.setDataValue('return_amt', parseInt(e.data.qty) * parseInt(e.data.return_price));
