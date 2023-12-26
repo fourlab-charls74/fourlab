@@ -194,13 +194,12 @@ class prd03Controller extends Controller
 		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '6')
 			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
 
-		$size_kind_sql = "select * from size_kind where use_yn = 'Y'";
+		$size_kind_sql = "select * from size_kind where use_yn = 'Y' order by size_kind_cd asc";
 		$size_kind = DB::select($size_kind_sql);
 
 		$values = [
 			'types' 	=> SLib::getCodes("PRD_MATERIAL_TYPE"),
 			'brand' 	=> SLib::getCodes("PRD_CD_BRAND"),
-			'years'		=> SLib::getCodes("PRD_CD_YEAR"),
 			'seasons' 	=> SLib::getCodes("PRD_CD_SEASON"),
 			'genders' 	=> SLib::getCodes("PRD_CD_GENDER"),
 			'items'		=> SLib::getCodes("PRD_CD_ITEM"),

@@ -675,16 +675,11 @@ class goods extends Controller
                 p.prd_cd
                 , pc.goods_no as goods_no
                 , pc.brand as brand
-                , concat(pc.brand,pc.year, pc.season, pc.gender, pc.item, pc.opt) as prd_cd_p
+                , pc.prd_cd_p as prd_cd_p
                 , d.code_val as brand
                 , c.code_val as opt_kind_nm
                 , pc.color as color
-                , ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size
+                , pc.size as size
                 , pc.goods_opt
                 , p.prd_nm as goods_nm
                 , p.prd_nm_eng as goods_nm_eng
@@ -695,7 +690,7 @@ class goods extends Controller
                 , p.rt as reg_dm
                 , i.img_url as img
                 , ifnull(pss.wqty, 0) as sg_qty
-				, ifnull(pss2.wqty, 0) as s_qty
+				, sum(ifnull(pss2.wqty, 0)) as s_qty
                 , p.com_id as com_id
             from product p
                 inner join product_code pc on p.prd_cd = pc.prd_cd
@@ -706,6 +701,7 @@ class goods extends Controller
                 left outer join code c on c.code_id = pc.opt and c.code_kind_cd = 'PRD_MATERIAL_OPT'
                 left outer join code d on d.code_id = pc.brand and d.code_kind_cd = 'PRD_MATERIAL_TYPE'
             where 1=1 and p.use_yn = 'Y' $inner_where
+            group by pc.prd_cd
             $limit
         ";
 
