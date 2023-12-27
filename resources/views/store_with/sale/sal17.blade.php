@@ -12,7 +12,6 @@
 <form method="get" name="search">
 	<div id="search-area" class="search_cum_form">
 		<div class="card mb-3">
-			<input type='hidden' id='is_searched' name='is_searched' value='{{$is_searched}}'>
 			<div class="d-flex card-header justify-content-between">
 				<h4>검색</h4>
 				<div class="flax_box">
@@ -30,7 +29,7 @@
 							<div class="form-inline date-select-inbox">
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" id="sdate" name="sdate" value="{{ $sdate }}" onchange="return isSearch('');" autocomplete="off" disable>
+										<input type="text" class="form-control form-control-sm docs-date month" id="sdate" name="sdate" value="{{ $sdate }}" autocomplete="off" disable>
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2" disable>
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -42,7 +41,7 @@
 								<span class="text_line">~</span>
 								<div class="docs-datepicker form-inline-inner input_box">
 									<div class="input-group">
-										<input type="text" class="form-control form-control-sm docs-date month" id="edate" name="edate" value="{{ $edate }}" onchange="return isSearch('');"  autocomplete="off">
+										<input type="text" class="form-control form-control-sm docs-date month" id="edate" name="edate" value="{{ $edate }}" autocomplete="off">
 										<div class="input-group-append">
 											<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
 												<i class="fa fa-calendar" aria-hidden="true"></i>
@@ -144,7 +143,6 @@
 </style>
 <script type="text/javascript" charset="utf-8">
 
-	//const IS_SEARCHED = document.search.is_searched.value;
 	let columns = [
         { headerName: "#", field: "num", type:'NumType', pinned:'left', aggSum:"합계", cellStyle: { 'text-align': "center" },
             cellRenderer: function (params) {
@@ -166,7 +164,13 @@
 				},
 		},
         { field: "scd", headerName: "매장코드", pinned:'left', hide: true },
-        { field: "store_nm", headerName: "매장명", pinned:'left', type: 'StoreNameType', width: 200},
+        { field: "store_nm", headerName: "매장명", pinned:'left', width: 200,
+			cellRenderer: function (params) {
+				if (params.value !== undefined) {
+					return '<a href="javascript:void(0);" onclick="return openStore(\'' + params.data.scd + '\');">' + params.value + '</a>';
+				}
+			}
+		},
         {
             field: "summary", headerName: "합계",
             children: [
@@ -290,29 +294,16 @@
 		}
 		gx = new HDGrid(gridDiv, columns, options);
 		initStore()
-
-        // if ($('#is_searched').val() === 'y') {
-            Search();
-        // }
-
+		Search();
 
 		// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
 		load_store_channel();
 	});
-
-	function isSearch(val){
-        $('#is_searched').val(val);
-    }
 	
 	function Search() {
-		if ($('#is_searched').val() === 'y') {
-			let data = $('form[name="search"]').serialize();
-			gx.Aggregation({ sum: "top" });
-			gx.Request('/store/sale/sal17/search', data, -1);
-		} else {
-            isSearch('y');
-			$('form[name="search"]').submit();
-		}
+		let data = $('form[name="search"]').serialize();
+		gx.Aggregation({ sum: "top" });
+		gx.Request('/store/sale/sal17/search', data, -1);
 	}
 
 	function initStore() {
@@ -324,10 +315,6 @@
             $('#store_cd').append(option).trigger('change');
         }
     }
-
-	const formReset = () => {
-		document.search.reset();
-	};
 
 	const startEditingCell = (row_index, col_key) => {
         gx.gridOptions.api.startEditingCell({ rowIndex: row_index, colKey: col_key });

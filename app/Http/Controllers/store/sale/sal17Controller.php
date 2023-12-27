@@ -20,7 +20,6 @@ class sal17Controller extends Controller
 	//
 	public function index(Request $request)
 	{
-		$is_searched = $request->input('is_searched', 'y');
         $sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
         $edate = $request->input('edate', now()->format("Y-m"));
         $store_type = $request->input('store_type', "");
@@ -75,7 +74,6 @@ class sal17Controller extends Controller
             'edate'         => $edate,
 			'months'	    => $months,
 			'store_types'	=> $store_types,
-			'is_searched' 	=> $is_searched,
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 			'store'         => DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', '=', $store_cd)->first(),   

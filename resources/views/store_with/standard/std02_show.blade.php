@@ -85,7 +85,7 @@
 											<td>
 												<div class="d-flex align-items-center">
 													<div class="flex_box w-100">
-														<select name='store_channel' id="store_channel" class="form-control form-control-sm"onchange="chg_store_channel();">
+														<select name='store_channel' id="store_channel" class="form-control form-control-sm" onchange="chg_store_channel();">
 															<option value=''>전체</option>
 															@if ($cmd == '') 
 																@foreach ($store_channel as $sc)
