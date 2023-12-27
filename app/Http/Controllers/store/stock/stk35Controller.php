@@ -592,7 +592,7 @@ class stk35Controller extends Controller
 					'storage_cd' => $row->storage_cd,
 					'qty' => 0,
 					//'wqty' => $qty, 231110 ceduce
-					'wqty' => $qty,
+					'wqty' => 0,
 					'goods_opt' => $row->goods_opt,
 					'use_yn' => 'Y',
 					'rt' => now()
@@ -600,47 +600,46 @@ class stk35Controller extends Controller
 		} else {
 			// 해당 창고에 상품 기존재고가 이미 존재할 경우
 			// 창고보유재고 증가
-			DB::table('product_stock_storage')
-				->where('prd_cd', '=', $row->prd_cd)
-				->where('storage_cd', '=', $row->storage_cd)
-				->update([
-					'wqty' => DB::raw('wqty + ' . ($qty)),
-					'ut' => now(),
-				]);
+			// 231110 ceduce
+			//DB::table('product_stock_storage')
+			//	->where('prd_cd', '=', $row->prd_cd)
+			//	->where('storage_cd', '=', $row->storage_cd)
+			//	->update([
+			//		'wqty' => DB::raw('wqty + ' . ($qty)),
+			//		'ut' => now(),
+			//	]);
 		}
 
 		if ($qty > 0 || $qty < 0) {
 			// 231110 ceduce
-			DB::table('product_stock_hst')
-				->insert([
-					'goods_no' => $row->goods_no,
-					'prd_cd' => $row->prd_cd,
-					'goods_opt' => $row->goods_opt,
-					'location_cd' => $row->storage_cd,
-					'location_type' => 'STORAGE',
-					'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
-					'price' => $row->price,
-					'wonga' => $row->wonga,
-					'qty' => $qty,
-					'stock_state_date' => date('Ymd'),
-					'r_stock_state_date' => date('Ymd'),
-					'ord_opt_no' => '',
-					'store_return_no' => $sr_prd_cd,
-					'comment' => '매장반품처리',
-					'rt' => now(),
-					'admin_id' => $admin_id,
-					'admin_nm' => $admin_nm,
-				]);
+			//DB::table('product_stock_hst')
+			//	->insert([
+			//		'goods_no' => $row->goods_no,
+			//		'prd_cd' => $row->prd_cd,
+			//		'goods_opt' => $row->goods_opt,
+			//		'location_cd' => $row->storage_cd,
+			//		'location_type' => 'STORAGE',
+			//		'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
+			//		'price' => $row->price,
+			//		'wonga' => $row->wonga,
+			//		'qty' => $qty,
+			//		'stock_state_date' => date('Ymd'),
+			//		'ord_opt_no' => '',
+			//		'comment' => '매장반품처리',
+			//		'rt' => now(),
+			//		'admin_id' => $admin_id,
+			//		'admin_nm' => $admin_nm,
+			//	]);
 		}
 
 		// 전체재고 중 창고재고 업데이트
 		// 231110 ceduce
-		DB::table('product_stock')
-			->where('prd_cd', '=', $row->prd_cd)
-			->update([
-				'wqty' => DB::raw('wqty + ' . $qty),
-				'ut' => now(),
-			]);
+		//DB::table('product_stock')
+		//	->where('prd_cd', '=', $row->prd_cd)
+		//	->update([
+		//		'wqty' => DB::raw('wqty + ' . $qty),
+		//		'ut' => now(),
+		//	]);
 
 		return 1;
 	}
@@ -701,8 +700,7 @@ class stk35Controller extends Controller
 				]);
 		}
 
-//		if (($p_qty - $f_qty) > 0 || ($p_qty - $f_qty) < 0 || ($p_qty - $f_qty == 0)) {
-		if ($f_qty > 0 || $f_qty < 0) {
+		if (($p_qty - $f_qty) > 0 || ($p_qty - $f_qty) < 0) {
 			DB::table('product_stock_hst')
 				->insert([
 					'goods_no' => $row->goods_no,
@@ -713,7 +711,7 @@ class stk35Controller extends Controller
 					'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
 					'price' => $row->price,
 					'wonga' => $row->wonga,
-					'qty' => $f_qty,
+					'qty' => ($p_qty - $f_qty),
 					'stock_state_date' => date('Ymd'),
 					'r_stock_state_date' => date('Ymd'),
 					'ord_opt_no' => '',
@@ -1061,22 +1059,22 @@ class stk35Controller extends Controller
 			"body" => $result,
 		]);
 	}
-	
+
 	public function add_row(Request $request) {
 		ini_set('memory_limit', '-1');
 		$prd_cd = $request->input('prd_cd', []);
 		$store_cd = $request->input('store_cd', []);
 
 		$prd_cds = explode(',', $prd_cd);
-		
+
 		$result = [];
 
-			
-			foreach($store_cd as $sc) {
-				$store = DB::table('store')->where('store_cd', $sc)->select('store_cd', 'store_nm')->first();
-				$product_codes = empty($prd_cds) ? "''" : "'" . implode("','", $prd_cds) . "'";
 
-				$sql = "
+		foreach($store_cd as $sc) {
+			$store = DB::table('store')->where('store_cd', $sc)->select('store_cd', 'store_nm')->first();
+			$product_codes = empty($prd_cds) ? "''" : "'" . implode("','", $prd_cds) . "'";
+
+			$sql = "
 					select
 						pc.prd_cd
 						, pc.goods_no
@@ -1107,17 +1105,17 @@ class stk35Controller extends Controller
 					where pc.prd_cd in ($product_codes)
 				";
 
-				$row = DB::select($sql);
-				
-				$result[] = $row;
+			$row = DB::select($sql);
+
+			$result[] = $row;
+		}
+
+		$res = [];
+		for ($i = 0; $i < count($result); $i++) {
+			for ($j = 0; $j < count($result[$i]); $j++) {
+				$res[] = $result[$i][$j];
 			}
-			
-			$res = [];
-			for ($i = 0; $i < count($result); $i++) {
-				for ($j = 0; $j < count($result[$i]); $j++) {
-					$res[] = $result[$i][$j];
-				}
-			}
+		}
 
 		return response()->json([
 			"code" => 200,
@@ -1129,7 +1127,7 @@ class stk35Controller extends Controller
 			],
 			"body" => $res,
 		]);
-		
+
 	}
 
 	// 창고반품 거래명세서 출력
