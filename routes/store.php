@@ -937,6 +937,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal29/searchBaebun', 'sal29Controller@searchBaebun');
         Route::get('sal29/download', 'sal29Controller@download');
 
+		//매장RT현황조회
+		Route::get('sal33','sal33Controller@index');
+		Route::get('sal33/search','sal33Controller@search');
+		
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
