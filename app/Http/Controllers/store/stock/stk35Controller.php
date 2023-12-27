@@ -1010,6 +1010,16 @@ class stk35Controller extends Controller
 				return response()->json(['code' => 404, 'msg' => '매장반품 기본정보가 올바르지 않습니다. 반품창고와 보내는매장 항목을 확인해주세요.']);
 			}
 
+			$store_stock_cnt =
+				DB::table('product_stock_store')
+					->where('store_cd', '=', $store_cd)
+					->where('prd_cd', '=', $prd_cd)
+					->count();
+
+			if ($store_stock_cnt < 1) {
+				return response()->json(['code' => 404, 'msg' => "'".$prd_cd."'" . '의 상품이 '. $store->store_nm.'('. $store->store_cd .')' .'에 존재하지 않습니다.']);
+			}
+
 			$sql = "
                 select
                     pc.prd_cd

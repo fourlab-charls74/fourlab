@@ -1006,6 +1006,16 @@ class stk30Controller extends Controller
 			$prd_cd = $d['prd_cd'];
 			$qty = $d['qty'] ?? 0;
 			$count = $d['count'] ?? '';
+			
+			$store_stock_cnt =
+				DB::table('product_stock_store')
+					->where('store_cd', '=', $store_cd)
+					->where('prd_cd', '=', $prd_cd)
+					->count();
+			
+			if ($store_stock_cnt < 1) {
+				return response()->json(['code' => 404, 'msg' => "'".$prd_cd."'" . '의 상품이 매장에 존재하지 않습니다.']);
+			}
 
 			$sql = "
                 select
@@ -1016,7 +1026,7 @@ class stk30Controller extends Controller
                     , if(g.goods_no <> '0', g.style_no, p.style_no) as style_no
                     , if(g.goods_no <> '0', g.goods_nm, p.prd_nm) as goods_nm
                     , if(g.goods_no <> '0', g.goods_nm_eng, p.prd_nm) as goods_nm_eng
-                    , concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
+                    , pc.prd_cd_p as prd_cd_p
                     , pc.color
                     , pc.size
                     , pc.goods_opt

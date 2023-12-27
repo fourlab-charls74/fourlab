@@ -396,6 +396,8 @@
 				if (res.data.code == 200) {
 					await gx.gridOptions.api.applyTransaction({add : res.data.body});
 					updatePinnedRow();
+				} else if (res.data.code == 404) {
+					alert(res.data.msg);
 				} else {
 					alert("상품정보조회 중 오류가 발생했습니다.\n다시 시도해주세요.");
 				}
