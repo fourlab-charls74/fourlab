@@ -322,11 +322,11 @@
             list.push({
                 headerName: size,
                 children: [
-                    {field: ss + "_qty", headerName: "재고", maxWidth: 60, minWidth: 60,
+                    {field: ss + "_qty", headerName: "실재고", maxWidth: 60, minWidth: 60,
                         cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                     },
-                    {field: ss + "_wqty", headerName: "가용재고", maxWidth: 65, minWidth: 65,
+                    {field: ss + "_wqty", headerName: "보유재고", maxWidth: 65, minWidth: 65,
                         cellStyle: (params) => ({ 'text-align': 'right', "background-color": size === setting_size ? "#AAFF99" : "none" }),
                         aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                     },        
@@ -337,10 +337,10 @@
         list.push({
             headerName: "합계",
             children: [
-                {field: "qty", headerName: "재고", type: "currencyType", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"}, pinned: "right",
+                {field: "qty", headerName: "실재고", type: "currencyType", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"}, pinned: "right",
                     aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                 },
-                {field: "wqty", headerName: "가용재고", type: "currencyType", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"}, pinned: "right",
+                {field: "wqty", headerName: "보유재고", type: "currencyType", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"}, pinned: "right",
                     aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                 },
             ],

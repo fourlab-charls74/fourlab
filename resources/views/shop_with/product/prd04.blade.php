@@ -284,7 +284,7 @@
 		{field: "goods_sh", headerName: "정상가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "price", headerName: "현재가", type: 'currencyType', width: 100, aggFunc: 'first'},
 		{field: "sale_rate", headerName: "할인율", width: 70, cellStyle:{'text-align':'right'}},
-		{field: "sqty", headerName: "재고", width:70, type: 'currencyType',
+		{field: "sqty", headerName: "실재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
 			},
@@ -299,7 +299,7 @@
 				}
 			}
 		},
-		{field: "swqty", headerName: "가용재고", width:70, type: 'currencyType',
+		{field: "swqty", headerName: "보유재고", width:70, type: 'currencyType',
 			aggFunc: (params) => {
 				return params.values.reduce((a,c) => a + (c * 1), 0);
 			},
