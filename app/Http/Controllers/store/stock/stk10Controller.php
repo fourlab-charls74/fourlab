@@ -647,6 +647,14 @@ class stk10Controller extends Controller
 
 			foreach($data as $d) {
                 if($d['state'] != $ori_state) continue;
+				
+				$sql_chk	= " select state from product_stock_release where idx = :idx ";
+				$row_chk	= DB::selectOne($sql_chk,['idx' => $d['idx']]);
+				$chk_state	= $row_chk->state;
+				
+				if( $chk_state == '40' ){
+					throw new Exception("이미 입고완료된 데이터 입니다.");
+				}
 
                 DB::table('product_stock_release')
                     ->where('idx', '=', $d['idx'])

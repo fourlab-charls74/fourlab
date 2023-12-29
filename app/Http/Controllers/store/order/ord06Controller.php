@@ -23,13 +23,13 @@ class ord06Controller extends Controller
 
 	public function index(Request $request)
 	{
-		$sdate = now()->sub(1, 'week')->format('Y-m-d');
-		$edate = date('Y-m-d');
+		$sdate = $request->input('sdate',now()->sub(1, 'week')->format('Y-m-d'));
+		$edate = $request->input('edate',date('Y-m-d'));
 
 		$date = $request->input('date', '');
 		if ($date != '') {
-			$sdate = date('Y-m-d', strtotime($date));
-			$edate = date('Y-m-d', strtotime($date));
+			//$sdate = date('Y-m-d', strtotime($date));
+			//$edate = date('Y-m-d', strtotime($date));
 		}
 
 		$pr_code 			= $request->input('pr_code', []);
@@ -44,13 +44,14 @@ class ord06Controller extends Controller
 		$on_off_yn 			= $request->input('on_off_yn', '');
 		$store_channel 		= $request->input('store_channel', '');
 		$store_channel_kind = $request->input('store_channel_kind', '');
+		$prd_cd			 	= $request->query("prd_cd", '');
 		$prd_cd_range_text 	= $request->query("prd_cd_range", '');
 		$prd_cd_range_nm 	= $request->query("prd_cd_range_nm", '');
 		parse_str($prd_cd_range_text, $prd_cd_range);
 
 		//매장별판매집계표(일별)에서 쿼리스트링으로 가져온 값들
-		$sdate = $request->query('sdate', $sdate);
-		$edate = $request->query('sdate', $edate);
+		//$sdate = $request->query('sdate', $sdate);
+		//$edate = $request->query('sdate', $edate);
 		$store_cd = $request->query('store_cd',$store_cd);
 		
 		$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
@@ -95,6 +96,7 @@ class ord06Controller extends Controller
 			'p_store_channel' => $store_channel,
 			'p_store_kind' 	=> $store_channel_kind,
 			'store'			=> $store,
+			'prd_cd'		=> $prd_cd,
 			'prd_cd_range'	=> $prd_cd_range,
 			'prd_cd_range_nm' => $prd_cd_range_nm,
 			'store_cd'		=> $store_cd
