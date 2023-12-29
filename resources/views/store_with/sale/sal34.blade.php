@@ -16,6 +16,7 @@
 					<h4>검색</h4>
 					<div>
 						<a href="#" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
+						<a href="javascript:gx.Download('매장별 할인판매 현황_{{ date('YmdH') }}');" class="btn btn-download btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -142,7 +143,7 @@
 			</div>
 			<div class="resul_btn_wrap mb-3">
 				<a href="javascript:;" class="btn btn-sm w-xs btn-primary shadow-sm apply-btn" onclick="return Search();"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-
+				<a href="javascript:gx.Download('매장별 할인판매 현황_{{ date('YmdH') }}');" class="btn btn-download btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 				<div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
 			</div>
 		</div>
