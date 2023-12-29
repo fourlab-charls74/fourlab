@@ -940,6 +940,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		//매장RT현황조회
 		Route::get('sal33','sal33Controller@index');
 		Route::get('sal33/search','sal33Controller@search');
+
+		//매장별 할인판매 현황
+		Route::get('sal34','sal34Controller@index');
+		Route::get('sal34/search','sal34Controller@search');
 		
     });
 
