@@ -303,6 +303,7 @@ class sal34Controller extends Controller
 				left outer join store_channel sc on sc.store_channel_cd = b.store_channel and sc.store_kind_cd = b.store_channel_kind
 				group by b.store_cd
 			) t
+			order by t.store_channel, t.store_kind
 		";
 
 		$rows = DB::select($sql);
