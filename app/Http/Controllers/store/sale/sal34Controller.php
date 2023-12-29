@@ -238,35 +238,35 @@ class sal34Controller extends Controller
 				select
 					b.store_cd
 					, sc.store_channel, sc.store_kind, b.store_nm
-					, if(b.ord_state = '$ord_state', ifnull(b.qty, 0), 0) as qty_30
-					, if(b.ord_state = '$ord_state', ifnull(b.recv_amt, 0), 0) as recv_amt_30
-					, if(b.ord_state = '$ord_state', ifnull(b.point_amt, 0), 0) as point_amt_30
-					, if(b.ord_state = '$ord_state', ifnull(b.coupon_amt, 0), 0) as coupon_amt_30
-					, if(b.ord_state = '$ord_state', ifnull(b.dc_amt, 0), 0) as dc_amt_30
-					, if(b.ord_state = '$ord_state', ifnull(b.fee_amt,0), 0) as fee_amt_30
-					, if(b.ord_state = '$ord_state', ifnull(b.wonga,0), 0) as wonga_30
-					, if(b.ord_state = '$ord_state', ifnull(b.taxation_amt, 0), 0) as taxation_amt_30					
-					, if(b.ord_state = '$ord_state', ifnull(b.tax_amt, 0), 0) as tax_amt_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.qty, 0), 0)) as qty_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.recv_amt, 0), 0)) as recv_amt_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.point_amt, 0), 0)) as point_amt_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.coupon_amt, 0), 0)) as coupon_amt_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.dc_amt, 0), 0)) as dc_amt_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.fee_amt,0), 0)) as fee_amt_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.wonga,0), 0)) as wonga_30
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.taxation_amt, 0), 0)) as taxation_amt_30					
+					, sum(if(b.ord_state = '$ord_state', ifnull(b.tax_amt, 0), 0)) as tax_amt_30
 					
-					, if(b.ord_state = 60, ifnull(b.qty, 0), 0) * -1 as qty_60
-					, if(b.ord_state = 60, ifnull(b.recv_amt, 0), 0) * -1 as recv_amt_60
-					, if(b.ord_state = 60, ifnull(b.point_amt, 0), 0) * -1 as point_amt_60
-					, if(b.ord_state = 60, ifnull(b.coupon_amt, 0), 0) * -1 as coupon_amt_60
-					, if(b.ord_state = 60, ifnull(b.fee_amt,0), 0) as fee_amt_60
-					, if(b.ord_state = 60, ifnull(b.wonga, 0), 0) as wonga_60
-					, if(b.ord_state = 60, ifnull(b.dc_amt, 0), 0) * -1 as dc_amt_60
-					, if(b.ord_state = 60, ifnull(b.taxation_amt, 0), 0) * -1 as taxation_amt_60
-					, if(b.ord_state = 60, ifnull(b.tax_amt, 0), 0) * -1 as tax_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.qty, 0), 0)) * -1 as qty_60
+					, sum(if(b.ord_state = 60, ifnull(b.recv_amt, 0), 0)) * -1 as recv_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.point_amt, 0), 0)) * -1 as point_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.coupon_amt, 0), 0)) * -1 as coupon_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.fee_amt,0), 0)) as fee_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.wonga, 0), 0)) as wonga_60
+					, sum(if(b.ord_state = 60, ifnull(b.dc_amt, 0), 0)) * -1 as dc_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_60
+					, sum(if(b.ord_state = 60, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_60
 
-					, if(b.ord_state = 61, ifnull(b.qty, 0), 0) * -1 as qty_61
-					, if(b.ord_state = 61, ifnull(b.recv_amt, 0), 0) * -1 as recv_amt_61
-					, if(b.ord_state = 61, ifnull(b.point_amt, 0), 0) * -1 as point_amt_61
-					, if(b.ord_state = 61, ifnull(b.coupon_amt, 0), 0) * -1  as coupon_amt_61
-					, if(b.ord_state = 61, ifnull(b.fee_amt,0), 0) * 1 as fee_amt_61
-					, if(b.ord_state = 61, ifnull(b.wonga, 0), 0)  as wonga_61
-					, if(b.ord_state = 61, ifnull(b.dc_amt, 0), 0) * -1  as dc_amt_61
-					, if(b.ord_state = 61, ifnull(b.taxation_amt, 0), 0) * -1 as taxation_amt_61
-					, if(b.ord_state = 61, ifnull(b.tax_amt, 0), 0) * -1 as tax_amt_61					
+					, sum(if(b.ord_state = 61, ifnull(b.qty, 0), 0)) * -1 as qty_61
+					, sum(if(b.ord_state = 61, ifnull(b.recv_amt, 0), 0)) * -1 as recv_amt_61
+					, sum(if(b.ord_state = 61, ifnull(b.point_amt, 0), 0)) * -1 as point_amt_61
+					, sum(if(b.ord_state = 61, ifnull(b.coupon_amt, 0), 0)) * -1  as coupon_amt_61
+					, sum(if(b.ord_state = 61, ifnull(b.fee_amt,0), 0)) * 1 as fee_amt_61
+					, sum(if(b.ord_state = 61, ifnull(b.wonga, 0), 0))  as wonga_61
+					, sum(if(b.ord_state = 61, ifnull(b.dc_amt, 0), 0)) * -1  as dc_amt_61
+					, sum(if(b.ord_state = 61, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_61
+					, sum(if(b.ord_state = 61, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_61					
 				from (
 					select
 						o.store_cd
@@ -301,6 +301,7 @@ class sal34Controller extends Controller
 					group by o.store_cd, w.ord_state
 				) b
 				left outer join store_channel sc on sc.store_channel_cd = b.store_channel and sc.store_kind_cd = b.store_channel_kind
+				group by b.store_cd
 			) t
 		";
 
