@@ -338,6 +338,7 @@ class ord06Controller extends Controller
                 a.goods_nm,
                 a.goods_nm_eng,
                 a.prd_cd_p,
+                b.brand_nm,
                 a.color,
                 a.size,
                 a.img,
@@ -397,7 +398,9 @@ class ord06Controller extends Controller
                     g.goods_nm_eng,
                     o.goods_nm,
                     o.goods_opt,
-                    concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                    -- concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p,
+                    pc.prd_cd_p,
+                    pc.brand,
                     if(g.special_yn <> 'Y', replace(g.img, '$cfg_img_size_real', '$cfg_img_size_list'), (
                         select replace(a.img, '$cfg_img_size_real', '$cfg_img_size_list') as img
                         from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
@@ -472,6 +475,7 @@ class ord06Controller extends Controller
                 left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
            		left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
+            	left outer join brand b on b.br_cd = a.brand and b.use_yn = 'Y'
         ";
 		// $result = DB::select($sql);
 		

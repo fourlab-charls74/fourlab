@@ -450,6 +450,7 @@
 		},
 		{field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
 		{field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
+		{field: "brand_nm", headerName: "브랜드", width: 120, cellStyle: {'text-align': 'center'}},
 		{field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {'text-align': 'center'}},
 		{field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}},
 		{field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
