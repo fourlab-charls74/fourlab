@@ -52,7 +52,7 @@ class sal35Controller extends Controller
 				left outer join store_sales_projection ssp on s.store_cd = ssp.store_cd and ssp.ym = '$ym'
 				left outer join (
 				    select
-				         if(o.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
+				         if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
 				    	, 0 as last_recv_amt
 				    	, o.store_cd
 				    	, ow.ord_state_date
@@ -69,7 +69,7 @@ class sal35Controller extends Controller
 				    
 				     select
 				         0 as recv_amt
-				        , if(o.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
+				        , if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
 				    	, o.store_cd
 				    	, ow.ord_state_date
 				    	, o.ord_state
@@ -108,7 +108,7 @@ class sal35Controller extends Controller
 					left outer join store_sales_projection ssp on s.store_cd = ssp.store_cd and ssp.ym = '$ym'
 					left outer join (
 						select
-							 if(o.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
+							 if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
 							, 0 as last_recv_amt
 							, o.store_cd
 							, ow.ord_state_date
@@ -125,7 +125,7 @@ class sal35Controller extends Controller
 						
 						 select
 							 0 as recv_amt
-							, if(o.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
+							, if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
 							, o.store_cd
 							, ow.ord_state_date
 							, o.ord_state
