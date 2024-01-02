@@ -203,8 +203,8 @@ class sal32Controller extends Controller
 				-- sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
 	
 				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) * 100),
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) * -100)
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
 				)
 				 as profit_rate,
 
