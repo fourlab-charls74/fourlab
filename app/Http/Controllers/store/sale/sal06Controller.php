@@ -124,7 +124,7 @@ class sal06Controller extends Controller
 		$sale_kinds_query = "";
 		foreach ($sale_kinds as $item) {
 			$id = $item->code_id;
-			$sale_kinds_query .= "sum(if(o.sale_kind = '$id', if(w.ord_state = '30', w.qty, w.qty * -1), 0)) as sale_kind_$id, ";
+			$sale_kinds_query .= "sum(if(o.sale_kind, '00') = '$id', if(w.ord_state = '30', w.qty, w.qty * -1), 0)) as sale_kind_$id, ";
 		}
 
 		$sql = /** @lang text */
