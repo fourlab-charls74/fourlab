@@ -115,7 +115,7 @@
 											<th class="required">매장명(영문)</th>
 											<td>
 												<div class="form-inline">
-													<input type="text" name="store_nm_eng" id="store_nm_eng" value="{{ $store->store_nm_eng }}" class="form-control form-control-sm w-100" />
+													<input type="text" name="store_nm_eng" id="store_nm_eng" value="{{ @$store->store_nm_eng }}" class="form-control form-control-sm w-100" />
 												</div>
 											</td>
 {{--											<th class="required" hidden>매장명(약칭)</th>--}}

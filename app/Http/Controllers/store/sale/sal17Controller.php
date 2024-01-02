@@ -72,7 +72,6 @@ class sal17Controller extends Controller
 		$values = [
             'sdate'         => $sdate,
             'edate'         => $edate,
-			'months'	    => $months,
 			'store_types'	=> $store_types,
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
@@ -86,6 +85,12 @@ class sal17Controller extends Controller
 		$sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
 		$edate = $request->input('edate', now()->format("Y-m"));
 
+		$months = [];
+		$sd = Carbon::parse($sdate);
+		while($sd <= Carbon::parse($edate)){
+			$months[] = [ "val" => $sd->format("Ym"), "fmt" => $sd->format("Y-m") ];
+			$sd->addMonth();
+		}
 		$months_count = Carbon::parse($sdate)->diffInMonths(Carbon::parse($edate)->lastOfMonth());
 
 		$store_cd = $request->input('store_cd', "");
@@ -212,7 +217,7 @@ class sal17Controller extends Controller
 			'code' => 200,
 			'head' => array(
 				'total' => count($rows),
-				'col_keys' => $col_keys
+				'months' => $months
 			),
 			'body' => $rows
 		]);

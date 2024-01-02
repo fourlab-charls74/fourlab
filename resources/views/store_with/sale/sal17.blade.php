@@ -174,13 +174,13 @@
         {
             field: "summary", headerName: "합계",
             children: [
-                {field: "proj_amt", headerName: "목표", type: 'currencyType', width:100, aggregation: true },
-                {field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType', width:100, aggregation: true },
-                {field: "progress_proj_amt", headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
+                {field: "proj_amt", headerName: "목표", type: 'currencyType', minWidth:100, aggregation: true },
+                {field: "recv_amt", headerName: "금액", type: 'currencyMinusColorType', minWidth:100, aggregation: true },
+                {field: "progress_proj_amt", headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true, minWidth:100,
                     cellRenderer: params => goalProgress(params.data)
                 },
-                {field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', width:100, aggregation: true },
-				{field: "growth_rate", headerName: "성장율(%)", aggregation: true,
+                {field: "last_recv_amt", headerName: "전년", type: 'currencyMinusColorType', minWidth:100, aggregation: true },
+				{field: "growth_rate", headerName: "성장율(%)", aggregation: true, minWidth:100,
 					cellRenderer : function(params) {
 						let recv_amt = toInt(params.data.recv_amt);
 						let last_recv_amt = toInt(params.data.last_recv_amt);
@@ -194,62 +194,75 @@
                 },
             ]
         },
-        @foreach($months as $index => $month)
-        {
-            field: "{{$month["val"]}}", headerName: "{{$month["fmt"]}}",
-            children: [
-                { field: 'proj_amt_{{$month["val"]}}', headerName: "목표", type: 'currencyType', width:100, aggregation: true,
-                    editable: params => params.node.rowPinned === 'top' ? false : true,
-                    cellStyle: params => {
-                        if (params.node.rowPinned === 'top') {
-                            return {};
-                        } else {
-                            return { 'background': '#ffff99' };
-                        }
-                    }
-                },
-                { field: 'recv_amt_{{$month["val"]}}', headerName: "금액", type: 'currencyMinusColorType', width:100, aggregation: true},
-                // { field: 'prev_recv_amt_{{$month["val"]}}', headerName: "전월", type: 'currencyMinusColorType', width:75, aggregation: true },
-                { field: 'progress_proj_amt_{{$month["val"]}}', headerName: "달성율(%)", type: 'currencyMinusColorType', aggregation: true,
-                    cellRenderer: function(params) {
-						let progress = 0;
-						let proj_amt = toInt(params.data.proj_amt_{{$month['val']}});
-						let recv_amt = toInt(params.data.recv_amt_{{$month['val']}});
-
-						if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
-						if (recv_amt == 0) return progress = 0;
-
-						if(proj_amt != null && recv_amt != null) {
-							progress = Comma(Math.round((recv_amt / proj_amt ) * 100));
-						}
-						if (progress == -Infinity) progress = 0;
-
-						return progress;
-					}
-                },
-                { field: 'last_recv_amt_{{$month["val"]}}', headerName: "전년", type: 'currencyMinusColorType', width:100, aggregation: true },
-				{ field: 'growth_rate_{{$month["val"]}}', headerName: "성장율(%)", aggregation: true,
-                    cellRenderer: function(params) {
-						let progress = 0;
-						let recv_amt = toInt(params.data.recv_amt_{{$month['val']}});
-						let last_recv_amt = toInt(params.data.last_recv_amt_{{$month['val']}});
-
-						if (recv_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
-						if (last_recv_amt == 0) return progress = 0;
-
-						if(recv_amt != null && last_recv_amt != null) {
-							progress = Comma(Math.round(( recv_amt / last_recv_amt) * 100));
-						}
-						if (progress == -Infinity) progress = 0;
-
-						return progress;
-					}
-                },
-            ]
-        },
-        @endforeach
-        {field: "", headerName: "", width: "auto"}
     ];
+
+	function setColumn(months) {
+		if (!months) return;
+		columns.splice(6);
+
+		for (let i=0;i<months.length;i++) {
+			let val = months[i].val;
+			let fmt = months[i].fmt;
+
+			columns.push({
+				field: val,
+				headerName: fmt,
+				children: [
+					{ field: 'proj_amt_' + val, headerName: "목표", type: 'currencyType', minWidth:100, aggregation: true,
+						editable: params => params.node.rowPinned === 'top' ? false : true,
+						cellStyle: params => {
+							if (params.node.rowPinned === 'top') {
+								return {};
+							} else {
+								return { 'background': '#ffff99' };
+							}
+						}
+					},
+					{ field: 'recv_amt_' + val, headerName: "금액", type: 'currencyMinusColorType', minWidth:100, aggregation: true},
+					{ field: 'progress_proj_amt_' + val, headerName: "달성율(%)", type: 'currencyMinusColorType', minWidth:100, aggregation: true,
+						cellRenderer: function(params) {
+							let progress = 0;
+							let proj_amt = toInt(params.data?.['proj_amt_' + val] || 0);
+							let recv_amt = toInt(params.data?.['recv_amt_' + val] || 0);
+
+							if (proj_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+							if (recv_amt == 0) return progress = 0;
+
+							if(proj_amt != null && recv_amt != null) {
+								progress = Comma(Math.round((recv_amt / proj_amt ) * 100));
+							}
+							if (progress == -Infinity) progress = 0;
+
+							return progress;
+						}
+					},
+					{ field: 'last_recv_amt_' + val, headerName: "전년", type: 'currencyMinusColorType', minWidth:100, aggregation: true },
+					{ field: 'growth_rate_' + val, headerName: "성장율(%)", aggregation: true, minWidth:100,
+						cellRenderer: function(params) {
+							let progress = 0;
+							let recv_amt = toInt(params.data?.['recv_amt_' + val] || 0);
+							let last_recv_amt = toInt(params.data?.['last_recv_amt_' + val] || 0);
+
+							if (recv_amt == 0) return progress = 0; //목표액이 0이면 달성율도 0으로 표시
+							if (last_recv_amt == 0) return progress = 0;
+
+							if(recv_amt != null && last_recv_amt != null) {
+								progress = Comma(Math.round(( recv_amt / last_recv_amt) * 100));
+							}
+							if (progress == -Infinity) progress = 0;
+
+							return progress;
+						}
+					},
+				],
+			});
+		}
+		columns.push({ width: "auto" });
+		gx.gridOptions.api.setColumnDefs([]);
+		gx.gridOptions.api.setColumnDefs(columns);
+		gx.CalAggregation();
+
+	}
 
 	/**
 	 * ( 목표 - 결제금액 ) / 목표 * 100 = 달성율(%)
@@ -278,21 +291,18 @@
 
 		return progress;
 	};
-	
-	const pApp = new App('',{
-		gridId:"#div-gd",
-	});
 
 	let gx;
+	const pApp = new App('', { gridId: "#div-gd" });
+	
 	$(document).ready(function() {
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		let options = {
+		gx = new HDGrid(gridDiv, columns, {
 			getRowStyle: (params) => params.node.rowPinned ? ({'font-weight': 'bold', 'background-color': '#eee', 'border': 'none'}) : false,
 			onCellValueChanged: params => evtAfterEdit(params)
-		}
-		gx = new HDGrid(gridDiv, columns, options);
+		});
 		initStore()
 		Search();
 
@@ -303,7 +313,9 @@
 	function Search() {
 		let data = $('form[name="search"]').serialize();
 		gx.Aggregation({ sum: "top" });
-		gx.Request('/store/sale/sal17/search', data, -1);
+		gx.Request('/store/sale/sal17/search', data, -1, function(e) {
+			setColumn(e.head.months);
+		});
 	}
 
 	function initStore() {

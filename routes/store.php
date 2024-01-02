@@ -945,6 +945,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::get('sal34','sal34Controller@index');
 		Route::get('sal34/search','sal34Controller@search');
 		
+
+		//채널별목표대비실적현황
+		Route::get('sal35','sal35Controller@index');
+		Route::get('sal35/search','sal35Controller@search');
+		Route::get('sal35/search2','sal35Controller@search2');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
