@@ -43,16 +43,16 @@ class sal35Controller extends Controller
 		$sql = "
 			select
 				s.store_nm_eng as stores
-				, ifnull(ssp.amt,0) as proj_amt 
+				, ifnull(ssp.amt,0) / 1.1 as proj_amt 
 				, sum(ifnull(w.recv_amt,0)) as recv_amt
 				, sum(ifnull(w.last_recv_amt,0)) as last_recv_amt
-				, ifnull(round(sum(w.recv_amt) / ssp.amt * 100, 2), 0.00) as progress_proj_rate
+				, ifnull(round(sum(w.recv_amt) / (ssp.amt / 1.1) * 100, 2), 0.00) as progress_proj_rate
 				, ifnull(round(sum(w.recv_amt) / sum(w.last_recv_amt) * 100, 2), 0.00) as elongation_rate
 			from store s
 				left outer join store_sales_projection ssp on s.store_cd = ssp.store_cd and ssp.ym = '$ym'
 				left outer join (
 				    select
-				         if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
+				         if(ow.ord_state > 30, (ow.recv_amt * -1) / 1.1, ow.recv_amt / 1.1) as recv_amt
 				    	, 0 as last_recv_amt
 				    	, o.store_cd
 				    	, ow.ord_state_date
@@ -69,7 +69,7 @@ class sal35Controller extends Controller
 				    
 				     select
 				         0 as recv_amt
-				        , if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
+				        , if(ow.ord_state > 30, (ow.recv_amt * -1) / 1.1, ow.recv_amt / 1.1) as last_recv_amt
 				    	, o.store_cd
 				    	, ow.ord_state_date
 				    	, o.ord_state
@@ -99,16 +99,16 @@ class sal35Controller extends Controller
 			from (    
 				select
 					s.store_nm_eng as stores
-					, ssp.amt as proj_amt
+					, ssp.amt / 1.1 as proj_amt
 					, sum(w.recv_amt) as recv_amt
 					, sum(w.last_recv_amt) as last_recv_amt
-					, round(sum(w.recv_amt) / ssp.amt * 100, 2) as progress_proj_rate
+					, round(sum(w.recv_amt) / (ssp.amt / 1.1) * 100, 2) as progress_proj_rate
 					, round(sum(w.recv_amt) / sum(w.last_recv_amt) * 100, 2) as elongation_rate
 				from store s
 					left outer join store_sales_projection ssp on s.store_cd = ssp.store_cd and ssp.ym = '$ym'
 					left outer join (
 						select
-							 if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
+							 if(ow.ord_state > 30, (ow.recv_amt * -1) / 1.1, ow.recv_amt / 1.1) as recv_amt
 							, 0 as last_recv_amt
 							, o.store_cd
 							, ow.ord_state_date
@@ -125,7 +125,7 @@ class sal35Controller extends Controller
 						
 						 select
 							 0 as recv_amt
-							, if(ow.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
+							, if(ow.ord_state > 30, (ow.recv_amt * -1) / 1.1, ow.recv_amt / 1.1) as last_recv_amt
 							, o.store_cd
 							, ow.ord_state_date
 							, o.ord_state
@@ -218,16 +218,16 @@ class sal35Controller extends Controller
 				from (    
 					select
 						s.store_nm_eng as stores
-						, ssp.amt as proj_amt
+						, ssp.amt / 1.1 as proj_amt
 						, sum(w.recv_amt) as recv_amt
 						, sum(w.last_recv_amt) as last_recv_amt
-						, round(sum(w.recv_amt) / ssp.amt * 100, 2) as progress_proj_rate
+						, round(sum(w.recv_amt) / (ssp.amt / 1.1)  * 100, 2) as progress_proj_rate
 						, round(sum(w.recv_amt) / sum(w.last_recv_amt) * 100, 2) as elongation_rate
 					from store s
 						left outer join store_sales_projection ssp on s.store_cd = ssp.store_cd and ssp.ym = '$ym'
 						left outer join (
 							select
-								 if(o.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as recv_amt
+								 if(ow.ord_state > 30, (ow.recv_amt * -1) / 1.1, ow.recv_amt / 1.1) as recv_amt
 								, 0 as last_recv_amt
 								, o.store_cd
 								, ow.ord_state_date
@@ -244,7 +244,7 @@ class sal35Controller extends Controller
 							
 							 select
 								 0 as recv_amt
-								, if(o.ord_state > 30, ow.recv_amt * -1, ow.recv_amt) as last_recv_amt
+								, if(ow.ord_state > 30, (ow.recv_amt * -1) / 1.1, ow.recv_amt / 1.1) as last_recv_amt
 								, o.store_cd
 								, ow.ord_state_date
 								, o.ord_state
