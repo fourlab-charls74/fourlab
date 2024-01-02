@@ -112,7 +112,7 @@
 													</div>
 												</div>
 											</td>
-											<th class="required">매장명(영문)</th>
+											<th>매장명(영문)</th>
 											<td>
 												<div class="form-inline">
 													<input type="text" name="store_nm_eng" id="store_nm_eng" value="{{ @$store->store_nm_eng }}" class="form-control form-control-sm w-100" />
@@ -1209,8 +1209,8 @@
 
 		//매장 영문명 입력여부
 		if(f1.store_nm_eng.value.trim() === '') {
-			f1.store_nm_eng.focus();
-			return alert("매장명(영문)을 입력해주세요.");
+			//f1.store_nm_eng.focus();
+			//return alert("매장명(영문)을 입력해주세요.");
 		}
 		// 매장명칭(약칭) 입력여부
 		// if(f1.store_nm_s.value.trim() === '') {
