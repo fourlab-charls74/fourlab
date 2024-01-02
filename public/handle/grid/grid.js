@@ -107,7 +107,7 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 //filter: 'agNumberColumnFilter',
                 comparator: sortnumber,
                 valueFormatter:formatNumber,
-                cellClass:'hd-grid-number',
+                cellClass:['hd-grid-number','hd-grid-percent'],
                 precision: 2,
             },
 
@@ -456,8 +456,14 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
                 numberFormat: {
                     format: '#,##0',
                 },
-            },            
-            // {
+            },
+			{
+				id: 'hd-grid-percent',
+				numberFormat: {
+					format: '#,##0.00',
+				},
+			},
+			// {
             //     id: 'hd-grid-string',
 			// 	dataType: 'String',
 			// 	numberFormat: {

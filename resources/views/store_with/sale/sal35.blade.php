@@ -216,13 +216,7 @@
 			Search2();
 
 			$(".export-excel").on("click", function (e) {
-				let gridOptions = gx.gridOptions;
-				let excelParams = {
-					fileName: '채널별목표대비실적현황_{{ date('YmdH') }}.xlsx',
-					sheetName: 'Sheet1',
-				};
-
-				gridOptions.api.exportDataAsExcel(excelParams);
+				gx.Download('채널별목표대비실적현황_{{ date('YmdH') }}.xlsx', { type: 'excel' });
 			});
 
 			// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
