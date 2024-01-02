@@ -136,13 +136,25 @@ class sal06Controller extends Controller
 					$sale_kinds_query
 					sum(w.qty) as qty,
 					sum(w.qty * w.price) as amt,
-					sum(w.recv_amt + w.point_apply_amt) as recv_amt,
-					sum(w.qty * w.price - w.recv_amt) as discount,
+					-- sum(w.recv_amt + w.point_apply_amt) as recv_amt,
+					sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as recv_amt,
+					( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) as recv_amt_novat,
+					-- sum(w.qty * w.price - w.recv_amt) as discount,
+					sum(w.qty * w.price - if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as discount,
 					avg(w.price) as avg_price,
 					avg(w.wonga) as wonga,
 					sum(w.wonga * w.qty) as sum_wonga,
-					sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
-					(sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
+					-- sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
+					( 
+						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1
+						- sum(w.wonga * w.qty)
+					) as sales_profit,
+					-- (sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
+					if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
+						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) * 100),
+						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) * -100)
+					)
+					 as profit_rate,
 					g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
 					o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
 				from order_opt o 
