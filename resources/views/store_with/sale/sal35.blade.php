@@ -226,7 +226,7 @@
 			});
 
 			// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
-			load_store_channel();
+			// load_store_channel();
 		});
 
 			function Search() {
@@ -239,7 +239,9 @@
 						stores : "총합계",
 						proj_amt : t.total_proj_amt,
 						recv_amt : t.total_recv_amt,
-						last_recv_amt : t.total_last_recv_amt
+						last_recv_amt : t.total_last_recv_amt,
+						progress_proj_rate : t.total_progress_proj_rate,
+						elongation_rate : t.total_elongation_rate,
 					};
 
 					gx.gridOptions.api.setPinnedTopRowData([pinnedRowData]);

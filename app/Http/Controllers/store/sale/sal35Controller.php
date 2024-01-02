@@ -43,11 +43,11 @@ class sal35Controller extends Controller
 		$sql = "
 			select
 				s.store_nm_eng as stores
-				, ssp.amt as proj_amt
-				, sum(w.recv_amt) as recv_amt
-				, sum(w.last_recv_amt) as last_recv_amt
-				, round(sum(w.recv_amt) / ssp.amt * 100, 2) as progress_proj_rate
-				, round(sum(w.recv_amt) / sum(w.last_recv_amt) * 100, 2) as elongation_rate
+				, ifnull(ssp.amt,0) as proj_amt 
+				, sum(ifnull(w.recv_amt,0)) as recv_amt
+				, sum(ifnull(w.last_recv_amt,0)) as last_recv_amt
+				, ifnull(round(sum(w.recv_amt) / ssp.amt * 100, 2), 0.00) as progress_proj_rate
+				, ifnull(round(sum(w.recv_amt) / sum(w.last_recv_amt) * 100, 2), 0.00) as elongation_rate
 			from store s
 				left outer join store_sales_projection ssp on s.store_cd = ssp.store_cd and ssp.ym = '$ym'
 				left outer join (
@@ -91,9 +91,11 @@ class sal35Controller extends Controller
 
 		$sql = "
 			select
-			    sum(a.proj_amt) as total_proj_amt
-			    , sum(a.recv_amt) as total_recv_amt
-				, sum(a.last_recv_amt) as total_last_recv_amt
+			    sum(ifnull(a.proj_amt,0)) as total_proj_amt
+			    , sum(ifnull(a.recv_amt,0)) as total_recv_amt
+				, sum(ifnull(a.last_recv_amt,0)) as total_last_recv_amt
+				, ifnull(round(sum(a.recv_amt) / sum(a.proj_amt) * 100, 2), 0.00) as total_progress_proj_rate
+				, ifnull(round(sum(a.recv_amt) / sum(a.last_recv_amt) * 100, 2), 0.00) as total_elongation_rate
 			from (    
 				select
 					s.store_nm_eng as stores
