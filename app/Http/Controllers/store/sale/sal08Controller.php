@@ -109,9 +109,11 @@ class sal08Controller extends Controller
 				, a.brand, b.brand_nm
 				, sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.w_ord_state > 30, -1, 1)) as sale_amt
 			    , sum(a.recv_amt * if(a.w_ord_state > 30, -1, 1)) as recv_amt
+				,( sum(if(a.w_ord_state = '30', a.recv_amt, a.recv_amt * -1))/1.1 ) as recv_amt_novat
 				, sum(a.wonga_amt) as wonga_amt
 				, sum(a.margin_amt) as margin_amt
-				, (sum(a.margin_amt) / sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1)) * 100) as margin_rate
+				-- , (sum(a.margin_amt) / sum((a.qty * (a.price - a.sale_kind_amt)) * if(a.ord_state > 30, -1, 1)) * 100) as margin_rate
+				, sum(a.margin_amt) / ( sum(if(a.w_ord_state = '30', a.recv_amt, a.recv_amt * -1))/1.1 ) * 100 as margin_rate
 				-- , sum(if(a.ord_state = '10', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '60', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '61', ifnull(a.taxation_amt, 0), 0)) as taxation_amt
 				-- , (sum(if(a.ord_state = '10', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '60', ifnull(a.taxation_amt, 0), 0)) + sum(if(a.ord_state = '61', ifnull(a.taxation_amt, 0), 0))) / 1.1 as taxation_amt
 			from (
@@ -125,7 +127,7 @@ class sal08Controller extends Controller
 				    , (w.qty * w.wonga) as wonga_amt
 					-- , (w.qty * (w.price - w.wonga)) as margin_amt
 				    -- , (o.recv_amt - (w.qty * w.wonga)) as margin_amt
-					, if(w.ord_state = '30', (o.recv_amt - (w.qty * w.wonga)), (o.recv_amt - (w.qty * w.wonga * -1)) * -1) as margin_amt    
+					, if(w.ord_state = '30', (o.recv_amt/1.1 - (w.qty * w.wonga)), (o.recv_amt/1.1 - (w.qty * w.wonga * -1)) * -1) as margin_amt    
 				     
 					, o.ord_state
 				    , w.ord_state as w_ord_state

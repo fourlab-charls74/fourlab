@@ -200,7 +200,7 @@
 </style>
 
 <script language="javascript">
-	const pinnedRowData = [{ store_cd: 'total', sale_amt: 0, recv_amt: 0, wonga_amt: 0, margin_amt: 0, margin_rate: 0 }];
+	const pinnedRowData = [{ store_cd: 'total', sale_amt: 0, recv_amt: 0, recv_amt_novat: 0, wonga_amt: 0, margin_amt: 0, margin_rate: 0 }];
 	const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     let columns = [
@@ -223,12 +223,13 @@
 		{field: "pr_code_nm", headerName: "판매처수수료명", width: 100, cellStyle: {"text-align": "center"}},
 		{field: "sale_amt", headerName: "판매금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "recv_amt", headerName: "실입금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "recv_amt_novat", headerName: "실결제금액(VAT별도)", type: 'currencyMinusColorType', aggFunc: sumValuesFunc},
 		{field: "wonga_amt", headerName: "원가금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_amt", headerName: "이익금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_rate", headerName: "이익율(%)", width: 70, type: "currencyType",
 			aggFunc: (params) => {
 				//return params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_rate * 1) + a, 0) / params.rowNode.allLeafChildren.length;
-				return Math.round((params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_amt * 1) + a, 0) / params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.sale_amt * 1) + a, 0) ) * 100);
+				return Math.round((params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.margin_amt * 1) + a, 0) / params.rowNode.allLeafChildren.reduce((a, c) => (c.data?.recv_amt_novat * 1) + a, 0) ) * 100);
 			},
 		},
 		{width: "auto"}
@@ -285,24 +286,26 @@
 	}
 
 	const updatePinnedRow = () => {
-        let [ sale_amt, recv_amt, wonga_amt, margin_amt, margin_rate, cnt ] = [ 0, 0, 0, 0, 0, 0 ];
+        let [ sale_amt, recv_amt, recv_amt_novat, wonga_amt, margin_amt, margin_rate, cnt ] = [ 0, 0, 0, 0, 0, 0, 0 ];
         const rows = gx.getRows();
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
                 sale_amt += parseFloat(row?.sale_amt || 0);
-                recv_amt += parseInt(row?.recv_amt || 0);
+				recv_amt += parseInt(row?.recv_amt || 0);
+				recv_amt_novat += parseInt(row?.recv_amt_novat || 0);
                 wonga_amt += parseFloat(row?.wonga_amt || 0);
                 margin_amt += parseFloat(row?.margin_amt || 0);
-                margin_rate += parseFloat(row?.margin_rate || 0);
+				//margin_rate += parseFloat(row?.margin_rate || 0);
+				margin_rate += Math.round(margin_amt/recv_amt_novat);
 				cnt += row !== undefined ? 1 : 0;
             });
         }
-		margin_rate	= Math.round((margin_amt / sale_amt) * 100);
+		margin_rate	= Math.round((margin_amt / recv_amt_novat) * 100);
 		//margin_rate = margin_rate / (cnt || 1);
 
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, sale_amt: sale_amt, recv_amt: recv_amt, wonga_amt: wonga_amt, margin_amt: margin_amt, margin_rate: margin_rate }
+            { ...pinnedRow.data, sale_amt: sale_amt, recv_amt: recv_amt, recv_amt_novat: recv_amt_novat, wonga_amt: wonga_amt, margin_amt: margin_amt, margin_rate: margin_rate }
         ]);
     };
 </script>
