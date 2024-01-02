@@ -134,7 +134,7 @@ class sal06Controller extends Controller
 				select 
 					o.store_cd,count(*) as cnt,
 					$sale_kinds_query
-					sum(w.qty) as qty,
+					sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty,
 					sum(w.qty * w.price) as amt,
 					-- sum(w.recv_amt + w.point_apply_amt) as recv_amt,
 					sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as recv_amt,
