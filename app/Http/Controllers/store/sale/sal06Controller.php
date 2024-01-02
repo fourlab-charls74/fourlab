@@ -120,7 +120,7 @@ class sal06Controller extends Controller
 		}
 		
 		// 판매유형별 쿼리 추가
-		$sale_kinds = SLib::getUsedSaleKinds();
+		$sale_kinds = SLib::getUsedSaleKinds('','Y');
 		$sale_kinds_query = "";
 		foreach ($sale_kinds as $item) {
 			$id = $item->code_id;
@@ -153,7 +153,8 @@ class sal06Controller extends Controller
 					left outer join brand b on g.brand = b.brand
 					left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
 					left outer join `code` c2 on c2.code_kind_cd = 'g_goods_type' and g.goods_type = c2.code_id
-				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61') 
+				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61')
+					and o.ord_state = '30' 
 					and o.store_cd <> '' 
 					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
 					$where

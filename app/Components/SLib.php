@@ -108,9 +108,12 @@ class SLib
         return $store_types;
     }
 
-    public static function getUsedSaleKinds($sale_kind_ids = "")
+    public static function getUsedSaleKinds($sale_kind_ids = "", $sale_type_use_yn = "")
     {
         $where = "";
+		
+		if( $sale_type_use_yn != '' )	$where = " and s.use_yn = '$sale_type_use_yn' ";
+		
         if (is_array($sale_kind_ids)) {
             if (count($sale_kind_ids) == 1 && $sale_kind_ids[0] != "") {
                 $where .= " and s.sale_kind = '" . Lib::quote($sale_kind_ids[0]) . "' ";
