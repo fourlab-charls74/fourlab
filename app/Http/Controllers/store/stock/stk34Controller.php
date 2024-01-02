@@ -216,9 +216,9 @@ class stk34Controller extends Controller
             $sql = "
                 select
 					competitor_cd,
-					max(store_cd) as store_cd,
-					max(competitor_nm) as competitor_nm,
-					max(sale_memo) as sale_memo
+					store_cd as store_cd,
+					competitor_nm as competitor_nm,
+					sale_memo as sale_memo
 					$sum_sale_amt
 				from (
 					select
@@ -229,7 +229,7 @@ class stk34Controller extends Controller
 						$sale_amt
 					from competitor_sale cs
 						left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor' and c.use_yn = 'Y'
-					where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-30'
+					where cs.store_cd = '$store_no' and cs.sale_date >= '$date-01' and cs.sale_date <= '$date-31'
 					group by cs.competitor_cd
 				
 					union
