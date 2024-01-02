@@ -151,8 +151,8 @@ class sal06Controller extends Controller
 					) as sales_profit,
 					-- (sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
 					if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
-						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) * 100),
-						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) * -100)
+						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
+						(( ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) / sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) ) * -100)
 					)
 					 as profit_rate,
 					g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
