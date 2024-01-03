@@ -408,7 +408,8 @@
                 // {headerName: "할인", field: "dc_amt_30", type: 'currencyType', aggregation: true},
                 // {headerName: "쿠폰", field: "coupon_amt_30", type: 'currencyType', aggregation: true},
                 // {headerName: "수수료", field: "fee_amt_30", type: 'currencyType', aggregation: true},
-                {headerName: "결제금액(VAT별도)", field: "recv_amt_30", type: 'currencyType', aggregation: true},
+				{headerName: "결제금액(VAT별도)", field: "recv_amt_30", type: 'currencyType', aggregation: true},
+				{headerName: "원가", field: "wonga_30", type: 'currencyType', aggregation: true},
             ]
         },
         {headerName: '교환',
@@ -419,6 +420,7 @@
                 // {headerName: "쿠폰", field: "coupon_amt_60", type: 'currencyType', aggregation: true},
                 // {headerName: "수수료", field: "fee_amt_60", type: 'currencyType', aggregation: true},
                 {headerName: "결제금액(VAT별도)", field: "recv_amt_60", type: 'currencyType', aggregation: true},
+				{headerName: "원가", field: "wonga_60", type: 'currencyType', aggregation: true},
             ]
         },
         {
@@ -430,6 +432,7 @@
                 // {headerName: "쿠폰", field: "coupon_amt_61", type: 'currencyType', aggregation: true},
                 // {headerName: "수수료", field: "fee_amt_61", type: 'currencyType', aggregation: true},
                 {headerName: "결제금액(VAT별도)", field: "recv_amt_61", type: 'currencyType', aggregation: true},
+				{headerName: "원가", field: "wonga_61", type: 'currencyType', aggregation: true},
             ]
         },
         {width: 0}
