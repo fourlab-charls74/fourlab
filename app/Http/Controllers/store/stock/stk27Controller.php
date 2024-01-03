@@ -250,10 +250,16 @@ class stk27Controller extends Controller
 				$storage_loss_no	= DB::getPdo()->lastInsertId();
 				
 				// 창고재고처리
-				$sql	= " select count(*) as tot from product_stock_storage where storage_cd = :storage_cd and prd_cd = :prd_cd";
-				$tot	= DB::selectOne($sql,['storage_cd' => $storage_cd, 'prd_cd' => $product['prd_cd']])->tot;
+				$sql	= " select count(*) as tot, qty, wqty from product_stock_storage where storage_cd = :storage_cd and prd_cd = :prd_cd";
+				$chk	= DB::selectOne($sql,['storage_cd' => $storage_cd, 'prd_cd' => $product['prd_cd']]);
+				$tot	= $chk->tot;
 				
 				if( $tot > 0 ){
+					
+					if( $chk->qty != $chk->wqty){
+						throw new Exception("실재고, 보유재고가 차이나는 데이터가 존재합니다[" . $product['prd_cd'] . "].");
+					}
+					
 					DB::table('product_stock_storage')
 						->where('storage_cd', $storage_cd)
 						->where('prd_cd', $product['prd_cd'])
