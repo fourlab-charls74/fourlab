@@ -210,7 +210,7 @@ class sal24Controller extends Controller
 				t.*,
 				(qty_30 + qty_60 + qty_61) as sum_qty,
 				(t.recv_amt_30 + t.recv_amt_60 + t.recv_amt_61) as sum_recv_amt,
-				(t.wonga_30 + t.wonga_60 * -1 + t.wonga_61 * -1) as sum_wonga,
+				(t.wonga_30 + t.wonga_60 + t.wonga_61) as sum_wonga,
 				(t.point_amt_30 + t.point_amt_60 + t.point_amt_61) as sum_point_amt,
 				(t.coupon_amt_30 + t.coupon_amt_60 + t.coupon_amt_61) as sum_coupon_amt,
 				(t.fee_amt_30 + t.fee_amt_60 + t.fee_amt_61 ) as sum_fee_amt,
