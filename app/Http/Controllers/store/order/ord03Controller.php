@@ -46,6 +46,8 @@ class ord03Controller extends Controller
 
 		$conf   = new Conf();
         $cfg_dlv_cd = $conf->getConfigValue("delivery","dlv_cd");
+		
+		$rel_orders = DB::table('code')->where('code_kind_cd', 'REL_ORDER')->where('code_id', 'like', 'O%')->select('code_id', 'code_val')->get();
 
 		$values = [
             'sdate'         	=> $sdate,
@@ -56,6 +58,7 @@ class ord03Controller extends Controller
 			'sale_places'		=> $sale_places, // 판매처
             'stat_pay_types'    => SLib::getCodes('G_STAT_PAY_TYPE'), // 결제방법
 			'items'			    => SLib::getItems(), // 품목
+			'rel_orders'		=> $rel_orders, // 온라인차수
             'sale_kinds'        => SLib::getUsedSaleKinds(), // 판매유형
 			'ord_kinds'			=> SLib::getCodes('G_ORD_KIND'), // 출고구분
 			'rel_reject_reasons'=> SLib::getCodes('REL_REJECT_REASON'), // 출고거부사유
@@ -78,6 +81,7 @@ class ord03Controller extends Controller
 		$search_date_stat = $request->input('search_date_stat', 'receipt');
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
+		$rel_order_date = $request->input('rel_order_date', '');
 		$rel_order = $request->input('rel_order', '');
 		$dlv_place_type = strtoupper($request->input('dlv_place_type', ''));
 		$storage_cd = $request->input('storage_cd', '');
@@ -116,8 +120,11 @@ class ord03Controller extends Controller
 		} else if ($search_date_stat === 'order') {
 			$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
 		}
-
-		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
+		
+		if ($rel_order_date != '') $where .= " and rc.rel_order like '" . $rel_order_date . "%'";
+		if ($rel_order != '') $where .= " and rc.rel_order like '%" . $rel_order . "' ";
+		if ($rel_order_date != '' && $rel_order != '') $where .= " and rc.rel_order = '" . $rel_order_date . '-' . $rel_order . "' ";
+		
 		if ($dlv_place_type === 'STORAGE') {
 			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
 			if ($storage_cd != '') {

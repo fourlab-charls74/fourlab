@@ -73,14 +73,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 inner-td">
-                        <div class="form-group">
-                            <label for="ord_no">출고차수</label>
-                            <div class="flax_box">
-                                <input type='text' class="form-control form-control-sm search-enter" name='rel_order' id="rel_order" value=''>
-                            </div>
-                        </div>
-                    </div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="ord_no">출고차수</label>
+							<div class="form-inline">
+								<input type='text' class="form-control form-control-sm search-enter" name='rel_order_date' id="rel_order_date" value='' style="width:47%">
+								<span class="text_line">-</span>
+								<select name='rel_order' id="rel_order" class="form-control form-control-sm" style="width: 47%;">
+									<option value=''>전체</option>
+								@foreach (@$rel_orders as $rel_order)
+									<option value='{{ $rel_order->code_val }}'>{{ $rel_order->code_val }}</option>
+								@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label for="store_no">배송처</label>
