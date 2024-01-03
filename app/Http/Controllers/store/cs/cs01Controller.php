@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Exception;
+use Carbon\Carbon;
 
 const KRW = 'KRW';
 const SUPER_ADMIN_ID = 'pklpkl'; // 슈퍼권한 (본사_정연수)
@@ -403,7 +404,10 @@ class cs01Controller extends Controller {
 				break;
 			case 'getinvoiceno':
 				$com_id = $request->input('com_id');
-				$invoice_no = $this->getInvoiceNo($com_id);
+				$stock_date = $request->input('stock_date');
+				$stock_date = Carbon::parse($stock_date);
+				$stock_date = $stock_date->format('ymd');
+				$invoice_no = $this->getInvoiceNo($com_id, $stock_date);
 				$response = response()->json(['code' => 1, 'invoice_no' => $invoice_no], 200);
 				break;
 			case 'checkopt':
@@ -1395,22 +1399,49 @@ class cs01Controller extends Controller {
 		
 	}
 
-	public function getInvoiceNo($com_id) {
-		$prefix_invoice_no = sprintf("%s_%s_A",$com_id,date("ymd"));
+	public function getInvoiceNo($com_id, $stock_date) {
 		$sql = "
-			select ifnull(max(invoice_no),0) as invoice_no from product_stock_order
-			where invoice_no like '$prefix_invoice_no%'
+			select
+				invoice_no
+			from product_stock_order
+			order by stock_no desc
 		";
-		$row = DB::selectOne($sql);
-		$max_invoice_no = $row->invoice_no;
-		if ($max_invoice_no == "0"){
-			$seq = 1;
+		
+		$invoice_no = DB::selectOne($sql);
+		$invoice_seq = explode("_", $invoice_no->invoice_no);
+		$invoice_seq = $invoice_seq[2];
+		$seq = substr($invoice_seq, 1);
+		$invoice_str = substr($invoice_seq, 0, 1);
+		$result = 0;
+		$format_result = "";
+		if ($seq == "999") {
+			$invoice_str = "B";
+			$result = 1;
+			$format_result = $invoice_str . str_pad($result, 3, '0', STR_PAD_LEFT);
 		} else {
-			$seq = str_replace($prefix_invoice_no,"",$max_invoice_no);
-			$seq = $seq + 1;
+			$result = (int)$seq + 1;
+			$format_result = $invoice_str . str_pad($result, 3, '0', STR_PAD_LEFT);
 		}
-		$invoice_no = sprintf("%s%03d",$prefix_invoice_no,$seq);
+		$invoice_no = sprintf("%s_%s_%s",$com_id,$stock_date, $format_result);
+
 		return $invoice_no;
+		
+//		2024-01-04 양대성 주석처리 (기존 입고번호 가져오는 부분)
+//		$prefix_invoice_no = sprintf("%s_%s_A",$com_id,$stock_date);
+//		$sql = "
+//			select ifnull(max(invoice_no),0) as invoice_no from product_stock_order
+//			where invoice_no like '$prefix_invoice_no%'
+//		";
+//		$row = DB::selectOne($sql);
+//		$max_invoice_no = $row->invoice_no;
+//		if ($max_invoice_no == "0"){
+//			$seq = 1;
+//		} else {
+//			$seq = str_replace($prefix_invoice_no,"",$max_invoice_no);
+//			$seq = $seq + 1;
+//		}
+//		$invoice_no = sprintf("%s%03d",$prefix_invoice_no,$seq);
+//		return $invoice_no;
 	}
 
 	/**

@@ -71,7 +71,7 @@
                             <div class="form-group">
                                 <label for="invoice_no" class="required">입고번호</label>
                                 <div class="flex_box">
-                                    <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" name="invoice_no" value="{{ @$invoice_no }}">
+                                    <input type="text" onfocus="return getInvoiceNo();" class="form-control form-control-sm" id="invoice_no" name="invoice_no" value="{{ @$invoice_no }}">
                                 </div>
                             </div>
                         </div>
@@ -485,6 +485,7 @@
     function getInvoiceNo() {
         const ff = document.search;
 	    const com_id = ff.com_id.value;
+		const stock_date = ff.stock_date.value;
 	    const invoice_no = ff.invoice_no.value;
 
         if (invoice_no == '' && com_id != "") {
@@ -493,7 +494,8 @@
                 method: 'post',
                 data: {
                     cmd: 'getinvoiceno',
-                    com_id: com_id
+                    com_id: com_id,
+					stock_date: stock_date
                 }
             }).then((response) => {
                 ff.invoice_no.value = response.data.invoice_no;
@@ -1246,6 +1248,11 @@
         outputNumber = parseFloat(outputString);
         return (outputNumber);
     }
+
+	$('#stock_date').on('change', function() {
+		$('#invoice_no').val('');
+		getInvoiceNo();
+	});
 
     /**********************************
      * 기타 주석처리 함수
