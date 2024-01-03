@@ -322,8 +322,8 @@ class sal24Controller extends Controller
 			$sale_date		= $row->date;
 			
 			$wonga_30		= $row->wonga_30;			//매출원가
-			$wonga_60		= $row->wonga_60 * -1;			//교환원가
-			$wonga_61		= $row->wonga_61 * -1;			//환불원가
+			$wonga_60		= $row->wonga_60;			//교환원가
+			$wonga_61		= $row->wonga_61;			//환불원가
 			$qty_30			= $row->qty_30;			//판매
 			$recv_amt_30	= $row->recv_amt_30/1.1;
 			$qty_60			= $row->qty_60;			//교환
