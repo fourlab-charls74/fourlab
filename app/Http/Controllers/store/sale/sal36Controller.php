@@ -77,7 +77,7 @@ class sal36Controller extends Controller
 					, ifnull(oo.sale_kind,'81') as sale_kind	-- 온라인 매장은 온라인 판매유형으로 등록
 					, (p.tag_price * oow.qty) * if(oow.ord_state = '30', 1, -1) as tag_amt
 					, (oow.price * oow.qty) as price_amt
-					, (oow.recv_amt * oow.qty) * if(oow.ord_state = '30', 1, -1) as recv_amt
+					, if(oow.qty > 0, 1, -1) * (oow.recv_amt * oow.qty) * if(oow.ord_state = '30', 1, -1) as recv_amt
 				from order_opt_wonga oow
 				inner join order_opt oo on oo.ord_opt_no = oow.ord_opt_no and oo.ord_state = '30'
 				inner join product p on oo.prd_cd = p.prd_cd
