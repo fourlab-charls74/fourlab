@@ -958,6 +958,7 @@ class ord03Controller extends Controller
 		$search_date_stat = $request->input('search_date_stat', 'receipt');
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
+		$rel_order_date = $request->input('rel_order_date', '');
 		$rel_order = $request->input('rel_order', '');
 		$dlv_place_type = strtoupper($request->input('dlv_place_type', ''));
 		$storage_cd = $request->input('storage_cd', '');
@@ -997,7 +998,10 @@ class ord03Controller extends Controller
 			$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
 		}
 
-		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
+		if ($rel_order_date != '') $where .= " and rc.rel_order like '" . $rel_order_date . "%'";
+		if ($rel_order != '') $where .= " and rc.rel_order like '%" . $rel_order . "' ";
+		if ($rel_order_date != '' && $rel_order != '') $where .= " and rc.rel_order = '" . $rel_order_date . '-' . $rel_order . "' ";
+		
 		if ($dlv_place_type === 'STORAGE') {
 			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
 			if ($storage_cd != '') {
@@ -1164,6 +1168,7 @@ class ord03Controller extends Controller
 		$sdate = $request->input('sdate', Carbon::now()->sub(3, 'day')->format("Y-m-d"));
 		$edate = $request->input('edate', Carbon::now()->format("Y-m-d"));
 		$rel_order = $request->input('rel_order', '');
+		$rel_order_date = $request->input('rel_order_date', '');
 		$dlv_place_type = strtoupper($request->input('dlv_place_type', ''));
 		$storage_cd = $request->input('storage_cd', '');
 		$store_cd = $request->input('store_no', '');
@@ -1202,7 +1207,10 @@ class ord03Controller extends Controller
 			$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
 		}
 
-		if ($rel_order != '') $where .= " and rc.rel_order like '" . $rel_order . "%' ";
+		if ($rel_order_date != '') $where .= " and rc.rel_order like '" . $rel_order_date . "%'";
+		if ($rel_order != '') $where .= " and rc.rel_order like '%" . $rel_order . "' ";
+		if ($rel_order_date != '' && $rel_order != '') $where .= " and rc.rel_order = '" . $rel_order_date . '-' . $rel_order . "' ";
+		
 		if ($dlv_place_type === 'STORAGE') {
 			$where .= " and rcp.dlv_location_type = '" . $dlv_place_type . "' ";
 			if ($storage_cd != '') {
