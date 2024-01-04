@@ -18,7 +18,8 @@
 					<h4>검색</h4>
 					<div class="flax_box">
 						<a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-						<a href="javascript:gx.Download('판매유형별매출통계_{{ date('YmdH') }}');" class="btn btn-download btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
+{{--						<a href="javascript:gx.Download('판매유형별매출통계_{{ date('YmdH') }}');" class="btn btn-download btn-sm btn-outline-primary shadow-sm mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>--}}
+						<a href="javascript:void(0);" class="export-excel btn btn-sm btn-primary shadow-sm pl-2 mr-1"><i class="bx bx-download fs-16"></i> 엑셀다운로드</a>
 						<div id="search-btn-collapse" class="btn-group mb-0 mb-sm-0"></div>
 					</div>
 				</div>
@@ -122,8 +123,11 @@
 					<div class="fl_box">
 						<h6 class="m-0 font-weight-bold">총 <span id="gd-total" class="text-primary">0</span> 건</h6>
 					</div>
-					<div class="fr_box">
-
+					<div class="d-flex justify-content-end">
+						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+							<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+							<label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -132,13 +136,28 @@
 			</div>
 		</div>
 	</div>
+	<style>
+		.ag-row-level-1 {
+			background-color: #edf4fd !important;
+		}
+	</style>
 	<script language="javascript">
+		const pinnedRowData = [{ sale_type_nm : '합계' , tag_amt : 0, price_amt : 0, recv_amt : 0 }];
+		const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
+		
 		let columns = [
-			{headerName: "년월", field: "ord_month",  width: 80, cellClass: 'hd-grid-code'},
-			{headerName: "판매유형", field: "sale_type_nm",  width: 150},
-			{headerName: "TAG가격", field: "tag_amt", type: 'numberType'},
-			{headerName: "현재가격", field: "price_amt", type: 'numberType'},
-			{headerName: "판매가격", field: "recv_amt", type: 'numberType'},
+			{headerName: "년월", field: "ord_month", rowGroup:true, hide:true, width: 80, cellClass: 'hd-grid-code'},
+			{headerName: '년월', showRowGroup: 'ord_month', cellRenderer: 'agGroupCellRenderer', width: 100},
+			{headerName: "판매유형", field: "sale_type_nm",  width: 150,
+				cellStyle: (params) => {
+					if (params.node.rowPinned === 'top') {
+						return { 'text-align' : 'center' };
+					}
+				}
+			},
+			{headerName: "TAG가격", field: "tag_amt", type: 'numberType', width: 110, aggFunc: sumValuesFunc},
+			{headerName: "현재가격", field: "price_amt", type: 'numberType', width: 110, aggFunc: sumValuesFunc},
+			{headerName: "판매가격", field: "recv_amt", type: 'numberType', width: 110, aggFunc: sumValuesFunc},
 			{headerName: "할인율(%)", field: "sale_ratio", type: 'percentType',},
 			{headerName: "비중(%)", field: "sg_ratio", type: 'percentType',},
 			{width: 'auto'}
@@ -153,8 +172,29 @@
 		$(document).ready(function() {
 			pApp.ResizeGrid(265);
 			let gridDiv = document.querySelector(pApp.options.gridId);
-			gx = new HDGrid(gridDiv, columns);
+			gx = new HDGrid(gridDiv, columns, {
+				pinnedTopRowData: pinnedRowData,
+				getRowStyle: (params) => {
+					if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
+				},
+				rollup: true,
+				groupSuppressAutoColumn: true,
+				suppressAggFuncInHeader: true,
+				enableRangeSelection: true,
+				animateRows: true,
+				
+			});
 			pApp.BindSearchEnter();
+
+			$(".export-excel").on("click", function (e) {
+				let gridOptions = gx.gridOptions;
+				let excelParams = {
+					fileName: '채널별목표대비실적현황_{{ date('YmdH') }}.xlsx',
+					sheetName: 'Sheet1',
+				};
+
+				gridOptions.api.exportDataAsExcel(excelParams);
+			});
 
 			// 판매채널 선택되지않았을때 매장구분 disabled처리하는 부분
 			load_store_channel();
@@ -164,7 +204,20 @@
 
 		function Search() {
 			let data = $('form[name="search"]').serialize();
-			gx.Request('/store/sale/sal36/search', data);
+			gx.Request('/store/sale/sal36/search', data, 1, function(e){
+				let t = e.head.total_data;
+
+				const pinnedRowData = {
+					sale_type_nm : "합계",
+					tag_amt : t.total_tag_amt,
+					price_amt : t.total_price_amt,
+					recv_amt : t.total_recv_amt
+				};
+
+				gx.gridOptions.api.setPinnedTopRowData([pinnedRowData]);
+				
+				setAllRowGroupExpanded($("#grid_expand").is(":checked"))
+			});
 		}
 
 	</script>
