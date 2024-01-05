@@ -372,10 +372,10 @@ class comm01Controller extends Controller
 
 	public function download_file($path) {
 
-		if (file_exists(storage_path('\\app\\public\\data\\community\\comm01\\'.$path))) {
+		if (file_exists(storage_path('/app/public/data/community/comm01/'.$path))) {
 
 			try{
-				return response()->download(public_path('\\data\\community\\comm01\\'.$path));
+				return response()->download(public_path('/data/community/comm01/'.$path));
 			} catch(Exception $e){
 				return response()->json([
 					"code" => '500',
