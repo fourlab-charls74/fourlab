@@ -953,6 +953,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		//판매유형별 매출통계
 		Route::get('sal36','sal36Controller@index');
 		Route::get('sal36/search','sal36Controller@search');
+		
+		//월간재고소진현황
+		Route::get('sal37','sal37Controller@index');
+		Route::get('sal37/search','sal37Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
