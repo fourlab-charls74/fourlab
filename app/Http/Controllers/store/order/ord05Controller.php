@@ -189,7 +189,12 @@ class ord05Controller extends Controller
 				from (
 					select o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng
 						, pc.prd_cd_p, pc.color, pc.size, o.goods_opt as opt_val, o.sale_kind as sale_kind_cd, o.pr_code as pr_code_cd
-						, if(w.ord_state = 30, o.qty, o.qty * -1) as qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.store_cd
+						, if(w.ord_state = 30, o.qty, o.qty * -1) as qty, o.wonga
+					    -- , g.goods_sh
+					    , p.tag_price as goods_sh
+					    -- , g.price as goods_price
+					    , p.price as goods_price
+					    , o.price, o.store_cd
 					    , if(w.ord_state = 30, o.recv_amt, o.recv_amt * -1) as recv_amt, w.ord_state, o.clm_state
 					    , (o.point_amt * -1) as point_amt, (o.coupon_amt * -1) as coupon_amt
 					 	-- , o.qty, o.wonga, g.goods_sh, g.price as goods_price, o.price, o.recv_amt, o.store_cd, o.clm_state
@@ -197,6 +202,7 @@ class ord05Controller extends Controller
 					from order_opt o
 					    inner join order_opt_wonga w on w.ord_opt_no = o.ord_opt_no and w.ord_state = :ord_state
 						inner join product_code pc on pc.prd_cd = o.prd_cd
+						inner join product p on p.prd_cd = o.prd_cd
 						inner join goods g on g.goods_no = o.goods_no
 					where o.ord_no = :ord_no 
 						-- and if(o.clm_state >= 60, :ord_state2 >= 60, 1=1)
@@ -233,7 +239,7 @@ class ord05Controller extends Controller
 				"page_cnt" => 1,
 				"page_total" => 1,
 				"pr_codes" => $pr_codes,
-				'sale_kinds' => SLib::getUsedSaleKinds(),
+				'sale_kinds' => SLib::getUsedSaleKinds('', 'Y'),
 			],
 			"body" => $rows,
 		]);

@@ -371,16 +371,26 @@
 	// 주문상품내역 수정 시, 새로 계산된 정보 반영
 	function setProductRow(params) {
 		if (['qty', 'sale_price', 'sale_kind_nm'].includes(params.column.colId)) {
+			let goods_price	= 0;
+			let price		= 0;
 			let sale_kind_amt = params.data.sale_kind_amt;
 
 			if (params.column.colId === 'sale_kind_nm' && params.data.sale_kind_nm !== '') {
-				let goods_price = parseInt(params.data.goods_price);
 				let sale_kind = params.data.sale_kinds.filter(st => st.sale_type_nm === params.data.sale_kind_nm)[0] || {};
+
+				if(sale_kind.sale_apply === 'tag'){
+					goods_price = parseInt(params.data.goods_sh);
+					price		= parseInt(params.data.goods_sh);
+				}else{
+					goods_price = parseInt(params.data.goods_price);
+					price		= params.data.price;
+				}
+
 				sale_kind_amt = sale_kind.amt_kind === 'per' ? (goods_price * sale_kind.sale_per / 100) : (sale_kind.sale_amt || 0) * 1;
 				params.data.sale_kind_amt = sale_kind_amt;
-				params.data.sale_price = params.data.price - sale_kind_amt;
+				params.data.sale_price = price - sale_kind_amt;
 			}
-			
+
 			params.data.dc_rate = (1 - (params.data.sale_price / params.data.goods_sh)) * 100;
 			params.data.ord_amt = params.data.qty * params.data.sale_price;
 			params.data.recv_amt = params.data.ord_amt + (params.data.coupon_amt || 0) + (params.data.point_amt || 0);
