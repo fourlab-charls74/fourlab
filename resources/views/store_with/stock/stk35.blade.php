@@ -209,6 +209,31 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="prd_cd">바코드</label>
+								<div class="flex_box">
+									<input type='text' id="prd_cd" name='prd_cd' class="form-control form-control-sm ac-style-no search-enter">
+									<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd" hidden><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="prd_cd">상품검색조건</label>
+								<div class="form-inline">
+									<div class="form-inline-inner input-box w-100">
+										<div class="form-inline inline_btn_box">
+											<input type='hidden' id="prd_cd_range" name='prd_cd_range'>
+											<input type='text' id="prd_cd_range_nm" name='prd_cd_range_nm' onclick="openApi();" class="form-control form-control-sm w-100 ac-style-no" readonly style="background-color: #fff;">
+											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-range"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="">자료수/정렬</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
@@ -303,11 +328,12 @@
 			{field: "sr_state_nm", headerName: "반품상태", width: 65, cellStyle: StyleReturnState},
 			{field: "sr_kind", hide: true},
 			{field: "storage_cd", hide: true},
-			{field: "storage_nm", headerName: "반품창고", width: 120},
+			{field: "storage_nm", headerName: "반품창고", width: 80},
 			{field: "store_type", hide: true},
 			{field: "store_cd", headerName: "매장코드", width: 70, cellClass: 'hd-grid-code'},
 			{field: "store_type_nm", headerName: "매장구분", width: 80, cellClass: 'hd-grid-code'},
-			{field: "store_nm", headerName: "매장명", width: 200},
+			{field: "store_nm", headerName: "매장명", width: 120},
+/*
 			{field: "store_qty", headerName: "매장보유재고", type: "currencyType", width: 90},
 			{field: "sr_price", headerName: "요청금액", type: "currencyType", width: 80},
 			{field: "sr_qty", headerName: "요청수량", type: "currencyType", width: 60},
@@ -327,6 +353,26 @@
 					}
 				}
 			},
+*/
+			{field: "prd_cd", headerName: "상품코드", width: 120},
+			{field: "opt_nm", headerName: "품목", width: 100},
+			{field: "brand_nm", headerName: "브랜드", width: 80},
+			{field: "style_no", headerName: "스타일넘버", width: 110},
+			{field: "prd_nm", headerName: "상품명", width: 180},
+			{field: "prd_cd_p", headerName: "품번", width: 90},
+			{field: "color", headerName: "컬러", width: 60, cellClass: 'hd-grid-code'},
+			{field: "size", headerName: "사이즈", width: 60, cellClass: 'hd-grid-code'},
+			{field: "tag_price", headerName: "택가", type: "currencyType", width: 80},
+			{field: "price", headerName: "현재가", type: "currencyType", width: 80},
+			{field: "return_price", headerName: "반품단가", type: "currencyType", width: 80},
+			{field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
+			{field: "qty", headerName: "요청수량", width: 60, type: 'currencyType'},
+			{field: "return_p_amt", headerName: "처리금액", width: 80, type: 'currencyType'},
+			{field: "return_p_qty", headerName: "처리수량", width: 60, type: 'currencyType'},
+			{field: "fixed_return_price", headerName: "확정금액", width: 80, type: 'currencyType'},
+			{field: "fixed_return_qty", headerName: "확정수량", width: 60, type: 'currencyType'},
+			{field: "reject_comment", headerName: "반품거부메모", width: 200},
+			{field: "fixed_comment", headerName: "확정메모", width: 200},
 			{width: 0},
 		];
 	</script>

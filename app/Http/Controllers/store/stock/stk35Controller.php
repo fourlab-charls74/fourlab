@@ -58,6 +58,9 @@ class stk35Controller extends Controller
 		$store_channel		= $request->input("store_channel", "");
 		$store_channel_kind	= $request->input("store_channel_kind", "");
 
+		$prd_cds	= $request->input('prd_cd', '');
+		$prd_cd_range_text  = $request->input("prd_cd_range", '');
+		
 		// where
 		$where = "";
 
@@ -95,6 +98,26 @@ class stk35Controller extends Controller
 		if ($store_channel != "") 		$where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") 	$where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
+		if($prd_cds != '') {
+			$prd_cd = explode(',', $prd_cds);
+			$where .= " and (1!=1";
+			foreach($prd_cd as $cd) {
+				$where .= " or srp.prd_cd like '" . Lib::quote($cd) . "%' ";
+			}
+			$where .= ")";
+		}
+
+		// 상품옵션 범위검색
+		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
+		parse_str($prd_cd_range_text, $prd_cd_range);
+		foreach ($range_opts as $opt) {
+			$rows = $prd_cd_range[$opt] ?? [];
+			if (count($rows) > 0) {
+				$opt_join = join(',', array_map(function($r) {return "'$r'";}, $rows));
+				$where .= " and pc.$opt in ($opt_join) ";
+			}
+		}
+
 		// ordreby
 		$ord        = $request->input("ord", "desc");
 		$ord_field  = $request->input("ord_field", "sr.sr_cd");
@@ -124,26 +147,50 @@ class stk35Controller extends Controller
                 sr.sr_kind,
                 sr.sr_state,
                 c.code_val as sr_state_nm,
-                sum(pss.wqty) as store_qty,
-                sum(srp.return_qty) as sr_qty,
-                sum(srp.return_qty * srp.return_price) as sr_price,
-                sum(srp.return_p_qty) as return_p_qty,
-                sum(srp.return_p_qty * srp.return_price) as return_p_price,
-				sum(srp.fixed_return_qty) as fixed_return_qty,
-                sum(srp.fixed_return_price) as fixed_return_price,
+                -- sum(pss.wqty) as store_qty,
+                -- sum(srp.return_qty) as sr_qty,
+                -- sum(srp.return_qty * srp.return_price) as sr_price,
+                -- sum(srp.return_p_qty) as return_p_qty,
+                -- sum(srp.return_p_qty * srp.return_price) as return_p_price,
+				-- sum(srp.fixed_return_qty) as fixed_return_qty,
+                -- sum(srp.fixed_return_price) as fixed_return_price,
                 sr.sr_reason,
                 co.code_val as sr_reason_nm,
-                sr.comment
+                sr.comment,
+                
+                srp.prd_cd
+            	, opt.code_val as opt_nm
+            	, b.brand_nm
+            	, p.style_no
+            	, p.prd_nm
+            	, pc.prd_cd_p
+            	, pc.color
+            	, pc.size
+                , p.tag_price
+                , srp.price
+                , srp.return_price 
+                , srp.return_qty as qty
+                , (srp.return_qty * srp.return_price) as return_amt
+                , srp.return_p_qty as return_p_qty
+                , (srp.return_p_qty * srp.return_price) as return_p_amt
+                , srp.fixed_return_price as fixed_return_price
+                , srp.fixed_return_qty as fixed_return_qty
+                , srp.fixed_comment as fixed_comment
+                , srp.reject_comment as reject_comment
             from store_return sr
                 inner join store_return_product srp on srp.sr_cd = sr.sr_cd
+                inner join product_code pc on srp.prd_cd = pc.prd_cd
+                inner join product p on srp.prd_cd = p.prd_cd
 				left outer join product_stock_store pss on pss.prd_cd = srp.prd_cd and pss.store_cd = sr.store_cd
                 inner join storage on storage.storage_cd = sr.storage_cd
                 inner join store on store.store_cd = sr.store_cd
                 inner join store_channel sc on sc.store_channel_cd = store.store_channel and sc.store_kind_cd = store.store_channel_kind
                 inner join code c on c.code_kind_cd = 'SR_CODE' and c.code_id = sr.sr_state
                 inner join code co on co.code_kind_cd = 'SR_REASON' and co.code_id = sr.sr_reason
+            	left outer join code opt on opt.code_id = pc.opt and opt.code_kind_cd = 'PRD_CD_OPT' and opt.use_yn = 'Y'
+            	left outer join brand b on b.br_cd = pc.brand and b.use_yn = 'Y'
             where 1=1 $where
-			group by sr.sr_cd
+			-- group by sr.sr_cd
             $orderby
             $limit
 		";
@@ -159,6 +206,8 @@ class stk35Controller extends Controller
 					select sr.sr_cd
 					from store_return sr
 						inner join store_return_product srp on srp.sr_cd = sr.sr_cd
+						inner join product_code pc on srp.prd_cd = pc.prd_cd
+						inner join product p on srp.prd_cd = p.prd_cd
 						left outer join product_stock_store pss on pss.prd_cd = srp.prd_cd and pss.store_cd = sr.store_cd
 						inner join storage on storage.storage_cd = sr.storage_cd
 						inner join store on store.store_cd = sr.store_cd
@@ -166,7 +215,7 @@ class stk35Controller extends Controller
 						inner join code c on c.code_kind_cd = 'SR_CODE' and c.code_id = sr.sr_state
 						inner join code co on co.code_kind_cd = 'SR_REASON' and co.code_id = sr.sr_reason
 					where 1=1 $where
-					group by sr.sr_cd
+					-- group by sr.sr_cd
 				) a
             ";
 
