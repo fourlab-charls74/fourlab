@@ -68,6 +68,19 @@
                                             </div>
                                         </td>
                                     </tr>
+									<tr>
+										<th>다운로드</th>
+										<td>
+											@if($user->attach_file_url != '' && $user->attach_file_url !== null)
+												@foreach(explode(',', $user->attach_file_url) as $file_url)
+													<a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
+													&nbsp;&nbsp;
+													<a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
+													<br/>
+												@endforeach
+											@endif
+										</td>
+									</tr>
                                     <tr>
                                         <th>내용</th>
                                         <td>
@@ -126,16 +139,8 @@
                                                     @endforeach
                                                 </td>
                                             @else
-                                                <th>파일 업로드 및 다운로드</th>
+                                                <th>파일 업로드</th>
                                                 <td>
-                                                    @if($user->attach_file_url != '' && $user->attach_file_url !== null)
-                                                        @foreach(explode(',', $user->attach_file_url) as $file_url) 
-                                                                <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
-                                                                &nbsp;&nbsp;
-                                                                <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
-                                                                <br/>
-                                                        @endforeach
-                                                    @endif
                                                     <div class="form-inline inline_btn_box">
                                                         <input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
                                                     </div>
