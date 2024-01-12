@@ -471,7 +471,7 @@ class prd06Controller extends Controller
 			//1. 창고 재고 데이터 시작
 			$sql    = "
 				select
-					pss.storage_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, 
+					pss.storage_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, pc.prd_cd_p, pc.year,
 					-- pss.wqty as qty
 					if( pss.wqty > pss.qty, pss.qty, pss.wqty) as qty
 				from product_stock_storage pss
@@ -489,6 +489,13 @@ class prd06Controller extends Controller
 	
 			$cnt	= 0;
 			foreach ($rows as $row) {
+				
+				if( $row->year == '24' ){
+					if( $row->prd_cd_p != 'F241MJK01CT' ){
+						continue;
+					}
+				}
+				
 				//대표창고 버퍼링 처리
 				if( $row->storage_cd == $stock_conf->default_storage_cd && $stock_conf->default_storage_buffer != 0){
 					$row->qty = $row->qty - $stock_conf->default_storage_buffer;
@@ -541,7 +548,7 @@ class prd06Controller extends Controller
 					// 매장 통합버퍼링
 					$sql    = "
 						select
-							'store_all' as store_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, max(p.price) as price, max(p.wonga) as wonga, sum(pss.wqty) as qty
+							'store_all' as store_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, max(p.price) as price, max(p.wonga) as wonga, sum(pss.wqty) as qty, pc.prd_cd_p, pc.year
 						from product_stock_store pss
 						inner join product_code pc on pc.prd_cd = pss.prd_cd
 						inner join product p on pss.prd_cd = p.prd_cd
@@ -556,7 +563,13 @@ class prd06Controller extends Controller
 	
 					$cnt	= 0;
 					foreach ($rows as $row) {
-	
+
+						if( $row->year == '24' ){
+							if( $row->prd_cd_p != 'F241MJK01CT' ){
+								continue;
+							}
+						}
+
 						//매장 통합 버퍼링 처리
 						if( $stock_conf->store_tot_buffer != 0){
 							$row->qty = $row->qty - $stock_conf->store_tot_buffer;
@@ -577,7 +590,7 @@ class prd06Controller extends Controller
 					// 매장 개별 버퍼링
 					$sql    = "
 						select
-							pss.store_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, pss.wqty as qty
+							pss.store_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, pss.wqty as qty, pc.prd_cd_p, pc.year
 						from product_stock_store pss
 						inner join product_code pc on pc.prd_cd = pss.prd_cd
 						inner join product p on pss.prd_cd = p.prd_cd
@@ -591,7 +604,13 @@ class prd06Controller extends Controller
 	
 					$cnt	= 0;
 					foreach ($rows as $row) {
-	
+
+						if( $row->year == '24' ){
+							if( $row->prd_cd_p != 'F241MJK01CT' ){
+								continue;
+							}
+						}
+
 						//매장 개별 버퍼링 처리
 						if( $store_buffer[$row->store_cd] != 0){
 							$row->qty = $row->qty - $store_buffer[$row->store_cd];
