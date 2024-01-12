@@ -379,8 +379,6 @@
     }
 
     function Update(no) {
-        $('input[name="content"]').val(editor1.html());
-
         let attachFileCnt = String('{{$user->attach_file_url}}').split(',');
 
         if ($('input[name="subject"]').val() === '') {
@@ -401,6 +399,8 @@
             alert('첨부파일의 개수는 5개 까지 입니다.');
             return false;
         }
+
+		$('input[name="content"]').val(editor1.html());
 
 		// 업데이트 시 이미 선택되어있던 매장의 개수
 		const store_sel_cnt = document.querySelectorAll('.store_sel').length;
