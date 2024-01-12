@@ -295,6 +295,23 @@ class comm01Controller extends Controller
             }
 
             DB::beginTransaction();
+			
+			$sql = "
+				select
+					attach_file_url
+				from notice_store
+				where ns_cd = $ns_cd
+			";
+			$isnull_files = DB::selectOne($sql);
+
+			$then = "";
+			if ($file_url != "") {
+				if ($isnull_files->attach_file_url != null) {
+					$then = "CONCAT(attach_file_url, ',' , '$file_url')";
+				} else {
+					$then = "'$file_url'";
+				}
+			}
             
             $sql = "
                 update notice_store
@@ -303,7 +320,7 @@ class comm01Controller extends Controller
                     content = '$content',
                     all_store_yn =  '$all_store_yn',
                     ut = $ut,
-                    attach_file_url = (case when '$file_url' != '' then CONCAT(attach_file_url, ',' , '$file_url') else attach_file_url end)
+                    attach_file_url = (case when '$file_url' != '' then $then else attach_file_url end)
                 where 
                     ns_cd = $ns_cd
             ";
