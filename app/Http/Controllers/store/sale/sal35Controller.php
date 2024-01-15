@@ -14,10 +14,12 @@ class sal35Controller extends Controller
 {
 	public function index()
 	{
+		$sdate = date("Y-m");
+		$format_sdate = date("m/Y");
+		
 		$values = [
-			'sdate' => date("Y-m"),
-			'store_channel'	=> SLib::getStoreChannel(),
-			'store_kind'	=> SLib::getStoreKind(),
+			'sdate' => $sdate,
+			'format_sdate'	=> $format_sdate,
 		];
 		return view(Config::get('shop.store.view') . '/sale/sal35', $values);
 	}

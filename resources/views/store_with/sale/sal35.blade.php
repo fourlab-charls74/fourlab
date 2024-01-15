@@ -107,14 +107,15 @@
 		* 달성율 = 판매금액 / 목표금액 * 100
 		* 신장율 = 판매금액 / 전년판매 * 100
 		* */
-		const pinnedRowData = [{ stores : "총합계", proj_amt : 0, recv_amt : 0, progress_proj_rate : 0, last_recv_amt : 0, elongation_rate : 0 }];
+		const sdate = "{{ $format_sdate }}";
+		const pinnedRowData = [{ stores : "total", proj_amt : 0, recv_amt : 0, progress_proj_rate : 0, last_recv_amt : 0, elongation_rate : 0 }];
 		const columns = [
 			{headerName: "Retail Store Sales", field: "stores", width: 160,
 				cellStyle : (params) => params.node.rowPinned === 'top' ? {'text-align' : 'center'} : {},
 			},
-			{headerName: "목표금액", field: "proj_amt", width: 130, type: "currencyType"},
-			{headerName: "판매금액", field: "recv_amt", width: 130, type: "currencyType"},
-			{headerName: "달성율(%)", field: "progress_proj_rate", width: 130, type: "percentType",
+			{headerName: "Budget " + sdate, field: "proj_amt", width: 130, type: "currencyType"},
+			{headerName: "Sales " + sdate, field: "recv_amt", width: 130, type: "currencyType"},
+			{headerName: "Sales vs Budget %", field: "progress_proj_rate", width: 130, type: "percentType",
 				cellRenderer: (params) => {
 					if (params.node.rowPinned === 'top') {
 						let t_proj_amt = parseInt(params.node.data.proj_amt);
@@ -128,8 +129,8 @@
 					}
 				}
 			},
-			{headerName: "전년판매", field: "last_recv_amt", width: 130, type: "currencyType"},
-			{headerName: "신장율(%)", field: "elongation_rate", width: 130, type: "percentType",
+			{headerName: "Sales LY", field: "last_recv_amt", width: 130, type: "currencyType"},
+			{headerName: "Sales vs LY %", field: "elongation_rate", width: 130, type: "percentType",
 				cellRenderer: (params) => {
 					if (params.node.rowPinned === 'top') {
 						let t_recv_amt = parseInt(params.node.data.recv_amt);
@@ -147,12 +148,12 @@
 		];
 
 		const columns2 = [
-			{headerName: "Sales By Channels", field: "channels", width: 160, aggSum: "총합계"
+			{headerName: "Sales By Channels", field: "channels", width: 160, aggSum: "total"
 				,cellStyle : (params) => params.node.rowPinned === 'top' ? {'text-align' : 'center'} : {}
 			},
-			{headerName: "목표금액", field: "channel_proj_amt", width: 130, type: "currencyType", aggregation: true },
-			{headerName: "판매금액", field: "channel_recv_amt", width: 130, type: "currencyType", aggregation: true },
-			{headerName: "달성율(%)", field: "channel_progress_proj_rate", width: 130, type: "percentType",
+			{headerName: "Budget " + sdate, field: "channel_proj_amt", width: 130, type: "currencyType", aggregation: true },
+			{headerName: "Sales " + sdate, field: "channel_recv_amt", width: 130, type: "currencyType", aggregation: true },
+			{headerName: "Sales vs Budget %", field: "channel_progress_proj_rate", width: 130, type: "percentType",
 				cellRenderer: (params) => {
 					if (params.node.rowPinned === 'top') {
 						let t_channel_proj_amt = parseInt(params.node.data.channel_proj_amt);
@@ -166,8 +167,8 @@
 					}
 				}
 			},
-			{headerName: "전년판매", field: "channel_last_recv_amt", width: 130, type: "currencyType", aggregation: true },
-			{headerName: "신장율(%)", field: "channel_elongation_rate", width: 130, type: "percentType",
+			{headerName: "Sales LY", field: "channel_last_recv_amt", width: 130, type: "currencyType", aggregation: true },
+			{headerName: "Sales vs LY %", field: "channel_elongation_rate", width: 130, type: "percentType",
 				cellRenderer: (params) => {
 					if (params.node.rowPinned === 'top') {
 						let t_channel_recv_amt = parseInt(params.node.data.channel_recv_amt);
@@ -236,7 +237,7 @@
 					let t = e.head.total_data;
 
 					const pinnedRowData = {
-						stores : "총합계",
+						stores : "total",
 						proj_amt : t.total_proj_amt,
 						recv_amt : t.total_recv_amt,
 						last_recv_amt : t.total_last_recv_amt,
