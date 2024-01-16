@@ -80,15 +80,21 @@ class stk36Controller extends Controller
 
 			 $sql = "
 				select 
-					com.store_cd
+					cs.store_cd
+				    , cs.competitor_cd
 					, c.code_val as $competitor_nm
 					, sum(cs.sale_amt) as $competitor_amt
 					, sum(cs.sale_amt) as sale_amt
 				from competitor_sale cs
-					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
-					inner join competitor com on com.competitor_cd = c.code_id
-				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and com.store_cd = '$store_cd' and com.use_yn = 'Y'
-				group by com.store_cd, cs.competitor_cd
+					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR' and c.use_yn = 'Y'
+					inner join (
+					    select
+					        competitor_cd
+						from competitor
+						where store_cd = '$store_cd' and use_yn = 'Y'
+					) com on com.competitor_cd = c.code_id
+				where cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and cs.sale_amt > 0
+				group by date_format(cs.sale_date, '%Y-%m'), cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
 			 ";
 
