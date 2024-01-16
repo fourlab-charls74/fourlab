@@ -214,6 +214,12 @@ class stk36Controller extends Controller
 					, sum(cs.sale_amt) as $competitor_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
+					inner join (
+					    select
+					        competitor_cd
+						from competitor
+						where store_cd = '$store_cd' and use_yn = 'Y'
+					) com on com.competitor_cd = c.code_id
 				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and c.code_val = '아크테릭스'
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
@@ -230,6 +236,12 @@ class stk36Controller extends Controller
 					, sum(cs.sale_amt) as $competitor_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
+					inner join (
+					    select
+					        competitor_cd
+						from competitor
+						where store_cd = '$store_cd' and use_yn = 'Y'
+					) com on com.competitor_cd = c.code_id
 				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and c.code_val = '파타고니아'
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
@@ -262,6 +274,12 @@ class stk36Controller extends Controller
 					, sum(cs.sale_amt) as $competitor_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
+					inner join (
+					    select
+					        competitor_cd
+						from competitor
+						where store_cd = '$store_cd' and use_yn = 'Y'
+					) com on com.competitor_cd = c.code_id
 				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and c.code_val = '아크테릭스'
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
@@ -276,6 +294,12 @@ class stk36Controller extends Controller
 					, sum(cs.sale_amt) as $competitor_amt
 				from competitor_sale cs
 					inner join code c on c.code_id = cs.competitor_cd and c.code_kind_cd = 'COMPETITOR'
+					inner join (
+					    select
+					        competitor_cd
+						from competitor
+						where store_cd = '$store_cd' and use_yn = 'Y'
+					) com on com.competitor_cd = c.code_id
 				where c.use_yn = 'Y' and cs.sale_date >= :sdate and cs.sale_date <= :edate and cs.store_cd = '$store_cd' and c.code_val = '파타고니아'
 				group by cs.store_cd, cs.competitor_cd
 				order by sum(cs.sale_amt) desc, $competitor_nm asc
