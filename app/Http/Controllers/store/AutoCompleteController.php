@@ -114,7 +114,6 @@ class AutoCompleteController extends Controller
                 from code
                 where code_kind_cd = 'PRD_CD_COLOR' and (code_id like :code_id or code_val like :code_val)
                 order by code_id
-                limit 0, 10
             ";
 			$results =  DB::select($sql, [
 				"code_id" => sprintf("%s%%", $keyword),
