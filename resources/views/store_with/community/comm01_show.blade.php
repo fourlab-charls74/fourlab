@@ -128,25 +128,14 @@
                                             </td>
 										</tr>
 										<tr>
-                                            @if(($user->attach_file_url != '' && $user->attach_file_url !== null) && count(explode(',', $user->attach_file_url)) >= 5)
-                                                <th>파일 다운로드</th>
-                                                <td>
-                                                    @foreach(explode(',', $user->attach_file_url) as $file_url) 
-                                                            <a href="javascript:downloadFile('{{$file_url}}')">{{explode('/', $file_url)[3]}}</a>
-                                                            &nbsp;&nbsp;
-                                                            <a href="javascript:deleteFile('{{$no}}', '{{$file_url}}')">X</a>
-                                                            <br/>
-                                                    @endforeach
-                                                </td>
-                                            @else
-                                                <th>파일 업로드</th>
-                                                <td>
-                                                    <div class="form-inline inline_btn_box">
-                                                        <input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
-                                                    </div>
-                                                    <span style="color:red">※이미지(jpg, png), 엑셀(excel), ppt(pptx)만 가능합니다.</span>
-                                                </td>
-                                            @endif
+											<th>파일 업로드</th>
+											<td>
+												<div class="form-inline inline_btn_box">
+													<input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
+												</div>
+												<span style="color:red">※이미지(jpg, png), 엑셀(excel), ppt(pptx)만 가능합니다.</span>
+											</td>
+										</tr>
                                         @endif
                                     </tr>
                                 </table>

@@ -171,7 +171,7 @@ class comm01Controller extends Controller
         $image_extionsions = config::get('file.image_extensions');
         
         $this->validate($request, [
-            'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)).strtolower(implode(',', $ppt_extionsions).strtolower(implode(',', $image_extionsions)))
+            'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)). "," .strtolower(implode(',', $ppt_extionsions). "," .strtolower(implode(',', $image_extionsions)))
         ]);
 
         $id =  Auth('head')->user()->id;
