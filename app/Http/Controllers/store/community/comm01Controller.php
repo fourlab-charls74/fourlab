@@ -303,7 +303,7 @@ class comm01Controller extends Controller
 				where ns_cd = $ns_cd
 			";
 			$isnull_files = DB::selectOne($sql);
-
+			
 			$then = "";
 			if ($file_url != "") {
 				if ($isnull_files->attach_file_url != null) {
@@ -311,7 +311,10 @@ class comm01Controller extends Controller
 				} else {
 					$then = "'$file_url'";
 				}
+			} else {
+				$then = "attach_file_url";
 			}
+			
             
             $sql = "
                 update notice_store
@@ -324,6 +327,7 @@ class comm01Controller extends Controller
                 where 
                     ns_cd = $ns_cd
             ";
+			
 
             DB::update($sql);
 			
