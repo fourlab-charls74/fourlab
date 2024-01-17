@@ -20,7 +20,7 @@ class comm01Controller extends Controller
     public function index($notice_id, Request $request)
     {
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
+        $sdate = $mutable->sub(1, 'year')->format('Y-m-d');
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
