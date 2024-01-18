@@ -237,11 +237,11 @@
                         <label for="formrow-email-input">보기</label>
                             <div class="form-inline form-radio-box">
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="color_and_size" id="color_and_size" class="custom-control-input" checked>
+                                    <input type="radio" name="group_type_condition" value="color_and_size" id="color_and_size" class="custom-control-input">
                                     <label class="custom-control-label" for="color_and_size">컬러, 사이즈</label>
                                 </div>
                                 <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="product_code_p" id="product_code_p" class="custom-control-input">
+                                    <input type="radio" name="group_type_condition" value="product_code_p" id="product_code_p" class="custom-control-input" checked>
                                     <label class="custom-control-label" for="product_code_p">품번</label>
                                 </div>
                             </div>
