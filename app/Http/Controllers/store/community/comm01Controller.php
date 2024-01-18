@@ -81,6 +81,7 @@ class comm01Controller extends Controller
                 s.cnt,
                 s.all_store_yn,
                 group_concat(a.store_nm separator ', ') as stores,
+                if ((select date_add(s.rt, interval 10 day)) < now(), 'false', 'true') as check_new_notice,
                 s.rt,
                 c.code_val as store_type_nm,
                 s.ut,

@@ -159,9 +159,13 @@
     let columns = [
         {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code'},
         {headerName: "제목", field: "subject", width: 400,
-            cellRenderer: function(params) {
-                return `<a href="/shop/community/comm01/${$('#store_notice_type').val()}/` + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
-            }
+			cellRenderer: function(params) {
+				if (params.data.check_new_notice == 'true') {
+					return '<a href="/shop/community/comm01/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ `<span class="blink" style="color:red;font-weight: bold" >[ NEW ] </span>` + params.value +`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				} else {
+					return '<a href="/shop/community/comm01/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ params.value +`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				}
+			},
         },
         {headerName: "ID", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},

@@ -9,6 +9,7 @@
         <meta name="format-detection" content="telephone=no">
         <meta content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" name="viewport"  />
         <meta name="csrf-token" content="{{ csrf_token() }}">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
         <!-- App favicon -->
         @include('shop_with.layouts.head')
     </head>
