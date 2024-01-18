@@ -107,14 +107,13 @@
 		* 달성율 = 판매금액 / 목표금액 * 100
 		* 신장율 = 판매금액 / 전년판매 * 100
 		* */
-		const sdate = "{{ $format_sdate }}";
 		const pinnedRowData = [{ stores : "total", proj_amt : 0, recv_amt : 0, progress_proj_rate : 0, last_recv_amt : 0, elongation_rate : 0 }];
 		const columns = [
 			{headerName: "Retail Store Sales", field: "stores", width: 160,
 				cellStyle : (params) => params.node.rowPinned === 'top' ? {'text-align' : 'center'} : {},
 			},
-			{headerName: "Budget " + sdate, field: "proj_amt", width: 130, type: "currencyType"},
-			{headerName: "Sales " + sdate, field: "recv_amt", width: 130, type: "currencyType"},
+			{headerName: "Budget ", field: "proj_amt", width: 130, type: "currencyType"},
+			{headerName: "Sales ", field: "recv_amt", width: 130, type: "currencyType"},
 			{headerName: "Sales vs Budget %", field: "progress_proj_rate", width: 130, type: "percentType",
 				cellRenderer: (params) => {
 					if (params.node.rowPinned === 'top') {
@@ -151,8 +150,8 @@
 			{headerName: "Sales By Channels", field: "channels", width: 160, aggSum: "total"
 				,cellStyle : (params) => params.node.rowPinned === 'top' ? {'text-align' : 'center'} : {}
 			},
-			{headerName: "Budget " + sdate, field: "channel_proj_amt", width: 130, type: "currencyType", aggregation: true },
-			{headerName: "Sales " + sdate, field: "channel_recv_amt", width: 130, type: "currencyType", aggregation: true },
+			{headerName: "Budget ", field: "channel_proj_amt", width: 130, type: "currencyType", aggregation: true },
+			{headerName: "Sales ", field: "channel_recv_amt", width: 130, type: "currencyType", aggregation: true },
 			{headerName: "Sales vs Budget %", field: "channel_progress_proj_rate", width: 130, type: "percentType",
 				cellRenderer: (params) => {
 					if (params.node.rowPinned === 'top') {
@@ -235,6 +234,8 @@
 				gx.Request('/store/sale/sal35/search', data, -1, function(e) {
 
 					let t = e.head.total_data;
+					let format_date = e.head.format_date;
+
 
 					const pinnedRowData = {
 						stores : "total",
@@ -246,6 +247,8 @@
 					};
 
 					gx.gridOptions.api.setPinnedTopRowData([pinnedRowData]);
+					
+					changeColumn(format_date);
 				});
 				Search2();
 			}
@@ -254,6 +257,23 @@
 				let data = $('form[name="search"]').serialize();
 				gx2.Aggregation({ sum: "top"});
 				gx2.Request('/store/sale/sal35/search2', data, -1);
+			}
+			
+			// 기간을 변경하면 해당 기간으로 컬럼명을 변경하는 부분
+			function changeColumn(date) {
+				let headerName = "Budget " + date;
+				let gridColumn = gx.gridOptions.columnApi.getColumn("proj_amt");
+				let gridColumn2 = gx2.gridOptions.columnApi.getColumn("channel_proj_amt");
+
+				if (gridColumn) {
+					gridColumn.colDef.headerName = headerName;
+					gx.gridOptions.api.refreshHeader();
+				}
+				
+				if (gridColumn2) {
+					gridColumn2.colDef.headerName = headerName;
+					gx2.gridOptions.api.refreshHeader();
+				}
 			}
 	</script>
 @stop

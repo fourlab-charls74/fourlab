@@ -36,6 +36,7 @@ class sal35Controller extends Controller
 		$ord_state_edate = str_replace("-","", $sdate)."31";
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format('Ym')."01";
 		$last_year_edate = Carbon::parse($sdate)->subYear()->format('Ym')."31";
+		$format_sdate = Carbon::parse($sdate)->format('m/Y');
 
 		/*  
 		* 달성율 = 판매금액 / 목표금액 * 100
@@ -152,7 +153,8 @@ class sal35Controller extends Controller
 			'code' => 200,
 			'head' => array(
 				'total' => count($rows),
-				"total_data" => $result[0]??''
+				"total_data" => $result[0]??'',
+				'format_date' => $format_sdate,
 			),
 			'body' => $rows
 		]);
