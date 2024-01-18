@@ -319,7 +319,7 @@
         list.push({
             headerName: "합계",
             children: [
-                {field: "qty", headerName: "실재고", type: "currencyType", maxWidth: 60, minWidth: 60, cellStyle: {"text-align": "right"}, pinned: "right",
+                {field: "qty", headerName: "실재고", type: "currencyType", maxWidth: 68, minWidth: 68, cellStyle: {"text-align": "right"}, pinned: "right", sort: "desc",
                     aggFunc: (params) => params.values.reduce((a,c) => a + (c * 1), 0),
                 },
                 {field: "wqty", headerName: "보유재고", type: "currencyType", maxWidth: 65, minWidth: 65, cellStyle: {"text-align": "right"}, pinned: "right",

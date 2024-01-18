@@ -568,6 +568,7 @@ class prd04Controller extends Controller
 				) a
 					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = a.color
 				group by a.store_cd, a.color
+				order by sum(a.qty) desc
 			";
 			$store_rows = DB::select($sql);
 
@@ -609,6 +610,7 @@ class prd04Controller extends Controller
 				) a
 					left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = a.color
 				group by a.storage_cd, a.color
+				order by sum(a.qty) desc
 			";
 			$storage_rows = DB::select($sql);
 
