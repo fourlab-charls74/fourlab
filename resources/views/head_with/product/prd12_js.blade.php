@@ -191,7 +191,7 @@
                 alert('삭제할 상품을 선택 해 주십시오.');
             } else if(goods_nos.length > 0 && confirm('삭제 하시겠습니까?')){
 
-                let d_cat_cd = '{{ @$plan->p_no }}';
+				let d_cat_cd = $('#d_cat_cd').val();
 
                 $.ajax({
                     method: 'post',
@@ -224,8 +224,9 @@
             });
             if(confirm('순서를 변경 하시겠습니까?')){
 
-                let d_cat_cd = '{{ @$plan->p_no }}';
-
+                {{--let d_cat_cd = '{{ @$plan->p_no }}';--}}
+				let d_cat_cd = $('#d_cat_cd').val();
+				
                 $.ajax({
                     method: 'post',
                     url: '/head/product/prd12/' + code + '/seq',

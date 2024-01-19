@@ -493,7 +493,8 @@ class prd12Controller extends Controller
         return response()->json([
             "code" => 200,
             "head" => array(
-                "total" => count($rows)
+                "total" => count($rows),
+				"d_cat_cd" => $d_cat_cd,
             ),
             "body" => $rows
         ]);
