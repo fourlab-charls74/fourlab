@@ -416,6 +416,7 @@
 			cellStyle: (params) => ({ color: params.value === 'Y' ? '#ff0000' : '#999' }),
 			cellRenderer: (params) => params.value === 'Y' ? '검수완료' : '검수전',
 		},
+		{field: "stock_check_storage", headerName: "반입창고", pinned: 'left', width: 70, cellClass: 'hd-grid-code',},
 		{field: "sale_place", hide: true}, // 판매처
 		{field: "sale_place_nm", headerName: "판매처", pinned: 'left', width: 80},
 	@if (@$user_group === 'N')

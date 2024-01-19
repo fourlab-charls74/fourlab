@@ -244,7 +244,7 @@ class ord04Controller extends Controller
 				, bk.code_val as baesong_kind
 			    , sp.com_nm as sale_place_nm, s.store_nm
 				, if(a.dlv_place_type = 'STORE', s1.store_nm, st.storage_nm) as dlv_place_cd
-				
+				, return_st.storage_nm as stock_check_storage
 			from (
 				select o.ord_no, o.ord_opt_no, o.goods_no, o.prd_cd, o.goods_opt
 					, o.wonga, o.price, o.qty, o.pay_type, o.dlv_amt, o.sale_place, o.store_cd
@@ -255,6 +255,7 @@ class ord04Controller extends Controller
 					, ifnull(pc.prd_cd_p, concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt)) as prd_cd_p, pc.color
 					, pc.size as size
 					, if(csc.state = 30, 'Y', 'N') as stock_check_yn
+					, ifnull(csc.storage_cd,'') as return_st_cd
 					, csc.comment
 					, csc.rt as csc_rt
 					, o.dlv_place_type
@@ -280,6 +281,7 @@ class ord04Controller extends Controller
 				left outer join store s on s.store_cd = a.store_cd
 				left outer join store s1 on s1.store_cd = a.dlv_place_cd
 				left outer join storage st on st.storage_cd = a.dlv_place_cd
+				left outer join storage return_st on return_st.storage_cd = a.return_st_cd
 		";
 		$result = DB::select($sql);
 
