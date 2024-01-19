@@ -244,7 +244,7 @@ class prd30Controller extends Controller
         $conf	= new Conf();
 		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_handle");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
-		//$cfg_domain_bizest	.= "/head";
+		$cfg_domain_bizest	.= "/head";
 
 		$result_no	= "";
 		$result_msg	= "";
@@ -437,7 +437,7 @@ class prd30Controller extends Controller
         $conf	= new Conf();
 		$cfg_domain_bizest	= $conf->getConfigValue("shop","domain_handle");
 		//$cfg_domain_bizest	= "127.0.0.1:8000/head";
-		//$cfg_domain_bizest	.= "/head";
+		$cfg_domain_bizest	.= "/head";
 
 		$result_no	= "";
 		$result_msg	= "";
