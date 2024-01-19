@@ -471,6 +471,16 @@ body.sidebar-enable nav .side_menu > ul > li > ul > li > ul > li > a{padding-lef
     .address_box a:first-child{margin-right:10px;}
 }
 
+@keyframes blink-effect {
+	50% {
+		opacity: 0;
+	}
+}
+
+.blink {
+	animation: blink-effect 2s step-end infinite;
+}
+
 
 .show_layout .card .card-body .th_border_none{word-break: keep-all;
     border-top: 1px solid #999;

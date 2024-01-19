@@ -43,7 +43,13 @@ class comm02Controller extends Controller
 
         $where = "";
         $orderby = "";
-        if ($sender != "") $where .= "and store_nm like '%" . Lib::quote($sender) . "%'  ";
+		$having = "";
+
+		if ($msg_type == 'send') {
+			if ($sender != "") $having .= "having receiver_nm like '%" . Lib::quote($sender) . "%'  ";
+		} else {
+			if ($sender != "") $having .= "having sender_nm like '%" . Lib::quote($sender) . "%'  ";
+		}
         if ($content != "") $where .= " and m.content like '%" . Lib::quote($content) . "%' ";
      
 
@@ -73,7 +79,7 @@ class comm02Controller extends Controller
                     m.msg_cd
                     , msd.receiver_type
                     , msd.receiver_cd
-                    , if(msd.receiver_type = 'S', s.store_nm, if(msd.receiver_type = 'U', mu.name, if(msd.receiver_type = 'H','본사',''))) as receiver_nm
+                    , group_concat(if(msd.receiver_type = 'S', s.store_nm, if(msd.receiver_type = 'U', mu.name, if(msd.receiver_type = 'H','본사',''))) separator ', ') as receiver_nm
                     , s.store_nm
                     , msd.receiver_type
                     , msd.check_yn
@@ -90,6 +96,7 @@ class comm02Controller extends Controller
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day) and m.del_yn = 'N'
                 $where
                 group by m.rt
+                $having
                 $orderby
                 $limit
             ";
@@ -99,8 +106,7 @@ class comm02Controller extends Controller
                 select 
                     m.msg_cd,
                     m.sender_cd,
-                    -- ifnull(if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'U', mu.name,if(m.sender_type = 'H', '본사', if(m.sender_type = 'G', s.store_nm, '')))), mu.name) as sender_nm,
-                   	if(m.sender_type = 'S', mu.name, if(m.sender_type = 'U', mu.name, if(m.sender_type = 'H', mu.name,''))) as sender_nm,
+                    if(m.sender_type = 'S', s.store_nm, if(m.sender_type = 'H', mu.name,'')) as sender_nm,
                     s.phone as mobile,
                     m.content,
                     md.rt,
@@ -114,6 +120,7 @@ class comm02Controller extends Controller
                 and m.rt >= :sdate and m.rt < date_add(:edate, interval 1 day) and m.del_yn = 'N'
                 $where
                 group by md.msg_cd
+                $having
                 $orderby
                 $limit
             ";

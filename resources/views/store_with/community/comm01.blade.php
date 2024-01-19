@@ -121,7 +121,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 inner-td">
+                            <div class="col-lg-4 inner-td" hidden>
                                 <div class="form-group">
                                     <label for="store_no">매장</label>
                                     <div class="form-inline inline_btn_box search-enter" >
@@ -196,14 +196,18 @@
         {headerName: "#", field: "num",type:'NumType', cellClass: 'hd-grid-code', width: 40},
         {headerName: "제목", field: "subject", width: 400,
             cellRenderer: function(params) {
-                return '<a href="/store/community/comm01/show/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ params.value+`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				if (params.data.check_new_notice == 'true') {
+					return '<a href="/store/community/comm01/show/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ `<span class="blink" style="color:red;font-weight: bold" >[ NEW ] </span>` + params.value+`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				} else {
+                	return '<a href="/store/community/comm01/show/' + $('#store_notice_type').val() + '/' + params.data.ns_cd +'" rel="noopener">'+ params.value+`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				}
             },
         },
         {headerName: "ID", field: "admin_id",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이메일", field: "admin_email", width: 150, cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
-        {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code',
+        {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code', hide:true,
             cellStyle: params => {
                 if(params.data.all_store_yn == 'Y'){
                     return {color:'red'}
@@ -219,7 +223,7 @@
                 }
             }
         },
-        {headerName: "공지매장", field: "store_nm", width: 340, cellStyle: {'white-space': 'normal'},
+        {headerName: "공지매장", field: "store_nm", width: 340, cellStyle: {'white-space': 'normal'}, hide:true,
             cellRenderer: function(params) {
 				if (params.data.all_store_yn == 'Y') {
 					return '';

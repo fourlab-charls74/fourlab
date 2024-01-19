@@ -169,9 +169,9 @@ class prd02Controller extends Controller
 			if(count($style_nos) > 1){
 				if(count($style_nos) > 500) array_splice($style_nos,500);
 				$in_style_nos = join(",",$style_nos);
-				$where .= " and g.style_no in ( $in_style_nos ) ";
+				$where .= " and p.style_no in ( $in_style_nos ) ";
 			} else {
-				if ($style_no != "") $where .= " and g.style_no = '" . Lib::quote($style_no) . "' ";
+				if ($style_no != "") $where .= " and p.style_no = '" . Lib::quote($style_no) . "' ";
 			}
 		}
 		
@@ -1788,9 +1788,10 @@ class prd02Controller extends Controller
 
 			$sql = "
 				select 
-					p.prd_cd, p.prd_nm , pc.seq
+					p.prd_cd, g.goods_nm as prd_nm, g.goods_nm_eng as goods_nm_eng , pc.seq
 				from product p 
 					inner join product_code pc on p.prd_cd = pc.prd_cd
+					inner join goods g on g.goods_no = pc.goods_no
 				where p.prd_cd like '$prd_cd%'
 				group by p.prd_nm
 				order by p.prd_cd asc
@@ -1819,9 +1820,11 @@ class prd02Controller extends Controller
 
 			$sql = "
 				select 
-					*
-				from product
-				where prd_nm = '$prd_nm'
+					g.goods_nm as prd_nm, g.goods_nm_eng as prd_nm_eng, p.style_no, p.tag_price, p.price, p.wonga, p.com_id
+				from product p
+					inner join product_code pc on p.prd_cd = pc.prd_cd
+					inner join goods g on g.goods_no = pc.goods_no
+				where g.goods_nm = '$prd_nm'
 				limit 1
 			";
 

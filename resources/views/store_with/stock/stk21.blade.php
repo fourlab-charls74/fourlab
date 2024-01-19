@@ -339,7 +339,7 @@
                 },
             ]
         },
-		{field: "total_dep_store_sale_qty", headerName: "총 판매 수량", width: 90, cellStyle: {"text-align": "right"}},
+		{field: "total_dep_store_sale_qty", headerName: "총 판매 수량", type: "currencyType", width: 90, cellStyle: {"text-align": "right"},},
 		{field: "store_cd",	headerName: "매장코드", width: 70, cellStyle: {"text-align": "center"}},
 		{field: "store_nm",	headerName: "받는 매장", width: 140, cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffff99"},
             editable: (params) => params.node.rowPinned === "top" ? false : true,
@@ -358,7 +358,7 @@
 				{field: "send_wqty", headerName: "보유재고", type: "currencyType", width: 65},
 			]
 		},
-		{field: "total_store_sale_qty", headerName: "총 판매 수량", width: 90, cellStyle: {"text-align": "right"}},
+		{field: "total_store_sale_qty", headerName: "총 판매 수량", type: "currencyType", width: 90, cellStyle: {"text-align": "right"}},
         {field: "rt_qty", headerName: "RT수량", type: "currencyType", width: 65,
             editable: (params) => params.node.rowPinned === "top" ? false : true,
             cellStyle: (params) => params.node.rowPinned === "top" ? '' : {"background-color": "#ffFF99"}},

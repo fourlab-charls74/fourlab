@@ -202,7 +202,7 @@ class mem01Controller extends Controller
 			}
 		}
 
-		if($name != "")			$where .= " and a.name = '$name' ";
+		if($name != "")			$where .= " and a.name like '%$name%' ";
 
 		if( $yn != "" ){
 			$yn	= ( $yn == "Y" )?"Y":"";
@@ -211,7 +211,20 @@ class mem01Controller extends Controller
 
 		if($jumin != "")		$where .= " and a.jumin1 = '$jumin' ";
 		if($phone != "")		$where .= " and a.phone = '$phone' ";
-		if($mobile != "")		$where .= " and a.mobile like '%$mobile%' ";
+		
+		if($mobile != "") {
+			if(strlen($mobile) == 4) {
+				$where .= " and a.mobile like '%$mobile' ";
+			} else {
+				if(strpos($mobile, '-') === false) {
+					$mobile = substr($mobile,0,3) . '-' . substr($mobile,3,4) . '-' . substr($mobile,7,4);
+				} else {
+					$mobile = $mobile;
+				}
+				$where .= " and a.mobile like '%$mobile%' ";
+			}
+		} 
+		
 		if($sex != "")			$where .= " and a.sex = '$sex'";
 		if($sdate != "")		$where .= " and a.regdate >= '$sdate' ";
 		if($edate != "")		$where .= " and a.regdate < DATE_ADD('$edate', INTERVAL 1 DAY) ";

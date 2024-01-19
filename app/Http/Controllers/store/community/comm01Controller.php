@@ -20,7 +20,7 @@ class comm01Controller extends Controller
     public function index($notice_id, Request $request)
     {
         $mutable = Carbon::now();
-        $sdate = $mutable->sub(1, 'week')->format('Y-m-d');
+        $sdate = $mutable->sub(1, 'year')->format('Y-m-d');
 
         $values = [
             'store_types' => SLib::getCodes("STORE_TYPE"),
@@ -81,6 +81,7 @@ class comm01Controller extends Controller
                 s.cnt,
                 s.all_store_yn,
                 group_concat(a.store_nm separator ', ') as stores,
+                if ((select date_add(s.rt, interval 10 day)) < now(), 'false', 'true') as check_new_notice,
                 s.rt,
                 c.code_val as store_type_nm,
                 s.ut,
@@ -171,7 +172,7 @@ class comm01Controller extends Controller
         $image_extionsions = config::get('file.image_extensions');
         
         $this->validate($request, [
-            'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)).strtolower(implode(',', $ppt_extionsions).strtolower(implode(',', $image_extionsions)))
+            'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)). "," .strtolower(implode(',', $ppt_extionsions). "," .strtolower(implode(',', $image_extionsions)))
         ]);
 
         $id =  Auth('head')->user()->id;
@@ -303,7 +304,7 @@ class comm01Controller extends Controller
 				where ns_cd = $ns_cd
 			";
 			$isnull_files = DB::selectOne($sql);
-
+			
 			$then = "";
 			if ($file_url != "") {
 				if ($isnull_files->attach_file_url != null) {
@@ -311,7 +312,10 @@ class comm01Controller extends Controller
 				} else {
 					$then = "'$file_url'";
 				}
+			} else {
+				$then = "attach_file_url";
 			}
+			
             
             $sql = "
                 update notice_store
@@ -324,6 +328,7 @@ class comm01Controller extends Controller
                 where 
                     ns_cd = $ns_cd
             ";
+			
 
             DB::update($sql);
 			
