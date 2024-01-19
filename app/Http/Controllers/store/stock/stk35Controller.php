@@ -242,7 +242,6 @@ class stk35Controller extends Controller
 		$sr = '';
 		$storages = DB::table("storage")
 			->where('use_yn', '=', 'Y')
-			->whereIn('storage_cd', ['S0006', 'C0005', 'A0009'])
 			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
 			->orderByDesc('default_yn')
 			->get();
@@ -997,7 +996,6 @@ class stk35Controller extends Controller
 	{
 		$storages = DB::table("storage")
 			->where('use_yn', '=', 'Y')
-			->whereIn('storage_cd', ['S0006', 'C0005', 'A0009'])
 			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
 			->orderByDesc('default_yn')
 			->get();

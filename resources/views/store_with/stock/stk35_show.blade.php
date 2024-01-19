@@ -108,9 +108,9 @@
 											<th class="required">반품창고</th>
 											<td>
 												<div class="form-inline">
-													<select name='storage_cd' class="form-control form-control-sm w-100">
+													<select id="storage_cd" name="storage_cd" class="form-control form-control-sm w-100">
 														@foreach (@$storages as $storage)
-															<option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @elseif(@$cmd === 'add') selected @endif>{{ $storage->storage_nm }}</option>
+															<option value='{{ $storage->storage_cd }}' @if(@$cmd == 'update' && $sr->storage_cd == $storage->storage_cd) selected @elseif(@$cmd == 'add' && $storage->storage_cd == 'S0006') selected @endif>{{ $storage->storage_nm }}</option>
 														@endforeach
 														<input type="hidden" id="storage" value="{{ @$sr->storage_cd }}" class="form-control form-control-sm w-100" readonly />
 													</select>
