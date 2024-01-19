@@ -15,9 +15,11 @@ use App\Models\Conf;
 class mem22Controller extends Controller
 {
 	public function index() {
-
-	  $values = [];
-	  return view( Config::get('shop.head.view') . '/member/mem22',$values);
+		$last_year = Carbon::now()->sub('1 year')->format('Y-m-d');
+	  	$values = [
+			  'last_year' => $last_year,
+		];
+	  	return view( Config::get('shop.head.view') . '/member/mem22',$values);
 	}
 
 	public function search(Request $request){
@@ -121,20 +123,24 @@ class mem22Controller extends Controller
 				ifnull(a.point_yn, 'N') as point_yn, a.point,
 				a.use_yn, a.cnt, a.comment_cnt, a.image_cnt, a.regi_date,
 				a.goods_no, a.goods_sub as goods_sub, b.style_no, c.estimate_no,
-                                o.ord_no,o.ord_opt_no,
-                                ( select count(*) from goods_estimate where user_id = a.user_id ) as est_user_cnt,
-                                ( select count(*) from goods_estimate where goods_no = a.goods_no ) as est_goods_cnt,
-                                ( select min(no) from goods_estimate where user_id = a.user_id and ord_opt_no = a.ord_opt_no ) as min_no
+				o.ord_no,o.ord_opt_no,
+				( select count(*) from goods_estimate where user_id = a.user_id ) as est_user_cnt,
+				( select count(*) from goods_estimate where goods_no = a.goods_no ) as est_goods_cnt,
+				( select min(no) from goods_estimate where user_id = a.user_id and ord_opt_no = a.ord_opt_no ) as min_no,
+				( select ord_date from order_opt where ord_opt_no = a.ord_opt_no ) as ord_date
 			from (
-				select no from goods_estimate a
-						left outer join goods g on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub
+				select 
+					no 
+				from goods_estimate a
+				left outer join goods g on a.goods_no = g.goods_no and a.goods_sub = g.goods_sub
 				where 1=1 $where
 				order by no desc
-                                limit $startno, $page_size
-			) e inner join goods_estimate a on a.no = e.no
-                                inner join goods b on a.goods_no = b.goods_no and a.goods_sub = b.goods_sub
-				left outer join goods_estimate_best c on a.no = c.estimate_no
-                                left outer join order_opt o on a.ord_opt_no = o.ord_opt_no
+				limit $startno, $page_size
+			) e 
+			inner join goods_estimate a on a.no = e.no
+			inner join goods b on a.goods_no = b.goods_no and a.goods_sub = b.goods_sub
+			left outer join goods_estimate_best c on a.no = c.estimate_no
+			left outer join order_opt o on a.ord_opt_no = o.ord_opt_no
 		";
 		/*
 		echo $sql;

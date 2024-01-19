@@ -158,10 +158,10 @@
                                 <div class="form-inline-inner input_box" style="width:30%;">
                                     <div class="form-group">
 										<select name="limit" class="form-control form-control-sm">
-											<option selected value=30>30</option>
 											<option value=50>50</option>
 											<option value=100>100</option>
 											<option value=150>150</option>
+											<option value=200>200</option>
 										</select>
                                     </div>
                                 </div>
@@ -247,6 +247,7 @@
 </form>
 
 <script>
+	let last_year = '{{@$last_year}}'
 	var columns = [
 		{
 			headerName: '선택',
@@ -302,6 +303,17 @@
 				else
 					return params.value;
 			}
+		},
+		{field: "recent_one_year", headerName: "최근 1년", width: 60, cellStyle:{"text-align" : "center"},
+			cellRenderer: function(params){
+				let ord_date = params.data.ord_date;
+				
+				if( ord_date >= last_year )
+					return "Y";
+				else
+					return "N";
+			}
+			
 		},
 		{field:"goods_title" , headerName:"제목", width:250,
 			cellRenderer: function(params){
