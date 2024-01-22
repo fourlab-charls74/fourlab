@@ -978,23 +978,24 @@
             return false;
         }
 
-        if (!ff.zipcode.value) {
-            alert("우편번호를 입력해주세요.");
-            openFindAddress('zipcode', 'addr1');
-            return false;
-        }
+		// 2024-01-22 양대성 주석처리
+        // if (!ff.zipcode.value) {
+        //     alert("우편번호를 입력해주세요.");
+        //     openFindAddress('zipcode', 'addr1');
+        //     return false;
+        // }
 
-        if (!ff.addr1.value) {
-            alert("주소를 입력해주세요.");
-            openFindAddress('zipcode', 'addr1');
-            return false;
-        }
+        // if (!ff.addr1.value) {
+        //     alert("주소를 입력해주세요.");
+        //     openFindAddress('zipcode', 'addr1');
+        //     return false;
+        // }
 
-        if (!ff.addr2.value) {
-            alert("나머지 주소를 입력해주세요.");
-            ff.addr2.focus();
-            return false;
-        }
+        // if (!ff.addr2.value) {
+        //     alert("나머지 주소를 입력해주세요.");
+        //     ff.addr2.focus();
+        //     return false;
+        // }
 
         return true;
     };
