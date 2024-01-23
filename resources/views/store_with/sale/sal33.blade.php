@@ -176,14 +176,34 @@
 			children: [
 				{headerName: "요청수", field: "in_rt_cnt", type: 'numberType'},
 				{headerName: "미확인수", field: "in_req_cnt", type: 'numberType'},
-				{headerName: "이동중수", field: "in_ing_cnt", type: 'numberType'},
-				{headerName: "완료수", field: "in_fin_cnt", type: 'numberType'},
-				{headerName: "완료율", field: "in_end_ratio", type: 'numberType',
+				{headerName: "미확인율(%)", field: "in_req_ratio", type: 'numberType',
+					cellRenderer: function(params) {
+						if( params.data.in_req_ratio !== '-'){
+							return params.data.in_req_ratio + "%";
+						}else{
+							return params.data.in_req_ratio;
+						}
+					}
+				},
+				{headerName: "접수수", field: "in_ing_cnt", type: 'numberType'},
+				{headerName: "처리수", field: "in_end_cnt", type: 'numberType'},
+				/*{headerName: "완료수", field: "in_fin_cnt", type: 'numberType'},*/
+				{headerName: "처리율", field: "in_end_ratio", type: 'numberType',
 					cellRenderer: function(params) {
 						if(params.data.in_end_ratio !== '-'){
 							return params.data.in_end_ratio + "%";
 						}else{
 							return params.data.in_end_ratio;
+						}
+					}
+				},
+				{headerName: "거부수", field: "in_rej_cnt", type: 'numberType'},
+				{headerName: "거부율(%)", field: "in_rej_ratio", type: 'numberType',
+					cellRenderer: function(params) {
+						if(params.data.in_rej_ratio !== '-'){
+							return params.data.in_rej_ratio + "%";
+						}else{
+							return params.data.in_rej_ratio;
 						}
 					}
 				},

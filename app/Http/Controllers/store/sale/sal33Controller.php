@@ -72,9 +72,15 @@ class sal33Controller extends Controller
 			
 					, sum(in_rt_cnt) as in_rt_cnt
 					, sum(in_req_cnt) as in_req_cnt
-					, (sum(in_rec_cnt) + sum(in_prc_cnt)) as in_ing_cnt
+					, ifnull(round(sum(in_req_cnt)/sum(in_rt_cnt)*100),'-') as in_req_ratio
+					, (sum(in_rt_cnt) - sum(in_req_cnt)) as in_ing_cnt
+					-- , (sum(in_rec_cnt) + sum(in_prc_cnt)) as in_ing_cnt
+					, (sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt)) as in_end_cnt
 					, sum(in_fin_cnt) as in_fin_cnt
-					, ifnull(round(sum(in_fin_cnt)/sum(in_rt_cnt)*100), '-') as in_end_ratio
+					, ifnull(round((sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt))/(sum(in_rt_cnt) - sum(in_req_cnt))*100),'-') as in_end_ratio
+					-- , ifnull(round(sum(in_fin_cnt)/sum(in_rt_cnt)*100), '-') as in_end_ratio
+					, sum(in_rej_cnt) as in_rej_cnt
+					, ifnull(round(sum(in_rej_cnt)/sum(in_rt_cnt)*100),'-') as in_rej_ratio
 					
 					, concat(
 						' ',
@@ -97,6 +103,7 @@ class sal33Controller extends Controller
 					, 0 as in_rec_cnt
 					, 0 as in_prc_cnt
 					, 0 as in_fin_cnt
+					, 0 as in_rej_cnt
 				from product_stock_rotation psr
 				where
 					psr.rt >= '$sdate' and psr.rt <= '$edate'
@@ -117,6 +124,7 @@ class sal33Controller extends Controller
 					, if(psr.state = '20', 1, 0) as in_rec_cnt
 					, if(psr.state = '30', 1, 0) as in_prc_cnt
 					, if(psr.state = '40', 1, 0) as in_fin_cnt
+					, if(psr.state = '-10', 1, 0) as in_rej_cnt
 				from product_stock_rotation psr
 				where
 					psr.rt >= '$sdate' and psr.rt <= '$edate'
