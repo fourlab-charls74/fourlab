@@ -303,7 +303,8 @@ class prd31Controller extends Controller
 		// XML 연동
 		//$url	= sprintf("http://%s/api/sabangnet/order_xml.php?c=get_order&ORD_ST_DATE=%s&ORD_ED_DATE=%s",$cfg_domain_bizest,$s_sdate,$s_edate);
 		$url	= sprintf("https://%s/api/sabangnet/order_xml/get_order?ORD_ST_DATE=%s&ORD_ED_DATE=%s",$cfg_domain_bizest,$s_sdate,$s_edate);
-		$url	= sprintf("http://r.sabangnet.co.kr/RTL_API/xml_order_info.html?xml_url=%s",urlencode($url));
+		//$url	= sprintf("http://r.sabangnet.co.kr/RTL_API/xml_order_info.html?xml_url=%s",urlencode($url));
+		$url	= sprintf("https://sbadmin14.sabangnet.co.kr/RTL_API/xml_order_info.html?xml_url=%s",urlencode($url));
 
 		// 몰별 옵션처리
 		$sql	= " select mall_name, sale_place, sku from shop_sabangnet_mall ";
@@ -1032,7 +1033,8 @@ class prd31Controller extends Controller
 		// XML 연동
 		//$url = sprintf("http://%s/api/sabangnet/delivery_xml.php?c=dlv_view&order_id=%s",$cfg_domain_bizest,$sabangnet_order_id);
 		$url = sprintf("http://%s/api/sabangnet/delivery_xml/dlv_view?order_id=%s",$cfg_domain_bizest,$sabangnet_order_id);
-		$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_order_invoice.html?xml_url=%s",urlencode($url));
+		//$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_order_invoice.html?xml_url=%s",urlencode($url));
+		$url = sprintf("https://sbadmin14.sabangnet.co.kr/RTL_API/xml_order_invoice.html?xml_url=%s",urlencode($url));
 
 		$response = Http::get($url);
 
