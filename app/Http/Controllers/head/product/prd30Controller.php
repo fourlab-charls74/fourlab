@@ -322,8 +322,9 @@ class prd30Controller extends Controller
 
 			//$url = sprintf("http://%s/api/sabangnet/goods_xml.php?c=goods_view&goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$price);
 			$url = sprintf("http://%s/api/sabangnet/goods_xml/good_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$price);
-			$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info.html?xml_url=%s",urlencode($url));
-
+			//$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info.html?xml_url=%s",urlencode($url));
+			$url = sprintf("https://sbadmin14..sabangnet.co.kr/RTL_API/xml_goods_info.html?xml_url=%s",urlencode($url));
+			
 			$response = Http::get($url);
 
 			$result_no	= $response->status();
@@ -502,7 +503,8 @@ class prd30Controller extends Controller
 
 			//$url = sprintf("http://%s/api/sabangnet/goods_xml.php?c=stock_view&goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
 			$url = sprintf("https://%s/api/sabangnet/goods_xml/summary_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
-			$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info2.html?xml_url=%s",urlencode($url));
+			//$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info2.html?xml_url=%s",urlencode($url));
+			$url = sprintf("https://sbadmin14.sabangnet.co.kr/RTL_API/xml_goods_info2.html?xml_url=%s",urlencode($url));
 
 			$response = Http::get($url);
 
