@@ -51,6 +51,9 @@ class sal34Controller extends Controller
 
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
 		//$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
+		
+		//유형별 컬럼
+		$sale_types	= DB::table('sale_type')->select('sale_kind', 'sale_type_nm')->where('use_yn', 'Y')->get();
 
 		$values = [
 			'sdate' 		=> $sdate,
@@ -75,6 +78,7 @@ class sal34Controller extends Controller
 			'store'			=> $store,
 			'prd_cd_range'	=> $prd_cd_range,
 			'prd_cd_range_nm' => $prd_cd_range_nm,
+			'sale_types'	=> $sale_types
 		];
 		return view(Config::get('shop.store.view') . '/sale/sal34', $values);
 	}
@@ -221,10 +225,18 @@ class sal34Controller extends Controller
 			}
 		}
 
+		//유형별 컬럼
+		$sale_types	= DB::table('sale_type')->select('sale_kind', 'sale_type_nm')->where('use_yn', 'Y')->get();
+		$sale_kinds_query = "";
+		foreach ($sale_types as $item) {
+			$id = $item->sale_kind;
+			$sale_kinds_query .= ", sum(if(ifnull(o.sale_kind, '81') = '$id', if(w.ord_state = '30', w.dc_apply_amt, w.dc_apply_amt * -1), 0)) as sale_kind_$id ";
+		}
+		
 		$sql = /** @lang text */
 			"
 			select
-				t.*,
+				t.*, sk.*,
 				(qty_30 + qty_60 + qty_61) as sum_qty,
 				(t.recv_amt_30 + t.recv_amt_60 + t.recv_amt_61) as sum_recv_amt,
 				(t.wonga_30 + t.wonga_60 + t.wonga_61) as sum_wonga,
@@ -232,6 +244,7 @@ class sal34Controller extends Controller
 				(t.coupon_amt_30 + t.coupon_amt_60 + t.coupon_amt_61) as sum_coupon_amt,
 				(t.fee_amt_30 + t.fee_amt_60 + t.fee_amt_61 ) as sum_fee_amt,
 				(t.dc_amt_30 + t.dc_amt_60 + t.dc_amt_61) as sum_dc_amt,
+				(t.dc_amt_30 + t.dc_amt_60 + t.dc_amt_61) as etc_dc_amt,
 				(t.taxation_amt_30 + t.taxation_amt_60 + t.taxation_amt_61) as sum_taxation_amt,
 				(t.tax_amt_30 + t.tax_amt_60 + t.tax_amt_61) as sum_tax_amt
 			from (
@@ -266,7 +279,7 @@ class sal34Controller extends Controller
 					, sum(if(b.ord_state = 61, ifnull(b.wonga, 0), 0))  as wonga_61
 					, sum(if(b.ord_state = 61, ifnull(b.dc_amt, 0), 0)) * -1  as dc_amt_61
 					, sum(if(b.ord_state = 61, ifnull(b.taxation_amt, 0), 0)) * -1 as taxation_amt_61
-					, sum(if(b.ord_state = 61, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_61					
+					, sum(if(b.ord_state = 61, ifnull(b.tax_amt, 0), 0)) * -1 as tax_amt_61		
 				from (
 					select
 						o.store_cd
@@ -303,6 +316,23 @@ class sal34Controller extends Controller
 				left outer join store_channel sc on sc.store_channel_cd = b.store_channel and sc.store_kind_cd = b.store_channel_kind
 				group by b.store_cd
 			) t
+			inner join (
+			
+				select 
+					o.store_cd
+					$sale_kinds_query
+				from order_opt o 
+					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
+					inner join goods g on o.goods_no = g.goods_no
+				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61')
+					and o.ord_state = '30' 
+					and o.store_cd <> '' 
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+					$inner_where2 $inner_where
+					$where
+				group by o.store_cd
+			
+			) sk on t.store_cd = sk.store_cd
 			order by t.store_channel, t.store_kind
 		";
 
@@ -404,6 +434,16 @@ class sal34Controller extends Controller
 				"fee_amt_61"	=> ($fee_amt_61) ? $fee_amt_61:0,
 				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61:0,
 			);
+			
+			$sale_types	= DB::table('sale_type')->select('sale_kind', 'sale_type_nm')->where('use_yn', 'Y')->get();
+			foreach ($sale_types as $item) {
+				$id = $item->sale_kind;
+				$array["sale_kind_" . $id] = $row->{"sale_kind_" . $id};
+				
+				$row->etc_dc_amt	-= $row->{"sale_kind_" . $id};
+			}
+			
+			$array["etc_dc_amt"]	= $row->etc_dc_amt;
 
 			return $array;
 
