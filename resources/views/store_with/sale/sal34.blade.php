@@ -190,12 +190,12 @@
 				}
 			},
 			{headerName: "매장명", field: "store_nm",  width: 130},
-			{ field: "sale_type", headerName: "판매유형",
+			{ field: "sale_type", headerName: "판매유형별 할인",
 				children: [
 						@foreach ($sale_types as $sale_type)
-					{ headerName: '{{ $sale_type->sale_type_nm }}', field: 'sale_kind_{{ $sale_type->sale_kind }}', type: 'numberType' },
+					{ headerName: '{{ $sale_type->sale_type_nm }}', field: 'sale_kind_{{ $sale_type->sale_kind }}', type: 'numberType', aggregation: true },
 						@endforeach
-					{ headerName: '기타유형', field: 'etc_dc_amt', type: 'numberType' },
+					{ headerName: '기타유형', field: 'etc_dc_amt', type: 'numberType', aggregation: true },
 				]
 			},
 			{headerName: '매출액구분',
