@@ -512,6 +512,23 @@
 											</td>
 										</tr>
 										<tr>
+											<th>초도출고 사용유무</th>
+											<td>
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="init_release_yn_Y" name="init_release_yn" value="Y" @if(@$store->init_release_yn != 'N') checked @endif />
+														<label class="custom-control-label" for="init_release_yn_Y">Y</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="init_release_yn_N" name="init_release_yn" value="N" @if(@$store->init_release_yn == 'N') checked @endif />
+														<label class="custom-control-label" for="init_release_yn_N">N</label>
+													</div>
+												</div>
+											</td>
+											<th>&nbsp;</th>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
 											<th>이미지</th>
 											<td colspan="3">
 												<div style="text-align:center;" id="multi_img">

@@ -369,6 +369,7 @@ class std02Controller extends Controller
 				'manage_type'			=> $request->input('manage_type'),
 				'exp_manage_yn'			=> $request->input('exp_manage_yn'),
 				'priority'				=> $request->input('priority'),
+				'init_release_yn'		=> $request->input('init_release_yn'),
 				'competitor_yn'			=> $request->input('competitor_yn'),
 				'pos_yn'				=> $request->input('pos_yn'),
 				'ostore_stock_yn'		=> $request->input('ostore_stock_yn'),

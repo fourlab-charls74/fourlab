@@ -153,7 +153,7 @@ class stk12Controller extends Controller
         $total_store_select_sql = "";
         $total_store = "";
         foreach($store_cds as $store_cd) {
-            $row = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('store_cd', '=', $store_cd)->first();
+            $row = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->where('store_cd', '=', $store_cd)->first();
             if($store_channel == '' or ($store_channel != '' and $row->store_channel == $store_channel)) {
                 array_push($stores, $row);
                 $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
@@ -165,7 +165,7 @@ class stk12Controller extends Controller
         if(count($store_cds) < 1) {
 			//판매채널만 선택되어있고 매장구분이 선택되어있지않을 때
             if (count($store_channel) > 0 && count($store_channel_kind) < 1) {
-                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->whereIn('store_channel', $store_channel)->get();
+                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->whereIn('store_channel', $store_channel)->get();
                 foreach($stores as $s) {
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
@@ -175,7 +175,7 @@ class stk12Controller extends Controller
                 }
 			//판매채널과 매장구분이 선택되어있을 때 
             } elseif (count($store_channel_kind) > 0 && count($store_channel) > 0) {
-                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->whereIn('store_channel', $store_channel)->whereIn('store_channel_kind',$store_channel_kind)->get();
+                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->whereIn('store_channel', $store_channel)->whereIn('store_channel_kind',$store_channel_kind)->get();
                 foreach($stores as $s) {
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
