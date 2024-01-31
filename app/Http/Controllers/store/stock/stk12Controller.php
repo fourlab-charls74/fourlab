@@ -152,6 +152,7 @@ class stk12Controller extends Controller
         $store_select_sql = "";
         $total_store_select_sql = "";
         $total_store = "";
+		
         foreach($store_cds as $store_cd) {
             $row = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->where('store_cd', '=', $store_cd)->first();
             if($store_channel == '' or ($store_channel != '' and $row->store_channel == $store_channel)) {
@@ -162,10 +163,31 @@ class stk12Controller extends Controller
                 $total_store .= "$store_cd"."_qty,";
             }
         }
+		
         if(count($store_cds) < 1) {
 			//판매채널만 선택되어있고 매장구분이 선택되어있지않을 때
             if (count($store_channel) > 0 && count($store_channel_kind) < 1) {
-                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->whereIn('store_channel', $store_channel)->get();
+				
+				$arr_store_channel	= "";
+				foreach ($store_channel as $key => $row) {
+					if($key > 0)	$arr_store_channel	.= ",";
+					$arr_store_channel	.= "'" . $row . "'";
+				}				
+
+				$sql_store	= "
+					select 
+						ifnull(p.code_seq,9999) as seq, s.store_cd, s.store_nm, s.store_channel, s.store_channel_kind 
+					from store s
+					left outer join code p on s.priority = p.code_id and p.code_kind_cd = 'PRIORITY'
+					where 
+						s.use_yn = 'Y'
+						and s.init_release_yn = 'Y'
+						and s.store_channel in ($arr_store_channel)
+					order by seq, store_cd
+				";
+				$stores	= DB::select($sql_store);
+
+				//$stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->whereIn('store_channel', $store_channel)->get();
                 foreach($stores as $s) {
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";
@@ -175,7 +197,34 @@ class stk12Controller extends Controller
                 }
 			//판매채널과 매장구분이 선택되어있을 때 
             } elseif (count($store_channel_kind) > 0 && count($store_channel) > 0) {
-                $stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->whereIn('store_channel', $store_channel)->whereIn('store_channel_kind',$store_channel_kind)->get();
+
+				$arr_store_channel	= "";
+				foreach ($store_channel as $key => $row) {
+					if($key > 0)	$arr_store_channel	.= ",";
+					$arr_store_channel	.= "'" . $row . "'";
+				}
+
+				$arr_store_channel_kind	= "";
+				foreach ($store_channel_kind as $key => $row) {
+					if($key > 0)	$arr_store_channel_kind	.= ",";
+					$arr_store_channel_kind	.= "'" . $row . "'";
+				}
+
+				$sql_store	= "
+					select 
+						ifnull(p.code_seq,9999) as seq, s.store_cd, s.store_nm, s.store_channel, s.store_channel_kind 
+					from store s
+					left outer join code p on s.priority = p.code_id and p.code_kind_cd = 'PRIORITY'
+					where 
+						s.use_yn = 'Y'
+						and s.init_release_yn = 'Y'
+						and s.store_channel in ($arr_store_channel)
+						and s.store_channel_kind in ($arr_store_channel_kind)
+					order by seq, store_cd
+				";
+				$stores	= DB::select($sql_store);//dd($sql_store);
+
+				//$stores = DB::table('store')->select('store_cd', 'store_nm', 'store_channel', 'store_channel_kind')->where('init_release_yn', 'Y')->whereIn('store_channel', $store_channel)->whereIn('store_channel_kind',$store_channel_kind)->get();
                 foreach($stores as $s) {
                     $store_cd = $s->store_cd;
                     $store_select_sql .= "(select qty from product_stock_store where store_cd = '$store_cd' and prd_cd = p.prd_cd) as $store_cd" . "_qty,";

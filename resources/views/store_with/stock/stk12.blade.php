@@ -321,7 +321,7 @@
 		const pApp = new App('', { gridId: "#div-gd" });
 
 		$(document).ready(function() {
-			pApp.ResizeGrid(275);
+			pApp.ResizeGrid(265);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			gx = new HDGrid(gridDiv, columns, {
@@ -340,8 +340,12 @@
 						if (isNaN(e.newValue) == true || e.newValue == "") {
 							alert("숫자만 입력가능합니다.");
 							gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+
 						} else {
 							updatePinnedRow();
+
+							if (isNaN(e.oldValue) == true) e.oldValue = undefined;	// 이전 데이터가 숫자가 아닐때 처리
+
 							if (e.oldValue != undefined) {
 								let oldValue = e.oldValue * 1;
 								let newValue = e.newValue * 1;
