@@ -186,7 +186,7 @@ class mem03Controller extends Controller
 		}
 
 		if($type != ""){
-			if($type == "on")	$where .= " and ( a.store_cd = '' or a.store_cd is null ) ";
+			if($type == "on")	$where .= " and ( a.store_cd = '' or a.store_cd is null ) and ( a.store_nm = '' or a.store_nm is null ) ";
 			if($type == "off")	$where .= " and a.store_cd <> '' ";
 		}
 
@@ -307,7 +307,7 @@ class mem03Controller extends Controller
         }
 
 		if($type != ""){
-			if($type == "on")	$where .= " and ( b.store_cd = '' or b.store_cd is null ) ";
+			if($type == "on")	$where .= " and ( b.store_cd = '' or b.store_cd is null ) and ( b.store_nm = '' or b.store_nm is null ) ";
 			if($type == "off")	$where .= " and b.store_cd <> '' ";
 		}
         
