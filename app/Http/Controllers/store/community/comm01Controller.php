@@ -259,8 +259,8 @@ class comm01Controller extends Controller
         $id =  Auth('head')->user()->id;
         $now = date('YmdHis');
 
-        $subject = $request->input('subject');
-        $content = $request->input('content');
+        $subject = Lib::Rq($request->input('subject'));
+        $content = Lib::Rq($request->input('content'));
         $store_no = explode(',', $request->input('store_no', ''));
         $files = $request->file('files');
         $file_url = null;
