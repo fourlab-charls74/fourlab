@@ -81,8 +81,29 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
                     </div>
+					<div class="row">
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
+								<label for="dlv_kind">회원가입 종류</label>
+								<div class="form-inline form-radio-box">
+									<div class="custom-control custom-radio">
+										<input type="radio" name="type" id="type_nb" class="custom-control-input" checked="" value="">
+										<label class="custom-control-label" for="type_nb">전체</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="type" id="type_n" class="custom-control-input" value="on">
+										<label class="custom-control-label" for="type_n">온라인</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" name="type" id="type_b" class="custom-control-input" value="off">
+										<label class="custom-control-label" for="type_b">오프라인</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						</form>
+					</div>
                     <div class="row">
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">

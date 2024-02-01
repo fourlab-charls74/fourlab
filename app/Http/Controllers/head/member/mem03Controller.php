@@ -163,6 +163,8 @@ class mem03Controller extends Controller
 		$in_group_nos		= Request("in_group_nos");
 		$ex_group_nos		= Request("ex_group_nos");
 
+		$type		= Request("type");
+		
 		$where = "";
 		$having = "";
 
@@ -181,6 +183,11 @@ class mem03Controller extends Controller
 
 		if($in_group_nos != ""){
 			$where .= " and ifnull(b.group_no,0) in ( $in_group_nos ) ";
+		}
+
+		if($type != ""){
+			if($type == "on")	$where .= " and ( a.store_cd = '' or a.store_cd is null ) ";
+			if($type == "off")	$where .= " and a.store_cd <> '' ";
 		}
 
 		if($ex_group_nos != ""){
@@ -232,14 +239,16 @@ class mem03Controller extends Controller
 		$last_edate	    = Request("last_edate");
 		$limit			= Request("limit", 500);
 
-		$cond_amt_from 	    = str_replace(",", "", Request("cond_amt_from"));
-		$cond_amt_to 		= str_replace(",", "", Request("cond_amt_to"));
-		$cond_cnt_from 	    = str_replace(",", "", Request("cond_cnt_from"));
-		$cond_cnt_to 		= str_replace(",", "", Request("cond_cnt_to"));
+		$cond_amt_from 	= str_replace(",", "", Request("cond_amt_from"));
+		$cond_amt_to 	= str_replace(",", "", Request("cond_amt_to"));
+		$cond_cnt_from 	= str_replace(",", "", Request("cond_cnt_from"));
+		$cond_cnt_to 	= str_replace(",", "", Request("cond_cnt_to"));
 
-		$order_sdate		= Request("order_sdate");
-		$order_edate		= Request("order_edate");
+		$order_sdate	= Request("order_sdate");
+		$order_edate	= Request("order_edate");
 
+		$type			= Request("type");
+		
         $page = Request("page", 1);
 
 		if ($page < 1 or $page == "") $page = 1;
@@ -296,6 +305,11 @@ class mem03Controller extends Controller
 		if($cond_cnt_to > 0){
 			$where .= " and c.ord_cnt < '$cond_cnt_to' ";
         }
+
+		if($type != ""){
+			if($type == "on")	$where .= " and ( b.store_cd = '' or b.store_cd is null ) ";
+			if($type == "off")	$where .= " and b.store_cd <> '' ";
+		}
         
         $id = Auth('head')->user()->id;
 		$ip = $_SERVER["REMOTE_ADDR"];
