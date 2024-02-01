@@ -41,10 +41,10 @@ class sal37Controller extends Controller
 		}
 		
 		$where = "";
-		if ($brand == 'F') $where .= " and brand = 'F'";
-		if ($brand == 'W') $where .= " and brand = 'W'";
-		if ($brand == 'P') $where .= " and brand = 'P'";
-		if ($brand == 'TR') $where .= " and brand = 'TR'";
+		if ($brand == 'F') $where .= " and pc.brand = 'F'";
+		if ($brand == 'W') $where .= " and pc.brand = 'W'";
+		if ($brand == 'P') $where .= " and pc.brand = 'P'";
+		if ($brand == 'TR') $where .= " and pc.brand = 'TR'";
 		
 		$page = $request->input('page', 1);
 		if ($page < 1 or $page == "") $page = 1;
@@ -52,13 +52,37 @@ class sal37Controller extends Controller
 		$startno = ($page - 1) * $page_size;
 		$limit = " limit $startno, $page_size ";
 		
+		$total_qty = "";
+		$total_recv_amt = "";
+		foreach ($months as $month) {
+			$total_qty .= ", if(o.ord_state > 30 and o.ord_state_date <= '$month[val]31', sum(o.qty) * -1, sum(o.qty)) as $month[val]_total_qty";
+			$total_recv_amt .= ", if(o.ord_state > 30 and o.ord_state_date <= '$month[val]31', sum(o.recv_amt) * -1, sum(o.recv_amt)) as $month[val]_total_recv_amt";
+		}
+		
+		
 		$sql = "
 			select
-				concat(brand, year, season) as season_brand
-			from product_code
-			where 1=1 $where and year >= 18
-			group by concat(brand, year, season)
-			order by brand, year, season asc
+				concat(pc.brand, pc.year) as brand_year
+				, concat(pc.brand, pc.year, pc.season) as season_brand
+				$total_qty
+				$total_recv_amt
+			from product_code pc
+				inner join (
+					select
+						w.qty
+						, o.recv_amt
+						, o.prd_cd
+						, w.ord_state
+						, w.ord_state_date
+					from order_opt_wonga w
+						inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+					where o.ord_date <= '2023-09-31'
+						and w.ord_state in (30, 60, 61) and o.ord_state = '30'
+						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1) 
+				) o on o.prd_cd = pc.prd_cd
+			where 1=1 $where and pc.year >= 18
+			group by concat(pc.brand, pc.year, pc.season)
+			order by pc.brand, pc.year, pc.season asc
 		";
 		
 		$rows = DB::select($sql);

@@ -84,17 +84,32 @@
 	<!-- DataTales Example -->
 	<div id="filter-area" class="card shadow-none mb-0 search_cum_form ty2 last-card">
 		<div class="card-body shadow">
+			<div class="card-title">
+				<div class="filter_wrap">
+					<div>
+						<div class="custom-control custom-checkbox form-check-box pr-2" style="float:right;">
+							<input type="checkbox" class="custom-control-input" name="grid_expand" id="grid_expand" onchange="return setAllRowGroupExpanded(this.checked);" checked>
+							<label class="custom-control-label font-weight-normal" for="grid_expand">항목펼쳐보기</label>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="table-responsive">
 				<div id="div-gd" style="height:calc(100vh - 370px);width:100%;" class="ag-theme-balham"></div>
 			</div>
 		</div>
 	</div>
+	<style>
+		.ag-row-level-1 {background-color: #f2f2f2 !important;}
+	</style>
 	<script language="javascript">
 
 		const pinnedRowData = [{ rank_idx : "랭크" }];
 
 		let columns = [
-			{field : "season_brand", headerName: "시즌별", pinned: "left", width: 100, cellStyle: {"text-align": "center"},
+			{field: "brand_year" , headerName: "브랜드/연도", rowGroup: true, hide: true},
+			{headerName: "브랜드/연도", showRowGroup: true, pinned: "left", cellRenderer: 'agGroupCellRenderer', width: 100, cellStyle: {"text-align": "center"}},
+			{field : "season_brand", headerName: "시즌별 피엘라벤", pinned: "left", width: 100, cellStyle: {"text-align": "center"},
 				cellRenderer: function(params) {
 					if (params.node.rowPinned === 'top') {
 						return "total";
@@ -121,6 +136,11 @@
 				getRowStyle: (params) => {
 					if (params.node.rowPinned)  return {'font-weight': 'bold', 'background': '#eee !important', 'border': 'none'};
 				},
+				rollup: true,
+				groupSuppressAutoColumn: true,
+				suppressAggFuncInHeader: true,
+				enableRangeSelection: true,
+				animateRows: true,
 			});
 
 			Search();
@@ -128,9 +148,8 @@
 		});
 
 		function setColumn(months) {
-			console.log(months);
 			if(!months) return;
-			columns.splice(1);
+			columns.splice(3);
 
 			for(let i = 0; i < months.length; i++) {
 				let val = months[i].val;
@@ -152,6 +171,7 @@
 				});
 			}
 			columns.push({ width: "auto" });
+			gx.gridOptions.api.setColumnDefs([]);
 			gx.gridOptions.api.setColumnDefs(columns);
 		}
 
@@ -160,6 +180,7 @@
 			let data = $('form[name="search"]').serialize();
 			gx.Request('/store/sale/sal37/search', data, 1, function(e) {
 				setColumn(e.head.months);
+				setAllRowGroupExpanded($("#grid_expand").is(":checked"));
 			});
 		}
 		
