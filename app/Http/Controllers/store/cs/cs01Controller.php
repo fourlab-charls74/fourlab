@@ -919,25 +919,25 @@ class cs01Controller extends Controller {
 				, s.total_cost * 1.1 as total_cost_novat
 				, date_format(s.stock_date, '%Y-%m-%d') as stock_date
 			    , date_format((select stock_date from product_stock_order_product where prd_cd = s.prd_cd order by stock_date desc limit 1), '%Y-%m-%d') as recent_stock_date
-				-- , (
-			    -- 	select (count(ss.stock_prd_no) + 1) as stock_cnt
-			    -- 	from product_stock_order_product ss
-			    -- 		inner join product_code pp on pp.prd_cd = ss.prd_cd
-			    -- 	where pp.prd_cd_p = pc.prd_cd_p and ss.rt < s.rt
-			  	-- ) as stock_cnt
-			    , (
-					select
-						(count(gr_ss.stock_no) + 1) as stock_cnt
-					from (
-						select 
-							ss.stock_no
-						from product_stock_order_product ss
-						inner join product_code pp on pp.prd_cd = ss.prd_cd
-						where 
-						pp.prd_cd_p = 'F241WJK01CT' and ss.rt < s.rt
-						group by ss.stock_no
-					) gr_ss
-			    ) as stock_cnt
+				 , (
+			     	select (count(ss.stock_prd_no) + 1) as stock_cnt
+			     	from product_stock_order_product ss
+			     		inner join product_code pp on pp.prd_cd = ss.prd_cd
+			     	where pp.prd_cd_p = pc.prd_cd_p and ss.rt < s.rt
+			  	) as stock_cnt
+			    -- , (
+				-- 	select
+				-- 		(count(gr_ss.stock_no) + 1) as stock_cnt
+				-- 	from (
+				-- 		select 
+				--  			ss.stock_no
+				-- 		from product_stock_order_product ss
+				-- 		inner join product_code pp on pp.prd_cd = ss.prd_cd
+				-- 		where 
+				-- 		pp.prd_cd_p = pc.prd_cd_p and ss.rt < s.rt
+				-- 		group by ss.stock_no
+				-- 	) gr_ss
+			    -- ) as stock_cnt
 				, ifnull((
 					select stock_prd_no 
 					from product_stock_order_product 
@@ -955,7 +955,7 @@ class cs01Controller extends Controller {
 			where stock_no = '$stock_no'
 			order by stock_prd_no asc
 		";
-		$rows = DB::select($sql);dd($sql);
+		$rows = DB::select($sql);
 		return response()->json(['rows' => $rows], 200);
 	}
 	
