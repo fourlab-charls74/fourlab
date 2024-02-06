@@ -919,12 +919,13 @@ class cs01Controller extends Controller {
 				, s.total_cost * 1.1 as total_cost_novat
 				, date_format(s.stock_date, '%Y-%m-%d') as stock_date
 			    , date_format((select stock_date from product_stock_order_product where prd_cd = s.prd_cd order by stock_date desc limit 1), '%Y-%m-%d') as recent_stock_date
-				 , (
-			     	select (count(ss.stock_prd_no) + 1) as stock_cnt
-			     	from product_stock_order_product ss
-			     		inner join product_code pp on pp.prd_cd = ss.prd_cd
-			     	where pp.prd_cd_p = pc.prd_cd_p and ss.rt < s.rt
-			  	) as stock_cnt
+			    , '' as stock_cnt
+				-- , (
+			    --  	select (count(ss.stock_prd_no) + 1) as stock_cnt
+			    --  	from product_stock_order_product ss
+			    --  		inner join product_code pp on pp.prd_cd = ss.prd_cd
+			    --  	where pp.prd_cd_p = pc.prd_cd_p and ss.rt < s.rt
+			  	-- ) as stock_cnt
 			    -- , (
 				-- 	select
 				-- 		(count(gr_ss.stock_no) + 1) as stock_cnt
@@ -945,6 +946,7 @@ class cs01Controller extends Controller {
 					order by stock_no desc limit 1
 				  ), 0) = s.stock_prd_no as is_last
 				, s.comment
+				, s.rt
 			from product_stock_order_product s
 				inner join product_code pc on pc.prd_cd = s.prd_cd
 				inner join product p on p.prd_cd = s.prd_cd
@@ -956,6 +958,30 @@ class cs01Controller extends Controller {
 			order by stock_prd_no asc
 		";
 		$rows = DB::select($sql);
+
+		foreach ($rows as $row) {
+			$stock_prd_cd_p	= $row->prd_cd_p;
+			$stock_rt		= $row->rt;
+			
+			$sql_stock_cnt	= "
+				select
+					(count(gr_ss.stock_no) + 1) as stock_cnt
+				from (
+					select 
+						ss.stock_no
+					from product_stock_order_product ss
+					inner join product_code pp on pp.prd_cd = ss.prd_cd
+					where 
+						pp.prd_cd_p = :prd_cd_p
+						and ss.rt <= :rt
+						group by ss.stock_no
+				) gr_ss
+			";
+			$stock_cnt	= DB::selectOne($sql_stock_cnt,['prd_cd_p' => $stock_prd_cd_p, 'rt' => $stock_rt])->stock_cnt;
+			
+			$row->stock_cnt	= $stock_cnt;
+		}
+
 		return response()->json(['rows' => $rows], 200);
 	}
 	
