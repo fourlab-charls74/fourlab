@@ -492,7 +492,19 @@ class prd06Controller extends Controller
 				
 				if( $row->year == '24' ){
 					if( $row->prd_cd_p != 'F241MJK01CT' ){
-						continue;
+						$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
+						$row_chk	= DB::select($sql_24chk);
+
+						$chk24	= 0;
+						foreach ($row_chk as $row_24){
+							if($row_24->prd_cd_p != ''){
+								if( $row_24->prd_cd_p == $row->prd_cd_p )	$chk24 += 1;
+							}else{
+								if( $row_24->prd_cd == $row->prd_cd )		$chk24 += 1;
+							}
+						}
+						
+						if($chk24 == 0) continue;
 					}
 				}
 				
@@ -566,7 +578,19 @@ class prd06Controller extends Controller
 
 						if( $row->year == '24' ){
 							if( $row->prd_cd_p != 'F241MJK01CT' ){
-								continue;
+								$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
+								$row_chk	= DB::select($sql_24chk);
+
+								$chk24	= 0;
+								foreach ($row_chk as $row_24){
+									if($row_24->prd_cd_p != ''){
+										if( $row_24->prd_cd_p == $row->prd_cd_p )	$chk24 += 1;
+									}else{
+										if( $row_24->prd_cd == $row->prd_cd )		$chk24 += 1;
+									}
+								}
+
+								if($chk24 == 0) continue;
 							}
 						}
 
@@ -607,7 +631,19 @@ class prd06Controller extends Controller
 
 						if( $row->year == '24' ){
 							if( $row->prd_cd_p != 'F241MJK01CT' ){
-								continue;
+								$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
+								$row_chk	= DB::select($sql_24chk);
+
+								$chk24	= 0;
+								foreach ($row_chk as $row_24){
+									if($row_24->prd_cd_p != ''){
+										if( $row_24->prd_cd_p == $row->prd_cd_p )	$chk24 += 1;
+									}else{
+										if( $row_24->prd_cd == $row->prd_cd )		$chk24 += 1;
+									}
+								}
+
+								if($chk24 == 0) continue;
 							}
 						}
 
