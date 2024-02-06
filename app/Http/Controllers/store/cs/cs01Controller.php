@@ -965,7 +965,7 @@ class cs01Controller extends Controller {
 			
 			$sql_stock_cnt	= "
 				select
-					(count(gr_ss.stock_no) + 1) as stock_cnt
+					(count(gr_ss.stock_no)) as stock_cnt
 				from (
 					select 
 						ss.stock_no
