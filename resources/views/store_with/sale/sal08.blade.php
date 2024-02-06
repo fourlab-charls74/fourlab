@@ -224,7 +224,7 @@
 		{field: "sale_amt", headerName: "판매금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "recv_amt", headerName: "실입금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "recv_amt_novat", headerName: "실결제금액(VAT별도)", type: 'currencyMinusColorType', aggFunc: sumValuesFunc},
-		{field: "wonga_amt", headerName: "원가금액(VAT별도)", width: 120, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
+		{field: "wonga_amt", headerName: "원가금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_amt", headerName: "이익금액", width: 100, type: "currencyMinusColorType", aggFunc: sumValuesFunc},
 		{field: "margin_rate", headerName: "이익율(%)", width: 70, type: "currencyType",
 			aggFunc: (params) => {
