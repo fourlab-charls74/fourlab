@@ -25,8 +25,8 @@
                 <div class="card-header d-flex justify-content-between">
                     <h4>기본 정보</h4>
                     <div>
-                        @if (@$super_admin == 'true' || (@$state > 0 && @$state < 40))
-                            @if(Auth('head')->user()->logistics_group_yn == 'Y')
+                        @if ((@$state > 0 && @$state < 40))
+                            @if(@$super_admin != 'true' && Auth('head')->user()->logistics_group_yn == 'Y')
                                 @if(@$state != 30)
                                     <a href="javascript:void(0);" onclick="cmder('{{ @$cmd }}')" class="btn btn-sm btn-primary shadow-sm"><i class="bx bx-save mr-1"></i>저장</a>
                                 @endif
