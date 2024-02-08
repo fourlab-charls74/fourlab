@@ -1011,40 +1011,53 @@ class cs01Controller extends Controller {
 
 	/**
 	 * 상품 입고
-	 * $type: 추가입고(A) / 기본(E) 
+	 * $type: 추가입고(A) / 기본(E)
+	 * $values: 입고정보
+	 * $products: 상품정보 []
+	 * $id: 관리자 아이디
+	 * $cur_state: 현재상태
+	 * 
+	 * description
+	 * - 추가입고는 현재상태가 '입고완료(30)' 일 때만 가능합니다.
+	 * - 추가입고 여부는 입고번호 단위로 판단합니다. (상품단위 X)
+	 * - 입고상품 삭제는 현재상태가 '입고처리중(20)' 이하일 때만 가능합니다.
+	 * - 슈퍼권한 관리자는 입고완료 처리 이후에 수량(재고) 변경 가능합니다.
 	 */
 	public function saveStockOrderProduct($type, $values, $products, $id, $cur_state = 0)
 	{
 		try {
 			$stock_no = $values['stock_no'];
 			$invoice_no = $values['invoice_no'] ?? '';
-			$state = $values['state'] ?? 10;
+			$state = $values['state'] ?? 10; // 변경할 입고상태
 			$loc = $values['loc'] ?? '';
 
-			// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
 			$stk_ord_products = [];
 			if ($state == 40 && $cur_state == $state && $id == SUPER_ADMIN_ID) {
+				// 슈퍼권한 관리자가 재원가확정할 때, 기존 상품데이터 백업
+				// * 재원가확정 기능을 제거할 때 아래 코드를 주석처리해 주세요.
 				$stk_ord_products = DB::table('product_stock_order_product')->select('prd_cd', 'exp_qty', 'qty', 'cost', 'prd_tariff_rate')->where('stock_no', $stock_no)->get()->toArray();
 			}
 
 			$ori_products = [];
-			if ($type != "A") { // 추가입고가 아닐때
+			// 추가입고가 아닐 때 ($type === 'E')
+			if ($type != "A") {
+				// 기존 상품데이터 백업
 				$ori_products = DB::table('product_stock_order_product')->where('stock_no', $stock_no)->get()->toArray();
-				$sql = "
-					delete from product_stock_order_product
-					where stock_no = :stock_no
-				";
-				DB::delete($sql, ['stock_no' => $stock_no]);
+				// 기존 상품데이터 삭제
+				DB::table('product_stock_order_product')->where('stock_no', $stock_no)->delete();
 			}
 			
 			if (count($products) > 0) {
 				$id = Auth::guard('head')->user()->id;
 
-				for ($i=0; $i<count($products); $i++) {
+				for ($i = 0; $i < count($products); $i++) {
 					$row = $products[$i];
 					$stock_prd_no = $row['stock_prd_no'] ?? 0;
 
 					if ($type != "A" || $stock_prd_no <= 0) {
+						// 추가입고가 아닌 경우 (저장버튼으로 입고등록/입고수정 시)
+						// 또는 추가입고의 상품데이터 중 새로 추가된 상품인 경우 (추가입고 시, 입고상품번호가 없는 새로 추가된 상품)
+
 						$item = $row['item'] ?? '';
 						$brand = $row['brand'] ?? '';
 						$prd_cd = $row['prd_cd'] ?? '';
@@ -1087,29 +1100,44 @@ class cs01Controller extends Controller {
 							'rt' => now(),
 							'ut' => now(),
 						];
+						// 상품데이터 새로 등록
 						DB::table('product_stock_order_product')->insert($params);
 
 						if (($state == 30 && ($cur_state < $state || $type == 'A')) || ($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID)) {
-							// 최초 입고완료인 경우
-							$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+							// 입고완료 이전상태 > 입고완료 상태로 변경 하는 경우
+							// 또는 입고완료 상태에서 추가입고하는 경우 (새로 추가된 상품만 해당)
+							// 또는 슈퍼권한 관리자가 원가확정 상태에서 추가입고하는 경우 (새로 추가된 상품만 해당)
 
-							// 최초 원가확정인 경우 (슈퍼권한)
+							// * 슈퍼권한 관리자의 원가확정 상태에서의 추가입고 처리 기능을 제거할 경우, 아래 if문 코드를 주석해제해 주세요.
+							// if (!($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID)) {
+							$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+							// }
+
+							// * 슈퍼권한 관리자의 원가확정 상태에서의 추가입고 처리 기능을 제거할 경우, 아래 if문 코드를 모두 주석처리해 주세요.
 							if ($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID) {
+								// 슈퍼권한 관리자가 원가확정 상태에서 추가입고 시 (새로 추가된 상품만 해당)
 								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
 							}
 						} else if ($state >= 30 && $state <= 40) {
-							// 원가확정 이후 재원가확정 단계를 위한 기존데이터 백업
+							// 입고완료 상태에서 입고정보 및 상품정보만 변경하는 경우
+							// 또는 입고완료 상태에서 원가확정 상태로 변경하는 경우
+							// 또는 원가확정 상태에서 재원가확정 처리하는 경우
+
 							$ori_product_stock = [];
 							if ($state == 40 && $cur_state == $state && $id == SUPER_ADMIN_ID) {
+								// 슈퍼권한 관리자가 재원가확정 처리할 때, 기존 상품데이터 백업
+								// * 재원가확정 기능을 제거할 때 아래 코드를 주석처리해 주세요.
 								$ori_product_stock = DB::table('product_stock')->select('wonga', 'in_qty')->where('prd_cd', $prd_cd)->first();
 							}
 
-							// product_stock_hst 에서 단가 수정
-							DB::table('product_stock_hst')
-								->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
-								->update([ 'wonga' => $cost ]);
+							// 단가 수정 처리 (입고완료 처리 시 모두 가능, 원가확정 처리 시 슈퍼권한 관리자만 가능)
+							if ($state == 30 || $id == SUPER_ADMIN_ID) {
+								DB::table('product_stock_hst')
+									->where('prd_cd', $prd_cd)->where('type', '1')->where('invoice_no', $invoice_no)
+									->update([ 'wonga' => $cost ]);
+							}
 
-							// 입고완료 이후 수량 변경 시 재고 업데이트 (슈퍼권한)
+							// 수량(재고) 수정 (입고완료 이후 슈퍼권한 관리자만 가능)
 							if ($id == SUPER_ADMIN_ID) {
 								$plus_qty = array_reduce($ori_products, function($a, $c) use ($prd_cd, $qty) { 
 									if ($c->prd_cd == $prd_cd && $c->qty != $qty) return array_merge($a, [$c]); 
@@ -1123,10 +1151,11 @@ class cs01Controller extends Controller {
 							}
 
 							if ($state == 40 && $cur_state < $state) {
-								// 최초 원가확정인 경우
+								// 입고완료 상태에서 원가확정 상태로 변경하는 경우
 								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
 							} else if ($state == 40 && $id == SUPER_ADMIN_ID) {
-								// 재원가확정
+								// 원가확정 상태에서 재원가확정 처리하는 경우
+								// * 재원가확정 기능을 제거할 때 아래 코드를 주석처리해 주세요. (updateConfirmedWonga 실행부분까지 주석처리)
 								$stk_ord_product = array_reduce($stk_ord_products, function($a, $c) use ($prd_cd) { 
 									if ($c->prd_cd === $prd_cd) return array_merge($a, [$c]); 
 									else return $a;
@@ -1136,7 +1165,10 @@ class cs01Controller extends Controller {
 							}
 						}
 					} else {
-						// 추가입고 and 기존등록상품일때
+						// 입고완료 상태에서 추가입고 진행 시, 상품데이터 중 기존상품번호가 있는 경우
+						// (추가된 상품이 아닌, 이전에 등록된 기존상품만 해당)
+						// * 해당 상품은 delete 처리되지 않은 상태입니다.
+
 						$unit_cost = str_replace(",","",str_replace("\\","",$row['unit_cost'])); // 단가
 						$prd_tariff_rate = round($row['prd_tariff_rate'] ?? 0, 2); // 상품별 관세율
 						$cost = str_replace(",","",$row['cost']);
@@ -1154,7 +1186,7 @@ class cs01Controller extends Controller {
 						];
 						DB::table('product_stock_order_product')->where('stock_prd_no', $stock_prd_no)->update($params);
 
-						// product_stock_hst 에서 단가 수정
+						// 단가 수정
 						$prd_cd = $row['prd_cd'] ?? '';
 						DB::table('product_stock_hst')
 							->where('prd_cd', $prd_cd)->where('invoice_no', $invoice_no)
