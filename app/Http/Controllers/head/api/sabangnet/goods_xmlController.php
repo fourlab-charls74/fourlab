@@ -140,7 +140,7 @@ class goods_xmlController extends Controller
 				(
 					select
 						if( is_option_use = 'Y',
-							group_concat(concat(SUBSTRING_INDEX(goods_opt, '^', 1),'^^', if(is_unlimited = 'Y', 900, good_qty),'^^',opt_price) separator ','),
+							group_concat(concat(SUBSTRING_INDEX(goods_opt, '^', 1),'^^', if(is_unlimited = 'Y', 900, ifnull(good_qty,0)),'^^',ifnull(opt_price,0)) separator ','),
 							concat(goods_opt,'^^', if(is_unlimited = 'Y', 900, good_qty))
 						)
 					from goods_summary
