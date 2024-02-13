@@ -135,7 +135,7 @@ class stk12Controller extends Controller
         $ord_field = $r['ord_field'] ?? "g.goods_no";
         if($ord_field == 'goods_no') $ord_field = 'g.' . $ord_field;
         else $ord_field = 'psr.' . $ord_field;
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+        $orderby = sprintf("order by %s %s, pc.color, ob.seq", $ord_field, $ord);
 
         // pagination
         $page = $r['page'] ?? 1;
@@ -265,6 +265,7 @@ class stk12Controller extends Controller
                 inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                 inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                 left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
+            	left outer join product_orderby ob on pc.size = ob.size_cd
             where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
             $orderby
             $limit
@@ -297,7 +298,7 @@ class stk12Controller extends Controller
                         inner join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
                         inner join code stat on stat.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = stat.code_id
                     where p.storage_cd = (select storage_cd from storage where default_yn = 'Y') $where
-                    $orderby
+                    -- $orderby
                 ) a
             ";
             $row = DB::select($sql);
