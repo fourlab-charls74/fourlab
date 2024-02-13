@@ -1109,14 +1109,14 @@ class cs01Controller extends Controller {
 							// 또는 슈퍼권한 관리자가 원가확정 상태에서 추가입고하는 경우 (새로 추가된 상품만 해당)
 
 							// * 슈퍼권한 관리자의 원가확정 상태에서의 추가입고 처리 기능을 제거할 경우, 아래 if문 코드를 주석해제해 주세요.
-							// if (!($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID)) {
-							$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
-							// }
+							if (!($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID)) {
+								$this->stockIn($goods_no, $prd_cd, $opt, $qty, $stock_no, $invoice_no, $cost, $loc);
+							}
 
 							// * 슈퍼권한 관리자의 원가확정 상태에서의 추가입고 처리 기능을 제거할 경우, 아래 if문 코드를 모두 주석처리해 주세요.
 							if ($state == 40 && $type === 'A' && $id === SUPER_ADMIN_ID) {
 								// 슈퍼권한 관리자가 원가확정 상태에서 추가입고 시 (새로 추가된 상품만 해당)
-								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
+								//$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
 							}
 						} else if ($state >= 30 && $state <= 40) {
 							// 입고완료 상태에서 입고정보 및 상품정보만 변경하는 경우
@@ -1156,12 +1156,12 @@ class cs01Controller extends Controller {
 							} else if ($state == 40 && $id == SUPER_ADMIN_ID) {
 								// 원가확정 상태에서 재원가확정 처리하는 경우
 								// * 재원가확정 기능을 제거할 때 아래 코드를 주석처리해 주세요. (updateConfirmedWonga 실행부분까지 주석처리)
-								$stk_ord_product = array_reduce($stk_ord_products, function($a, $c) use ($prd_cd) { 
-									if ($c->prd_cd === $prd_cd) return array_merge($a, [$c]); 
-									else return $a;
-								}, []);
-								if (count($stk_ord_product) > 0) $stk_ord_product = $stk_ord_product[0];
-								$this->updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product);
+								//$stk_ord_product = array_reduce($stk_ord_products, function($a, $c) use ($prd_cd) { 
+								//	if ($c->prd_cd === $prd_cd) return array_merge($a, [$c]); 
+								//	else return $a;
+								//}, []);
+								//if (count($stk_ord_product) > 0) $stk_ord_product = $stk_ord_product[0];
+								//$this->updateConfirmedWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $prd_tariff_rate, $invoice_no, $ori_product_stock, $stk_ord_product);
 							}
 						}
 					} else {
@@ -1193,6 +1193,14 @@ class cs01Controller extends Controller {
 							->update([ 'wonga' => $cost ]);
 					}
 				}
+
+				//원가확정시 평균원가 세팅
+				if ($state >= 30 && $state <= 40) {
+					if ($state == 40 && $cur_state < $state) {
+						$this->confirmWongaMst($invoice_no);
+					}
+				}
+				
 			}
 			return ['code' => 1, 'msg' => '입고상품이 정상적으로 추가되었습니다.'];
 		} catch (Exception $e) {
@@ -1236,6 +1244,123 @@ class cs01Controller extends Controller {
 		// 	where goods_no = '${goods_no}'
 		// ";
 		// DB::update($sql);
+	}
+
+	// 품번별 원가확정
+	private function confirmWongaMst($invoice_no)
+	{
+		try {
+	
+			$sql = "
+				select 
+					distinct pc.prd_cd_p
+				from product_stock_order_product psop 
+				inner join product_code pc on psop.prd_cd = pc.prd_cd
+				where 
+					psop.invoice_no = :invoice_no 
+					and psop.state = '40'
+			";
+			$rows	= DB::select($sql, ['invoice_no' => $invoice_no]);
+	
+			foreach ($rows as $row){
+	
+				$prd_cd_p	= $row->prd_cd_p;
+				$tot_qty	= 0;
+				$tot_cur_qty	= 0;
+				$total_old_wonga	= 0;
+				$total_cur_wonga	= 0;
+	
+				$sql_stock	= "
+					select
+						ps.prd_cd, ps.wonga, ps.in_qty
+					from product_stock ps
+					inner join product_code pc on ps.prd_cd = pc.prd_cd
+					where
+						pc.prd_cd_p	= :prd_cd_p
+				";
+				$rows_stock	= DB::select($sql_stock, ['prd_cd_p' => $prd_cd_p]);
+	
+				foreach ($rows_stock as $row_stock){
+	
+					$in_qty	= $row_stock->in_qty;
+					$wonga	= $row_stock->wonga;
+					$cur_wonga	= 0;
+					$cur_qty	= 0;
+					$tot_qty	+= $in_qty;
+	
+					$sql_order	= " select qty, cost from product_stock_order_product where state = '40' and invoice_no = :invoice_no and prd_cd = :prd_cd limit 1 ";
+					$row_order	= DB::selectOne($sql_order, ['invoice_no' => $invoice_no, 'prd_cd' => $row_stock->prd_cd]);
+	
+					if ($row_order != null){
+						$cur_qty	= $row_order->qty;
+						$cur_wonga	= $row_order->cost;
+						$tot_cur_qty	+= $cur_qty;
+					}
+	
+					$total_old_wonga	+= ($in_qty - $cur_qty) * $wonga;
+					$total_cur_wonga	+= $cur_qty * $cur_wonga;
+				}
+	
+				$total_wonga	= $total_old_wonga + $total_cur_wonga;
+				$avg_wonga		= round($total_wonga / ($tot_qty));
+	
+				//로그 데이터 등록
+				DB::table('product_stock_order_wonga')->insert([
+					'invoice_no'	=> $invoice_no,
+					'prd_cd_p'		=> $prd_cd_p,
+					'qty'			=> $tot_qty,
+					'wonga'			=> $total_wonga,
+					'in_qty'		=> $tot_cur_qty,
+					'in_wonga'		=> $total_cur_wonga,
+					'avg_wonga'		=> $avg_wonga,
+					'rt'     		=> now(),
+					'ut'     		=> now()
+				]);
+	
+				// 1. product_stock update
+				$sql_ps	= " update product_stock set wonga = '$avg_wonga', qty_wonga = qty * $avg_wonga, ut = now() where prd_cd like '$prd_cd_p%' ";
+				DB::update($sql_ps);
+	
+				// 2. goods update
+				$sql_goods = "
+					update goods g
+					inner join product_code pc on pc.goods_no = g.goods_no and pc.goods_no <> '0'
+						set g.wonga	= :avg_wonga
+					where
+						pc.prd_cd_p = :prd_cd_p
+				";
+				DB::update($sql_goods,['avg_wonga' => $avg_wonga, 'prd_cd_p' => $prd_cd_p]);
+	
+				// 3. product update
+				$sql_product	= " update product set wonga = '$avg_wonga' where prd_cd like '$prd_cd_p%' ";
+				DB::update($sql_product);
+	
+				// 4. 모든 판매된 주문건(및 hst)의 원가 값 업데이트
+				$sql_o = "
+						update order_opt set
+							wonga = '$avg_wonga'
+						where prd_cd like '$prd_cd_p%'
+					";
+				DB::update($sql_o);
+	
+				$orders = DB::select("select ord_opt_no from order_opt where prd_cd like '$prd_cd_p%'");
+				foreach ($orders as $ord) {
+					$sql_ow = "
+							update order_opt_wonga set
+								wonga = '$avg_wonga'
+							where ord_opt_no = '$ord->ord_opt_no'
+						";
+					DB::update($sql_ow);
+	
+					// product_stock_hst 에서 단가 수정
+					$sql_hst	= " update product_stock_hst set wonga = '$avg_wonga' where ord_opt_no = '$ord->ord_opt_no' and prd_cd like '$prd_cd_p%' ";
+					DB::update($sql_hst);
+				}
+	
+			}
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
 	}
 
 	/**
