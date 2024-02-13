@@ -32,7 +32,7 @@ class goods_xmlController extends Controller
 		$cfg_api_sabangnet_key	= $conf->getConfigValue("api","sabangnet_key");
 
 		$cfg_domain	= $conf->getConfigValue("shop","domain");
-		$host	= (strpos($cfg_domain, 'http://') !== false) ? $cfg_domain : sprintf("http://%s", $cfg_domain);
+		$host	= (strpos($cfg_domain, 'https://') !== false) ? $cfg_domain : sprintf("https://%s", $cfg_domain);
 
 		$goods_no	= $request->input("goods_no");
 		$goods_sub	= $request->input("goods_sub",0);
