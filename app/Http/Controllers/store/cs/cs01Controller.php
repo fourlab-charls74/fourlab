@@ -1152,7 +1152,7 @@ class cs01Controller extends Controller {
 
 							if ($state == 40 && $cur_state < $state) {
 								// 입고완료 상태에서 원가확정 상태로 변경하는 경우
-								$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
+								//$this->confirmWonga($stock_no, $prd_cd, $goods_no, $exp_qty, $cost, $invoice_no);
 							} else if ($state == 40 && $id == SUPER_ADMIN_ID) {
 								// 원가확정 상태에서 재원가확정 처리하는 경우
 								// * 재원가확정 기능을 제거할 때 아래 코드를 주석처리해 주세요. (updateConfirmedWonga 실행부분까지 주석처리)
