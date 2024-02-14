@@ -133,7 +133,7 @@
 												<div class="form-inline inline_btn_box">
 													<input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
 												</div>
-												<span style="color:red">※이미지(jpg, png), 엑셀(excel), ppt(pptx)만 가능합니다.</span>
+												<span style="color:red">※이미지(jpg, png), 엑셀(excel), ppt(pptx), PDF만 가능합니다.</span>
 											</td>
 										</tr>
                                         @endif
@@ -220,11 +220,15 @@
             'jpeg',
             'png'
         ];
+		
+		const pdfExtension = [
+			'pdf'
+		];
 
         const extension = String(filename).split('.')[1];
         let extensionStr = String(extension).toLowerCase();
 
-        if(excelExtension.indexOf(extensionStr) >= 0 || pptExtension.indexOf(extensionStr) >= 0 || imageExtension.indexOf(extensionStr) >= 0) {
+        if(excelExtension.indexOf(extensionStr) >= 0 || pptExtension.indexOf(extensionStr) >= 0 || imageExtension.indexOf(extensionStr) >= 0 || pdfExtension.indexOf(extensionStr) >= 0) {
             return true;
         }
 

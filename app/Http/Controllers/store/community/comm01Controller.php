@@ -152,8 +152,6 @@ class comm01Controller extends Controller
 
         $storeCodes = DB::select($sql);
 		
-//		dd($storeCodes);
-
         $values = [
             'no' => $no,
             'user' => $user,
@@ -170,9 +168,10 @@ class comm01Controller extends Controller
         $excel_extensions = config::get('file.excel_extensions');
         $ppt_extionsions = config::get('file.ppt_extensions');
         $image_extionsions = config::get('file.image_extensions');
+        $pdf_extionsions = config::get('file.pdf_extensions');
         
         $this->validate($request, [
-            'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)). "," .strtolower(implode(',', $ppt_extionsions). "," .strtolower(implode(',', $image_extionsions)))
+            'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)). "," .strtolower(implode(',', $ppt_extionsions). "," .strtolower(implode(',', $image_extionsions). "," .strtolower(implode(',', $pdf_extionsions))))
         ]);
 
         $id =  Auth('head')->user()->id;
