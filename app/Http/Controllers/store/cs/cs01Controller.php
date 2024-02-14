@@ -1254,6 +1254,8 @@ class cs01Controller extends Controller {
 			$sql = "
 				select 
 					distinct pc.prd_cd_p
+                    , date_format(date_sub(psop.stock_date, interval 1 month),'%Y-%m') as chk_date
+					-- , date_format(date_sub(psop.stock_date, interval 1 month),'%Y%m') as chk_date2
 				from product_stock_order_product psop 
 				inner join product_code pc on psop.prd_cd = pc.prd_cd
 				where 
@@ -1265,6 +1267,10 @@ class cs01Controller extends Controller {
 			foreach ($rows as $row){
 	
 				$prd_cd_p	= $row->prd_cd_p;
+				$chk_sdate	= $row->chk_date . "-01 00:00:00";
+				$chk_edate	= $row->chk_date . "-31 23:59:59";
+				//$chk_sdate2	= $row->chk_date2 . "01";
+				//$chk_edate2	= $row->chk_date2 . "31";
 				$tot_qty	= 0;
 				$tot_cur_qty	= 0;
 				$total_old_wonga	= 0;
@@ -1335,15 +1341,17 @@ class cs01Controller extends Controller {
 				$sql_product	= " update product set wonga = '$avg_wonga' where prd_cd like '$prd_cd_p%' ";
 				DB::update($sql_product);
 	
-				// 4. 모든 판매된 주문건(및 hst)의 원가 값 업데이트
+				// 4. 모든 판매된 주문건(및 hst)의 원가 값 업데이트 ( 정산기간전 자료 )
 				$sql_o = "
 						update order_opt set
 							wonga = '$avg_wonga'
-						where prd_cd like '$prd_cd_p%'
+						where
+							ord_date >= '$chk_sdate' and ord_date <= '$chk_edate'
+							and prd_cd like '$prd_cd_p%'
 					";
 				DB::update($sql_o);
 	
-				$orders = DB::select("select ord_opt_no from order_opt where prd_cd like '$prd_cd_p%'");
+				$orders = DB::select("select ord_opt_no from order_opt where ord_date >= '$chk_sdate' and ord_date <= '$chk_edate' and prd_cd like '$prd_cd_p%'");
 				foreach ($orders as $ord) {
 					$sql_ow = "
 							update order_opt_wonga set
