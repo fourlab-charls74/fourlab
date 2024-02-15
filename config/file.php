@@ -29,6 +29,10 @@ return [
         'jpeg',
         'png'
     ],
+	
+	'pdf_extensions' => [
+		'pdf'
+	],
 
     'store_notice_path' => 'data/community/comm01'
 ];
