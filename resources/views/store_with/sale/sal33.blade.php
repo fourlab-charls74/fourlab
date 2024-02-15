@@ -138,7 +138,7 @@
 		{headerName: "매장명", field: "store_nm",  width: 130},
 		{headerName: '반출현황',
 			children: [
-				{headerName: "요청수", field: "out_rt_cnt", type: 'numberType'},
+				{headerName: "요청받은수", field: "out_rt_cnt", type: 'numberType'},
 				{headerName: "미확인수", field: "out_req_cnt", type: 'numberType'},
 				{headerName: "미확인율(%)", field: "out_req_ratio", type: 'numberType',
 					cellRenderer: function(params) {
@@ -174,7 +174,7 @@
 		},
 		{headerName: '반입현황',
 			children: [
-				{headerName: "요청수", field: "in_rt_cnt", type: 'numberType'},
+				{headerName: "요청한수", field: "in_rt_cnt", type: 'numberType'},
 				{headerName: "미확인수", field: "in_req_cnt", type: 'numberType'},
 				{headerName: "미확인율(%)", field: "in_req_ratio", type: 'numberType',
 					cellRenderer: function(params) {
