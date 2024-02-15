@@ -446,7 +446,7 @@ class Coupon
 	 * @return	 array	쿠폰코드배열
 	 *
 	 */
-	function GenerateCouponCode($prefix, $count, $len = 12)
+	function GenerateCouponCode($prefix, $count, $len = 8)
 	{
             $sprefix = substr(strtoupper(str_pad(dechex($prefix),4,"0",STR_PAD_RIGHT)),0,4);
             $checksum_prefix = 0;
