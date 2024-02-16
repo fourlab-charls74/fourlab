@@ -854,9 +854,10 @@ class Claim
 			$success_code = DB::table('product_stock')
 				->where('prd_cd', '=', $prd_cd)
 				->update([
-					'qty_wonga'	=> DB::raw('qty_wonga + ' . ($qty * ($ord->wonga = 0))),
+					//'qty_wonga'	=> DB::raw('qty_wonga + ' . ($qty * ($ord->wonga = 0))),
 					'out_qty' => DB::raw('out_qty - ' . $qty),
 					'qty' => DB::raw('qty + ' . $qty),
+					'qty_wonga' => DB::raw('qty * wonga'),
 					'ut' => now(),
 				]);
 
