@@ -753,7 +753,8 @@ class mem01Controller extends Controller
                             end bank_code,
                             a.ord_state, a.clm_state,
                             -- e.com_nm as sale_place,
-                            ifnull(e.com_nm, a.sale_place) as sale_place,
+                            -- ifnull(e.com_nm, a.sale_place) as sale_place,
+                            if(a.sale_place in ('피엘라벤', ''), ifnull((select store_nm from store where store_cd = a.store_cd), a.sale_place), a.sale_place) as sale_place,
                             i.com_nm, c.price-c.wonga as prf,
                             case a.ord_state
                                 when '-20' then null
