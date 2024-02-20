@@ -140,7 +140,7 @@
 									<h5 class="m-0 font-weight-bold">상품 세부 정보</h5>
 								</div>
 								<div class="fr_box">
-									<button type="button" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
+									<button type="button" id="gd-setting" class="setting-grid-col ml-2"><i class="fas fa-cog text-primary"></i></button>
 								</div>
 							</div>
 						</div>
@@ -536,23 +536,14 @@
 <script type="text/javascript" charset="utf-8">
 	const pApp = new App('', { gridId: "#div-gd", height: 265 });
 	let gx;
-	$(document).ready(function() {
+	$(document).ready(async function() {
 		pApp.ResizeGrid(265);
 		pApp.BindSearchEnter();
 		let gridDiv = document.querySelector(pApp.options.gridId);
-		let url_path_array = String(window.location.href).split('/');
-		const pid = filter_pid(String(url_path_array[url_path_array.length - 1]).toLocaleUpperCase());
+		const my_columns = await getMyColumns(() => gx, gridDiv, columns);
+		gx = new HDGrid(gridDiv, my_columns, {});
 
-		get_indiv_columns(pid, columns, function(data) {
-			gx = new HDGrid(gridDiv, data);
-
-			setMyGridHeader.Init(gx,
-				indiv_grid_save.bind(this, pid, gx),
-				indiv_grid_init.bind(this, pid)
-			);
-
-			Search(1);
-		});
+		Search(1);
 	});
 
 
