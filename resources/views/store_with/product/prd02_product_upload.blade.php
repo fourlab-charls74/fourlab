@@ -524,10 +524,10 @@
 		}
 
 		// 스타일넘버 입력여부
-		// if (f1.style_no.value.trim() === '') {
-		// 	f1.style_no.focus();
-		// 	return alert("스타일넘버를 입력해주세요.");
-		// }
+		if (f1.style_no.value.trim() === '') {
+		 	f1.style_no.focus();
+		 	return alert("스타일넘버를 입력해주세요.");
+		}
 
 		// 상품명 입력여부
 		if (f1.prd_nm.value.trim() === '') {
@@ -550,6 +550,24 @@
 		// 원가 입력여부
 		if (f1.wonga.value.trim() === '') {
 			f1.wonga.focus();
+			return alert("원가를 입력해주세요.");
+		}
+
+		// 정상가 입력여부
+		if (f1.tag_price.value.trim() === '') {
+			f1.tag_price.focus();
+			return alert("원가를 입력해주세요.");
+		}
+
+		// 현재가 입력여부
+		if (f1.price.value.trim() === '') {
+			f1.price.focus();
+			return alert("원가를 입력해주세요.");
+		}
+
+		// 원산지 입력여부
+		if (f1.origin.value.trim() === '') {
+			f1.origin.focus();
 			return alert("원가를 입력해주세요.");
 		}
 

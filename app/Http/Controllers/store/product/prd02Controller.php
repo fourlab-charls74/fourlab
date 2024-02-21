@@ -717,6 +717,20 @@ class prd02Controller extends Controller
 					where prd_cd = '$prd_cd'
 				";
 				DB::update($product_stock_sql);
+				
+				//상품정보 업데이트
+				$sql_product	= " 
+					select 
+						p.tag_price, p.price, p.wonga 
+					from product p
+					inner join product_code pc on p.prd_cd = pc.prd_cd
+					where 
+						pc.prd_cd = :prd_cd 
+				";
+				$product_info	= DB::selectOne($sql_product, ['prd_cd' => $prd_cd]);
+				
+				$sql_goods	= " update goods set goods_sh = :good_sh, price = :price, wonga = :wonga where goods_no = :goods_no ";
+				DB::update($sql_goods, ['goods_sh' => $product_info->tag_price, 'price' => $product_info->price, 'wonga' => $product_info->wonga, 'goods_no' => $goods_no]);
 
 				//기존 상품 매핑 정보 테이블 정보 추가
 				$sql	= " select count(*) as tot from goods_xmd where cd = :prd_cd ";
@@ -941,6 +955,9 @@ class prd02Controller extends Controller
 
 	public function edit_goods_no($product_code, $goods_no, Request $request)
 	{
+		$sup_coms = DB::table("company")->where('use_yn', '=', 'Y')->where('com_type', '=', '1')
+			->select('com_id', 'com_nm')->get()->all(); // 공급업체 리스트
+		
 		$product = array(); 
 
 		if( $goods_no != "" ){
@@ -957,6 +974,8 @@ class prd02Controller extends Controller
 				    , pc.size
 					, p.tag_price as goods_sh
 					, p.price as price
+				    , p.wonga
+				    , p.com_id
 					, pc.size_kind
 					, p.origin as origin
 				from product_code pc
@@ -973,6 +992,7 @@ class prd02Controller extends Controller
 		$size_kind = DB::select($size_kind_sql);
 
 		$values = [
+			'sup_coms' 	=> $sup_coms,
 			'prd_cd'	=> $product_code,
 			'goods_no'	=> $goods_no,
 			'product'	=> $product,
@@ -1620,6 +1640,8 @@ class prd02Controller extends Controller
 
 		$prd_cd 	= $request->input('prd_cd');
 		$goods_no	= $request->input('goods_no');
+		$style_no	= $request->input('style_no');
+		$com_id		= $request->input('sup_com');
 		$tag_price	= $request->input('tag_price');
 		$price		= $request->input('price');
 		$size_kind	= $request->input('size_kind');
@@ -1640,15 +1662,22 @@ class prd02Controller extends Controller
 			DB::beginTransaction();
 			
 			if ($goods_no != '0') {
+				
+				$sql		= " select com_nm from company where com_id = :com_id ";
+				$com_info	= DB::selectOne($sql, ['com_id' => $com_id]);
+				
 				DB::table('goods')
 					->where('goods_no', '=', $goods_no)
 					->update([
-						"price" => $price,
-						"goods_sh" => $tag_price,
-						"org_nm" => $origin, // goods 테이블의 원산지 변경
-						"admin_id" => $admin_id,
-						"admin_nm" => $admin_name,
-						"upd_dm" => now(),
+						"style_no"	=> $style_no,
+						"price"		=> $price,
+						"goods_sh"	=> $tag_price,
+						"org_nm"	=> $origin, // goods 테이블의 원산지 변경
+						"com_id"	=> $com_id,
+						"com_nm"	=> $com_info->com_nm,
+						"admin_id"	=> $admin_id,
+						"admin_nm"	=> $admin_name,
+						"upd_dm"	=> now(),
 					]);
 			}
 			
@@ -1696,8 +1725,10 @@ class prd02Controller extends Controller
 					DB::table('product')
 						->where('prd_cd', 'like', $pr->prd_cd_p . '%')
 						->update([
+							"style_no"	=> $style_no,
 							"price" 	=> $price,
 							"tag_price" => $tag_price,
+							"com_id"	=> $com_id,
 							"origin"	=> $origin,
 							"admin_id"	=> $admin_id,
 							"ut" => now(),

@@ -69,7 +69,28 @@
 											<th>상품옵션</th>
 											<td>{{ $product->goods_opt }}</td>
 											<th>아이템코드</th>
-											<td>{{ $product->style_no }}</td>
+											<td>
+												<div class="flax_box">
+													<input type='text' class="form-control form-control-sm" name='style_no' id="style_no" value='{{ $product->style_no }}'>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<th>공급업체</th>
+											<td>
+												<div class="flax_box">
+													<select name='sup_com' id="sup_com" class="form-control form-control-sm">
+														<option value=''>선택</option>
+														@foreach ($sup_coms as $com)
+															<option value='{{ $com->com_id }}'
+																@if($product->com_id === $com->com_id) selected @endif	
+															>{{ $com->com_id }} : {{ $com->com_nm }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th>원가</th>
+											<td>{{ number_format($product->wonga) }} 원</td>
 										</tr>
 										<tr>
 											<th>정상가</th>
@@ -226,9 +247,14 @@
 	}
 
 	function save() {
-		let size_kind = $('#size_kind').val();
-		if (size_kind == '') return alert('사이즈구분을 선택해주세요.');
-		if(!window.confirm("품번이 같은 상품의 정상가, 현재가, 사이즈구분, 원산지가 변경됩니다.\n정보를 수정하시겠습니까?")) return;
+		if( $('#style_no').val() == '' )	return alert('아이템코드는 반드시 입력해야 합니다.');
+		if( $('#sup_com').val() == '' )		return alert('공급업체는 반드시 선택해야 합니다.');
+		if( $('#tag_price').val() == '' )	return alert('정상가는 반드시 입력해야 합니다.');
+		if( $('#price').val() == '' )		return alert('현재가는 반드시 입력해야 합니다.');
+		if( $('#size_kind').val() == '' )	return alert('사이즈구분은 반드시 선택해야 합니다.');
+		if( $('#origin').val() == '' )		return alert('원산지는 반드시 입력해야 합니다.');
+
+		if(!window.confirm("품번이 같은 상품의 정상가, 현재가, 아이템코드, 공급업체, 사이즈구분, 원산지가 변경됩니다.\n정보를 수정하시겠습니까?")) return;
 		
 
 		axios({
@@ -237,6 +263,8 @@
 			data: {
 				prd_cd : $('#prd_cd').val(),
 				goods_no : $("#goods_no").val(),
+				style_no : $('#style_no').val(),
+				sup_com : $('#sup_com').val(),
 				tag_price : $("#tag_price").val(),
 				price : $("#price").val(),
 				size_kind : $('#size_kind').val(),
