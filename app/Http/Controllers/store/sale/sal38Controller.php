@@ -138,18 +138,22 @@ class sal38Controller extends Controller
 			}
 		}
 
-		// 요일코드 추가 및 날짜별 합계 쿼리 적용
+		// 날짜별 적용
 		$sum		= "";
 		$day_amt = [];
 		$day_term	= date_diff(date_create($sdate),date_create($edate));
 		$day_term	= $day_term->format("%a");
 
 		for( $i = 0; $i <= $day_term; $i++ ){
-			$chk_date	= date("Ymd", strtotime($sdate . ' +' . $i . ' day '));
+			$chk_date		= date("Ymd", strtotime($sdate . ' +' . $i . ' day '));
+			$chk_date_txt	= date("Y-m-d", strtotime($sdate . ' +' . $i . ' day '));
+			$yoil			= date('w', strtotime($chk_date_txt));
 
 			$sum .= " , sum(if(w.ord_state_date = '$chk_date' ,if(w.ord_state > 30, w.recv_amt * -1, w.recv_amt),0)) as day_${chk_date}_val ";
 
-			$day_amt[] = $chk_date;
+			$day_amt[$i]['text']	= $chk_date_txt;
+			$day_amt[$i]['value']	= $chk_date;
+			$day_amt[$i]['yoil']	= $yoil;
 		}
 
 

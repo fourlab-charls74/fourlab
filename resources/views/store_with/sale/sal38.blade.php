@@ -313,6 +313,20 @@
 			</ul>
 		</div>
 	</div>
+	<style>
+		.hd-grid-red {
+			color: red;
+		}
+		.hd-grid-blue {
+			color: blue;
+		}
+		.ag-row-level-1 {
+			background-color: #eee !important;
+		}
+		.ag-row-level-2 {
+			background-color: #edf4fd !important;
+		}
+	</style>
 	<script src="https://unpkg.com/ag-charts-community@2.1.0/dist/ag-charts-community.min.js"></script>
 	<script language="javascript">
 
@@ -400,14 +414,21 @@
 			if(!day_col) return;
 			columns.splice(9);
 
-			let obj = { fields: "day", headerName: "기간", children: [] };
+			let obj = { field: "day", headerName: "기간", children: [] };
 
 			for(let i = 0; i < day_col.length; i++) {
-				let cd = 'day_' + day_col[i] + '_val';
-				let nm = day_col[i];
+				let cd		= 'day_' + day_col[i]['value'] + '_val';
+				let nm		= day_col[i]['text'];
+				let yoil	= day_col[i]['yoil'];
 
-				let col = { fields: cd, headerName: nm, type: 'numberType', width:80, }
+				let col = { field: cd, headerName: nm, type: 'numberType', width:80, aggregation: true }
 
+				if ( yoil == 0 ) {
+					col.headerClass = 'hd-grid-red'; // 일요일 표시
+				} else if ( yoil == 6 ) {
+					col.headerClass = 'hd-grid-blue'; // 토요일 표시
+				}
+				
 				obj.children.push(col);
 			}
 			columns.push(obj);
