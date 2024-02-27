@@ -59,7 +59,13 @@ class stk12Controller extends Controller
 
         // where
 		if($r['prd_cd'] != null) {
-            $prd_cd = explode(',', $r['prd_cd']);
+			$prd_cd	= $r['prd_cd'];
+			$prd_cd = preg_replace("/\s/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\t/", ",", $prd_cd);
+			$prd_cd = preg_replace("/\n/", ",", $prd_cd);
+			$prd_cd = preg_replace("/,,/", ",", $prd_cd);
+
+            $prd_cd = explode(',', $prd_cd);
 			$where .= " and (1!=1";
 			foreach($prd_cd as $cd) {
 				$where .= " or p.prd_cd like '" . Lib::quote($cd) . "%' ";
