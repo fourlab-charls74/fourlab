@@ -235,11 +235,14 @@ class prd05Controller extends Controller
 				, g.goods_nm_eng
 				, c.code_val as color
 				, pc.size as size
-				, g.price
-				, g.goods_sh
+				, p.price
+				, p.tag_price as goods_sh
+				-- , g.price
+				-- , g.goods_sh
 			from product_price_list ppl
 			inner join product_price pp on pp.idx = ppl.product_price_cd
 			inner join product_code pc on ppl.prd_cd = pc.prd_cd
+			inner join product p on ppl.prd_cd = p.prd_cd
 			left outer join goods g on g.goods_no = pc.goods_no
 			left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
 			left outer join brand b on b.br_cd = pc.brand
@@ -863,8 +866,10 @@ class prd05Controller extends Controller
                     , pc.color
                     , pc.size as size
                     , pc.goods_opt
-                    , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
-                    , if(g.goods_no <> '0', g.price, p.price) as price
+                    , p.tag_price as goods_sh
+                    , p.price
+                    -- , if(g.goods_no <> '0', g.goods_sh, p.tag_price) as goods_sh
+                    -- , if(g.goods_no <> '0', g.price, p.price) as price
                 	, '$price_kind' as price_kind
                 	, '$change_kind' as change_kind
                 	, '$change_val_rate' as change_val_rate
