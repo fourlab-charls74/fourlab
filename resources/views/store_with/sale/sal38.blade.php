@@ -350,20 +350,20 @@
 			},
 			{headerName: '매출액구분',
 				children: [
-					{headerName: "수량", field: "sum_qty",type:'numberType',aggregation:true},
-					{headerName: "적립금", field: "sum_point_amt",type:'currencyType',aggregation:true},
-					{headerName: "할인", field: "sum_dc_amt",type:'currencyType',aggregation:true, width:80},
-					{headerName: "쿠폰", field: "sum_coupon_amt",type:'currencyType',aggregation:true},
+					{headerName: "수량", field: "sum_qty", width:60, type:'numberType',aggregation:true},
+					{headerName: "적립금", field: "sum_point_amt", width:70, type:'currencyType',aggregation:true},
+					{headerName: "할인", field: "sum_dc_amt", width:70, type:'currencyType',aggregation:true, width:80},
+					{headerName: "쿠폰", field: "sum_coupon_amt", width:70, type:'currencyType',aggregation:true},
 					//{headerName: "수수료", field: "sum_fee_amt",type:'currencyType',aggregation:true},
-					{headerName: "결제금액", field: "sum_recv_amt",type:'currencyType',aggregation:true},
+					{headerName: "결제금액", field: "sum_recv_amt", width:85, type:'currencyType',aggregation:true},
 					//{headerName: "과세", field: "sum_taxation_amt",type:'currencyType',aggregation:true, width:80},
 					//{headerName: "비과세", field: "sum_taxfree",type:'currencyType',aggregation:true},
 				]
 			},
 			{headerName: "부가세", field: "vat",type:'currencyType',aggregation:true, width:80},
 			{headerName: "매출액(VAT별도)", field: "sum_amt",type:'currencyType',aggregation:true, width:100},
-			{headerName: "매출원가", field: "sum_wonga",type:'currencyType',aggregation:true},
-			{headerName: "마진율", field: "margin",type:'percentType',
+			{headerName: "매출원가", field: "sum_wonga", width:85, type:'currencyType',aggregation:true},
+			{headerName: "마진율", field: "margin", width:85, type:'percentType',
 				valueGetter:function(params){
 					if(params.data.store_nm === "합계" || params.data.store_nm === "평균"){
 						const data = params.data;
@@ -380,37 +380,37 @@
 			//},
 			{headerName: '판매',
 				children: [
-					{headerName: "수량", field: "qty_10",type:'numberType',aggregation:true},
+					{headerName: "수량", field: "qty_10", width:60, type:'numberType',aggregation:true},
 					//{headerName: "적립금", field: "point_amt_10",type:'currencyType',aggregation:true},
 					//{headerName: "할인", field: "dc_amt_10",type:'currencyType',aggregation:true, width:80},
 					//{headerName: "쿠폰", field: "coupon_amt_10",type:'currencyType',aggregation:true},
 					//{headerName: "수수료", field: "fee_amt_10",type:'currencyType',aggregation:true},
-					{headerName: "결제금액(VAT별도)", field: "recv_amt_10",type:'currencyType',aggregation:true},
+					{headerName: "결제금액(VAT별도)", field: "recv_amt_10", width:120, type:'currencyType',aggregation:true},
 				]
 			},
 			{headerName: '교환',
 				children: [
-					{headerName: "수량", field: "qty_60",type:'numberType',aggregation:true},
+					{headerName: "수량", field: "qty_60", width:60, type:'numberType',aggregation:true},
 					//{headerName: "적립금", field: "point_amt_60",type:'currencyType',aggregation:true},
 					//{headerName: "할인", field: "dc_amt_60",type:'currencyType',aggregation:true},
 					//{headerName: "쿠폰", field: "coupon_amt_60",type:'currencyType',aggregation:true},
-					{headerName: "결제금액(VAT별도)", field: "recv_amt_60", type: 'currencyType', aggregation: true},
+					{headerName: "결제금액(VAT별도)", field: "recv_amt_60", width:120, type: 'currencyType', aggregation: true},
 				]
 			},
 			{
 				headerName: '환불',
 				children: [
-					{headerName: "수량", field: "qty_61", type: 'numberType', aggregation: true},
+					{headerName: "수량", field: "qty_61", width:60, type: 'numberType', aggregation: true},
 					// {headerName: "적립금", field: "point_amt_61", type: 'currencyType', aggregation: true},
 					// {headerName: "할인", field: "dc_amt_61", type: 'currencyType', aggregation: true},
 					// {headerName: "쿠폰", field: "coupon_amt_61", type: 'currencyType', aggregation: true},
 					// {headerName: "수수료", field: "fee_amt_61", type: 'currencyType', aggregation: true},
-					{headerName: "결제금액(VAT별도)", field: "recv_amt_61", type: 'currencyType', aggregation: true},
+					{headerName: "결제금액(VAT별도)", field: "recv_amt_61", width:120, type: 'currencyType', aggregation: true},
 				]
 			},
 		];
 
-		function setColumn(day_col) {
+		function setColumn(day_col, store_data) {
 			if(!day_col) return;
 			columns.splice(9);
 
@@ -434,7 +434,26 @@
 			columns.push(obj);
 			columns.push({ width: "auto" });
 
+			gx.gridOptions.api.setColumnDefs([]);
 			gx.gridOptions.api.setColumnDefs(columns);
+			
+			setPinnedRowData([...obj.children], store_data);
+		}
+
+		function setPinnedRowData(rows, store_data) {
+			const sum_obj = {}, avg_obj = {};
+			rows.map(child => {
+				const total_sum = store_data.reduce((acc, cur) => acc + (cur[child.field] * 1), 0);
+				sum_obj[child.field] = total_sum; // 합계치 계산
+				avg_obj[child.field] = Math.round(total_sum / store_data.length); // 평균치 계산
+			});
+			const sum_pinned = gx.gridOptions.api.getPinnedTopRow(0);
+			const avg_pinned = gx.gridOptions.api.getPinnedTopRow(1);
+
+			gx.gridOptions.api.setPinnedTopRowData([
+				{ store_nm: '합계', ...sum_pinned.data, ...sum_obj },
+				{ store_nm: '합계', ...avg_pinned.data, ...avg_obj },
+			]);
 		}
 	</script>
 	<script type="text/javascript" charset="utf-8">
@@ -459,6 +478,12 @@
 					}
 				}
 			});
+
+			gx.Aggregation({
+				"sum":"top",
+				"avg":"top"
+			});
+
 			Search();
 
 			// 판매유형 다중검색
@@ -477,12 +502,8 @@
 
 		function Search() {
 			let data = $('form[name="search"]').serialize();
-			gx.Aggregation({
-				"sum":"top",
-				"avg":"top"
-			});
 			gx.Request('/store/sale/sal38/search', data, -1, function(data){
-				setColumn(data.head.day_amt);
+				setColumn(data.head.day_amt, data.body);
 
 				chart_data = data.body;
 
