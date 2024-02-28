@@ -227,7 +227,7 @@ class sal31Controller extends Controller
 					-- 매장판매
 					sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
 					-- loss
-					sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
+					sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 					
 					sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 				from product_stock_hst hst
@@ -383,7 +383,7 @@ class sal31Controller extends Controller
 							-- 매장판매
 							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
 							-- loss
-							sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
+							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 							
 							sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 						from product_stock_hst hst
