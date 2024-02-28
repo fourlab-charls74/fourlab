@@ -183,7 +183,7 @@ class sal22Controller extends Controller
 					-- 매장반품
 					sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) as store_return_qty,
 					-- loss
-					sum(if(hst.type = 14, hst.qty and hst.stock_state_date <= '$edate', 0)) * -1 as loss_qty,
+					sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 					
 					sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 				from product_stock_hst hst
