@@ -729,7 +729,7 @@ class prd02Controller extends Controller
 				";
 				$product_info	= DB::selectOne($sql_product, ['prd_cd' => $prd_cd]);
 				
-				$sql_goods	= " update goods set goods_sh = :good_sh, price = :price, wonga = :wonga where goods_no = :goods_no ";
+				$sql_goods	= " update goods set goods_sh = :goods_sh, price = :price, wonga = :wonga where goods_no = :goods_no ";
 				DB::update($sql_goods, ['goods_sh' => $product_info->tag_price, 'price' => $product_info->price, 'wonga' => $product_info->wonga, 'goods_no' => $goods_no]);
 
 				//기존 상품 매핑 정보 테이블 정보 추가
