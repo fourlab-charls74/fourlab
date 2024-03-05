@@ -284,20 +284,29 @@
             }
         }
 
-        // 쿠폰 조건에 따라 disabled 처리
-        const selected_coupon_nos = list.filter(d => d.coupon_no !== '').map(d => d.coupon_no);
-        const usable_coupon_nos = $("#coupon_no option").toArray()
-            .filter(opt => {
-                let d = opt.dataset;
-                if (d.apply === 'AG' && d.ex_goods_nos.includes(goods.goods_no + '')) return false;
-                if (d.apply === 'SG' && !d.goods_nos.includes(goods.goods_no + '')) return false;
-                if (selected_coupon_nos.includes(opt.value) && goods.coupon_no !== opt.value) return false;
-                return true;
-            }).map(opt => opt.value);
-        $("#coupon_no > option").toArray().forEach(opt => {
-            $(opt).prop("disabled", !usable_coupon_nos.includes(opt.value));
-            if (opt.value === goods.coupon_no) $(opt).prop("selected", true);
-        });
+		if ($(sale_type).val() !== '00') {
+			// 판매유형이 일반판매(00)이 아닐 경우, 쿠폰 사용 불가
+			$("#coupon_no").prop("disabled", true);
+			$("#coupon_no").prop("selectedIndex", 0);
+		} else {
+			// 판매유형이 일반판매(00)일 경우, 사용가능한 쿠폰여부 설정
+			$("#coupon_no").prop("disabled", false);
+
+			// 쿠폰 조건에 따라 disabled 처리
+			const selected_coupon_nos = list.filter(d => d.coupon_no !== '').map(d => d.coupon_no);
+			const usable_coupon_nos = $("#coupon_no option").toArray()
+				.filter(opt => {
+					let d = opt.dataset;
+					if (d.apply === 'AG' && d.ex_goods_nos.includes(goods.goods_no + '')) return false;
+					if (d.apply === 'SG' && !d.goods_nos.includes(goods.goods_no + '')) return false;
+					if (selected_coupon_nos.includes(opt.value) && goods.coupon_no !== opt.value) return false;
+					return true;
+				}).map(opt => opt.value);
+			$("#coupon_no > option").toArray().forEach(opt => {
+				$(opt).prop("disabled", !usable_coupon_nos.includes(opt.value));
+				if (opt.value === goods.coupon_no) $(opt).prop("selected", true);
+			});
+		}
     }
 
     /** 상품리스트에서 상품 삭제 */
@@ -358,10 +367,39 @@
 	                    dc_rate: 100 - Math.round((std_price - discount_amt) / rowData.goods_sh * 100),
                         total: rowData.qty * (std_price - discount_amt) - (rowData.coupon_discount_amt || 0)
                     });
+					
+					if (st.sale_kind !== "00") {
+						// 판매유형이 일반판매(00)이 아닐 경우, 쿠폰 사용 불가
+						$("#coupon_no").prop("disabled", true);
+						$("#coupon_no").prop("selectedIndex", 0);
+						updateOrderValue('coupon_no', '');
+					} else {
+						// 판매유형이 일반판매(00)일 경우, 사용가능한 쿠폰여부 설정
+						$("#coupon_no").prop("disabled", false);
+
+						// 쿠폰 조건에 따라 disabled 처리
+						const selected_coupon_nos = gx.getRows().filter(d => d.coupon_no !== '').map(d => d.coupon_no);
+						const usable_coupon_nos = $("#coupon_no option").toArray()
+							.filter(opt => {
+								let d = opt.dataset;
+								if (d.apply === 'AG' && d.ex_goods_nos.includes(rowData.goods_no + '')) return false;
+								if (d.apply === 'SG' && !d.goods_nos.includes(rowData.goods_no + '')) return false;
+								if (selected_coupon_nos.includes(opt.value) && rowData.coupon_no !== opt.value) return false;
+								return true;
+							}).map(opt => opt.value);
+						$("#coupon_no > option").toArray().forEach(opt => {
+							$(opt).prop("disabled", !usable_coupon_nos.includes(opt.value));
+							if (opt.value === rowData.coupon_no) $(opt).prop("selected", true);
+						});
+					}
                 } else if(key === 'pr_code') {
                     curRow[0].setData({...rowData, pr_code: value});
                 } else if(key === 'coupon_no') {
-                    const cp = event.target.selectedOptions[0]?.dataset;
+					let cp = {};
+					if (event !== null) {
+                        cp = event.target.selectedOptions[0]?.dataset;
+					}
+
                     const discount_amt = cp.amt_kind === 'P'
                         ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100)
                         : ((cp.amt || 0) * 1);
@@ -373,7 +411,7 @@
                         coupon_discount_amt: discount_amt,
 						dc_rate: 100 - Math.round(((rowData.price * rowData.qty) - discount_amt) / rowData.qty / rowData.goods_sh * 100),
                         total: rowData.price * rowData.qty - discount_amt
-                    })
+                    });
 	                
 	                $("#cur_price").text();
                 }
@@ -616,6 +654,23 @@
 
     /** 선택한 고객의 사용가능한 쿠폰목록 조회 */
     async function getUserCouponList(user_id = '') {
+		// 이전 쿠폰 적용내역 삭제
+		gx.gridOptions.api.forEachNode(node => {
+			const rowData = node.data;
+			const dc_rate = 100 - Math.round((rowData.price * rowData.qty) / rowData.qty / rowData.goods_sh * 100);
+			$("#cur_dc_rate").text(Comma(dc_rate) + ' %');
+			node.setData({
+				...rowData,
+				coupon_no: '',
+				c_no: undefined,
+				coupon_discount_amt: 0,
+				dc_rate: dc_rate,
+				total: rowData.price * rowData.qty
+			});
+		});
+		updateOrderValue('coupon_no', '');
+	    
+	    // 쿠폰 목록 표기
         let html = "<option value=''>-- 선택 안함 --</option>";
 
         if (user_id === '') {
