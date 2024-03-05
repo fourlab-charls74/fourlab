@@ -172,7 +172,8 @@
                                         <option value="500">500</option>
                                         <option value="1000">1000</option>
                                         <option value="2000">2000</option>
-                                        <option value="5000">5000</option>
+										<option value="5000">5000</option>
+										<option value="10000">10000</option>
                                     </select>
                                 </div>
                                 <span class="text_line">/</span>
