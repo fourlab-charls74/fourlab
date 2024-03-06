@@ -481,6 +481,7 @@ class stk20Controller extends Controller
 					]);
 
                 //RT처리 알림 전송
+				/*
                 $content = $d['dep_store_nm'] . '에서 ';
                 if ($d['type'] == 'R') $content .= '요청RT를 처리하였습니다.';
                 else if ($d['type'] == 'G') $content .= '일반RT를 처리하였습니다.';
@@ -503,6 +504,7 @@ class stk20Controller extends Controller
                         'check_yn' => 'N',
                         'rt' => now()
                     ]);
+				*/
             }
 
 			DB::commit();
