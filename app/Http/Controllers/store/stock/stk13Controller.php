@@ -310,9 +310,9 @@ class stk13Controller extends Controller
 
 			// 1순위 : 매장보유재고가 0인 경우
 			if ($row->store_wqty < 1) {
-				$rel_qty = $row->sale_cnt < 0 ? 0 : ($row->sale_cnt * 1);
+				$rel_qty = ( $row->sale_cnt < 0 || $releases[$row->prd_cd]['storage_wqty'] < 0 ) ? 0 : ($row->sale_cnt * 1);
 				$predicted_cnt = $releases[$row->prd_cd]['storage_wqty'] - $rel_qty;
-				if ($predicted_cnt < 0) $rel_qty = $releases[$row->prd_cd]['storage_wqty'];
+				if ($predicted_cnt < 0 && $releases[$row->prd_cd]['storage_wqty'] > 0) $rel_qty = $releases[$row->prd_cd]['storage_wqty'];
 				$releases[$row->prd_cd]['storage_wqty'] -= $rel_qty;
 				$releases[$row->prd_cd][$row->store_cd]['rel_qty'] = $rel_qty;
 			}
@@ -333,13 +333,13 @@ class stk13Controller extends Controller
 
 			foreach ((array) $releases[$key] as $k => $v) {
 				if ($k !== 'storage_wqty' && $v['rel_qty'] < 1) {
-					$rr = $v['sale_cnt'] < 0 ? 0 : $v['sale_cnt'];
+					$rr = ( $v['sale_cnt'] < 0 || $releases[$key]['storage_wqty'] < 0 ) ? 0 : $v['sale_cnt'];
 					$rel_qty = $rr;
 					if ($v['store_wqty'] >= 5 && $v['store_wqty'] > ($v['sale_cnt'] * 2)) $rel_qty = 0;
 					if ($v['sale_cnt'] >= 10) $rel_qty = $rr;
 
 					$predicted_cnt = $releases[$key]['storage_wqty'] - $rel_qty;
-					if ($predicted_cnt < 0) $rel_qty = $releases[$key]['storage_wqty'];
+					if ($predicted_cnt < 0 && $releases[$key]['storage_wqty'] > 0) $rel_qty = $releases[$key]['storage_wqty'];
 					$releases[$key]['storage_wqty'] -= $rel_qty;
 					$releases[$key][$k]['rel_qty'] = $rel_qty;
 				}
