@@ -187,10 +187,9 @@
 					</div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="brand_cd">브랜드</label>
-							<div class="form-inline inline_btn_box">
-								<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
-								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+							<label for="brand_cd">전표번호</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm search-enter" name='dc_num' id="dc_num" value=''>
 							</div>
 						</div>
 					</div>
@@ -222,6 +221,17 @@
 									<input type="radio" name="ord" id="sort_desc" value="desc" checked="">
 									<input type="radio" name="ord" id="sort_asc" value="asc">
 								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row search-area-ext d-none">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="brand_cd">브랜드</label>
+							<div class="form-inline inline_btn_box">
+								<select id="brand_cd" name="brand_cd" class="form-control form-control-sm select2-brand"></select>
+								<a href="#" class="btn btn-sm btn-outline-primary sch-brand"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 							</div>
 						</div>
 					</div>
@@ -414,7 +424,7 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_nm", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-		// {field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
+		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">

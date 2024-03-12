@@ -10,10 +10,11 @@
 		<tr>
 			<td></td>
 			<td>거래일자 : {{ @$receipt_date }}</td>
-		@foreach(range(1, 21) as $i)
+		@foreach(range(1, 17) as $i)
 			<td></td>
 		@endforeach
-			<td colspan="6">구분 : {{ @$rel_type }}</td>
+			<td colspan="5">구분 : {{ @$rel_type }}</td>
+			<td colspan="5">출고차수 : {{ @$rel_order }}</td>
 			<td>전표번호 : {{ @$document_number }}</td>
 		</tr>
 		<tr>

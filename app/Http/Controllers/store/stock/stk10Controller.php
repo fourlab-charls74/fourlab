@@ -188,7 +188,9 @@ class stk10Controller extends Controller
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
-
+		if($r['dc_num'] != null)
+			$where	.= " and psr.document_number = '" . $r['dc_num'] . "' ";
+		
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "psr.req_rt";
@@ -982,27 +984,29 @@ class stk10Controller extends Controller
 	
 	public function _getDocumentFile($document_number, $idx) {
 		$sql = "
-			select p.prd_cd
-			     , type.code_val as type_nm
-			     , g.goods_nm
-			     , pc.color
-			     , pc.size
-			     , p.qty
-			     , g.price
-			     , (g.price * p.qty) as total_price
-			     , round(g.price / 1.1) as release_price
-			     , round(g.price / 1.1 * p.qty) as total_release_price
-				 , s.store_nm
-			     , s.addr1
-			     , s.addr2
-				 , s.phone
-				 , s.fax
-			     , s.biz_no
-			     , s.biz_ceo
-			     , s.biz_uptae
-			     , s.biz_upjong
-				 , (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = p.storage_cd) as storage_addr
-				 , (select concat(ifnull(ceo, ''), ' ', phone) from storage where storage_cd = p.storage_cd) as storage_manager
+			select
+				p.prd_cd
+			    , p.rel_order
+				, type.code_val as type_nm
+				, g.goods_nm
+				, pc.color
+				, pc.size
+				, p.qty
+				, g.price
+				, (g.price * p.qty) as total_price
+				, round(g.price / 1.1) as release_price
+				, round(g.price / 1.1 * p.qty) as total_release_price
+				, s.store_nm
+				, s.addr1
+				, s.addr2
+				, s.phone
+				, s.fax
+				, s.biz_no
+				, s.biz_ceo
+				, s.biz_uptae
+				, s.biz_upjong
+				, (select concat(addr1, ifnull(addr2, '')) from storage where storage_cd = p.storage_cd) as storage_addr
+				, (select concat(ifnull(ceo, ''), ' ', phone) from storage where storage_cd = p.storage_cd) as storage_manager
 			from product_stock_release p
 				inner join goods g on g.goods_no = p.goods_no
 				inner join product_code pc on pc.prd_cd = p.prd_cd
@@ -1024,6 +1028,7 @@ class stk10Controller extends Controller
 
 		if (count($rows) > 0) {
 			$data['receipt_date']		= date('Y-m-d'); // 접수일자? 출고일자? 논의 후 수정필요
+			$data['rel_order']			= $rows[0]->rel_order ?? '';
 			$data['rel_type'] 			= $rows[0]->type_nm ?? '';
 			$data['store_nm'] 			= $rows[0]->store_nm ?? '';
 			$data['store_addr'] 		= ($rows[0]->addr1 ?? '') . ($rows[0]->addr2);

@@ -170,6 +170,8 @@ class stk10Controller extends Controller
             $where .= " and g.goods_nm like '%" . $r['goods_nm'] . "%'";
         if($r['goods_nm_eng'] != null) 
             $where .= " and g.goods_nm_eng like '%" . $r['goods_nm_eng'] . "%'";
+		if($r['dc_num'] != null)
+			$where	.= " and psr.document_number = '" . $r['dc_num'] . "' ";
 
         // ordreby
         $ord = $r['ord'] ?? 'desc';
