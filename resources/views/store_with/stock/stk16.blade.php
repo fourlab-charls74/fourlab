@@ -338,6 +338,7 @@
         {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 80, cellClass: 'hd-grid-code'},
         {field: "store_channel",	headerName: "판매채널", pinned: 'left', width: 80, cellStyle:{"text-align" : "center"}},
         {field: "store_channel_kind",	headerName: "매장구분", pinned: 'left', width: 80, cellStyle:{"text-align" : "center"}},
+		{field: "store_cd", headerName: "매장코드", pinned: 'left', hide: true},
         {field: "store_nm",	headerName: "매장", pinned: 'left', width: 100, cellStyle:{"text-align" : "center"} },
         {field: "storage_nm", headerName: "창고", pinned: 'left', width: 100, cellStyle:{"text-align" : "center"}},
 		{field: "type_nm", headerName: "구분", width: 60, cellClass: 'hd-grid-code'},
@@ -655,10 +656,12 @@
 
 		alert("명세서를 일괄출력하고 있습니다. 잠시만 기다려주세요.");
 
+		const data = rows.map(row => ({ release_no: row.release_no, idx: row.idx, store_cd: row.store_cd, store_nm: row.store_nm }));
+
 		axios({
 			url: '/store/stock/stk16/download-multi',
 			method: 'post',
-			data: { data: rows.map(row => ({ release_no: row.release_no, idx: row.idx })) },
+			data: { data },
 		}).then(function (res) {
 			window.location = '/' + res.data.file_path;
 		}).catch(function (err) {

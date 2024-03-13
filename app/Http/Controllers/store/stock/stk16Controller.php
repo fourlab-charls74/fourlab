@@ -137,12 +137,13 @@ class stk16Controller extends Controller
                 c.code_val as type_nm,
                 c2.code_val as opt,
                 c3.code_val as color,
-                ifnull((
-					select s.size_cd from size s
-					where s.size_kind_cd = pc.size_kind
-					   and s.size_cd = pc.size
-					   and use_yn = 'Y'
-				),'') as size,
+                -- ifnull((
+				-- 	select s.size_cd from size s
+				-- 	where s.size_kind_cd = pc.size_kind
+				-- 	   and s.size_cd = pc.size
+				-- 	   and use_yn = 'Y'
+				-- ),'') as size,
+                pc.size,
                 c5.code_val as unit,
                 c6.code_val as rel_type,
                 ifnull(p.price, 0) as goods_price,
@@ -696,10 +697,23 @@ class stk16Controller extends Controller
 	{
 		$data = $request->input('data', []);
 		$data = array_reduce($data, function($a, $c) {
-			$is_already = in_array($c['release_no'], array_map(function($item) { return $item['release_no']; }, $a));
+//			$is_already = in_array($c['release_no'], $c['store_cd'], array_map(function($item) { return [$item['release_no'], $item['store_cd']]; }, $a));
+			$is_already = in_array([$c['release_no'], $c['store_cd']], array_map(function($item) { return [$item['release_no'], $item['store_cd']]; }, $a));
 			if (!$is_already) return array_merge($a, [$c]);
 			return $a;
 		}, []);
+		
+		$store_nms = [];
+		$release_nos = [];
+		foreach ($data as $key => $row) {
+			$store_nms[$key] = $row['store_nm'];
+			$release_nos[$key] = $row['release_no'];
+		}
+		
+		$store_nms = array_column($data, 'store_nm');
+		$document_numbers = array_column($data, 'release_no');
+		
+		array_multisort($store_nms, SORT_ASC, $release_nos, SORT_DESC, $data);
 
 		$save_path = "data/store/stk16/";
 		$file_name = "원부자재출고거래명세서_일괄출력_" . date('YmdHis') . '.xlsx';
@@ -711,7 +725,8 @@ class stk16Controller extends Controller
 		$exports = [];
 		foreach ($data as $row) {
 			$release_no = $row['release_no'] ?? '';
-			$export = $this->_getDocumentFile($release_no);
+			$idx = $row['idx'] ?? '';
+			$export = $this->_getDocumentFile($release_no, $idx);
 			foreach ($export->sheets() as $sht) {
 				$exports[] = $sht;
 			}
@@ -721,7 +736,7 @@ class stk16Controller extends Controller
 		return response()->json([ 'file_path' => sprintf("%s%s%s", "", $save_path, $file_name) ]);
 	}
 
-	public function _getDocumentFile($release_no) {
+	public function _getDocumentFile($release_no, $idx) {
 		$sql = "
             select
                 ssr.release_no
@@ -768,6 +783,8 @@ class stk16Controller extends Controller
                 inner join product_code pc on pc.prd_cd = ssr.prd_cd
                 inner join product p on p.prd_cd = ssr.prd_cd
             where ssr.release_no = :release_no
+            	and ssr.store_cd = (select store_cd from sproduct_stock_release where idx = '$idx')
+            order by prd_cd desc
         ";
 
 		$rows = DB::select($sql, [ 'release_no' => $release_no]);
