@@ -111,7 +111,7 @@ class ord02Controller extends Controller
 		$limit = $request->input('limit', 100);
 
 		/** 검색조건 필터링 */
-		$where = "";
+		$where = " and o.goods_no <> '132533' ";	//폭스트레킹 티켓 제외
 		$prd_where = "";
 
 		$where .= " and o.ord_date >= '$sdate 00:00:00' and o.ord_date <= '$edate 23:59:59' ";
