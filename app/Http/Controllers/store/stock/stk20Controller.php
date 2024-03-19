@@ -646,6 +646,14 @@ class stk20Controller extends Controller
 				
 				// 접수상태
 				if ($d['state'] == 20) {
+					// RT 데이터 존재 유무 체크
+					$sql	= " select count(*) as tot from product_stock_rotation where idx = :idx and del_yn = 'N' ";
+					$tot	= DB::selectOne($sql, ["idx" => $d['idx']])->tot;
+
+					if($tot == 0){
+						throw new Exception('이미 삭제된 RT입니다.');
+					}
+
 					// product_stock_store -> 보내는 매장 보유재고 플러스
 					DB::table('product_stock_store')
 						->where('prd_cd', '=', $d['prd_cd'])
@@ -679,6 +687,14 @@ class stk20Controller extends Controller
 					
 				// 처리중상태
 				} else if ($d['state'] == 30) {
+					// RT 데이터 존재 유무 체크
+					$sql	= " select count(*) as tot from product_stock_rotation where idx = :idx and del_yn = 'N' ";
+					$tot	= DB::selectOne($sql, ["idx" => $d['idx']])->tot;
+					
+					if($tot == 0){
+						throw new Exception('이미 삭제된 RT입니다.');
+					}
+					
 					// product_stock_store -> 보내는 매장 실재고, 보유재고 플러스
 					DB::table('product_stock_store')
 						->where('prd_cd', '=', $d['prd_cd'])
