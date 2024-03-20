@@ -190,7 +190,7 @@ class IndexController extends Controller
             inner join product_code pc on oo.prd_cd = pc.prd_cd
             inner join product p on oo.prd_cd = p.prd_cd
             where
-                oo.ord_state >= '10' and ( oo.clm_state = '' or oo.clm_state is null or oo.clm_state = '-30' or oo.clm_state = '90' )
+                oo.ord_state >= '30' and ( oo.clm_state = '' or oo.clm_state is null or oo.clm_state = '-30' or oo.clm_state = '90' )
                 and oo.ord_date >= '$sdate2 00:00:00' and oo.ord_date <= '$edate2 23:59:59'
             group by pc.prd_cd
             order by sum(oo.qty) desc

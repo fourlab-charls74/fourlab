@@ -278,7 +278,7 @@ function StyleGoodsStateLH50(params){
 	var state = {
 		"판매중지":"#808080",
 		"등록대기중":"#669900",
-        판매대기중: "#000000",
+        "판매대기중": "#000000",
 		"판매중":"#0000ff",
 		"품절[수동]":"#ff0000",
 		"품절":"#AAAAAA",
@@ -448,23 +448,23 @@ const StyleLineHeight = {
 
 const setRowGroupExpanded = (e) => {
     e.api.selectionController.lastSelectedNode?.setExpanded(e.api.selectionController.lastSelectedNode.selected);
-}
+};
 
 const setAllRowGroupExpanded = (expand = true) => {
     if (!gx) return;
     if (expand) gx.gridOptions.api.expandAll();
     else gx.gridOptions.api.collapseAll();
-}
+};
 
 function unComma(txt) {
     if (txt && txt.replace) return txt.replace(/,/gi, '') * 1
 
     return 0;
-};
+}
 
 function com(obj) {
     obj.value = numberFormat(unComma(obj.value));
-};
+}
 
 //타입이 숫자고 ,로 자리수 표현을 하지 않을 경우
 function onlynum(obj) {
@@ -473,8 +473,8 @@ function onlynum(obj) {
     if (isNaN( val * 1 )) {
         obj.value = 0;
         return;
-    };
-};
+    }
+}
 
 //타입이 숫자고 ,로 자리수 표현을 할경우
 function currency(obj) {
@@ -483,10 +483,10 @@ function currency(obj) {
     if (isNaN( val )) {
         obj.value = 0;
         return;
-    };
+    }
 
     com(obj);
-};
+}
 
 /* grid selected cell delete & backspace key 클릭 시 내용 삭제 기능 관련 + 방향키 셀 이동기능 */
 function getDeleteCellColumnObject() {

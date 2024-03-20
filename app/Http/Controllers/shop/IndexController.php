@@ -4,6 +4,7 @@ namespace App\Http\Controllers\shop;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\S_Release;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -221,19 +222,30 @@ class IndexController extends Controller
          limit 10
      ";
 
-     $chart3Result = DB::select($sql);
+    $chart3Result = DB::select($sql);
 
-        $values = [
-            'sdate' => $sdate,
-            'edate' => $edate,
-            'sdate2' => $sdate2,
-            'edate2' => $edate2,
-            'result' => $result,
-            'pieResult' => $piechart,
-            'chart2Result' => $chart2Result,
-            'chart3Result' => $chart3Result
-            
-        ];
+	$user = [
+		'id'	=> Auth('head')->user()->id,
+		'name'	=> Auth('head')->user()->name
+	];
+
+	$store_cd	= Auth('head')->user()->store_cd;
+	$release	= new S_Release($user);
+	$expire_release_cnt	= $release->getExpireRelease('30', $store_cd);
+	
+
+	$values = [
+		'sdate' => $sdate,
+		'edate' => $edate,
+		'sdate2' => $sdate2,
+		'edate2' => $edate2,
+		'result' => $result,
+		'pieResult' => $piechart,
+		'chart2Result' => $chart2Result,
+		'chart3Result' => $chart3Result,
+		'expire_release_cnt'	=> $expire_release_cnt
+		
+	];
 
 
         return view(Config::get('shop.shop.view'). '/index',$values);

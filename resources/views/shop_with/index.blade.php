@@ -482,6 +482,11 @@
     }
   });
 
+	@if( $expire_release_cnt > 0)
+		alert('한달이 지난 입고처리해야 할 출고관리 자료가 {{ $expire_release_cnt }}건 존재합니다. \n출고관리 페이지로 이동합니다.');
+		location.href	= '/shop/stock/stk10';
+	@endif
+
 </script>
 
 @stop
