@@ -442,6 +442,11 @@
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
 
+	@if( $expire_release_cnt > 0)
+	alert('한달이 지난 입고처리해야 할 출고관리 자료가 {{ $expire_release_cnt }}건 존재합니다. \n출고관리 페이지로 이동합니다.');
+	location.href	= '/shop/stock/stk10';
+	@endif
+	
 </script>
 
 @stop

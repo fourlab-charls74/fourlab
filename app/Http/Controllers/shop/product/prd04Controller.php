@@ -7,6 +7,7 @@ use App\Components\Lib;
 use App\Components\SLib;
 use App\Components\ULib;
 use Illuminate\Http\Request;
+use App\Models\S_Release;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -19,14 +20,23 @@ class prd04Controller extends Controller
 
 	public function index()
 	{
+		$user = [
+			'id'	=> Auth('head')->user()->id,
+			'name'	=> Auth('head')->user()->name
+		];
+
 		//로그인한 아이디의 매칭된 매장을 불러옴
 		$user_store	= Auth('head')->user()->store_cd;
 
+		$release	= new S_Release($user);
+		$expire_release_cnt	= $release->getExpireRelease('30', $user_store);
+		
 
 		$values = [
 			'sdate'			=> date('Y-m-d'),
             'store_types'	=> SLib::getCodes("STORE_TYPE"), // 매장구분
-			'user_store'	=> $user_store
+			'user_store'	=> $user_store,
+			'expire_release_cnt'	=> $expire_release_cnt
 		];
 
 		return view( Config::get('shop.shop.view') . '/product/prd04',$values);
