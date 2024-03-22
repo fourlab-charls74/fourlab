@@ -258,8 +258,10 @@
                     lvl = 'ml-2';
                 } else if (d_cat_cd.length === 9) {
                     lvl = 'ml-3';
-                } else if (d_cat_cd.length > 9) {
-                    lvl = 'ml-4';
+				} else if (d_cat_cd.length === 12) {
+					lvl = 'ml-4';
+				} else if (d_cat_cd.length > 12) {
+					lvl = 'ml-5';
                 }
 				return '<a href="#" class="' + lvl + '" data-code="' + params.data.d_cat_cd + '" data-child-cnt="' + params.data.child_cnt + '" onClick="ClickCategory(this)">' + params.value + '</a>'
             }
@@ -276,12 +278,24 @@
             width: 65,
             type: 'numberType'
         },
-        {
-            field: "40_cnt",
-            headerName: "판매중",
-            width: 65,
-            type: 'numberType'
-        },
+		{
+			field: "40_cnt",
+			headerName: "판매중",
+			width: 65,
+			type: 'numberType'
+		},
+		{
+			field: "display_cnt",
+			headerName: "전시중",
+			width: 65,
+			type: 'numberType'
+		},
+		{
+			field: "product_match_cnt",
+			headerName: "store",
+			width: 65,
+			type: 'numberType'
+		},
         {
             field: "sort_opt",
             headerName: "정렬",
