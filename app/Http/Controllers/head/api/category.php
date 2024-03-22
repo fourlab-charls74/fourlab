@@ -65,7 +65,7 @@ class category extends Controller
 						limit 0,1                        
 					) as mx_len
 				from category a
-				where a.cat_type = :cat_type2 
+				where a.cat_type = :cat_type2 and a.use_yn = 'Y'
 				$where
 				order by a.seq, d_cat_cd
             ";
