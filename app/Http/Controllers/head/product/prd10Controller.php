@@ -33,7 +33,10 @@ class prd10Controller extends Controller
 				, ifnull(b.cnt, 0) as cnt
 				, ifnull(b.30_cnt, 0) as 30_cnt
 				, ifnull(b.40_cnt, 0) as 40_cnt
+				, ifnull(b.display_cnt, 0) as display_cnt
 				, if(ifnull(c.sort_opt, 'A') = 'A', '자동', '수동') as sort_opt
+				, c.product_brand, c.product_gender, c.product_item
+				, 0 as product_match_cnt
 				, ifnull(c.auth, 'A') as auth
 				, c.use_yn
 				, c.regi_date
@@ -53,6 +56,7 @@ class prd10Controller extends Controller
 						c.cat_type, c.d_cat_cd,
 						sum(if(g.sale_stat_cl = '30', 1, 0 )) as 30_cnt,
 						sum(if(g.sale_stat_cl = '40', 1, 0)) as 40_cnt,
+						sum(if(g.sale_stat_cl = '10' or g.sale_stat_cl = '20' or g.sale_stat_cl = '40', 1, 0)) as display_cnt,
 						count(*) as cnt
 					from category c
 						inner join category_goods cg on c.cat_type = cg.cat_type and c.d_cat_cd = cg.d_cat_cd
@@ -65,6 +69,63 @@ class prd10Controller extends Controller
         ";
             //echo "<pre>$query</pre>";
         $result = DB::select($query);
+
+		foreach ($result as $row) {
+			
+			if( $row->product_brand != '' || $row->product_gender != '' || $row->product_item != '' ){
+
+				$brand_query 	= "";
+				$gender_query 	= "";
+				$item_query 	= "";
+				
+				if( $row->product_brand != '' ){
+					$product_brand	= explode(',', $row->product_brand);
+					$brand_query	= " and brand in (";
+					for($i = 0; $i < count($product_brand); $i++ ){
+						if($i > 0) $brand_query	.= ",";
+						$brand_query	.= "'" . $product_brand[$i] . "'";
+					}
+					$brand_query	.= ") ";
+				}
+
+				if( $row->product_gender != '' ){
+					$product_gender	= explode(',', $row->product_gender);
+					$gender_query	= " and gender in (";
+					for($i = 0; $i < count($product_gender); $i++ ){
+						if($i > 0) $gender_query	.= ",";
+						$gender_query	.= "'" . $product_gender[$i] . "'";
+					}
+					$gender_query	.= ") ";
+				}
+
+				if( $row->product_item != '' ){
+					$product_item	= explode(',', $row->product_item);
+					$item_query	= " and item in (";
+					for($i = 0; $i < count($product_item); $i++ ){
+						if($i > 0) $item_query	.= ",";
+						$item_query	.= "'" . $product_item[$i] . "'";
+					}
+					$item_query	.= ") ";
+				}
+				
+				$sql_product	= "
+					select
+						count(distinct pc.goods_no) as tot
+					from product_code pc
+					inner join product p on pc.prd_cd = p.prd_cd
+					inner join product_stock_storage pss on pc.prd_cd = pss.prd_cd
+					where
+						1 = 1
+						$brand_query
+						$gender_query
+						$item_query
+						and (p.tag_price - p.price)/p.tag_price <= 0.3
+						and pss.wqty > 0
+				";
+				$row->product_match_cnt	= DB::selectOne($sql_product)->tot;
+			}
+		}
+		
         return response()->json([
             "code" => 200,
             "head" => array(
