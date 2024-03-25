@@ -397,7 +397,10 @@ Route::group(['middleware' => 'head', 'as' => 'head.', 'namespace' => 'head'], f
         Route::post('prd10/{code?}/save', 'prd10Controller@goods_add');
         Route::post('prd10/{code?}/del', 'prd10Controller@goods_del');
         Route::post('prd10/{code?}/seq', 'prd10Controller@goods_seq');
-        Route::post('prd10/{code?}/disp', 'prd10Controller@goods_disp');
+		Route::post('prd10/{code?}/disp', 'prd10Controller@goods_disp');
+
+		Route::get('prd10/store_goods/{d_cat_cd?}', 'prd10Controller@store_goods');
+		Route::get('prd10/store_goods_search', 'prd10Controller@store_goods_list');
 
         // 섹션관리
         Route::get('prd11', 'prd11Controller@index');
