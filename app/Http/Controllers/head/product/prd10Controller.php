@@ -35,7 +35,7 @@ class prd10Controller extends Controller
 				, ifnull(b.40_cnt, 0) as 40_cnt
 				, ifnull(b.display_cnt, 0) as display_cnt
 				, if(ifnull(c.sort_opt, 'A') = 'A', '자동', '수동') as sort_opt
-				, c.product_brand, c.product_gender, c.product_item
+				, c.product_brand, c.product_gender, c.product_item, c.product_outlet_yn
 				, 0 as product_match_cnt
 				, ifnull(c.auth, 'A') as auth
 				, c.use_yn
@@ -72,15 +72,16 @@ class prd10Controller extends Controller
 
 		foreach ($result as $row) {
 			
-			if( $row->product_brand != '' || $row->product_gender != '' || $row->product_item != '' ){
+			if( $row->product_brand != '' || $row->product_gender != '' || $row->product_item != '' || $row->product_outlet_yn == 'Y' ){
 
 				$brand_query 	= "";
 				$gender_query 	= "";
 				$item_query 	= "";
+				$outlet_query	= "";
 				
 				if( $row->product_brand != '' ){
 					$product_brand	= explode(',', $row->product_brand);
-					$brand_query	= " and brand in (";
+					$brand_query	= " and pc.brand in (";
 					for($i = 0; $i < count($product_brand); $i++ ){
 						if($i > 0) $brand_query	.= ",";
 						$brand_query	.= "'" . $product_brand[$i] . "'";
@@ -90,7 +91,7 @@ class prd10Controller extends Controller
 
 				if( $row->product_gender != '' ){
 					$product_gender	= explode(',', $row->product_gender);
-					$gender_query	= " and gender in (";
+					$gender_query	= " and pc.gender in (";
 					for($i = 0; $i < count($product_gender); $i++ ){
 						if($i > 0) $gender_query	.= ",";
 						$gender_query	.= "'" . $product_gender[$i] . "'";
@@ -100,12 +101,18 @@ class prd10Controller extends Controller
 
 				if( $row->product_item != '' ){
 					$product_item	= explode(',', $row->product_item);
-					$item_query	= " and item in (";
+					$item_query	= " and pc.item in (";
 					for($i = 0; $i < count($product_item); $i++ ){
 						if($i > 0) $item_query	.= ",";
 						$item_query	.= "'" . $product_item[$i] . "'";
 					}
 					$item_query	.= ") ";
+				}
+
+				if( $row->product_outlet_yn == 'Y' ){
+					$outlet_query	.= " and (p.tag_price - p.price)/p.tag_price >= 0.2 ";
+				}else{
+					$outlet_query	.= " and (p.tag_price - p.price)/p.tag_price <= 0.3 ";
 				}
 				
 				$sql_product	= "
@@ -114,12 +121,13 @@ class prd10Controller extends Controller
 					from product_code pc
 					inner join product p on pc.prd_cd = p.prd_cd
 					inner join product_stock_storage pss on pc.prd_cd = pss.prd_cd
+					inner join goods g on pc.goods_no = g.goods_no
 					where
 						1 = 1
 						$brand_query
 						$gender_query
 						$item_query
-						and (p.tag_price - p.price)/p.tag_price <= 0.3
+						$outlet_query
 						and pss.wqty > 0
 				";
 				$row->product_match_cnt	= DB::selectOne($sql_product)->tot;
@@ -528,4 +536,116 @@ class prd10Controller extends Controller
             'body' => $result,
         ]);
     }
+
+	// 상품 조건별 매장 상품 메인
+	public function store_goods($d_cat_cd, Request $request)
+	{
+		$values = [
+			'd_cat_cd'	=> $d_cat_cd,
+			'goods_stats' => SLib::getCodes('G_GOODS_STAT'),
+		];
+		
+		return view( Config::get('shop.head.view') . '/product/prd10_store_goods',$values);
+	}
+	
+	// 상품 조건별 매장 상품 리스트
+	public function store_goods_list(Request $request)
+	{
+		$d_cat_cd	= $request->input('d_cat_cd');
+		
+		$sql	= " 
+			select 
+				c.product_brand, c.product_gender, c.product_item, c.product_outlet_yn
+			from category c
+			where
+				c.cat_type = 'DISPLAY'
+			  	and c.use_yn = 'Y'
+				and c.d_cat_cd = :d_cat_cd
+			limit 1
+		";
+		$category_info	= DB::selectOne($sql,['d_cat_cd' => $d_cat_cd]);
+
+		if( $category_info->product_brand != '' || $category_info->product_gender != '' || $category_info->product_item != '' || $category_info->product_outlet_yn == 'Y' ){
+			$product_brand	= $category_info->product_brand;
+			$product_gender	= $category_info->product_gender;
+			$product_item	= $category_info->product_item;
+			$product_outlet_yn	= $category_info->product_outlet_yn;
+
+			$brand_query 	= "";
+			$gender_query 	= "";
+			$item_query 	= "";
+			$outlet_query	= "";
+
+			if( $product_brand != '' ){
+				$product_brand	= explode(',', $product_brand);
+				$brand_query	= " and pc.brand in (";
+				for($i = 0; $i < count($product_brand); $i++ ){
+					if($i > 0) $brand_query	.= ",";
+					$brand_query	.= "'" . $product_brand[$i] . "'";
+				}
+				$brand_query	.= ") ";
+			}
+
+			if( $product_gender != '' ){
+				$product_gender	= explode(',', $product_gender);
+				$gender_query	= " and pc.gender in (";
+				for($i = 0; $i < count($product_gender); $i++ ){
+					if($i > 0) $gender_query	.= ",";
+					$gender_query	.= "'" . $product_gender[$i] . "'";
+				}
+				$gender_query	.= ") ";
+			}
+
+			if( $product_item != '' ){
+				$product_item	= explode(',', $product_item);
+				$item_query	= " and pc.item in (";
+				for($i = 0; $i < count($product_item); $i++ ){
+					if($i > 0) $item_query	.= ",";
+					$item_query	.= "'" . $product_item[$i] . "'";
+				}
+				$item_query	.= ") ";
+			}
+			
+			if( $product_outlet_yn == 'Y' ){
+				$outlet_query	= " and (p.tag_price - p.price)/p.tag_price >= 0.2 ";
+			}else{
+				$outlet_query	= " and (p.tag_price - p.price)/p.tag_price <= 0.3 ";
+			}
+
+			$sql_product	= "
+					select
+						distinct pc.goods_no, 
+						g.style_no, g.goods_nm, g.head_desc, g.goods_sh, g.price, 
+						cd.code_val as sale_stat_cl, 'N' as category_goods_yn
+					from product_code pc
+					inner join product p on pc.prd_cd = p.prd_cd
+					inner join product_stock_storage pss on pc.prd_cd = pss.prd_cd
+					inner join goods g on pc.goods_no = g.goods_no
+                    left outer join code cd on cd.code_kind_cd = 'G_GOODS_STAT' and g.sale_stat_cl = cd.code_id
+					where
+						1 = 1
+						$brand_query
+						$gender_query
+						$item_query
+						$outlet_query
+						and pss.wqty > 0
+				";
+			$result	= DB::select($sql_product);
+
+			foreach ($result as $row) {
+				$sql_chk	= " select count(*) as tot from category_goods where cat_type = 'DISPLAY' and disp_yn = 'Y' and d_cat_cd = :d_cat_cd and goods_no = :goods_no";
+				$tot	= DB::selectOne($sql_chk,['d_cat_cd' => $d_cat_cd, 'goods_no' => $row->goods_no])->tot;
+				
+				if( $tot > 0 )	$row->category_goods_yn = 'Y';
+			}			
+		}
+		
+		return response()->json([
+			"code" => 200,
+			"head" => array(
+				"total" => count($result),
+			),
+			"body" => $result
+		]);
+	}
 }

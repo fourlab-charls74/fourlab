@@ -294,7 +294,12 @@
 			field: "product_match_cnt",
 			headerName: "store",
 			width: 65,
-			type: 'numberType'
+			type: 'numberType',
+			cellRenderer: (params) => {
+				if( params.value > 0 ){
+					return `<a href="#" onClick="openStoreGoods('${params.data.d_cat_cd}');">${params.value}</a>`
+				}
+			}
 		},
         {
             field: "sort_opt",
@@ -302,6 +307,7 @@
 			width: 55,
 			cellClass: 'hd-grid-code'
         },
+		{ field:"d_cat_cd", hide:true},
         { width: "auto" }
     ];
 </script>
@@ -337,6 +343,12 @@
         var cat_type = $('#cat_type').val();
         gx.Request('/head/product/prd10/search', "cat_type=" + cat_type);
     }
+	
+	function openStoreGoods(d_cat_cd)
+	{
+		const url = '/head/product/prd10/store_goods/' + d_cat_cd;
+		window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=300,left=300,width=1700,height=880");
+	}
 </script>
 <script language="javascript">
     var columns_list = [
