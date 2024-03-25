@@ -35,7 +35,7 @@ class prd10Controller extends Controller
 				, ifnull(b.40_cnt, 0) as 40_cnt
 				, ifnull(b.display_cnt, 0) as display_cnt
 				, if(ifnull(c.sort_opt, 'A') = 'A', '자동', '수동') as sort_opt
-				, c.product_brand, c.product_gender, c.product_item, c.product_outlet_yn
+				, c.product_brand, c.product_gender, c.product_item, c.product_outlet_yn, c.product_check_rate
 				, 0 as product_match_cnt
 				, ifnull(c.auth, 'A') as auth
 				, c.use_yn
@@ -78,6 +78,7 @@ class prd10Controller extends Controller
 				$gender_query 	= "";
 				$item_query 	= "";
 				$outlet_query	= "";
+				$product_check_rate	= $row->product_check_rate/100;
 				
 				if( $row->product_brand != '' ){
 					$product_brand	= explode(',', $row->product_brand);
@@ -110,9 +111,9 @@ class prd10Controller extends Controller
 				}
 
 				if( $row->product_outlet_yn == 'Y' ){
-					$outlet_query	.= " and (p.tag_price - p.price)/p.tag_price >= 0.2 ";
+					$outlet_query	.= " and (p.tag_price - p.price)/p.tag_price >= $product_check_rate ";
 				}else{
-					$outlet_query	.= " and (p.tag_price - p.price)/p.tag_price <= 0.3 ";
+					$outlet_query	.= " and (p.tag_price - p.price)/p.tag_price <= $product_check_rate ";
 				}
 				
 				$sql_product	= "
@@ -552,10 +553,14 @@ class prd10Controller extends Controller
 	public function store_goods_list(Request $request)
 	{
 		$d_cat_cd	= $request->input('d_cat_cd');
+		$goods_stat	= $request->input('goods_stat');
+		$style_no	= $request->input('style_no');
+		$goods_no	= $request->input('goods_no');
+		$goods_nm	= $request->input('goods_nm');
 		
 		$sql	= " 
 			select 
-				c.product_brand, c.product_gender, c.product_item, c.product_outlet_yn
+				c.product_brand, c.product_gender, c.product_item, c.product_outlet_yn, c.product_check_rate
 			from category c
 			where
 				c.cat_type = 'DISPLAY'
@@ -570,11 +575,13 @@ class prd10Controller extends Controller
 			$product_gender	= $category_info->product_gender;
 			$product_item	= $category_info->product_item;
 			$product_outlet_yn	= $category_info->product_outlet_yn;
+			$product_check_rate	= $category_info->product_check_rate/100;
 
 			$brand_query 	= "";
 			$gender_query 	= "";
 			$item_query 	= "";
 			$outlet_query	= "";
+			$where			= "";
 
 			if( $product_brand != '' ){
 				$product_brand	= explode(',', $product_brand);
@@ -607,10 +614,34 @@ class prd10Controller extends Controller
 			}
 			
 			if( $product_outlet_yn == 'Y' ){
-				$outlet_query	= " and (p.tag_price - p.price)/p.tag_price >= 0.2 ";
+				$outlet_query	= " and (p.tag_price - p.price)/p.tag_price >= $product_check_rate ";
 			}else{
-				$outlet_query	= " and (p.tag_price - p.price)/p.tag_price <= 0.3 ";
+				$outlet_query	= " and (p.tag_price - p.price)/p.tag_price <= $product_check_rate ";
 			}
+			
+			if( $goods_stat <> '' ){
+				$where	.= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
+			}
+
+			if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
+
+			$goods_no = preg_replace("/\s/",",",$goods_no);
+			$goods_no = preg_replace("/\t/",",",$goods_no);
+			$goods_no = preg_replace("/\n/",",",$goods_no);
+			$goods_no = preg_replace("/,,/",",",$goods_no);
+
+			if( $goods_no != "" ){
+				$goods_nos = explode(",",$goods_no);
+				if(count($goods_nos) > 1){
+					if(count($goods_nos) > 500) array_splice($goods_nos,500);
+					$in_goods_nos = join(",",$goods_nos);
+					$where .= " and g.goods_no in ( $in_goods_nos ) ";
+				} else {
+					if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
+				}
+			}
+
+			if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%' ";
 
 			$sql_product	= "
 					select
@@ -629,6 +660,7 @@ class prd10Controller extends Controller
 						$item_query
 						$outlet_query
 						and pss.wqty > 0
+						$where
 				";
 			$result	= DB::select($sql_product);
 

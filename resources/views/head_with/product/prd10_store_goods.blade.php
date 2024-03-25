@@ -13,7 +13,7 @@
 			</div>
 		</div>
 		<div class="d-flex">
-			<a href="javascript:void(0);" onclick="save();" class="btn btn-primary mr-1"><i class="fas fa-search fa-sm text-white-50 mr-1"></i>조회</a>
+			<a href="javascript:void(0);" onclick="return Search();" class="btn btn-primary mr-1"><i class="fas fa-search fa-sm text-white-50 mr-1"></i>조회</a>
 			<a href="javascript:void(0);" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
