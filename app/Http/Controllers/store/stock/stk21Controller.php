@@ -209,7 +209,7 @@ class stk21Controller extends Controller
             where
                 s.use_yn = 'Y'
                 and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
-                and s.store_stock_yn = 'Y'
+                -- and s.store_stock_yn = 'Y'
                 $where
             group by s.store_cd
             order by ps.qty desc
@@ -241,7 +241,7 @@ class stk21Controller extends Controller
                 where
                     s.use_yn = 'Y'
                     and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
-                    and s.store_stock_yn = 'Y'
+                    -- and s.store_stock_yn = 'Y'
                     $where
             ) as a
         ";
