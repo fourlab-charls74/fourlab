@@ -990,7 +990,7 @@ class ord22Controller extends Controller
                         $order_gift_no	= $g_row->no;
                         if( $order_gift_no != "" )
                         {
-                            $gift->GiveGift($order_gift_no);
+                            //$gift->GiveGift($order_gift_no);
                         }
                     }
 
