@@ -445,7 +445,7 @@ class ord03Controller extends Controller
 							if (!empty($opt->user_nm)) {
 								$user_nm	= $opt->user_nm;
                                 $mobile		= $opt->mobile;
-                                $goods_nm	= mb_substr($opt->goods_nm, 0, 10);
+                                $goods_nm	= mb_substr($opt->goods_nm, 0, 30);
 
 								$dlv_nm = SLib::getCodesValue('DELIVERY', $dlv_cd);
 								if($dlv_nm === '') $dlv_nm = $dlv_cd;
