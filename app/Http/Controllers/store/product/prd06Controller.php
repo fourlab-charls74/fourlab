@@ -489,12 +489,13 @@ class prd06Controller extends Controller
 	
 			$cnt	= 0;
 			foreach ($rows as $row) {
-				
+
+				/*
 				if( $row->year == '24' ){
 					if( $row->prd_cd_p != 'F241MJK01CT' ){
 						$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
 						$row_chk	= DB::select($sql_24chk);
-
+	
 						$chk24	= 0;
 						foreach ($row_chk as $row_24){
 							if($row_24->prd_cd_p != ''){
@@ -507,6 +508,7 @@ class prd06Controller extends Controller
 						if($chk24 == 0) continue;
 					}
 				}
+				*/
 				
 				//대표창고 버퍼링 처리
 				if( $row->storage_cd == $stock_conf->default_storage_cd && $stock_conf->default_storage_buffer != 0){
