@@ -516,7 +516,7 @@ class ord06Controller extends Controller
                     -- round((1 - (sum((o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) * if(w.ord_state > 30, -1, 1)) / sum(g.goods_sh * if(w.ord_state > 30, -1, 1)))) * 100) as avg_dc_rate,
                     sum(w.qty * (o.price - if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt)) * if(w.ord_state > 30, -1, 1)) as total_ord_amt,
                     sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as total_recv_amt,
-                    sum((w.recv_amt + w.point_apply_amt) * if(w.ord_state > 30, -1, 1)) as total_acc_amt,
+                    sum((w.recv_amt + ifnull(w.point_apply_amt,0)) * if(w.ord_state > 30, -1, 1)) as total_acc_amt,
                     sum(o.dlv_amt * if(w.ord_state > 30, -1, 1)) as total_dlv_amt
                 from order_opt_wonga w
                     inner join order_opt o on o.ord_opt_no = w.ord_opt_no
