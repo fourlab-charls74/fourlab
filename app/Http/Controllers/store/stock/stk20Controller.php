@@ -461,9 +461,9 @@ class stk20Controller extends Controller
     // 보내는매장 출고 (처리) (20 -> 30)
     public function release(Request $request) 
     {          
-        $ori_state = 20;
-        $new_state = 30;
-        $admin_id = Auth('head')->user()->id;
+        $ori_state	= 20;
+        $new_state	= 30;
+        $admin_id	= Auth('head')->user()->id;
         $data = $request->input("data", []);
 
         try {
@@ -472,6 +472,14 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
+				
+				$sql	= " select state from product_stock_rotation where idx = :idx ";
+				$check_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
+				
+				if( $check_state != '20' ){
+					$code = '-102';
+					throw new Exception("이미처리된 RT 상품입니다.");
+				}
 
                 DB::table('product_stock_rotation')
                     ->where('idx', '=', $d['idx'])
@@ -554,6 +562,14 @@ class stk20Controller extends Controller
 			foreach($data as $d) {
                 if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
+
+				$sql	= " select state from product_stock_rotation where idx = :idx ";
+				$check_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
+
+				if( $check_state != '30' ){
+					$code = '-102';
+					throw new Exception("이미처리된 RT 상품입니다.");
+				}
 
                 DB::table('product_stock_rotation')
                     ->where('idx', '=', $d['idx'])
