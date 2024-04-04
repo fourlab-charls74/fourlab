@@ -167,6 +167,7 @@ class stk35Controller extends Controller
             	, pc.color
             	, pc.size
                 , p.tag_price
+                , p.wonga
                 , srp.price
                 , srp.return_price 
                 , srp.return_qty as qty

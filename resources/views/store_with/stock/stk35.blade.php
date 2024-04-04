@@ -364,6 +364,7 @@
 			{field: "size", headerName: "사이즈", width: 60, cellClass: 'hd-grid-code'},
 			{field: "tag_price", headerName: "택가", type: "currencyType", width: 80},
 			{field: "price", headerName: "현재가", type: "currencyType", width: 80},
+			{field: "wonga", headerName: "원가", type: "currencyType", width: 80},
 			{field: "return_price", headerName: "반품단가", type: "currencyType", width: 80},
 			{field: "return_amt", headerName: "요청금액", width: 80, type: 'currencyType'},
 			{field: "qty", headerName: "요청수량", width: 60, type: 'currencyType'},
