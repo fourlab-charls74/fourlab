@@ -50,15 +50,15 @@ class stk30Controller extends Controller
 		$pro_date_yn	= $request->input('pro_date_yn');
 		$pro_sdate      = $request->input("pro_sdate", now()->sub(1, 'week')->format('Ymd'));
 		$pro_edate      = $request->input("pro_edate", date("Ymd"));
-        $sr_state   = $request->input("sr_state", "");
-        $sr_reason  = $request->input("sr_reason", "");
-        $storage_cd = $request->input("storage_cd", "");
-        $store_no   = $request->input("store_no", "");
+		$sr_state   = $request->input("sr_state", "");
+		$sr_reason  = $request->input("sr_reason", "");
+		$storage_cd = $request->input("storage_cd", "");
+		$store_no   = $request->input("store_no", "");
 
-        $store_channel		= $request->input("store_channel", "");
+		$store_channel		= $request->input("store_channel", "");
 		$store_channel_kind	= $request->input("store_channel_kind", "");
-        
-        // where
+
+		// where
 		$where = "";
 
 		if( $date_yn == "Y" ) {
@@ -86,29 +86,29 @@ class stk30Controller extends Controller
 				and cast(sr.sr_pro_date as date) <= '$pro_edate'
         	";
 		}
-		
-        if($sr_state != "")     $where .= " and sr.sr_state = '" . Lib::quote($sr_state) . "'";
-        if($sr_reason != "")    $where .= " and sr.sr_reason = '" . Lib::quote($sr_reason) . "'";
-        if($storage_cd != "")   $where .= " and sr.storage_cd = '" . Lib::quote($storage_cd) . "'";
-        if($store_no != "")     $where .= " and sr.store_cd = '" . Lib::quote($store_no) . "'";
 
-        if ($store_channel != "") 		$where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
+		if($sr_state != "")     $where .= " and sr.sr_state = '" . Lib::quote($sr_state) . "'";
+		if($sr_reason != "")    $where .= " and sr.sr_reason = '" . Lib::quote($sr_reason) . "'";
+		if($storage_cd != "")   $where .= " and sr.storage_cd = '" . Lib::quote($storage_cd) . "'";
+		if($store_no != "")     $where .= " and sr.store_cd = '" . Lib::quote($store_no) . "'";
+
+		if ($store_channel != "") 		$where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") 	$where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
-        // ordreby
-        $ord        = $request->input("ord", "desc");
-        $ord_field  = $request->input("ord_field", "sr.sr_cd");
-        if($ord_field == 'sr_cd') $ord_field = 'sr.' . $ord_field;
-        $orderby    = sprintf("order by %s %s", $ord_field, $ord);
-        
-        // pagination
-        $page       = $request->input("page", 1);
-        $page_size  = $request->input("limit", 100);
-        if ($page < 1 or $page == "") $page = 1;
-        $startno    = ($page - 1) * $page_size;
-        $limit      = " limit $startno, $page_size ";
+		// ordreby
+		$ord        = $request->input("ord", "desc");
+		$ord_field  = $request->input("ord_field", "sr.sr_cd");
+		if($ord_field == 'sr_cd') $ord_field = 'sr.' . $ord_field;
+		$orderby    = sprintf("order by %s %s", $ord_field, $ord);
 
-        // search
+		// pagination
+		$page       = $request->input("page", 1);
+		$page_size  = $request->input("limit", 100);
+		if ($page < 1 or $page == "") $page = 1;
+		$startno    = ($page - 1) * $page_size;
+		$limit      = " limit $startno, $page_size ";
+
+		// search
 		$sql = "
             select
                 sr.sr_cd,
@@ -149,11 +149,11 @@ class stk30Controller extends Controller
 		";
 		$result = DB::select($sql);
 
-        // pagination
-        $total = 0;
-        $page_cnt = 0;
-        if($page == 1) {
-            $sql = "
+		// pagination
+		$total = 0;
+		$page_cnt = 0;
+		if($page == 1) {
+			$sql = "
 				select count(sr_cd) as total
 				from (
 					select sr.sr_cd
@@ -170,10 +170,10 @@ class stk30Controller extends Controller
 				) a
             ";
 
-            $row = DB::selectOne($sql);
-            $total = $row->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        }
+			$row = DB::selectOne($sql);
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
 
 		return response()->json([
 			"code" => 200,
@@ -185,20 +185,20 @@ class stk30Controller extends Controller
 			],
 			"body" => $result
 		]);
-    }
+	}
 
-    // 매장반품 등록 & 상세팝업 오픈
-    public function show($sr_cd = '') 
-    {
-        $sr = '';
+	// 매장반품 등록 & 상세팝업 오픈
+	public function show($sr_cd = '')
+	{
+		$sr = '';
 		$storages = DB::table("storage")
 			->where('use_yn', '=', 'Y')
 			->select('storage_cd', 'storage_nm as storage_nm', 'default_yn')
 			->orderByDesc('default_yn')
 			->get();
 
-        if($sr_cd != '') {
-            $sql = "
+		if($sr_cd != '') {
+			$sql = "
                 select
                     sr.sr_cd,
 					concat(sr.store_cd, '_', REPLACE(sr.sr_date, '-', '') , '_' , LPAD(sr.sr_cd, 3, '0')) as sr_code,
@@ -216,28 +216,28 @@ class stk30Controller extends Controller
                     inner join store s on s.store_cd = sr.store_cd
                 where sr_cd = :sr_cd
             ";
-            $sr = DB::selectOne($sql, [ 'sr_cd' => $sr_cd ]);
-        }
+			$sr = DB::selectOne($sql, [ 'sr_cd' => $sr_cd ]);
+		}
 
-        $values = [
-            'cmd' 			=> $sr == '' ? "add" : "update",
-            'sdate'         => $sr == '' ? date("Y-m-d") : $sr->sr_date,
-            'storages'      => $storages,
-            'sr_reasons'    => SLib::getCodes("SR_REASON"),
-            'sr'            => $sr,
-            'sr_cd'         => $sr_cd,
-            'sr_state'      => $sr->sr_state ?? '',
+		$values = [
+			'cmd' 			=> $sr == '' ? "add" : "update",
+			'sdate'         => $sr == '' ? date("Y-m-d") : $sr->sr_date,
+			'storages'      => $storages,
+			'sr_reasons'    => SLib::getCodes("SR_REASON"),
+			'sr'            => $sr,
+			'sr_cd'         => $sr_cd,
+			'sr_state'      => $sr->sr_state ?? '',
 			'reject_reasons' => SLib::getCodes('SR_REJECT_REASON'),
 			'return_storage_cd' => 'S0006', // 반품창고
-        ];
-        return view(Config::get('shop.store.view') . '/stock/stk30_show', $values);
-    }
+		];
+		return view(Config::get('shop.store.view') . '/stock/stk30_show', $values);
+	}
 
-    // 기존에 반품등록된 상품목록 조회
-    public function search_return_products(Request $request)
-    {
-        $sr_cd = $request->input('sr_cd', '');
-        $sql = "
+	// 기존에 반품등록된 상품목록 조회
+	public function search_return_products(Request $request)
+	{
+		$sr_cd = $request->input('sr_cd', '');
+		$sql = "
             select 
                 @rownum := @rownum + 1 as count,
                 srp.sr_prd_cd, 
@@ -285,7 +285,7 @@ class stk30Controller extends Controller
                 (select @rownum :=0) as r
             where srp.sr_cd = :sr_cd
         ";
-        $products = DB::select($sql, [ 'sr_cd' => $sr_cd ]);
+		$products = DB::select($sql, [ 'sr_cd' => $sr_cd ]);
 
 		return response()->json([
 			"code" => 200,
@@ -297,43 +297,43 @@ class stk30Controller extends Controller
 			],
 			"body" => $products
 		]);
-    }
+	}
 
-    // 매장반품 등록
-    public function save(Request $request)
-    {
+	// 매장반품 등록
+	public function save(Request $request)
+	{
 		$code = 200;
 		$msg = "";
 
-        $admin_id = Auth('head')->user()->id;
-        $sr_kind = $request->input("sr_kind", "G"); // 일반(G) / 일괄(B)
-        $sr_state = 10; // 반품등록 시 요청 상태로 등록
-        $sr_date = $request->input("sr_date", date("Y-m-d"));
-        $storage_cd = $request->input("storage_cd", "");
-        $store_cd = $request->input("store_cd", "");
-        $sr_reason = $request->input("sr_reason", "");
-        $comment = $request->input("comment", "");
-        $products = $request->input("products", []);
+		$admin_id = Auth('head')->user()->id;
+		$sr_kind = $request->input("sr_kind", "G"); // 일반(G) / 일괄(B)
+		$sr_state = 10; // 반품등록 시 요청 상태로 등록
+		$sr_date = $request->input("sr_date", date("Y-m-d"));
+		$storage_cd = $request->input("storage_cd", "");
+		$store_cd = $request->input("store_cd", "");
+		$sr_reason = $request->input("sr_reason", "");
+		$comment = $request->input("comment", "");
+		$products = $request->input("products", []);
 
-        try {
-            DB::beginTransaction();
+		try {
+			DB::beginTransaction();
 
-            if(count($products) < 1) {
-                throw new Exception("반품등록할 상품을 선택해주세요.");
-            }
+			if(count($products) < 1) {
+				throw new Exception("반품등록할 상품을 선택해주세요.");
+			}
 
-            $sr_cd = DB::table('store_return')
-                ->insertGetId([
-                    'storage_cd' => $storage_cd,
-                    'store_cd' => $store_cd,
-                    'sr_date' => $sr_date,
-                    'sr_kind' => $sr_kind,
-                    'sr_state' => $sr_state,
-                    'sr_reason' => $sr_reason,
-                    'comment' => $comment,
-                    'rt' => now(),
-                    'admin_id' => $admin_id,
-                ]);
+			$sr_cd = DB::table('store_return')
+				->insertGetId([
+					'storage_cd' => $storage_cd,
+					'store_cd' => $store_cd,
+					'sr_date' => $sr_date,
+					'sr_kind' => $sr_kind,
+					'sr_state' => $sr_state,
+					'sr_reason' => $sr_reason,
+					'comment' => $comment,
+					'rt' => now(),
+					'admin_id' => $admin_id,
+				]);
 
 			foreach($products as $product) {
 				if ($product['store_wqty'] < $product['return_qty']) {
@@ -341,17 +341,17 @@ class stk30Controller extends Controller
 					throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
 				}
 
-                DB::table('store_return_product')
-                    ->insert([
-                        'sr_cd' => $sr_cd,
-                        'prd_cd' => $product['prd_cd'],
-                        'price' => $product['price'], // 판매가
-                        'return_price' => $product['return_price'], // 반품단가
-                        'return_qty' => $product['return_qty'], // 요청수량
-                        'rt' => now(),
-                        'admin_id' => $admin_id,
-                    ]);
-            }
+				DB::table('store_return_product')
+					->insert([
+						'sr_cd' => $sr_cd,
+						'prd_cd' => $product['prd_cd'],
+						'price' => $product['price'], // 판매가
+						'return_price' => $product['return_price'], // 반품단가
+						'return_qty' => $product['return_qty'], // 요청수량
+						'rt' => now(),
+						'admin_id' => $admin_id,
+					]);
+			}
 
 			//상품반품 등록 시 매장에 내역 확인 알림 표시
 			$sql = "
@@ -360,9 +360,9 @@ class stk30Controller extends Controller
 				from store
 				where store_cd = :store_cd
 			";
-			
+
 			$store_nm = DB::selectOne($sql,['store_cd' => $store_cd]);
-			
+
 			$res = DB::table('msg_store')
 				->insertGetId([
 					'msg_kind' => 'STORE_RETURN',
@@ -384,33 +384,33 @@ class stk30Controller extends Controller
 
 
 			DB::commit();
-            $msg = "매장반품이 정상적으로 요청되었습니다.";
+			$msg = "매장반품이 정상적으로 요청되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = $code === 200 ? 500 : $code;
 			$msg = $e->getMessage();
 		}
 
-        return response()->json([ "code" => $code, "msg" => $msg ]);
-    }
+		return response()->json([ "code" => $code, "msg" => $msg ]);
+	}
 
-    // 창고반품 수정 (+상태변경)
-    public function update(Request $request)
-    {
+	// 창고반품 수정 (+상태변경)
+	public function update(Request $request)
+	{
 		$code = 200;
 		$msg = "";
 
-        $admin_id = Auth('head')->user()->id;
+		$admin_id = Auth('head')->user()->id;
 		$admin_nm = Auth('head')->user()->name;
-        $sr_cd = $request->input("sr_cd", "");
-        $sr_reason = $request->input("sr_reason", "");
-        $comment = $request->input("comment", "");
-        $new_state = $request->input("new_state", "");
-        $products = $request->input("products", []);
+		$sr_cd = $request->input("sr_cd", "");
+		$sr_reason = $request->input("sr_reason", "");
+		$comment = $request->input("comment", "");
+		$new_state = $request->input("new_state", "");
+		$products = $request->input("products", []);
 
-        try {
-            DB::beginTransaction();
-			
+		try {
+			DB::beginTransaction();
+
 			$sr_update = [
 				'sr_reason' => $sr_reason,
 				'comment' => $comment,
@@ -430,10 +430,10 @@ class stk30Controller extends Controller
 				$sr_update = array_merge($sr_update, [ 'sr_fin_date' => date('Y-m-d') ]);
 			}
 
-            DB::table('store_return')
-                ->where('sr_cd', $sr_cd)
-                ->update($sr_update);
-			
+			DB::table('store_return')
+				->where('sr_cd', $sr_cd)
+				->update($sr_update);
+
 			$now_state = DB::table('store_return')->where('sr_cd', $sr_cd)->value('sr_state');
 
 			foreach($products as $product) {
@@ -441,7 +441,7 @@ class stk30Controller extends Controller
 //					$code = 501;
 //					throw new Exception('매장보유재고보다 많은 수량을 반품요청할 수 없습니다.');
 //				}
-				
+
 				$sr_prd_cd = $product['sr_prd_cd'] ?? '';
 				if ($sr_prd_cd !== '') {
 					DB::table('store_return_product')
@@ -484,19 +484,19 @@ class stk30Controller extends Controller
 					// 반품완료 재고처리
 					$this->_set_return_stock($sr_prd_cd, $admin_id, $admin_nm);
 				}
-            }
+			}
 
 			DB::commit();
-            $msg = "매장반품내역이 정상적으로 저장되었습니다.";
+			$msg = "매장반품내역이 정상적으로 저장되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
 			$code = $code === 200 ? 500 : $code;
 			$msg = $e->getMessage();
 		}
 
-        return response()->json(["code" => $code, "msg" => $msg]);
-    }
-	
+		return response()->json(["code" => $code, "msg" => $msg]);
+	}
+
 	/** 매장반품 처리중 시, 재고처리 */
 	private function _set_return_p_stock($sr_prd_cd, $admin_id, $admin_nm)
 	{
@@ -517,7 +517,7 @@ class stk30Controller extends Controller
 		";
 		$row = DB::selectOne($sql, [ 'sr_prd_cd' => $sr_prd_cd ]);
 		if ($row === null) throw new Exception("반품정보가 존재하지 않습니다.");
-		
+
 		$qty = $row->return_qty ?? 0;
 
 		$store_stock_cnt =
@@ -525,19 +525,18 @@ class stk30Controller extends Controller
 				->where('store_cd', '=', $row->store_cd)
 				->where('prd_cd', '=', $row->prd_cd)
 				->count();
-		
+
 		if ($store_stock_cnt < 1) {
 			DB::table('product_stock_store')
 				->insert([
-					'goods_no'	=> $row->goods_no,
-					'prd_cd'	=> $row->prd_cd,
-					'store_cd'	=> $row->store_cd,
-					'qty'		=> 0,
-					'wqty'		=> $qty * -1,
-					'rqty'		=> $qty,					// 24-04 매장관리 개선작업 : 반품수량 등록
-					'goods_opt'	=> $row->goods_opt,
-					'use_yn'	=> 'Y',
-					'rt'		=> now()
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'store_cd' => $row->store_cd,
+					'qty' => 0,
+					'wqty' => $qty * -1,
+					'goods_opt' => $row->goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now()
 				]);
 		} else {
 			// 매장보유재고 차감 (+ history)
@@ -546,16 +545,13 @@ class stk30Controller extends Controller
 				->where('store_cd', '=', $row->store_cd)
 				->update([
 					'wqty' => DB::raw('wqty - ' . $qty),
-					'rqty' => DB::raw('rqty + ' . $qty),	// 24-04 매장관리 개선작업 : 반품 수량 업데이트
 					'ut' => now(),
 				]);
 		}
-		
+
 		// qty가 0이 아닐 때만 hst에 저장
 		if ($qty > 0 || $qty < 0) {
-			// 24-04 매장관리 개선작업 : hst 등록 삭제 ( 매장 hst 등록은 반품 완료시 일괄 등록 )
-			// product_stock_return_hst로 대처 추후 return 전용 테이블로 사용 예정
-			DB::table('product_stock_return_hst')
+			DB::table('product_stock_hst')
 				->insert([
 					'goods_no' => $row->goods_no,
 					'prd_cd' => $row->prd_cd,
@@ -570,7 +566,7 @@ class stk30Controller extends Controller
 					'r_stock_state_date' => date('Ymd'),
 					'ord_opt_no' => '',
 					'store_return_no'	=> $sr_prd_cd,
-					'comment' => '매장반품진행중처리',
+					'comment' => '매장반품처리',
 					'rt' => now(),
 					'admin_id' => $admin_id,
 					'admin_nm' => $admin_nm,
@@ -675,19 +671,19 @@ class stk30Controller extends Controller
 				->where('store_cd', '=', $row->store_cd)
 				->where('prd_cd', '=', $row->prd_cd)
 				->count();
-		
+
 		if ($store_stock_cnt < 1) {
 			// 해당 매장에 상품 기존재고가 없을 경우
 			DB::table('product_stock_store')
 				->insert([
-					'goods_no'	=> $row->goods_no,
-					'prd_cd'	=> $row->prd_cd,
-					'store_cd'	=> $row->store_cd,
-					'qty'		=> $f_qty * -1,
-					'wqty'		=> $f_qty * -1,
-					'goods_opt'	=> $row->goods_opt,
-					'use_yn'	=> 'Y',
-					'rt'		=> now()
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'store_cd' => $row->store_cd,
+					'qty' => $f_qty * -1,
+					'wqty' => $f_qty * -1,
+					'goods_opt' => $row->goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now()
 				]);
 		} else {
 			// 매장보유재고 재설정 (+ history) 및 실재고 차감
@@ -695,39 +691,12 @@ class stk30Controller extends Controller
 				->where('prd_cd', '=', $row->prd_cd)
 				->where('store_cd', '=', $row->store_cd)
 				->update([
-					'qty'	=> DB::raw('qty - ' . $f_qty),
-					'wqty'	=> DB::raw('wqty + ' . ($p_qty - $f_qty)),
-					'rqty'	=> DB::raw('rqty - ' . $p_qty),	// 24-04 매장관리 개선작업 : 반품완료로 인한 rqty 차감 ( 추가 차감은 필요없음 )
-					'ut'	=> now(),
+					'qty' => DB::raw('qty - ' . $f_qty),
+					'wqty' => DB::raw('wqty + ' . ($p_qty - $f_qty)),
+					'ut' => now(),
 				]);
 		}
 
-		// 24-04 매장관리 개선작업 : 매장 HST 등록
-		if( $f_qty > 0 || $f_qty < 0 ){
-			DB::table('product_stock_hst')
-				->insert([
-					'goods_no'			=> $row->goods_no,
-					'prd_cd'			=> $row->prd_cd,
-					'goods_opt'			=> $row->goods_opt,
-					'location_cd'		=> $row->store_cd,
-					'location_type'		=> 'STORE',
-					'type'				=> PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(출고)
-					'price'				=> $row->price,
-					'wonga'				=> $row->wonga,
-					'qty'				=> $f_qty * -1,
-					'stock_state_date'		=> date('Ymd'),
-					'r_stock_state_date'	=> date('Ymd'),
-					'ord_opt_no'		=> '',
-					'store_return_no'	=> $sr_prd_cd,
-					'comment'			=> '매장반품완료처리',
-					'rt'				=> now(),
-					'admin_id'			=> $admin_id,
-					'admin_nm'			=> $admin_nm,
-				]);
-		}
-		
-		//	24-04 매장관리 개선작업 : 매장 HST 추가등록 삭제 ( 전체 등록으로 대처 )
-		/*
 		if (($p_qty - $f_qty) > 0 || ($p_qty - $f_qty) < 0) {
 			DB::table('product_stock_hst')
 				->insert([
@@ -750,10 +719,8 @@ class stk30Controller extends Controller
 					'admin_nm' => $admin_nm,
 				]);
 		}
-		*/
 
-		// 24-04 매장관리 개선작업 : 완료시 매장 HST 등록됨으로 인해 무의미하여 주석처리
-		/*
+		//
 		DB::table('product_stock_hst')
 			->where('store_return_no', '=', $sr_prd_cd)
 			->where('location_type', '=', $row->store_cd)
@@ -762,8 +729,7 @@ class stk30Controller extends Controller
 				'r_stock_state_date' => date('Ymd'),
 				'ut'	=> now()
 			]);
-		*/
-		
+
 		//해당 창고에 재고있는지 확인하는 부분
 		$storage_stock_cnt =
 			DB::table('product_stock_storage')
@@ -775,14 +741,14 @@ class stk30Controller extends Controller
 			// 해당 창고에 상품 기존재고가 없을 경우
 			DB::table('product_stock_storage')
 				->insert([
-					'goods_no'		=> $row->goods_no,
-					'prd_cd'		=> $row->prd_cd,
-					'storage_cd'	=> $row->storage_cd,
-					'qty'			=> $f_qty,
-					'wqty'			=> $f_qty,
-					'goods_opt'		=> $row->goods_opt,
-					'use_yn'		=> 'Y',
-					'rt'			=> now()
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'storage_cd' => $row->storage_cd,
+					'qty' => $f_qty,
+					'wqty' => $f_qty,
+					'goods_opt' => $row->goods_opt,
+					'use_yn' => 'Y',
+					'rt' => now()
 				]);
 		} else {
 			// 창고보유재고 재설정 (+ history) 및 실재고 증가
@@ -790,36 +756,37 @@ class stk30Controller extends Controller
 				->where('prd_cd', '=', $row->prd_cd)
 				->where('storage_cd', '=', $row->storage_cd)
 				->update([
-					'qty'	=> DB::raw('qty + ' . $f_qty),
+					'qty' => DB::raw('qty + ' . $f_qty),
 					// 231110 ceduce
 					//'wqty' => DB::raw('wqty - ' . ($p_qty - $f_qty)),
-					'wqty'	=> DB::raw('wqty + ' . $f_qty),
-					'ut'	=> now(),
+					'wqty' => DB::raw('wqty + ' . $f_qty),
+					'ut' => now(),
 				]);
 		}
 
+		//if (($p_qty - $f_qty) > 0 || ($p_qty - $f_qty) < 0) {
 		if ($f_qty > 0 || $f_qty < 0) {
 			DB::table('product_stock_hst')
 				->insert([
-					'goods_no'			=> $row->goods_no,
-					'prd_cd'			=> $row->prd_cd,
-					'goods_opt'			=> $row->goods_opt,
-					'location_cd'		=> $row->storage_cd,
-					'location_type'		=> 'STORAGE',
-					'type'				=> PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
-					'price'				=> $row->price,
-					'wonga'				=> $row->wonga,
+					'goods_no' => $row->goods_no,
+					'prd_cd' => $row->prd_cd,
+					'goods_opt' => $row->goods_opt,
+					'location_cd' => $row->storage_cd,
+					'location_type' => 'STORAGE',
+					'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품(입고)
+					'price' => $row->price,
+					'wonga' => $row->wonga,
 					// 231110 ceduce
 					//'qty' => ($p_qty - $f_qty) * -1,
-					'qty'				=> $f_qty,
-					'stock_state_date'		=> date('Ymd'),
-					'r_stock_state_date'	=> date('Ymd'),
-					'ord_opt_no'		=> '',
+					'qty' => $f_qty,
+					'stock_state_date' => date('Ymd'),
+					'r_stock_state_date' => date('Ymd'),
+					'ord_opt_no' => '',
 					'store_return_no'	=> $sr_prd_cd,
-					'comment'			=> '매장반품확정',
-					'rt'				=> now(),
-					'admin_id'			=> $admin_id,
-					'admin_nm'			=> $admin_nm,
+					'comment' => '매장반품확정',
+					'rt' => now(),
+					'admin_id' => $admin_id,
+					'admin_nm' => $admin_nm,
 				]);
 		}
 
@@ -829,8 +796,8 @@ class stk30Controller extends Controller
 			->update([
 				// 231110 ceduce
 				//'wqty' => DB::raw('wqty - ' . ($p_qty - $f_qty)),
-				'wqty'	=> DB::raw('wqty + ' . $f_qty),
-				'ut'	=> now(),
+				'wqty' => DB::raw('wqty + ' . $f_qty),
+				'ut' => now(),
 			]);
 
 		return 1;
@@ -872,77 +839,72 @@ class stk30Controller extends Controller
 					if ($prd->sr_state < 30) continue;
 
 					// 원복수량: 반품완료상태일 때는 확정수량, 반품처리중상태일 때는 처리수량
-					$return_qty		= $prd->sr_state >= 40 ? ($prd->fixed_return_qty ?? 0) : 0; // 실재고
-					$return_wqty	= $prd->sr_state >= 40 ? ($prd->fixed_return_qty ?? 0) : ($prd->return_p_qty ?? 0); // 보유재고
-					$return_rqty	= $prd->sr_state >= 40 ? 0 : ($prd->return_p_qty ?? 0); // 24-04 반품관리 개선작업 : 처리중일때만 rqty 존재 하여 처리
+					$return_qty = $prd->sr_state >= 40 ? ($prd->fixed_return_qty ?? 0) : 0; // 실재고
+					$return_wqty = $prd->sr_state >= 40 ? ($prd->fixed_return_qty ?? 0) : ($prd->return_p_qty ?? 0); // 보유재고
 
 					// 매장보유재고 환원 (+ history)
 					DB::table('product_stock_store')
 						->where('prd_cd', $prd->prd_cd)
 						->where('store_cd', $prd->store_cd)
 						->update([
-							'qty'	=> DB::raw('qty + ' . $return_qty),
-							'wqty'	=> DB::raw('wqty + ' . $return_wqty),
-							'rqty'	=> DB::raw('rqty - ' . $return_rqty),	// 24-04 반품관리 개선작업 : rqty 원복 ( 30 상태일때만 존재 )
-							'ut'	=> now(),
+							'qty' => DB::raw('qty + ' . $return_qty),
+							'wqty' => DB::raw('wqty + ' . $return_wqty),
+							'ut' => now(),
 						]);
+					if ($return_wqty > 0 || $return_wqty < 0) {
+						DB::table('product_stock_hst')
+							->insert([
+								'goods_no' => $prd->goods_no,
+								'prd_cd' => $prd->prd_cd,
+								'goods_opt' => $prd->goods_opt,
+								'location_cd' => $prd->store_cd,
+								'location_type' => 'STORE',
+								'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품
+								'price' => $prd->price,
+								'wonga' => $prd->wonga,
+								'qty' => $return_wqty * 1,
+								'stock_state_date' => date('Ymd'),
+								'r_stock_state_date' => date('Ymd'),
+								'ord_opt_no' => '',
+								'store_return_no'	=> $prd->sr_prd_cd,
+								'comment' => '매장반품삭제',
+								'rt' => now(),
+								'admin_id' => $admin_id,
+								'admin_nm' => $admin_nm,
+							]);
+					}
 
 					if($prd->sr_state >= "40"){
-
-						// 24-04 반품관리 개선작업 : 매장 반품 삭제
-						if ($return_wqty > 0 || $return_wqty < 0) {
-							DB::table('product_stock_hst')
-								->insert([
-									'goods_no'			=> $prd->goods_no,
-									'prd_cd'			=> $prd->prd_cd,
-									'goods_opt'			=> $prd->goods_opt,
-									'location_cd'		=> $prd->store_cd,
-									'location_type'		=> 'STORE',
-									'type'				=> PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품
-									'price'				=> $prd->price,
-									'wonga'				=> $prd->wonga,
-									'qty'				=> $return_wqty * 1,
-									'stock_state_date'	=> date('Ymd'),
-									'r_stock_state_date'	=> date('Ymd'),
-									'ord_opt_no'		=> '',
-									'store_return_no'	=> $prd->sr_prd_cd,
-									'comment'			=> '매장반품삭제',
-									'rt'				=> now(),
-									'admin_id'			=> $admin_id,
-									'admin_nm'			=> $admin_nm,
-								]);
-						}
 
 						// 창고보유재고 차감 (+ history)
 						DB::table('product_stock_storage')
 							->where('prd_cd', '=', $prd->prd_cd)
 							->where('storage_cd', '=', $prd->storage_cd)
 							->update([
-								'qty'	=> DB::raw('qty - ' . $return_qty),
-								'wqty'	=> DB::raw('wqty - ' . $return_wqty),
-								'ut'	=> now(),
+								'qty' => DB::raw('qty - ' . $return_qty),
+								'wqty' => DB::raw('wqty - ' . $return_wqty),
+								'ut' => now(),
 							]);
-						
 						if ($return_wqty > 0 || $return_wqty < 0) {
 							DB::table('product_stock_hst')
 								->insert([
-									'goods_no'			=> $prd->goods_no,
-									'prd_cd'			=> $prd->prd_cd,
-									'goods_opt'			=> $prd->goods_opt,
-									'location_cd'		=> $prd->storage_cd,
-									'location_type'		=> 'STORAGE',
-									'type'				=> PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품
-									'price'				=> $prd->price,
-									'wonga'				=> $prd->wonga,
-									'qty'				=> $return_wqty * -1,
-									'stock_state_date'	=> date('Ymd'),
-									'r_stock_state_date'	=> date('Ymd'),
-									'ord_opt_no'		=> '',
+									'goods_no' => $prd->goods_no,
+									'prd_cd' => $prd->prd_cd,
+									'goods_opt' => $prd->goods_opt,
+									'location_cd' => $prd->storage_cd,
+									'location_type' => 'STORAGE',
+									'type' => PRODUCT_STOCK_TYPE_RETURN, // 재고분류 : 반품
+									'price' => $prd->price,
+									'wonga' => $prd->wonga,
+									'qty' => $return_wqty * -1,
+									'stock_state_date' => date('Ymd'),
+									'r_stock_state_date' => date('Ymd'),
+									'ord_opt_no' => '',
 									'store_return_no'	=> $prd->sr_prd_cd,
-									'comment'			=> '매장반품삭제',
-									'rt'				=> now(),
-									'admin_id'			=> $admin_id,
-									'admin_nm'			=> $admin_nm,
+									'comment' => '매장반품삭제',
+									'rt' => now(),
+									'admin_id' => $admin_id,
+									'admin_nm' => $admin_nm,
 								]);
 						}
 
@@ -950,8 +912,8 @@ class stk30Controller extends Controller
 						DB::table('product_stock')
 							->where('prd_cd', '=', $prd->prd_cd)
 							->update([
-								'wqty'	=> DB::raw('wqty - ' . $return_wqty),
-								'ut'	=> now(),
+								'wqty' => DB::raw('wqty - ' . $return_wqty),
+								'ut' => now(),
 							]);
 
 					}
@@ -1042,13 +1004,13 @@ class stk30Controller extends Controller
 			$prd_cd = $d['prd_cd'];
 			$qty = $d['qty'] ?? 0;
 			$count = $d['count'] ?? '';
-			
+
 			$store_stock_cnt =
 				DB::table('product_stock_store')
 					->where('store_cd', '=', $store_cd)
 					->where('prd_cd', '=', $prd_cd)
 					->count();
-			
+
 			if ($store_stock_cnt < 1) {
 				return response()->json(['code' => 404, 'msg' => "'".$prd_cd."'" . '의 상품이 매장에 존재하지 않습니다.']);
 			}

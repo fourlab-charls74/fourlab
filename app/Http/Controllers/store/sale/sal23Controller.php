@@ -158,7 +158,7 @@ class sal23Controller extends Controller
 					-- 상품입고
 					sum(if(
 						(
-							hst.type = '1'
+							hst.type = '1'	
 							and if( hst.stock_state_date <= '20231109', (hst.location_type = 'STORE' or hst.location_type = 'STORAGE') , hst.location_type = 'STORAGE')
 							and hst.stock_state_date <= '$edate'
 					    ), hst.qty, 0

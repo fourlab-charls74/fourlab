@@ -272,7 +272,7 @@ class  sal27Controller extends Controller
 						group by prd_cd
 					) pssg on pssg.prd_cd = pc.prd_cd
 					left outer join (
-						select ss.prd_cd, sum(ss.wqty) as wqty
+						select ss.prd_cd, sum(ss.wqty + ss.rqty) as wqty
 						from product_stock_store ss
 							inner join store s on s.store_cd = ss.store_cd
 						where 1=1 $store_where
@@ -302,7 +302,8 @@ class  sal27Controller extends Controller
 										select sr_cd
 										from store_return
 										where 1=1 $storage_where1 
-											and sr_state > 10
+											-- and sr_state > 10
+											and sr_state = '40'
 											$date_where3
 									) rr on rr.sr_cd = r.sr_cd
 							) r on r.sr_cd = p.sr_cd

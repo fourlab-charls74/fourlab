@@ -160,10 +160,10 @@ class sal31Controller extends Controller
 				,p.wonga
 			
 				-- 이전재고
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_sh
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_sh
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
 			
 				-- 매장입고
 				,ifnull(hst.store_in_qty, 0) as store_in_qty
@@ -202,13 +202,13 @@ class sal31Controller extends Controller
 				,ifnull(hst.loss_qty, 0) * p.wonga as loss_wonga
 			
 				-- 기간재고
-				,sum(pss.wqty) - ifnull(hst.next_qty, 0) as term_qty
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0)) * p.price as term_price
-				,(sum(pss.wqty) - ifnull(hst.next_qty, 0)) * p.wonga as term_wonga
+				,sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) as term_qty
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.price as term_price
+				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.wonga as term_wonga
 			
 				-- 현재재고
-				,pss.wqty as current_qty
+				,(pss.wqty + pss.rqty) as current_qty
 			from product_stock_store pss
 			inner join product_code pc on pss.prd_cd = pc.prd_cd and pc.type = 'N'
 			left outer join (
@@ -316,10 +316,10 @@ class sal31Controller extends Controller
 						,p.wonga
 					
 						-- 이전재고
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_sh
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_sh
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
 					
 						-- 매장입고
 						,ifnull(hst.store_in_qty, 0) as store_in_qty
@@ -358,13 +358,13 @@ class sal31Controller extends Controller
 						,ifnull(hst.loss_qty, 0) * p.wonga as loss_wonga
 					
 						-- 기간재고
-						,sum(pss.wqty) - ifnull(hst.next_qty, 0) as term_qty
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0)) * p.price as term_price
-						,(sum(pss.wqty) - ifnull(hst.next_qty, 0)) * p.wonga as term_wonga
+						,sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) as term_qty
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.price as term_price
+						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.wonga as term_wonga
 					
 						-- 현재재고
-						,pss.wqty as current_qty
+						,(pss.wqty + pss.rqty) as current_qty
 					from product_stock_store pss
 					inner join product_code pc on pss.prd_cd = pc.prd_cd and pc.type = 'N'
 					left outer join (
