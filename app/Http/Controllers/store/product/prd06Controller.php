@@ -523,6 +523,19 @@ class prd06Controller extends Controller
 				//온라인창고 버퍼링 처리
 				if( $row->storage_cd == $stock_conf->online_storage_cd && $stock_conf->online_storage_buffer != 0){
 					$row->qty = $row->qty - $stock_conf->online_storage_buffer;
+					
+					// 재고 감가 시작
+					$sql_exp	= " select prd_cd, exp_cnt from product_stock_exp ";
+					$row_exp	= DB::select($sql_exp);
+					
+					foreach( $row_exp as $exp ){
+						if( $exp->prd_cd == $row->prd_cd ){
+							$row->qty	= $row->qty - $exp->exp_cnt;
+							
+							if( $row->qty < 0 )	$row->qty = 0;
+						}
+					}
+					// 재고 감가 종료
 				}
 	
 				//임시
@@ -583,6 +596,7 @@ class prd06Controller extends Controller
 					$cnt	= 0;
 					foreach ($rows as $row) {
 
+						/*
 						if( $row->year == '24' ){
 							if( $row->prd_cd_p != 'F241MJK01CT' ){
 								$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
@@ -600,6 +614,7 @@ class prd06Controller extends Controller
 								if($chk24 == 0) continue;
 							}
 						}
+						*/
 
 						//매장 통합 버퍼링 처리
 						if( $stock_conf->store_tot_buffer != 0){
