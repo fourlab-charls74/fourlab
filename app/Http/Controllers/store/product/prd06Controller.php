@@ -492,9 +492,9 @@ class prd06Controller extends Controller
 
 				if( $row->year == '24' ){
 
-					if( $row->prd_cd_p == 'F241WLS03CT' || $row->prd_cd_p == 'F242MHL04CT' ){
-						continue;
-					}
+					//if( $row->prd_cd_p == 'F241WLS03CT' || $row->prd_cd_p == 'F242MHL04CT' ){
+					//	continue;
+					//}
 
 					/*
 					if( $row->prd_cd_p != 'F241MJK01CT' ){
