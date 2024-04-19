@@ -1254,9 +1254,11 @@ class cs01Controller extends Controller {
 			$sql = "
 				select 
 					distinct pc.prd_cd_p
-                    , date_format(date_sub(psop.stock_date, interval 1 month),'%Y-%m') as chk_date
+                    , date_format(date_sub(pso.cfm_rt, interval 1 month),'%Y-%m') as chk_date
+                    -- , date_format(date_sub(psop.stock_date, interval 1 month),'%Y-%m') as chk_date
 					-- , date_format(date_sub(psop.stock_date, interval 1 month),'%Y%m') as chk_date2
 				from product_stock_order_product psop 
+				inner join product_stock_order pso on pso.stock_no = psop.stock_no
 				inner join product_code pc on psop.prd_cd = pc.prd_cd
 				where 
 					psop.invoice_no = :invoice_no 
@@ -1346,12 +1348,14 @@ class cs01Controller extends Controller {
 						update order_opt set
 							wonga = '$avg_wonga'
 						where
-							ord_date >= '$chk_sdate' and ord_date <= '$chk_edate'
+							ord_date >= '$chk_sdate' 
+						  	-- and ord_date <= '$chk_edate'
 							and prd_cd like '$prd_cd_p%'
 					";
 				DB::update($sql_o);
-	
-				$orders = DB::select("select ord_opt_no from order_opt where ord_date >= '$chk_sdate' and ord_date <= '$chk_edate' and prd_cd like '$prd_cd_p%'");
+
+				$orders = DB::select("select ord_opt_no from order_opt where ord_date >= '$chk_sdate' and prd_cd like '$prd_cd_p%'");
+				//$orders = DB::select("select ord_opt_no from order_opt where ord_date >= '$chk_sdate' and ord_date <= '$chk_edate' and prd_cd like '$prd_cd_p%'");
 				foreach ($orders as $ord) {
 					$sql_ow = "
 							update order_opt_wonga set
