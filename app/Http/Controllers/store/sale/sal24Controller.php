@@ -275,7 +275,7 @@ class sal24Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join company c on o.sale_place = c.com_id
 						left outer join store store on store.store_cd = o.store_cd
-						left outer join product_code pc on pc.prd_cd = o.prd_cd
+						inner join product_code pc on pc.prd_cd = o.prd_cd
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
