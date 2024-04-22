@@ -200,7 +200,7 @@ class sal23Controller extends Controller
             $orderby
             $limit
         ";
-        $rows = DB::select($sql);dd($sql);
+        $rows = DB::select($sql);
 
         // pagination
         $total = 0;
@@ -272,7 +272,8 @@ class sal23Controller extends Controller
 						,ifnull(hst.sale_qty, 0) as sale_qty
 						,ifnull(hst.sale_qty, 0) * p.tag_price as sale_sh
 						,ifnull(hst.sale_qty, 0) * p.price as sale_price
-						,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
+						,ifnull(hst.sale_wonga, 0) as sale_wonga
+						-- ,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
 		
 						-- LOSS
 						, ifnull(loss_qty, 0) as loss_qty
@@ -319,7 +320,10 @@ class sal23Controller extends Controller
 		
 							-- 매장판매
 							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
-		
+				
+							-- 매장판매 ( 원가 )
+							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
+
 							-- loss
 							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 							
@@ -329,6 +333,7 @@ class sal23Controller extends Controller
 							)) as next_qty
 						from product_stock_hst hst
 						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
+						left outer join order_opt oo on oo.ord_opt_no = hst.ord_opt_no
 						where
 							1=1
 							$hst_where  	
@@ -344,7 +349,7 @@ class sal23Controller extends Controller
 						$where
                 ) a
             ";
-			$row = DB::selectOne($sql);
+			$row = DB::selectOne($sql);dd($sql);
             $total_data = $row;
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
