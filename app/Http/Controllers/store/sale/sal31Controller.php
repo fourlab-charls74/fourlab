@@ -193,7 +193,8 @@ class sal31Controller extends Controller
 				,ifnull(hst.sale_qty, 0) as sale_qty
 				,ifnull(hst.sale_qty, 0) * p.tag_price as sale_sh
 				,ifnull(hst.sale_qty, 0) * p.price as sale_price
-				,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
+				,ifnull(hst.sale_wonga, 0) as sale_wonga
+				-- ,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
 			
 				-- loss
 				,ifnull(hst.loss_qty, 0) as loss_qty
@@ -226,6 +227,10 @@ class sal31Controller extends Controller
 					sum(if(hst.type = 15 and hst.qty < 0 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as rt_out_qty,
 					-- 매장판매
 					sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
+
+					-- 매장판매 ( 원가 )
+					sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
+
 					-- loss
 					sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 					
@@ -233,6 +238,7 @@ class sal31Controller extends Controller
 				from product_stock_hst hst
 				inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
 				inner join store on store.store_cd = hst.location_cd
+				left outer join order_opt oo on oo.ord_opt_no = hst.ord_opt_no
 				where
 					hst.location_type = 'STORE'
 					$hst_where  	
@@ -349,7 +355,8 @@ class sal31Controller extends Controller
 						,ifnull(hst.sale_qty, 0) as sale_qty
 						,ifnull(hst.sale_qty, 0) * p.tag_price as sale_sh
 						,ifnull(hst.sale_qty, 0) * p.price as sale_price
-						,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
+						,ifnull(hst.sale_wonga, 0) as sale_wonga
+						-- ,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
 					
 						-- loss
 						,ifnull(hst.loss_qty, 0) as loss_qty
@@ -382,6 +389,10 @@ class sal31Controller extends Controller
 							sum(if(hst.type = 15 and hst.qty < 0 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as rt_out_qty,
 							-- 매장판매
 							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
+
+							-- 매장판매 ( 원가 )
+							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
+
 							-- loss
 							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 							
@@ -389,6 +400,7 @@ class sal31Controller extends Controller
 						from product_stock_hst hst
 						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
 						inner join store on store.store_cd = hst.location_cd
+						left outer join order_opt oo on oo.ord_opt_no = hst.ord_opt_no
 						where
 							hst.location_type = 'STORE'
 							$hst_where  	

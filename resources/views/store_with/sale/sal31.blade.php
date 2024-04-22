@@ -150,7 +150,11 @@
 								<label>매장폐점여부</label>
 								<div class="form-inline form-radio-box">
 									<div class="custom-control custom-radio">
-										<input type="radio" class="custom-control-input" id="close_yn_N" name="close_yn" value="N" checked />
+										<input type="radio" class="custom-control-input" id="close_yn_" name="close_yn" value="" checked />
+										<label class="custom-control-label" for="close_yn_">전체</label>
+									</div>
+									<div class="custom-control custom-radio">
+										<input type="radio" class="custom-control-input" id="close_yn_N" name="close_yn" value="N" />
 										<label class="custom-control-label" for="close_yn_N">폐점제외</label>
 									</div>
 									<div class="custom-control custom-radio">
