@@ -349,7 +349,7 @@ class sal23Controller extends Controller
 						$where
                 ) a
             ";
-			$row = DB::selectOne($sql);dd($sql);
+			$row = DB::selectOne($sql);
             $total_data = $row;
             $total = $row->total;
             $page_cnt = (int)(($total - 1) / $page_size) + 1;
