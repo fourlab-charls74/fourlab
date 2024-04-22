@@ -370,7 +370,7 @@ class goods_xmlController extends Controller
 
 		// 상품 재고 정보
 		$sql_sku = "
-			select concat(cast(replace(goods_opt, '^',':') as char),'^^',good_qty,'^^',opt_price) as 'SKU_VALUE'
+			select concat(cast(replace(goods_opt, '^',':') as char),'^^',good_qty,'^^',ifnull(opt_price,0)) as 'SKU_VALUE'
 			from goods_summary where goods_no = :goods_no and goods_sub = 0 and use_yn = 'Y'
 			order by seq
 		";
