@@ -321,8 +321,10 @@ class goods_xmlController extends Controller
 		$goods_no	= $request->input("goods_no");
 		$goods_sub	= $request->input("goods_sub",0);
 		$price		= $request->input("price",0);
+		$ok_qty		= $request->input("ok_qty",0);
 
 		$data		= "";
+		$where		= "";
 
 		// XML Header
         //header("Content-Type: text/plain; charset=euc-kr");
@@ -367,13 +369,22 @@ class goods_xmlController extends Controller
 			$row->COMPAYNY_GOODS_CD	= sprintf("<![CDATA[%s]]>",$row->COMPAYNY_GOODS_CD);
 
 		}
+		
+		if( $ok_qty > 0 ){
+			$sql_sku = "
+				select concat(cast(replace(goods_opt, '^',':') as char),'^^', if(good_qty >= $ok_qty, good_qty, 0),'^^',ifnull(opt_price,0)) as 'SKU_VALUE'
+				from goods_summary where goods_no = :goods_no and goods_sub = 0 and use_yn = 'Y'
+				order by seq
+			";
+		}else{
+			$sql_sku = "
+				select concat(cast(replace(goods_opt, '^',':') as char),'^^',good_qty,'^^',ifnull(opt_price,0)) as 'SKU_VALUE'
+				from goods_summary where goods_no = :goods_no and goods_sub = 0 and use_yn = 'Y'
+				order by seq
+			";
+		}
 
 		// 상품 재고 정보
-		$sql_sku = "
-			select concat(cast(replace(goods_opt, '^',':') as char),'^^',good_qty,'^^',ifnull(opt_price,0)) as 'SKU_VALUE'
-			from goods_summary where goods_no = :goods_no and goods_sub = 0 and use_yn = 'Y'
-			order by seq
-		";
 		$rs_sku = DB::select($sql_sku,['goods_no' => $goods_no]);
 		$row->SKU_INFO	= $rs_sku;
 

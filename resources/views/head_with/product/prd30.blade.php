@@ -258,6 +258,17 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="name">옵션별재고연동</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box" style="width:75%;">
+									<input type='text' class="form-control form-control-sm search-enter" name='ok_qty' id='ok_qty' value=''>
+								</div>
+								<span class="text_line" style="width:25%;text-align:left;">&nbsp;개 이상</span>
+							</div>
+						</div>
+					</div>
 
 				</div>
 
@@ -650,6 +661,14 @@
 		}
 
 		if (confirm("선택한 상품을 재고 연동하시겠습니까?")) {
+			if($('#ok_qty').val() != ""){
+				if(isNaN($('#ok_qty').val())) {
+					alert('옵션별 재고연동은 숫자만 입력 가능합니다.');
+				}else{
+					alert('옵션별 재고연동수가 입력되어 있습니다. \n재고연동수 이상의 재고만 연동됩니다.\n그래도 연동하시겠습니까?');
+				}
+			}
+
 			StockShopGood();
 		}
 	}
@@ -695,6 +714,7 @@
 			var goods_sub = 0;
 			var shop_goods_no = row.data.shop_goods_no;
 			var shop_price = row.data.shop_price;
+			var ok_qty	= $('#ok_qty').val();
 			//var data = goods_no +"\t" + goods_sub  +"\t" + shop_goods_no  +"\t" + shop_price;
 
 			checkData = row.data;
@@ -710,7 +730,8 @@
 					goods_no: goods_no,
 					goods_sub: goods_sub,
 					shop_goods_no: shop_goods_no,
-					shop_price: shop_price
+					shop_price: shop_price,
+					ok_qty: ok_qty,
 				},
 				success: function(data) {
 					cbStockShopGood(data, row);

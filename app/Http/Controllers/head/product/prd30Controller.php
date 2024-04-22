@@ -321,7 +321,7 @@ class prd30Controller extends Controller
 			}
 
 			//$url = sprintf("http://%s/api/sabangnet/goods_xml.php?c=goods_view&goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$price);
-			$url = sprintf("http://%s/api/sabangnet/goods_xml/good_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$price);
+			$url = sprintf("https://%s/api/sabangnet/goods_xml/good_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$price);
 			//$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info.html?xml_url=%s",urlencode($url));
 			$url = sprintf("https://sbadmin14.sabangnet.co.kr/RTL_API/xml_goods_info.html?xml_url=%s",urlencode($url));
 			
@@ -447,6 +447,7 @@ class prd30Controller extends Controller
 		$goods_sub	= $request->input("goods_sub");
 		$shop_goods_no	= $request->input("shop_goods_no");
 		$shop_price	= $request->input("shop_price");
+		$ok_qty		= $request->input("ok_qty");
 
 		$sql	= "
 			select
@@ -502,7 +503,7 @@ class prd30Controller extends Controller
 			$option_qty	= $row->opt_info;
 
 			//$url = sprintf("http://%s/api/sabangnet/goods_xml.php?c=stock_view&goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
-			$url = sprintf("https://%s/api/sabangnet/goods_xml/summary_view/?goods_no=%s&price=%s",$cfg_domain_bizest,$goods_no,$shop_price);
+			$url = sprintf("https://%s/api/sabangnet/goods_xml/summary_view/?goods_no=%s&price=%s&ok_qty=%s",$cfg_domain_bizest,$goods_no,$shop_price,$ok_qty);
 			//$url = sprintf("http://r.sabangnet.co.kr/RTL_API/xml_goods_info2.html?xml_url=%s",urlencode($url));
 			$url = sprintf("https://sbadmin14.sabangnet.co.kr/RTL_API/xml_goods_info2.html?xml_url=%s",urlencode($url));
 
