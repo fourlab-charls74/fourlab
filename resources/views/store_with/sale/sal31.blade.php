@@ -262,7 +262,7 @@
 				]
 			},
 			{
-				headerName: "매장입고",
+				headerName: "물류입고",
 				children: [
 					{field: "store_in_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
 					{field: "store_in_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
@@ -271,7 +271,7 @@
 				]
 			},
 			{
-				headerName: "매장반품",
+				headerName: "물류반품",
 				children: [
 					{field: "store_return_qty", headerName: "수량", width: 60, type: "currencyType", aggFunc: sumValuesFunc},
 					{field: "store_return_sh", headerName: "TAG금액", width: 80, type: "currencyType", aggFunc: sumValuesFunc},
