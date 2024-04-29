@@ -30,7 +30,7 @@
                             <label for="date_type">일자</label>
                             <div class="form-inline date-select-inbox">
                                 <select id="date_type" name="date_type" class="form-control form-control-sm" style="width:30%; margin-right: auto;">
-                                    <option value="receipt_date">접수일자</option>
+                                    <option value="receipt_date">매장접수일</option>
                                     <option value="h_receipt_date">본사접수일</option>
                                     <option value="end_date">수선완료일</option>
                                     <option value="err_date">불량등록일</option>
@@ -206,7 +206,7 @@
             },
             pinned: 'left'
         },
-        { field: "receipt_date", headerName: "접수일자", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
+        { field: "receipt_date", headerName: "매장접수일", width: 100, cellStyle: DEFAULT_STYLE, pinned: 'left' },
         { field: "as_state", headerName: "수선상태", width: 100, pinned: 'left' ,
             cellRenderer: (params) => {
                 switch (params.value) {

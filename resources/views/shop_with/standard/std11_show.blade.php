@@ -41,7 +41,7 @@
                             <tbody>
                             <tr>
                                 <th>
-                                    <label for="receipt_date" class="required">접수일자</label>
+                                    <label for="receipt_date" class="required">매장접수일</label>
                                 </th>
                                 <td>
                                     <div class="docs-datepicker form-inline-inner input_box w-100">

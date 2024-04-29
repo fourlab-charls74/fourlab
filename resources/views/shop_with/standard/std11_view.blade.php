@@ -40,7 +40,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th class="required">접수일자</th>
+                                            <th class="required">매장접수일</th>
                                             <td>
                                                 <div class="form-inline">
                                                     <div class="docs-datepicker form-inline-inner input_box w-100">
