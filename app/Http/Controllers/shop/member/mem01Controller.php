@@ -828,7 +828,7 @@ class mem01Controller extends Controller
 			}
 		}
 
-		if($name != "")			$where .= " and a.name = '$name' ";
+		if($name != "")			$where .= " and a.name like '%$name%' ";
 
 		if( $yn != "" ){
 			$yn	= ( $yn == "Y" )?"Y":"";
