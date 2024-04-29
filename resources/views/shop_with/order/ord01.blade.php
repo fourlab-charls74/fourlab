@@ -338,6 +338,9 @@
 			cellRenderer: (params) => params.value === undefined || params.node.rowPinned === 'top' ? '' : params.node.rowIndex + 1,
 		},
         // {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
+		{field: "ord_state_date", headerName: "판매상태일자", pinned: 'left', width: 90, cellClass: 'hd-grid-code',
+			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : params.value.slice(0,4) + '-' + params.value.slice(4,6) + '-' + params.value.slice(6,8)
+		},
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 145, cellStyle: StyleOrdNo, type: 'StoreOrderNoType',
             cellStyle: params => {
                 if (params.node.rowPinned === 'top') {
@@ -352,40 +355,31 @@
             }
         },
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'ShopOrderNoType', cellStyle: {'text-align': 'center'}},
-		{field: "ord_state_date", headerName: "판매상태일자", pinned: 'left', width: 90, cellClass: 'hd-grid-code',
-			cellRenderer: (params) => params.node.rowPinned === 'top' ? '' : params.value.slice(0,4) + '-' + params.value.slice(4,6) + '-' + params.value.slice(6,8)
-		},
         {field: "ord_state", headerName: "판매상태", pinned: 'left', width: 70, cellClass: 'hd-grid-code',
 			cellStyle: (params) => ({ 'color': params.data.ord_state_cd > 30 ? '#ff0000' : '#0000ff', 'font-weight': 'bold' })
         },
         {field: "clm_state", headerName: "클레임상태", pinned: 'left', width: 70, cellStyle: StyleClmState},
-        {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {'text-align': 'center'}},
-        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
-        {field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
-        {field: "img", headerName: "이미지_url", hide:true},
-        {field: "goods_nm", headerName: "상품명", width: 150,
-            cellRenderer: function (params) {
-                if (params.value !== undefined) {
-                    if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
-                    return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
-                }
-            }
-        },
-        {field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
-        {field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "opt_val", headerName: "옵션", width: 130},
-        {field: "user_nm", headerName: "주문자(아이디)", width: 100},
-        {field: "r_nm", headerName: "수령자", width: 70},
-        {field: "goods_sh", headerName: "정상가", width: 85, type: "currencyType"},
-        {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType"},
-        {field: "price", headerName: "현재가", width: 85, type: "currencyType"},
-        {field: "sale_dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
-        {field: "sale_kind_nm", headerName: "판매유형", width: 100},
-        {field: "sale_kind", headerName: "판매유형", hide:true},
+		{field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {'text-align': 'center'}},
+		{field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: {'text-align': 'center'}},
+		{field: "img", headerName: "이미지", type: 'GoodsImageType', width:50, surl:"{{config('shop.front_url')}}"},
+		{field: "img", headerName: "이미지_url", hide:true},
+		{field: "goods_nm", headerName: "상품명", width: 150,
+			cellRenderer: function (params) {
+				if (params.value !== undefined) {
+					if(params.data.goods_no == null) return '존재하지 않는 상품입니다.';
+					return '<a href="#" onclick="return openShopProduct(\'' + params.data.goods_no + '\');">' + params.value + '</a>';
+				}
+			}
+		},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150},
+		{field: "prd_cd_p", headerName: "품번", width: 90, cellStyle: {"text-align": "center"}},
+		{field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+		{field: "size", headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+		{field: "goods_sh", headerName: "정상가", width: 85, type: "currencyType"},
+		{field: "price", headerName: "현재가", width: 85, type: "currencyType"},
+		{field: "sale_dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
+		{field: "sale_kind_nm", headerName: "판매유형", width: 100},
+		{field: "sale_kind", headerName: "판매유형", hide:true},
 		{field: "sale_price", headerName: "판매단가", width: 80, type: "currencyType"},
 		{field: "dc_rate", headerName: "할인율(%)", width: 65, type: "currencyType"},
 		{field: "qty", headerName: "판매수량", width: 60, type: "currencyType" ,
@@ -398,21 +392,28 @@
 		},
 		{field: "ord_amt", headerName: "판매금액", width: 80, type: "currencyType"},
 		{field: "recv_amt", headerName: "실결제금액", width: 80, type: "currencyType"},
+		{field: "user_nm", headerName: "주문자(아이디)", width: 100},
+		{field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
+		{field: "ord_type", headerName: "판매구분", width: 60, cellStyle: {'text-align': 'center'}},
+		{field: "dlv_comment", headerName: "메모", width: 120},
+		{field: "store_nm", headerName: "판매매장", width: 100},
+		{field: "ord_date", headerName: "판매일시", type: "DateTimeType"},
+		{field: "pay_date", headerName: "입금일시", type: "DateTimeType"},
+		{field: "dlv_end_date", headerName: "배송일시", type: "DateTimeType"},
+		{field: "last_up_date", headerName: "클레임일시", type: "DateTimeType"},
+
+        {field: "pay_stat", headerName: "입금상태", pinned: 'left', width: 60, cellStyle: {'text-align': 'center'}, hide:true},
+        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {'text-align': 'center'}, hide:true},
+        {field: "opt_val", headerName: "옵션", width: 130, hide:true},
+        {field: "r_nm", headerName: "수령자", width: 70, hide:true},
+        {field: "goods_price", headerName: "자사몰판매가", width: 85, type: "currencyType", hide:true},
 		{field: "acc_amt", headerName: "정산금액", width: 80, type: "currencyType", hide:true},
-        {field: "pr_code_nm", headerName: "판매처수수료", width: 80},
-        {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType"},
-        {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType"},
-        {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
-        {field: "ord_type", headerName: "판매구분", width: 60, cellStyle: {'text-align': 'center'}},
-        {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
-        {field: "store_nm", headerName: "판매매장", width: 100},
-        {field: "baesong_kind", headerName: "배송구분", width: 60},
-        {field: "state", headerName: "처리현황", width: 80},
-        {field: "dlv_comment", headerName: "메모", width: 120},
-        {field: "ord_date", headerName: "판매일시", type: "DateTimeType"},
-        {field: "pay_date", headerName: "입금일시", type: "DateTimeType"},
-        {field: "dlv_end_date", headerName: "배송일시", type: "DateTimeType"},
-        {field: "last_up_date", headerName: "클레임일시", type: "DateTimeType"},
+        {field: "pr_code_nm", headerName: "판매처수수료", width: 80, hide:true},
+        {field: "dlv_amt", headerName: "배송비", width: 60, type: "currencyType", hide:true},
+        {field: "sales_com_fee", headerName: "판매수수료", width: 80, type: "currencyType", hide:true},
+        {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind, hide:true},
+        {field: "baesong_kind", headerName: "배송구분", width: 60, hide:true},
+        {field: "state", headerName: "처리현황", width: 80, hide:true},
    ];
 
     let gx;
