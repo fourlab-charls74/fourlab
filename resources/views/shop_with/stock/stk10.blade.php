@@ -1,12 +1,12 @@
 @extends('shop_with.layouts.layout')
-@section('title','상품출고관리')
+@section('title','상품입고관리')
 @section('content')
 <div class="page_tit">
-	<h3 class="d-inline-flex">상품출고관리</h3>
+	<h3 class="d-inline-flex">상품입고관리</h3>
 	<div class="d-inline-flex location">
 		<span class="home"></span>
 		<span>상품관리</span>
-		<span>/ 상품출고관리</span>
+		<span>/ 상품입고관리</span>
 	</div>
 </div>
 <form method="get" name="search">
@@ -342,6 +342,7 @@
         },
         {field: "rel_type",	headerName: "출고구분", pinned: 'left', width: 70, cellStyle: {"text-align": "center"}},
         {field: "rel_order", headerName: "출고차수", pinned: 'left', width: 100, cellStyle: {"text-align": "center"}},
+		{field: "document_number",	headerName: "전표번호", pinned: 'left', width: 60, cellStyle: {"text-align": "center"}},
         {field: "state", headerName: "출고상태", pinned: 'left', cellStyle: StyleReleaseState, width: 70,
             cellRenderer: function(params) {
                 return rel_states[params.value];
@@ -424,7 +425,6 @@
         {field: "prc_rt", headerName: "처리일시", width: 120, cellStyle: {"text-align": "center"}},
         {field: "fin_nm", headerName: "완료(입고)자", cellStyle: {"text-align": "center"}},
         {field: "fin_rt", headerName: "완료(입고)일시", width: 120, cellStyle: {"text-align": "center"}},
-		{field: "document_number",	headerName: "전표번호", width: 60, cellStyle: {"text-align": "center"}},
 	];
 </script>
 <script type="text/javascript" charset="utf-8">
