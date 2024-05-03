@@ -1368,6 +1368,34 @@ class cs01Controller extends Controller {
 					$sql_hst	= " update product_stock_hst set wonga = '$avg_wonga' where ord_opt_no = '$ord->ord_opt_no' and prd_cd like '$prd_cd_p%' ";
 					DB::update($sql_hst);
 				}
+				
+				/////////////////////
+				//평균원가 프로그램 시작
+				/////////////////////
+				$sql_avg	= "
+					select 
+						round(sum(psop.qty * psop.cost)/sum(psop.qty)) as wonga
+					from product_stock_order_product psop
+					inner join product_code pc on pc.prd_cd = psop.prd_cd
+					where
+						psop.state = '40'
+						and pc.prd_cd_p = :prd_cd_p
+				";
+				$n_avg_wonga	= DB::selectOne($sql_avg, ['prd_cd_p' => $prd_cd_p]);
+				
+				$sql_avg_update	= " update product_wonga set wonga = :wonga where prd_cd_p = :prd_cd_p ";
+				DB::update($sql_avg_update,['wonga' => $n_avg_wonga, 'prd_cd_p' => $prd_cd_p]);
+
+				$admin_id = Auth::guard('head')->user()->id;
+				
+				$sql_avg_log	= "
+					insert into product_wonga_log(prd_cd_p, wonga, invoice_no, rt, admin_id)
+					values ( '$prd_cd_p', '$n_avg_wonga', '$invoice_no', now(), '$admin_id')
+				";
+				DB::insert($sql_avg_log);
+				/////////////////////
+				//평균원가 프로그램 종료
+				/////////////////////
 	
 			}
 		} catch (Exception $e) {
