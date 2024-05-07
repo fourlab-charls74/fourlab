@@ -934,6 +934,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal24', 'sal24Controller@index');
         Route::get('sal24/search', 'sal24Controller@search');
 
+		Route::get('sal54', 'sal54Controller@index');
+		Route::get('sal54/search', 'sal54Controller@search');
+		
         //월별 매출 통계
         Route::get('sal25', 'sal25Controller@index');
         Route::get('sal25/search', 'sal25Controller@search');

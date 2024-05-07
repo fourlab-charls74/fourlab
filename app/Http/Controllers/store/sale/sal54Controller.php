@@ -12,10 +12,10 @@ use PDO;
 use Carbon\Carbon;
 use DateTime;
 
-class sal24Controller extends Controller
+class sal54Controller extends Controller
 {
-    // 일별 매출 통계
-    public function index(Request $req) 
+	// 일별 매출 통계
+	public function index(Request $req)
 	{
 		$date = new DateTime($req->input('sdate', now()->startOfMonth()->sub(0, 'month')->format("Ym"). '01'));
 		$sdate = $date->format('Y-m-d');
@@ -35,21 +35,21 @@ class sal24Controller extends Controller
 		$store_channel_kind = $req->input('store_channel_kind', '');
 		$prd_cd_range_text 	= $req->query("prd_cd_range", '');
 		$prd_cd_range_nm 	= $req->query("prd_cd_range_nm", '');
-		
+
 		parse_str($prd_cd_range_text, $prd_cd_range);
 		$pr_code_ids = [];
 		$sell_type_ids = [];
-		
+
 		if(!empty($pr_code)) {
 			$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
-			$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());	
+			$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());
 		}
-		
+
 		if(!empty($sell_type)) {
 			$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
-			$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());	
+			$sell_type_ids = array_map(function ($p) { return $p->code_id; }, $sell_type_ids->toArray());
 		}
-		
+
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
 		//$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
 
@@ -78,31 +78,31 @@ class sal24Controller extends Controller
 			'prd_cd_range'	=> $prd_cd_range,
 			'prd_cd_range_nm' => $prd_cd_range_nm,
 		];
-		return view(Config::get('shop.store.view') . '/sale/sal24', $values);
-    }
+		return view(Config::get('shop.store.view') . '/sale/sal54', $values);
+	}
 
-    public function search(Request $request)
+	public function search(Request $request)
 	{
 
-        $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
-        $edate = str_replace("-","",$request->input('edate',date("Ymd")));
+		$sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
+		$edate = str_replace("-","",$request->input('edate',date("Ymd")));
 
-        $brand_cd 			= $request->input("brand_cd");
-        $goods_nm 			= $request->input("goods_nm");
-        $item				= $request->input("item");
-        $ord_state			= $request->input("ord_state");
+		$brand_cd 			= $request->input("brand_cd");
+		$goods_nm 			= $request->input("goods_nm");
+		$item				= $request->input("item");
+		$ord_state			= $request->input("ord_state");
 		$ord_type 			= $request->input("ord_type", "");
 		$sale_place 		= $request->input("sale_place", "");
 		$stat_pay_type 		= $request->input("stat_pay_type");
-        $store_cd       	= $request->input('store_no');
-        $sell_type      	= $request->input('sell_type');
-        $pr_code        	= $request->input('pr_code');
-        $on_off_yn      	= $request->input('on_off_yn');
+		$store_cd       	= $request->input('store_no');
+		$sell_type      	= $request->input('sell_type');
+		$pr_code        	= $request->input('pr_code');
+		$on_off_yn      	= $request->input('on_off_yn');
 		$store_channel		= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
-        $inner_where = "";
+		$inner_where = "";
 		$inner_where2	= "";	//매출
 		$where = "";
 
@@ -153,18 +153,18 @@ class sal24Controller extends Controller
 			$where .= "and o.store_cd != ''";
 		}
 
-        if($goods_nm != ""){
-            $inner_where .= " and g.goods_nm like '%$goods_nm%' ";
-        }
+		if($goods_nm != ""){
+			$inner_where .= " and g.goods_nm like '%$goods_nm%' ";
+		}
 
-        if($brand_cd != ""){
-            $inner_where .= " and g.brand ='$brand_cd'";
-        }
+		if($brand_cd != ""){
+			$inner_where .= " and g.brand ='$brand_cd'";
+		}
 
-        //옵션(품목)
-        if ($item != ""){
-            $inner_where .= " and g.opt_kind_cd = '$item' ";
-        }
+		//옵션(품목)
+		if ($item != ""){
+			$inner_where .= " and g.opt_kind_cd = '$item' ";
+		}
 
 		if ($sale_place != "")	$inner_where .= " and o.sale_place = '$sale_place' ";
 		// if ($ord_type != "") 	$inner_where .= " and o.ord_type   = '$ord_type' ";
@@ -183,7 +183,7 @@ class sal24Controller extends Controller
 				$inner_where2	.= " and ( $ord_type_where ) ";
 			}
 		}
-		
+
 		// 결제조건
 		if( $stat_pay_type != "" ){
 			$stat_pay_type_where	= "";
@@ -258,8 +258,8 @@ class sal24Controller extends Controller
 						, sum(w.qty)as qty
 						, sum(w.recv_amt) as recv_amt
 						, sum(w.point_apply_amt) as point_amt
-						, sum(w.wonga * w.qty) as wonga
-						-- , sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
+						-- , sum(w.wonga * w.qty) as wonga
+						, sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
 						, sum(w.coupon_apply_amt) as coupon_amt
 						, sum(w.sales_com_fee) as fee_amt
 						, sum(w.dc_apply_amt) as dc_amt
@@ -277,7 +277,7 @@ class sal24Controller extends Controller
 						left outer join company c on o.sale_place = c.com_id
 						left outer join store store on store.store_cd = o.store_cd
 						inner join product_code pc on pc.prd_cd = o.prd_cd
-						-- inner join product p on o.prd_cd = p.prd_cd
+						inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
@@ -316,13 +316,13 @@ class sal24Controller extends Controller
 				group by a.ord_state_date
 			) p on a.sale_date = p.ord_state_date
 		";
-			
+
 		$rows = DB::select($sql);
 
 		$result = collect($rows)->map(function ($row) {
 
 			$sale_date		= $row->date;
-			
+
 			$wonga_30		= $row->wonga_30;			//매출원가
 			$wonga_60		= $row->wonga_60;			//교환원가
 			$wonga_61		= $row->wonga_61;			//환불원가
@@ -440,13 +440,13 @@ class sal24Controller extends Controller
 
 		})->all();
 
-        return response()->json([
-            "code" => 200,
-            "head" => array(
-                "total" => count($result)
-            ),
-            "body" => $result
-        ]);
-    }
+		return response()->json([
+			"code" => 200,
+			"head" => array(
+				"total" => count($result)
+			),
+			"body" => $result
+		]);
+	}
 
 }
