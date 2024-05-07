@@ -11,51 +11,51 @@ use Illuminate\Support\Facades\DB;
 use PDO;
 use Carbon\Carbon;
 
-class sal25Controller extends Controller
+class sal55Controller extends Controller
 {
-    // 월별 매출 통계
-    public function index() 
+	// 월별 매출 통계
+	public function index()
 	{
 
-        $mutable = Carbon::now();
-        $sdate	= sprintf("%s",$mutable->sub(3, 'month')->format('Y-m'));
+		$mutable = Carbon::now();
+		$sdate	= sprintf("%s",$mutable->sub(3, 'month')->format('Y-m'));
 
-        $values = [
-            'sdate' => $sdate,
-            'edate' => date("Y-m"),
-            'items' => SLib::getItems(),
+		$values = [
+			'sdate' => $sdate,
+			'edate' => date("Y-m"),
+			'items' => SLib::getItems(),
 			'ord_types'     => SLib::getCodes('G_ORD_TYPE'),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
-        ];
-        return view( Config::get('shop.store.view') . '/sale/sal25',$values);
-    }
+		];
+		return view( Config::get('shop.store.view') . '/sale/sal55',$values);
+	}
 
-    public function search(Request $request)
+	public function search(Request $request)
 	{
 
-        $sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(12, 'month')->format('Ym')));
-        $edate = str_replace("-","",$request->input('edate',date("Ym")));
+		$sdate = str_replace("-","",$request->input('sdate',Carbon::now()->sub(12, 'month')->format('Ym')));
+		$edate = str_replace("-","",$request->input('edate',date("Ym")));
 
-        $brand_cd 			= $request->input("brand_cd", "");
-        $goods_nm 			= $request->input("goods_nm");
-        $item				= $request->input("item");
+		$brand_cd 			= $request->input("brand_cd", "");
+		$goods_nm 			= $request->input("goods_nm");
+		$item				= $request->input("item");
 		$ord_type 			= $request->input("ord_type", "");
-        $ord_state			= $request->input("ord_state");
-        $stat_pay_type		= $request->input("stat_pay_type");
-        $store_cd       	= $request->input('store_no');
-        $sell_type      	= $request->input('sell_type');
-        $pr_code        	= $request->input('pr_code');
-        $on_off_yn      	= $request->input('on_off_yn');
+		$ord_state			= $request->input("ord_state");
+		$stat_pay_type		= $request->input("stat_pay_type");
+		$store_cd       	= $request->input('store_no');
+		$sell_type      	= $request->input('sell_type');
+		$pr_code        	= $request->input('pr_code');
+		$on_off_yn      	= $request->input('on_off_yn');
 		$store_channel		= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
 
-        $inner_where = "";
+		$inner_where = "";
 		$inner_where2	= "";	//매출
-        $where = "";
+		$where = "";
 
 		// 판매채널/매장구분 검색
 		if ($store_channel != "") $where .= "and store.store_channel ='" . Lib::quote($store_channel). "'";
@@ -72,7 +72,7 @@ class sal25Controller extends Controller
 			}
 		}
 
-        // 매장검색
+		// 매장검색
 		if ( $store_cd != "" ) {
 			$where	.= " and o.store_cd = '$store_cd' ";
 		}
@@ -97,7 +97,7 @@ class sal25Controller extends Controller
 			$where	.= ")";
 		}
 
-        //온/오프라인
+		//온/오프라인
 		if ($on_off_yn == 'ON') {
 			$where .= "and o.store_cd = ''";
 		} else if ($on_off_yn == 'OFF') {
@@ -105,18 +105,18 @@ class sal25Controller extends Controller
 		}
 
 
-        if($goods_nm != ""){
-            $inner_where .= " and g.goods_nm like '%$goods_nm%' ";
-        }
+		if($goods_nm != ""){
+			$inner_where .= " and g.goods_nm like '%$goods_nm%' ";
+		}
 
-        if($brand_cd != ""){
-            $inner_where .= " and g.brand ='$brand_cd'";
-        }
+		if($brand_cd != ""){
+			$inner_where .= " and g.brand ='$brand_cd'";
+		}
 
-        //옵션(품목)
-        if ($item != ""){
-            $inner_where .= " and g.opt_kind_cd = '$item' ";
-        }
+		//옵션(품목)
+		if ($item != ""){
+			$inner_where .= " and g.opt_kind_cd = '$item' ";
+		}
 
 		// if ($ord_type != "") 	$inner_where .= " and o.ord_type   = '$ord_type' ";
 		if( $ord_type != "" ){
@@ -149,8 +149,8 @@ class sal25Controller extends Controller
 			}
 		}
 
-        $sql = /** @lang text */
-            "
+		$sql = /** @lang text */
+			"
 			select
 				a.sale_date  as date
 				, t.*
@@ -208,8 +208,8 @@ class sal25Controller extends Controller
 						, sum(w.qty)as qty
 						, sum(w.recv_amt) as recv_amt
 						, sum(w.point_apply_amt) as point_amt
-						, sum(w.wonga * w.qty) as wonga
-						-- , sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
+						-- , sum(w.wonga * w.qty) as wonga
+						, sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
 						, sum(w.coupon_apply_amt) as coupon_amt
 						, sum(w.dc_apply_amt) as dc_amt						
 						, sum(w.sales_com_fee) as fee_amt
@@ -226,7 +226,7 @@ class sal25Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join store store on store.store_cd = o.store_cd
 						inner join product_code pc on pc.prd_cd = o.prd_cd
-						-- inner join product p on o.prd_cd = p.prd_cd
+						inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 					where
 						w.ord_state_date >= concat('$sdate', '01') 
 						and w.ord_state_date <= concat('$edate', '31') 
@@ -238,43 +238,43 @@ class sal25Controller extends Controller
 				) b group by b.sale_date
 			) t on a.sale_date = t.sale_date
         ";
-			
-        //echo "<pre>$sql</pre>";exit;
 
-        //$result = DB::select($sql);
-        $pdo = DB::connection()->getPdo();
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        $result = [];
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC))
-        {
-            $row["sum_taxation_no_vat"]	= round($row["sum_taxation_amt"]/1.1);		// 과세 부가세 별도
+		//echo "<pre>$sql</pre>";exit;
+
+		//$result = DB::select($sql);
+		$pdo = DB::connection()->getPdo();
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute();
+		$result = [];
+		while($row = $stmt->fetch(PDO::FETCH_ASSOC))
+		{
+			$row["sum_taxation_no_vat"]	= round($row["sum_taxation_amt"]/1.1);		// 과세 부가세 별도
 			//$row["vat"] = $row["sum_taxation_amt"] - $row["sum_taxation_no_vat"];
 			$row["vat"] = $row["sum_tax_amt"];
 			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["sum_fee_amt"] - $row["vat"];
 			//$row["sum_amt"] = $row["sum_recv_amt"] + $row["sum_point_amt"] - $row["vat"];
 			$row["sum_amt"] = $row["sum_recv_amt"] - $row["vat"];
-            $row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
-            $row["margin"] = $row["sum_amt"]? round(($row["sum_amt"] - $row["sum_wonga"]) / $row["sum_amt"] * 100,2) : 0;
-            $row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
-            $row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
-            $row["sum_wonga"] = $row["sum_wonga"] * 1;
+			$row["sum_taxfree"]	= $row["sum_amt"] -  $row["sum_taxation_amt"];
+			$row["margin"] = $row["sum_amt"]? round(($row["sum_amt"] - $row["sum_wonga"]) / $row["sum_amt"] * 100,2) : 0;
+			$row["margin1"] = $row["wonga_30"] - $row["wonga_60"];
+			$row["margin2"] = $row["wonga_30"] - $row["wonga_60"] - $row["vat"];
+			$row["sum_wonga"] = $row["sum_wonga"] * 1;
 			//$row["recv_amt_61"] = $row["recv_amt_61"] + $row["fee_amt_61"];
 			$row["recv_amt_30"]	= $row["recv_amt_30"]/1.1;
 			$row["recv_amt_60"]	= $row["recv_amt_60"]/1.1;
 			$row["recv_amt_61"]	= $row["recv_amt_61"]/1.1;
 
-            $result[] = $row;
-        }
+			$result[] = $row;
+		}
 
-        return response()->json([
-                "code" => 200,
-                "head" => array(
-                    "total" => count($result)
-                ),
-                "body" => $result
-            ]
-        );
-    }
+		return response()->json([
+				"code" => 200,
+				"head" => array(
+					"total" => count($result)
+				),
+				"body" => $result
+			]
+		);
+	}
 
 }
