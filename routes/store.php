@@ -906,6 +906,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal21', 'sal21Controller@index');
         Route::get('sal21/search', 'sal21Controller@search');
 
+		Route::get('sal51', 'sal51Controller@index');
+		Route::get('sal51/search', 'sal51Controller@search');
+		
 		// 매장수불집계표(품번)
 		Route::get('sal31', 'sal31Controller@index');
 		Route::get('sal31/search', 'sal31Controller@search');
