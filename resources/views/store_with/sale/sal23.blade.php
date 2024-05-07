@@ -232,7 +232,7 @@
             ]
         },
         {
-            headerName: "기간재고",
+            headerName: "기말재고",
             children: [
                 {field: "term_qty", headerName: "수량", width: 65, aggFunc: sumValuesFunc, cellStyle: {"text-align": "right"},
                     cellRenderer: (params) => {

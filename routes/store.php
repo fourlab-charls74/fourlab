@@ -926,7 +926,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         // 본사수불집계표
         Route::get('sal23', 'sal23Controller@index');
         Route::get('sal23/search', 'sal23Controller@search');
-      
+
+		Route::get('sal53', 'sal53Controller@index');
+		Route::get('sal53/search', 'sal53Controller@search');
+		
         // 일별 매출 통계
         Route::get('sal24', 'sal24Controller@index');
         Route::get('sal24/search', 'sal24Controller@search');

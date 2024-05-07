@@ -11,38 +11,38 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
 
-class sal23Controller extends Controller
+class sal53Controller extends Controller
 {
 	public function index()
 	{
-        $values = [
-            'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
-            'edate' => date('Y-m-d'),
+		$values = [
+			'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
+			'edate' => date('Y-m-d'),
 		];
-        return view(Config::get('shop.store.view') . '/sale/sal23', $values);
+		return view(Config::get('shop.store.view') . '/sale/sal53', $values);
 	}
 
-    public function search(Request $request)
-    {
-        $sdate = $request->input('sdate', now()->sub(1, 'month')->format('Ymd'));
-        $edate = $request->input('edate', date('Ymd'));
-        $next_edate = date("Ymd", strtotime("+1 day", strtotime($edate)));
-        $now_date = date('Ymd');
+	public function search(Request $request)
+	{
+		$sdate = $request->input('sdate', now()->sub(1, 'month')->format('Ymd'));
+		$edate = $request->input('edate', date('Ymd'));
+		$next_edate = date("Ymd", strtotime("+1 day", strtotime($edate)));
+		$now_date = date('Ymd');
 		$prd_cd	= $request->input('prd_cd', ''); // 상품코드
 		$prd_cd_range_text = $request->input('prd_cd_range', ''); // 상품옵션범위
-        $ext_current_qty = $request->input('ext_current_qty', ''); // 현재재고 0 제외여부
-        $storage_cd = $request->input('storage_no');
+		$ext_current_qty = $request->input('ext_current_qty', ''); // 현재재고 0 제외여부
+		$storage_cd = $request->input('storage_no');
 
 		$sdate	= str_replace('-','', $sdate);
 		$edate	= str_replace('-','', $edate);
 		$next_edate	= str_replace('-','', $next_edate);
 
-        /** 검색조건 필터링 */
-        $where = "";
+		/** 검색조건 필터링 */
+		$where = "";
 		$hst_where	= "";
 
-        // 상품코드 검색
-        if ($prd_cd != '') {
+		// 상품코드 검색
+		if ($prd_cd != '') {
 			$prd_cd = explode(',', $prd_cd);
 			$where .= " and (1<>1 ";
 			$hst_where .= " and (1!=1";
@@ -67,24 +67,24 @@ class sal23Controller extends Controller
 			}
 		}
 
-        if ($ext_current_qty == 'true') $where .= " and ps.qty > 0 ";
+		if ($ext_current_qty == 'true') $where .= " and ps.qty > 0 ";
 
-        /** 데이터 정렬 */
-        $ord = $request->input('ord', 'desc');
-        $ord_field = $request->input('ord_field', 'pc.rt');
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
+		/** 데이터 정렬 */
+		$ord = $request->input('ord', 'desc');
+		$ord_field = $request->input('ord_field', 'pc.rt');
+		$orderby = sprintf("order by %s %s", $ord_field, $ord);
 
-        /** 페이징처리 */
-        $page = $request->input('page', 1);
-        if ($page < 1 or $page == "") $page = 1;
-        $page_size = $request->input('limit', 500);
-        $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
+		/** 페이징처리 */
+		$page = $request->input('page', 1);
+		if ($page < 1 or $page == "") $page = 1;
+		$page_size = $request->input('limit', 500);
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 
 		//전체 데이터 보기(임시)
 		if($page_size == -1)    $limit = "";
 
-        $sql = "
+		$sql = "
             select 
                 ps.prd_cd
                 , pc.prd_cd_p
@@ -98,38 +98,38 @@ class sal23Controller extends Controller
                 , pc.goods_opt
                 , p.tag_price as goods_sh
                 , p.price
-                , p.wonga
+                , pw.wonga
 
                 -- 이전재고
                 , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
                 , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_tag_price
                 , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
-                , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
+                , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * pw.wonga as prev_wonga
 
                 -- 상품입고
                 , ifnull(hst.stock_in_qty, 0) as stock_in_qty
                 , ifnull(hst.stock_in_qty, 0) * p.tag_price as stock_in_tag_price
                 , ifnull(hst.stock_in_qty, 0) * p.price as stock_in_price
-                , ifnull(hst.stock_in_qty, 0) * p.wonga as stock_in_wonga
+                , ifnull(hst.stock_in_qty, 0) * pw.wonga as stock_in_wonga
 
                 -- 기간반품
                 , ifnull(stock_return_qty, 0) as stock_return_qty
                 , ifnull(stock_return_qty, 0) * p.tag_price as stock_return_tag_price
                 , ifnull(stock_return_qty, 0) * p.price as stock_return_price
-                , ifnull(stock_return_qty, 0) * p.wonga as stock_return_wonga
+                , ifnull(stock_return_qty, 0) * pw.wonga as stock_return_wonga
 
 				-- 매장판매
 				,ifnull(hst.sale_qty, 0) as sale_qty
 				,ifnull(hst.sale_qty, 0) * p.tag_price as sale_tag_price
 				,ifnull(hst.sale_qty, 0) * p.price as sale_price
-				,ifnull(hst.sale_wonga, 0)  as sale_wonga
-				-- ,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
+				-- ,ifnull(hst.sale_wonga, 0)  as sale_wonga
+				,ifnull(hst.sale_qty, 0) * pw.wonga as sale_wonga
 
                 -- LOSS
                 , ifnull(loss_qty, 0) as loss_qty
                 , ifnull(loss_qty, 0) * p.tag_price as loss_tag_price
                 , ifnull(loss_qty, 0) * p.price as loss_price
-                , ifnull(loss_qty, 0) * p.wonga as loss_wonga
+                , ifnull(loss_qty, 0) * pw.wonga as loss_wonga
                 
                 -- 기간재고
                 -- , ps.qty - ifnull(hst.next_qty, 0) as term_qty
@@ -145,7 +145,7 @@ class sal23Controller extends Controller
             	) as term_qty
             	,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * p.tag_price as term_tag_price
             	,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * p.price as term_price
-            	,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * p.wonga as term_wonga
+            	,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * pw.wonga as term_wonga
             
             from product_stock ps
 			left outer join (
@@ -172,7 +172,7 @@ class sal23Controller extends Controller
 					sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
 
 					-- 매장판매 ( 원가 )
-					sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
+					-- sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
 
 					-- loss
 					sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
@@ -183,7 +183,7 @@ class sal23Controller extends Controller
 					)) as next_qty
 				from product_stock_hst hst
 				inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
-				left outer join order_opt oo on oo.ord_opt_no = hst.ord_opt_no
+				-- left outer join order_opt oo on oo.ord_opt_no = hst.ord_opt_no
 				where
 				    1=1
 					$hst_where  	
@@ -191,6 +191,7 @@ class sal23Controller extends Controller
 				group by prd_cd_p, prd_cd
 			) hst on ps.prd_cd = hst.prd_cd
 			inner join product_code pc on ps.prd_cd = pc.prd_cd and pc.type = 'N'
+            inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 			inner join product p on ps.prd_cd = p.prd_cd
 			left outer join goods g on g.goods_no = ps.goods_no
 			left outer join brand b on b.br_cd = pc.brand
@@ -200,14 +201,14 @@ class sal23Controller extends Controller
             $orderby
             $limit
         ";
-        $rows = DB::select($sql);
+		$rows = DB::select($sql);
 
-        // pagination
-        $total = 0;
-        $total_data = '';
-        $page_cnt = 0;
-        if($page == 1) {
-            $sql = "	
+		// pagination
+		$total = 0;
+		$total_data = '';
+		$page_cnt = 0;
+		if($page == 1) {
+			$sql = "	
                 select 
                     count(a.prd_cd) as total
                     , sum(prev_qty) as prev_qty
@@ -248,38 +249,38 @@ class sal23Controller extends Controller
 						, pc.goods_opt
 						, p.tag_price as goods_sh
 						, p.price
-						, p.wonga
+						, pw.wonga
 		
 						-- 이전재고
 						, (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
 						, (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_sh
 						, (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
-						, (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
+						, (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * pw.wonga as prev_wonga
 		
 						-- 상품입고
 						, ifnull(hst.stock_in_qty, 0) as stock_in_qty
 						, ifnull(hst.stock_in_qty, 0) * p.tag_price as stock_in_sh
 						, ifnull(hst.stock_in_qty, 0) * p.price as stock_in_price
-						, ifnull(hst.stock_in_qty, 0) * p.wonga as stock_in_wonga
+						, ifnull(hst.stock_in_qty, 0) * pw.wonga as stock_in_wonga
 		
 						-- 기간반품
 						, ifnull(stock_return_qty, 0) as stock_return_qty
 						, ifnull(stock_return_qty, 0) * p.tag_price as stock_return_sh
 						, ifnull(stock_return_qty, 0) * p.price as stock_return_price
-						, ifnull(stock_return_qty, 0) * p.wonga as stock_return_wonga
+						, ifnull(stock_return_qty, 0) * pw.wonga as stock_return_wonga
 		
 						-- 매장판매
 						,ifnull(hst.sale_qty, 0) as sale_qty
 						,ifnull(hst.sale_qty, 0) * p.tag_price as sale_sh
 						,ifnull(hst.sale_qty, 0) * p.price as sale_price
-						,ifnull(hst.sale_wonga, 0) as sale_wonga
-						-- ,ifnull(hst.sale_qty, 0) * p.wonga as sale_wonga
+						-- ,ifnull(hst.sale_wonga, 0) as sale_wonga
+						,ifnull(hst.sale_qty, 0) * pw.wonga as sale_wonga
 		
 						-- LOSS
 						, ifnull(loss_qty, 0) as loss_qty
 						, ifnull(loss_qty, 0) * p.tag_price as loss_sh
 						, ifnull(loss_qty, 0) * p.price as loss_price
-						, ifnull(loss_qty, 0) * p.wonga as loss_wonga
+						, ifnull(loss_qty, 0) * pw.wonga as loss_wonga
 						
 						-- 기간재고
 						-- , ps.qty - ifnull(hst.next_qty, 0) as term_qty
@@ -295,7 +296,7 @@ class sal23Controller extends Controller
 						) as term_qty
 						,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * p.tag_price as term_sh
 						,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * p.price as term_price
-						,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * p.wonga as term_wonga
+						,( (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) + ifnull(hst.stock_in_qty, 0) - ifnull(stock_return_qty, 0) - ifnull(hst.sale_qty, 0) - ifnull(loss_qty, 0) ) * pw.wonga as term_wonga
 						
 					from product_stock ps
 					left outer join (
@@ -322,7 +323,7 @@ class sal23Controller extends Controller
 							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as sale_qty,
 				
 							-- 매장판매 ( 원가 )
-							sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
+							-- sum(if((hst.type = '2' or hst.type = '5' or hst.type = '6') and location_type = 'STORE' and hst.stock_state_date <= '$edate', hst.qty * oo.wonga, 0)) * -1 as sale_wonga,
 
 							-- loss
 							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
@@ -341,6 +342,7 @@ class sal23Controller extends Controller
 						group by prd_cd_p, prd_cd
 					) hst on ps.prd_cd = hst.prd_cd
 					inner join product_code pc on ps.prd_cd = pc.prd_cd and pc.type = 'N'
+					inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 					inner join product p on ps.prd_cd = p.prd_cd
 					left outer join goods g on g.goods_no = ps.goods_no
 					left outer join brand b on b.br_cd = pc.brand
@@ -350,11 +352,11 @@ class sal23Controller extends Controller
                 ) a
             ";
 			$row = DB::selectOne($sql);
-            $total_data = $row;
-            $total = $row->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        }
-        
+			$total_data = $row;
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
+
 		return response()->json([
 			'code' => 200,
 			'head' => [
@@ -362,9 +364,9 @@ class sal23Controller extends Controller
 				'page' => $page,
 				'page_cnt' => $page_cnt,
 				'page_total' => count($rows),
-                'total_data' => $total_data
+				'total_data' => $total_data
 			],
 			'body' => $rows,
 		]);
-    }
+	}
 }
