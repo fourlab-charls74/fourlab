@@ -189,7 +189,9 @@ class ord05Controller extends Controller
 				from (
 					select o.ord_no, o.ord_opt_no, o.ord_date, o.prd_cd, o.goods_no, g.style_no, g.goods_nm, g.goods_nm_eng
 						, pc.prd_cd_p, pc.color, pc.size, o.goods_opt as opt_val, o.sale_kind as sale_kind_cd, o.pr_code as pr_code_cd
-						, if(w.ord_state = 30, o.qty, o.qty * -1) as qty, o.wonga
+						, if(w.ord_state = 30, o.qty, o.qty * -1) as qty
+					    -- , p.wonga
+					    , o.wonga
 					    -- , g.goods_sh
 					    , p.tag_price as goods_sh
 					    -- , g.price as goods_price

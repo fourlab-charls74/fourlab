@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use PDO;
 
-class ord06Controller extends Controller
+class ord36Controller extends Controller
 {
 	private function _getOrdStates() {
 		return [
@@ -19,7 +19,7 @@ class ord06Controller extends Controller
 			(object) ['code_id' => 60, 'code_val' => '교환완료'],
 			(object) ['code_id' => 61, 'code_val' => '환불완료'],
 		];
-	} 
+	}
 
 	public function index(Request $request)
 	{
@@ -53,7 +53,7 @@ class ord06Controller extends Controller
 		//$sdate = $request->query('sdate', $sdate);
 		//$edate = $request->query('sdate', $edate);
 		$store_cd = $request->query('store_cd',$store_cd);
-		
+
 		$pr_code_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'PR_CODE')->whereIn('code_id', $pr_code)->get();
 		$pr_code_ids = array_map(function ($p) { return $p->code_id; }, $pr_code_ids->toArray());
 		$sell_type_ids = DB::table('code')->select('code_id')->where('code_kind_cd', 'SALE_KIND')->whereIn('code_id', $sell_type)->get();
@@ -65,8 +65,8 @@ class ord06Controller extends Controller
 		$conf = new Conf();
 		$domain = $conf->getConfigValue("shop", "domain");
 
-		
-		
+
+
 
 		$values = [
 			'sdate' 		=> $sdate,
@@ -101,7 +101,7 @@ class ord06Controller extends Controller
 			'prd_cd_range_nm' => $prd_cd_range_nm,
 			'store_cd'		=> $store_cd
 		];
-		return view(Config::get('shop.store.view') . '/order/ord06', $values);
+		return view(Config::get('shop.store.view') . '/order/ord36', $values);
 	}
 
 	public function search(Request $request)
@@ -303,7 +303,7 @@ class ord06Controller extends Controller
 			}
 			$where	.= ")";
 		}
-		
+
 		//판매처 주문번호 검색
 		if ($out_ord_opt_no != "") {
 			$where .= " and o.out_ord_opt_no = '$out_ord_opt_no' ";
@@ -415,8 +415,8 @@ class ord06Controller extends Controller
                     om.sale_place,
                     g.price as goods_price,
                     g.goods_sh,
-                    o.wonga,
-                    -- p.wonga,
+                    pw.wonga,
+                    -- o.wonga,
                     o.price,
                     o.recv_amt,
                     ifnull(w.point_apply_amt, 0) as point_apply_amt,
@@ -447,7 +447,7 @@ class ord06Controller extends Controller
                 from order_opt_wonga w
                     inner join order_opt o on o.ord_opt_no = w.ord_opt_no
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
-                    -- left outer join product p on o.prd_cd = p.prd_cd
+                    left outer join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
                     inner join order_mst om on o.ord_no = om.ord_no
                     inner join goods g on o.goods_no = g.goods_no
                     left outer join payment pay on om.ord_no = pay.ord_no
@@ -480,20 +480,20 @@ class ord06Controller extends Controller
             	left outer join brand b on b.br_cd = a.brand and b.use_yn = 'Y'
         ";
 		// $result = DB::select($sql);
-		
+
 		$pdo	= DB::connection()->getPdo();
 		$stmt	= $pdo->prepare($sql);
 		$stmt->execute();
 		$result	= [];
-		
+
 		$ord_states = $this->_getOrdStates();
-		
+
 		while($row2 = $stmt->fetch(PDO::FETCH_ASSOC))
 		{
 			if($row2["img"] != ""){
 				$row2["img"] = sprintf("%s%s",config("shop.image_svr"), $row2["img"]);
 			}
-			
+
 			$idx = array_search($row2["ord_state_cd"], array_column($ord_states, 'code_id'));
 			$row2["ord_state"] = $ord_states[$idx]->code_val;
 

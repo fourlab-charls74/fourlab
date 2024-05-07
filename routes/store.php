@@ -802,7 +802,7 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('ord01/order/store_refund', 'ord01Controller@store_refund_save'); // 매장환불처리
         Route::get('ord01/refund/{ord_no}/{ord_opt_no?}', 'ord01Controller@refund');
         Route::post('ord01/complete-reservation', 'ord01Controller@complete_reservation'); // 예약판매상품 지급처리
-
+		
         // 온라인 주문접수
         Route::get('ord02','ord02Controller@index');
         Route::get('ord02/search','ord02Controller@search');
@@ -834,6 +834,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		// 판매내역조회
 		Route::get('ord06', 'ord06Controller@index');
 		Route::get('ord06/search', 'ord06Controller@search');
+
+		Route::get('ord36', 'ord36Controller@index');
+		Route::get('ord36/search', 'ord36Controller@search');
     });
 
     // 고객관리
