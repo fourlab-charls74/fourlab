@@ -370,6 +370,11 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('prd02/{no}/image', 'prd02Controller@index');
         Route::get("prd02/slider", "prd02Controller@index_slider");
 
+		Route::get('prd32','prd32Controller@index');
+		Route::get('prd32/search','prd32Controller@search');
+		
+		
+		
         // 원부자재 상품 관리
         Route::get('prd03','prd03Controller@index');
         Route::get('prd03/search','prd03Controller@search');
@@ -767,6 +772,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		Route::post('stk35/batch-getgoods', 'stk35Controller@get_goods');
 		Route::put('stk35/addrow', 'stk35Controller@add_row');
 
+		Route::get('stk65','stk65Controller@index');
+		Route::get('stk65/search','stk65Controller@search');
+		
 		//new월별동종업계매출관리
 		Route::get('stk36','stk36Controller@index');
 		Route::get('stk36/search', 'stk36Controller@search');

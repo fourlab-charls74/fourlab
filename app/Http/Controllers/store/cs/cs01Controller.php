@@ -1372,6 +1372,24 @@ class cs01Controller extends Controller {
 				/////////////////////
 				//평균원가 프로그램 시작
 				/////////////////////
+
+				/// 실반영후 주척 삭제해야함
+				$sql_product	= " update product set wonga = $n_avg_wonga, ut = now() where prd_cd like '" . $prd_cd_p . "%' ";
+				//DB::update($sql_product);
+
+				/// 실반영후 주척 삭제해야함
+				$sql_product	= " update product set wonga = $n_avg_wonga, qty_wonga = qty * wonga, ut = now() where prd_cd like '" . $prd_cd_p . "%' ";
+				//DB::update($sql_product);
+
+				/// 실반영후 주척 삭제해야함
+				$sql_product	= "
+					update goods g set
+						g.wonga = $n_avg_wonga
+					where
+						g.goods_no in ( select  distinct goods_no from product_code where prd_cd_p = '$prd_cd_p' ) 
+				";
+				//DB::update($sql_product);
+				
 				$sql_avg	= "
 					select 
 						round(sum(psop.qty * psop.cost)/sum(psop.qty)) as wonga
