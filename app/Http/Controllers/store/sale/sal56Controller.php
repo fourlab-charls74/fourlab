@@ -10,29 +10,29 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class sal26Controller extends Controller
+class sal56Controller extends Controller
 {
-    // 업체별 매출 통계
-    public function index() 
+	// 업체별 매출 통계
+	public function index()
 	{
-        $mutable = Carbon::now();
-        $sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
+		$mutable = Carbon::now();
+		$sdate	= $mutable->sub(3, 'month')->format('Y-m-d');
 
-        $values = [
-            'sdate' => $sdate,
-            'edate' => date("Y-m-d"),
-            'items' => SLib::getItems(),
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'store_types'   => SLib::getCodes('STORE_TYPE'),
+		$values = [
+			'sdate' => $sdate,
+			'edate' => date("Y-m-d"),
+			'items' => SLib::getItems(),
+			'com_types'     => SLib::getCodes('G_COM_TYPE'),
+			'store_types'   => SLib::getCodes('STORE_TYPE'),
 			'sale_kinds'	=> SLib::getCodes('SALE_KIND'),
 			'pr_codes'		=> SLib::getCodes('PR_CODE'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
-        ];
-        return view( Config::get('shop.store.view') . '/sale/sal26',$values);
-    }
+		];
+		return view( Config::get('shop.store.view') . '/sale/sal56',$values);
+	}
 
-    public function search(Request $request){
+	public function search(Request $request){
 
 		$sdate		= str_replace("-","",$request->input('sdate',Carbon::now()->sub(1, 'month')->format('Ymd')));
 		$edate		= str_replace("-","",$request->input('edate',date("Ymd")));
@@ -45,9 +45,9 @@ class sal26Controller extends Controller
 		$goods_nm	= $request->input("goods_nm");
 		$ord_state	= $request->input("ord_state");
 		$ord_type	= $request->input("ord_type");
-        $sell_type  = $request->input('sell_type');
-        $pr_code    = $request->input('pr_code');
-        $store_cd   = $request->input('store_no');
+		$sell_type  = $request->input('sell_type');
+		$pr_code    = $request->input('pr_code');
+		$store_cd   = $request->input('store_no');
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 		$prd_cd_range_text 	= $request->input("prd_cd_range", '');
@@ -55,25 +55,25 @@ class sal26Controller extends Controller
 		$inner_where	= "";
 		$inner_where2	= "";	//매출
 
-        if($com_cd != ""){
-            $inner_where .= " and c.com_id = '". Lib::quote($com_cd). "'";
-        }
+		if($com_cd != ""){
+			$inner_where .= " and c.com_id = '". Lib::quote($com_cd). "'";
+		}
 
-        if($com_type != ""){
-            $inner_where .= " and c.com_type = '". Lib::quote($com_type). "'";
-        }
+		if($com_type != ""){
+			$inner_where .= " and c.com_type = '". Lib::quote($com_type). "'";
+		}
 
-        if($item != ""){
-            $inner_where .= " and g.opt_kind_cd = '". Lib::quote($item). "'";
-        }
+		if($item != ""){
+			$inner_where .= " and g.opt_kind_cd = '". Lib::quote($item). "'";
+		}
 
-        if($brand_cd != ""){
-            $inner_where .= " and g.brand = '". Lib::quote($brand_cd). "'";
-        }
+		if($brand_cd != ""){
+			$inner_where .= " and g.brand = '". Lib::quote($brand_cd). "'";
+		}
 
-        if($goods_nm != ""){
-            $inner_where .= " and g.goods_nm like '%". Lib::quote($goods_nm)."%' ";
-        }
+		if($goods_nm != ""){
+			$inner_where .= " and g.goods_nm like '%". Lib::quote($goods_nm)."%' ";
+		}
 
 		if( $ord_type != "" ){
 			$ord_type_where	= "";
@@ -92,9 +92,9 @@ class sal26Controller extends Controller
 			$inner_where2	.= " and ( o.ord_type < 0 ) ";
 		}
 
-        $where = "";
+		$where = "";
 
-        //판매유형 검색
+		//판매유형 검색
 		if ( $sell_type != "" ) {
 			$where	.= " and (1!=1";
 			foreach($sell_type as $sell_types) {
@@ -117,15 +117,15 @@ class sal26Controller extends Controller
 		if ($store_channel != "") $where .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 
-        // 매장검색
-        if ( $store_cd != "" ) {
-            $where	.= " and (1!=1";
-            foreach($store_cd as $store_cd) {
-                $where .= " or o.store_cd = '$store_cd' ";
+		// 매장검색
+		if ( $store_cd != "" ) {
+			$where	.= " and (1!=1";
+			foreach($store_cd as $store_cd) {
+				$where .= " or o.store_cd = '$store_cd' ";
 
-            }
-            $where	.= ")";
-        }
+			}
+			$where	.= ")";
+		}
 
 		// 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
@@ -138,8 +138,8 @@ class sal26Controller extends Controller
 			}
 		}
 
-        $sql = /** @lang text */
-            "
+		$sql = /** @lang text */
+			"
 			select
                 a.store_cd as store_cd, a.store_nm as store_nm
 				, t.*
@@ -192,8 +192,8 @@ class sal26Controller extends Controller
 							, sum(w.qty)as qty
 							, sum(w.recv_amt) as recv_amt
 							, sum(w.point_apply_amt) as point_amt
-							, sum(w.wonga * w.qty) as wonga
-							-- , sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
+							-- , sum(w.wonga * w.qty) as wonga
+							, sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
 							, sum(w.coupon_apply_amt) as coupon_amt
 							, sum(w.sales_com_fee) as fee_amt
 							, sum(w.dc_apply_amt) as dc_amt
@@ -212,7 +212,7 @@ class sal26Controller extends Controller
 							inner join company c on w.com_id = c.com_id
                             inner join store s on s.store_cd = o.store_cd
                             inner join product_code pc on pc.prd_cd = o.prd_cd
-                            -- inner join product p on o.prd_cd = p.prd_cd
+                            inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 						where
 							w.ord_state_date >= '$sdate' 
 							and w.ord_state_date <= '$edate' and w.ord_state in ($ord_state,60,61)
@@ -225,36 +225,36 @@ class sal26Controller extends Controller
             order by sum_amt desc
         ";
 
-        $result = DB::select($sql);
-		
+		$result = DB::select($sql);
 
-        foreach($result as $row){
-            // $row->sum_amt = $row->sum_recv_amt + $row->sum_point_amt - $row->sum_fee_amt;
-            $row->sum_taxfree	= $row->sum_amt -  $row->sum_taxation_amt;
-            $row->sum_taxation_no_vat	= round($row->sum_taxation_amt/1.1);		// 과세 부가세 별도
+
+		foreach($result as $row){
+			// $row->sum_amt = $row->sum_recv_amt + $row->sum_point_amt - $row->sum_fee_amt;
+			$row->sum_taxfree	= $row->sum_amt -  $row->sum_taxation_amt;
+			$row->sum_taxation_no_vat	= round($row->sum_taxation_amt/1.1);		// 과세 부가세 별도
 			//$row->vat = $row->sum_taxation_amt - $row->sum_taxation_no_vat;
 			$row->vat = $row->sum_tax_amt;
 
 			//$row->sum_amt	= $row->sum_recv_amt + $row->sum_point_amt - $row->vat;
 			$row->sum_amt	= $row->sum_recv_amt - $row->vat;
 
-            $row->margin = $row->sum_amt? round((1 - $row->sum_wonga/$row->sum_amt)*100, 2):0;
-            $row->margin1 = $row->wonga_10 - $row->wonga_60;
-            $row->margin2 = $row->wonga_10 - $row->wonga_60 - $row->vat;
+			$row->margin = $row->sum_amt? round((1 - $row->sum_wonga/$row->sum_amt)*100, 2):0;
+			$row->margin1 = $row->wonga_10 - $row->wonga_60;
+			$row->margin2 = $row->wonga_10 - $row->wonga_60 - $row->vat;
 
 			$row->recv_amt_10	= $row->recv_amt_10/1.1;
 			$row->recv_amt_60	= $row->recv_amt_60/1.1;
 			$row->recv_amt_61	= $row->recv_amt_61/1.1;
-        }
+		}
 
-        return response()->json([
-                "code" => 200,
-                "head" => array(
-                    "total" => count($result)
-                ),
-                "body" => $result
-            ]
-        );
-    }
+		return response()->json([
+				"code" => 200,
+				"head" => array(
+					"total" => count($result)
+				),
+				"body" => $result
+			]
+		);
+	}
 
 }
