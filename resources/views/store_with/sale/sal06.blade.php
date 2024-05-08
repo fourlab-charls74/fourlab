@@ -7,6 +7,7 @@
 		<span class="home"></span>
 		<span>/ 경영관리</span>
 		<span>/ 매장유형별판매분석</span>
+		<span>/ <a href="/store/sale/sal66">신규</a></span>
 	</div>
 </div>
 <form method="get" name="search">
