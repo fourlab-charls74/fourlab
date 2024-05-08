@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class sal07Controller extends Controller
+class sal67Controller extends Controller
 {
-	public function index() 
+	public function index()
 	{
-        $mutable	= now();
-        $sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
+		$mutable	= now();
+		$sdate		= $mutable->sub(1, 'month')->format('Y-m-d');
 
 		// 매장구분
 		$sql = " 
@@ -27,18 +27,18 @@ class sal07Controller extends Controller
 		$store_types = DB::select($sql);
 
 		$values = [
-            'sdate'         => $sdate,
-            'edate'         => date("Y-m-d"),
-            'style_no'		=> "",
+			'sdate'         => $sdate,
+			'edate'         => date("Y-m-d"),
+			'style_no'		=> "",
 			'store_types'   => $store_types,
-            'com_types'     => SLib::getCodes('G_COM_TYPE'),
-            'items'			=> SLib::getItems(),
-            // 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
-            // 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
+			'com_types'     => SLib::getCodes('G_COM_TYPE'),
+			'items'			=> SLib::getItems(),
+			// 'goods_stats'	=> SLib::getCodes('G_GOODS_STAT'),
+			// 'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
-        return view( Config::get('shop.store.view') . '/sale/sal07', $values);
+		return view( Config::get('shop.store.view') . '/sale/sal67', $values);
 	}
 
 	public function search(Request $request)
@@ -57,16 +57,16 @@ class sal07Controller extends Controller
 		$store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
 
-        $style_no = $request->input("style_no");
-        $goods_no = $request->input("goods_no");
-        $goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
-        $item = $request->input("item");
-        $brand_nm = $request->input("brand_nm");
-        $brand_cd = $request->input("brand_cd");
-        $goods_nm = $request->input("goods_nm");
-        $goods_nm_eng = $request->input("goods_nm_eng");
+		$style_no = $request->input("style_no");
+		$goods_no = $request->input("goods_no");
+		$goods_nos = $request->input('goods_nos', '');       // 상품번호 textarea
+		$item = $request->input("item");
+		$brand_nm = $request->input("brand_nm");
+		$brand_cd = $request->input("brand_cd");
+		$goods_nm = $request->input("goods_nm");
+		$goods_nm_eng = $request->input("goods_nm_eng");
 
-        $page = $request->input('page', 1);
+		$page = $request->input('page', 1);
 		if ( $page < 1 or $page == "" )	$page = 1;
 		$limit = $request->input('limit', 100);
 
@@ -155,7 +155,7 @@ class sal07Controller extends Controller
 
 		if ( $page == 1 ) {
 			$query = /** @lang text */
-            	"
+				"
 				select
 				count(cnt) as total
 				from
@@ -178,9 +178,9 @@ class sal07Controller extends Controller
 			if ($row) $total = $row->total;
 			$page_cnt = (int)(($total - 1) / $page_size) + 1;
 		}
-		
+
 		$sql = /** @lang text */
-            "
+			"
 			select 
 				o.prd_cd,count(*) as cnt,
 				sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty,
@@ -190,29 +190,23 @@ class sal07Controller extends Controller
 				sum(w.qty * w.price - if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as discount,
 				avg(w.price) as avg_price,
 				avg(w.wonga) as wonga,
-				sum(w.wonga * w.qty) as sum_wonga,
-				-- sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as sum_wonga,
+				-- sum(w.wonga * w.qty) as sum_wonga,
+				sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as sum_wonga,
 
 				( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) as recv_amt_novat,
 				
 				( 
 					sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1
-					- sum(w.wonga * w.qty)
-					-- sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1))
+					-- sum(w.wonga * w.qty)
+					- sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1))
 				) as sales_profit,
 				
 				-- sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
 	
-				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
+				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) > 0,
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
 				)
-				/*
-				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) > 0,
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
-				)
-				*/
 				 as profit_rate,
 
 				-- (sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
@@ -223,7 +217,7 @@ class sal07Controller extends Controller
 				inner join order_opt o on o.ord_opt_no = w.ord_opt_no 
 				inner join goods g on o.goods_no = g.goods_no
 				inner join product_code pc on pc.prd_cd = o.prd_cd
-				-- inner join product p on o.prd_cd = p.prd_cd
+				inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 				inner join code item on item.code_kind_cd = 'PRD_CD_ITEM' and item.code_id = pc.item
 				left outer join store s on o.store_cd = s.store_cd
 				left outer join brand b on pc.brand = b.br_cd
