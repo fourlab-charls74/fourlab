@@ -7,6 +7,7 @@
 			<span class="home"></span>
 			<span>/ 영업관리</span>
 			<span>/ 매장수불집계표(품번)</span>
+			<span>/ <a href="/store/sale/sal31">이전</a></span>
 		</div>
 	</div>
 	<div id="search-area" class="search_cum_form">
