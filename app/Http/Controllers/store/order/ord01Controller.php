@@ -1756,7 +1756,7 @@ class ord01Controller extends Controller
                     , company.r_zip_code as com_r_zip_code, company.r_addr1 as com_r_addr1, company.r_addr2  as com_r_addr2
                     , company.md_nm, company.memo as com_memo, a.price, a.dlv_pay_type
                     , m.memo as member_memo, 'Y' as taxpayer_yn,mu.name as seller
-                    , a.store_cd, s.store_nm, a.pr_code, a.prd_cd, a.out_ord_opt_no
+                    , a.store_cd, s.store_nm, a.pr_code, a.prd_cd, b.out_ord_no
                 from order_opt a
                     inner join order_mst b on a.ord_no = b.ord_no
                     left outer join code c on c.code_kind_cd = 'DELIVERY' and a.dlv_cd = c.code_id

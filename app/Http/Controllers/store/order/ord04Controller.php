@@ -82,7 +82,7 @@ class ord04Controller extends Controller
 		$dlv_place_type = $request->input('dlv_place_type', '');
 		$store_no = $request->input('store_no', []);
 		
-		$out_ord_opt_no	= $request->input('out_ord_opt_no', '');
+		$out_ord_no	= $request->input('out_ord_no', '');
 
 		$ord_field = $request->input('ord_field', 'o.ord_date');
 		$ord = $request->input('ord', 'desc');
@@ -223,8 +223,8 @@ class ord04Controller extends Controller
 		}
 		
 		//판매처주문번호 검색
-		if( $out_ord_opt_no != '' ){
-			$where	.= " and o.out_ord_opt_no = '$out_ord_opt_no' ";
+		if( $out_ord_no != '' ){
+			$where	.= " and om.out_ord_no = '$out_ord_no' ";
 		}
 		
 		//일자검색
@@ -267,7 +267,7 @@ class ord04Controller extends Controller
 					, csc.rt as csc_rt
 					, o.dlv_place_type
 					, o.dlv_place_cd
-					, o.out_ord_opt_no
+					, om.out_ord_no
 				from order_opt o
 					inner join order_mst om on om.ord_no = o.ord_no
 				    left outer join claim c on c.ord_opt_no = o.ord_opt_no

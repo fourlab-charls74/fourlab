@@ -262,7 +262,7 @@
                                                 </td>
 												<th>판매처주문번호</th>
 												<td>
-													<div class="txt_box">{{ @$ord->out_ord_opt_no }}</div>
+													<div class="txt_box">{{ @$ord->out_ord_no }}</div>
 												</td>
                                         </tbody>
                                     </table>
