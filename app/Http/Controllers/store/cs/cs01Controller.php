@@ -1378,7 +1378,7 @@ class cs01Controller extends Controller {
 				//DB::update($sql_product);
 
 				/// 실반영후 주척 삭제해야함
-				$sql_product	= " update product set wonga = $n_avg_wonga, qty_wonga = qty * wonga, ut = now() where prd_cd like '" . $prd_cd_p . "%' ";
+				$sql_product	= " update product_stock set wonga = $n_avg_wonga, qty_wonga = qty * wonga, ut = now() where prd_cd like '" . $prd_cd_p . "%' ";
 				//DB::update($sql_product);
 
 				/// 실반영후 주척 삭제해야함
