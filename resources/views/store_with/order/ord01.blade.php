@@ -477,6 +477,8 @@
         {field: "pay_type", headerName: "결제방법", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "ord_type", headerName: "주문구분", width: 60, cellStyle: {'text-align': 'center'}},
         {field: "ord_kind", headerName: "출고구분", width: 60, cellStyle: StyleOrdKind},
+		{field: "store_channel", headerName: "판매채널", width: 80, cellStyle: {'text-align': 'center'}},
+		{field: "store_channel_kind", headerName: "매장구분", width: 80, cellStyle: {'text-align': 'center'}},
         {field: "store_nm", headerName: "주문매장", width: 100},
         {field: "baesong_kind", headerName: "배송구분", width: 60},
         {field: "state", headerName: "처리현황", width: 80},

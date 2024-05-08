@@ -400,7 +400,8 @@ class ord01Controller extends Controller
                 ord_type.code_val as ord_type,
                 ord_kind.code_val as ord_kind,
                 a.store_cd,
-                ifnull(s.store_nm, '본사') as store_nm,
+                -- ifnull(s.store_nm, '본사') as store_nm,
+                ifnull(s.store_nm, concat(a.com_nm, '(출고예정)')) as store_nm,
                 baesong_kind.code_val as baesong_kind,
                 a.dlv_no,
                 dlv_cd.code_val as dlv_cm,
@@ -420,7 +421,9 @@ class ord01Controller extends Controller
                 a.dlv_end_date,
                 a.last_up_date,
                 if(a.ord_state <= 10 and a.clm_state = 0 and ord_opt_cnt = 0, 'Y', 'N') as ord_del_yn,
-                '2' as depth
+                '2' as depth,
+                sc.store_channel as store_channel,
+                sc2.store_kind as store_channel_kind
             from (
                 select
                     om.ord_no,
@@ -473,7 +476,8 @@ class ord01Controller extends Controller
                     (select count(*) from order_opt where ord_no = o.ord_no and ord_opt_no != o.ord_opt_no and (ord_state > 10 or clm_state > 0)) as ord_opt_cnt,
                     st.amt_kind,
                     ifnull(if(st.amt_kind = 'per', round(o.price * st.sale_per / 100), st.sale_amt), 0) as sale_kind_amt,
-                    round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate
+                    round((1 - (o.price / g.goods_sh)) * 100) as sale_dc_rate,
+                    cy.com_nm
                 from order_opt o
                     left outer join product_code pc on pc.prd_cd = o.prd_cd
                     inner join order_mst om on o.ord_no = om.ord_no
@@ -485,6 +489,7 @@ class ord01Controller extends Controller
                     -- left outer join sale_type st on st.sale_kind = o.sale_kind and st.use_yn = 'Y'
                     left outer join sale_type st on st.sale_kind = o.sale_kind
 					left outer join store store on store.store_cd = o.store_cd
+					left outer join company cy on o.sale_place = cy.com_id  
                 where 1=1 $where
                 $orderby
                 $limit
@@ -500,6 +505,8 @@ class ord01Controller extends Controller
                 left outer join store s on s.store_cd = a.store_cd
                 left outer join code sale_kind on (sale_kind.code_id = a.sale_kind and sale_kind.code_kind_cd = 'SALE_KIND')
                 left outer join code pr_code on (pr_code.code_id = a.pr_code and pr_code.code_kind_cd = 'PR_CODE')
+           		left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
+				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
         ";
         // $result = DB::select($sql);
 
