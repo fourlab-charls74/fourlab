@@ -8,6 +8,7 @@
 			<span class="home"></span>
 			<span>/ 경영관리</span>
 			<span>/ 매장별 매출 통계</span>
+			<span>/ <a href="/store/sale/sal56">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search" id="search">
