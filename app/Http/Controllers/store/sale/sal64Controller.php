@@ -12,7 +12,7 @@ use PDO;
 use Carbon\Carbon;
 use DateTime;
 
-class sal34Controller extends Controller
+class sal64Controller extends Controller
 {
 	// 일별 매출 통계
 	public function index(Request $req)
@@ -51,7 +51,7 @@ class sal34Controller extends Controller
 
 		$store = DB::table('store')->select('store_cd', 'store_nm')->where('store_cd', $store_cd)->first();
 		//$brand = DB::table('brand')->select('brand', 'brand_nm')->where('brand', $brand_cd)->first();
-		
+
 		//유형별 컬럼
 		$sale_types	= DB::table('sale_type')->select('sale_kind', 'sale_type_nm')->where('use_yn', 'Y')->get();
 
@@ -80,7 +80,7 @@ class sal34Controller extends Controller
 			'prd_cd_range_nm' => $prd_cd_range_nm,
 			'sale_types'	=> $sale_types
 		];
-		return view(Config::get('shop.store.view') . '/sale/sal34', $values);
+		return view(Config::get('shop.store.view') . '/sale/sal64', $values);
 	}
 
 	public function search(Request $request)
@@ -232,7 +232,7 @@ class sal34Controller extends Controller
 			$id = $item->sale_kind;
 			$sale_kinds_query .= ", sum(if(ifnull(o.sale_kind, '81') = '$id', if(w.ord_state = '30', w.dc_apply_amt, w.dc_apply_amt * -1), 0)) as sale_kind_$id ";
 		}
-		
+
 		$sql = /** @lang text */
 			"
 			select
@@ -288,8 +288,8 @@ class sal34Controller extends Controller
 						, sum(w.qty)as qty
 						, sum(w.recv_amt) as recv_amt
 						, sum(w.point_apply_amt) as point_amt
-						, sum(w.wonga * w.qty) as wonga
-						-- , sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
+						-- , sum(w.wonga * w.qty) as wonga
+						, sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
 						, sum(w.coupon_apply_amt) as coupon_amt
 						, sum(w.sales_com_fee) as fee_amt
 						, sum(w.dc_apply_amt) as dc_amt
@@ -305,7 +305,7 @@ class sal34Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join store store on store.store_cd = o.store_cd
 						inner join product_code pc on pc.prd_cd = o.prd_cd
-						-- inner join product p on o.prd_cd = p.prd_cd
+						inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 					where
 						w.ord_state_date >= '$sdate' and w.ord_state_date <= '$edate'
 						and w.ord_state in ('$ord_state',60,61)
@@ -436,15 +436,15 @@ class sal34Controller extends Controller
 				"fee_amt_61"	=> ($fee_amt_61) ? $fee_amt_61:0,
 				"recv_amt_61"	=> ($recv_amt_61) ? $recv_amt_61:0,
 			);
-			
+
 			$sale_types	= DB::table('sale_type')->select('sale_kind', 'sale_type_nm')->where('use_yn', 'Y')->get();
 			foreach ($sale_types as $item) {
 				$id = $item->sale_kind;
 				$array["sale_kind_" . $id] = $row->{"sale_kind_" . $id};
-				
+
 				$row->etc_dc_amt	-= $row->{"sale_kind_" . $id};
 			}
-			
+
 			$array["etc_dc_amt"]	= $row->etc_dc_amt;
 
 			return $array;

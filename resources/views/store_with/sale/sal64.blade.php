@@ -7,7 +7,7 @@
 			<span class="home"></span>
 			<span>/ 경영관리</span>
 			<span>/ 매장별 할인판매 현황</span>
-			<span>/ <a href="/store/sale/sal64">신규</a></span>
+			<span>/ <a href="/store/sale/sal34">기존</a></span>
 		</div>
 	</div>
 	<form method="get" name="search" id="search">
@@ -296,7 +296,7 @@
 		function Search() {
 			let data = $('form[name="search"]').serialize();
 			gx.Aggregation({ "sum": "top", "avg": "top" });
-			gx.Request('/store/sale/sal34/search', data, -1, function(data) {
+			gx.Request('/store/sale/sal64/search', data, -1, function(data) {
 			});
 		}
 	</script>
