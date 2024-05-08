@@ -7,6 +7,7 @@
 			<span class="home"></span>
 			<span>/ 매장관리</span>
 			<span>/ 매장반품관리(상품)</span>
+			<span>/ <a href="/store/stock/stk35">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search">

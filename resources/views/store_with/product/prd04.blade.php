@@ -7,6 +7,7 @@
 		<span class="home"></span>
 		<span>/ 매장관리</span>
 		<span>/ 상품재고관리</span>
+		<span>/ <a href="/store/product/prd34">신규</a></span>
 	</div>
 </div>
 

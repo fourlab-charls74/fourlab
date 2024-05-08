@@ -409,6 +409,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd04/upload_store', 'prd04Controller@upload_store');
         Route::put('prd04/batch_store', 'prd04Controller@update_store');
 
+		Route::get('prd34','prd34Controller@index');
+		Route::get('prd34/search','prd34Controller@search');
+		
         // 상품가격 관리
         Route::get('prd05','prd05Controller@index');
         Route::get('prd05/search','prd05Controller@search');

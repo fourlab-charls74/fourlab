@@ -7,6 +7,7 @@
 			<span class="home"></span>
 			<span>판매관리</span>
 			<span>/ 판매내역조회</span>
+			<span>/ <a href="/store/order/ord06">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search">
