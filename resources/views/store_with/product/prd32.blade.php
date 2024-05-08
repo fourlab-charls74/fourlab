@@ -14,6 +14,7 @@
 			<span class="home"></span>
 			<span>/ 상품관리</span>
 			<span>/ 상품코드관리</span>
+			<span>/ <a href="/store/product/prd02">기존</a></span>
 		</div>
 	</div>
 	<style>
