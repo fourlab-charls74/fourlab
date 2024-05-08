@@ -266,6 +266,7 @@ class prd02Controller extends Controller
 				, (ps.qty - ps.wqty) as sqty
 				, p.tag_price as goods_sh
 				, p.price as price
+				-- , pw.wonga as wonga -- 평균원가
 				, p.wonga as wonga
 				, (100 / (if(pc.goods_no = 0, p.price, g.price) / (if(pc.goods_no = 0, p.price, g.price) - (p.wonga * 1.1)))) as margin_rate
 				, (if(pc.goods_no = 0, p.price, g.price) - (p.wonga * 1.1)) as margin_amt
@@ -279,6 +280,7 @@ class prd02Controller extends Controller
 			from product_code pc
 				inner join product_stock ps on ps.prd_cd = pc.prd_cd
 				inner join product p on p.prd_cd = pc.prd_cd
+				-- inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p -- 평균원가
 				left outer join goods g on g.goods_no = pc.goods_no
 				$in_store_sql
 				left outer join code type on type.code_kind_cd = 'G_GOODS_TYPE' and g.goods_type = type.code_id
