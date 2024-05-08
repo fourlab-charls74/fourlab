@@ -229,12 +229,10 @@
                                 <div class="table-box-ty2 mobile">
                                     <table class="table incont table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <colgroup>
-                                            <col width="9%">
-                                            <col width="25%">
-                                            <col width="9%">
-                                            <col width="25%">
-                                            <col width="9%">
-                                            <col width="25%">
+                                            <col width="12%">
+                                            <col width="28%">
+                                            <col width="12%">
+                                            <col width="28%">
                                         </colgroup>
                                         <tbody>
                                             <tr>
@@ -246,21 +244,26 @@
                                                 <td>
                                                     <div class="txt_box">{{ @$store->store_nm }}</div>
                                                 </td>
+											</tr>
+											<tr>
                                                 <th>매장구분</th>
                                                 <td>
                                                     <div class="txt_box">{{ @$store->store_type_nm }}</div>
                                                 </td>
-                                            </tr>
-                                            <tr>
                                                 <th>매장종류</th>
                                                 <td>
                                                     <div class="txt_box">{{ @$store->store_kind_nm }}</div>
                                                 </td>
+											</tr>
+											<tr>
                                                 <th>주소</th>
-                                                <td colspan="3">
+                                                <td>
                                                     <div class="txt_box">[{{ @$store->zipcode }}] {{ @$store->addr1 }} {{ @$store->addr2 ?? '' }}</div>
                                                 </td>
-                                            </tr>
+												<th>판매처주문번호</th>
+												<td>
+													<div class="txt_box">{{ @$ord->out_ord_opt_no }}</div>
+												</td>
                                         </tbody>
                                     </table>
                                 </div>

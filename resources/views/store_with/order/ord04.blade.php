@@ -363,6 +363,14 @@
 							</div>
 						</div>
 					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="ord_no">판매처주문번호</label>
+							<div class="flax_box">
+								<input type='text' class="form-control form-control-sm search-enter" name='out_ord_opt_no' id="out_ord_opt_no" value=''>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -472,6 +480,7 @@
 				}
 			}
 		},
+		{field: "out_ord_opt_no", headerName: "판매처주문번호", width: 100, cellClass: 'hd-grid-code'},
 	];
 
 	const pApp = new App('', { gridId:"#div-gd", height: 265 });

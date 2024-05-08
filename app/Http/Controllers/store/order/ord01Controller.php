@@ -1756,7 +1756,7 @@ class ord01Controller extends Controller
                     , company.r_zip_code as com_r_zip_code, company.r_addr1 as com_r_addr1, company.r_addr2  as com_r_addr2
                     , company.md_nm, company.memo as com_memo, a.price, a.dlv_pay_type
                     , m.memo as member_memo, 'Y' as taxpayer_yn,mu.name as seller
-                    , a.store_cd, s.store_nm, a.pr_code, a.prd_cd
+                    , a.store_cd, s.store_nm, a.pr_code, a.prd_cd, a.out_ord_opt_no
                 from order_opt a
                     inner join order_mst b on a.ord_no = b.ord_no
                     left outer join code c on c.code_kind_cd = 'DELIVERY' and a.dlv_cd = c.code_id
@@ -1785,7 +1785,7 @@ class ord01Controller extends Controller
         $store_cd = $row->store_cd;
         $sql = "
             select
-                a.store_cd, a.store_nm_s as store_nm
+                a.store_cd, a.store_nm as store_nm
                 , a.store_type, a.store_kind, a.zipcode, a.addr1, a.addr2
                 , c.code_val as store_type_nm, d.code_val as store_kind_nm
             from store a
