@@ -868,6 +868,9 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::get('sal06','sal06Controller@index');
         Route::get('sal06/search','sal06Controller@search');
 
+		Route::get('sal66','sal66Controller@index');
+		Route::get('sal66/search','sal66Controller@search');
+		
 		//상품별이익현황
         Route::get('sal07','sal07Controller@index');
         Route::get('sal07/search','sal07Controller@search');

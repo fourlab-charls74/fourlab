@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Number;
 
-class sal06Controller extends Controller
+class sal66Controller extends Controller
 {
-	public function index(Request $request) 
+	public function index(Request $request)
 	{
 		$sdate = Carbon::now()->startOfMonth()->format("Y-m-d"); // 이번 달 기준
 		$edate = Carbon::now()->format("Y-m-d");
@@ -21,14 +21,14 @@ class sal06Controller extends Controller
 		$sale_kind_id = $request->input('sale_kind_id', "");
 
 		$values = [
-            'sdate'         => $sdate,
+			'sdate'         => $sdate,
 			'edate'         => $edate,
 			'sale_kinds' 	=> SLib::getCodes('SALE_KIND'),
 			'items'			=> SLib::getItems(), // 품목
 			'store_channel'	=> SLib::getStoreChannel(),
 			'store_kind'	=> SLib::getStoreKind(),
 		];
-        return view( Config::get('shop.store.view') . '/sale/sal06', $values );
+		return view( Config::get('shop.store.view') . '/sale/sal66', $values );
 	}
 
 	public function search(Request $request)
@@ -44,7 +44,7 @@ class sal06Controller extends Controller
 		$goods_no = $request->input('goods_no', "");
 		$goods_nm = $request->input("goods_nm", "");
 		$goods_nm_eng = $request->input("goods_nm_eng", "");
-        $brand_cd = $request->input("brand_cd");
+		$brand_cd = $request->input("brand_cd");
 		$style_no = $request->input('style_no', "");
 		$prd_cd = $request->input('prd_cd', "");
 		$sale_yn = $request->input('sale_yn','Y');
@@ -73,14 +73,14 @@ class sal06Controller extends Controller
 				if ($goods_no != "") $where .= " and g.goods_no = '" . Lib::quote($goods_no) . "' ";
 			}
 		}
-		
+
 		if ($goods_nm != "") $where .= " and g.goods_nm like '%" . Lib::quote($goods_nm) . "%'";
 		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%" . Lib::quote($goods_nm_eng) . "%'";
 		if ($style_no != "") $where .= " and g.style_no like '" . Lib::quote($style_no) . "%'";
 		if ($sale_kind != "") $where .= " and o.sale_kind = '" . Lib::quote($sale_kind) . "' ";
 
-        $where2 = "";
-        if ($sale_yn == "Y") $where2 .= " and qty is not null";
+		$where2 = "";
+		if ($sale_yn == "Y") $where2 .= " and qty is not null";
 		if ($store_channel != "") $where2 .= " and s.store_channel ='" . Lib::quote($store_channel). "'";
 		if ($store_channel_kind != "") $where2 .= " and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
 		if ($store_cd != "") $where2 .= " and s.store_cd like '" . Lib::quote($store_cd) . "%'";
@@ -118,7 +118,7 @@ class sal06Controller extends Controller
 				$where .= " and o.prd_cd like '" . Lib::quote($prd_cd) . "%' ";
 			}
 		}
-		
+
 		// 판매유형별 쿼리 추가
 		$sale_kinds = SLib::getUsedSaleKinds('','Y');
 		$sale_kinds_query = "";
@@ -128,7 +128,7 @@ class sal06Controller extends Controller
 		}
 
 		$sql = /** @lang text */
-		"
+			"
 			select s.store_nm, c.store_channel as store_type_nm, a.*
 			from store s left outer join ( 
 				select 
@@ -143,25 +143,18 @@ class sal06Controller extends Controller
 					sum(w.qty * w.price - if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as discount,
 					avg(w.price) as avg_price,
 					avg(w.wonga) as wonga,
-					sum(w.wonga * w.qty) as sum_wonga,
-					-- sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as sum_wonga,
+					-- sum(w.wonga * w.qty) as sum_wonga,
+					sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as sum_wonga,
 					-- sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
 					( 
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1
-						- sum(w.wonga * w.qty)
-						-- sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1))
+						- sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1))
 					) as sales_profit,
 					-- (sum(w.qty * w.price) / sum(w.qty * w.price - w.wonga * w.qty)) * 100 as profit_rate,
-					if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
-						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
-						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
+					if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) > 0,
+						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
+						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(pw.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
 					)
-					/*
-					if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) > 0,
-						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
-						(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
-					)
-					*/
 					 as profit_rate,
 					g.goods_type, c.code_val as sale_stat_cl_val, c2.code_val as goods_type_nm,
 					o.goods_no, g.brand, b.brand_nm, g.style_no, o.goods_opt, g.img, g.goods_nm, g.goods_nm_eng
@@ -169,7 +162,7 @@ class sal06Controller extends Controller
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join goods g on o.goods_no = g.goods_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
-					-- inner join product p on o.prd_cd = p.prd_cd
+					inner join product_wonga pw on pc.prd_cd_p = pw.prd_cd_p
 					left outer join store s on o.store_cd = s.store_cd
 					left outer join brand b on g.brand = b.brand
 					left outer join `code` c on c.code_kind_cd = 'g_goods_stat' and g.sale_stat_cl = c.code_id
@@ -189,7 +182,7 @@ class sal06Controller extends Controller
 		$result = DB::select($sql);
 
 		$array = [];
-		
+
 		foreach($sale_kinds as $item) {
 			$id = $item->code_id;
 			$array["sale_kind_$id"] = 0;
@@ -198,7 +191,7 @@ class sal06Controller extends Controller
 		$array['store_nm'] = '합계';
 
 		collect($result)->map(function ($row) use (&$sale_kinds, &$array) {
-			
+
 			foreach($sale_kinds as $item) {
 				$id = $item->code_id;
 
@@ -209,7 +202,7 @@ class sal06Controller extends Controller
 			}
 
 		})->all();
-		
+
 		return response()->json([
 			'code'	=> 200,
 			'head'	=> array(
