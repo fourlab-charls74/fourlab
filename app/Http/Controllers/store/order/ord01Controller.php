@@ -1985,6 +1985,22 @@ class ord01Controller extends Controller
 
         $values['ord_lists'] = $rows;
 
+		###################################################################
+		#	외부 주문번호 처리
+		###################################################################
+		if($values['ord']->out_ord_no == '' && $values['ord']->p_ord_opt_no != ''){
+			$sql	= "
+				select om.out_ord_no
+				from order_opt oo
+				inner join order_mst om on oo.ord_no = om.ord_no
+				where
+					oo.ord_opt_no = '" . $values['ord']->p_ord_opt_no . "'
+			";
+			$out_ord_no	= DB::selectOne($sql)->out_ord_no;
+			
+			if($out_ord_no != '')	$values['ord']->out_ord_no	= "(부모주문)" . $out_ord_no;
+		}		
+
         ###################################################################
         #	결제정보
         ###################################################################
