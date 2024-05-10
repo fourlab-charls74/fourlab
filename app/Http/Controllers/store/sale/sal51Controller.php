@@ -209,10 +209,39 @@ class sal51Controller extends Controller
 				-- ,ifnull(hst.loss_qty, 0) * p.wonga as loss_wonga
 			
 				-- 기간재고
-				,(pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) as term_qty
-				,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
-				,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.price as term_price
-				,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
+				,(
+					((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0))
+					+ ifnull(hst.store_in_qty, 0)
+					- ifnull(hst.store_return_qty, 0)
+					- ifnull(hst.sale_qty, 0)
+					- ifnull(hst.loss_qty, 0)
+				) as term_qty
+				,(
+					((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price
+					+ ifnull(hst.store_in_qty, 0) * p.tag_price
+					- ifnull(hst.store_return_qty, 0) * p.tag_price
+					- ifnull(hst.sale_qty, 0) * p.tag_price
+					- ifnull(hst.loss_qty, 0) * p.tag_price
+				) as term_sh
+				,(
+					((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price
+					+ ifnull(hst.store_in_qty, 0) * p.price
+					- ifnull(hst.store_return_qty, 0) * p.price
+					- ifnull(hst.sale_qty, 0) * p.price
+					- ifnull(hst.loss_qty, 0) * p.price
+				) as term_price
+				,(
+					((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * pw.wonga
+					+ ifnull(hst.store_in_qty, 0) * pw.wonga
+					- ifnull(hst.store_return_qty, 0) * pw.wonga
+					- ifnull(hst.sale_qty, 0) * pw.wonga
+					- ifnull(hst.loss_qty, 0) * pw.wonga
+				) as term_wonga
+				
+				-- ,(pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) as term_qty
+				-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
+				-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.price as term_price
+				-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
 				-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.wonga as term_wonga
 			
 				-- 현재재고
@@ -373,10 +402,38 @@ class sal51Controller extends Controller
 						,ifnull(hst.loss_qty, 0) * pw.wonga as loss_wonga
 					
 						-- 기간재고
-						,(pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) as term_qty
-						,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
-						,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.price as term_price
-						,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
+						,(
+							((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0))
+							+ ifnull(hst.store_in_qty, 0)
+							- ifnull(hst.store_return_qty, 0)
+							- ifnull(hst.sale_qty, 0)
+							- ifnull(hst.loss_qty, 0)
+						) as term_qty
+						,(
+							((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price
+							+ ifnull(hst.store_in_qty, 0) * p.tag_price
+							- ifnull(hst.store_return_qty, 0) * p.tag_price
+							- ifnull(hst.sale_qty, 0) * p.tag_price
+							- ifnull(hst.loss_qty, 0) * p.tag_price
+						) as term_sh
+						,(
+							((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price
+							+ ifnull(hst.store_in_qty, 0) * p.price
+							- ifnull(hst.store_return_qty, 0) * p.price
+							- ifnull(hst.sale_qty, 0) * p.price
+							- ifnull(hst.loss_qty, 0) * p.price
+						) as term_price
+						,(
+							((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * pw.wonga
+							+ ifnull(hst.store_in_qty, 0) * pw.wonga
+							- ifnull(hst.store_return_qty, 0) * pw.wonga
+							- ifnull(hst.sale_qty, 0) * pw.wonga
+							- ifnull(hst.loss_qty, 0) * pw.wonga
+						) as term_wonga
+						-- ,(pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0) as term_qty
+						-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
+						-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * p.price as term_price
+						-- ,((pss.wqty + pss.rqty) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
 					
 						-- 현재재고
 						,(pss.wqty + pss.rqty) as current_qty

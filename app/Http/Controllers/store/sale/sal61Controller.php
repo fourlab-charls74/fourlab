@@ -203,10 +203,39 @@ class sal61Controller extends Controller
 				,ifnull(hst.loss_qty, 0) * pw.wonga as loss_wonga
 			
 				-- 기간재고
-				,sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) as term_qty
-				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
-				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.price as term_price
-				,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
+			    ,(
+			    	(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) 
+			        + ifnull(hst.store_in_qty, 0)
+			        - ifnull(hst.store_return_qty, 0)
+			        - ifnull(hst.sale_qty, 0)
+			        - ifnull(hst.loss_qty, 0)
+			    ) as term_qty
+			    ,(
+			        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price
+			        + ifnull(hst.store_in_qty, 0) * p.tag_price
+			        - ifnull(hst.store_return_qty, 0) * p.tag_price
+			        - ifnull(hst.sale_qty, 0) * p.tag_price
+			        - ifnull(hst.loss_qty, 0) * p.tag_price
+			    ) as term_sh
+			    ,(
+			        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price
+			        + ifnull(hst.store_in_qty, 0) * p.price
+			        - ifnull(hst.store_return_qty, 0) * p.price
+			        - ifnull(hst.sale_qty, 0) * p.price
+			        - ifnull(hst.loss_qty, 0) * p.price
+			    ) as term_price
+			    ,(
+			        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * pw.wonga
+			        + ifnull(hst.store_in_qty, 0) * pw.wonga
+			        - ifnull(hst.store_return_qty, 0) * pw.wonga
+			        - ifnull(hst.sale_qty, 0) * pw.wonga
+			        - ifnull(hst.loss_qty, 0) * pw.wonga
+			    ) as term_wonga
+
+				-- ,sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) as term_qty
+				-- ,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
+				-- ,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.price as term_price
+				-- ,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
 			
 				-- 현재재고
 				,(pss.wqty + pss.rqty) as current_qty
@@ -366,10 +395,39 @@ class sal61Controller extends Controller
 						,ifnull(hst.loss_qty, 0) * pw.wonga as loss_wonga
 					
 						-- 기간재고
-						,sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) as term_qty
-						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
-						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.price as term_price
-						,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
+					    ,(
+					        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0))
+					        + ifnull(hst.store_in_qty, 0)
+					        - ifnull(hst.store_return_qty, 0)
+					        - ifnull(hst.sale_qty, 0)
+					        - ifnull(hst.loss_qty, 0)
+					    ) as term_qty
+					    ,(
+					        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price
+					        + ifnull(hst.store_in_qty, 0) * p.tag_price
+					        - ifnull(hst.store_return_qty, 0) * p.tag_price
+					        - ifnull(hst.sale_qty, 0) * p.tag_price
+					        - ifnull(hst.loss_qty, 0) * p.tag_price
+					    ) as term_sh
+					    ,(
+					        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price
+					        + ifnull(hst.store_in_qty, 0) * p.price
+					        - ifnull(hst.store_return_qty, 0) * p.price
+					        - ifnull(hst.sale_qty, 0) * p.price
+					        - ifnull(hst.loss_qty, 0) * p.price
+					    ) as term_price
+					    ,(
+					        (sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * pw.wonga
+					        + ifnull(hst.store_in_qty, 0) * pw.wonga
+					        - ifnull(hst.store_return_qty, 0) * pw.wonga
+					        - ifnull(hst.sale_qty, 0) * pw.wonga
+					        - ifnull(hst.loss_qty, 0) * pw.wonga
+					    ) as term_wonga
+					     
+						-- ,sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0) as term_qty
+						-- ,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.tag_price as term_sh
+						-- ,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * p.price as term_price
+						-- ,(sum((pss.wqty + pss.rqty)) - ifnull(hst.next_qty, 0)) * pw.wonga as term_wonga
 					
 						-- 현재재고
 						,(pss.wqty + pss.rqty) as current_qty
