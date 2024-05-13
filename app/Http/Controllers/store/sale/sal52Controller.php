@@ -341,7 +341,10 @@ class sal52Controller extends Controller
 					left outer join (
 						select
 							hst.location_cd as storage_cd, pc.prd_cd_p, hst.prd_cd, 
-							sum(if( hst.stock_state_date <= '$edate', hst.qty, 0)) as qty,
+							sum(if(hst.stock_state_date <= '$edate',
+								if((hst.ord_opt_no > 0 and oo.ord_state = '30') or hst.ord_opt_no = 0, hst.qty, 0), 
+								0
+							)) as qty,
 					
 							-- 상품입고
 							sum(if(hst.type = 1 and hst.stock_state_date <= '$edate', hst.qty, 0)) as storage_in_qty,
@@ -352,16 +355,24 @@ class sal52Controller extends Controller
 							-- 이동출고
 							sum(if(hst.type = 16 and hst.qty < 0 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as rt_out_qty,
 							-- 매장출고
-							sum(if(hst.type = 17 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as store_out_qty,
+							sum(if(hst.type = 17 and hst.stock_state_date <= '$edate',
+								if((hst.ord_opt_no > 0 and oo.ord_state = '30') or hst.ord_opt_no = 0, hst.qty, 0), 
+								0
+							)) * -1 as store_out_qty,
 							-- 매장반품
 							sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) as store_return_qty,
 							-- loss
 							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 							
-							sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
+							sum(if(
+								hst.stock_state_date >= '$next_edate',
+								if((hst.ord_opt_no > 0 and oo.ord_state = '30') or hst.ord_opt_no = 0, hst.qty, 0), 
+								0
+							)) as next_qty
 						from product_stock_hst hst
 						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
 						inner join storage on storage.storage_cd = hst.location_cd
+						left outer join order_opt oo on hst.ord_opt_no = oo.ord_opt_no
 						where
 							hst.location_type = 'STORAGE'
 							$hst_where  	
