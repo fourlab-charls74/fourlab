@@ -2,7 +2,7 @@
 @section('title','본사수불집계표')
 @section('content')
 	<div class="page_tit">
-		<h3 class="d-inline-flex">본사수불집계표</h3>
+		<h3 class="d-inline-flex">[NEW]본사수불집계표</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>/ 영업관리</span>

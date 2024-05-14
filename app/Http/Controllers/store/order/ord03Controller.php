@@ -566,7 +566,8 @@ class ord03Controller extends Controller
 				->where('prd_cd', '=', $prd_cd)
 				->where('store_cd', '=', $location_cd) 
 				->update([
-					'qty' => DB::raw('qty - ' . $ord_qty),
+					'qty'	=> DB::raw('qty - ' . $ord_qty),
+					'oqty'	=> DB::raw('oqty - ' . $ord_qty),
 					'ut' => now(),
 				]);
 		} else if ($location_type === 'STORAGE') {
@@ -611,7 +612,8 @@ class ord03Controller extends Controller
 		DB::table('product_stock')
 			->where('prd_cd', '=', $prd_cd)
 			->update([
-				'ut' => now(),
+				'oqty'	=> DB::raw('oqty - ' . $ord_qty),
+				'ut'	=> now(),
 			]);
 
 		DB::table('product_stock_hst')
@@ -813,15 +815,17 @@ class ord03Controller extends Controller
 					->where('prd_cd', '=', $prd_cd)
 					->where('store_cd', '=', $location_cd) 
 					->update([
-						'wqty' => DB::raw('wqty + ' . $ord_qty),
+						'wqty'	=> DB::raw('wqty + ' . $ord_qty),
+						'oqty'	=> DB::raw('oqty - ' . $ord_qty),
 						'ut' => now(),
 					]);
 				DB::table('product_stock')
 					->where('prd_cd', '=', $prd_cd)
 					->update([
 						'qty_wonga'	=> DB::raw('qty_wonga + ' . ($ord_qty * $wonga)),
-						'out_qty' => DB::raw('out_qty - ' . $ord_qty),
-						'qty' => DB::raw('qty + ' . $ord_qty),
+						'out_qty'	=> DB::raw('out_qty - ' . $ord_qty),
+						'qty'		=> DB::raw('qty + ' . $ord_qty),
+						'oqty'		=> DB::raw('oqty - ' . $ord_qty),
 						'ut' => now(),
 					]);
 			} else if ($location_type === 'STORAGE') {

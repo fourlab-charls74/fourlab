@@ -573,15 +573,17 @@ class ord02Controller extends Controller
 				->where('prd_cd', '=', $prd_cd)
 				->where('store_cd', '=', $location_cd)
 				->update([
-					'wqty' => DB::raw('wqty - ' . $ord_qty),
+					'wqty'	=> DB::raw('wqty - ' . $ord_qty),
+					'oqty'	=> DB::raw('oqty + ' . $ord_qty),	// 온라인 처리중인 재고 
 					'ut' => now(),
 				]);
 			DB::table('product_stock')
 				->where('prd_cd', '=', $prd_cd)
 				->update([
 					'qty_wonga'	=> DB::raw('qty_wonga - ' . ($ord_qty * $wonga)),
-					'out_qty' => DB::raw('out_qty + ' . $ord_qty),
-					'qty' => DB::raw('qty - ' . $ord_qty),
+					'out_qty'	=> DB::raw('out_qty + ' . $ord_qty),
+					'qty'		=> DB::raw('qty - ' . $ord_qty),
+					'oqty'		=> DB::raw('oqty + ' . $ord_qty),	// 온라인 처리중인 재고 
 					'ut' => now(),
 				]);
 		} else if ($location_type === 'STORAGE') {
