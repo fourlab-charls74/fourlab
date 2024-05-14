@@ -341,10 +341,7 @@ class sal52Controller extends Controller
 					left outer join (
 						select
 							hst.location_cd as storage_cd, pc.prd_cd_p, hst.prd_cd, 
-							sum(if(hst.stock_state_date <= '$edate',
-								if((hst.ord_opt_no > 0 and oo.ord_state = '30') or hst.ord_opt_no = 0, hst.qty, 0), 
-								0
-							)) as qty,
+							sum(if(hst.stock_state_date <= '$edate',hst.qty, 0)) as qty,
 					
 							-- 상품입고
 							sum(if(hst.type = 1 and hst.stock_state_date <= '$edate', hst.qty, 0)) as storage_in_qty,
@@ -364,11 +361,7 @@ class sal52Controller extends Controller
 							-- loss
 							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 							
-							sum(if(
-								hst.stock_state_date >= '$next_edate',
-								if((hst.ord_opt_no > 0 and oo.ord_state = '30') or hst.ord_opt_no = 0, hst.qty, 0), 
-								0
-							)) as next_qty
+							sum(if(hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 						from product_stock_hst hst
 						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
 						inner join storage on storage.storage_cd = hst.location_cd
