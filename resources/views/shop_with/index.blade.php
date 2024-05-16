@@ -148,7 +148,13 @@
      const columns = [
         {headerName: "제목", field: "subject", width: 0,
             cellRenderer: function(params) {
-                return '<a href="/shop/community/comm01/notice/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
+				if (params.data.check_new_notice == 'true') {
+					return '<a href="/shop/community/comm01/notice/' + params.data.ns_cd +'" rel="noopener">'+ `<span class="blink" style="color:red;font-weight: bold" >[ NEW ] </span>` + params.value +`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				} else {
+					return '<a href="/shop/community/comm01/notice/' + params.data.ns_cd +'" rel="noopener">'+ params.value +`${params.data.attach_file_yn === 'Y' ? `<i class="bi bi-paperclip"></i>` : '' }</a>`;
+				}
+
+                //return '<a href="/shop/community/comm01/notice/' + params.data.ns_cd +'" rel="noopener">'+ params.value+'</a>';
             }
         },
         {headerName: "이름", field: "admin_nm",  width: 70, cellClass: 'hd-grid-code'},

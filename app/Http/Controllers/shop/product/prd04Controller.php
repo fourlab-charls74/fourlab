@@ -70,6 +70,7 @@ class prd04Controller extends Controller
 		$orderby	= sprintf("order by %s %s, concat(pc.prd_cd_p,pc.color), ob.seq", $ord_field, $ord);	//사이즈 정렬 기준으로 변경
 		$plan_category	= $request->input('plan_category');
 		$match_yn = $request->input('match_yn1');
+		$minus_qty	= $request->input('minus_qty');
 
 		$sdate 		= str_replace('-', '', $sdate);
 		$next_edate = str_replace('-', '', $next_edate);
@@ -186,6 +187,10 @@ class prd04Controller extends Controller
 
 		if($ext_store_qty == 'true') {
 			$having .= "having sqty <> 0";
+		}
+		
+		if($minus_qty == 'Y'){
+			$where	.= " and pss.wqty < 0 ";
 		}
 
 

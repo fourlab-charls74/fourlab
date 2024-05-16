@@ -18,12 +18,12 @@
         <form name="search" method="get">
             <div class="card">
                 <div class="d-flex card-header justify-content-between">
-                    <h4>검색</h4>
+                    <h4 onClick="displaySearch();" style="cursor:pointer;">검색</h4>
                     <div class="flax_box">
                         <a href="javascript:void(0);" id="search_sbtn" onclick="return Search();" class="btn btn-sm btn-primary shadow-sm pl-2"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
                     </div>
                 </div>
-                <div class="card-body">
+                <div id="search_sec" class="card-body" style="display:none;">
                     <div class="row">
                         <div class="col-lg-6 inner-td">
                             <div class="form-group">
@@ -89,9 +89,9 @@
     <div class="show_layout mb-2">
         <div class="card shadow">
             <div class="card-header mb-0">
-                <a href="#">상품정보</a>
+                <a onClick="displayProductInfo();" style="cursor:pointer;" href="#">상품정보</a>
             </div>
-            <div class="card-body">
+            <div id="product_info_sec" class="card-body" style="display:none;">
                 <div class="table-responsive">
                     <div class="table-box-ty2 mobile">
                         <table class="table incont table-bordered" width="100%" cellspacing="0">
@@ -340,5 +340,23 @@
         gx.gridOptions.api.setRowData([]);
         gx2.gridOptions.api.setRowData([]);
     }
+	
+	// 검색 섹션 표시 유무
+	function displaySearch(){
+		if($('#search_sec').css('display') != "none"){
+			$('#search_sec').hide();
+		}else{
+			$('#search_sec').show();
+		}
+	}
+
+	// 상품정보 표시 유무
+	function displayProductInfo(){
+		if($('#product_info_sec').css('display') != "none"){
+			$('#product_info_sec').hide();
+		}else{
+			$('#product_info_sec').show();
+		}
+	}
 </script>
 @stop

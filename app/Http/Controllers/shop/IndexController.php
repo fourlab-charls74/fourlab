@@ -271,9 +271,11 @@ class IndexController extends Controller
                 s.cnt,
                 s.all_store_yn,
                 group_concat(a.store_nm separator ', ') as stores,
+                if ((select date_add(s.rt, interval 10 day)) < now(), 'false', 'true') as check_new_notice,
                 s.rt,
                 c.code_val as store_type_nm,
-                s.ut
+                s.ut,
+                 (case when ifnull(char_length(s.attach_file_url), 0) > 0 then 'Y' else 'N' end ) as attach_file_yn
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
@@ -304,12 +306,6 @@ class IndexController extends Controller
         $edate = date("Y-m-d");
         $user_store = Auth('head')->user()->store_cd;
 		$user_id = Auth('head')->user()->id;
-
-        if ($user_store == 'L0025') {
-            $receiver_type = 'H';
-        } else {
-            $receiver_type = 'S';
-        }
 
         $sql = "
             select 

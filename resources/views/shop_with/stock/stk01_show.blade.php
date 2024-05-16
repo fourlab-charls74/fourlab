@@ -19,9 +19,9 @@
     <div class="show_layout mb-4">
         <div class="card shadow">
             <div class="card-header mb-0">
-                <a href="#">상품정보</a>
+                <a onClick="displayProductInfo();" style="cursor:pointer;" href="#">상품정보</a>
             </div>
-            <div class="card-body">
+            <div id="product_info_sec" class="card-body" style="display:none;">
                 <div class="table-responsive">
                     <div class="table-box-ty2 mobile">
                         <table class="table incont table-bordered" width="100%" cellspacing="0">
@@ -320,5 +320,14 @@
 			}
         });
     }
+
+	// 상품정보 표시 유무
+	function displayProductInfo(){
+		if($('#product_info_sec').css('display') != "none"){
+			$('#product_info_sec').hide();
+		}else{
+			$('#product_info_sec').show();
+		}
+	}
 </script>
 @stop

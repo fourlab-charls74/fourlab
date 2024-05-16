@@ -209,6 +209,10 @@
 					</div>
 					<div class="fr_box">
 						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
+							<input type="checkbox" class="custom-control-input" name="minus_qty" id="minus_qty" value="Y">
+							<label class="custom-control-label font-weight-normal" for="minus_qty">마이너스 재고 조회</label>
+						</div>
+						<div class="custom-control custom-checkbox form-check-box pr-2" style="display:inline-block;">
 							<input type="checkbox" class="custom-control-input" name="ext_store_qty" id="ext_store_qty" value="Y">
 							<label class="custom-control-label font-weight-normal" for="ext_store_qty">매장재고 0 제외</label>
 						</div>
