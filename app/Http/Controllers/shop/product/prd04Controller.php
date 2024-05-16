@@ -190,7 +190,10 @@ class prd04Controller extends Controller
 		}
 		
 		if($minus_qty == 'Y'){
-			$where	.= " and pss.wqty < 0 ";
+			if($having != '')	$having .= " and ";
+			else				$having .= " having ";
+			$having	.= " swqty < 0 ";
+			//$where	.= " and pss.wqty < 0 ";
 		}
 
 
@@ -207,11 +210,11 @@ class prd04Controller extends Controller
 			"
 				select
 					count(prd_cd) as total,
-					sum(a.goods_sh * a.sqty) as total_goods_sh,
-					sum(a.price * a.sqty) as total_price,
-					sum(a.wonga * a.sqty) as total_wonga,
-					sum(a.sqty) as total_sqty,
-					sum(a.swqty) as total_swqty
+					ifnull(sum(a.goods_sh * a.sqty), 0) as total_goods_sh,
+					ifnull(sum(a.price * a.sqty), 0) as total_price,
+					ifnull(sum(a.wonga * a.sqty), 0) as total_wonga,
+					ifnull(sum(a.sqty), 0) as total_sqty,
+					ifnull(sum(a.swqty), 0) as total_swqty
 				from (
 					select
 						pc.prd_cd
