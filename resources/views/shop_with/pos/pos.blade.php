@@ -886,6 +886,11 @@
 	let gx;
 
     const columns = [
+        {field: "delete_goods", headerName: "X", width: 30, cellStyle: LineHeight40Center,
+            cellRenderer: (params) => {
+	            return `<button type="button" class="butt bg-white b-1-gray" style="width:18px;height:18px;" onclick="return removeProduct('${params.data.prd_cd}');"><i class="fa fa-times fc-black fs-10 w-100 h-100" aria-hidden="true"></i></button>`;
+            }
+        },
         {field: "prd_cd", headerName: "바코드", width: 130, cellStyle: LineHeight40Center},
         {field: "goods_nm", headerName: "상품명", width: "auto", minWidth: 100, wrapText: true, cellStyle: LineHeight40},
         {field: "color", headerName: "컬러", width: 105, wrapText: true, cellStyle: LineHeight40},
@@ -1000,6 +1005,7 @@
 		gx = new HDGrid(gridDiv, columns, {
             rowSelection: 'single',
             suppressRowClickSelection: false,
+			suppressCopyRowsToClipboard: true, // 셀 복사기능 설정
             onSelectionChanged: function(e) {
                 let goods = e.api.getSelectedRows();
                 if(goods.length > 0) {
@@ -1009,9 +1015,10 @@
                 }
                 // updateOrderValue();
             },
-			onRowDoubleClicked: function (e) {
-				if (!$(e.event.target).hasClass('fa')) removeProduct(e.node.data.prd_cd);
-			}
+			// 더블클릭 시 선택한 상품 삭제 (2024-05-17 주석처리)
+			// onRowDoubleClicked: function (e) {
+				// if (!$(e.event.target).hasClass('fa')) removeProduct(e.node.data.prd_cd);
+			// }
         });
 
 		pApp2.ResizeGrid(275, 400);
