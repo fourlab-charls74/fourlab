@@ -81,7 +81,7 @@ class std05Controller extends Controller
 		if ($sale_type_cd != '') {
 			$sql = "
 				select s.idx as sale_type_cd
-				     , s.sale_kind, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn
+				     , s.sale_kind, s.sale_type_nm, s.sale_apply, s.amt_kind, s.sale_amt, s.sale_per, s.use_yn, s.type
 				from sale_type s
 					inner join code c on c.code_kind_cd = 'SALE_KIND' and c.code_id = s.sale_kind
 				where s.idx = :sale_type_cd
@@ -174,16 +174,17 @@ class std05Controller extends Controller
 			DB::beginTransaction();
 
 			$idx = DB::table('sale_type')->insertGetId([
-				'sale_kind' => $r['sale_kind'],
-				'sale_type_nm' => $r['sale_type_nm'],
-				'sale_apply' => $r['sale_apply'],
-				'amt_kind' => $r['amt_kind'],
-				'sale_amt' => $r['sale_amt'] ?? null,
-				'sale_per' => $r['sale_per'] ?? null,
-				'use_yn' => $r['use_yn'],
-				'reg_date' => now(),
-				'mod_date' => now(),
-				'admin_id' => $admin_id,
+				'sale_kind'		=> $r['sale_kind'],
+				'sale_type_nm'	=> $r['sale_type_nm'],
+				'sale_apply'	=> $r['sale_apply'],
+				'type'			=> $r['type'],
+				'amt_kind'		=> $r['amt_kind'],
+				'sale_amt'		=> $r['sale_amt'] ?? null,
+				'sale_per'		=> $r['sale_per'] ?? null,
+				'use_yn'		=> $r['use_yn'],
+				'reg_date'		=> now(),
+				'mod_date'		=> now(),
+				'admin_id'		=> $admin_id,
 			]);
 
 			$cnt = DB::table('code')
@@ -254,14 +255,15 @@ class std05Controller extends Controller
 			DB::table('sale_type')
 				->where("idx", "=", $idx)
 				->update([
-					'sale_type_nm' => $r['sale_type_nm'],
-					'sale_apply' => $r['sale_apply'],
-					'amt_kind' => $r['amt_kind'],
-					'sale_amt' => $r['sale_amt'] ?? null,
-					'sale_per' => $r['sale_per'] ?? null,
-					'use_yn' => $r['use_yn'],
-					'mod_date' => now(),
-					'admin_id' => $admin_id,
+					'sale_type_nm'	=> $r['sale_type_nm'],
+					'sale_apply'	=> $r['sale_apply'],
+					'type'			=> $r['type'],
+					'amt_kind'		=> $r['amt_kind'],
+					'sale_amt'		=> $r['sale_amt'] ?? null,
+					'sale_per'		=> $r['sale_per'] ?? null,
+					'use_yn'		=> $r['use_yn'],
+					'mod_date'		=> now(),
+					'admin_id'		=> $admin_id,
 				]);
 
 			DB::table('code')

@@ -279,8 +279,13 @@ class ord06Controller extends Controller
 		if ($com_cd != '') $where .= " and g.com_id = '$com_cd' ";
 		else if ($com_nm != '') $where .= " and g.com_nm = '$com_nm' ";
 
-		if ($sale_form == 'OFF') $where .= " and (o.store_cd is not null and o.store_cd <> '$offline_store') ";
-		else if ($sale_form == 'ON') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
+		//////////////////////
+		/// sale_form 기능 변경
+		//////////////////////
+		//if ($sale_form == 'OFF') $where .= " and (o.store_cd is not null and o.store_cd <> '$offline_store') ";
+		//else if ($sale_form == 'ON') $where .= " and (o.store_cd is null or o.store_cd = '$offline_store') ";
+		if ($sale_form == 'OFF')		$where .= " and st.type <> 'online' ";
+		else if ($sale_form == 'ON')	$where .= " and st.type = 'online' ";
 
 		if ($sale_kind != '') $where .= "and o.sale_kind = '$sale_kind' ";
 

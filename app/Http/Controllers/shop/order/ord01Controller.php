@@ -131,6 +131,7 @@ class ord01Controller extends Controller
         $page           = $request->input('page', 1);
         $prd_cd_range_text = $request->input("prd_cd_range", '');
         $sell_type      = $request->input('sell_type');
+		$sale_form		= $request->input('sale_form');
 
         if ($page < 1 or $page == '') $page = 1;
 
@@ -291,6 +292,9 @@ class ord01Controller extends Controller
 			}
 			$where	.= ")";
 		}
+
+		if ($sale_form == 'OFF')		$where .= " and st.type <> 'online' ";
+		else if ($sale_form == 'ON')	$where .= " and st.type = 'online' ";
 
         // ordreby
         $orderby = sprintf("order by %s %s, w.ord_wonga_no desc", $ord_field, $ord);

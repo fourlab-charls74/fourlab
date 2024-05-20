@@ -208,17 +208,19 @@
                     </div>
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
-							<label for="style_no">스타일넘버/온라인코드</label>
-							<div class="form-inline">
-								<div class="form-inline-inner input_box">
-									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
+							<label>온/오프라인 주문</label>
+							<div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" class="custom-control-input" id="sale_form_A" name="sale_form" value="" @if($on_off_yn == '') checked @endif />
+									<label class="custom-control-label" for="sale_form_A">전체</label>
 								</div>
-								<span class="text_line">/</span>
-								<div class="form-inline-inner input-box" style="width:47%">
-									<div class="form-inline-inner inline_btn_box">
-										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
-										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-									</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" class="custom-control-input" id="sale_form_On" name="sale_form" value="ON" @if($on_off_yn == 'ON') checked @endif />
+									<label class="custom-control-label" for="sale_form_On">온라인</label>
+								</div>
+								<div class="custom-control custom-radio">
+									<input type="radio" class="custom-control-input" id="sale_form_Off" name="sale_form" value="OFF" @if($on_off_yn == 'OFF') checked @endif />
+									<label class="custom-control-label" for="sale_form_Off">오프라인</label>
 								</div>
 							</div>
 						</div>
@@ -284,6 +286,23 @@
 					</div>
 				</div>
 				<div class="row search-area-ext d-none">
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="style_no">스타일넘버/온라인코드</label>
+							<div class="form-inline">
+								<div class="form-inline-inner input_box">
+									<input type='text' class="form-control form-control-sm ac-style-no search-enter" name='style_no' id="style_no">
+								</div>
+								<span class="text_line">/</span>
+								<div class="form-inline-inner input-box" style="width:47%">
+									<div class="form-inline-inner inline_btn_box">
+										<input type='text' class="form-control form-control-sm w-100 search-enter" name='goods_no' id='goods_no' value=''>
+										<a href="#" class="btn btn-sm btn-outline-primary sch-goods_nos"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 	                <div class="col-lg-4 inner-td">
 		                <div class="form-group">
 			                <label for="goods_nm">상품명</label>

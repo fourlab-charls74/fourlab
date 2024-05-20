@@ -299,6 +299,19 @@
 				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
+							<label for="pr_code">판매유형</label>
+							<div class="flax_box">
+								<select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
+									<option value=''>전체</option>
+									@foreach ($sale_kinds as $sale_kind)
+										<option value='{{ $sale_kind->code_id }}' @if(in_array($sale_kind->code_id, $sell_type_ids)) selected @endif>{{ $sale_kind->code_val }}</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
 							<label for="style_no">스타일넘버/온라인코드</label>
 							<div class="form-inline">
 								<div class="form-inline-inner input_box">
@@ -344,26 +357,13 @@
 							</div>
 						</div>
 					</div>
+				</div>
+				<div class="row search-area-ext d-none">
 					<div class="col-lg-4 inner-td">
 						<div class="form-group">
 							<label for="goods_nm_eng">상품명(영문)</label>
 							<div class="flex_box">
 								<input type='text' class="form-control form-control-sm ac-goods-nm-eng search-enter" name='goods_nm_eng' id="goods_nm_eng" value=''>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row search-area-ext d-none">
-					<div class="col-lg-4 inner-td">
-						<div class="form-group">
-							<label for="pr_code">판매유형</label>
-							<div class="flax_box">
-								<select id="sell_type" name="sell_type[]" class="form-control form-control-sm multi_select w-100" multiple>
-									<option value=''>전체</option>
-									@foreach ($sale_kinds as $sale_kind)
-										<option value='{{ $sale_kind->code_id }}' @if(in_array($sale_kind->code_id, $sell_type_ids)) selected @endif>{{ $sale_kind->code_val }}</option>
-									@endforeach
-								</select>
 							</div>
 						</div>
 					</div>

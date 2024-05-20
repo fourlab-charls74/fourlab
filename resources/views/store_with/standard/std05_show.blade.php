@@ -118,6 +118,21 @@
                                                 </div>
                                             </td>
                                         </tr>
+										<tr>
+											<th>유형타입</th>
+											<td colspan="3">
+												<div class="form-inline form-radio-box">
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="type_off" name="type" value="" @if(@$sale_type->type != 'online') checked @endif />
+														<label class="custom-control-label" for="type_off">전체</label>
+													</div>
+													<div class="custom-control custom-radio">
+														<input type="radio" class="custom-control-input" id="type_on" name="type" value="online" @if(@$sale_type->type == 'online') checked @endif />
+														<label class="custom-control-label" for="type_on">온라인</label>
+													</div>
+												</div>
+											</td>
+										</tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -409,6 +424,7 @@
             sale_kind: f1.sale_kind.value,
             sale_type_nm: f1.sale_type_nm.value,
             sale_apply: f1.sale_apply.value,
+			type: f1.type.value,
             amt_kind: f1.amt_kind.value,
             sale_amt: f1.amt_kind.value === 'amt' ? unComma(f1.sale_val.value) : '',
             sale_per: f1.amt_kind.value === 'per' ? unComma(f1.sale_val.value) : '',
