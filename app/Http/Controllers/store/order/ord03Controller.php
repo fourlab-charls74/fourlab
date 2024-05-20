@@ -570,6 +570,15 @@ class ord03Controller extends Controller
 					'oqty'	=> DB::raw('oqty - ' . $ord_qty),
 					'ut' => now(),
 				]);
+
+			// 온라인 주문중인 재고 값 차감
+			DB::table('product_stock')
+				->where('prd_cd', '=', $prd_cd)
+				->update([
+					'oqty'	=> DB::raw('oqty - ' . $ord_qty),
+					'ut'	=> now(),
+				]);
+			
 		} else if ($location_type === 'STORAGE') {
 			DB::table('product_stock_storage')
 				->where('prd_cd', '=', $prd_cd)
@@ -612,7 +621,6 @@ class ord03Controller extends Controller
 		DB::table('product_stock')
 			->where('prd_cd', '=', $prd_cd)
 			->update([
-				'oqty'	=> DB::raw('oqty - ' . $ord_qty),
 				'ut'	=> now(),
 			]);
 
