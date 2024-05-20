@@ -9,7 +9,7 @@
 	</style>
 
 	<div class="page_tit">
-		<h3 class="d-inline-flex">상품코드관리</h3>
+		<h3 class="d-inline-flex">[NEW]상품코드관리</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>/ 상품관리</span>

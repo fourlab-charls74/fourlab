@@ -2,7 +2,7 @@
 @section('title','판매내역조회')
 @section('content')
 	<div class="page_tit">
-		<h3 class="d-inline-flex">판매내역조회</h3>
+		<h3 class="d-inline-flex">[NEW]판매내역조회</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>판매관리</span>

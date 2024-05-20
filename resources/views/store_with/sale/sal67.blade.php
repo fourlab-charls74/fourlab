@@ -2,7 +2,7 @@
 @section('title','상품별이익현황')
 @section('content')
 	<div class="page_tit">
-		<h3 class="d-inline-flex">상품별이익현황</h3>
+		<h3 class="d-inline-flex">[NEW]상품별이익현황</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
 			<span>/ 경영관리</span>
