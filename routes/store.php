@@ -451,10 +451,14 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('prd07/batch-import', 'prd07Controller@import_excel');
         Route::post('prd07/batch-getproducts','prd07Controller@get_products');
         Route::post('prd07/batch-products','prd07Controller@batch_products');
-
+		
         // 이미지 관리
         Route::post('prd08/{idx}/upload', 'prd08Controller@upload');
         Route::get('prd08/{no}/image', 'prd08Controller@index');
+
+		// 상품관리 - 매장재고 조회
+		Route::get('prd09', 'prd09Controller@index');
+		Route::get('prd09/search', 'prd09Controller@search');
 
         // 상품이미지 일괄등록
         Route::get('prd23', 'prd23Controller@index');
