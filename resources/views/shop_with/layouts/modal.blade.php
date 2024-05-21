@@ -597,6 +597,14 @@
 												</div>
 											</div>
 										</div>
+										<div class="col-lg-4 inner-td" id="search_prdcd_name_eng">
+											<div class="form-group">
+												<label style="min-width:80px;">상품명(영문)</label>
+												<div class="flex_box">
+													<input type='text' class="form-control form-control-sm search-all" onkeypress="searchPrdcd.Search(event);" name='goods_nm_eng' value=''>
+												</div>
+											</div>
+										</div>
 										<div class="col-lg-4 inner-td" id="search_prdcd_match">
 											<div class="form-group">
 												<label for="formrow-email-input">매칭여부</label>

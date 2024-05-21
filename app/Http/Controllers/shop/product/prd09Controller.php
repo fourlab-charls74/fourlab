@@ -64,7 +64,7 @@ class prd09Controller extends Controller
 				select
 				    	s.size_cd
 				from size s
-					inner join product_code pc on pc.size = s.size_cd
+				inner join product_code pc on pc.size = s.size_cd and pc.size_kind = s.size_kind_cd
 				where s.size_cd = pc.size and use_yn = 'Y' and pc.prd_cd like '$prd_cd_p%'
 				group by s.size_cd
 				order by s.size_seq asc
@@ -80,9 +80,14 @@ class prd09Controller extends Controller
 					pc.prd_cd_p
 					, pc.prd_cd
 					, pc.goods_no
-					, g.goods_nm
-					, g.goods_nm_eng
-					, g.style_no
+					-- , g.goods_nm
+					-- , g.goods_nm_eng
+					-- , g.style_no
+					, p.prd_nm as goods_nm
+					, p.prd_nm_eng as goods_nm_eng
+				    , p.style_no
+				    , format(p.tag_price, 0) as tag_price
+				    , format(p.price, 0) as price
 					, g.com_id
 					, g.com_nm
 					, g.brand
@@ -95,6 +100,7 @@ class prd09Controller extends Controller
 						from goods a where a.goods_no = g.goods_no and a.goods_sub = 0
 					)) as img
 				from product_code pc
+				inner join product p on p.prd_cd = pc.prd_cd
 					left outer join goods g on g.goods_no = pc.goods_no
 					left outer join brand b on b.brand = g.brand
 					left outer join opt o on g.opt_kind_cd = o.opt_kind_cd
@@ -107,7 +113,7 @@ class prd09Controller extends Controller
 			if (!isset($prd) || $prd->goods_no == '0') {
 				$sql = "
 					select
-						p.prd_cd, p.prd_nm as goods_nm, p.style_no, p.type, p.com_id, c.com_nm
+						p.prd_cd, p.prd_nm as goods_nm, p.prd_nm_eng as goods_nm_eng, format(p.tag_price, 0) as tag_price, format(p.price, 0) as price, p.style_no, p.type, p.com_id, c.com_nm
 						, p.match_yn, p.use_yn, pc.brand, b.brand_nm
 						, pc.prd_cd_p as prd_cd_p
 					from product p

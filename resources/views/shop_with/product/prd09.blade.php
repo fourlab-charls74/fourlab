@@ -48,7 +48,7 @@
 								<div class="form-inline">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
-											<input type='text' id="prd_cd_p" name='prd_cd_p' value="{{ @$prd_cd_p }}" class="form-control form-control-sm w-100 search-enter">
+											<input type='text' id="prd_cd_p" name='prd_cd_p' value="{{ @$prd_cd_p }}" class="form-control form-control-sm w-100 sch-prdcd-p search-enter">
 											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-p"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
@@ -136,18 +136,18 @@
 								</td>
 								<th style="width:30px">품번</th>
 								<td id="prd_prd_cd_p"></td>
-								<th>스타일넘버</th>
-								<td id="prd_style_no"></td>
-								<th>품목</th>
-								<td id="prd_opt_kind_nm"></td>
-							</tr>
-							<tr>
-								<th>브랜드</th>
-								<td id="prd_brand_nm"></td>
 								<th>상품명</th>
 								<td id="prd_goods_nm"></td>
 								<th>상품명(영문)</th>
 								<td id="prd_goods_nm_eng"></td>
+							</tr>
+							<tr>
+								<th>스타일넘버</th>
+								<td id="prd_style_no"></td>
+								<th>정상가</th>
+								<td id="tag_price"></td>
+								<th>현재가</th>
+								<td id="price"></td>
 							</tr>
 							</tbody>
 						</table>
@@ -239,7 +239,7 @@
 			if (gridDiv !== null) {
 				gx = new HDGrid(gridDiv, storage_columns, {
 					autoGroupColumnDef: basic_autoGroupColumnDef('창고명', 250),
-					groupDefaultExpanded: 0, // 0: close, 1: open
+					groupDefaultExpanded: 1, // 0: close, 1: open
 					suppressAggFuncInHeader: true,
 					animateRows: true,
 					suppressMakeColumnVisibleAfterUnGroup: true,
@@ -314,10 +314,12 @@
 			$("#prd_goods_no").text(prd.goods_no ??= '');
 			$("#prd_style_no").text(prd.style_no ??= '');
 			$("#prd_com_nm").text(prd.com_nm ??= '');
-			$("#prd_opt_kind_nm").text(prd.opt_kind_nm ??= '');
-			$("#prd_brand_nm").text(prd.brand_nm ??= '');
+			//$("#prd_opt_kind_nm").text(prd.opt_kind_nm ??= '');
+			//$("#prd_brand_nm").text(prd.brand_nm ??= '');
 			$("#prd_goods_nm").text(prd.goods_nm ??= '');
 			$("#prd_goods_nm_eng").text(prd.goods_nm_eng ??= '');
+			$("#tag_price").text(prd.tag_price ??= '');
+			$("#price").text(prd.price ??= '');
 		}
 
 		function setColumns(sizes) {

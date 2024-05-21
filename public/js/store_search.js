@@ -590,8 +590,9 @@ SearchPrdcd.prototype.Open = async function(callback = null, match = false, prd_
 SearchPrdcd.prototype.SetModal = function() {
     $("#SearchPrdcdModalLabel").text("품번 검색");
     $("#search_prdcd_match").addClass("d-none");
-    $("#search_prdcd_code").addClass("col-lg-6");
-    $("#search_prdcd_name").addClass("col-lg-6");
+    $("#search_prdcd_code").addClass("col-lg-4");
+	$("#search_prdcd_name").addClass("col-lg-4");
+	$("#search_prdcd_name_eng").addClass("col-lg-4");
     $("#search_prdcd_code label").text("품번");
     $("#select_prdcd_btn").addClass("d-none");
 }

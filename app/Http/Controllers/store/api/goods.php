@@ -926,8 +926,9 @@ class goods extends Controller
     /** 코드일련 검색 */
     public function search_prdcd_p(Request $request)
     {
-        $prd_cd_p = $request->input('prd_cd', '');
-        $goods_nm = $request->input('goods_nm', '');
+        $prd_cd_p		= $request->input('prd_cd', '');
+		$goods_nm		= $request->input('goods_nm', '');
+		$goods_nm_eng	= $request->input('goods_nm_eng', '');
 
         $brand = $request->input('brand', []);
         $brand_contain = $request->input('brand_contain', '');
@@ -945,8 +946,9 @@ class goods extends Controller
         $where = "";
         $having = "";
 
-        if ($prd_cd_p != '') $having .= " and prd_cd_p like '$prd_cd_p%' ";
-        if ($goods_nm != '') $having .= " and goods_nm like '%$goods_nm%' ";
+        if ($prd_cd_p != '')		$having .= " and prd_cd_p like '$prd_cd_p%' ";
+        if ($goods_nm != '')		$having .= " and goods_nm like '%$goods_nm%' ";
+		if ($goods_nm_eng != '')	$having .= " and goods_nm_eng like '%$goods_nm_eng%' ";
         
         foreach(self::Conds as $key => $value)
         {
@@ -971,11 +973,12 @@ class goods extends Controller
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                 , pc.prd_cd
                 , pc.goods_no
-                , ifnull(g.goods_nm, (select prd_nm from product p where p.prd_cd = pc.prd_cd)) as goods_nm
-                , g.goods_nm_eng
-                , ifnull(g.style_no, (select style_no from product p where p.prd_cd = pc.prd_cd)) as style_no
+                , ifnull(p.prd_nm, g.goods_nm ) as goods_nm
+                , ifnull(p.prd_nm_eng, g.goods_nm_eng ) as goods_nm_eng
+                , ifnull(p.style_no, g.style_no) as style_no
             from product_code pc
-                left outer join goods g on g.goods_no = pc.goods_no
+            inner join product p on p.prd_cd = pc.prd_cd
+            left outer join goods g on g.goods_no = pc.goods_no
             where 1=1 $where
             group by prd_cd_p
             having 1=1 $having
