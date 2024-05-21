@@ -44,7 +44,7 @@ class std11Controller extends Controller
 		$items = SLib::getItems();
         $com_types = SLib::getCodes("G_COM_TYPE");
 		$as_states = SLib::getCodes("AS_STATE");
-		$user_store = Auth('head`')->user()->store_cd;
+		$user_store = Auth('head')->user()->store_cd;
 		$user_store_nm = Auth('head')->user()->store_nm;
 
 		//컬러
