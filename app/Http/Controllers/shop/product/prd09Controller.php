@@ -242,7 +242,7 @@ class prd09Controller extends Controller
 							where stock_state_date >= '$next_edate' and stock_state_date <= '$now_date' and location_type = 'STORAGE'
 						) hst on hst.prd_cd = ps.prd_cd and hst.location_cd = ps.storage_cd
 						left outer join code c on c.code_kind_cd = 'PRD_CD_COLOR' and c.code_id = pc.color
-					where ps.prd_cd like '$prd_cd_p%' and ps.qty != 0 and ps.wqty != 0
+					where ps.prd_cd like '$prd_cd_p%' and s.default_yn = 'Y'
 					group by ps.storage_cd, pc.prd_cd
 					order by pc.color, s.storage_nm
 				) a
