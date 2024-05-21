@@ -33,6 +33,8 @@
                                     <option value="receipt_date">매장접수일</option>
                                     <option value="h_receipt_date">본사접수일</option>
                                     <option value="end_date">수선완료일</option>
+									<option value="end_store_date">매장도착일</option>
+									<option value="end_customer_date">고객인도일</option>
                                     <option value="err_date">불량등록일</option>
                                 </select>
                                 <div class="docs-datepicker form-inline-inner input_box" style="width:30%">
@@ -112,7 +114,7 @@
 									@endforeach
 								</select>
 								<div class="custom-control custom-checkbox form-check-box ml-1" style="min-width: 110px;">
-									<input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y" checked>
+									<input type="checkbox" class="custom-control-input" name="ext_done_state" id="ext_done_state" value="Y">
 									<label class="custom-control-label font-weight-normal" for="ext_done_state">완료 조회 제외</label>
 								</div>
 							</div>
@@ -220,6 +222,10 @@
                         return "진행중";
                     case 40:
                         return "완료(정상)";
+					case 41:
+						return "완료(매장도착)";
+					case 42:
+						return "완료(고객인도)";
                     case 50:
                         return "완료(불량)";
                 }
@@ -234,7 +240,7 @@
                         return {'color' : 'blue' , 'text-align' : 'center'};
                     case 30:
                         return {'color' : 'green' , 'text-align' : 'center'};
-                    case 40:
+                    case 40: case 41: case 42:
                         return {'color' : 'red' , 'text-align' : 'center'};
                     case 50:
                         return {'color' : 'purple' , 'text-align' : 'center'};
@@ -284,6 +290,8 @@
         { field: "end_date", headerName: "수선완료일", width: 100, cellStyle: DEFAULT_STYLE, },
         { field: "err_date", headerName: "불량등록일", width: 100, cellStyle: DEFAULT_STYLE, },
         { field: "h_content", headerName: "본사설명", width: 300, cellStyle: {"text-align" : "left"}, },
+		{ field: "end_store_date", headerName: "매장도착일", width: 100, cellStyle: DEFAULT_STYLE},
+		{ field: "end_customer_date", headerName: "고객인도일", width: 100, cellStyle: DEFAULT_STYLE},
         { field: "rt", headerName: "등록일", width: 120, cellStyle: DEFAULT_STYLE, },
         { field: "ut", headerName: "수정일", width: 120, cellStyle: DEFAULT_STYLE, },
         

@@ -15,6 +15,8 @@
         <div class="d-flex">
             @if ($row->as_type != '5' && $row->as_type != '6')
                 <a href="javascript:void(0)" onclick="change_state()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</a>
+			@elseif($row->as_type == '5' || $row->as_type == '6')
+				<a href="javascript:void(0)" onclick="change_end_state()" class="btn btn-primary mr-1"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 매장처리 저장</a>
             @endif
             <a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
         </div>
@@ -317,6 +319,73 @@
                 </form>
             </div>
         </div>
+
+		@if($row->as_type == '5' || $row->as_type == '6')
+		<div class="card mb-3">
+			<div class="card-header mb-0">
+				<a href="javascript:void(0);">매장처리</a>
+			</div>
+			<div class="card-body">
+				<form name="f3">
+					<div class="table-responsive">
+						<div class="table-box-ty2 mobile">
+							<table class="table incont table-bordered" width="100%" cellspacing="0">
+								<tbody>
+								<tr>
+									<th style="width:10%;">
+										<label for="end_store_date">매장도착일</label>
+									</th>
+									<td style="wdith:23.3%;">
+										<div class="form-inline">
+											<div class="docs-datepicker form-inline-inner input_box w-100">
+												<div class="input-group">
+													<input type="text" class="form-control form-control-sm docs-date" name="end_store_date" value="{{@$row->end_store_date}}" id="end_store_date" autocomplete="off">
+													<div class="input-group-append">
+														<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+															<i class="fa fa-calendar" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+												<div class="docs-datepicker-container"></div>
+											</div>
+										</div>
+									</td>
+									<td style="width:66.6%;">
+										※ 매장도착일 등록시 수선상태가 "매장도착"으로 변경됩니다.
+									</td>
+								</tr>
+								<tr>
+									<th>
+										<label for="end_customer_date">고객인도일</label>
+									</th>
+									<td>
+										<div class="form-inline">
+											<div class="docs-datepicker form-inline-inner input_box w-100">
+												<div class="input-group">
+													<input type="text" class="form-control form-control-sm docs-date" name="end_customer_date" value="{{@$row->end_customer_date}}" id="end_customer_date" autocomplete="off">
+													<div class="input-group-append">
+														<button type="button" class="btn btn-outline-secondary docs-datepicker-trigger p-0 pl-2 pr-2">
+															<i class="fa fa-calendar" aria-hidden="true"></i>
+														</button>
+													</div>
+												</div>
+												<div class="docs-datepicker-container"></div>
+											</div>
+										</div>
+									</td>
+									<td>
+										※ 고객인도일 등록시 수선상태가 "고객인도"로 변경됩니다.
+									</td>
+								</tr>
+								</tbody>
+							</table>								
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		@endif						
+								
     </div>
 </div>
 
@@ -516,6 +585,45 @@
             console.log(err);
         });
     }
+	
+	function change_end_state(){
+		
+		if($('#end_store_date').val() == '' && $('#end_customer_date').val() != ''){
+			alert('고객인도일 등록시에는 반드시 매장도착일이 등록되어야 합니다.');
+			$('#end_store_date').focus();
+			
+			return false;
+		}
+		
+		if($('#end_store_date').val() == '' && $('#end_customer_date').val() == ''){
+			ret	= confirm('매장도착일과 고객인도일이 없습니다. 그래도 등록하시겠습니까?');
+		}else{
+			ret	= true;
+		}
+		
+		if(ret){
+			let idx		= '{{@$row->idx}}';
+			let data	= $('form[name="f3"]').serialize();
+			data		+= '&idx=' + idx;
+			
+			axios({
+				url: '/store/standard/std11/change-end-state',
+				method: 'post',
+				data: data
+			}).then(function (res) {
+				if(res.data.code === 200) {
+					alert(res.data.msg);
+					window.close();
+					opener.Search();
+				} else {
+					console.log(res.data);
+					alert("저장 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
+		}
+	}
 
     function removeCommasAndSpaces(prd_cd) {
         return prd_cd.replace(/[\s,]+/g, '');

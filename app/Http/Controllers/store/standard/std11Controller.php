@@ -102,7 +102,8 @@ class std11Controller extends Controller
 		if ($store_cd != '') $where .= "and a.store_cd = '$store_cd'";
 		if ($as_type != '') $where .= "and a.as_type = '$as_type'";
 		if ($as_state != '') $where .= "and a.as_state = '$as_state'";
-		if ($ext_done_state == 'Y') $where .= "and (a.as_state != '40' and a.as_state != '50')";
+		//if ($ext_done_state == 'Y') $where .= "and (a.as_state != '40' and a.as_state != '50')";
+		if ($ext_done_state == 'Y') $where .= "and a.as_state < '40' ";
 		
 
 		$query = /** @lang text */
@@ -131,6 +132,8 @@ class std11Controller extends Controller
 				, a.end_date
 				, a.err_date
 				, a.h_content
+				, a.end_store_date
+				, a.end_customer_date
 				, a.rt
 				, a.ut
 			from repair_service a
@@ -225,8 +228,8 @@ class std11Controller extends Controller
 
 	public function create(Request $request)
 	{
-		$inputs = $request->all();
-		$store_cd = $request->input("store_no");
+		$inputs		= $request->all();
+		$store_cd	= $request->input("store_no");
 		$inputs['mobile'] = $inputs['mobile'] ? implode("-", array_filter($inputs['mobile'])) : "";
 		if($inputs['store_nm'] == '') {
 			$store_nm = DB::table('store')
@@ -260,12 +263,12 @@ class std11Controller extends Controller
 
                 $res = DB::table('msg_store')
                     ->insertGetId([
-                        'msg_kind' => 'AS',
-                        'sender_type' => 'H',
-                        'sender_cd' => 'HEAD',
-                        'reservation_yn' => 'N',
-                        'content' => $content,
-                        'rt' => now()
+                        'msg_kind'		=> 'AS',
+                        'sender_type'	=> 'H',
+                        'sender_cd'		=> 'HEAD',
+                        'reservation_yn'	=> 'N',
+                        'content'		=> $content,
+                        'rt'			=> now()
                     ]);
                 
                 DB::table('msg_store_detail')
@@ -388,10 +391,11 @@ class std11Controller extends Controller
 
 	public function save(Request $request) 
 	{
+		$admin_id	= Auth('head')->user()->id;
 
-		$data = $request->all();
+		$data		= $request->all();
 
-		$mobile = $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
+		$mobile		= $data['mobile'][0].'-'.$data['mobile'][1].'-'.$data['mobile'][2];
 
 		if($data['as_type'] == '1') { //매장접수(A/S)
 			$as_state = 10;
@@ -406,26 +410,27 @@ class std11Controller extends Controller
 
 			DB::table('repair_service')
 				->insert([
-					'receipt_date' => $data['edate'],
-					'as_state' => $as_state,
-					'store_cd' => $data['store_no'],
-					'as_type' => $data['as_type'],
-					'customer_no' => $data['customer_no']??'',
-					'customer' => $data['customer']??'',
-					'mobile' => $mobile,
-					'zipcode' => $data['zipcode']??'',
-					'addr1' => $data['addr1']??'',
-					'addr2' => $data['addr2']??'',
-					'prd_cd' => $data['prd_cd'],
-					'goods_nm' => $data['goods_nm'],
-					'color' => $data['color'],
-					'size_kind_cd' => $data['size_kind'],
-					'size' => $data['size'],
-					'is_free' => $data['is_free'],
-					'as_amt' => $data['as_amt']??'',
-					'content' => $data['content']??'',
-					'rt' => now(),
-					'ut' => now(),
+					'receipt_date'	=> $data['edate'],
+					'as_state'		=> $as_state,
+					'store_cd'		=> $data['store_no'],
+					'as_type'		=> $data['as_type'],
+					'customer_no'	=> $data['customer_no']??'',
+					'customer'		=> $data['customer']??'',
+					'mobile'		=> $mobile,
+					'zipcode'		=> $data['zipcode']??'',
+					'addr1'			=> $data['addr1']??'',
+					'addr2'			=> $data['addr2']??'',
+					'prd_cd'		=> $data['prd_cd'],
+					'goods_nm'		=> $data['goods_nm'],
+					'color'			=> $data['color'],
+					'size_kind_cd'	=> $data['size_kind'],
+					'size'			=> $data['size'],
+					'is_free'		=> $data['is_free'],
+					'as_amt'		=> $data['as_amt']??'',
+					'content'		=> $data['content']??'',
+					'admin_id'		=> $admin_id,
+					'rt'			=> now(),
+					'ut'			=> now(),
 				]);
 
 			DB::commit();
@@ -804,6 +809,75 @@ class std11Controller extends Controller
         }
 
         return response()->json(["code" => $code, "result" => $result]);
+	}
+	
+	// 매장 처리 상태 변경 추가
+	public function change_end_state(Request $request) {
+		/**
+		 * 수선진행상태
+		 *  10 : 수선요청
+		 *  11 : 불량요청
+		 *  12 : 본사심의요청
+		 *  20 : 수선접수
+		 *  30 : 수선진행
+		 *  40 : 수선완료
+		 *  41 : 매장도착
+		 *  42 : 고객인도
+		 *  50 : 불량
+		 */
+
+		$data		= $request->all();
+		$admin_id	= Auth('head')->user()->id;;
+		$code		= 200;
+		$msg		= "";
+		$as_state	= 40;
+
+		$sql			= " select as_state from repair_service where idx = :idx ";
+		$org_as_state	= DB::selectOne($sql, ['idx' => $data['idx']])->as_state;
+
+		if( $org_as_state < 40){
+			$code	= 500;
+			$msg	= "수정 가능한 수선진행상태가 아닙니다.";
+		}
+
+		if( $data['end_store_date'] == ''){
+			if($data['end_customer_date'] != ''){
+				$code	= 500;
+				$msg	= "매장도착일이 등록되지 않은 고객인도일은 등록할 수 없습니다.";
+			}
+		}else{
+			if($data['end_customer_date'] == '')	$as_state = 41;
+			else									$as_state = 42;
+		}
+		
+		if($code == '200'){
+
+			try {
+				DB::beginTransaction();
+
+				DB::table('repair_service')
+					->where('idx', '=', $data['idx'])
+					->update([
+						'as_state'			=> $as_state,
+						'end_store_date'	=> $data['end_store_date'],
+						'end_customer_date'	=> $data['end_customer_date'],
+						'end_ut'			=> now(),
+						'end_id'			=> $admin_id
+					]);
+
+				DB::commit();
+				$code	= 200;
+				$msg	= "매장처리 정보가 저장되었습니다.";
+
+			} catch (Exception $e) {
+				DB::rollback();
+				$code	= 500;
+				$msg	= $e->getMessage();
+			}
+			
+		}
+
+		return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
 }

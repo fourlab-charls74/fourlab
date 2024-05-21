@@ -229,6 +229,8 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
         Route::post('std11/edit', 'std11Controller@edit');
         Route::post('std11/remove', 'std11Controller@remove');
         Route::post('std11/change-size', 'std11Controller@change_size');
+		
+		Route::post('std11/change-end-state', 'std11Controller@change_end_state');
 
         //코드
         Route::get('std51', 'std51Controller@index');

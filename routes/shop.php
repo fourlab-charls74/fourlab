@@ -176,24 +176,26 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         Route::post('std08/remove', 'std08Controller@remove');
         Route::get('std08/choice', 'std08Controller@choice_index');
 
-        // 수선관리
-         Route::get('std11', 'std11Controller@index');
-         Route::get('std11/search', 'std11Controller@search');
-         Route::post('std11/batch-edit', 'std11Controller@batchEdit');
-         Route::post('std11/repair-info-save', 'std11Controller@save');
-         Route::post('std11/change_state', 'std11Controller@change_state');
-         Route::post('std11/change_state2', 'std11Controller@change_state2');
-         Route::get('std11/create', 'std11Controller@showCreate');
-         Route::post('std11/create', 'std11Controller@create');
-         Route::get('std11/view/{idx?}', 'std11Controller@view');
-         Route::post('std11/delete', 'std11Controller@delete');
-		 Route::post('std11/change-size', 'std11Controller@change_size');
-         Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
-         Route::post('std11/edit', 'std11Controller@edit');
-         Route::post('std11/remove', 'std11Controller@remove');
- 
+		// 수선관리
+		Route::get('std11', 'std11Controller@index');
+		Route::get('std11/search', 'std11Controller@search');
+		Route::post('std11/batch-edit', 'std11Controller@batchEdit');
+		Route::post('std11/repair-info-save', 'std11Controller@save');
+		Route::post('std11/change_state', 'std11Controller@change_state');
+		Route::post('std11/change_state2', 'std11Controller@change_state2');
+		Route::get('std11/create', 'std11Controller@showCreate');
+		Route::post('std11/create', 'std11Controller@create');
+		Route::get('std11/view/{idx?}', 'std11Controller@view');
+		Route::post('std11/delete', 'std11Controller@delete');
+		Route::post('std11/change-size', 'std11Controller@change_size');
+		Route::get('std11/detail/{idx?}', 'std11Controller@showDetail');
+		Route::post('std11/edit', 'std11Controller@edit');
+		Route::post('std11/remove', 'std11Controller@remove');
 
-        //코드
+		Route::post('std11/change-end-state', 'std11Controller@change_end_state');
+
+
+		//코드
         Route::get('std51', 'std51Controller@index');
         Route::post('std51', 'std51Controller@store');
         Route::get('std51/search', 'std51Controller@search');
