@@ -233,7 +233,7 @@
 		});
 
 		$(document).ready(async function() {
-			pApp.ResizeGrid(275, 152);
+			pApp.ResizeGrid(275, 252);
 			pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			if (gridDiv !== null) {
@@ -246,7 +246,7 @@
 				});
 			}
 
-			pApp2.ResizeGrid(275, 510);
+			pApp2.ResizeGrid(275, 410);
 			//pApp2.BindSearchEnter();
 			let gridDiv2 = document.querySelector(pApp2.options.gridId);
 			if (gridDiv2 !== null) {
