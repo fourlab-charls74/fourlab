@@ -48,7 +48,7 @@
 								<div class="form-inline">
 									<div class="form-inline-inner input-box w-100">
 										<div class="form-inline inline_btn_box">
-											<input type='text' id="prd_cd_p" name='prd_cd_p' value="{{ @$prd_cd_p }}" class="form-control form-control-sm w-100 ac-style-no search-enter">
+											<input type='text' id="prd_cd_p" name='prd_cd_p' value="{{ @$prd_cd_p }}" class="form-control form-control-sm w-100 search-enter">
 											<a href="#" class="btn btn-sm btn-outline-primary sch-prdcd-p"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
 										</div>
 									</div>
@@ -234,7 +234,7 @@
 
 		$(document).ready(async function() {
 			pApp.ResizeGrid(275, 152);
-			pApp.BindSearchEnter();
+			//pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			if (gridDiv !== null) {
 				gx = new HDGrid(gridDiv, storage_columns, {
@@ -247,7 +247,7 @@
 			}
 
 			pApp2.ResizeGrid(275, 510);
-			pApp2.BindSearchEnter();
+			//pApp2.BindSearchEnter();
 			let gridDiv2 = document.querySelector(pApp2.options.gridId);
 			if (gridDiv2 !== null) {
 				gx2 = new HDGrid(gridDiv2, store_columns, {

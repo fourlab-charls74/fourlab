@@ -234,7 +234,7 @@
 
 		$(document).ready(async function() {
 			pApp.ResizeGrid(275, 152);
-			pApp.BindSearchEnter();
+			//pApp.BindSearchEnter();
 			let gridDiv = document.querySelector(pApp.options.gridId);
 			if (gridDiv !== null) {
 				gx = new HDGrid(gridDiv, storage_columns, {
@@ -247,7 +247,7 @@
 			}
 
 			pApp2.ResizeGrid(275, 510);
-			pApp2.BindSearchEnter();
+			//pApp2.BindSearchEnter();
 			let gridDiv2 = document.querySelector(pApp2.options.gridId);
 			if (gridDiv2 !== null) {
 				gx2 = new HDGrid(gridDiv2, store_columns, {
