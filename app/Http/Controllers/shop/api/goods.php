@@ -1024,9 +1024,9 @@ class goods extends Controller
                 concat(pc.brand, pc.year, pc.season, pc.gender, pc.item, pc.seq, pc.opt) as prd_cd_p
                 , pc.prd_cd
                 , pc.goods_no
-                , ifnull(p.prd_nm, g.goods_nm ) as goods_nm
-                , ifnull(p.prd_nm_eng, g.goods_nm_eng ) as goods_nm_eng
-                , ifnull(p.style_no, g.style_no) as style_no
+                , if(ifnull(p.prd_nm, '') != '',p.prd_nm, g.goods_nm) as goods_nm
+                , if(ifnull(p.prd_nm_eng, '') != '', p.prd_nm_eng, g.goods_nm_eng ) as goods_nm_eng
+                , if(ifnull(p.style_no, '') != '', p.style_no, g.style_no) as style_no
             from product_code pc
             inner join product p on p.prd_cd = pc.prd_cd
             left outer join goods g on g.goods_no = pc.goods_no
