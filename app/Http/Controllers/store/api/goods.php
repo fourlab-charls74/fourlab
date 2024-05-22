@@ -929,6 +929,7 @@ class goods extends Controller
         $prd_cd_p		= $request->input('prd_cd', '');
 		$goods_nm		= $request->input('goods_nm', '');
 		$goods_nm_eng	= $request->input('goods_nm_eng', '');
+		$style_no		= $request->input('style_no', '');
 
         $brand = $request->input('brand', []);
         $brand_contain = $request->input('brand_contain', '');
@@ -949,6 +950,7 @@ class goods extends Controller
         if ($prd_cd_p != '')		$having .= " and prd_cd_p like '$prd_cd_p%' ";
         if ($goods_nm != '')		$having .= " and goods_nm like '%$goods_nm%' ";
 		if ($goods_nm_eng != '')	$having .= " and goods_nm_eng like '%$goods_nm_eng%' ";
+		if ($style_no != '')		$having .= " and style_no like '%$style_no%' ";
         
         foreach(self::Conds as $key => $value)
         {

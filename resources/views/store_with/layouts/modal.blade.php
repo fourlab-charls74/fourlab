@@ -593,7 +593,7 @@
                             <div class="card-body">
                                 <div class="row_wrap mb-2">
                                     <div class="row">
-                                        <div class="col-lg-4 inner-td" id="search_prdcd_code">
+                                        <div class="col-lg-4 inner-td pt10" id="search_prdcd_code">
                                             <div class="form-group">
                                                 <label style="min-width:80px;">바코드</label>
                                                 <div class="flex_box">
@@ -601,7 +601,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 inner-td" id="search_prdcd_name">
+                                        <div class="col-lg-4 inner-td pt10" id="search_prdcd_name">
                                             <div class="form-group">
                                                 <label style="min-width:80px;">상품명</label>
                                                 <div class="flex_box">
@@ -609,7 +609,7 @@
                                                 </div>
                                             </div>
                                         </div>
-										<div class="col-lg-4 inner-td" id="search_prdcd_name_eng">
+										<div class="col-lg-4 inner-td pt10" id="search_prdcd_name_eng">
 											<div class="form-group">
 												<label style="min-width:80px;">상품명(영문)</label>
 												<div class="flex_box">
@@ -617,7 +617,15 @@
 												</div>
 											</div>
 										</div>
-                                        <div class="col-lg-4 inner-td" id="search_prdcd_match">
+										<div class="col-lg-4 inner-td pt10" id="search_prdcd_styleno">
+											<div class="form-group">
+												<label style="min-width:80px;">스타일넘버</label>
+												<div class="flex_box">
+													<input type='text' class="form-control form-control-sm search-all" onkeypress="searchPrdcd.Search(event);" name='style_no' value=''>
+												</div>
+											</div>
+										</div>
+                                        <div class="col-lg-4 inner-td pt10" id="search_prdcd_match">
                                             <div class="form-group">
                                             <label for="formrow-email-input">매칭여부</label>
                                                 <div class="form-inline form-radio-box">
