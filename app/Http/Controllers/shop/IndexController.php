@@ -285,7 +285,8 @@ class IndexController extends Controller
 		$main_order	= DB::selectOne($sql, ['store_cd1' => $user_store, 'store_cd2' => $user_store]);
 
 		// 2. 출고현황
-		$sec_pdate = $mutable4->sub(1, 'month')->format('Y-m-d');
+		$mutable5 = Carbon::now();
+		$sec_pdate = $mutable5->sub(1, 'month')->format('Y-m-d');
 		
 		$sql	= "
 			select
