@@ -311,21 +311,21 @@ class IndexController extends Controller
 			select
 				sum(out_rt_cnt) as out_rt_cnt
 				, sum(out_req_cnt) as out_req_cnt
-				, ifnull(round(sum(out_req_cnt)/sum(out_rt_cnt)*100),'-') as out_req_ratio
+				, ifnull(round(sum(out_req_cnt)/sum(out_rt_cnt)*100),'0') as out_req_ratio
 				-- , (sum(out_rt_cnt) - sum(out_req_cnt)) as out_ing_cnt
 				, (sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt)) as out_end_cnt
-				, ifnull(round((sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt))/(sum(out_rt_cnt) - sum(out_req_cnt))*100),'-') as out_end_ratio
+				, ifnull(round((sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt))/(sum(out_rt_cnt) - sum(out_req_cnt))*100),'0') as out_end_ratio
 				, sum(out_rej_cnt) as out_rej_cnt
-				, ifnull(round(sum(out_rej_cnt)/sum(out_rt_cnt)*100),'-') as out_rej_ratio
+				, ifnull(round(sum(out_rej_cnt)/sum(out_rt_cnt)*100),'0') as out_rej_ratio
 				, sum(in_rt_cnt) as in_rt_cnt
 				, sum(in_req_cnt) as in_req_cnt
-				, ifnull(round(sum(in_req_cnt)/sum(in_rt_cnt)*100),'-') as in_req_ratio
+				, ifnull(round(sum(in_req_cnt)/sum(in_rt_cnt)*100),'0') as in_req_ratio
 				-- , (sum(in_rt_cnt) - sum(in_req_cnt)) as in_ing_cnt
 				, (sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt)) as in_end_cnt
 				, sum(in_fin_cnt) as in_fin_cnt
-				, ifnull(round((sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt))/(sum(in_rt_cnt) - sum(in_req_cnt))*100),'-') as in_end_ratio
+				, ifnull(round((sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt))/(sum(in_rt_cnt) - sum(in_req_cnt))*100),'0') as in_end_ratio
 				, sum(in_rej_cnt) as in_rej_cnt
-				, ifnull(round(sum(in_rej_cnt)/sum(in_rt_cnt)*100),'-') as in_rej_ratio
+				, ifnull(round(sum(in_rej_cnt)/sum(in_rt_cnt)*100),'0') as in_rej_ratio
 			
 				, concat(
 					' ',
