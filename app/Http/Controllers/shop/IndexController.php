@@ -351,7 +351,7 @@ class IndexController extends Controller
 				from product_stock_rotation psr
 				where
 					psr.rt >= '" . $sec_pdate . " 00:00:00'
-					and psr.dep_store_cd = 'H0017'
+					and psr.dep_store_cd = :store_cd1
 			
 				union all
 			
@@ -372,10 +372,10 @@ class IndexController extends Controller
 				from product_stock_rotation psr
 				where
 					psr.rt >= '" . $sec_pdate . " 00:00:00'
-					and psr.store_cd = :store_cd
+					and psr.store_cd = :store_cd2
 			) rt
 		";
-		$main_rotation	= DB::selectOne($sql, ['store_cd' => $user_store]);
+		$main_rotation	= DB::selectOne($sql, ['store_cd1' => $user_store, 'store_cd2' => $user_store]);
 		
 		$values = [
 			'main_order'	=> $main_order,
