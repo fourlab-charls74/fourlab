@@ -34,11 +34,23 @@
             min-height: 400px;
         }
     }
+	
+	#main_table th{
+		border:1px solid #DDDDDD;
+		padding: 5px 5px;
+		background-color:#F1F1F1;
+	}
+	#main_table td{
+		border:1px solid #DDDDDD;
+		padding: 5px 5px;
+		font-weight: 400;
+	}
 </style>
 
 <div id="main_grid">
     <div class="card shadow" style="grid-area: a;">
         <div class="card-body h-100">
+			{{--
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="bar-tab" data-toggle="tab" href="#bar" role="tab" aria-controls="bar" aria-selected="false">일별 매출</a>
@@ -54,7 +66,118 @@
                     </div>
                 </div>
             </div>
-        </div>
+			--}}
+			<div class="fl_box pt80">
+				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-chalkboard fs-14 mr-2"></i>매출현황 [{{@$sec_sdate}}]</h6>
+			</div>
+			<div class="pt10">
+				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
+					<tbody>
+					<tr class="txtc">
+						<th colspan="5">당월매출</th>
+						<th colspan="2">목표매출</th>
+						<th colspan="2">전년도매출</th>
+					</tr>
+					<tr class="txtc">
+						<th style="width:11.11%">판매수량</th>
+						<th style="width:11.11%">오프라인</th>
+						<th style="width:11.11%">온라인</th>
+						<th style="width:11.11%">합계금액</th>
+						<th style="width:11.11%">오프:온(%)</th>
+						<th style="width:11.11%">목표매출</th>
+						<th style="width:11.11%">달성율(%)</th>
+						<th style="width:11.11%">전년도매출</th>
+						<th style="width:11.11%">성장율(%)</th>
+					</tr>
+					<tr class="txtr">
+						<td>{{number_format(@$main_order->qty)}}</td>
+						<td>{{number_format(@$main_order->offline)}}</td>
+						<td>{{number_format(@$main_order->online)}}</td>
+						<td>{{number_format(@$main_order->recv_amt)}}</td>
+						<td class="txtc">{{@$main_order->offline_online_rate}}</td>
+						<td>{{number_format(@$main_order->proj_amt)}}</td>
+						<td>{{@$main_order->progress_proj_amt}}%</td>
+						<td>{{number_format(@$main_order->prev_recv_amt)}}</td>
+						<td>{{@$main_order->growth_rate}}%</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="fl_box pt50">
+				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-package fs-14 mr-2"></i>출고현황 [최근한달]</h6>
+			</div>
+			<div class="pt10">
+				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
+					<tbody>
+					<tr class="txtc">
+						<th style="width:20%;">구분</th>
+						<th style="width:20%;">초도</th>
+						<th style="width:20%;">판매분</th>
+						<th style="width:20%;">요청분</th>
+						<th style="width:20%;">합계</th>
+					</tr>
+					<tr class="txtc">
+						<th>출고처리중</th>
+						<td>{{number_format(@$main_release->f_ing_qty)}}</td>
+						<td>{{number_format(@$main_release->s_ing_qty)}}</td>
+						<td>{{number_format(@$main_release->r_ing_qty)}}</td>
+						<td>{{number_format(@$main_release->t_ing_qty)}}</td>
+					</tr>
+					<tr class="txtc">
+						<th>출고완료</th>
+						<td>{{number_format(@$main_release->f_end_qty)}}</td>
+						<td>{{number_format(@$main_release->s_end_qty)}}</td>
+						<td>{{number_format(@$main_release->r_end_qty)}}</td>
+						<td>{{number_format(@$main_release->t_end_qty)}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="fl_box pt50">
+				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-repost fs-14 mr-2"></i>RT현황 [최근한달]</h6>
+			</div>
+			<div class="pt10">
+				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
+					<tbody>
+					<tr class="txtc">
+						<th style="width:12%">구분</th>
+						<th style="width:11%">요청수</th>
+						<th style="width:11%">미확인수</th>
+						<th style="width:11%">미확인율(%)</th>
+						<th style="width:11%">처리수</th>
+						<th style="width:11%">처리율(%)</th>
+						<th style="width:11%">거부수</th>
+						<th style="width:11%">거부율(%)</th>
+						<th style="width:11%">반출:반입(%)</th>
+					</tr>
+					<tr class="txtc">
+						<th>반출</th>
+						<td>{{number_format(@$main_rotation->out_rt_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->out_req_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->out_req_ratio)}}%</td>
+						<td>{{number_format(@$main_rotation->out_end_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->out_end_ratio)}}%</td>
+						<td>{{number_format(@$main_rotation->out_rej_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->out_rej_ratio)}}%</td>
+						<td rowspan="2">{{@$main_rotation->rt_ratio}}</td>
+					</tr>
+					<tr class="txtc">
+						<th>반입</th>
+						<td>{{number_format(@$main_rotation->in_rt_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->in_req_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->in_req_ratio)}}%</td>
+						<td>{{number_format(@$main_rotation->in_end_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->in_end_ratio)}}%</td>
+						<td>{{number_format(@$main_rotation->in_rej_cnt)}}</td>
+						<td>{{number_format(@$main_rotation->in_rej_ratio)}}%</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			
+		</div>
     </div>
     <div class="card shadow" style="grid-area: b;">
         <div class="card-body h-100">
@@ -138,7 +261,7 @@
 <script>
     $(document).ready(function(){
         $('#order_amt-tab').trigger("click");
-        $('#bar-tab').trigger("click");
+        //$('#bar-tab').trigger("click");
         //openNoticePopup();
     });
 </script>
@@ -287,12 +410,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
 
 <script>
-  const ctx = document.getElementById('myChart');
+/*  
+	const ctx = document.getElementById('myChart');
 
   let edate = '{{$edate}}';
   let sdate = '{{$sdate}}';
 
-  let chartData = <?= json_encode($result)?>;
+  let chartData = {{--<?= json_encode($result)?>--}};
   let all_date = getDatesStartToLast(sdate, edate);
   
   let labels = [];
@@ -352,7 +476,7 @@
         }
     },
   });
-
+*/
     function getDatesStartToLast(sdate, edate) {
         var regex = RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/);
         if(!(regex.test(sdate) && regex.test(edate))) return "Not Date Format";

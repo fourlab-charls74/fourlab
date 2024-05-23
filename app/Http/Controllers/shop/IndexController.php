@@ -76,8 +76,8 @@ class IndexController extends Controller
             ) t on a.sale_date = t.sale_date 
         ";
 
-        $rows = DB::select($sql);
-
+        //$rows = DB::select($sql);
+/*
         $result = collect($rows)->map(function ($row) {
 
 			$sale_date				= $row->date;
@@ -102,7 +102,7 @@ class IndexController extends Controller
 			return $array;
 
 		})->all();
-
+*/
 
         $sql = "
         select
@@ -184,12 +184,12 @@ class IndexController extends Controller
                 order by sum_amt desc
         ";
 
-        $piechart = DB::select($sql);
+        //$piechart = DB::select($sql);
 
          //주문금액
          $sql = "
          select
-             p.prd_nm, p.style_no, pc.prd_cd_p,
+             p.style_no as prd_nm, p.style_no, pc.prd_cd_p,
              sum(oo.wonga * oo.qty) as wonga, sum(oo.recv_amt) as recv_amt
          from order_opt oo
          inner join product_code pc on oo.prd_cd = pc.prd_cd
@@ -208,7 +208,7 @@ class IndexController extends Controller
      // 주문수량
      $sql = "
          select
-             p.prd_nm, p.style_no, pc.prd_cd_p,
+             p.style_no as prd_nm, p.style_no, pc.prd_cd_p,
              sum(oo.qty) as qty
          from order_opt oo
          inner join product_code pc on oo.prd_cd = pc.prd_cd
@@ -234,19 +234,164 @@ class IndexController extends Controller
 	$expire_release_cnt	= $release->getExpireRelease('30', $store_cd);
 	
 
-	$values = [
-		'sdate' => $sdate,
-		'edate' => $edate,
-		'sdate2' => $sdate2,
-		'edate2' => $edate2,
-		'result' => $result,
-		'pieResult' => $piechart,
-		'chart2Result' => $chart2Result,
-		'chart3Result' => $chart3Result,
-		'expire_release_cnt'	=> $expire_release_cnt
-		
-	];
 
+		// 매인 좌측상단
+
+		// 1. 매출현황
+		$mutable4 = Carbon::now();
+
+		$sec_sdate	= date('Ym');
+		$sec_pdate = $mutable4->sub(1, 'year')->format('Ym');
+		
+		$sql	= "
+			select
+				a.qty, a.offline, a.online, a.recv_amt
+				, concat(round((a.offline / a.recv_amt) * 100,0), ' : ', round((a.online / a.recv_amt) * 100,0)) as offline_online_rate
+				, ifnull(p.amt,0) as proj_amt
+				, round(a.recv_amt / ifnull(p.amt,0) * 100, 1) as progress_proj_amt
+				, b.recv_amt as prev_recv_amt
+				, round(a.recv_amt / b.recv_amt * 100, 1) as growth_rate
+			from (
+				select
+					o.store_cd,
+					sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty, 
+					sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt,  
+					if (s.online_only_yn = 'Y', sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)) as online,
+					if (s.online_only_yn = 'Y', sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end))  as offline
+				from order_opt_wonga w
+				inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
+				inner join store s on s.store_cd = o.store_cd
+				where 
+					w.ord_state in(30, 60, 61) 
+					and w.ord_state_date like '" . $sec_sdate . "%'
+					and o.store_cd = :store_cd1
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+			) a
+			left outer join store_sales_projection p on p.ym = '$sec_sdate' and a.store_cd = p.store_cd
+			left outer join (
+				select
+					o.store_cd,
+					sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt
+				from order_opt_wonga w
+				inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
+				inner join store s on s.store_cd = o.store_cd
+				where 
+					w.ord_state in(30, 60, 61) 
+					and w.ord_state_date like '" . $sec_pdate . "%'
+					and o.store_cd = :store_cd2
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+			) b on a.store_cd = b.store_cd
+		";
+		$main_order	= DB::selectOne($sql, ['store_cd1' => $user_store, 'store_cd2' => $user_store]);
+
+		// 2. 출고현황
+		$sec_pdate = $mutable4->sub(1, 'month')->format('Y-m-d');
+		
+		$sql	= "
+			select
+				sum(if(psr.type = 'F' and psr.state < 40, psr.qty, 0)) as f_ing_qty
+				, sum(if(psr.type = 'F' and psr.state = 40, psr.qty, 0)) as f_end_qty
+				, sum(if(psr.type = 'S' and psr.state < 40, psr.qty, 0)) as s_ing_qty
+				, sum(if(psr.type = 'S' and psr.state = 40, psr.qty, 0)) as s_end_qty
+				, sum(if(psr.type = 'R' and psr.state < 40, psr.qty, 0)) as r_ing_qty
+				, sum(if(psr.type = 'R' and psr.state = 40, psr.qty, 0)) as r_end_qty
+				, sum(if(psr.state < 40, psr.qty, 0)) as t_ing_qty
+				, sum(if(psr.state = 40, psr.qty, 0)) as t_end_qty
+			from product_stock_release psr
+			where
+				psr.store_cd = :store_cd
+				and psr.req_rt >= '" . $sec_pdate . " 00:00:00'
+				and psr.type <> 'G'
+		";
+		$main_release	= DB::selectOne($sql, ['store_cd' => $user_store]);
+		
+		// 3. RT현황
+		$sql	= "
+			select
+				sum(out_rt_cnt) as out_rt_cnt
+				, sum(out_req_cnt) as out_req_cnt
+				, ifnull(round(sum(out_req_cnt)/sum(out_rt_cnt)*100),'-') as out_req_ratio
+				-- , (sum(out_rt_cnt) - sum(out_req_cnt)) as out_ing_cnt
+				, (sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt)) as out_end_cnt
+				, ifnull(round((sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt))/(sum(out_rt_cnt) - sum(out_req_cnt))*100),'-') as out_end_ratio
+				, sum(out_rej_cnt) as out_rej_cnt
+				, ifnull(round(sum(out_rej_cnt)/sum(out_rt_cnt)*100),'-') as out_rej_ratio
+				, sum(in_rt_cnt) as in_rt_cnt
+				, sum(in_req_cnt) as in_req_cnt
+				, ifnull(round(sum(in_req_cnt)/sum(in_rt_cnt)*100),'-') as in_req_ratio
+				-- , (sum(in_rt_cnt) - sum(in_req_cnt)) as in_ing_cnt
+				, (sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt)) as in_end_cnt
+				, sum(in_fin_cnt) as in_fin_cnt
+				, ifnull(round((sum(in_rec_cnt) + sum(in_prc_cnt) + sum(in_fin_cnt))/(sum(in_rt_cnt) - sum(in_req_cnt))*100),'-') as in_end_ratio
+				, sum(in_rej_cnt) as in_rej_cnt
+				, ifnull(round(sum(in_rej_cnt)/sum(in_rt_cnt)*100),'-') as in_rej_ratio
+			
+				, concat(
+					' ',
+					ifnull(round((sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt))/((sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt)) + sum(in_fin_cnt)) * 100), '-'), 
+					' : ',
+					ifnull(round(sum(in_fin_cnt)/((sum(out_rec_cnt) + sum(out_prc_cnt) + sum(out_fin_cnt)) + sum(in_fin_cnt)) * 100), '-')
+				) as rt_ratio
+			from
+			(
+				select
+					psr.dep_store_cd as store_cd
+					, 1 as out_rt_cnt
+					, if(psr.state = '10', 1, 0) as out_req_cnt
+					, if(psr.state = '20', 1, 0) as out_rec_cnt
+					, if(psr.state = '30', 1, 0) as out_prc_cnt
+					, if(psr.state = '40', 1, 0) as out_fin_cnt
+					, if(psr.state = '-10', 1, 0) as out_rej_cnt
+					, 0 as in_rt_cnt
+					, 0 as in_req_cnt
+					, 0 as in_rec_cnt
+					, 0 as in_prc_cnt
+					, 0 as in_fin_cnt
+					, 0 as in_rej_cnt
+				from product_stock_rotation psr
+				where
+					psr.rt >= '" . $sec_pdate . " 00:00:00'
+					and psr.dep_store_cd = 'H0017'
+			
+				union all
+			
+				select
+					psr.store_cd as store_cd
+					, 0 as out_rt_cnt
+					, 0 as out_req_cnt
+					, 0 as out_rec_cnt
+					, 0 as out_prc_cnt
+					, 0 as out_fin_cnt
+					, 0 as out_rej_cnt
+					, 1 as in_rt_cnt
+					, if(psr.state = '10', 1, 0) as in_req_cnt
+					, if(psr.state = '20', 1, 0) as in_rec_cnt
+					, if(psr.state = '30', 1, 0) as in_prc_cnt
+					, if(psr.state = '40', 1, 0) as in_fin_cnt
+					, if(psr.state = '-10', 1, 0) as in_rej_cnt
+				from product_stock_rotation psr
+				where
+					psr.rt >= '" . $sec_pdate . " 00:00:00'
+					and psr.store_cd = :store_cd
+			) rt
+		";
+		$main_rotation	= DB::selectOne($sql, ['store_cd' => $user_store]);
+		
+		$values = [
+			'main_order'	=> $main_order,
+			'main_release'	=> $main_release,
+			'main_rotation'	=> $main_rotation,
+			'sec_sdate'		=> date('Y-m'),
+			'sdate'			=> $sdate,
+			'edate'			=> $edate,
+			'sdate2'		=> $sdate2,
+			'edate2'		=> $edate2,
+			//'result'		=> $result,
+			//'pieResult'	=> $piechart,
+			'chart2Result'	=> $chart2Result,
+			'chart3Result'	=> $chart3Result,
+			'expire_release_cnt'	=> $expire_release_cnt
+		];
 
         return view(Config::get('shop.shop.view'). '/index',$values);
     }
