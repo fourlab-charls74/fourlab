@@ -67,7 +67,7 @@
                 </div>
             </div>
 			--}}
-			<div class="fl_box pt80">
+			<div class="fl_box">
 				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-chalkboard fs-14 mr-2"></i>매출현황 [{{@$sec_sdate}}]</h6>
 			</div>
 			<div class="pt10">
@@ -104,10 +104,10 @@
 				</table>
 			</div>
 
-			<div class="fl_box pt50">
+			<div class="fl_box pt10">
 				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-package fs-14 mr-2"></i>출고현황 [최근한달]</h6>
 			</div>
-			<div class="pt10">
+			<div class="pt20">
 				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
 					<tbody>
 					<tr class="txtc">
@@ -135,7 +135,7 @@
 				</table>
 			</div>
 
-			<div class="fl_box pt50">
+			<div class="fl_box pt20">
 				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-repost fs-14 mr-2"></i>RT현황 [최근한달]</h6>
 			</div>
 			<div class="pt10">
