@@ -198,7 +198,16 @@
 
         let same_goods = gx.getRows().find(g => g.prd_cd === prd_cd);
         if(same_goods === undefined) {
-            gx.gridOptions.api.applyTransaction({ add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: '', pr_code: pr_codes[0]?.pr_code || ''}] });
+			
+			// 상품 추가 시, 마지막 행의 판매유형을 기본값으로 설정 (2024-05-23)
+			let sale_type = '';
+			const last_row_idx = gx.gridOptions.api.getDisplayedRowCount() - 1;
+			const last_row = gx.gridOptions.api.getDisplayedRowAtIndex(last_row_idx);
+			if (last_row) {
+				sale_type = last_row.data?.sale_type || '';
+			}
+			
+            gx.gridOptions.api.applyTransaction({ add: [{...goods, qty: 1, total: 1 * goods.price, sale_type: sale_type, pr_code: pr_codes[0]?.pr_code || ''}] });
             gx.gridOptions.api.forEachNode((node) => {
                 if(node.data.prd_cd === prd_cd) {
                     node.setSelected(true);
@@ -211,6 +220,10 @@
             gx2.setRows([]);
 
             $("#search_prd_keyword_out").trigger("focus");
+
+			if (last_row) {
+				updateOrderValue('sale_type', sale_type);
+			}
         } else {
             alert("이미 선택된 상품입니다.");
         }
@@ -266,7 +279,13 @@
             }
         });
         if(goods.sale_type != "") {
-            $(sale_type).val(goods.sale_type).prop("selected", true);
+			const is_exist = Array.from(sale_type.options).some(opt => opt.value === goods.sale_type);
+            if (is_exist) {
+				$(sale_type).val(goods.sale_type).prop("selected", true);
+			} else {
+				$(sale_type).prop("selectedIndex", 0);
+				updateOrderValue('sale_type', $(sale_type).val());
+            }
         } else {
             $(sale_type).prop("selectedIndex", 0);
 			updateOrderValue('sale_type', $(sale_type).val());
