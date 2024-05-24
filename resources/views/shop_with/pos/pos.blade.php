@@ -1143,6 +1143,9 @@
             let paytype = $(e.relatedTarget).data('pay-type');
             $(e.currentTarget).find('#paymodal_title').text(title);
             $(e.currentTarget).find('[name=paymodal_paytype]').val(paytype);
+			
+			//모달 SHOW 시점에 남은금액 반영 ( 최초 전체금액 )
+			setDueAmt();
         });
         $('#payModal').on('hide.bs.modal', function(e) {
             $("#pay_press_amt").val(0);
