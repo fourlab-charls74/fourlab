@@ -248,7 +248,7 @@ class IndexController extends Controller
 				a.qty, a.offline, a.online, a.recv_amt
 				, concat(round((a.offline / a.recv_amt) * 100,0), ' : ', round((a.online / a.recv_amt) * 100,0)) as offline_online_rate
 				, ifnull(p.amt,0) as proj_amt
-				, round(a.recv_amt / ifnull(p.amt,0) * 100, 1) as progress_proj_amt
+				, round(ifnull(a.recv_amt / ifnull(p.amt,0), 0) * 100, 1) as progress_proj_amt
 				, b.recv_amt as prev_recv_amt
 				, round(a.recv_amt / b.recv_amt * 100, 1) as growth_rate
 			from (
