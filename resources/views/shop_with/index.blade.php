@@ -49,7 +49,7 @@
 
 <div id="main_grid">
     <div class="card shadow" style="grid-area: a;">
-        <div class="card-body h-100">
+        <div class="card-body h-100" style="overflow:auto;">
 			{{--
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
