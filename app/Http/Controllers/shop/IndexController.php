@@ -189,7 +189,7 @@ class IndexController extends Controller
          //주문금액
          $sql = "
          select
-             p.style_no as prd_nm, p.style_no, pc.prd_cd_p,
+             p.prd_nm as prd_nm, p.style_no, pc.prd_cd_p,
              sum(oo.wonga * oo.qty) as wonga, sum(oo.recv_amt) as recv_amt
          from order_opt oo
          inner join product_code pc on oo.prd_cd = pc.prd_cd
@@ -200,7 +200,7 @@ class IndexController extends Controller
              and oo.store_cd = '$user_store'
          group by pc.prd_cd_p
          order by sum(oo.recv_amt) desc
-         limit 10
+         limit 8
      ";
 
      $chart2Result = DB::select($sql);
@@ -208,7 +208,7 @@ class IndexController extends Controller
      // 주문수량
      $sql = "
          select
-             p.style_no as prd_nm, p.style_no, pc.prd_cd_p,
+             p.prd_nm as prd_nm, p.style_no, pc.prd_cd_p,
              sum(oo.qty) as qty
          from order_opt oo
          inner join product_code pc on oo.prd_cd = pc.prd_cd
@@ -219,7 +219,7 @@ class IndexController extends Controller
              and oo.store_cd = '$user_store'
          group by pc.prd_cd_p
          order by sum(oo.qty) desc
-         limit 10
+         limit 8
      ";
 
     $chart3Result = DB::select($sql);
