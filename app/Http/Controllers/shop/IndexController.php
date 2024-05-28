@@ -237,6 +237,36 @@ class IndexController extends Controller
 
 		// 매인 좌측상단
 
+		// 0. 당일매출
+		$today	= date('Ymd');
+		$sql	= "
+			select
+				ifnull(a.qty, 0) as qty,
+				ifnull(a.offline, 0) as offline,
+				ifnull(a.online, 0) as online,
+				ifnull(a.recv_amt, 0) as recv_amt, 
+				concat(round((ifnull(a.offline, 0) / ifnull(a.recv_amt, 0)) * 100,0), ' : ', round((ifnull(a.online, 0) / ifnull(a.recv_amt, 0)) * 100,0)) as offline_online_rate
+			from
+			(
+				select
+					o.store_cd,
+					sum(if(w.ord_state > 30, o.qty * -1, o.qty)) as qty, 
+					if (s.online_only_yn = 'Y', sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end))  as offline,
+					if (s.online_only_yn = 'Y', sum(case when o.sale_kind <> 81 or o.sale_kind is null then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end), sum(case when o.sale_kind = 81 then (o.recv_amt * if(w.ord_state > 30, -1, 1)) else 0 end)) as online,
+					sum(o.recv_amt * if(w.ord_state > 30, -1, 1)) as recv_amt
+				from order_opt_wonga w
+				inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
+				inner join store s on s.store_cd = o.store_cd
+				where 
+					w.ord_state in(30, 60, 61) 
+					and w.ord_state_date = :today
+					and o.store_cd = :store_cd
+					and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+			) a
+		";
+		$main_today	= DB::selectOne($sql, ['store_cd' => $user_store, 'today' => $today]);
+		
+		
 		// 1. 매출현황
 		$mutable4 = Carbon::now();
 
@@ -379,6 +409,7 @@ class IndexController extends Controller
 		$main_rotation	= DB::selectOne($sql, ['store_cd1' => $user_store, 'store_cd2' => $user_store]);
 		
 		$values = [
+			'main_today'	=> $main_today,
 			'main_order'	=> $main_order,
 			'main_release'	=> $main_release,
 			'main_rotation'	=> $main_rotation,

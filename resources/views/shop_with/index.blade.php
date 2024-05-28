@@ -37,12 +37,12 @@
 	
 	#main_table th{
 		border:1px solid #DDDDDD;
-		padding: 5px 5px;
+		padding: 4px 4px;
 		background-color:#F1F1F1;
 	}
 	#main_table td{
 		border:1px solid #DDDDDD;
-		padding: 5px 5px;
+		padding: 3px 3px;
 		font-weight: 400;
 	}
 </style>
@@ -68,9 +68,33 @@
             </div>
 			--}}
 			<div class="fl_box">
-				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-chalkboard fs-14 mr-2"></i>매출현황 [{{@$sec_sdate}}]</h6>
+				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-chalkboard fs-14 mr-2"></i>일매출현황 [{{@$edate}}]</h6>
 			</div>
-			<div class="pt10">
+			<div>
+				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
+					<tbody>
+					<tr class="txtc">
+						<th style="width:11.11%">판매수량</th>
+						<th style="width:11.11%">오프라인</th>
+						<th style="width:11.11%">온라인</th>
+						<th style="width:11.11%">합계금액</th>
+						<th style="width:11.11%">오프:온(%)</th>
+					</tr>
+					<tr class="txtr">
+						<td>{{number_format(@$main_today->qty)}}</td>
+						<td>{{number_format(@$main_today->offline)}}</td>
+						<td>{{number_format(@$main_today->online)}}</td>
+						<td>{{number_format(@$main_today->recv_amt)}}</td>
+						<td class="txtc">{{@$main_today->offline_online_rate}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="fl_box pt20">
+				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-chalkboard fs-14 mr-2"></i>월매출현황 [{{@$sec_sdate}}]</h6>
+			</div>
+			<div>
 				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
 					<tbody>
 					<tr class="txtc">
@@ -107,7 +131,7 @@
 			<div class="fl_box pt20">
 				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-package fs-14 mr-2"></i>출고현황 [최근한달]</h6>
 			</div>
-			<div class="pt10">
+			<div>
 				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
 					<tbody>
 					<tr class="txtc">
@@ -138,7 +162,7 @@
 			<div class="fl_box pt20">
 				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-repost fs-14 mr-2"></i>RT현황 [최근한달]</h6>
 			</div>
-			<div class="pt10">
+			<div>
 				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
 					<tbody>
 					<tr class="txtc">
