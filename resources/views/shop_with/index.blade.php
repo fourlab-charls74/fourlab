@@ -68,7 +68,7 @@
             </div>
 			--}}
 			<div class="fl_box">
-				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-chalkboard fs-14 mr-2"></i>일매출현황 [{{@$edate}}]</h6>
+				<h6 class="m-0 font-weight-bold" style="font-size:16px;"><i class="bx bx-clipboard fs-14 mr-2"></i>일매출현황 [{{@$edate}}]</h6>
 			</div>
 			<div>
 				<table class="table-bordered" width="100%" cellspacing="0" id="main_table">
