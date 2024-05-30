@@ -162,7 +162,7 @@
 </style>
 <script language="javascript">
 
-const pinnedRowData = [{ store_cd : 'total' , "sale_amt" : 0 }];
+const pinnedRowData = [{ store_cd : 'total' , "store_amt" : 0, "sale_amt_off" : 0, "sale_amt_on" : 0,  "sale_amt" : 0 }];
 
 const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
@@ -188,6 +188,24 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 					return {'background' : '#FA8072'};
 				} else {
 					return {};
+				}
+			}
+		},
+		{headerName: "오프라인", field: "sale_amt_off",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', aggFunc: sumValuesFunc,
+			cellStyle : (params) => {
+				if(params.node.level == 2 && params.data.competitor == '피엘라벤') {
+					return {'text-align' : 'right', 'background': '#FA8072'};
+				} else {
+					return {'text-align' : 'right'};
+				}
+			}
+		},
+		{headerName: "온라인", field: "sale_amt_on",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', aggFunc: sumValuesFunc,
+			cellStyle : (params) => {
+				if(params.node.level == 2 && params.data.competitor == '피엘라벤') {
+					return {'text-align' : 'right', 'background': '#FA8072'};
+				} else {
+					return {'text-align' : 'right'};
 				}
 			}
 		},
@@ -250,16 +268,20 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 			
 			let rowData = [];
 			store_amt.forEach(store => {
-				let sale_amt = store[0].store_amt;
-				let store_cd = store[0].store_cd;
-				let store_nm = store[0].store_nm;
-				let sale_date = store[0].sale_date;
-				let competitor = store[0].competitor;
+				let sale_amt		= store[0].store_amt;
+				let store_cd		= store[0].store_cd;
+				let store_nm		= store[0].store_nm;
+				let sale_date		= store[0].sale_date;
+				let competitor		= store[0].competitor;
+				let sale_amt_off	= store[0].store_amt_off;
+				let sale_amt_on		= store[0].store_amt_on;
 				
 				rowData.push({
 					sale_date,
 					store_cd,
 					store_nm,
+					sale_amt_off,
+					sale_amt_on,
 					sale_amt,
 					competitor
 				});
@@ -286,8 +308,8 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
 
     function add() {
-        const url = '/shop/stock/stk34/create';
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
+        const url = '/shop/stock/stk33/create';
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=900");
     }
 
     const updatePinnedRow = () => {

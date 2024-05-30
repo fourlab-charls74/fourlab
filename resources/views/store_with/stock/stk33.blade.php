@@ -143,8 +143,10 @@
             </div>
         <div class="resul_btn_wrap mb-3">
             <a href="#" id="search_sbtn" onclick="Search();" class="btn btn-sm btn-primary shadow-sm mr-1"><i class="fas fa-search fa-sm text-white-50"></i> 조회</a>
-            <a href="/store/stock/stk33/create" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 추가</a>
-            <div class="search_mode_wrap btn-group mr-2 mb-0 mb-sm-0"></div>
+			<a href="#" onclick="add()" class="btn btn-sm btn-outline-primary shadow-sm pl-2 mr-1"><i class="bx bx-plus fs-16"></i> 등록</a>
+			<button id="download-list" onclick="gx.Download();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+				<i class="bx bx-download fs-16"></i> 엑셀다운로드
+			</button>&nbsp;&nbsp;
         </div>
     </div>
 </form>
@@ -189,6 +191,17 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0
         {headerName: "매장구분", field: "store_type",  pinned:'left', width: 70, cellClass: 'hd-grid-code', hide:true},
         {headerName: "매장매출액", field: "store_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
         {headerName: "합계(원)", field: "total_amt",  pinned:'left', width: 100, cellClass: 'hd-grid-code', type:'currencyType', cellStyle: { 'font-weight': '700', background: '#eee', textAlign: 'right' },aggFunc: "first",},
+		@foreach($competitors as $com)
+		{headerName: "{{ $com->code_val }}",field: "competitors",
+			children: [
+				{headerName: "오프라인", field: "amt_off_{{$com->code_id}}", width:80, cellClass: 'hd-grid-code', type:'currencyType', cellStyle:{textAlign:'right'},aggFunc: "first"},
+				{headerName: "온라인", field: "amt_on_{{$com->code_id}}", width:80, cellClass: 'hd-grid-code', type:'currencyType', cellStyle:{textAlign:'right'},aggFunc: "first"},
+				{headerName: "합계", field: "amt_{{$com->code_id}}", width:80, cellClass: 'hd-grid-code', type:'currencyType', cellStyle:{textAlign:'right'},aggFunc: "first"},
+			]
+		},
+		@endforeach
+
+/*
         {field: "competitors",	headerName: "동종업계 매장",
             children: [
                 @foreach($competitors as $com)
@@ -196,6 +209,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0
                 @endforeach
             ]
         },
+*/  
         {width: 'auto'}
     ];
 
@@ -243,7 +257,7 @@ const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0
     //추가버튼 팝업 오픈
     function add() {
         const url = '/store/stock/stk33/create';
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=900");
     }
 </script>
 @stop

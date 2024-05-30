@@ -1,15 +1,15 @@
 @extends('shop_with.layouts.layout-nav')
-@section('title','동종업계 일별매출관리 등록')
+@section('title','동종업계매출등록')
 @section('content')
 
 <div class="py-3 px-sm-3">
     <div class="page_tit">
-        <h3 class="d-inline-flex">동종업계 일별매출관리 등록</h3>
+        <h3 class="d-inline-flex">동종업계매출등록</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
             <span>/ 매장관리</span>
-            <span>/ 동종업계 일별매출관리</span>
-            <span>/ 동종업계 일별매출관리 등록</span>
+            <span>/ 동종업계 일|월별매출관리</span>
+            <span>/ 동종업계매출등록</span>
         </div>
     </div>
     <form method="get" name="search">
@@ -103,19 +103,31 @@
                     // e.node.setSelected(true);
                     for (let i = 1; i <= sale_date;i++) {
                         if (i<10) {
-                            if (e.column.colId == "sale_amt_0" + i) {
+                            if (e.column.colId == "sale_amt_off_0" + i) {
                                 if (isNaN(e.newValue) == true) {
                                     alert("숫자만 입력가능합니다.");
                                     gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                                 }
                             }
+							if (e.column.colId == "sale_amt_on_0" + i) {
+								if (isNaN(e.newValue) == true) {
+									alert("숫자만 입력가능합니다.");
+									gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+								}
+							}
                         } else {
-                            if (e.column.colId == "sale_amt_" + i) {
+                            if (e.column.colId == "sale_amt_off_" + i) {
                                 if (isNaN(e.newValue) == true) {
                                     alert("숫자만 입력가능합니다.");
                                     gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
                                 }
                             }
+							if (e.column.colId == "sale_amt_on_" + i) {
+								if (isNaN(e.newValue) == true) {
+									alert("숫자만 입력가능합니다.");
+									gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
+								}
+							}
                         }
                     }
 
@@ -166,11 +178,39 @@
                 mutable_cols.push(col);
             });
 
-            mutable_cols.push(dayColumns(days));
+           //mutable_cols.push(dayColumns(days));
+			//온라인 컬럼 추가 수정 시작
+			for(let i = 1; i <= days; i++){
+				let day_field_off	= "";
+				let day_field_on	= "";
+				let day_headerName	= "";
+				if(i < 10){
+					day_headerName	= '0'+ i +'일';
+					day_field_off	= 'sale_amt_off_0' + i;
+					day_field_on	= 'sale_amt_on_0' + i;
+				} else{
+					day_headerName	= i +'일';
+					day_field_off	= 'sale_amt_off_' + i;
+					day_field_on	= 'sale_amt_on_' + i;
+				}
+
+				let col = { fields: "year_month" + i, headerName: day_headerName, children: [] };
+
+				let add_col_off = {field: day_field_off, headerName: '오프라인', minWidth: 75, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99","text-align": "right"}};
+				col.children.push(add_col_off)
+
+				let add_col_on = {field: day_field_on, headerName: '온라인', minWidth: 75, type: "currencyType" , editable:true, cellStyle: {"background-color": "#ffFF99","text-align": "right"}};
+				col.children.push(add_col_on)
+
+				mutable_cols.push(col);
+			}
+			//온라인 컬럼 추가 수정 종료
+			
             mutable_cols.push({ headerName: "", field: "", width: "auto" });
             gx.gridOptions.api.setColumnDefs(mutable_cols);
         };
 
+/*		온라인 컬럼 추가로 인한 삭제		
         const dayColumns = (days) => {
             let col = { fields: "year_month", headerName: date, children: [] };
             for (let i = 1; i <= days; i++) {
@@ -188,7 +228,8 @@
             }
             return col;
         };
-
+*/
+	
         //매출액 저장
         function Save_amt() {
             let store_no = document.getElementById('store_no').value;

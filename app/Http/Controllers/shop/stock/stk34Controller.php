@@ -41,14 +41,14 @@ class stk34Controller extends Controller
     // 검색
     public function search(Request $request)
     {
-        $r = $request->all();
-        $sdate = $request->input('sdate');
-        $edate = $request->input('edate');
-        $store_no = $request->input('store_no', '');
-		$user_store = Auth('head')->user()->store_cd;
+        $r			= $request->all();
+        $sdate		= $request->input('sdate');
+        $edate		= $request->input('edate');
+        $store_no	= $request->input('store_no', '');
+		$user_store	= Auth('head')->user()->store_cd;
 
-        $where = "";
-        $orderby = "";
+        $where		= "";
+        $orderby	= "";
         if ($store_no != "") $where .= " and cs.store_cd like '%" . Lib::quote($store_no) . "%'";
 
         // ordreby
@@ -71,6 +71,8 @@ class stk34Controller extends Controller
                     , cs.competitor_cd
                     , s.store_type
                     , c.code_val as competitor
+                    , sum(cs.sale_amt_off) as sale_amt_off
+                    , sum(cs.sale_amt_on) as sale_amt_on
                     , sum(cs.sale_amt) as sale_amt
                     , cs.sale_memo
                 from competitor_sale cs
@@ -93,6 +95,8 @@ class stk34Controller extends Controller
                     "
                     select
                         count(a.store_nm) as total,
+                        sum(a.sale_amt_off) as sal_amt_off,
+                        sum(a.sale_amt_on) as sal_amt_on,
                         sum(a.sale_amt) as sal_amt
                     from (
                         select 
@@ -103,6 +107,8 @@ class stk34Controller extends Controller
                             , cs.competitor_cd
                             , s.store_type
                             , c.code_val as competitor
+                            , cs.sale_amt_off as sale_amt_off
+                            , cs.sale_amt_on as sale_amt_on
                             , cs.sale_amt as sale_amt
                         from competitor_sale cs
                             left outer join code c on c.code_id = cs.competitor_cd and code_kind_cd = 'competitor'
@@ -137,13 +143,16 @@ class stk34Controller extends Controller
 		foreach ($res as $r) {
 			$sql = "
                     select
-                        ifnull(sum(o.recv_amt * if(w.ord_state > 30, -1, 1)),0) as store_amt
-                        , '$r->store_cd' as store_cd
-                        , '$r->sale_date' as sale_date
-                        , '$r->store_nm' as store_nm
-                        , '피엘라벤' as competitor
+						ifnull(sum(if(ifnull(st.type,'') != 'online', o.recv_amt * if(w.ord_state > 30, -1, 1), 0)), 0)    as store_amt_off
+						, ifnull(sum(if(st.type = 'online', o.recv_amt * if(w.ord_state > 30, -1, 1), 0)), 0)    as store_amt_on
+						, ifnull(sum(o.recv_amt * if(w.ord_state > 30, -1, 1)),0) as store_amt
+						, '$r->store_cd' as store_cd
+						, '$r->sale_date' as sale_date
+						, '$r->store_nm' as store_nm
+						, '피엘라벤' as competitor
                     from order_opt_wonga w
-                    	inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                    inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+                    left outer join sale_type st on o.sale_kind = st.sale_kind
                     where w.ord_state in(30, 60, 61) and o.store_cd = '$r->store_cd' and o.ord_state = '30' 
                         and w.ord_state_date >= replace(concat('$r->sale_date','-01'), '-','')
                         and w.ord_state_date <= replace(concat('$r->sale_date','-31'),'-','')
@@ -155,16 +164,16 @@ class stk34Controller extends Controller
 		}
 
 		return response()->json([
-			"code" => 200,
-			"head" => array(
-				"total" => $total,
-				"page" => $page,
-				"page_cnt" => $page_cnt,
-				"page_total" => count($rows),
-				"total_data" => $total_data,
-				"store_amt" => $store_amt
+			"code"	=> 200,
+			"head"	=> array(
+				"total"			=> $total,
+				"page"			=> $page,
+				"page_cnt"		=> $page_cnt,
+				"page_total"	=> count($rows),
+				"total_data"	=> $total_data,
+				"store_amt"		=> $store_amt
 			),
-			"body" => $rows
+			"body"	=> $rows
 		]);
     }
 

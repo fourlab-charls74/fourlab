@@ -95,8 +95,16 @@ class stk33Controller extends Controller
         $t_amt = "";
 
         foreach($code_ids as $code_id) {
-            $com .= ", ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt end), 0) as 'amt_$code_id'";
-            $t_amt .= ", sum(a.amt_$code_id) as amt_$code_id";
+            $com .= "
+            	, ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt_off end), 0) as 'amt_off_$code_id'
+            	, ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt_on end), 0) as 'amt_on_$code_id'
+            	, ifnull(sum(case when cs.competitor_cd = '$code_id' then cs.sale_amt end), 0) as 'amt_$code_id'
+            ";
+            $t_amt .= "
+            	, sum(a.amt_off_$code_id) as amt_off_$code_id
+            	, sum(a.amt_on_$code_id) as amt_on_$code_id
+            	, sum(a.amt_$code_id) as amt_$code_id
+            ";
         }
 
         $sql = "
@@ -199,13 +207,19 @@ class stk33Controller extends Controller
 
         for ($i = 1; $i<=$day; $i++) {
             if ($i < 10) {
-                $sale_amt .= ",sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt,0)) as sale_amt_0$i ";
-				$null_sale_amt .= ", '0' as sale_amt_0$i";
-				$sum_sale_amt .= ", sum(sale_amt_0$i) as sale_amt_0$i";
+				//$sale_amt .= ",sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt,0)) as sale_amt_0$i ";
+				//$null_sale_amt .= ", '0' as sale_amt_0$i";
+				//$sum_sale_amt .= ", sum(sale_amt_0$i) as sale_amt_0$i";
+				$sale_amt		.= " ,sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt_off,0)) as sale_amt_off_0$i ,sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt_on,0)) as sale_amt_on_0$i ,sum(if(right(cs.sale_date,2) = '0$i',cs.sale_amt,0)) as sale_amt_0$i ";
+				$null_sale_amt	.= " , '0' as sale_amt_off_0$i , '0' as sale_amt_on_0$i , '0' as sale_amt_0$i ";
+				$sum_sale_amt	.= " , sum(sale_amt_off_0$i) as sale_amt_off_0$i , sum(sale_amt_on_0$i) as sale_amt_on_0$i , sum(sale_amt_0$i) as sale_amt_0$i ";
             } else {
-                $sale_amt .= ",sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt,0)) as sale_amt_$i ";
-				$null_sale_amt .= ", '0' as sale_amt_$i";
-				$sum_sale_amt .= ", sum(sale_amt_$i) as sale_amt_$i";
+				//$sale_amt .= ",sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt,0)) as sale_amt_$i ";
+				//$null_sale_amt .= ", '0' as sale_amt_$i";
+				//$sum_sale_amt .= ", sum(sale_amt_$i) as sale_amt_$i";
+				$sale_amt		.= " ,sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt_off,0)) as sale_amt_off_$i ,sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt_on,0)) as sale_amt_on_$i ,sum(if(right(cs.sale_date,2) = '$i',cs.sale_amt,0)) as sale_amt_$i ";
+				$null_sale_amt	.= " , '0' as sale_amt_off_$i , '0' as sale_amt_on_$i , '0' as sale_amt_$i ";
+				$sum_sale_amt	.= " , sum(sale_amt_off_$i) as sale_amt_off_$i , sum(sale_amt_on_$i) as sale_amt_on_$i , sum(sale_amt_$i) as sale_amt_$i ";
             }
         }
 
@@ -298,22 +312,24 @@ class stk33Controller extends Controller
             $upsert_array = [];
             foreach($data as $rows) {
                 foreach($day_arr as $day_value) {
-                    $key = $rows['competitor_cd'].$date.$day_value;
-                    $upsert_array[$key]['store_cd']      = $rows['store_cd'];
-                    $upsert_array[$key]['sale_memo']      = $rows['sale_memo']??'';
-                    $upsert_array[$key]['competitor_cd'] = $rows['competitor_cd'];
-                    $upsert_array[$key]['sale_date']     = $date . '-' .$day_value;
-                    $upsert_array[$key]['admin_id']      = $admin_id;
-                    $upsert_array[$key]['rt']            = date("Y-m-d H:i:s");
-                    $upsert_array[$key]['ut']            = date("Y-m-d H:i:s");
-                    $upsert_array[$key]['sale_amt']      = isset($rows['sale_amt_'.$day_value]) ? $rows['sale_amt_'.$day_value] : 0;
+					$key	= $rows['competitor_cd'].$date.$day_value;
+					$upsert_array[$key]['store_cd']			= $rows['store_cd'];
+					$upsert_array[$key]['sale_memo']		= $rows['sale_memo']??'';
+					$upsert_array[$key]['competitor_cd']	= $rows['competitor_cd'];
+					$upsert_array[$key]['sale_date']		= $date . '-' .$day_value;
+					$upsert_array[$key]['admin_id']			= $admin_id;
+					$upsert_array[$key]['rt']				= date("Y-m-d H:i:s");
+					$upsert_array[$key]['ut']				= date("Y-m-d H:i:s");
+					$upsert_array[$key]['sale_amt_off']		= isset($rows['sale_amt_off_'.$day_value]) ? $rows['sale_amt_off_'.$day_value] : 0;
+					$upsert_array[$key]['sale_amt_on']		= isset($rows['sale_amt_on_'.$day_value]) ? $rows['sale_amt_on_'.$day_value] : 0;
+					$upsert_array[$key]['sale_amt']			= $upsert_array[$key]['sale_amt_off'] + $upsert_array[$key]['sale_amt_on'];
                 }
             }
 
             DB::table('competitor_sale')->upsert(
                 $upsert_array,
                 ['store_cd', 'competitor_cd', 'sale_date'],
-                ['sale_amt','sale_memo', 'rt', 'ut']
+                ['sale_amt', 'sale_amt_off', 'sale_amt_on', 'sale_memo', 'rt', 'ut']
             );
 
             DB::commit();

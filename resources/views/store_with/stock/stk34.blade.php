@@ -179,7 +179,7 @@
 </style>
 <script language="javascript">
 
-const pinnedRowData = [{ store_cd : 'total' , "store_amt" : 0, "sale_amt" : 0 }];
+const pinnedRowData = [{ store_cd : 'total' , "store_amt" : 0, "sale_amt_off" : 0, "sale_amt_on" : 0, "sale_amt" : 0 }];
 
 const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
@@ -207,6 +207,24 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
                 }
             }
         },
+		{headerName: "오프라인", field: "sale_amt_off",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', aggFunc: sumValuesFunc,
+			cellStyle : (params) => {
+				if(params.node.level == 2 && params.data.competitor == '피엘라벤') {
+					return {'text-align' : 'right', 'background': '#FA8072'};
+				} else {
+					return {'text-align' : 'right'};
+				}
+			}
+		},
+		{headerName: "온라인", field: "sale_amt_on",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', aggFunc: sumValuesFunc,
+			cellStyle : (params) => {
+				if(params.node.level == 2 && params.data.competitor == '피엘라벤') {
+					return {'text-align' : 'right', 'background': '#FA8072'};
+				} else {
+					return {'text-align' : 'right'};
+				}
+			}
+		},
         {headerName: "매출액", field: "sale_amt",  pinned:'left', width: 110, cellClass: 'hd-grid-code', type:'currencyType', aggFunc: sumValuesFunc,
             cellStyle : (params) => {
                 if(params.node.level == 2 && params.data.competitor == '피엘라벤') {
@@ -266,17 +284,21 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
             let rowData = [];
             store_amt.forEach(store => {
-                let sale_amt = store[0].store_amt;
-                let store_cd = store[0].store_cd;
-                let store_nm = store[0].store_nm;
-                let sale_date = store[0].sale_date;
-                let competitor = store[0].competitor;
+				let sale_amt		= store[0].store_amt;
+				let store_cd		= store[0].store_cd;
+				let store_nm		= store[0].store_nm;
+				let sale_date		= store[0].sale_date;
+				let competitor		= store[0].competitor;
+				let sale_amt_off	= store[0].store_amt_off;
+				let sale_amt_on		= store[0].store_amt_on;
 
                 rowData.push({
                     sale_date,
                     store_cd,
                     store_nm,
-                    sale_amt,
+					sale_amt_off,
+					sale_amt_on,
+					sale_amt,
                     competitor
                 });
             });
@@ -304,22 +326,26 @@ const sumValuesFunc = (params) => params.values.reduce((a,c) => a + (c * 1), 0);
 
     // 매출액 등록 팝업
     function add() {
-        const url = '/store/stock/stk34/create';
-        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1000,height=700");
+        const url = '/store/stock/stk33/create';
+        const msg = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1200,height=900");
     }
 
     const updatePinnedRow = () => {
-        let [ sale_amt ] = [ 0 ];
+		let [ sale_amt_off ] = [ 0 ];
+		let [ sale_amt_on ] = [ 0 ];
+		let [ sale_amt ] = [ 0 ];
         const rows = gx.getRows();
 
         if (rows && Array.isArray(rows) && rows.length > 0) {
             rows.forEach((row, idx) => {
-                sale_amt += parseInt(row?.sale_amt || 0);
+				sale_amt_off += parseInt(row?.sale_amt_off || 0);
+				sale_amt_on += parseInt(row?.sale_amt_on || 0);
+				sale_amt += parseInt(row?.sale_amt || 0);
             });
         }
         let pinnedRow = gx.gridOptions.api.getPinnedTopRow(0);
         gx.gridOptions.api.setPinnedTopRowData([
-            { ...pinnedRow.data, sale_amt : sale_amt }
+            { ...pinnedRow.data, sale_amt_off : sale_amt_off, sale_amt_on : sale_amt_on, sale_amt : sale_amt }
         ]);
     };
 </script>
