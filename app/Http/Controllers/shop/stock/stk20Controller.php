@@ -239,6 +239,7 @@ class stk20Controller extends Controller
     }
 
     // 접수 (10 -> 20)
+	// 240530 : 접수|처리중 상태 합침 ( 10 -> 30 )
     public function receipt(Request $request) 
     {
         $ori_state = 10;
@@ -413,7 +414,7 @@ class stk20Controller extends Controller
 						'sender_type' => 'S',
 						'sender_cd' => $dep_store_cd ?? '',
 						'reservation_yn' => 'N',
-						'content' => '매장요청RT가 '. $dep_store_msg_cnt .'건 접수되었습니다.',
+						'content' => '매장요청RT가 '. $dep_store_msg_cnt .'건 처리되었습니다.',
 						'rt' => now()
 					]);
 
@@ -427,13 +428,58 @@ class stk20Controller extends Controller
 					]);
 			}
 
+			// 접수|처리중 합침 작업 시작
+			$new_state	= 30;
+
+			foreach($data as $d) {
+				if($d['idx'] == "") continue;
+				if($d['state'] != $ori_state) continue;
+
+				$sql	= " select state from product_stock_rotation where idx = :idx ";
+				$check_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
+
+				if( $check_state != '20' ){
+					$code = '-102';
+					throw new Exception("이미처리된 RT 상품입니다.");
+				}
+
+				DB::table('product_stock_rotation')
+					->where('idx', '=', $d['idx'])
+					->update([
+						'state'		=> $new_state,
+						'prc_id'	=> $admin_id,
+						'prc_rt'	=> now(),
+						'ut'		=> now(),
+					]);
+
+				// product_stock_store -> 보내는 매장 실재고 차감
+				DB::table('product_stock_store')
+					->where('prd_cd', '=', $d['prd_cd'])
+					->where('store_cd', '=', $d['dep_store_cd'])
+					->update([
+						'qty'	=> DB::raw('qty - ' . ($d['qty'] ?? 0)),
+						'ut'	=> now(),
+					]);
+
+				//RT 완료처리
+				DB::table('product_stock_hst')
+					->where('rt_no', '=', $d['idx'])
+					->where('location_cd', '=', $d['dep_store_cd'])
+					->update([
+						'r_stock_state_date' => date('Ymd'),
+						'ut'	=> now()
+					]);
+			}
+			// 접수|처리중 합침 작업 종료
+			
 			DB::commit();
-            $code = 200;
-            $msg = "접수처리가 정상적으로 완료되었습니다.";
+			$code	= 200;
+			// $msg = "접수처리가 정상적으로 완료되었습니다.";
+			$msg	= "출고처리가 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
+			$code	= 500;
+			$msg	= $e->getMessage();
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);

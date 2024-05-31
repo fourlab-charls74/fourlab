@@ -246,9 +246,12 @@
                                 <div class="docs-datepicker-container"></div>
                             </div>
                         </div>--}}
-                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
+                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">처리</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+						{{--
+						<!-- 접수/처리중 상태 합침 //-->
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">처리</a>
+                        --}}
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">완료</a>
                         <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
@@ -426,6 +429,7 @@
 	}
 
     // 접수 (10 -> 20)
+	// 240530 : 접수|처리중 상태 합침 ( 10 -> 30 )	
     function receipt() {
         let rows = gx.getSelectedRows();
         let user_store = '{{$user_store}}';
@@ -434,9 +438,13 @@
         for(let i = 0; i < rows.length; i++){
             if(rows[i].dep_store_cd != user_store) return alert('보내는 매장이 ' + rows[i].dep_store_nm + '인 매장만 접수가 가능합니다.');
         }
-        if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
-        if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
+
+        //if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
+        //if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
+        //if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
+		if(rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
+		if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리 가능합니다.");
+		if(!confirm("선택한 항목을 출고처리하시겠습니까?")) return;
 
         axios({
             url: '/shop/stock/stk20/receipt',

@@ -131,7 +131,7 @@
 								<select name='competitor_type' class="form-control form-control-sm search-enter">
 									<option value=''>전체</option>
 									@foreach ($competitors as $competitor)
-									<option value='{{ $competitor->code_id }}'>{{ $competitor->code_val }}</option>
+									<option value='{{-- $competitor->code_id --}}'>{{-- $competitor->code_val --}}</option>
 									@endforeach
 								</select>
 							</div>
@@ -174,7 +174,7 @@
 	const pinnedRowData = [{ store_nm : '합계' , "total_amt" : 0 , "store_amt" : 0,
 
 		@foreach($competitors as $com)
-	amt_{{$com->code_id}} : 0,
+	amt_{{--$com->code_id--}} : 0,
 	@endforeach
 	}];
 

@@ -293,9 +293,12 @@
 						</div>
                         <a href="javascript:void(0);" onclick="updateState()" class="btn btn-sm btn-primary shadow-sm">RT상태변경</a>
 						<span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
-                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">접수</a>
+                        <a href="javascript:void(0);" onclick="receipt()" class="btn btn-sm btn-primary shadow-sm">RT처리중</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
+						{{--
+						<!-- 접수/처리중 상태 합침 //-->
                         <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">RT처리중</a>
+                        --}}
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">RT완료</a>
                         <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
@@ -479,11 +482,15 @@
 	}
 
     // 접수 (10 -> 20)
+	// 240530 : 접수|처리중 상태 합침 ( 10 -> 30 )	
     function receipt() {
-        let rows = gx.getSelectedRows();
-        if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
-        if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
-        if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
+		let rows = gx.getSelectedRows();
+		//if(rows.length < 1) return alert("접수처리할 항목을 선택해주세요.");
+		//if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 접수처리 가능합니다.");
+		//if(!confirm("선택한 항목을 접수처리하시겠습니까?")) return;
+		if(rows.length < 1) return alert("출고처리할 항목을 선택해주세요.");
+		if(rows.filter(r => r.state !== 10).length > 0) return alert("'요청'상태의 항목만 출고처리 가능합니다.");
+		if(!confirm("선택한 항목을 출고처리하시겠습니까?")) return;
 
         axios({
             url: '/store/stock/stk20/receipt',
