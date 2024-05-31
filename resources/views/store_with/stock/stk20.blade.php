@@ -297,8 +297,9 @@
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
 						{{--
 						<!-- 접수/처리중 상태 합침 //-->
-                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">RT처리중</a>
-                        --}}
+						--}}
+                        <a href="javascript:void(0);" onclick="release()" class="btn btn-sm btn-primary shadow-sm mr-1">RT처리중(기존)</a>
+                        {{----}}
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">RT완료</a>
                         <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
