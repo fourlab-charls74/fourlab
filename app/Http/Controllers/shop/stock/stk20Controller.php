@@ -81,6 +81,10 @@ class stk20Controller extends Controller
             and cast(psr.$date_state as date) <= '$edate'
         ";
 
+		if($r['rt_inout'] != null){
+			if($r['rt_inout'] == 'out')	$where .= " and  psr.dep_store_cd = '" . Lib::quote($user_store) . "' ";
+			if($r['rt_inout'] == 'in')	$where .= " and  psr.store_cd = '" . Lib::quote($user_store) . "' ";
+		}
 		if($r['rt_type'] != null)
 			$where .= " and psr.type = '" . $r['rt_type'] . "'";
 		if(isset($r['send_store_no']))

@@ -31,6 +31,23 @@
                     <div class="col-lg-4 inner-td">
                         <div class="form-group">
                             <label>구분</label>
+							<div class="form-inline inline_select_box">
+								<div class="form-inline-inner input-box w-50 pr-1">
+									<select name='rt_inout' class="form-control form-control-sm w-100">
+										<option value=''>전체</option>
+										<option value='out'>매장출고</option>
+										<option value='in'>매장입고</option>
+									</select>
+								</div>
+								<div class="form-inline-inner input-box w-50">
+									<select name='rt_type' class="form-control form-control-sm w-100">
+										<option value=''>전체</option>
+										<option value='G'>매장요청RT</option>
+										<option value='R'>본사요청RT</option>
+									</select>
+								</div>
+							</div>
+							<!--
                             <div class="flex_box">
                                 <select name='rt_type' class="form-control form-control-sm">
                                     <option value=''>전체</option>
@@ -38,6 +55,7 @@
                                     <option value='R'>본사요청RT</option>
                                 </select>
                             </div>
+                            //-->
                         </div>
                     </div>
                     <div class="col-lg-4 inner-td">
