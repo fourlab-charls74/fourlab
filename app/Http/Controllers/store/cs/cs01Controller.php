@@ -1382,7 +1382,7 @@ class cs01Controller extends Controller {
 						psop.state = '40'
 						and pc.prd_cd_p = :prd_cd_p
 				";
-				$n_avg_wonga	= DB::selectOne($sql_avg, ['prd_cd_p' => $prd_cd_p]);
+				$n_avg_wonga	= DB::selectOne($sql_avg, ['prd_cd_p' => $prd_cd_p])->wonga;
 				
 				$sql_avg_update	= " update product_wonga set wonga = :wonga where prd_cd_p = :prd_cd_p ";
 				DB::update($sql_avg_update,['wonga' => $n_avg_wonga, 'prd_cd_p' => $prd_cd_p]);
