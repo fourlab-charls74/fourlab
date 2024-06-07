@@ -127,7 +127,7 @@ class prd01Controller extends Controller
         $limit = $request->input("limit",100);
         $ord = $request->input('ord','desc');
         $ord_field = $request->input('ord_field','g.goods_no');
-		// $type = $request->input("type");
+		$type		= $request->input("type",'N');
 		$goods_type = $request->input("goods_type");
 
 		$sale_yn	= $request->input("sale_yn");
@@ -223,7 +223,7 @@ class prd01Controller extends Controller
              }
         }
 
-		// if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
+		if ($type != "") $where .= " and g.type = '" . Lib::quote($type) . "' ";
 		if ($goods_type != "") $where .= " and g.goods_type = '" . Lib::quote($goods_type) . "' ";
 
 		if( $sale_yn != "" )	$where .= " and g.sale_yn = '$sale_yn' ";
@@ -1091,6 +1091,7 @@ class prd01Controller extends Controller
 					, ifnull(c.dlv_policy, 'S') as dlv_policy
 					, a.sale_type, a.sale_yn, a.sale_wonga, a.normal_wonga, a.sale_dt_yn, ifnull(a.normal_price,0) as normal_price
 					, a.class
+					, a.type -- 상품 타입
 				from goods a
 					left join brand br on br.brand = a.brand
 					left join company c on c.com_id = a.com_id
@@ -1362,6 +1363,7 @@ class prd01Controller extends Controller
 				"brand"				=> $req->input('brand_cd', ''),
 				"sale_stat_cl"		=> $req->input('sale_stat_cl', ''),
 				"style_no"			=> $req->input('style_no', ''),
+				"type"				=> $req->input('type','N'),
 				"goods_type"		=> $req->input('goods_type', ''),
 				"com_id"			=> $req->input('com_id',''),
 				"com_type"			=> $req->input('com_type'),
@@ -1720,6 +1722,7 @@ class prd01Controller extends Controller
 		$brand				= $request->input('brand_cd');
 		$sale_stat_cl		= $request->input('sale_stat_cl');
 		$style_no			= $request->input('style_no');
+		$type				= $request->input('type', 'N');
 		$goods_type			= $request->input('goods_type');
 
 		$point_cfg			= $request->input('point_cfg','S');
@@ -1855,6 +1858,7 @@ class prd01Controller extends Controller
 							brand				= '".$brand."',
 							sale_stat_cl		= '".$sale_stat_cl."',
 							style_no			= '".$style_no."',
+							type				= '" . $type . "',
 							goods_type			= '".$goods_type."',
 							com_id				= '".$com_id."',
 							com_type			= '".$com_type."',

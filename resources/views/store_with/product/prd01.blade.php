@@ -312,6 +312,25 @@
                         </div>
                     </div> -->
                 </div>
+				<div class="search-area-ext d-none row">
+
+					<div class="col-lg-4 inner-td">
+						<div class="form-group">
+							<label for="item">상품타입</label>
+							<div class="form-inline">
+								<div class="form-inline-inner form-check-box w-100">
+									<select id="type" name="type" class="form-control form-control-sm w-100">
+										<option value="">전체</option>
+										<option value="N" selected>일반</option>
+										<option value="S">사입전용</option>
+										<option value="D">납품</option>
+										<option value="E">기획</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
             </div>
         </div>
         <div class="resul_btn_wrap mb-3">

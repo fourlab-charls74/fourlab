@@ -616,34 +616,46 @@
                                                             </x-tool-tip>
                                                         </div>
                                                     </td>
-                                                    <th >상단 홍보글</th>
-                                                    <td>
-                                                        <div class="input_box">
-                                                            <input type="text" name="head_desc" class="form-control form-control-sm search-all" value="{{ @$goods_info->head_desc }}">
-                                                        </div>
-                                                    </td>
+													<th >상품 타입</th>
+													<td>
+														<div class="txt_box flax_box">
+															<select name="type" id="type" class="form-control form-control-sm">
+																<option value="">상품 타입</option>
+																<option value="N" @if (@$goods_info->type === 'N') selected @endif>일반</option>
+																<option value="S" @if (@$goods_info->type === 'S') selected @endif>사입전용</option>
+																<option value="D" @if (@$goods_info->type === 'D') selected @endif>납품</option>
+																<option value="E" @if (@$goods_info->type === 'E') selected @endif>기획</option>
+															</select>
+														</div>
+													</td>
                                                 </tr>
                                                 <tr>
+													<th >상단 홍보글</th>
+													<td>
+														<div class="input_box">
+															<input type="text" name="head_desc" class="form-control form-control-sm search-all" value="{{ @$goods_info->head_desc }}">
+														</div>
+													</td>
                                                     <th >하단 홍보글</th>
                                                     <td >
                                                         <div class="input_box">
                                                             <input type="text" class="form-control form-control-sm search-all" name="ad_desc" id="ad_desc" value="{{ @$goods_info->ad_desc }}"/>
                                                         </div>
                                                     </td>
-                                                    <th class="required">MD선택</th>
-                                                    <td>
-                                                        <div class="wd300">
-                                                            <input type="hidden" name="md_nm" id="md_nm" value="{{@$goods_info->md_nm}}">
-                                                            <select name="md_id" id="md_id" class="form-control form-control-sm search-all">
-                                                                <option value="">==MD선택==</option>
-                                                                @foreach($md_list as $md)
-                                                                    <option value="{{$md->id}}" {{ (@$goods_info->md_id == $md->id) ? "selected" : "" }}>{{$md->name}} ({{$md->id}})</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </td>
                                                 </tr>
                                                 <tr>
+													<th class="required">MD선택</th>
+													<td>
+														<div class="wd300">
+															<input type="hidden" name="md_nm" id="md_nm" value="{{@$goods_info->md_nm}}">
+															<select name="md_id" id="md_id" class="form-control form-control-sm search-all">
+																<option value="">==MD선택==</option>
+																@foreach($md_list as $md)
+																	<option value="{{$md->id}}" {{ (@$goods_info->md_id == $md->id) ? "selected" : "" }}>{{$md->name}} ({{$md->id}})</option>
+																@endforeach
+															</select>
+														</div>
+													</td>
                                                     <th>신상품 적용일</th>
                                                     <td>
                                                         <div class="form-inline form-radio-box flax_box txt_box">
@@ -668,27 +680,29 @@
                                                             <div class="docs-datepicker-container"></div>
                                                         </div>
                                                     </td>
-                                                    <th>등록일시</th>
-                                                    <td>
-                                                        <div class="txt_box">
-                                                            {{ @$goods_info->reg_dm }}
-                                                        </div>
-                                                    </td>
                                                 </tr>
                                                 <tr>
+													<th>등록일시</th>
+													<td>
+														<div class="txt_box">
+															{{ @$goods_info->reg_dm }}
+														</div>
+													</td>
                                                     <th>수정일시</th>
                                                     <td>
                                                         <div class="txt_box">
                                                             {{ @$goods_info->upd_dm }}
                                                         </div>
                                                     </td>
-                                                    <th>메모</th>
-                                                    <td>
-                                                        <div class="input_box wd300">
-                                                            <input type='text' class="form-control form-control-sm search-all" name='goods_memo' id='goods_memo' value='{{ @$goods_info->goods_memo  }}' />
-                                                        </div>
-                                                    </td>
                                                 </tr>
+												<tr>
+													<th>메모</th>
+													<td colspan="3">
+														<div class="input_box wd300">
+															<input type='text' class="form-control form-control-sm search-all" name='goods_memo' id='goods_memo' value='{{ @$goods_info->goods_memo  }}' />
+														</div>
+													</td>
+												</tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -1997,7 +2011,7 @@
                             window.close();
                         } else {
 						    alert("변경된 내용이 정상적으로 저장 되었습니다.");
-						    location.href="/store/product/prd01/" + data;
+						   // location.href="/store/product/prd01/" + data;
                         }
 					}
 				},
