@@ -506,6 +506,8 @@ class ord05Controller extends Controller
 			}
 
 		} catch(Exception $e) {
+			DB::rollback();
+			
 			$pay_result = 0;
 
 			return response()->json([

@@ -717,6 +717,8 @@
 				if (id.id == nodeid) {
 					nodeid.setDataValue('ord_state_nm', "입금완료");
 					nodeid.setDataValue('pay_stat', "입금(품절)");
+					//id.setDataValue('ord_state_nm', "입금완료");
+					//id.setDataValue('pay_stat', "입금(품절)");
 				}
 			});
 

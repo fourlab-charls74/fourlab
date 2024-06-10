@@ -726,13 +726,17 @@ class Order
 							"BUTTON_INFO" => "주문내역조회^WL^'$domain'/app/mypage/order_list"
 						);
 						$sms_msg = $sms->MsgReplace($cfg_payment_msg, $msgarr);
-						
+
+						$sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
+
+						/*
 						if($cfg_kakao_yn == 'Y' && $template_code != ''){
 							// 문자 서비스
 							$sms->SendKakao( $template_code, $mobile, $user_nm, $sms_msg, $msgarr, '', $btnarr);
 						} else {
 							$sms->Send($sms_msg, $mobile, $user_nm);
 						}
+						*/
 					}
 				}
 			}
