@@ -361,7 +361,8 @@ class ord01Controller extends Controller
                 a.dlv_end_date,
                 a.last_up_date,
                 if(a.ord_state <= 10 and a.clm_state = 0 and ord_opt_cnt = 0, 'Y', 'N') as ord_del_yn,
-                '2' as depth
+                '2' as depth,
+                a.ord_type as ord_type_org
             from (
                 select
                     om.ord_no,
@@ -2198,6 +2199,50 @@ class ord01Controller extends Controller
                 // 포인트 반납(차감)
                 $point->Refund($ord->ord_opt_no, $ord->add_point, '61');
             }
+
+			// 사용된 쿠폰 반납처리
+			if ($ord->coupon_no != '' && $ord->coupon_amt > 0 && $ord->user_id != '') {
+
+				DB::table('coupon')->where('coupon_no', $ord->coupon_no)->update([
+					'coupon_use_cnt'	=> DB::raw('coupon_use_cnt - 1'),
+					'coupon_order_cnt'	=> DB::raw('coupon_order_cnt - 1'),
+				]);
+
+				//오프라인 쿠폰 사용 초기화
+				$sql_coupon_info	= " select serial from coupon_member where coupon_no = :coupon_no and user_id = :user_id and ord_opt_no = :ord_opt_no ";
+				$coupon_info		= DB::selectOne($sql_coupon_info, ["coupon_no" => $ord->coupon_no, "user_id" => $ord->user_id, "ord_opt_no" => $ord_opt_no]);
+
+				if(isset($coupon_info->serial)){
+					if( $coupon_info->serial != ''){
+						DB::table('coupon_serial')
+							->where('coupon_no', $ord->coupon_no)->where('serial', $coupon_info->serial)
+							->update([
+								'use_date'	=> null,
+								'use_yn'	=> '',
+								'ut'		=> now(),
+							]);
+					}
+				}
+
+				DB::table('coupon_member')
+					->where('user_id', $ord->user_id)->where('coupon_no', $ord->coupon_no)->where('ord_opt_no', $ord_opt_no)
+					->update([
+						'use_date'	=> null,
+						'use_yn'	=> 'N',
+						'ut'		=> now(),
+					]);
+
+				DB::table('coupon_use_log_t')->insert([
+					'coupon_no'		=> $ord->coupon_no,
+					'user_id'		=> $ord->user_id,
+					'ord_opt_no'	=> $ord->ord_opt_no,
+					'ord_no'		=> $ord->ord_no,
+					'order_amt'		=> $ord->refund_price,
+					'coupon_amt'	=> $ord->coupon_amt * -1,
+					'regi_date'		=> now(),
+					'use_gubun'		=> '1',
+				]);
+			}
 
             $msg = '매장환불처리가 완료되었습니다.';
             DB::commit();
@@ -4062,41 +4107,41 @@ class ord01Controller extends Controller
     /** 예약판매상품 지급완료처리 (예약주문건 정상주문처리) */
     public function complete_reservation(Request $request)
     {
-        $ord_no = $request->input('ord_no', '');
-        $ord_opt_no = $request->input('ord_opt_no', '');
-        $ord_type = 15; // 정상:15
-
-        $code = 200;
-        $msg = '';
-
-        try {
-            DB::beginTransaction();
-
-            $order = DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
-            $stock_amt = DB::table('product_stock_store')->where('store_cd', $order->store_cd)->where('prd_cd', $order->prd_cd)->value('wqty');
-
-            if (is_null($stock_amt) || $stock_amt < 0) {
-                $code = 404;
-                throw new Exception('매장 보유재고가 0개 이상일 때만 예약상품지급이 가능합니다. 해당상품의 현재 보유재고는 ' . ($stock_amt ?? '-') . '개 입니다.');
-            }
-
-            DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
-            DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
-
-            $reservation_ord_cnt = DB::table('order_opt')->where('ord_no', $ord_no)->where('ord_type', 4)->count();
-            if ($reservation_ord_cnt < 1) {
-                DB::table('order_mst')->where('ord_no', $ord_no)->update([ 'ord_type' => $ord_type ]);
-            }
-
-            DB::commit();
-            $msg = '예약판매상품이 지급완료처리되었습니다.';
-        } catch (Exception $e) {
-            DB::rollback();
-            if ($code === 200) $code = 500;
-            $msg = $e->getMessage();
-        }
-
-        return response()->json(['code' => $code, 'msg' => $msg], 200);
+		$ord_no		= $request->input('ord_no', '');
+		$ord_opt_no	= $request->input('ord_opt_no', '');
+		$ord_type	= 15; // 정상:15
+		
+		$code	= 200;
+		$msg	= '';
+		
+		try {
+			DB::beginTransaction();
+		
+			$order		= DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->first();
+			$stock_amt	= DB::table('product_stock_store')->where('store_cd', $order->store_cd)->where('prd_cd', $order->prd_cd)->value('wqty');
+		
+			if (is_null($stock_amt) || $stock_amt < 0) {
+				$code	= 404;
+				throw new Exception('매장 보유재고가 0개 이상일 때만 예약상품지급이 가능합니다. 해당상품의 현재 보유재고는 ' . ($stock_amt ?? '-') . '개 입니다.');
+			}
+		
+			DB::table('order_opt')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+			DB::table('order_opt_wonga')->where('ord_opt_no', $ord_opt_no)->update([ 'ord_type' => $ord_type ]);
+		
+			$reservation_ord_cnt = DB::table('order_opt')->where('ord_no', $ord_no)->where('ord_type', 4)->count();
+			if ($reservation_ord_cnt < 1) {
+				DB::table('order_mst')->where('ord_no', $ord_no)->update([ 'ord_type' => $ord_type ]);
+			}
+		
+			DB::commit();
+			$msg = '예약판매상품이 지급완료처리되었습니다.';
+		} catch (Exception $e) {
+			DB::rollback();
+			if ($code === 200) $code = 500;
+			$msg = $e->getMessage();
+		}
+		
+		return response()->json(['code' => $code, 'msg' => $msg], 200);
     }
 
 

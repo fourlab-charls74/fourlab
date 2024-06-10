@@ -370,8 +370,10 @@
             },
             cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') return "합계";
-                else return params.value;
-            }
+                else{
+					return `${params.data.ord_type_org == '4' ? '<span class="text-danger">[예약]</span> ' : ''}${params.value}`;
+				} 
+            },
         },
         {field: "ord_opt_no", headerName: "일련번호", pinned: 'left', width: 60, type: 'ShopOrderNoType', cellStyle: {'text-align': 'center'}},
         {field: "ord_state", headerName: "판매상태", pinned: 'left', width: 70, cellClass: 'hd-grid-code',

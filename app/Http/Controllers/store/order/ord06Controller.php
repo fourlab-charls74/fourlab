@@ -387,7 +387,8 @@ class ord06Controller extends Controller
                 '2' as depth,
                 sc.store_channel as store_channel,
                 sc2.store_kind as store_channel_kind,
-                a.out_ord_opt_no
+                a.out_ord_opt_no,
+                a.ord_type as ord_type_org
             from (
                 select
                     om.ord_no,

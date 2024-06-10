@@ -734,7 +734,7 @@
                             <button class="btn-sm btn btn-primary store-refund-btn fs-12">매장환불</button>
                             @endif
                             @if (@$store && ($order_opt->ord_type == 4))
-                            <button class="btn-sm btn btn-primary store-complete-reservation-btn fs-12">예약상품지급</button>
+                            <button class="btn-sm btn btn-primary store-complete-reservation-btn fs-12 bg-success">예약상품지급</button>
                             @endif
                             <button class="btn-sm btn btn-secondary sms-send-btn fs-12">SMS 발송</button>
                             <button class="btn-sm btn btn-secondary sms-list-btn fs-12">SMS 내역</button>
