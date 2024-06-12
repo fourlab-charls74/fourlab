@@ -136,7 +136,7 @@
 		{headerName: "매장구분", field: "store_kind",  width: 80, cellClass: 'hd-grid-code'},
 		{headerName: "매장코드", field: "store_cd",  width: 80, hide:true},
 		{headerName: "매장명", field: "store_nm",  width: 130},
-		{headerName: '반출현황',
+		{headerName: '매장출고',
 			children: [
 				{headerName: "요청받은수", field: "out_rt_cnt", type: 'numberType'},
 				{headerName: "미확인수", field: "out_req_cnt", type: 'numberType'},
@@ -172,7 +172,7 @@
 				},
 			]
 		},
-		{headerName: '반입현황',
+		{headerName: '매장입고',
 			children: [
 				{headerName: "요청한수", field: "in_rt_cnt", type: 'numberType'},
 				{headerName: "미확인수", field: "in_req_cnt", type: 'numberType'},
