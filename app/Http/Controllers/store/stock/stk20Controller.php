@@ -664,10 +664,10 @@ class stk20Controller extends Controller
     // 거부 (10 -> -10)
     public function reject(Request $request) 
     {
-        $ori_state = 10;
-        $new_state = -10;
-        $admin_id = Auth('head')->user()->id;
-        $data = $request->input("data", []);
+        $ori_state	= 10;
+        $new_state	= -10;
+        $admin_id	= Auth('head')->user()->id;
+        $data		= $request->input("data", []);
 
         try {
             DB::beginTransaction();
@@ -679,19 +679,25 @@ class stk20Controller extends Controller
                 DB::table('product_stock_rotation')
                     ->where('idx', '=', $d['idx'])
                     ->update([
-                        'state' => $new_state,
-                        'rec_comment' => $d['rec_comment'] ?? '',
-                        'ut' => now(),
+                        'state'			=> $new_state,
+                        'rec_comment'	=> $d['rec_comment'] ?? '',
+						'rec_id'		=> $admin_id,
+						'rec_rt'		=> now(),
+						'prc_id'		=> $admin_id,
+						'prc_rt'		=> now(),
+						'fin_id'		=> $admin_id,
+						'fin_rt'		=> now(),
+                        'ut'			=> now(),
                     ]);
             }
 
 			DB::commit();
-            $code = 200;
-            $msg = "거부처리가 정상적으로 완료되었습니다.";
+            $code	= 200;
+            $msg	= "거부처리가 정상적으로 완료되었습니다.";
 		} catch (Exception $e) {
 			DB::rollback();
-			$code = 500;
-			$msg = $e->getMessage();
+			$code	= 500;
+			$msg	= $e->getMessage();
 		}
 
         return response()->json(["code" => $code, "msg" => $msg]);
