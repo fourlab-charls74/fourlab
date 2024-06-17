@@ -1014,6 +1014,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		//월간재고소진현황
 		Route::get('sal37','sal37Controller@index');
 		Route::get('sal37/search','sal37Controller@search');
+
+		// 상품입출고 통합조회
+		Route::get('sal39','sal39Controller@index');
+		Route::get('sal39/search','sal39Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {

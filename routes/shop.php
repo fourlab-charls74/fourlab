@@ -713,6 +713,10 @@ Route::group(['middleware' => 'shop','as' => 'shop.', 'namespace' => 'shop'], fu
         //판매처별 매출 통계
         Route::get('sal26', 'sal26Controller@index');
         Route::get('sal26/search', 'sal26Controller@search');
+
+		// 상품입출고 통합조회
+		Route::get('sal39','sal39Controller@index');
+		Route::get('sal39/search','sal39Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
