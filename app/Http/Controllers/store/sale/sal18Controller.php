@@ -86,7 +86,7 @@ class sal18Controller extends Controller
 			 	left outer join store_channel sc on sc.store_channel_cd = s.store_channel and dep = 1
 				left outer join store_channel sc2 on sc2.store_kind_cd = s.store_channel_kind and sc2.dep = 2
 				
-			where 1=1 $where
+			where s.use_yn = 'Y' $where
 			order by s.store_cd
 		";
 		$result = DB::select($sql);
