@@ -86,7 +86,14 @@ class goods_xmlController extends Controller
 			replace(g.img,'500','600') as 'IMG_PATH3',	 -- 부가이미지3
 			g.img as 'IMG_PATH4',	 -- 부가이미지4
 			g.img as 'IMG_PATH5',	 -- 부가이미지5
-			replace(g.img,'500','600') as 'IMG_PATH6',	 -- 부가이미지6
+			-- replace(g.img,'500','600') as 'IMG_PATH6',	 -- 부가이미지6
+
+			'' as 'IMG_PATH6',	 -- 부가이미지6
+			'' as 'IMG_PATH7',	 -- 부가이미지7
+			'' as 'IMG_PATH8',	 -- 부가이미지8
+			'' as 'IMG_PATH9',	 -- 부가이미지9
+			'' as 'IMG_PATH10',	 -- 부가이미지10
+
 			replace(g.img,'500','270') as 'IMG_PATH22',	 -- 부가이미지22
 		";
 
@@ -226,6 +233,18 @@ class goods_xmlController extends Controller
 			}
 
 			if( trim($row->MAKER ) == "" )	$row->MAKER = $row->BRAND_NM;
+			
+			$sql_img	= " select type, img from goods_image where goods_no = :goods_no ";
+			$img_rows	= DB::select($sql_img, ['goods_no' => $goods_no]);
+
+			//부가 이미지 작업
+			foreach($img_rows as $img_row){
+				if($img_row->type == 'b')	$row->IMG_PATH6 = $img_row->img;
+				if($img_row->type == 'c')	$row->IMG_PATH7 = $img_row->img;
+				if($img_row->type == 'd')	$row->IMG_PATH8 = $img_row->img;
+				if($img_row->type == 'e')	$row->IMG_PATH9 = $img_row->img;
+				if($img_row->type == 'f')	$row->IMG_PATH10 = $img_row->img;
+			}
 
 			$row->IMG_PATH	= sprintf("%s%s",$host,$row->IMG_PATH);
 			$row->IMG_PATH1	= sprintf("%s%s",$host,$row->IMG_PATH1);
@@ -233,9 +252,14 @@ class goods_xmlController extends Controller
 			$row->IMG_PATH3	= sprintf("%s%s",$host,$row->IMG_PATH3);
 			$row->IMG_PATH4	= sprintf("%s%s",$host,$row->IMG_PATH4);
 			$row->IMG_PATH5	= sprintf("%s%s",$host,$row->IMG_PATH5);
-			$row->IMG_PATH6	= sprintf("%s%s",$host,$row->IMG_PATH6);
-			$row->IMG_PATH22	= sprintf("%s%s",$host,$row->IMG_PATH22);
 
+			if($row->IMG_PATH6 != '')	$row->IMG_PATH6 = sprintf("%s%s",$host,$row->IMG_PATH6);
+			if($row->IMG_PATH7 != '')	$row->IMG_PATH7 = sprintf("%s%s",$host,$row->IMG_PATH7);
+			if($row->IMG_PATH8 != '')	$row->IMG_PATH8 = sprintf("%s%s",$host,$row->IMG_PATH8);
+			if($row->IMG_PATH9 != '')	$row->IMG_PATH9 = sprintf("%s%s",$host,$row->IMG_PATH9);
+			if($row->IMG_PATH10 != '')	$row->IMG_PATH10 = sprintf("%s%s",$host,$row->IMG_PATH10);
+
+			$row->IMG_PATH22	= sprintf("%s%s",$host,$row->IMG_PATH22);
 		}
 
 		if( strpos($row->CHAR_1_NM,',') !== false )
@@ -274,7 +298,13 @@ class goods_xmlController extends Controller
 		$row->IMG_PATH3		= sprintf("<![CDATA[%s]]>",$row->IMG_PATH3);
 		$row->IMG_PATH4		= sprintf("<![CDATA[%s]]>",$row->IMG_PATH4);
 		$row->IMG_PATH5		= sprintf("<![CDATA[%s]]>",$row->IMG_PATH5);
-		$row->IMG_PATH6		= sprintf("<![CDATA[%s]]>",$row->IMG_PATH6);
+
+		if($row->IMG_PATH6 != '')	$row->IMG_PATH6 = sprintf("<![CDATA[%s]]>",$row->IMG_PATH6);
+		if($row->IMG_PATH7 != '')	$row->IMG_PATH7 = sprintf("<![CDATA[%s]]>",$row->IMG_PATH7);
+		if($row->IMG_PATH8 != '')	$row->IMG_PATH8 = sprintf("<![CDATA[%s]]>",$row->IMG_PATH8);
+		if($row->IMG_PATH9 != '')	$row->IMG_PATH9 = sprintf("<![CDATA[%s]]>",$row->IMG_PATH9);
+		if($row->IMG_PATH10 != '')	$row->IMG_PATH10 = sprintf("<![CDATA[%s]]>",$row->IMG_PATH10);
+
 		$row->IMG_PATH22	= sprintf("<![CDATA[%s]]>",$row->IMG_PATH22);
 
 		$row->GOODS_REMARKS	= sprintf("<![CDATA[%s]]>",$row->GOODS_REMARKS);
