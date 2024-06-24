@@ -236,13 +236,13 @@
                         <div class="form-group">
                         <label for="formrow-email-input">보기</label>
                             <div class="form-inline form-radio-box">
+								<div class="custom-control custom-radio">
+									<input type="radio" name="group_type_condition" value="product_code_p" id="product_code_p" class="custom-control-input" checked>
+									<label class="custom-control-label" for="product_code_p">품번</label>
+								</div>
                                 <div class="custom-control custom-radio">
                                     <input type="radio" name="group_type_condition" value="color_and_size" id="color_and_size" class="custom-control-input">
                                     <label class="custom-control-label" for="color_and_size">컬러, 사이즈</label>
-                                </div>
-                                <div class="custom-control custom-radio">
-                                    <input type="radio" name="group_type_condition" value="product_code_p" id="product_code_p" class="custom-control-input" checked>
-                                    <label class="custom-control-label" for="product_code_p">품번</label>
                                 </div>
                             </div>
                         </div>
@@ -316,7 +316,7 @@
         {field: "style_no", headerName: "스타일넘버", width: 70, cellStyle: StyleLineHeight},
 		{field: "img", headerName: "이미지", type: 'GoodsImageType', width: 50, cellStyle: {"line-height": "30px"}, surl:"{{config('shop.front_url')}}"},
         {field: "img", headerName: "이미지_url", hide: true},
-		{field: "goods_nm", headerName: "상품명", cellStyle: {"line-height": "30px"}, width: 150,
+		{field: "goods_nm", headerName: "상품명", cellStyle: {"line-height": "30px"}, width: 250,
 			cellRenderer: function (params) {
 				if (params.data?.goods_no == '' || params.node.aggData?.goods_no == '') {
 					return '<a href="javascript:void(0);" onclick="return blank_goods_no();">' + (params.value || '') + '</a>';
@@ -326,7 +326,7 @@
 				}
 			}
 		},
-		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 150, cellStyle: {"line-height": "30px"}},
+		{field: "goods_nm_eng", headerName: "상품명(영문)", width: 250, cellStyle: {"line-height": "30px"}},
 		{field: "prd_cd_p", headerName: "품번", cellStyle: StyleLineHeight, width: 90},
 		{field: "color", headerName: "컬러", cellStyle: StyleLineHeight, width: 55},
 		{field: "size", headerName: "사이즈", cellStyle: StyleLineHeight, width: 55},
@@ -334,7 +334,7 @@
         {field: "in_warehouse",	headerName: "입고",
             children: [
                 {headerName: "수량", field: "in_sum_qty", type: 'numberType', width: 60},
-                {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 70},
+                {headerName: "금액", field: "in_sum_amt", type: 'currencyMinusColorType', width: 100},
                 {headerName: "판매율(%)", field: "in_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
@@ -347,7 +347,7 @@
         {field: "total_sale", headerName: "총판매",
             children: [
                 {headerName: "수량", field: "total_ord_qty", type: 'numberType', width: 60},
-                {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 70},
+                {headerName: "금액", field: "total_ord_amt", type: 'currencyMinusColorType', width: 100},
                 {headerName: "판매율(%)", field: "total_sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
             ]
         },
@@ -413,13 +413,21 @@
 			let prd_columns = columns.map(c => c.field === "prd_cd_p"
 				? ({...c, pinned: "left"})
 				: c.headerName === "바코드" ? ({...c, hide: true})
-					: c.field === "goods_no" ? ({...c, pinned: "auto"}) : c);
+				: c.headerName === "온라인코드" ? ({...c, hide: true})
+				: c.headerName === "컬러" ? ({...c, hide: true})
+				: c.headerName === "사이즈" ? ({...c, hide: true})
+				: c.headerName === "옵션" ? ({...c, hide: true})
+				: c.field === "goods_no" ? ({...c, pinned: "auto"}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		} else {
 			let prd_columns = columns.map(c => c.field === "prd_cd_p"
 				? ({...c, pinned: "auto"})
 				: c.headerName === "바코드" ? ({...c, hide: false})
-					: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
+				: c.headerName === "온라인코드" ? ({...c, hide: false})
+				: c.headerName === "컬러" ? ({...c, hide: false})
+				: c.headerName === "사이즈" ? ({...c, hide: false})
+				: c.headerName === "옵션" ? ({...c, hide: false})
+				: c.field === "goods_no" ? ({...c, cellStyle: StyleGoodsNo}) : c);
 			gx.gridOptions.api.setColumnDefs(prd_columns);
 		}
 	}
