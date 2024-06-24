@@ -83,18 +83,29 @@ class sal03Controller extends Controller
 			$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 		}
 
-		$where	= "";
-		$in_where	= "";
+		$where			= "";
+		$in_where		= "";
+		$store_where	= "";
+		
 		if($com_type != "")		$where .= " and g.com_type = '$com_type' ";
 		if($store_type != "")	$in_where .= " and s.store_type = '" . $store_type . "' ";
-		if($store_cd != "")		$in_where .= " and oo.store_cd = '" . $store_cd . "' ";
+		if($store_cd != ""){
+			$in_where		.= " and oo.store_cd = '" . $store_cd . "' ";
+			$store_where	.= " and store.store_cd = '" . $store_cd . "' ";
+		}		
 		if($prd_cd != "")		$in_where .= " and oo.prd_cd like '" . $prd_cd . "%' ";
 		if($com_id != "")		$where .= " and g.com_id = '" . Lib::quote($com_id) . "'";
 		if($com_nm != "")		$where .= " and g.com_nm like '%" . Lib::quote($com_nm) . "%' ";
 		if($style_no != "")		$where .= " and g.style_no like '" . Lib::quote($style_no) . "%' ";
 		if($item != "")			$where .= " and g.opt_kind_cd = '" . Lib::quote($item) . "' ";
-		if($store_channel != "")	$in_where .= "and s.store_channel ='" . Lib::quote($store_channel). "'";
-		if($store_channel_kind != "")	$in_where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+		if($store_channel != ""){
+			$in_where		.= "and s.store_channel ='" . Lib::quote($store_channel). "'";
+			$store_where	.= "and store.store_channel ='" . Lib::quote($store_channel). "'";
+		}	
+		if($store_channel_kind != ""){
+			$in_where .= "and s.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+			$store_where .= "and store.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+		}
 		if($brand_cd != "") {
 			$where .= " and g.brand = '" . Lib::quote($brand_cd) . "' ";
 		}else if ($brand_cd == "" && $brand_nm != "") {
@@ -211,7 +222,12 @@ class sal03Controller extends Controller
 						, sum(oo.price * oo.qty) as ord_amt
 						, oo.goods_no, oo.goods_opt
 						, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
-						, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
+						, (
+							select sum(pss.wqty) 
+							from product_stock_store pss
+							left outer join store store on pss.store_cd = store.store_cd
+							where pss.prd_cd = pc.prd_cd $store_where
+						) as store_wqty
 					from order_opt_wonga ow 
 					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
 					left outer join store s on oo.store_cd = s.store_cd
@@ -261,10 +277,12 @@ class sal03Controller extends Controller
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as total_ord_amt
 					from order_opt_wonga w
 					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					left outer join store store on o.store_cd = store.store_cd
 					where 
 						o.prd_cd = '$prd_cd' 
 						and w.ord_state in (30, 60, 61)
 						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+						$store_where
 						-- and ( oclm_state = 0 or clm_state = -30 or clm_state = 90)
 				";
 				$tot_ord = DB::selectOne($sql_tot_ord);
@@ -300,9 +318,11 @@ class sal03Controller extends Controller
 						sum(psr.qty) as qty,
 						left(min(psr.prc_rt), 10) as prc_rt
 					from product_stock_release psr
+					left outer join store store on psr.store_cd = store.store_cd
 					where 
 						psr.state = '40'
 						and psr.prd_cd = '$prd_cd'
+						$store_where
 				";
 				$tot_out = DB::selectOne($sql_out);
 
@@ -312,6 +332,7 @@ class sal03Controller extends Controller
 				$tot_ex_sum_qty	+= $tot_out->qty;
 
 				$row['total_sale_rate']	= ($row['in_sum_qty'] == 0)?0:round($row['total_ord_qty'] / $row['in_sum_qty'] * 100);
+				$row['sale_rate']		= ($row['in_sum_qty'] == 0)?0:round($row['ord_qty'] / $row['in_sum_qty'] * 100);
 
 				$result[] = $row;
 			}
@@ -359,7 +380,12 @@ class sal03Controller extends Controller
 								, sum(oo.price * oo.qty) as ord_amt
 								, oo.goods_no, oo.goods_opt
 								, (select sum(wqty) from product_stock_storage where prd_cd = pc.prd_cd ) as storage_wqty
-								, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd) as store_wqty
+								, (
+									select sum(pss.wqty) 
+									from product_stock_store pss
+									left outer join store store on pss.store_cd = store.store_cd
+									where pss.prd_cd = pc.prd_cd $store_where
+								) as store_wqty
 							from order_opt_wonga ow
 							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
 							left outer join store s on oo.store_cd = s.store_cd
@@ -468,10 +494,11 @@ class sal03Controller extends Controller
 						) as storage_wqty
 						, 
 						(
-							select sum(a_.wqty) 
-							from product_stock_store a_
-							inner join product_code b_ on a_.prd_cd = b_.prd_cd
-							where b_.prd_cd_p = pc.prd_cd_p
+							select sum(pss.wqty) 
+							from product_stock_store pss
+							inner join product_code b_ on pss.prd_cd = b_.prd_cd
+							left outer join store store on pss.store_cd = store.store_cd
+							where b_.prd_cd_p = pc.prd_cd_p $store_where
 						) as store_wqty
 					from order_opt_wonga ow 
 					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
@@ -520,10 +547,12 @@ class sal03Controller extends Controller
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as total_ord_amt
 					from order_opt_wonga w
 					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					left outer join store store on o.store_cd = store.store_cd
 					where 
 						o.prd_cd like '$prd_cd_p%' 
 						and w.ord_state in (30, 60, 61)
 						and if( w.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+						$store_where
 						-- and ( oclm_state = 0 or clm_state = -30 or clm_state = 90)
 				";
 				$tot_ord = DB::selectOne($sql_tot_ord);
@@ -559,9 +588,11 @@ class sal03Controller extends Controller
 						sum(psr.qty) as qty,
 						left(min(psr.prc_rt), 10) as prc_rt
 					from product_stock_release psr
+					left outer join store store on psr.store_cd = store.store_cd
 					where 
 						psr.state = '40'
 						and psr.prd_cd like '$prd_cd_p%'
+						$store_where
 				";
 				$tot_out = DB::selectOne($sql_out);
 
@@ -571,6 +602,7 @@ class sal03Controller extends Controller
 				$tot_ex_sum_qty	+= $tot_out->qty;
 
 				$row['total_sale_rate']	= ($row['in_sum_qty'] == 0)?0:round($row['total_ord_qty'] / $row['in_sum_qty'] * 100);
+				$row['sale_rate']		= ($row['in_sum_qty'] == 0)?0:round($row['ord_qty'] / $row['in_sum_qty'] * 100);
 
 				$result[] = $row;
 			}
@@ -625,10 +657,11 @@ class sal03Controller extends Controller
 								) as storage_wqty
 								, 
 								(
-									select sum(a_.wqty) 
-									from product_stock_store a_
-									inner join product_code b_ on a_.prd_cd = b_.prd_cd
-									where b_.prd_cd_p = pc.prd_cd_p
+									select sum(pss.wqty) 
+									from product_stock_store pss
+									inner join product_code b_ on pss.prd_cd = b_.prd_cd
+									left outer join store store on pss.store_cd = store.store_cd
+									where b_.prd_cd_p = pc.prd_cd_p $store_where
 								) as store_wqty
 							from order_opt_wonga ow
 							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
