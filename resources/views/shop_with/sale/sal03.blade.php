@@ -277,7 +277,6 @@
 				children: [
 					{headerName: "수량", field: "ord_qty", type: 'numberType', width: 60},
 					{headerName: "금액", field: "ord_amt", type: 'currencyMinusColorType', width: 70},
-					{headerName: "판매율(%)", field: "sale_rate", cellStyle:{'text-align': 'right'}, type: 'currencyMinusColorType', width: 70}
 				]
 			},
 			{field: "store_wqty", headerName: "매장재고", type: 'numberType', width: 60},
