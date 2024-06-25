@@ -729,7 +729,7 @@
                             <button class="btn-sm btn btn-secondary sms-send-btn fs-12">SMS 발송</button>
                             <button class="btn-sm btn btn-secondary sms-list-btn fs-12">SMS 내역</button>
                             --}}
-                            <button class="btn-sm btn btn-secondary ord20-btn fs-12">수기판매</button>
+                            <button href="javascript:;" onclick="return window.open('/shop/pos', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=0,left=0,width=1920,height=980');" class="btn-sm btn btn-secondary {{--ord20-btn--}} fs-12">수기판매</button>
                             <button class="btn-sm btn btn-secondary tmp-save-btn fs-12">임시저장</button>
     
                             @if( ($order_opt->ord_state == "5" || $order_opt->ord_state == "9") && ($order_opt->clm_state == '0' || $order_opt->clm_state == '1' || $order_opt->clm_state == '-30') )

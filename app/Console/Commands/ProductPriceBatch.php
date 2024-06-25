@@ -46,7 +46,7 @@ class ProductPriceBatch extends Command
 			
 			$sql_list = "
 				select
-					ppl.idx, pc.goods_no, pc.prd_cd, ppl.change_price, ppl.plan_category
+					ppl.idx, pc.goods_no, pc.prd_cd, ppl.change_price, ppl.pr_code, ppl.plan_category
 				from product_price_list ppl
 				inner join product_price pp on ppl.product_price_cd = pp.idx
 				inner join product_code pc on pc.prd_cd = ppl.prd_cd
@@ -62,6 +62,7 @@ class ProductPriceBatch extends Command
 				$goods_no		= $row_list->goods_no;
 				$prd_cd			= $row_list->prd_cd;
 				$change_price	= $row_list->change_price;
+				$pr_code		= $row_list->pr_code;
 				$plan_category	= $row_list->plan_category;
 
 				//goods 테이블 price 가격변경
@@ -90,7 +91,8 @@ class ProductPriceBatch extends Command
 						->where('prd_cd', 'like', $pr->prd_cd_p . '%')
 						->update([
 							"price" 	=> $change_price,
-							"ut" => now()
+							"pr_code"	=> $pr_code,
+							"ut"		=> now()
 						]);
 
 					if($plan_category != '00'){

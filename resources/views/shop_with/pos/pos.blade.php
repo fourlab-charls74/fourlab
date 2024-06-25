@@ -111,9 +111,12 @@
 			                    <th>점포수수료</th>
 			                    <td class="pl-3 pr-2">
 				                    <select name="pr_code" id="pr_code" class="sel w-100" onchange="return updateOrderValue('pr_code', event.target.value)">
+										<option value="JS">상품별등록</option>
+										{{--
 					                    @foreach (@$pr_codes as $pr_code)
 						                    <option value="{{ $pr_code->pr_code }}">{{ $pr_code->pr_code_nm }}</option>
 					                    @endforeach
+					                    --}}
 				                    </select>
 			                    </td>
 		                    </tr>

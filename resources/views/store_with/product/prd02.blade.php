@@ -154,6 +154,19 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="formrow-email-input">행사구분</label>
+								<div class="flax_box">
+									<select name="pr_code" id="pr_code" class="form-control form-control-sm">
+										<option value=''> 선택 </option>
+										@foreach ($pr_codes as $pr_code)
+											<option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_id }} : {{ $pr_code->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 							<label for="formrow-email-input">매칭여부</label>
 								<div class="form-inline form-radio-box">
 									<div class="custom-control custom-radio">
@@ -171,6 +184,8 @@
 								</div>
 							</div>
 						</div>
+					</div>
+					<div class="search-area-ext d-none row">
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
 								<label for="">자료수/정렬</label>
@@ -350,6 +365,7 @@
 			{field: "margin_amt", headerName: "마진액", type: 'numberType', width:80, cellStyle: {"line-height": "30px"}, aggFunc: 'first'},
 			{field: "margin_rate", headerName: "마진율(%)", type: 'percentType', width:80, cellStyle: {"line-height": "30px"}},
 			{field: "org_nm", headerName: "원산지", cellStyle: {"line-height": "30px"}},
+			{field: "pr_code_nm", headerName: "행사구분", width:60, cellStyle: {"text-align": "center"}},
 			{field: "com_nm", headerName: "업체", width:84, cellStyle: {"line-height": "30px"}},
 			{{--
 			// {field: "reg_dm", headerName: "등록일자", width:110, cellStyle: {"line-height": "30px"}},

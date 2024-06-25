@@ -1,6 +1,16 @@
 @extends('store_with.layouts.layout-nav')
 @section('title', '바코드 매칭 정보')
 @section('content')
+
+<style>
+	.required:after {content:" *"; color: red;}
+	.table th {min-width:120px;}
+
+	@media (max-width: 740px) {
+		.table td {float: unset !important;width:100% !important;}
+	}
+</style>
+
 <div class="show_layout py-3 px-sm-3">
 	<div class="page_tit d-flex justify-content-between">
 		<div class="d-flex">
@@ -18,15 +28,6 @@
 			<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i>닫기</a>
 		</div>
 	</div>
-
-	<style> 
-		.required:after {content:" *"; color: red;}
-		.table th {min-width:120px;}
-
-		@media (max-width: 740px) {
-			.table td {float: unset !important;width:100% !important;}
-		}
-	</style>
 
 	<form name="f1" id="f1">
 
@@ -125,6 +126,21 @@
 												</div>
 											</td>
 										</tr>
+										<tr>
+											<th class="required">행사구분</th>
+											<td>
+												<div class="flax_box">
+													<select name='pr_code' id='pr_code' class="form-control form-control-sm prd_code">
+														<option value=''>선택</option>
+														@foreach ($pr_codes as $pr_code)
+															<option value='{{ $pr_code->code_id }}' @if($product->pr_code === $pr_code->code_id) selected @endif>{{ $pr_code->code_id }} : {{ $pr_code->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
+											<th>&nbsp;</th>
+											<td>&nbsp;</td>
+										</tr>
 									</tbody>
 								</table>
 							</div>
@@ -161,16 +177,16 @@
 	};
 
 	const columns = [
-		{field:"prd_cd",	headerName: "바코드",		width:120},
+		{field:"prd_cd",	headerName: "바코드",	width:120},
 		{field:"goods_no",	headerName: "온라인코드",	width:72},
 		{field:"style_no",	headerName: "아이템코드",	width:72},
-		{field:"goods_nm",	headerName: "상품명",		width:250},
-		{field:"goods_opt",	headerName: "상품옵션",		width:200},
-		{field:"prd_cd_p",	headerName: "품번",			width:90},
-		{field:"color",		headerName: "컬러",			width:72, cellStyle:{'text-align':'center'}},
-		{field:"size",		headerName: "사이즈",		width:72, cellStyle:{'text-align':'center'}},
-		{field:"match_yn",  headerName: "등록유무",		width:60, cellStyle:{'text-align':'center'}},
-		{field:"del",       headerName: "삭제",  		width:60, cellStyle:{'text-align':'center'},
+		{field:"goods_nm",	headerName: "상품명",	width:250},
+		{field:"goods_opt",	headerName: "상품옵션",	width:200},
+		{field:"prd_cd_p",	headerName: "품번",		width:90},
+		{field:"color",		headerName: "컬러",		width:72, cellStyle:{'text-align':'center'}},
+		{field:"size",		headerName: "사이즈",	width:72, cellStyle:{'text-align':'center'}},
+		{field:"match_yn",  headerName: "등록유무",	width:60, cellStyle:{'text-align':'center'}},
+		{field:"del",       headerName: "삭제",  	width:60, cellStyle:{'text-align':'center'},
 			cellRenderer: function(params) {
 				if (params.value !== undefined) {
 					if( params.value != ''){
@@ -189,12 +205,12 @@
 			}
 		},
 		{field:"brand",		headerName:"브랜드",		hide:true},
-		{field:"year",		headerName:"년도",			hide:true},
-		{field:"season",	headerName:"시즌",			hide:true},
-		{field:"gender",	headerName:"성별",			hide:true},
-		{field:"opt",		headerName:"품목",			hide:true},
-		{field:"item",		headerName:"하위품목",		hide:true},
-		{field:"seq",		headerName:"순서차수",		hide:true},
+		{field:"year",		headerName:"년도",		hide:true},
+		{field:"season",	headerName:"시즌",		hide:true},
+		{field:"gender",	headerName:"성별",		hide:true},
+		{field:"opt",		headerName:"품목",		hide:true},
+		{field:"item",		headerName:"하위품목",	hide:true},
+		{field:"seq",		headerName:"순서차수",	hide:true},
 		{field:"prd_cd",	headerName:"바코드",		hide:true},
 		{field: "", headerName:"", width:"auto"},
 	];
@@ -253,22 +269,23 @@
 		if( $('#price').val() == '' )		return alert('현재가는 반드시 입력해야 합니다.');
 		if( $('#size_kind').val() == '' )	return alert('사이즈구분은 반드시 선택해야 합니다.');
 		if( $('#origin').val() == '' )		return alert('원산지는 반드시 입력해야 합니다.');
+		if( $('#pr_code').val() == '' )	return alert('행사코드는 반드시 선택해야 합니다.');
 
-		if(!window.confirm("품번이 같은 상품의 정상가, 현재가, 아이템코드, 공급업체, 사이즈구분, 원산지가 변경됩니다.\n정보를 수정하시겠습니까?")) return;
-		
+		if(!window.confirm("품번이 같은 상품의 정상가, 현재가, 아이템코드, 공급업체, 사이즈구분, 원산지. 행사코드가 변경됩니다.\n정보를 수정하시겠습니까?")) return;
 
 		axios({
 			url: '/store/product/prd02/update_product',
 			method: 'post',
 			data: {
-				prd_cd : $('#prd_cd').val(),
-				goods_no : $("#goods_no").val(),
-				style_no : $('#style_no').val(),
-				sup_com : $('#sup_com').val(),
-				tag_price : $("#tag_price").val(),
-				price : $("#price").val(),
-				size_kind : $('#size_kind').val(),
-				origin : $('#origin').val()
+				prd_cd :	$('#prd_cd').val(),
+				goods_no :	$("#goods_no").val(),
+				style_no :	$('#style_no').val(),
+				sup_com :	$('#sup_com').val(),
+				tag_price :	$("#tag_price").val(),
+				price :		$("#price").val(),
+				size_kind :	$('#size_kind').val(),
+				origin :	$('#origin').val(),
+				pr_code :	$('#pr_code').val()
 			},
 		}).then(function(res) {
 			if (res.data.code === 200) {

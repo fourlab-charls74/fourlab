@@ -95,6 +95,19 @@
 						</div>
 						<div class="col-lg-4 inner-td">
 							<div class="form-group">
+								<label for="formrow-email-input">행사구분</label>
+								<div class="flax_box">
+									<select name="pr_code" id="pr_code" class="form-control form-control-sm">
+										<option value=''> 선택 </option>
+										@foreach ($pr_codes as $pr_code)
+											<option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_id }} : {{ $pr_code->code_val }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 inner-td">
+							<div class="form-group">
 								<label for="">자료수/정렬</label>
 								<div class="form-inline">
 									<div class="form-inline-inner input_box" style="width:24%;">
@@ -207,10 +220,11 @@
 					return Comma(params.data.change_price) + '원';
 				}
 			},
-			{field: "plan_category", headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},
-			{field: "change_kind", headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
-			{field: "change_cnt", headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
-			{field: "change_type", headerName: "적용구분", width: 80, cellClass: 'hd-grid-code',
+			{field: "pr_code_nm",		headerName: "행사구분", width: 80, cellClass: 'hd-grid-code'},
+			{field: "plan_category",	headerName: "운영구분", width: 80, cellClass: 'hd-grid-code'},
+			{field: "change_kind",		headerName: "변경종류", width: 80, cellClass: 'hd-grid-code' , hide:true},
+			{field: "change_cnt",		headerName: "변경상품수", width: 100, cellClass: 'hd-grid-code', hide:true},
+			{field: "change_type",		headerName: "적용구분", width: 80, cellClass: 'hd-grid-code',
 				cellStyle: params => {
 					if (params.data.change_type == 'A') {
 						return { "background-color": "#FFDFDF" }

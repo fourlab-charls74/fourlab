@@ -40,7 +40,7 @@
                                 <table class="table incont table-bordered" width="100%" cellspacing="0">
                                     <tbody>
                                         <tr>
-                                            <th>주문매장</th>
+                                            <th class="required">주문매장</th>
                                             <td>
                                                 <div class="flax_box mr-2">
                                                     <div class="form-inline inline_btn_box w-100">

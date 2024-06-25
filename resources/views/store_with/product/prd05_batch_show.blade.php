@@ -82,6 +82,17 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">행사구분</th>
+											<td>
+												<div class="flax_box">
+													<select name='pr_code' id='pr_code' class="form-control form-control-sm prd_code">
+														<option value=''>선택</option>
+														@foreach ($pr_codes as $pr_code)
+															<option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_id }} : {{ $pr_code->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
 											<th class="required">상품운영 구분</th>
 											<td>
 												<div class="flax_box">
@@ -94,12 +105,10 @@
 													</select>
 												</div>
 											</td>
-											<th>샘플파일</th>
-											<td><a href="/sample/sample_prd05.xlsx"> sample_prd05.xlsx</a></td>
 										</tr>
 										<tr>
 											<th class="required">파일</th>
-											<td colspan="3">
+											<td>
 												<div class="d-flex flex-column">
 													<div class="d-flex" style="width:100%;">
 														<input id="excel_file" type="file" name="excel_file" class="mr-2" />
@@ -107,6 +116,8 @@
 													</div>
 												</div>
 											</td>
+											<th>샘플파일</th>
+											<td><a href="/sample/sample_prd05.xlsx"> sample_prd05.xlsx</a></td>
 										</tr>
 										</tbody>
 									</table>
@@ -187,6 +198,7 @@
 				let change_date_res	= $('#change_date_res').val();
 				let change_date_now	= document.getElementById('change_date_now').innerText;
 				let type			= $("input[name='product_price_type']:checked").val();
+				let pr_code			= $('#pr_code').val();
 				let plan_category	= $('#plan_category').val();
 				let rows = gx.getSelectedRows();
 
@@ -203,6 +215,7 @@
 						change_date_now : change_date_now,
 						change_cnt : rows.length,
 						type : type,
+						pr_code : pr_code,
 						plan_category : plan_category
 
 					},

@@ -50,6 +50,7 @@ class prd02Controller extends Controller
 			'goods_types'	=> SLib::getCodes('G_GOODS_TYPE'),
 			'is_unlimiteds'	=> SLib::getCodes('G_IS_UNLIMITED'),
 			'size_kind'		=> $size_kind,
+			'pr_codes'		=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02',$values);
@@ -91,7 +92,8 @@ class prd02Controller extends Controller
 		else $orderby = sprintf("order by p.match_yn desc, %s %s, pc.prd_cd ", $ord_field, $ord);
 
 		$in_store_sql = "";
-		$match_yn = $request->input('match_yn1');
+		$match_yn	= $request->input('match_yn1');
+		$pr_code	= $request->input('pr_code');
 
 		$where		= "";
 		if($prd_cd != "") {
@@ -131,6 +133,7 @@ class prd02Controller extends Controller
 
 		if($head_desc != "")	$where .= " and g.head_desc like '%" . Lib::quote($head_desc) . "%' ";
 		if($ad_desc != "")		$where .= " and g.ad_desc like '%" . Lib::quote($ad_desc) . "%' ";
+		if($pr_code != "")		$where .= " and p.pr_code = '" . Lib::quote($pr_code) . "' ";
 
 		if( $store_no != "" ){
 			$in_store_sql	= " left outer join product_stock_store pss on pc.prd_cd = pss.prd_cd ";
@@ -276,7 +279,8 @@ class prd02Controller extends Controller
 				, g.upd_dm
 				, p.match_yn
 				, p.origin as org_nm
-				, pc.size_kind as size_kind
+				, pc.size_kind as size_kind,
+				  prc.code_val as pr_code_nm
 			from product_code pc
 				inner join product_stock ps on ps.prd_cd = pc.prd_cd
 				inner join product p on p.prd_cd = pc.prd_cd
@@ -291,6 +295,7 @@ class prd02Controller extends Controller
 				left outer join code bk on bk.code_kind_cd = 'G_BAESONG_KIND' and bk.code_id = g.baesong_kind
 				left outer join code bi on bi.code_kind_cd = 'G_BAESONG_INFO' and bi.code_id = g.baesong_info
 				left outer join code dpt on dpt.code_kind_cd = 'G_DLV_PAY_TYPE' and dpt.code_id = g.dlv_pay_type
+				left outer join code prc on prc.code_kind_cd = 'PR_CODE' and prc.code_id = p.pr_code
 				inner join code c on c.code_kind_cd = 'PRD_CD_COLOR' and pc.color = c.code_id
 				inner join brand b on b.br_cd = pc.brand
 			where 1 = 1
@@ -980,6 +985,7 @@ class prd02Controller extends Controller
 				    , p.com_id
 					, pc.size_kind
 					, p.origin as origin
+					, p.pr_code
 				from product_code pc
 				inner join product p on p.prd_cd = pc.prd_cd
 				left outer join goods g on g.goods_no = pc.goods_no
@@ -990,15 +996,16 @@ class prd02Controller extends Controller
 			$product	= DB::selectOne($sql,['prd_cd' => $product_code]);
 		}
 
-		$size_kind_sql = "select * from size_kind where use_yn = 'Y' order by seq";
-		$size_kind = DB::select($size_kind_sql);
+		$size_kind_sql	= " select * from size_kind where use_yn = 'Y' order by seq ";
+		$size_kind		= DB::select($size_kind_sql);
 
 		$values = [
 			'sup_coms' 	=> $sup_coms,
 			'prd_cd'	=> $product_code,
 			'goods_no'	=> $goods_no,
 			'product'	=> $product,
-			'size_kind' => $size_kind
+			'size_kind' => $size_kind,
+			'pr_codes'	=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_edit',$values);
@@ -1091,6 +1098,7 @@ class prd02Controller extends Controller
         return response()->json(["code" => $code, "msg" => $msg]);
 	}
 
+	//현재 사용하지 않음(확인후 삭제 예정)
 	public function match_goods_no($product_code, Request $request)
 	{
 
@@ -1107,7 +1115,8 @@ class prd02Controller extends Controller
 
 		$values = [
 			'prd_cd'	=> $product_code,
-			'product'	=> $product
+			'product'	=> $product,
+			'pr_codes'	=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_edit_match',$values);
@@ -1482,7 +1491,8 @@ class prd02Controller extends Controller
 			'sup_coms' 	=> $sup_coms,
 			'units' 	=> SLib::getCodes("PRD_CD_UNIT"),
 			'images' 	=> [],
-			'size_kind' => $size_kind
+			'size_kind' => $size_kind,
+			'pr_codes'	=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd02_product_upload',$values);
@@ -1648,6 +1658,7 @@ class prd02Controller extends Controller
 		$price		= $request->input('price');
 		$size_kind	= $request->input('size_kind');
 		$origin 	= $request->input('origin', '');
+		$pr_code	= $request->input('pr_code');
 	
 		// $sql = "
 		// 	select
@@ -1732,8 +1743,9 @@ class prd02Controller extends Controller
 							"tag_price" => $tag_price,
 							"com_id"	=> $com_id,
 							"origin"	=> $origin,
+							"pr_code"	=> $pr_code,
 							"admin_id"	=> $admin_id,
-							"ut" => now(),
+							"ut"		=> now(),
 						]);
 				}
 			//}
@@ -2326,30 +2338,31 @@ class prd02Controller extends Controller
 
 	public function get_products2(Request $request)
 	{
-		$data = $request->input('data', []);
-		$result = [];
+		$data	= $request->input('data', []);
+		$result	= [];
 
 		foreach($data as $key => $d)
 		{
-			$brand = $d['brand'];
-			$opt_kind_nm = $d['opt_kind_nm'];
-			$prd_cd_p = $d['prd_cd_p'];
-			$color = $d['color'];
-			$size_kind = $d['size_kind'];
-			$size = $d['size'];
-			$goods_nm = $d['goods_nm'];
-			$goods_nm_eng = $d['goods_nm_eng'];
-			$style_no = $d['style_no'];
-			$seq = $d['seq'];
-			$price = $d['price'];
-			$wonga = $d['wonga'];
-			$tag_price = $d['tag_price'];
-			$year = $d['year'];
-			$season = $d['season'];
-			$gender = $d['gender'];
-			$item = $d['item'];
-			$sup_com = $d['sup_com'];
-			$origin = $d['origin'];
+			$brand			= $d['brand'];
+			$opt_kind_nm	= $d['opt_kind_nm'];
+			$prd_cd_p		= $d['prd_cd_p'];
+			$color			= $d['color'];
+			$size_kind		= $d['size_kind'];
+			$size			= $d['size'];
+			$goods_nm		= $d['goods_nm'];
+			$goods_nm_eng	= $d['goods_nm_eng'];
+			$style_no		= $d['style_no'];
+			$seq			= $d['seq'];
+			$price			= $d['price'];
+			$wonga			= $d['wonga'];
+			$tag_price		= $d['tag_price'];
+			$year			= $d['year'];
+			$season			= $d['season'];
+			$gender			= $d['gender'];
+			$item			= $d['item'];
+			$sup_com		= $d['sup_com'];
+			$origin			= $d['origin'];
+			$pr_code		= $d['pr_code'];
 
 			$sql = "
 				select
@@ -2372,62 +2385,73 @@ class prd02Controller extends Controller
 					, '$item' as item
 					, '$sup_com' as sup_com
 					, '$origin' as origin
+					, '$pr_code' as pr_code
 				from product_code
 				limit 1
-
             ";
 			$row = DB::selectOne($sql);
 			array_push($result, $row);
 		}
 
 		return response()->json([
-			"code" => 200,
-			"head" => [
-				"total" => count($result),
-				"page" => 1,
-				"page_cnt" => 1,
-				"page_total" => 1,
+			"code"	=> 200,
+			"head"	=> [
+				"total"		=> count($result),
+				"page"		=> 1,
+				"page_cnt"	=> 1,
+				"page_total"=> 1,
 			],
-			"body" => $result
+			"body"	=> $result
 		]);
 	}
 
 	public function batch_products2(Request $request)
 	{
-		$admin_id = Auth('head')->user()->id;
-		$data = $request->input("products", []);
+		$admin_id	= Auth('head')->user()->id;
+		$data		= $request->input("products", []);
 		
 		try {
 			DB::beginTransaction();
 
 			foreach ($data as $row) {
-				$prd_cd_p = $row['prd_cd_p'];
-				$brand = $row['brand'];
-				$year = $row['year'];
-				$season = $row['season'];
-				$gender = $row['gender'];
-				$item = $row['item'];
-				$opt = $row['opt_kind_nm'];
-				$style_no = $row['style_no'];
-				$seq = $row['seq'];
-				$color = $row['color'];
-				$size_kind = $row['size_kind'];
-				$size = $row['size'];
-				$goods_nm = $row['goods_nm'];
-				$goods_nm_eng = $row['goods_nm_eng'];
-				$sup_com = $row['sup_com'];
-				$wonga = $row['wonga'];
-				$tag_price = $row['tag_price'];
-				$price = $row['price'];
-				$origin = $row['origin'];
+				$prd_cd_p	= $row['prd_cd_p'];
+				$brand		= $row['brand'];
+				$year		= $row['year'];
+				$season		= $row['season'];
+				$gender		= $row['gender'];
+				$item		= $row['item'];
+				$opt		= $row['opt_kind_nm'];
+				$style_no	= $row['style_no'];
+				$seq		= $row['seq'];
+				$color		= $row['color'];
+				$size_kind	= $row['size_kind'];
+				$size		= $row['size'];
+				$goods_nm	= $row['goods_nm'];
+				$goods_nm_eng	= $row['goods_nm_eng'];
+				$sup_com	= $row['sup_com'];
+				$wonga		= $row['wonga'];
+				$tag_price	= $row['tag_price'];
+				$price		= $row['price'];
+				$origin		= $row['origin'];
+				$pr_code	= $row['pr_code'];
 
-				$unit = "";
-				$goods_no = "";
-				$goods_opt = "";
+				$unit		= "";
+				$goods_no	= "";
+				$goods_opt	= "";
 				
-				$prd_cd = $prd_cd_p . $color . $size;
+				$prd_cd		= $prd_cd_p . $color . $size;
 
-				$sql = "select count(*) as count from product where prd_cd = :prd_cd";
+				// 행사코드 오류 검토
+				$pr_code_err	= "";
+				if(($pr_code == 'JS') && ($tag_price != $price))	$pr_code_err = "Y";
+				if(($pr_code == 'J2') && ($tag_price <= $price))	$pr_code_err = "Y";
+				if(($pr_code == 'J1') && ($brand == 'F'))			$pr_code_err = "Y";
+				
+				if($pr_code_err == 'Y'){
+					return response()->json(["code" => -2, "prd_cd" => $prd_cd]);
+				}
+
+				$sql	= "select count(*) as count from product where prd_cd = :prd_cd";
 				$result	= DB::selectOne($sql, ['prd_cd' => $prd_cd]);
 				
 				if ($result->count == 0) {
@@ -2443,6 +2467,7 @@ class prd02Controller extends Controller
 						'com_id'		=> $sup_com,
 						'unit'			=> $unit,
 						'origin'		=> $origin,
+						'pr_code'		=> $pr_code,
 						'rt'			=> now(),
 						'ut'			=> now(),
 						'admin_id'		=> $admin_id
@@ -2470,19 +2495,19 @@ class prd02Controller extends Controller
 					]);
 
 					DB::table('product_stock')->insert([
-						'goods_no' => $goods_no,
-						'prd_cd' => $prd_cd,
-						'wonga'	=> $wonga,
+						'goods_no'	=> $goods_no,
+						'prd_cd'	=> $prd_cd,
+						'wonga'		=> $wonga,
 						'qty_wonga'	=> 0,
-						'in_qty' => 0,
-						'out_qty' => 0,
-						'qty' => 0,
-						'wqty' => 0,
-						'goods_opt' => $goods_opt,
-						'barcode' => $prd_cd,
-						'use_yn' => 'Y',
-						'rt' => now(),
-						'ut' => now()
+						'in_qty'	=> 0,
+						'out_qty'	=> 0,
+						'qty'		=> 0,
+						'wqty'		=> 0,
+						'goods_opt'	=> $goods_opt,
+						'barcode'	=> $prd_cd,
+						'use_yn'	=> 'Y',
+						'rt'		=> now(),
+						'ut'		=> now()
 					]);
 				}else {
 					DB::rollback();
@@ -2491,12 +2516,12 @@ class prd02Controller extends Controller
 			}
 
 			DB::commit();
-			$code = 200;
-			$msg = "성공";
+			$code	= 200;
+			$msg	= "성공";
 		} catch (\Exception $e) {
 			DB::rollback();
-			$msg = $e->getMessage();
-			$code = 500;
+			$msg	= $e->getMessage();
+			$code	= 500;
 		}
 
 		return response()->json(["code" => $code, "msg" => $msg]);
@@ -2504,8 +2529,8 @@ class prd02Controller extends Controller
 
 	public function save_product2(Request $request)
 	{
-		$admin_id = Auth('head')->user()->id;
-		$sel_data = $request->input("sel_data");
+		$admin_id	= Auth('head')->user()->id;
+		$sel_data	= $request->input("sel_data");
 		
 		try {
 
@@ -2531,6 +2556,7 @@ class prd02Controller extends Controller
 				$wonga 		= $row['wonga'];
 				$tag_price 	= $row['tag_price'];
 				$origin 	= $row['origin'];
+				$pr_code	= $row['pr_code'];
 //				$plan_category 	= $row['plan_category'];
 				
 				$brand 		= explode(' : ', $brand);
@@ -2540,6 +2566,7 @@ class prd02Controller extends Controller
 				$opt 		= explode(' : ', $opt);
 				$item 		= explode(' : ', $item);
 				$sup_com 	= explode(' : ', $sup_com);
+				$pr_code	= explode(' : ', $pr_code);
 //				$plan_category 	= explode(' : ', $plan_category);
 
 				$unit = "";
@@ -2560,19 +2587,20 @@ class prd02Controller extends Controller
 				if ($result->count == 0) {
 
 					DB::table('product')->insert([
-						'prd_cd' => $prd_cd,
-						'prd_nm' => $prd_nm,
-						'prd_nm_eng' => $prd_nm_eng,
-						'style_no' => $style_no,
-						'price' => $price,
-						'wonga' => $wonga,
-						'tag_price' => $tag_price,
-						'com_id' => $sup_com[0],
-						'origin' => $origin,
-						'unit' => $unit,
-						'rt' => now(),
-						'ut' => now(),
-						'admin_id' => $admin_id
+						'prd_cd'		=> $prd_cd,
+						'prd_nm'		=> $prd_nm,
+						'prd_nm_eng'	=> $prd_nm_eng,
+						'style_no'		=> $style_no,
+						'price'			=> $price,
+						'wonga'			=> $wonga,
+						'tag_price'		=> $tag_price,
+						'com_id'		=> $sup_com[0],
+						'origin'		=> $origin,
+						'pr_code'		=> $pr_code[0],
+						'unit'			=> $unit,
+						'rt'			=> now(),
+						'ut'			=> now(),
+						'admin_id'		=> $admin_id
 					]);
 
 					DB::table('product_code')->insert([
@@ -2597,40 +2625,38 @@ class prd02Controller extends Controller
 						'admin_id'	=> $admin_id
 					]);
 
-					
-
 					DB::table('product_stock')->insert([
-						'goods_no' => $goods_no,
-						'prd_cd' => $prd_cd,
-						'wonga'	=> $wonga,
+						'goods_no'	=> $goods_no,
+						'prd_cd'	=> $prd_cd,
+						'wonga'		=> $wonga,
 						'qty_wonga'	=> 0,
-						'in_qty' => 0,
-						'out_qty' => 0,
-						'qty' => 0,
-						'wqty' => 0,
-						'goods_opt' => $goods_opt,
-						'barcode' => $prd_cd,
-						'use_yn' => 'Y',
-						'rt' => now(),
-						'ut' => now()
+						'in_qty'	=> 0,
+						'out_qty'	=> 0,
+						'qty'		=> 0,
+						'wqty'		=> 0,
+						'goods_opt'	=> $goods_opt,
+						'barcode'	=> $prd_cd,
+						'use_yn'	=> 'Y',
+						'rt'		=> now(),
+						'ut'		=> now()
 					]);
 
 					/**
 					 *  상품 이미지 저장 (단일 이미지)
 					 */
 					if ($row['image'] != null) {
-						$base64_src = $row['image'];
-						$save_path = "/images/prd02";
+						$base64_src	= $row['image'];
+						$save_path	= "/images/prd02";
 
 						$unique_img_name = $prd_cd . $style_no;
 
 						$img_url = ULib::uploadBase64img($save_path, $base64_src, $unique_img_name);
 
 						DB::table('product_image')->insert([
-							'prd_cd' => $prd_cd,
-							'img_url' => $img_url,
-							'rt' => now(),
-							'ut' => now(),
+							'prd_cd'	=> $prd_cd,
+							'img_url'	=> $img_url,
+							'rt'		=> now(),
+							'ut'		=> now(),
 							'admin_id'	=> $admin_id
 						]);
 					}

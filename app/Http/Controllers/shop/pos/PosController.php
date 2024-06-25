@@ -598,9 +598,12 @@ class PosController extends Controller
                 $goods = DB::selectOne($sql, ['goods_no' => $goods_no]);
 				
 				$sql = "
-					select p.price, p.wonga, p.tag_price as goods_sh from product p where p.prd_cd = :prd_cd
+					select p.price, p.wonga, p.tag_price as goods_sh, p.pr_code from product p where p.prd_cd = :prd_cd
 				";
 				$product = DB::selectOne($sql, [ 'prd_cd' => $prd_cd ]);
+				
+				// product 점포수수료 구분 반영 ( 기존 POS 선택 반영 X )
+				$pr_code	= $product->pr_code;
 
                 $item_ord_amt = $product->price * $qty; // 해당상품 총 주문금액 (주문금액은 판매가기준)
 

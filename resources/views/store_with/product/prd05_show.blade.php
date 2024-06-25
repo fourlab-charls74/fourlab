@@ -104,6 +104,17 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">행사구분</th>
+											<td>
+												<div class="flax_box">
+													<select name='pr_code' id='pr_code' class="form-control form-control-sm prd_code">
+														<option value=''>선택</option>
+														@foreach ($pr_codes as $pr_code)
+															<option value='{{ $pr_code->code_id }}' @if(@$res->pr_code === $pr_code->code_id) selected @endif>{{ $pr_code->code_id }} : {{ $pr_code->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
 											<th class="required">상품운영 구분</th>
 											<td>
 												<div class="flax_box">
@@ -116,8 +127,6 @@
 													</select>
 												</div>
 											</td>
-											<th>&nbsp;</th>
-											<td>&nbsp;</td>
 										</tr>
 										</tbody>
 									</table>
@@ -447,14 +456,17 @@
 			let rows				= gx.getSelectedRows();
 			let change_cnt			= rows.length;
 			let price_kind			= $('#price_kind').val();
+			let pr_code				= $('#pr_code').val();
 			let plan_category		= $('#plan_category').val();
 			let change_price_type 	= $('#change_price_type').val();
 
 			if(rows.length < 1)		return alert('가격을 변경할 상품을 선택해주세요.');
 			
+			if(pr_code == '')						return alert('행사구분은 반드시 선택해야 합니다.');
+			
 			if (change_price_type == 'B') {
-				if(price_kind == '')	return alert('정상가/현재가는 반드시 선택해야 합니다.');
-				if(change_kind == '')	return alert('변경구분은 반드시 선택해야 합니다.');
+				if(price_kind == '')				return alert('정상가/현재가는 반드시 선택해야 합니다.');
+				if(change_kind == '')				return alert('변경구분은 반드시 선택해야 합니다.');
 				if($('#change_price').val() == '' )	return alert('변경 액/률은 반드시 선택해야 합니다.');
 			}
 
@@ -472,6 +484,7 @@
 					change_cnt : change_cnt,
 					type : type,
 					price_kind : price_kind,
+					pr_code : pr_code,
 					plan_category : plan_category,
 					change_price_type : change_price_type,
 				},

@@ -941,26 +941,26 @@ class ord01Controller extends Controller
         $order_opt = [];
 
         for ($i = 0; $i < count($cart); $i++) {
-            $goods_no = $cart[$i]['goods_no'] ?? '';
-            $goods_sub = $cart[$i]['goods_sub'] ?? '';
+            $goods_no		= $cart[$i]['goods_no'] ?? '';
+            $goods_sub		= $cart[$i]['goods_sub'] ?? '';
             if(empty($goods_sub) || !is_numeric($goods_sub)) $goods_sub = 0;
-            $goods_type = $cart[$i]['goods_type_cd'] ?? '';
-            $goods_price = ($cart[$i]['price'] ?? 0) - ($cart[$i]['dc_amt'] ?? 0) - ($cart[$i]['coupon_amt'] ?? 0);
-			$sugi_price = ($cart[$i]['price'] ?? 0) * 1;
-            $point = $cart[$i]['point'] ?? '';
-            $com_type = $cart[$i]['com_type'] ?? '';
-            $prd_cd = $cart[$i]['prd_cd'] ?? '';
-            $goods_opt = $cart[$i]['goods_opt'] ?? '';
-            $qty = ($cart[$i]['qty'] ?? 0) * 1; // 판매수량
-            $addopt_amt = $cart[$i]['addopt_amt'] ?? 0;
+            $goods_type		= $cart[$i]['goods_type_cd'] ?? '';
+            $goods_price	= ($cart[$i]['price'] ?? 0) - ($cart[$i]['dc_amt'] ?? 0) - ($cart[$i]['coupon_amt'] ?? 0);
+			$sugi_price		= ($cart[$i]['price'] ?? 0) * 1;
+            $point			= $cart[$i]['point'] ?? '';
+            $com_type		= $cart[$i]['com_type'] ?? '';
+            $prd_cd			= $cart[$i]['prd_cd'] ?? '';
+            $goods_opt		= $cart[$i]['goods_opt'] ?? '';
+            $qty			= ($cart[$i]['qty'] ?? 0) * 1; // 판매수량
+            $addopt_amt		= $cart[$i]['addopt_amt'] ?? 0;
             $order_addopt_amt = $addopt_amt * $qty;
 
-            $opt_ord_type = 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
+            $opt_ord_type	= 14; // order_opt의 ord_type (수기판매:14 / 예약:4)
 
             // 옵션가격
-            $a_goods_opt = explode("|", $goods_opt);
-            $opt_amt = $cart[$i]["opt_amt"] ?? 0;
-            $order_opt_amt = $opt_amt * $qty;
+            $a_goods_opt	= explode("|", $goods_opt);
+            $opt_amt		= $cart[$i]["opt_amt"] ?? 0;
+            $order_opt_amt	= $opt_amt * $qty;
 
             $sql = "
                 select
@@ -976,6 +976,9 @@ class ord01Controller extends Controller
 			$product = DB::table('product')->where('prd_cd', $prd_cd)->first();
 			$product_price = $product->price ?? 0;
 			$product_wonga = $product->wonga ?? 0;
+			
+			//행사코드(판매처수수료) 상품정보에서 가져오기
+			$cart[$i]["pr_code_cd"]	= $product->pr_code;
 			
 			// 판매가 지정되지 않은 경우, 현재판매가로 설정
 			if ($sugi_price == 0 || $sugi_price == '') {

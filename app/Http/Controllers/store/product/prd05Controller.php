@@ -26,8 +26,9 @@ class prd05Controller extends Controller
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
 		$values = [
-			'sdate'         => $sdate,
-			'edate'         => date("Y-m-d", strtotime('3 day')),
+			'sdate'		=> $sdate,
+			'edate'		=> date("Y-m-d", strtotime('3 day')),
+			'pr_codes'	=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd05',$values);
@@ -92,11 +93,12 @@ class prd05Controller extends Controller
 						, pp.change_val as change_val
 						, pp.change_type as change_type
 						, pp.price_kind as price_kind
+						, p.pr_code
 					from product_price_list ppl
-						inner join product p on p.prd_cd = ppl.prd_cd
-						left outer join product_code pc on pc.prd_cd = ppl.prd_cd
-						inner join goods g on g.goods_no = pc.goods_no
-						left outer join product_price pp on pp.idx = ppl.product_price_cd
+					inner join product p on p.prd_cd = ppl.prd_cd
+					inner join product_code pc on pc.prd_cd = ppl.prd_cd
+					left outer join goods g on g.goods_no = pc.goods_no
+					left outer join product_price pp on pp.idx = ppl.product_price_cd
 					where 1=1 and ppl.product_price_cd = '$code'
 				";
 
@@ -105,12 +107,13 @@ class prd05Controller extends Controller
 		}
 
 		$values = [
-			'code'	=> $code,
-			'res'	=> $res,
-			'cmd'	=> $cmd,
-			'sdate'	=> $sdate,
-			'edate'	=> date("Y-m-d"),
-			'rdate'	=> date("Y-m-d", strtotime('1 day'))
+			'code'		=> $code,
+			'res'		=> $res,
+			'cmd'		=> $cmd,
+			'sdate'		=> $sdate,
+			'edate'		=> date("Y-m-d"),
+			'rdate'		=> date("Y-m-d", strtotime('1 day')),
+			'pr_codes'	=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd05_show',$values);
@@ -175,32 +178,34 @@ class prd05Controller extends Controller
 
 	public function search(Request $request)
 	{
-		$sdate = $request->input('sdate');
-		$edate = $request->input('edate');
-		$prd_cd = $request->input('prd_cd');
-		$nud = $request->input("s_nud", "N");
-		$goods_nm = $request->input("goods_nm");
-		$goods_nm_eng = $request->input("goods_nm_eng");
+		$sdate		= $request->input('sdate');
+		$edate		= $request->input('edate');
+		$prd_cd		= $request->input('prd_cd');
+		$nud		= $request->input("s_nud", "N");
+		$goods_nm	= $request->input("goods_nm");
+		$goods_nm_eng	= $request->input("goods_nm_eng");
+		$pr_code	= $request->input('pr_code');
 
-		$where = "";
-		if( $prd_cd != "" ) $where .= " and pc.prd_cd like '$prd_cd%'";
-		if($nud == 'Y') $where .= " and ( ppl.change_date >= '$sdate' and ppl.change_date < date_add('$edate',interval 1 day)) ";
-		if ($goods_nm != "") $where .= " and g.goods_nm like '%". Lib::quote($goods_nm)."%' ";
-		if ($goods_nm_eng != "") $where .= " and g.goods_nm_eng like '%". Lib::quote($goods_nm_eng)."%' ";
+		$where	= "";
+		if( $prd_cd != "" )		$where .= " and pc.prd_cd like '$prd_cd%'";
+		if($nud == 'Y')			$where .= " and ( ppl.change_date >= '$sdate' and ppl.change_date < date_add('$edate',interval 1 day)) ";
+		if($goods_nm != "")		$where .= " and g.goods_nm like '%". Lib::quote($goods_nm)."%' ";
+		if($goods_nm_eng != "")	$where .= " and g.goods_nm_eng like '%". Lib::quote($goods_nm_eng)."%' ";
+		if($pr_code != "")		$where .= " and p.pr_code = '" . Lib::quote($pr_code) . "' ";
 
 		// ordreby
-		$ord_field  = $request->input("ord_field", "ppl.change_date");
-		$ord        = $request->input("ord", "desc");
-		$orderby    = sprintf("order by %s %s", $ord_field, $ord);
+		$ord_field	= $request->input("ord_field", "ppl.change_date");
+		$ord		= $request->input("ord", "desc");
+		$orderby	= sprintf("order by %s %s", $ord_field, $ord);
 
 		// pagination
-		$page       = $request->input("page", 1);
-		$page_size  = $request->input("limit", 100);
-		if ($page < 1 or $page == "") $page = 1;
-		$startno    = ($page - 1) * $page_size;
-		$limit      = " limit $startno, $page_size ";
+		$page		= $request->input("page", 1);
+		$page_size	= $request->input("limit", 100);
+		if($page < 1 or $page == "")	$page = 1;
+		$startno	= ($page - 1) * $page_size;
+		$limit		= " limit $startno, $page_size ";
 
-		$sql = "
+		$sql	= "
 			select
 				ppl.idx
 				, ppl.change_date
@@ -219,8 +224,7 @@ class prd05Controller extends Controller
 				, ppl.rt
 				, ppl.ut
 				, pc.prd_cd
-			    , 
-			    case
+			    , case
 			        when ppl.plan_category = '00' then '변경없음'
 			        when pc.plan_category = '01' then '정상매장'
 			        when pc.plan_category = '02' then '전매장'
@@ -237,6 +241,7 @@ class prd05Controller extends Controller
 				, pc.size as size
 				, p.price
 				, p.tag_price as goods_sh
+				, pr_code.code_val as pr_code_nm
 				-- , g.price
 				-- , g.goods_sh
 			from product_price_list ppl
@@ -245,6 +250,7 @@ class prd05Controller extends Controller
 			inner join product p on ppl.prd_cd = p.prd_cd
 			left outer join goods g on g.goods_no = pc.goods_no
 			left outer join code c on c.code_id = pc.color and c.code_kind_cd = 'PRD_CD_COLOR'
+			left outer join code pr_code on pr_code.code_id = p.pr_code and pr_code.code_kind_cd = 'PR_CODE' and pr_code.use_yn = 'Y'
 			left outer join brand b on b.br_cd = pc.brand
 			left outer join opt opt on opt.opt_kind_cd = g.opt_kind_cd and opt.opt_id = 'K'
 			where 1=1 
@@ -265,6 +271,7 @@ class prd05Controller extends Controller
 				from product_price_list ppl
 				inner join product_price pp on pp.idx = ppl.product_price_cd
 				inner join product_code pc on ppl.prd_cd = pc.prd_cd
+				inner join product p on ppl.prd_cd = p.prd_cd
 				left outer join goods g on g.goods_no = pc.goods_no
 				where 1=1
 				$where
@@ -376,6 +383,7 @@ class prd05Controller extends Controller
 		$type				= $request->input('type');
 		$admin_id			= Auth('head')->user()->id;
 		$price_kind			= $request->input('price_kind');
+		$pr_code			= $request->input('pr_code');
 		$plan_category		= $request->input('plan_category', '00');
 		$change_price_type	= $request->input('change_price_type');
 
@@ -423,6 +431,7 @@ class prd05Controller extends Controller
 						'price_kind'		=> $price_kind??'',
 						'apply_yn'			=> $apply_yn,
 						'change_type'		=> $change_type,
+						'pr_code'			=> $pr_code,
 						'plan_category'		=> $plan_category,
 						'product_price_cd'	=> $product_price_cd,
 						'prd_cd'			=> $d['prd_cd'],
@@ -449,6 +458,7 @@ class prd05Controller extends Controller
 							->where('prd_cd', 'like', $pr->prd_cd_p . '%')
 							->update([
 								"price" 	=> $d['change_val'],
+								"pr_code"	=> $pr_code,
 								"admin_id"	=> $admin_id,
 								"ut"		=> now()
 							]);
@@ -657,9 +667,10 @@ class prd05Controller extends Controller
 		$sdate		= $mutable->sub(1, 'week')->format('Y-m-d');
 
 		$values = [
-			'sdate'	=> $sdate,
-			'edate'	=> date("Y-m-d"),
-			'rdate'	=> date("Y-m-d", strtotime('1 day'))
+			'sdate'		=> $sdate,
+			'edate'		=> date("Y-m-d"),
+			'rdate'		=> date("Y-m-d", strtotime('1 day')),
+			'pr_codes'	=> SLib::getCodes("PR_CODE")
 		];
 
 		return view( Config::get('shop.store.view') . '/product/prd05_batch_show',$values);
@@ -703,6 +714,7 @@ class prd05Controller extends Controller
 		$change_date_now	= $request->input('change_date_now');
 		$change_cnt			= $request->input('change_cnt');
 		$type				= $request->input('type');
+		$pr_code			= $request->input('pr_code');
 		$plan_category		= $request->input('plan_category', '00');
 		$data				= $request->input('data', []);
 
@@ -755,6 +767,7 @@ class prd05Controller extends Controller
 						'price_kind'		=> $price_kind,
 						'apply_yn'			=> $apply_yn,
 						'change_type'		=> $change_type,
+						'pr_code'			=> $pr_code,
 						'plan_category'		=> $plan_category,
 						'product_price_cd'	=> $product_price_cd,
 						'prd_cd'			=> $d['prd_cd'],
@@ -780,6 +793,7 @@ class prd05Controller extends Controller
 							->where('prd_cd', 'like', $pr->prd_cd_p . '%')
 							->update([
 								'price'		=> $d['change_val'],
+								'pr_code'	=> $pr_code,
 								'admin_id'	=> $admin_id,
 								'ut'		=> now()
 							]);

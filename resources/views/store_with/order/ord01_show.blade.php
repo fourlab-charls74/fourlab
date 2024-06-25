@@ -444,13 +444,13 @@
         {headerCheckboxSelection: true, checkboxSelection: true,  width: 28},
         {field: "prd_cd", headerName: "바코드", width: 120, cellStyle: {"text-align": "center"}},
         {field: "goods_no", hide: true},
-        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 200, wrapText: true, autoHeight: true},
-        {field: "goods_opt", headerName: "옵션", width: 130},
+        {field: "goods_nm", headerName: "상품명", type: "HeadGoodsNameType", width: 300, wrapText: true, autoHeight: true},
+        {field: "goods_opt", headerName: "옵션", width: 180},
         {field: "sg_qty", headerName: "창고재고", width: 60, type: 'currencyType'},
         {field: "store_wqty", headerName: "매장재고", width: 60, type: 'currencyType'},
 		{field: "goods_price", headerName: "현재가", width: 60, type: 'currencyType'},
         {field: "qty", headerName: "수량", width: 60, type: 'currencyType', editable: true, cellStyle: {"background-color": "#ffff99"}, onCellValueChanged: EditAmt},
-		{field: "pr_code", headerName: "판매처수수료", width: 80, editable: true, cellClass: 'hd-grid-edit',
+		{field: "pr_code", headerName: "판매처수수료", width: 80, hide:true, editable: true, cellClass: 'hd-grid-edit',
 			onCellValueChanged: function (params) {
 				if (params.oldValue !== params.newValue) {
 					let pr_code = pr_codes.filter(pc => pc.pr_code_nm === params.newValue)[0];

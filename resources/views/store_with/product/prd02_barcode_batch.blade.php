@@ -2,6 +2,15 @@
 @section('title', '바코드 일괄등록')
 @section('content')
 
+<style>
+	.table th {min-width: 120px;}
+	.table td {width: 25%;}
+
+	@media (max-width: 740px) {
+		.table td {float: unset !important;width: 100% !important;}
+	}
+</style>
+	
 	<!-- import excel lib -->
 	<script src="https://unpkg.com/xlsx-style@0.8.13/dist/xlsx.full.min.js"></script>
 
@@ -22,15 +31,6 @@
 				<a href="javascript:void(0)" onclick="window.close();" class="btn btn-outline-primary"><i class="fas fa-times fa-sm mr-1"></i> 닫기</a>
 			</div>
 		</div>
-
-		<style>
-			.table th {min-width: 120px;}
-			.table td {width: 25%;}
-
-			@media (max-width: 740px) {
-				.table td {float: unset !important;width: 100% !important;}
-			}
-		</style>
 
 		<div class="card_wrap aco_card_wrap">
 			<div class="card shadow">
@@ -106,6 +106,7 @@
 			{field: "wonga", headerName: "원가", type: 'currencyType', width: 80},
 			{field: "sup_com", headerName: "공급업체", width: 120, cellStyle: {"text-align": "center"}},
 			{field: "origin", headerName: "원산지", width: 90, cellStyle: {"text-align": "center"}},
+			{field: "pr_code", headerName: "행사코드", width: 90, cellStyle: {"text-align": "center"}},
 		];
 	</script>
 
@@ -222,7 +223,8 @@
 				'P': 'price',
 				'Q': 'wonga',
 				'R': 'sup_com',
-				'S': 'origin'
+				'S': 'origin',
+				'T': 'pr_code'
 			};
 
 			var firstRowIndex = 6; // 엑셀 6행부터 시작 (샘플데이터 참고)
@@ -330,6 +332,9 @@
 				} else if (res.data.code === -1) {
 					const prd_cd = res.data.prd_cd;
 					alert(`${prd_cd}는 중복되었거나 이미 존재하는 상품 코드입니다.\n중복을 제거하거나 상품 코드를 재확인 후 다시 시도해주세요.`);
+				} else if (res.data.code === -2) {
+					const prd_cd = res.data.prd_cd;
+					alert(`${prd_cd}의 행사코드가 잘못되었습니다.\n확인 후 다시 시도해주세요.`);
 				} else {
 					console.log(res.data);
 					alert("바코드 일괄등록 중 오류가 발생했습니다.\n관리자에게 문의해주세요.");

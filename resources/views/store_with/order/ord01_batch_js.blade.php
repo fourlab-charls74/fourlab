@@ -219,8 +219,11 @@
         let rows = gx.getRows();
         if(rows.length < 1) return alert("일괄판매할 주문건이 존재하지 않습니다.");
 
-        let bank_code = $("[name=bank_code]").val();
-        // if(bank_code === "") return alert("입금은행을 선택해주세요.");
+		let store_nm	= $("[name=store_nm]").val();
+		if(store_nm === "") return alert("주문매장은 반드시 선택해주세요.");
+
+		let bank_code = $("[name=bank_code]").val();
+		// if(bank_code === "") return alert("입금은행을 선택해주세요.");
 
         let apy_fee = $("[name=apy_fee]").is(":checked");
         let fee = $("[name=fee]").val();
