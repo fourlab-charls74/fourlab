@@ -171,6 +171,7 @@
 		{headerName:"FAX",			field:"fax",			width:100},
 		{headerName:"개점일",		field:"sdate",			width:75, cellClass: 'hd-grid-code'},
 		{headerName:"폐점일",		field:"edate",			width:75, cellClass: 'hd-grid-code'},
+		{headerName:"출고우선순위",	field:"priority_nm",	width:85, cellClass: 'hd-grid-code'},
 		{headerName:"매니저",		children:[
 			{headerName:"매니저명",	field:"manager_nm",		width:60, cellClass: 'hd-grid-code'},
 			{headerName:"연락처",	field:"manager_mobile",	width:100, cellClass: 'hd-grid-code'},

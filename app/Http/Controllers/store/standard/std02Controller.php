@@ -86,6 +86,7 @@ class std02Controller extends Controller
 				c.code_val as store_type_nm,
 				d.code_val as store_kind_nm,
 				e.code_val as store_area_nm,
+				f.code_val as priority_nm,
 				if(sg.name <> '', sg.name, a.grade_cd) as grade_nm
 			from store a
 			left outer join store_channel sc on sc.store_channel_cd = a.store_channel and dep = 1
@@ -93,6 +94,7 @@ class std02Controller extends Controller
 			left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
 			left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
 			left outer join code e on e.code_kind_cd = 'store_area' and e.code_id = a.store_area
+			left outer join code f on f.code_kind_cd = 'priority' and f.code_id = a.priority
 			left outer join (
 				select grade_cd, name, sdate, edate
 				from store_grade
