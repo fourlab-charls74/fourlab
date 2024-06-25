@@ -202,7 +202,7 @@ class sal03Controller extends Controller
 						, oo.goods_no, oo.goods_opt
 						, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd and store_cd = '$store_cd') as store_wqty
 					from order_opt_wonga ow 
-					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 					left outer join store s on oo.store_cd = s.store_cd
 					inner join product_code pc on pc.prd_cd = oo.prd_cd
 					where
@@ -246,7 +246,7 @@ class sal03Controller extends Controller
 						sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty, 
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as total_ord_amt
 					from order_opt_wonga w
-					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
 					where 
 						o.prd_cd = '$prd_cd' 
 						and w.ord_state in (30, 60, 61)
@@ -300,7 +300,7 @@ class sal03Controller extends Controller
 								, oo.goods_no, oo.goods_opt
 								, (select sum(wqty) from product_stock_store where prd_cd = pc.prd_cd and store_cd = '$store_cd') as store_wqty
 							from order_opt_wonga ow
-							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 							left outer join store s on oo.store_cd = s.store_cd
 							inner join product_code pc on pc.prd_cd = oo.prd_cd
 							where
@@ -391,7 +391,7 @@ class sal03Controller extends Controller
 							where b_.prd_cd_p = pc.prd_cd_p and a_.store_cd = '$store_cd'
 						) as store_wqty
 					from order_opt_wonga ow 
-					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 					left outer join store s on oo.store_cd = s.store_cd
 					inner join product_code pc on pc.prd_cd = oo.prd_cd
 					where
@@ -433,7 +433,7 @@ class sal03Controller extends Controller
 						sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty, 
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as total_ord_amt
 					from order_opt_wonga w
-					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
 					where 
 						o.prd_cd like '$prd_cd_p%' 
 						and w.ord_state in (30, 60, 61)
@@ -492,7 +492,7 @@ class sal03Controller extends Controller
 									where b_.prd_cd_p = pc.prd_cd_p and a_.store_cd = '$store_cd'
 								) as store_wqty
 							from order_opt_wonga ow
-							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 							left outer join store s on oo.store_cd = s.store_cd
 							inner join product_code pc on pc.prd_cd = oo.prd_cd
 							where

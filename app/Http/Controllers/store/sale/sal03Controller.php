@@ -157,12 +157,12 @@ class sal03Controller extends Controller
 			$where .= " and g.sale_stat_cl = '" . Lib::quote($goods_stat) . "' ";
 		}
 
-		$page_size = $limit;
-		$startno = ($page - 1) * $page_size;
-		$limit = " limit $startno, $page_size ";
+		$page_size	= $limit;
+		$startno	= ($page - 1) * $page_size;
+		$limit		= " limit $startno, $page_size ";
 
 		$cfg_img_size_real	= "a_500";
-		$cfg_img_size_list	 = "s_50";
+		$cfg_img_size_list	= "s_50";
 
 		
 		
@@ -229,7 +229,7 @@ class sal03Controller extends Controller
 							where pss.prd_cd = pc.prd_cd $store_where
 						) as store_wqty
 					from order_opt_wonga ow 
-					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 					left outer join store s on oo.store_cd = s.store_cd
 					inner join product_code pc on pc.prd_cd = oo.prd_cd
 					where
@@ -276,7 +276,7 @@ class sal03Controller extends Controller
 						sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty, 
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as total_ord_amt
 					from order_opt_wonga w
-					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
 					left outer join store store on o.store_cd = store.store_cd
 					where 
 						o.prd_cd = '$prd_cd' 
@@ -320,7 +320,7 @@ class sal03Controller extends Controller
 					from product_stock_release psr
 					left outer join store store on psr.store_cd = store.store_cd
 					where 
-						psr.state = '40'
+						psr.state >= '30'
 						and psr.prd_cd = '$prd_cd'
 						$store_where
 				";
@@ -387,7 +387,7 @@ class sal03Controller extends Controller
 									where pss.prd_cd = pc.prd_cd $store_where
 								) as store_wqty
 							from order_opt_wonga ow
-							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 							left outer join store s on oo.store_cd = s.store_cd
 							inner join product_code pc on pc.prd_cd = oo.prd_cd
 							where
@@ -501,7 +501,7 @@ class sal03Controller extends Controller
 							where b_.prd_cd_p = pc.prd_cd_p $store_where
 						) as store_wqty
 					from order_opt_wonga ow 
-					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+					inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 					left outer join store s on oo.store_cd = s.store_cd
 					inner join product_code pc on pc.prd_cd = oo.prd_cd
 					where
@@ -546,7 +546,7 @@ class sal03Controller extends Controller
 						sum(if(w.ord_state = '30', w.qty, w.qty * -1)) as qty, 
 						sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as total_ord_amt
 					from order_opt_wonga w
-					inner join order_opt o on w.ord_opt_no = o.ord_opt_no
+					inner join order_opt o on w.ord_opt_no = o.ord_opt_no and o.ord_state = '30'
 					left outer join store store on o.store_cd = store.store_cd
 					where 
 						o.prd_cd like '$prd_cd_p%' 
@@ -590,7 +590,7 @@ class sal03Controller extends Controller
 					from product_stock_release psr
 					left outer join store store on psr.store_cd = store.store_cd
 					where 
-						psr.state = '40'
+						psr.state >= '30'
 						and psr.prd_cd like '$prd_cd_p%'
 						$store_where
 				";
@@ -664,7 +664,7 @@ class sal03Controller extends Controller
 									where b_.prd_cd_p = pc.prd_cd_p $store_where
 								) as store_wqty
 							from order_opt_wonga ow
-							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no
+							inner join order_opt oo on ow.ord_opt_no = oo.ord_opt_no and oo.ord_state = '30'
 							left outer join store s on oo.store_cd = s.store_cd
 							inner join product_code pc on pc.prd_cd = oo.prd_cd
 							where
