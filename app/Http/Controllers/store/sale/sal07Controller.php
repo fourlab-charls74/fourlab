@@ -163,7 +163,7 @@ class sal07Controller extends Controller
 					select 
 						count(*) as cnt
 					from order_opt_wonga w
-						inner join order_opt o on o.ord_opt_no = w.ord_opt_no
+						inner join order_opt o on o.ord_opt_no = w.ord_opt_no and o.ord_state = '30'
 						inner join goods g on o.goods_no = g.goods_no
 						inner join product_code pc on pc.prd_cd = o.prd_cd
 						left outer join store s on o.store_cd = s.store_cd
@@ -220,7 +220,7 @@ class sal07Controller extends Controller
 				item.code_val as opt_kind_nm,
 				pc.color, pc.prd_cd_p, pc.size
 			from order_opt_wonga w 
-				inner join order_opt o on o.ord_opt_no = w.ord_opt_no 
+				inner join order_opt o on o.ord_opt_no = w.ord_opt_no and o.ord_state = '30'
 				inner join goods g on o.goods_no = g.goods_no
 				inner join product_code pc on pc.prd_cd = o.prd_cd
 				-- inner join product p on o.prd_cd = p.prd_cd
