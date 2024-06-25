@@ -326,6 +326,7 @@ class sal34Controller extends Controller
 				from order_opt o 
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join goods g on o.goods_no = g.goods_no
+					left outer join store store on store.store_cd = o.store_cd
 				where w.`ord_state_date` >= '$sdate' and w.ord_state_date <= '$edate' and w.`ord_state` in ( '30','60','61')
 					and o.ord_state = '30' 
 					and o.store_cd <> '' 
