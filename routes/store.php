@@ -1018,6 +1018,10 @@ Route::group(['middleware' => 'store','as' => 'store.', 'namespace' => 'store'],
 		// 상품입출고 통합조회
 		Route::get('sal39','sal39Controller@index');
 		Route::get('sal39/search','sal39Controller@search');
+
+		// 매장회원 구매 통계
+		Route::get('sal40','sal40Controller@index');
+		Route::get('sal40/search','sal40Controller@search');
     });
 
     Route::prefix("account")->namespace('account')->group(function () {
