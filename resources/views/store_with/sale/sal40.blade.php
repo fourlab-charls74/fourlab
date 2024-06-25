@@ -177,7 +177,9 @@
 					{headerName: "판매수량",		field: "u_qty",		width: 80, type: 'numberType', aggFunc: sumValuesFunc},
 					{headerName: "실결제금액",	field: "u_recv_amt",width: 100, type: 'numberType', aggFunc: sumValuesFunc},
 					{headerName: "구매회원수",	field: "ord_cnt",	width: 80, type: 'numberType', aggFunc: sumValuesFunc},
-					{headerName: "평균구매수",	field: "avg_qty",	width: 80, type: 'numberType', type: 'percentType'},
+					{headerName: "평균구매수",	field: "avg_qty",	width: 80, type: 'numberType', type: 'percentType',
+						aggFunc: (params) => (sumValuesFunc(params) / params.values.length).toFixed(2),
+					},
 					{headerName: "기간가입수",	field: "join_cnt",	width: 80, type: 'numberType', aggFunc: sumValuesFunc},
 				]
 			},
