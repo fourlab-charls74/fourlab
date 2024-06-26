@@ -272,8 +272,10 @@
                         --}}
                         <a href="javascript:void(0);" onclick="receive()" class="btn btn-sm btn-primary shadow-sm mr-1">완료</a>
                         <a href="javascript:void(0);" onclick="reject()" class="btn btn-sm btn-primary shadow-sm">거부</a>
+						{{--
                         <span class="d-none d-lg-block ml-2 mr-2 tex-secondary">|</span>
                         <a href="javascript:void(0);" onclick="remove()" class="btn btn-sm btn-outline-primary shadow-sm">삭제</a>
+                        --}}
                     </div>
 				</div>
 			</div>
