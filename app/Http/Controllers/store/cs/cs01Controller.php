@@ -898,8 +898,10 @@ class cs01Controller extends Controller {
 				, s.prd_cd
 				, if(s.goods_no = 0, p.prd_nm, g.goods_nm) as goods_nm
 				, if(s.goods_no = 0, p.prd_nm_eng, g.goods_nm_eng) as goods_nm_eng
-				, if(s.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
-				, if(s.goods_no = 0, p.price, g.price) as price
+				, p.tag_price as goods_sh
+				, p.price
+				-- , if(s.goods_no = 0, p.tag_price, g.goods_sh) as goods_sh
+				-- , if(s.goods_no = 0, p.price, g.price) as price
 				, b.brand_nm
 				, pc.prd_cd_p
 				, pc.color
