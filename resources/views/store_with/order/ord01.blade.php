@@ -423,13 +423,6 @@
         // {headerName: "No", pinned: "left", valueGetter: "node.id", cellRenderer: "loadingRenderer", width: 50, cellStyle: {'text-align': 'center'}},
         {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 28},
         {field: "ord_no", headerName: "주문번호", pinned: 'left', width: 130, cellStyle: StyleOrdNo, type: 'StoreOrderNoType',
-            cellStyle: params => {
-                if (params.node.rowPinned === 'top') {
-                    return {'text-align': 'center'};
-                } else {
-                    return {};
-                }
-            },
             cellRenderer: function(params) {
 				if (params.node.rowPinned === 'top') return "합계";
                 else return params.value;

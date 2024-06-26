@@ -952,7 +952,7 @@
                                         <tbody>
                                             @if (count($claim_memos) > 0)
                                             @foreach($claim_memos as $claim_memo)
-                                            <tr>
+                                            <tr @if ($claim_memo->ord_opt_no == $ord_opt_no) style="background-color: yellow" @endif>
                                                 <td>{{@$claim_memo->cs_form}}</td>
                                                 <td><a href="#goods">{{@$claim_memo->clm_state}}</a></td>
                                                 <td>{{@$claim_memo->regi_date}}</td>
