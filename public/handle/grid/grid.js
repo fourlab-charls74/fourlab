@@ -58,6 +58,27 @@ function setArrowKeyboardEvent(e) {
 	}
 };
 
+// 엑셀다운로드 전, 모든 컬럼에 대하여 default cellClass 지정 ("cell")
+function setDefaultCellClass(cols) {
+	return cols.map(col => {
+		if (col.cellClass) {
+			if (Array.isArray(col.cellClass)) {
+				col.cellClass.push('cell');
+			} else {
+				col.cellClass = [col.cellClass, 'cell'];
+			}
+		} else {
+			col.cellClass = 'cell';
+		}
+		
+		if (col.children) {
+			col.children = setDefaultCellClass(col.children);
+		}
+
+		return col;
+	});
+}
+
 function HDGrid(gridDiv , columns, optionMixin = {}){
     this.id = gridDiv.id.replace("div-", "");
     this.gridDiv = gridDiv;
@@ -428,8 +449,13 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         // debug: true,
 
         excelStyles: [
+			{
+				id: 'cell',
+				font: { size: 11 },
+			},
             {
                 id: 'header',
+				font: { size: 11 },
                 alignment: {
                     vertical: 'Center',
                     horizontal: 'Center',
@@ -785,10 +811,13 @@ HDGrid.prototype.HideLoadingLayer = function(){
  */
 HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
 
+	const cols = setDefaultCellClass(this.gridOptions.api.getColumnDefs());	
+	this.gridOptions.api.setColumnDefs(cols);
+
     const values = {
         fileName: title,
         sheetName: 'Sheet1',
-        headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : 30,
+        headerRowHeight: options.hasOwnProperty('headerHeight') ? options.headerHeight : null,
         skipPinnedTop: options.hasOwnProperty('addPinnedTop') ? !options.addPinnedTop : true,
         skipGroups: options.hasOwnProperty('skipGroups') ? options.skipGroups : false,
 		columnGroups: true,
