@@ -1,6 +1,6 @@
 @extends('store_with.layouts.layout-nav')
 @php
-    $title = "매장반품등록";
+    $title	= "매장반품등록";
     if($cmd == "update") $title = "매장반품내역";
 @endphp
 @section('title', $title)
