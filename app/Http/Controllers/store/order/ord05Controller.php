@@ -167,7 +167,13 @@ class ord05Controller extends Controller
 	public function searchOrderOpts($ord_no, Request $request)
 	{
 		$ord_state = $request->input('ord_state', 30);
-		$first_of_the_current_month = now()->firstOfMonth()->format('Y-m-d 00:00:00');
+
+		//해당월 5일까지는 전달 정보 수정가능하게 (정산전 시점)
+		if(now()->format('j') <= 5){
+			$first_of_the_current_month	= now()->modify('first day of last month')->format('Y-m-d 00:00:00');
+		}else{
+			$first_of_the_current_month = now()->firstOfMonth()->format('Y-m-d 00:00:00');
+		}
 
 		$sql = "
 			select b.*

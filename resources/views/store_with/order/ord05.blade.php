@@ -210,7 +210,7 @@
 			<div class="card-header mb-0 d-flex justify-content-between align-items-left align-items-sm-center flex-column flex-sm-row">
 				<h5 class="m-0 mb-3 mb-sm-0">주문상품내역<span id="select_ord_no" class="text-danger fs-14 ml-2"></span></h5>
 				<div class="d-flex align-items-center justify-content-center justify-content-sm-end">
-					<p class="text-secondary mr-2">* <span class="text-danger font-weight-bold">당월주문건</span>이고 <span class="text-danger font-weight-bold">정산대기</span> 상태인 <span class="text-danger font-weight-bold">교환/환불 처리되지 않은</span> 주문건만 수정 가능합니다.</p>
+					<p class="text-secondary mr-2">* <span class="text-danger font-weight-bold">`당월주문건` 혹은 `해당월 5일이전 전월주문건`[정산대기시점]</span>이고 <span class="text-danger font-weight-bold">정산대기</span> 상태인 <span class="text-danger font-weight-bold">교환/환불 처리되지 않은</span> 주문건만 수정 가능합니다.</p>
 				    <button type="button" class="btn btn-sm btn-primary shadow-sm pl-2 mr-1" onclick="return saveProductRow();"><i class="fas fa-save fa-sm text-white-50 mr-1"></i> 저장</button>
 					<button type="button" class="btn btn-sm btn-outline-primary shadow-sm" onclick="return resetProductRow();"><i class="fas fa-redo fa-sm mr-1"></i> 초기화</button> 
 				</div>
