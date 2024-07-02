@@ -1386,8 +1386,20 @@ class cs01Controller extends Controller {
 				";
 				$n_avg_wonga	= DB::selectOne($sql_avg, ['prd_cd_p' => $prd_cd_p])->wonga;
 				
-				$sql_avg_update	= " update product_wonga set wonga = :wonga where prd_cd_p = :prd_cd_p ";
-				DB::update($sql_avg_update,['wonga' => $n_avg_wonga, 'prd_cd_p' => $prd_cd_p]);
+				$chk_sql	= " select count(*) as tot from product_wonga where prd_cd_p = :prd_cd_p ";
+				$chk_cnt	= DB::selectOne($chk_sql, ['prd_cd_p' => $prd_cd_p])->tot;
+				
+				if($chk_cnt == 0){
+					$sql_avg_insert	= " 
+						insert into product_wonga(prd_cd_p, wonga, rt, admin_id) 
+						values ('$prd_cd_p', '$n_avg_wonga', now(), 'system') 
+					";
+					DB::insert($sql_avg_insert);
+				}else{
+					$sql_avg_update	= " update product_wonga set wonga = :wonga where prd_cd_p = :prd_cd_p ";
+					DB::update($sql_avg_update,['wonga' => $n_avg_wonga, 'prd_cd_p' => $prd_cd_p]);
+				}
+				
 
 				$admin_id = Auth::guard('head')->user()->id;
 				
