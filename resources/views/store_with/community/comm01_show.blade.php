@@ -35,7 +35,7 @@
                     <div>
                         @if($no > 0)
                         <button type="button" onclick="return Update('{{ $no }}');" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="bx bx-save fs-14 mr-1"></i> 저장</button>
-                        <button type="button" href="#" onclick="history.back();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 목록</button>
+                        <button type="button" href="#" onclick="location.href='/store/community/comm01/{{$store_notice_type}}';" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"> 목록</button>
                         <!-- <button type="button" href="#" onclick="return Destroy('{{ $no }}');" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="far fa-trash-alt fs-12 mr-1"></i> 삭제</button> -->
                         @else
                         <button type="button" href="#" onclick="Create();return false;" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="bx bx-save fs-14 mr-1"></i> 저장</button>
@@ -90,54 +90,68 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        @if($store_notice_type === 'notice')
-                                            <th>매장 선택</th>
-                                            <td>
-                                                @if($no > 0)
-                                                <div class="form-inline inline_btn_box">
-                                                    <input type='hidden' id="store_nm" name="store_nm">
-													@foreach($storeCode as $sc)
-														@if($sc->store_nm == null)
-															<b style="color:red;">※전체 매장 공지입니다.</b>
-														@elseif($sc->check_yn == 'Y')
-															<div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
-																<span>{{$sc->store_nm}}
-																	<b style="color:blue;">[확인]</b>&nbsp;&nbsp;
-																</span>
-															</div>
-														@elseif($sc->check_yn == 'N')
-															<div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
-																<span>{{$sc->store_nm}}
-																	<b style="color:red;">[미확인]</b>&nbsp;
-																	<button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;padding-bottom:3px;">x</button>&nbsp;&nbsp;
-																</span>
-															</div>
-														@endif
-													@endforeach
-                                                </div>
-                                                @endif
-                                                <div class="form-inline inline_btn_box">
-                                                    <input type='hidden' id="store_nm" name="store_nm">
-                                                    <select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
-                                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
-                                                </div>
-                                                @if($no == "")
-                                                <span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
-                                                @endif
-                                            </td>
-										</tr>
-										<tr>
-											<th>파일 업로드</th>
-											<td>
-												<div class="form-inline inline_btn_box">
-													<input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
+									@if($store_notice_type === 'notice' || 1 === 1)
+									<tr>
+										<th>매장 선택</th>
+										<td>
+											@if($no > 0)
+											<div class="form-inline inline_btn_box">
+												<input type='hidden' id="store_nm" name="store_nm">
+												@foreach($storeCode as $sc)
+													@if($sc->store_nm == null)
+														<b style="color:red;">※전체 매장 공지입니다.</b>
+													@elseif($sc->check_yn == 'Y')
+														<div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
+															<span>{{$sc->store_nm}}
+																<b style="color:blue;">[확인]</b>&nbsp;&nbsp;
+															</span>
+														</div>
+													@elseif($sc->check_yn == 'N')
+														<div class="store_sel" data-store='{{$sc->store_cd}}' style="border:0.5px solid gray; border-radius: 5px; margin-right:15px;margin-bottom:10px;padding-left:10px;">
+															<span>{{$sc->store_nm}}
+																<b style="color:red;">[미확인]</b>&nbsp;
+																<button type= "button" class= "select_store_delete" onclick="select_store_delete('{{$sc->store_cd}}','{{$sc->ns_cd}}')" style="border:none;background:none;color:#153066;padding-bottom:3px;">x</button>&nbsp;&nbsp;
+															</span>
+														</div>
+													@endif
+												@endforeach
+											</div>
+											@endif
+											<div class="form-inline inline_btn_box">
+												<input type='hidden' id="store_nm" name="store_nm">
+												<select id="store_no" name="store_no[]" class="form-control form-control-sm select2-store multi_select" multiple ></select>
+												<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary sch-store"><i class="bx bx-dots-horizontal-rounded fs-16"></i></a>
+											</div>
+											@if($no == "")
+											<span style="color:red">※매장 미선택시 전체 매장 공지로 등록됩니다.</span>
+											@endif
+										</td>
+									</tr>
+									@endif
+									<tr>
+										<th>파일 업로드</th>
+										<td>
+											<div class="form-inline inline_btn_box">
+												<input type = "file" name= "notice_add_file" id="notice_add_file" multiple>
+											</div>
+											<span style="color:red">※이미지(jpg, png), 엑셀(excel), ppt(pptx), PDF만 가능합니다.</span>
+										</td>
+									</tr>
+									<tr>
+										<th>사용 여부</th>
+										<td>
+											<div class="form-inline form-radio-box">
+												<div class="custom-control custom-radio">
+													<input type="radio" name="use_yn" id="use_y" class="custom-control-input" value="Y" @if(@$user->use_yn != 'N') checked @endif />
+													<label class="custom-control-label" for="use_y">사용</label>
 												</div>
-												<span style="color:red">※이미지(jpg, png), 엑셀(excel), ppt(pptx), PDF만 가능합니다.</span>
-											</td>
-										</tr>
-                                        @endif
-                                    </tr>
+												<div class="custom-control custom-radio">
+													<input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="N" @if(@$user->use_yn == 'N') checked @endif />
+													<label class="custom-control-label" for="use_n">미사용</label>
+												</div>
+											</div>
+										</td>
+									</tr>
                                 </table>
                             </div>
                         </div>
@@ -255,8 +269,8 @@
             type: 'GET',
             cache: false,
             xhrFields: {
-                responseType: 'blob'
-            },
+    			responseType: 'blob'
+    		},
         })
         .done(function (data, status, jqXhr) {
             if (!data) {
@@ -264,9 +278,9 @@
             }
 
             try {
-                let blob = new Blob([data], { type: jqXhr.getResponseHeader('content-type') });
-                let fileName = getFileName(jqXhr.getResponseHeader('content-disposition'));
-                fileName = decodeURI(fileName);
+                let blob	= new Blob([data], { type: jqXhr.getResponseHeader('content-type') });
+                let fileName= getFileName(jqXhr.getResponseHeader('content-disposition'));
+                fileName	= decodeURI(fileName);
     
                 //익스플로어
                 if (window.navigator.msSaveOrOpenBlob) {
@@ -327,6 +341,7 @@
         formData.append('content', $('input[name="content"]').val());
         formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
         formData.append('store_nm', $('input[name="store_nm"]').val());
+		formData.append('use_yn', $('input[name="use_yn"]:checked').val());
         formData.append('_token', "{{ csrf_token() }}");
         
 
@@ -365,6 +380,7 @@
                         alert('파일 삭제에 성공하였습니다.');
                         location.reload();
                     } else {
+						console.log(data);
                         alert('처리 중 문제가 발생하였습니다. 다시 시도하여 주십시오.');
                     }
 
@@ -411,6 +427,7 @@
         formData.append('store_no', $('#store_no').val() == undefined ? '' : $('#store_no').val());
 		formData.append('store_cd', store_sel_cnt);
         formData.append('store_nm', $('input[name="store_nm"]').val());
+		formData.append('use_yn', $('input[name="use_yn"]:checked').val());
         formData.append('_token', "{{ csrf_token() }}");
 
         $.ajax({

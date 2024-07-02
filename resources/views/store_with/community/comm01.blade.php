@@ -96,7 +96,7 @@
                     </div>
                 </div>
                     <div class="row">
-                        @if($store_notice_type === "notice")
+                        @if($store_notice_type === "notice" || 1 === 1)
                             <div class="col-lg-4 inner-td">
                                 <div class="form-group">
                                     <label for="good_types">판매채널/매장구분</label>
@@ -121,6 +121,27 @@
                                     </div>
                                 </div>
                             </div>
+
+							<div class="col-lg-4 inner-td">
+								<div class="form-group">
+									<label for="dlv_kind">사용여부</label>
+									<div class="form-inline form-radio-box">
+										<div class="custom-control custom-radio">
+											<input type="radio" name="use_yn" id="use_yn" class="custom-control-input" value="">
+											<label class="custom-control-label" for="use_yn">전체</label>
+										</div>
+										<div class="custom-control custom-radio">
+											<input type="radio" name="use_yn" id="use_y" class="custom-control-input" checked="" value="y">
+											<label class="custom-control-label" for="use_y">Y</label>
+										</div>
+										<div class="custom-control custom-radio">
+											<input type="radio" name="use_yn" id="use_n" class="custom-control-input" value="n">
+											<label class="custom-control-label" for="use_n">N</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						
                             <div class="col-lg-4 inner-td" hidden>
                                 <div class="form-group">
                                     <label for="store_no">매장</label>
@@ -207,6 +228,7 @@
         {headerName: "이름", field: "admin_nm",  width: 80, cellClass: 'hd-grid-code'},
         {headerName: "이메일", field: "admin_email", width: 150, cellClass: 'hd-grid-code'},
         {headerName: "조회수", field: "cnt", type:'numberType',width: 50, cellClass: 'hd-grid-code'},
+		{headerName: "사용", field: "use_yn",  width: 55, cellClass: 'hd-grid-code'},
         {headerName: "전체 공지 여부", field: "all_store_yn",width: 90, cellClass: 'hd-grid-code', hide:true,
             cellStyle: params => {
                 if(params.data.all_store_yn == 'Y'){
@@ -223,7 +245,7 @@
                 }
             }
         },
-        {headerName: "공지매장", field: "store_nm", width: 340, cellStyle: {'white-space': 'normal'}, hide:true,
+        {headerName: "공지매장", field: "store_nm", width: 340, cellStyle: {'white-space': 'normal'},
             cellRenderer: function(params) {
 				if (params.data.all_store_yn == 'Y') {
 					return '';

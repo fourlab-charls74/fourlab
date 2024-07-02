@@ -95,7 +95,7 @@ class comm01Controller extends Controller
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
                 left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-            where s.rt >= :sdate and s.rt < date_add(:edate, interval 1 day) 
+            where s.use_yn = 'Y' and s.rt >= :sdate and s.rt < date_add(:edate, interval 1 day) 
                 and store_notice_type in (
                     select code_id from code c2 where c2.code_kind_cd  = 'STORE_NOTICE_TYPE' and c2.code_val = '$notice_id'
                 )

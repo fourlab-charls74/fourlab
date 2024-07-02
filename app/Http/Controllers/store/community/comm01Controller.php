@@ -37,23 +37,26 @@ class comm01Controller extends Controller
     public function search($notice_id, Request $request)
     {
 
-        $r = $request->all();
+        $r	= $request->all();
 
-        $sdate = $request->input('sdate', Carbon::now()->sub(3, 'month')->format('Y-m-d'));
-        $edate = $request->input('edate', date("Y-m-d"));
-        $subject = $request->input('subject', '');
-        $content = $request->input('content', '');
-        $store_no = $request->input('store_no', '');
+        $sdate		= $request->input('sdate', Carbon::now()->sub(3, 'month')->format('Y-m-d'));
+        $edate		= $request->input('edate', date("Y-m-d"));
+        $subject	= $request->input('subject', '');
+        $content	= $request->input('content', '');
+        $store_no	= $request->input('store_no', '');
         $store_channel	= $request->input("store_channel");
 		$store_channel_kind	= $request->input("store_channel_kind");
+		$use_yn		= $request->input('use_yn', '');
 
-        $where = "";
-        $orderby = "";
-        if ($subject != "") $where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
-        if ($content != "") $where .= " and s.content like '%" . Lib::quote($content) . "%' ";
-        if ($store_no != "") $where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
-        if ($store_channel != "") $where .= " and a.store_channel ='" . Lib::quote($store_channel). "'";
-		if ($store_channel_kind != "") $where .= " and a.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+        $where		= "";
+        $orderby	= "";
+        if($subject != "")		$where .= " and s.subject like '%" . Lib::quote($subject) . "%' ";
+        if($content != "")		$where .= " and s.content like '%" . Lib::quote($content) . "%' ";
+        if($store_no != "")		$where .= " and d.store_cd like '%" . Lib::quote($store_no) . "%' ";
+        if($store_channel != "")$where .= " and a.store_channel ='" . Lib::quote($store_channel). "'";
+		if($store_channel_kind != "")	$where .= " and a.store_channel_kind ='" . Lib::quote($store_channel_kind). "'";
+		if($use_yn != "")		$where .= " and s.use_yn ='" . Lib::quote($use_yn). "'";
+
         // ordreby
         $ord = $r['ord'] ?? 'desc';
         $ord_field = $r['ord_field'] ?? "s.rt";
@@ -80,12 +83,16 @@ class comm01Controller extends Controller
                 s.admin_email,
                 s.cnt,
                 s.all_store_yn,
-                group_concat(a.store_nm separator ', ') as stores,
+                concat(
+                	substring(group_concat(a.store_nm separator ', '), 1, 32),
+                	if(char_length(group_concat(a.store_nm separator ', ')) > 32, '...', '') 
+                ) as stores,
                 if ((select date_add(s.rt, interval 10 day)) < now(), 'false', 'true') as check_new_notice,
                 s.rt,
                 c.code_val as store_type_nm,
                 s.ut,
-                (case when ifnull(char_length(s.attach_file_url), 0) > 0 then 'Y' else 'N' end ) as attach_file_yn
+                (case when ifnull(char_length(s.attach_file_url), 0) > 0 then 'Y' else 'N' end ) as attach_file_yn,
+                s.use_yn
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store a on a.store_cd = d.store_cd
@@ -115,19 +122,24 @@ class comm01Controller extends Controller
     public function create($notice_id, Request $request)
     {
 
-        $name =  Auth('head')->user()->name;
-        $no = $request->input('ns_cd');
+        $name	=  Auth('head')->user()->name;
+        $no		= $request->input('ns_cd');
 
-        $user = new \stdClass();
-        $user->name = $name;
-        $user->subject = '';
-        $user->content = '';
-        $user->ns_cd = $no;
-        $user->store_cd = '';
-        $user->store_nm = '';
-        $user->attach_file_url = '';
+        $user	= new \stdClass();
+        $user->name		= $name;
+        $user->subject	= '';
+        $user->content	= '';
+        $user->ns_cd	= $no;
+        $user->store_cd	= '';
+        $user->store_nm	= '';
+        $user->attach_file_url	= '';
+		$user->use_yn	= "";
 
-        $values = ['no' => $no, 'user' => $user, 'store_notice_type' => $notice_id];
+        $values	= [
+			'no'	=> $no, 
+			'user'	=> $user, 
+			'store_notice_type'	=> $notice_id
+		];
 		
         return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
     }
@@ -143,7 +155,8 @@ class comm01Controller extends Controller
                 d.ns_cd,
                 s.ns_cd,
                 d.store_cd,
-                store.store_nm
+                store.store_nm,
+                s.use_yn
             from notice_store s 
                 left outer join notice_store_detail d on s.ns_cd = d.ns_cd
                 left outer join store on store.store_cd = d.store_cd
@@ -153,10 +166,10 @@ class comm01Controller extends Controller
         $storeCodes = DB::select($sql);
 		
         $values = [
-            'no' => $no,
-            'user' => $user,
-            'storeCode' => $storeCodes,
-            'store_notice_type' => $notice_id
+            'no'		=> $no,
+            'user'		=> $user,
+            'storeCode'	=> $storeCodes,
+            'store_notice_type'	=> $notice_id
         ];
 
         return view(Config::get('shop.store.view') . '/community/comm01_show', $values);
@@ -164,31 +177,32 @@ class comm01Controller extends Controller
 
     public function store(Request $request)
     {
-        $now = date('YmdHis');
-        $excel_extensions = config::get('file.excel_extensions');
-        $ppt_extionsions = config::get('file.ppt_extensions');
-        $image_extionsions = config::get('file.image_extensions');
-        $pdf_extionsions = config::get('file.pdf_extensions');
+        $now	= date('YmdHis');
+        $excel_extensions	= config::get('file.excel_extensions');
+        $ppt_extionsions	= config::get('file.ppt_extensions');
+        $image_extionsions	= config::get('file.image_extensions');
+        $pdf_extionsions	= config::get('file.pdf_extensions');
         
         $this->validate($request, [
             'files.*' => 'required|mimes:'.strtolower(implode(',', $excel_extensions)). "," .strtolower(implode(',', $ppt_extionsions). "," .strtolower(implode(',', $image_extionsions). "," .strtolower(implode(',', $pdf_extionsions))))
         ]);
 
-        $id =  Auth('head')->user()->id;
-        $email = Auth('head')->user()->email;
-        $ns_cd = $request->input('ns_cd');
-        $subject = $request->input('subject');
-        $content = $request->input('content');
-        $admin_id = $id;
-        $admin_nm = $request->input('name');
-        $store_cd = explode(',', $request->input('store_no', ''));
-        $store_notice_type = $request->input('store_notice_type', '') === 'vmd' ? '02' : '01';
-        $rt = DB::raw('now()');
-        $store_nm = $request->input('store_nm');
-        $rt2 = DB::raw('now()');
+        $id			=  Auth('head')->user()->id;
+        $email		= Auth('head')->user()->email;
+        $ns_cd		= $request->input('ns_cd');
+        $subject	= $request->input('subject');
+        $content	= $request->input('content');
+        $admin_id	= $id;
+        $admin_nm	= $request->input('name');
+        $store_cd	= explode(',', $request->input('store_no', ''));
+        $store_notice_type	= $request->input('store_notice_type', '') === 'vmd' ? '02' : '01';
+        $rt			= DB::raw('now()');
+        $store_nm	= $request->input('store_nm');
+        $rt2		= DB::raw('now()');
+		$use_yn		= $request->input('use_yn');
 
-        $files = $request->file('files');
-        $file_url = null;
+        $files		= $request->file('files');
+        $file_url	= null;
 		
         if ($store_cd[0] == "") {
             $all_store_yn = "Y";
@@ -197,89 +211,94 @@ class comm01Controller extends Controller
         }
 
         try {
-
             //엑셀 및 ppt, image 업로드 
             if (count($_FILES) > 0) {
                 $url_array = [];
                 foreach($files as $file) {
-                    $file_name = "$now"."$id"."_".uniqid().".".$file->extension();
-                    $save_path = config::get('file.store_notice_path');
-                    $url_array[] = ULib::uploadFile($save_path, $file_name, $file);
+                    $file_name	= "$now"."$id"."_".uniqid().".".$file->extension();
+                    $save_path	= config::get('file.store_notice_path');
+                    $url_array[]= ULib::uploadFile($save_path, $file_name, $file);
                 }
-                $file_url = implode(',', $url_array);
+				
+                $file_url	= implode(',', $url_array);
             }
 
             DB::beginTransaction();
 
             $res = DB::table('notice_store')
                 ->insertGetId([
-                    'store_notice_type' => $store_notice_type,
-                    'attach_file_url' => $file_url,
-                    'ns_cd' => $ns_cd,
-                    'subject' => $subject,
-                    'content' => $content,
-                    'admin_id' => $admin_id,
-                    'admin_nm' => $admin_nm,
-                    'admin_email' => $email,
-                    'all_store_yn' => $all_store_yn,
-                    'cnt' => 0,
-                    'rt' => $rt
+                    'store_notice_type'	=> $store_notice_type,
+                    'attach_file_url'	=> $file_url,
+                    'ns_cd'		=> $ns_cd,
+                    'subject'	=> $subject,
+                    'content'	=> $content,
+                    'admin_id'	=> $admin_id,
+                    'admin_nm'	=> $admin_nm,
+                    'admin_email'	=> $email,
+                    'all_store_yn'	=> $all_store_yn,
+					'use_yn'	=> $use_yn,
+                    'cnt'		=> 0,
+                    'rt'		=> $rt
                 ]);
 
             if ($store_cd[0] != "") {
                 foreach ($store_cd as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
-                            'ns_cd' => $res,
-                            'store_cd' => $sc,
-                            'check_yn' => 'N',
-                            'rt' => $rt2
+                            'ns_cd'		=> $res,
+                            'store_cd'	=> $sc,
+                            'check_yn'	=> 'N',
+                            'rt'		=> $rt2
                         ]);
                 }
             }
 			
             DB::commit();
-            $code = 200;
-            $msg = "";
+            $code	= 200;
+            $msg	= "";
         } catch (Exception $e) {
             DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
+            $code	= 500;
+            $msg	= $e->getMessage();
         }
 
         return response()->json([
-            "code" => $code,
-            "msg" => $msg
+            "code"	=> $code,
+            "msg"	=> $msg
         ]);
     }
 
     public function update($no, Request $request)
     {
-        $id =  Auth('head')->user()->id;
-        $now = date('YmdHis');
-
-        $subject = Lib::Rq($request->input('subject'));
-        $content = Lib::Rq($request->input('content'));
-        $store_no = explode(',', $request->input('store_no', ''));
-        $files = $request->file('files');
-        $file_url = null;
-		$store_cd = (int)$request->input('store_cd');
+		$code	= "";
+		$msg	= "";
 		
-        $ns_cd = $no;
-        $ut = DB::raw('now()');
-        $rt2 = DB::raw('now()');
+        $id		=  Auth('head')->user()->id;
+        $now	= date('YmdHis');
+
+        $subject	= Lib::Rq($request->input('subject'));
+        $content	= Lib::Rq($request->input('content'));
+        $store_no	= explode(',', $request->input('store_no', ''));
+        $files		= $request->file('files');
+        $file_url	= null;
+		$store_cd	= (int)$request->input('store_cd');
+		$use_yn		= $request->input('use_yn');
+		
+        $ns_cd		= $no;
+        $ut		= DB::raw('now()');
+        $rt2	= DB::raw('now()');
 		
         if ($store_cd == 0 && $store_no[0] == '') {
-            $all_store_yn = "Y";
+            $all_store_yn	= "Y";
         } else {
-            $all_store_yn = "N";
+            $all_store_yn	= "N";
         }
 		
         $notice_store = [
-            'subject' => $subject,
-            'content' => $content,
-            'all_store_yn' => $all_store_yn,
-            'ut' => $ut
+            'subject'	=> $subject,
+            'content'	=> $content,
+            'all_store_yn'	=> $all_store_yn,
+            'ut'		=> $ut
         ];
 
         try {
@@ -296,7 +315,7 @@ class comm01Controller extends Controller
 
             DB::beginTransaction();
 			
-			$sql = "
+			$sql	= "
 				select
 					attach_file_url
 				from notice_store
@@ -304,7 +323,7 @@ class comm01Controller extends Controller
 			";
 			$isnull_files = DB::selectOne($sql);
 			
-			$then = "";
+			$then	= "";
 			if ($file_url != "") {
 				if ($isnull_files->attach_file_url != null) {
 					$then = "CONCAT(attach_file_url, ',' , '$file_url')";
@@ -315,19 +334,18 @@ class comm01Controller extends Controller
 				$then = "attach_file_url";
 			}
 			
-            
             $sql = "
                 update notice_store
                 set 
-                    subject = '$subject', 
-                    content = '$content',
-                    all_store_yn =  '$all_store_yn',
-                    ut = $ut,
-                    attach_file_url = (case when '$file_url' != '' then $then else attach_file_url end)
+                    subject	= '$subject', 
+                    content	= '$content',
+                    all_store_yn	=  '$all_store_yn',
+                    use_yn	= '$use_yn',
+                    ut		= $ut,
+                    attach_file_url	= (case when '$file_url' != '' then $then else attach_file_url end)
                 where 
                     ns_cd = $ns_cd
             ";
-			
 
             DB::update($sql);
 			
@@ -335,25 +353,26 @@ class comm01Controller extends Controller
                 foreach ($store_no as $sc) {
                     DB::table('notice_store_detail')
                         ->insert([
-                            'ns_cd' => $ns_cd,
-                            'store_cd' => $sc,
-                            'check_yn' => 'N',
-                            'rt' => $rt2
+                            'ns_cd'		=> $ns_cd,
+                            'store_cd'	=> $sc,
+                            'check_yn'	=> 'N',
+                            'rt'		=> $rt2
                         ]);
                 }
             }
 
             DB::commit();
-            $code = 200;
-            $msg = "";
+            $code	= 200;
+            $msg	= "";
         } catch (Exception $e) {
             DB::rollBack();
-            $code = 500;
-            $msg = $e->getMessage();
+            $code	= 500;
+            $msg	= $e->getMessage();
         }
+		
         return response()->json([
-            "code" => $code,
-            "msg" => $msg
+            "code"	=> $code,
+            "msg"	=> $msg
         ]);
     }
 
