@@ -60,9 +60,9 @@
 
     /** 대기내역 조회 */
     function searchWaiting() {
-        gx5.Request("/shop/pos/search/waiting", "", -1, function(d) {
-            $("#waiting_cnt").text(d.head.total);
-        });
+        // gx5.Request("/shop/pos/search/waiting", "", -1, function(d) {
+        //     $("#waiting_cnt").text(d.head.total);
+        // });
     }
 
     /** 주문대기 삭제 */
