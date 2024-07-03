@@ -108,6 +108,17 @@
 											</td>
 										</tr>
 										<tr>
+											<th class="required">아이템</th>
+											<td>
+												<div class="flax_box">
+													<select name='item' id='item' class="form-control form-control-sm prd_code">
+														<option value=''>선택</option>
+														@foreach ($items as $item)
+															<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
+														@endforeach
+													</select>
+												</div>
+											</td>
 											<th class="required">품목</th>
 											<td>
 												<div class="flax_box">
@@ -115,17 +126,6 @@
 														<option value=''>선택</option>
 														@foreach ($opts as $opt)
 															<option value='{{ $opt->code_id }}'>{{ $opt->code_id }} : {{ $opt->code_val }}</option>
-														@endforeach
-													</select>
-												</div>
-											</td>
-											<th class="required">하위품목</th>
-											<td>
-												<div class="flax_box">
-													<select name='item' id='item' class="form-control form-control-sm prd_code">
-														<option value=''>선택</option>
-														@foreach ($items as $item)
-														<option value='{{ $item->code_id }}'>{{ $item->code_id }} : {{ $item->code_val }}</option>
 														@endforeach
 													</select>
 												</div>
@@ -798,7 +798,8 @@
 			method: 'post',
 			url: '/store/product/prd02/sel_seq',
 			data: {
-				prd_cd : prd_cd
+				prd_cd : prd_cd,
+				opt : opt
 			},
 			success: function(data) {
 				if (data.code == '200') {

@@ -1826,7 +1826,8 @@ class prd02Controller extends Controller
 	public function selSeq(Request $request)
 	{
 
-		$prd_cd = $request->input('prd_cd', '');
+		$prd_cd	= $request->input('prd_cd', '');
+		$opt	= $request->input('opt', '');
 
 		try {
 			DB::beginTransaction();
@@ -1837,7 +1838,7 @@ class prd02Controller extends Controller
 				from product p 
 					inner join product_code pc on p.prd_cd = pc.prd_cd
 					inner join goods g on g.goods_no = pc.goods_no
-				where p.prd_cd like '$prd_cd%'
+				where p.prd_cd like '$prd_cd%' and pc.opt = '$opt'
 				group by p.prd_nm
 				order by p.prd_cd asc
 			";
