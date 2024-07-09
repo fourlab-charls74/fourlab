@@ -13,8 +13,8 @@
 		@foreach(range(1, 21) as $i)
 			<td></td>
 		@endforeach
-		<td colspan="6">구분 : 반품</td>
-		<td>전표번호 : {{ @$document_number }}</td>
+		<td colspan="5">구분 : 반품</td>
+		<td colspan="6">전표번호 : {{ @$document_number }}</td>
 	</tr>
 	<tr>
 		<td rowspan="5">공 급 자</td>

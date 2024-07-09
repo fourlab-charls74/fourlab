@@ -123,10 +123,10 @@
 </div>
 
 <script language="javascript">
-    const now_state = '{{ @$sr->sr_state }}';
-    const pinnedRowData = [{ prd_cd: '합계', qty: 0, total_return_price: 0 , fixed_return_qty: 0, fixed_return_price : 0}];
+    const now_state		= '{{ @$sr->sr_state }}';
+    const pinnedRowData	= [{ prd_cd: '합계', qty: 0, total_return_price: 0 , fixed_return_qty: 0, fixed_return_price : 0}];
 
-	const reject_reasons = <?= json_encode(@$reject_reasons) ?>;
+	const reject_reasons	= <?= json_encode(@$reject_reasons) ?>;
 	reject_reasons.unshift({ code_id: "", code_val: "-" });
 
     let columns = [
@@ -138,6 +138,19 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
+		{field: "print", headerName: "명세서", pinned: 'left', cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+			cellRenderer: function(params) {
+				if(params.data.print !== '' && params.node.rowPinned !== 'top') {
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.sr_cd}, '${params.data.box_no}')">출력</a>`;
+				} else{
+					return ' ';
+				}
+			}
+		},
+		{field: "box_no",	headerName: "박스번호", pinned: 'left', width: 80, cellStyle: {"text-align": "center"},
+			cellClass: (params)	=> params.node.rowPinned !== 'top' && now_state < 40 ? 'hd-grid-edit' : '',
+			editable: (params)	=> params.node.rowPinned !== 'top' && now_state < 40,
+		},
         {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
         {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
         {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
@@ -354,5 +367,10 @@
         var url = '/shop/product/prd01/' + prd_no;
         var product = window.open(url, "_blank", "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=1024,height=900");
     }
+
+	// 매장반품 거래명세서 출력(박스번호별)
+	function printDocument(sr_cd, box_no) {
+		location.href = '/shop/stock/stk30/download?sr_cd=' + sr_cd + '&box_no=' + box_no;
+	}
 </script>
 @stop

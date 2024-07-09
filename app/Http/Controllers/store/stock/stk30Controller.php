@@ -240,9 +240,11 @@ class stk30Controller extends Controller
         $sql	= "
             select 
                 @rownum := @rownum + 1 as count,
+                srp.box_no as print,
                 srp.sr_prd_cd, 
                 srp.sr_cd, 
                 srp.prd_cd,
+                srp.box_no,
                 pc.goods_no,
                 g.goods_type,
                 ifnull(type.code_val, 'N/A') as goods_type_nm,
@@ -345,9 +347,10 @@ class stk30Controller extends Controller
                     ->insert([
                         'sr_cd'		=> $sr_cd,
                         'prd_cd'	=> $product['prd_cd'],
-                        'price'		=> $product['price'], // 판매가
-                        'return_price'	=> $product['return_price'], // 반품단가
-                        'return_qty'	=> $product['return_qty'], // 요청수량
+                        'price'		=> $product['price'],				// 판매가
+                        'return_price'	=> $product['return_price'],	// 반품단가
+                        'return_qty'	=> $product['return_qty'],		// 요청수량
+						'box_no'	=> $product['box_no'] ?? '',		//박스번호
                         'rt'		=> now(),
                         'admin_id'	=> $admin_id,
                     ]);
@@ -448,6 +451,7 @@ class stk30Controller extends Controller
 							'fixed_return_price'=> $product['fixed_return_price'], // 확정금액
 							'fixed_return_qty'	=> $product['fixed_return_qty'], // 확정수량
 							'fixed_comment'		=> $product['fixed_comment'] ?? '',
+							'box_no'			=> $product['box_no'] ?? '',
 							'ut'				=> now(),
 							'admin_id'			=> $admin_id,
 						]);
@@ -462,9 +466,10 @@ class stk30Controller extends Controller
 							'return_p_qty'	=> $product['return_p_qty'], // 처리수량
 							'reject_reason'	=> $product['reject_reason'] ?? '', // 반품거부사유
 							'reject_comment'=> $product['reject_comment'] ?? '', // 반품거부메모
-							'fixed_return_price'	=> $product['fixed_return_price'], // 확정금액
+							'fixed_return_price'=> $product['fixed_return_price'], // 확정금액
 							'fixed_return_qty'	=> $product['fixed_return_qty'], // 확정수량
 							'fixed_comment'	=> $product['fixed_comment'] ?? '',
+							'box_no'		=> $product['box_no'] ?? '',
 							'rt'			=> now(),
 							'admin_id'		=> $admin_id,
 						]);
@@ -1098,6 +1103,15 @@ class stk30Controller extends Controller
 	public function download(Request $request)
 	{
 		$sr_cd	= $request->input('sr_cd');
+		$box_no	= $request->input('box_no', '');
+		
+		if($box_no != '') {
+			$box_no_query	= " and srp.box_no = '" . Lib::quote($box_no) . "' ";
+			$box_no_txt		= "-" . $box_no;
+		}else{
+			$box_no_query	= "";
+			$box_no_txt		= "";
+		}
 
 		$sql	= "
             select srp.prd_cd
@@ -1126,13 +1140,14 @@ class stk30Controller extends Controller
 			inner join store_return sr on sr.sr_cd = srp.sr_cd
 			inner join store s on s.store_cd = sr.store_cd
             where srp.sr_cd = :sr_cd
+            $box_no_query
         ";
 		$rows	= DB::select($sql, ['sr_cd' => $sr_cd]);
 
 		$data	= [
-			'one_sheet_count' => 36,
-			'document_number' => sprintf('%04d', $sr_cd),
-			'products' => $rows
+			'one_sheet_count'	=> 36,
+			'document_number'	=> sprintf('%04d%s', $sr_cd,  $box_no_txt),
+			'products'			=> $rows
 		];
 
 		if (count($rows) > 0) {
@@ -1212,6 +1227,6 @@ class stk30Controller extends Controller
 		$keys	= [ 'list_key' => 'products', 'one_sheet_count' => $data['one_sheet_count'], 'cell_width' => 8, 'cell_height' => 48 ];
 		$images	= [[ 'title' => '인감도장', 'public_path' => '/img/stamp.png', 'cell' => 'P4', 'height' => 150 ]];
 
-		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '반품거래명세서.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+		return Excel::download(new ExcelViewExport($view_url, $data, $style, $images, $keys), '반품거래명세서-' . $sr_cd . $box_no_txt . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
 	}
 }

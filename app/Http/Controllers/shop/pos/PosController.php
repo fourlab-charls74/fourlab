@@ -675,8 +675,10 @@ class PosController extends Controller
                     }
 
                     // 쿠폰할인은 TAG가 기준입니다.
+					// 쿠폰할인을 판매가 기준으로 변경. 20240702 김용남
                     $item_coupon_amt = $cp->coupon_amt_kind === 'P'
-                        ? round($product->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0)
+						//? round($product->goods_sh * $qty * ($cp->coupon_per ?? 0) / 100, 0)
+						? round($product->price * $qty * ($cp->coupon_per ?? 0) / 100, 0)
                         : ($cp->coupon_amt ?? 0);
                 }
 

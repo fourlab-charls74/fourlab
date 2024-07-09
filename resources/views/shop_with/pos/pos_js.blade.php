@@ -420,7 +420,8 @@
 					}
 
                     const discount_amt = cp.amt_kind === 'P'
-                        ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100)
+						// ? Math.round(rowData.goods_sh * rowData.qty * ((cp.per || 0) * 1) / 100)
+						? Math.round(rowData.price * rowData.qty * ((cp.per || 0) * 1) / 100)
                         : ((cp.amt || 0) * 1);
 					$("#cur_dc_rate").text(Comma(100 - Math.round(((rowData.price * rowData.qty) - discount_amt) / rowData.qty / rowData.goods_sh * 100)) + ' %');
                     curRow[0].setData({

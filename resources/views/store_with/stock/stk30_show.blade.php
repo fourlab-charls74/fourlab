@@ -191,20 +191,33 @@
                 return (parseInt(valueA) > parseInt(valueB)) ? 1 : -1;
             },
         },
-        {field: "chk", headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
-        {field: "prd_cd", headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
-        {field: "goods_no", headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "opt_kind_nm", headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
-        {field: "brand", headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
+        {field: "chk",		headerName: '', pinned: 'left', cellClass: 'hd-grid-code', checkboxSelection: true, headerCheckboxSelection: true, sort: null, width: 29},
+		{field: "print", headerName: "명세서", pinned: 'left', cellStyle: {"text-align": "center", "color": "#4444ff", "font-size": '13px'},
+			cellRenderer: function(params) {
+				if(params.data.print !== '' && params.node.rowPinned !== 'top') {
+					return `<a href="javascript:void(0);" style="color: inherit;" onclick="printDocument(${params.data.sr_cd}, '${params.data.box_no}')">출력</a>`;
+				} else{
+					return ' ';
+				}
+			}
+		},
+		{field: "box_no",	headerName: "박스번호", pinned: 'left', width: 80, cellStyle: {"text-align": "center"},
+			cellClass: (params)	=> params.node.rowPinned !== 'top' && now_state < 40 ? 'hd-grid-edit' : '',
+			editable: (params)	=> params.node.rowPinned !== 'top' && now_state < 40,
+		},
+		{field: "prd_cd",	headerName: "바코드", pinned: 'left', width: 130, cellStyle: {"text-align": "center"}},
+        {field: "goods_no",	headerName: "온라인코드", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "opt_kind_nm",	headerName: "품목", width: 70, cellStyle: {"text-align": "center"}},
+        {field: "brand",	headerName: "브랜드", width: 80, cellStyle: {"text-align": "center"}},
         {field: "style_no",	headerName: "스타일넘버", width: 70, cellStyle: {"text-align": "center"}},
         {field: "goods_nm",	headerName: "상품명", type: 'HeadGoodsNameType', width: 200},
         {field: "goods_nm_eng",	headerName: "상품명(영문)", width: 200},
         {field: "prd_cd_p",	headerName: "품번", width: 100, cellStyle: {"text-align": "center"}},
-        {field: "color", headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
-        {field: "size",	headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "color",	headerName: "컬러", width: 55, cellStyle: {"text-align": "center"}},
+        {field: "size",		headerName: "사이즈", width: 55, cellStyle: {"text-align": "center"}},
         {field: "goods_opt", headerName: "옵션", width: 100},
         {field: "goods_sh", headerName: "정상가", type: "currencyType", width: 70},
-        {field: "price", headerName: "현재가", type: "currencyType", width: 70},
+        {field: "price",	headerName: "현재가", type: "currencyType", width: 70},
         {field: "return_price", headerName: "반품단가", width: 70, type: 'currencyType',
             editable: (params) => checkIsEditable(params) && now_state < 30,
             cellStyle: (params) => checkIsEditable(params) && now_state < 30 ? {"background-color": "#ffff99"} : {}
@@ -280,21 +293,21 @@
             onCellValueChanged: (e) => {
 				e.node.setSelected(true);
                 if (['return_price', 'qty', 'return_p_qty', 'fixed_return_qty'].includes(e.column.colId)) {
-                    if (isNaN(e.newValue) == true || e.newValue === "") {
-                        alert("숫자만 입력가능합니다.");
-                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    } else if(e.newValue < 0) {
-                        alert("음수는 입력할 수 없습니다.");
-                        gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    } else if(
+					if (isNaN(e.newValue) == true || e.newValue === "") {
+						alert("숫자만 입력가능합니다.");
+						gx.gridOptions.api.startEditingCell({rowIndex: e.rowIndex, colKey: e.column.colId});
+					} else if (e.newValue < 0) {
+						alert("음수는 입력할 수 없습니다.");
+						gx.gridOptions.api.startEditingCell({rowIndex: e.rowIndex, colKey: e.column.colId});
+					} else if (
 						(e.column.colId === "qty" && e.data.store_wqty < parseInt(e.data.qty))
 						|| (e.column.colId === "return_p_qty" && e.data.store_wqty < parseInt(e.data.return_p_qty))
-	                    // 아래코드 주석처리 (확정수량은 처리 이후 현재의 보유재고보다 많을 수 있습니다.)
+						// 아래코드 주석처리 (확정수량은 처리 이후 현재의 보유재고보다 많을 수 있습니다.)
 						// || (e.column.colId === "fixed_return_qty" && e.data.store_wqty < parseInt(e.data.fixed_return_qty))
-                    ) {
+					) {
 						// alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 						// gx.gridOptions.api.startEditingCell({ rowIndex: e.rowIndex, colKey: e.column.colId });
-                    } else {
+					} else {
 						if (e.column.colId === "return_price") {
 							e.node.setDataValue('return_amt', parseInt(e.data.qty) * parseInt(e.data.return_price));
 							e.node.setDataValue('return_p_amt', parseInt(e.data.return_p_qty) * parseInt(e.data.return_price));
@@ -307,7 +320,15 @@
 							e.node.setDataValue('fixed_return_price', parseInt(e.data.fixed_return_qty) * parseInt(e.data.return_price));
 						}
 						updatePinnedRow();
-                    }
+					}
+				} else if(e.column.colId === "box_no") {
+					if(e.newValue !== ""){
+						const regex = /^[a-zA-Z0-9\s]*$/;
+						if(!regex.test(e.newValue)) {
+							alert("박스번호는 영문과 숫자만 가능합니다.");
+							gx.gridOptions.api.startEditingCell({rowIndex: e.rowIndex, colKey: e.column.colId});
+						}
+					}
                 } else if (e.column.colId === "reject_reason_val") {
 					e.node.setDataValue('reject_reason', reject_reasons.find(rs => rs.code_val === e.value)?.code_id || '');
 				}
@@ -333,14 +354,14 @@
     function Save(cmd) {
         if(!cmd) return;
 
-        let sr_reason = document.f1.sr_reason.value;
-        let comment = document.f1.comment.value;
-        let rows = gx.getRows();
+        let sr_reason	= document.f1.sr_reason.value;
+        let comment		= document.f1.comment.value;
+        let rows		= gx.getRows();
 
         if(cmd === 'add') {
-            let sr_date = document.f1.sdate.value;
-            let storage_cd = document.f1.storage_cd.value;
-            let store_cd = document.f1.store_no.value;
+            let sr_date		= document.f1.sdate.value;
+            let storage_cd	= document.f1.storage_cd.value;
+            let store_cd	= document.f1.store_no.value;
 
             if(store_cd === '') {
                 $(".sch-store").click();
@@ -351,8 +372,12 @@
             let excess_qtys = rows.filter(r => (r.qty * 1) > (r.store_wqty * 1));
             // if(excess_qtys.length > 0) return alert("해당 매장의 보유재고보다 많은 수량을 반품할 수 없습니다.");
 
+			let return_prices	= rows.filter(r => r.return_price === undefined);
+			if(return_prices.length > 0) return alert("반품단가는 반드시 입력해야 합니다.");
+			
+			
             if (!confirm("반품요청하시겠습니까?")) return;
-
+			
             axios({
                 url: '/store/stock/stk30/save',
                 method: 'put',
@@ -362,7 +387,7 @@
                     store_cd,
                     sr_reason,
                     comment,
-                    products: rows.map(r => ({ prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty, store_wqty: r.store_wqty })),
+                    products: rows.map(r => ({ box_no: ( r.box_no !== undefined ? r.box_no : ''), prd_cd: r.prd_cd, price: r.price, return_price: r.return_price, return_qty: r.qty, store_wqty: r.store_wqty })),
                 },
             }).then(function (res) {
                 if(res.data.code === 200) {
@@ -485,7 +510,8 @@
     var addRow = (row) => { // goods_api에서 opener 함수로 사용하기 위해 var로 선언
         const count = gx.gridOptions.api.getDisplayedRowCount() + callbaackRows.length;
         row = { 
-            ...row, 
+            ...row,
+			print: '',
             item: row.opt_kind_nm, 
             qty: 0, 
             return_price: row.price,
@@ -556,8 +582,6 @@
 			}
 		}
 		
-		
-		
 		let sr_cd = '{{ @$sr->sr_cd }}';
 		let sr_reason = document.f1.sr_reason.value;
 		let comment = document.f1.comment.value;
@@ -585,5 +609,10 @@
 			console.log(err);
 		});
     }
+
+	// 매장반품 거래명세서 출력(박스번호별)
+	function printDocument(sr_cd, box_no) {
+		location.href = '/store/stock/stk30/download?sr_cd=' + sr_cd + '&box_no=' + box_no;
+	}
 </script>
 @stop
