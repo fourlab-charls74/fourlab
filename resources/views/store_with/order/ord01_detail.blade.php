@@ -246,11 +246,11 @@
                                                 </td>
 											</tr>
 											<tr>
-                                                <th>매장구분</th>
+                                                <th>판매채널</th>
                                                 <td>
                                                     <div class="txt_box">{{ @$store->store_type_nm }}</div>
                                                 </td>
-                                                <th>매장종류</th>
+                                                <th>매장구분</th>
                                                 <td>
                                                     <div class="txt_box">{{ @$store->store_kind_nm }}</div>
                                                 </td>

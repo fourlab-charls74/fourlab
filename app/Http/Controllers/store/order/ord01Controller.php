@@ -1790,10 +1790,11 @@ class ord01Controller extends Controller
             select
                 a.store_cd, a.store_nm as store_nm
                 , a.store_type, a.store_kind, a.zipcode, a.addr1, a.addr2
-                , c.code_val as store_type_nm, d.code_val as store_kind_nm
+                , sc.store_channel as store_type_nm
+                , sc2.store_kind as store_kind_nm
             from store a
-                left outer join code c on c.code_kind_cd = 'store_type' and c.code_id = a.store_type
-                left outer join code d on d.code_kind_cd = 'store_kind' and d.code_id = a.store_kind
+			left outer join store_channel sc on sc.store_channel_cd = a.store_channel and dep = 1
+			left outer join store_channel sc2 on sc2.store_kind_cd = a.store_channel_kind and sc2.dep = 2
             where a.store_cd = '$store_cd'
         ";
         $store = DB::selectOne($sql);
