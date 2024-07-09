@@ -213,9 +213,7 @@
 				    </div>
 				    <div class="d-flex" style="position:absolute;bottom:12px;right:12px;">
 					    <button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-gray pb-2 pt-2 pl-3 pr-3" data-toggle="modal" data-target="#searchMemberModal">고객조회</button>
-					    <!--
-							<button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-blue pb-2 pt-2 pl-3 pr-3" data-toggle="modal" data-target="#addMemberModal">고객등록</button>
-						-->
+						<button type="button" class="butt fc-white fs-10 fw-sb br-1 bg-blue pb-2 pt-2 pl-3 pr-3 ml-1" data-toggle="modal" data-target="#addMemberModal">고객등록</button>
 				    </div>
 			    </div>
 		    </div>
@@ -737,7 +735,7 @@
 	            return `<button type="button" class="butt bg-white b-1-gray" style="width:18px;height:18px;" onclick="return removeProduct('${params.data.prd_cd}');"><i class="fa fa-times fc-black fs-10 w-100 h-100" aria-hidden="true"></i></button>`;
             }
         },
-        {field: "prd_cd", headerName: "상품코드", width: 130, cellStyle: LineHeight40Center},
+        {field: "prd_cd", headerName: "바코드", width: 130, cellStyle: LineHeight40Center},
         {field: "goods_nm", headerName: "상품명", width: "auto", minWidth: 100, wrapText: true, cellStyle: LineHeight40},
         {field: "color", headerName: "컬러", width: 110, wrapText: true, cellStyle: LineHeight40},
         {field: "size", headerName: "사이즈", width: 60, wrapText: true, cellStyle: LineHeight40Center},
