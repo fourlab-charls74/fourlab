@@ -621,7 +621,7 @@
 														<div class="txt_box flax_box">
 															<select name="type" id="type" class="form-control form-control-sm">
 																<option value="">상품 타입</option>
-																<option value="N" @if (@$goods_info->type === 'N') selected @endif>일반</option>
+																<option value="N" @if (@$goods_info->type === 'N' || @$goods_info->type == '') selected @endif>일반</option>
 																<option value="S" @if (@$goods_info->type === 'S') selected @endif>사입전용</option>
 																<option value="D" @if (@$goods_info->type === 'D') selected @endif>납품</option>
 																<option value="E" @if (@$goods_info->type === 'E') selected @endif>기획</option>
