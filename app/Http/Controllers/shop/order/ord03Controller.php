@@ -445,13 +445,15 @@ class ord03Controller extends Controller
 							if (!empty($opt->user_nm)) {
 								$user_nm	= $opt->user_nm;
                                 $mobile		= $opt->mobile;
-                                $goods_nm	= mb_substr($opt->goods_nm, 0, 30);
+                                //$goods_nm	= mb_substr($opt->goods_nm, 0, 30);
+								$goods_nm	= $opt->goods_nm;
 
 								$dlv_nm = SLib::getCodesValue('DELIVERY', $dlv_cd);
 								if($dlv_nm === '') $dlv_nm = $dlv_cd;
 
                                 $sms = new SMS($user);
-                                $sms_msg = sprintf("[%s]%s..발송완료 %s(%s)",$cfg_shop_name, $goods_nm, $dlv_nm, $dlv_no);
+                                //$sms_msg = sprintf("[%s]%s..발송완료 %s(%s)",$cfg_shop_name, $goods_nm, $dlv_nm, $dlv_no);
+								$sms_msg	= sprintf("[Fjallraven] 배송 시작 안내\n주문하신 상품 배송이 시작되었습니다.\n- 상품명: %s\n- 택배사: %s\n- 운송장번호: %s", $goods_nm, $dlv_nm, $dlv_no);
 
 								if($mobile != ""){
 									$sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
