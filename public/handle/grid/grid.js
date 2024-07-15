@@ -58,27 +58,6 @@ function setArrowKeyboardEvent(e) {
 	}
 };
 
-// 엑셀다운로드 전, 모든 컬럼에 대하여 default cellClass 지정 ("cell")
-function setDefaultCellClass(cols) {
-	return cols.map(col => {
-		if (col.cellClass) {
-			if (Array.isArray(col.cellClass)) {
-				col.cellClass.push('cell');
-			} else {
-				col.cellClass = [col.cellClass, 'cell'];
-			}
-		} else {
-			col.cellClass = 'cell';
-		}
-		
-		if (col.children) {
-			col.children = setDefaultCellClass(col.children);
-		}
-
-		return col;
-	});
-}
-
 function HDGrid(gridDiv , columns, optionMixin = {}){
     this.id = gridDiv.id.replace("div-", "");
     this.gridDiv = gridDiv;
@@ -451,11 +430,11 @@ function HDGrid(gridDiv , columns, optionMixin = {}){
         excelStyles: [
 			{
 				id: 'cell',
-				font: { size: 11 },
+				// font: { size: 11 },
 			},
             {
                 id: 'header',
-				font: { size: 11 },
+				// font: { size: 11 },
                 alignment: {
                     vertical: 'Center',
                     horizontal: 'Center',
@@ -811,9 +790,6 @@ HDGrid.prototype.HideLoadingLayer = function(){
  */
 HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
 
-	const cols = setDefaultCellClass(this.gridOptions.api.getColumnDefs());	
-	this.gridOptions.api.setColumnDefs(cols);
-
     const values = {
         fileName: title,
         sheetName: 'Sheet1',
@@ -825,6 +801,20 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
             return options.hasOwnProperty('level') && Number.isInteger(options.level) ? options.level !== params.node.level : false;
         },
         processRowGroupCallback: (params) => params.node.key,
+		processHeaderCallback: (params) => {
+			const col = params.column.colDef;
+			if (col.cellClass) {
+				if (Array.isArray(col.cellClass)) {
+					col.cellClass.push('cell');
+				} else {
+					col.cellClass = [col.cellClass, 'cell'];
+				}
+			} else {
+				col.cellClass = 'cell';
+			}
+
+			return params.column.colDef.headerName;
+		},
         processCellCallback: (params) => {
             let val = params.value;
 
@@ -864,7 +854,10 @@ HDGrid.prototype.Download = function (title = 'export.csv', options = {}) {
         // processHeaderCallback: (params) => {
         //     return (params.column.parent.originalColumnGroup.colGroupDef.headerName ? `${params.column.parent.originalColumnGroup.colGroupDef.headerName} > ` : '') + params.columnApi.getDisplayNameForColumn(params.column, null);
         // },
-		columnKeys: options.hasOwnProperty('columns') ? options.columns : undefined
+		columnKeys: options.hasOwnProperty('columns') ? options.columns : undefined,
+		columnWidth: (params) => {
+			return Math.max(params.column.actualWidth - 50, 75);
+		},
     };
     
     if (options.type === 'excel') {
