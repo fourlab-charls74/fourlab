@@ -178,7 +178,10 @@ class comm02Controller extends Controller
                     '$div_store' as store,
                     store_type
                 from store
-                where 1=1 and store_type = '08' and use_yn = 'Y' $where
+                where 
+                	1=1 
+					and store_channel in ('DE', 'BS', 'CO') 
+					and use_yn = 'Y' $where
                 ";
        
         $result = DB::select($sql);
