@@ -208,7 +208,7 @@ class stk21Controller extends Controller
             	left outer join order_opt o on o.store_cd = s.store_cd and o.prd_cd = '$prd_cd' and o.ord_state in (30, 60, 61)
             where
                 s.use_yn = 'Y'
-                and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+                -- and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
                 -- and s.store_stock_yn = 'Y'
                 $where
             group by s.store_cd
@@ -240,7 +240,7 @@ class stk21Controller extends Controller
                     left outer join product_stock_storage pss on pss.storage_cd = (select storage_cd from storage where default_yn = 'Y') and pss.prd_cd = '$prd_cd'
                 where
                     s.use_yn = 'Y'
-                    and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
+                    -- and if(s.sdate <= '$now_date' and date_format(date_add(date_format(s.sdate, '%Y-%m-%d'), interval 1 month), '%Y%m%d') >= '$now_date', s.open_month_stock_yn <> 'Y', 1=1)
                     -- and s.store_stock_yn = 'Y'
                     $where
             ) as a
