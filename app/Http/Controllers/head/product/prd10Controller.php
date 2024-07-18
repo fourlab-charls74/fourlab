@@ -344,19 +344,28 @@ class prd10Controller extends Controller
 						// 상위카테고리에 해당 상품 함께 등록
 						$p_d_cat_cd = $d_cat_cd;
 						while($p_d_cat_cd = DB::table('category')->where('cat_type', $cat_type)->where('d_cat_cd', $p_d_cat_cd)->value('p_d_cat_cd')) {
+							
+							$sql_p_chk	= " select count(*) as tot from category_goods where cat_type = :cat_type and d_cat_cd = :d_cat_cd ";
+							$p_tot		= DB::selectOne($sql_p_chk, ['cat_type' => $cat_type, 'd_cat_cd' => $p_d_cat_cd])->tot;
+							
+							if($p_tot === 0){
+								$section_goods = [
+									'cat_type' => $cat_type,
+									'd_cat_cd' => $p_d_cat_cd,
+									'goods_no' => $goods_nos[$i],
+									'goods_sub' => 0,
+									'disp_yn' => 'Y',
+									'admin_id' => $id,
+									'admin_nm' => $name,
+									'regi_date' => DB::raw('now()'),
+									'seq' => 0,
+								];
+								DB::table('category_goods')->insert($section_goods);
+							}else{
+								$sql_sg	= " update category_goods set disp_yn = 'Y' where cat_type = :cat_type and d_cat_cd = :d_cat_cd ";
+								DB::update($sql_sg, ['cat_type' => $cat_type, 'd_cat_cd' => $p_d_cat_cd]);
+							}
 
-							$section_goods = [
-								'cat_type' => $cat_type,
-								'd_cat_cd' => $p_d_cat_cd,
-								'goods_no' => $goods_nos[$i],
-								'goods_sub' => 0,
-								'disp_yn' => 'Y',
-								'admin_id' => $id,
-								'admin_nm' => $name,
-								'regi_date' => DB::raw('now()'),
-								'seq' => 0,
-							];
-							DB::table('category_goods')->insert($section_goods);
 						}
                     }
                 }
