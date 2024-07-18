@@ -403,6 +403,7 @@ class sal39Controller extends Controller
 					$date_val >= '$sdate' and $date_val <= '$edate'
 					$rt_out_where
 					$where_common
+					and psr.del_yn <> 'Y'
 			
 				union all
 			
@@ -437,6 +438,7 @@ class sal39Controller extends Controller
 					$date_val >= '$sdate' and $date_val <= '$edate'
 					$rt_in_where
 					$where_common
+					and psr.del_yn <> 'Y'
 			
 				union all
 					
