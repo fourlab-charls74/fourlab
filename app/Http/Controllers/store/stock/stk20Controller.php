@@ -298,13 +298,36 @@ class stk20Controller extends Controller
 
                 // 보내는 매장
 				// product_stock_store -> 보유재고 차감
-				DB::table('product_stock_store')
-					->where('prd_cd', '=', $prd->prd_cd)
-					->where('store_cd', '=', $d['dep_store_cd']) 
-					->update([
-						'wqty'	=> DB::raw('wqty - ' . ($d['qty'] ?? 0)),
-						'ut'	=> now(),
-					]);
+				$store_stock_cnt =
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $prd->prd_cd)
+						->where('store_cd', '=', $d['dep_store_cd'])
+						->count();
+
+				if($store_stock_cnt < 1) {
+					// 해당 매장에 상품 기존재고가 없을 경우
+					DB::table('product_stock_store')
+						->insert([
+							'goods_no'	=> $prd->goods_no,
+							'prd_cd'	=> $prd->prd_cd,
+							'store_cd'	=> $d['dep_store_cd'],
+							'qty'		=> 0,
+							'wqty'		=> ($d['qty'] ?? 0) * -1,
+							'goods_opt'	=> $prd->goods_opt,
+							'use_yn'	=> 'Y',
+							'rt'		=> now(),
+						]);
+				} else {
+
+					DB::table('product_stock_store')
+						->where('prd_cd', '=', $prd->prd_cd)
+						->where('store_cd', '=', $d['dep_store_cd'])
+						->update([
+							'wqty'	=> DB::raw('wqty - ' . ($d['qty'] ?? 0)),
+							'ut'	=> now(),
+						]);
+					
+				}
                 
 				// 재고이력 등록
 				DB::table('product_stock_hst')

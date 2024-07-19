@@ -306,8 +306,9 @@ class stk21Controller extends Controller
             }, ARRAY_FILTER_USE_BOTH);
             
             if (count($over_qtys) > 0) {
-                $code = 400;
-                throw new Exception('보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.');
+				//통아웃도어 => 도봉산매장 정리를 위해 잠시 주석
+                //$code = 400;
+                //throw new Exception('보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.');
             }
 			
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
@@ -603,14 +604,15 @@ class stk21Controller extends Controller
 			}
 
 			if (count($over_qtys) > 0) {
-				$code = 400;
-				$message = '보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.'."\n";
+				//통아웃도어 => 도봉산매장 정리를 위해 잠시 주석
+				//$code = 400;
+				//$message = '보내는 매장의 보유재고를 초과하여 RT를 요청할 수 없습니다.'."\n";
 				
-				foreach ($failed_data as $fd) {
-					$message .= "매장코드 : {$fd[0]}, 바코드 : {$fd[1]}" . "\n";
-				}
-				$message = rtrim($message, ', ');
-				throw new Exception($message);
+				//foreach ($failed_data as $fd) {
+				//	$message .= "매장코드 : {$fd[0]}, 바코드 : {$fd[1]}" . "\n";
+				//}
+				//$message = rtrim($message, ', ');
+				//throw new Exception($message);
 			}
 
 			$sql = "select ifnull(document_number, 0) + 1 as document_number from product_stock_rotation order by document_number desc limit 1";
