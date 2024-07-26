@@ -122,6 +122,16 @@
     </div>
 
 <script>
+	@if ($msg_type == 'pop')
+		window.onload = function() {
+		localStorage.setItem('{{$msg_cd}}', 'true');
+
+		// Optional: Close the popup after a certain time or action
+		window.onunload = function() {
+			localStorage.setItem('{{$msg_cd}}', 'false');
+		};
+	};
+	@endif
 
     /*$(document).ready(function(){
         $('#showStore').hide();

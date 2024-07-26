@@ -25,8 +25,20 @@
 			success: function (data) {
 				if (data.code == 200) {
 					$.each(data.msgs, function (i, item) {
-						const url = '/store/stock/stk32/showContent?msg_type=pop&msg_cd=' + item.msg_cd;
-						const msg = window.open(url, item.msg_cd, "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+
+						const popupOpened = localStorage.getItem(item.msg_cd);
+						if (!popupOpened || popupOpened === 'false') {
+
+							const url			= '/store/stock/stk32/showContent?msg_type=pop&msg_cd=' + item.msg_cd;
+							const popupWindow	= window.open(url, item.msg_cd, "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
+
+							if (popupWindow) {
+								localStorage.setItem(item.msg_cd, 'true');
+							}
+						}
+
+						//const url = '/store/stock/stk32/showContent?msg_type=pop&msg_cd=' + item.msg_cd;
+						//const msg = window.open(url, item.msg_cd, "toolbar=no,scrollbars=yes,resizable=yes,status=yes,top=500,left=500,width=800,height=615");
 					});
 				} else {
 					alert("메세지 팝업을 표시할 수 없습니다.\n관리자에게 문의해 주십시오.");
