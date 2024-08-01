@@ -2187,18 +2187,30 @@ class ord01Controller extends Controller
                 throw new Exception("환불처리 중 오류가 발생했습니다.");
             }
 
-            // 포인트 환원 및 반납처리
+            // 포인트 환원처리
             if($ord->user_id != null && $ord->refund_point_amt > 0) {
-                $point = new Point($user, $ord->user_id);
-                $point->SetOrdNo($ord->ord_no);
-                $point->SetOrdOptNo($ord->ord_opt_no);
-
-                // 포인트 환원
-                $point->Cancel($ord->refund_point_amt);
-
-                // 포인트 반납(차감)
-                $point->Refund($ord->ord_opt_no, $ord->add_point, '61');
+                if($ord->user_id != ''){
+                    $point = new Point($user, $ord->user_id);
+                    $point->SetOrdNo($ord->ord_no);
+                    $point->SetOrdOptNo($ord->ord_opt_no);
+    
+                    // 포인트 환원
+                    $point->Cancel($ord->refund_point_amt);
+                }
             }
+
+            //포인트 반납처리
+            if($ord->user_id != null && $ord->add_point > 0) {
+                if($ord->user_id != ''){
+                    $point  = new Point($user, $ord->user_id);
+                    $point->SetOrdNo($ord->ord_no);
+                    $point->SetOrdOptNo($ord->ord_opt_no);
+    
+                    // 포인트 반납(차감)
+                    $point->Refund($ord->ord_opt_no, $ord->add_point, '61');
+                }
+            }
+
 
 			// 사용된 쿠폰 반납처리
 			if ($ord->coupon_no != '' && $ord->coupon_amt > 0 && $ord->user_id != '') {
