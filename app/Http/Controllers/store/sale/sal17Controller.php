@@ -85,6 +85,9 @@ class sal17Controller extends Controller
 		$sdate = $request->input('sdate', now()->startOfMonth()->subMonth()->format("Y-m"));
 		$edate = $request->input('edate', now()->format("Y-m"));
 
+		$w_sdate = str_replace("-", "", $sdate) . "01";
+		$w_edate = str_replace("-", "", $edate) . "31";
+
 		$months = [];
 		$sd = Carbon::parse($sdate);
 		while($sd <= Carbon::parse($edate)){
@@ -126,9 +129,15 @@ class sal17Controller extends Controller
 
 			// 기간 이내의 주문금액, 결제금액 가져오기
 			$sum_month_others .= " 
+				sum(if(ow.ord_state_date like '${Ym}%', ow.price*ow.qty,0)) as ord_amt_${Ym}, 
+				sum(if(ow.ord_state_date like '${Ym}%', ow.recv_amt * if(ow.ord_state = '30', 1, -1),0)) as recv_amt_${Ym}${comma}
+			";
+			/*
+			$sum_month_others .= " 
 				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', o.price*o.qty,0)) as ord_amt_${Ym}, 
 				sum(if(date_format(m.ord_date,'%Y%m') = '${Ym}', o.recv_amt,0)) as recv_amt_${Ym}${comma}
 			";
+			*/
 
 			// 기간 이내의 매장목표 가져오기
 			$sum_proj_amt .= "
@@ -140,9 +149,15 @@ class sal17Controller extends Controller
 			$month = substr($Ym, 4, 2);
 			$last_Ym = $last_year . $month;
 			$sum_last_year .= " 
+				sum(if(ow.ord_state_date like '${last_Ym}%', ow.price*ow.qty,0)) as last_ord_amt_${Ym}, 
+				sum(if(ow.ord_state_date like '${last_Ym}%', ow.recv_amt * if(ow.ord_state = '30', 1, -1),0)) as last_recv_amt_${Ym}${comma}
+			";
+			/*
+			$sum_last_year .= " 
 				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', o.price*o.qty,0)) as last_ord_amt_${Ym}, 
 				sum(if(date_format(m.ord_date,'%Y%m') = '${last_Ym}', o.recv_amt,0)) as last_recv_amt_${Ym}${comma}
 			";
+			*/
 
 			// 12월 넘어가는 경우 01월로 변경, 아닌 경우 한달을 더해줌
 			array_push($col_keys, (int)$Ym);
@@ -170,7 +185,11 @@ class sal17Controller extends Controller
 		$next_edate = Carbon::parse($edate)->addMonth()->format("Y-m");
 
 		$last_year_sdate = Carbon::parse($sdate)->subYear()->format("Y-m");
-		$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
+		//$last_year_next_edate = Carbon::parse($edate)->subYear()->addMonth()->format("Y-m");
+		$last_year_next_edate = Carbon::parse($edate)->subYear()->format("Y-m");
+
+		$w_last_year_sdate		= str_replace("-", "", $last_year_sdate) . "01";
+		$w_last_year_next_edate	= str_replace("-", "", $last_year_next_edate) . "31";;
 
 		$sql = /** @lang text */
             "
@@ -178,22 +197,37 @@ class sal17Controller extends Controller
 				from store s 
 				left outer join
 				( 
-					select m.store_cd, sum(o.price*o.qty) as ord_amt, sum(o.recv_amt) as recv_amt,
+					select o.store_cd, sum(ow.price*ow.qty) as ord_amt, sum(ow.recv_amt * if(ow.ord_state = '30', 1, -1)) as recv_amt,
 						${sum_month_others}
 					from order_mst m 
-						inner join order_opt o on m.ord_no = o.ord_no 
-					where m.ord_date > '${sdate}' and m.ord_date < '${next_edate}' and m.store_cd <> ''
-					group by m.store_cd
+					inner join order_opt o on m.ord_no = o.ord_no and o.ord_state = '30'
+					inner join order_opt_wonga ow on o.ord_opt_no = ow.ord_opt_no 
+					where 
+						-- m.ord_date > '${sdate}' 
+						-- and m.ord_date < '${next_edate}' 
+						ow.ord_state_date >= '${w_sdate}' 
+						and ow.ord_state_date <= '${w_edate}' 
+						and ow.ord_state in(30, 60, 61) 
+						and if( ow.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+						and o.store_cd <> ''
+					group by o.store_cd
 				) a on s.store_cd = a.store_cd 
 				left outer join 
 				(
 					select 
-						m.store_cd, sum(o.recv_amt) as last_recv_amt,
+						o.store_cd, sum(ow.recv_amt * if(ow.ord_state = '30', 1, -1)) as last_recv_amt,
 						${sum_last_year}
 					from order_mst m 
-						inner join order_opt o on m.ord_no = o.ord_no 
-					where m.ord_date >= '${last_year_sdate}' and m.ord_date < '${last_year_next_edate}' and m.store_cd <> ''
-					group by m.store_cd
+					inner join order_opt o on m.ord_no = o.ord_no  and o.ord_state = '30'
+					inner join order_opt_wonga ow on o.ord_opt_no = ow.ord_opt_no 
+					where 
+						-- m.ord_date >= '${last_year_sdate}' and m.ord_date < '${last_year_next_edate}' 
+						ow.ord_state_date >= '${w_last_year_sdate}' 
+						and ow.ord_state_date <= '${w_last_year_next_edate}' 
+						and ow.ord_state in(30, 60, 61) 
+						and if( ow.ord_state_date <= '20231109', o.sale_kind is not null, 1=1)
+						and o.store_cd <> ''
+					group by o.store_cd
 				) b on s.store_cd = b.store_cd 
 				left outer join 
 				(
