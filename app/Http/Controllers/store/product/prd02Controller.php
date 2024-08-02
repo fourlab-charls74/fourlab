@@ -1866,7 +1866,7 @@ class prd02Controller extends Controller
 
 			$sql = "
 				select 
-					g.goods_nm as prd_nm, g.goods_nm_eng as prd_nm_eng, p.style_no, p.tag_price, p.price, p.wonga, p.com_id
+					g.goods_nm as prd_nm, g.goods_nm_eng as prd_nm_eng, p.style_no, p.tag_price, p.price, p.wonga, p.com_id, p.pr_code
 				from product p
 					inner join product_code pc on p.prd_cd = pc.prd_cd
 					inner join goods g on g.goods_no = pc.goods_no

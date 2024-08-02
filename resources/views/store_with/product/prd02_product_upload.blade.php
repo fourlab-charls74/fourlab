@@ -233,7 +233,7 @@
 											<th class="required">행사구분</th>
 											<td>
 												<div class="flax_box">
-													<select name='pr_code' id='pr_code' class="form-control form-control-sm prd_code">
+													<select name='pr_code' id='pr_code' class="form-control form-control-sm">
 														<option value=''>선택</option>
 														@foreach ($pr_codes as $pr_code)
 															<option value='{{ $pr_code->code_id }}'>{{ $pr_code->code_id }} : {{ $pr_code->code_val }}</option>
