@@ -784,7 +784,7 @@ class mem01Controller extends Controller
                         if(point_status = 'N',concat(point_nm,'\(대기\)'),point_nm) as point_nm, point, regi_date, expire_day, admin_nm, admin_id, '' as ord_opt_no
                     from point_list
                     where user_id = '$user_id'
-                    order by no desc
+                    order by regi_date desc
                 ";
                 break;
             //고객문의 목록 검색 쿼리
