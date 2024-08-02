@@ -505,7 +505,7 @@ class prd06Controller extends Controller
 						}
 					}
 					
-					if($chk24 == 0) continue;
+					if($chk24 > 0) continue;
 					/**/
 				}
 				
@@ -604,7 +604,7 @@ class prd06Controller extends Controller
 								}
 							}
 
-							if($chk24 == 0) continue;
+							if($chk24 > 0) continue;
 						}
 						/**/
 
@@ -656,7 +656,7 @@ class prd06Controller extends Controller
 								}
 							}
 
-							if($chk24 == 0) continue;
+							if($chk24 > 0) continue;
 						}
 
 						//매장 개별 버퍼링 처리
