@@ -262,6 +262,14 @@ class stk20Controller extends Controller
                 if($d['idx'] == "") continue;
                 if($d['state'] != $ori_state) continue;
 
+				$sql	= " select state from product_stock_rotation where idx = :idx ";
+				$check_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
+
+				if( $check_state != '10' ){
+					$code = '-102';
+					throw new Exception("이미처리된 RT 상품입니다.");
+				}
+
                 $sql = "
                     select pc.prd_cd, pc.goods_no, pc.goods_opt, g.price, g.wonga
                     from product_code pc
@@ -439,13 +447,13 @@ class stk20Controller extends Controller
 				if($d['idx'] == "") continue;
 				if($d['state'] != $ori_state) continue;
 
-				$sql	= " select state from product_stock_rotation where idx = :idx ";
-				$check_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
+				//$sql	= " select state from product_stock_rotation where idx = :idx ";
+				//$check_state	= DB::selectOne($sql, ['idx' => $d['idx']])->state;
 
-				if( $check_state != '20' ){
-					$code = '-102';
-					throw new Exception("이미처리된 RT 상품입니다.");
-				}
+				//if( $check_state != '20' ){
+				//	$code = '-102';
+				//	throw new Exception("이미처리된 RT 상품입니다.");
+				//}
 
 				DB::table('product_stock_rotation')
 					->where('idx', '=', $d['idx'])
