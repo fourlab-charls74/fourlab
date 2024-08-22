@@ -307,7 +307,8 @@ class prd04Controller extends Controller
 				, p.tag_price as goods_sh
 				, p.price
 				, p.wonga
-				, round(((g.goods_sh - g.price) / g.goods_sh) * 100, 2) as sale_rate
+				-- , round(((g.goods_sh - g.price) / g.goods_sh) * 100, 2) as sale_rate
+				, round(((p.tag_price - p.price) / p.tag_price) * 100, 2) as sale_rate
 				, p.match_yn
 				, ps.qty as hqty
 				, ps.wqty as hwqty
