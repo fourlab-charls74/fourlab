@@ -3008,6 +3008,7 @@ class prd01Controller extends Controller
             $jaego = new Jaego($user);
 
 			foreach ($data as $item) {
+				$opt_name	= $item['opt_name'];
 				$opt_price = $item["opt_price"];
 				$opt_memo = $item["opt_memo"] ?? "";
                 $wqty = $item["wqty"] ?? 0;
@@ -3017,6 +3018,28 @@ class prd01Controller extends Controller
                 if ($jaego->isUnlimited($goods_no) == "N") {
                     $jaego->SetStockQty($goods_no, 0, $goods_opt, $wqty, '상품옵션재고수정');
                 }
+				
+				//존재하지 않는 옵션에 대해 생성하기 시작
+				$sql	= " select count(*) as tot from goods_summary where goods_no = :goods_no and goods_sub = '0' and goods_opt = :goods_opt ";
+				$tot	= DB::selectOne($sql, ['goods_no' => $goods_no, 'goods_opt' => $goods_opt ])->tot;
+				
+				if($tot == 0){
+					DB::table('goods_summary')->insert([
+						'goods_no'		=> $goods_no,
+						'goods_sub'		=> 0,
+						'opt_name'		=> $opt_name,
+						'goods_opt'		=> $goods_opt,
+						'opt_price'		=> $opt_price,
+						'good_qty'		=> 0,
+						'wqty'			=> 0,
+						'soldout_yn'	=> 'N',
+						'use_yn'		=> 'Y',
+						'rt'			=> now(),
+						'ut'			=> now(),
+						'last_date'		=> now()
+					]);
+				}
+				//존재하지 않는 옵션에 대해 생성하기 종료
 
 				$wqty_sql = "";
 				$values = [
