@@ -177,7 +177,7 @@ class std05Controller extends Controller
 				'sale_kind'		=> $r['sale_kind'],
 				'sale_type_nm'	=> $r['sale_type_nm'],
 				'sale_apply'	=> $r['sale_apply'],
-				'type'			=> $r['type'],
+				'type'			=> $r['type'] ?? '',
 				'amt_kind'		=> $r['amt_kind'],
 				'sale_amt'		=> $r['sale_amt'] ?? null,
 				'sale_per'		=> $r['sale_per'] ?? null,
@@ -227,7 +227,7 @@ class std05Controller extends Controller
 					'reg_date' => now(),
 				]);
 			}
-	
+
 			$msg = "정상적으로 저장되었습니다.";
 			DB::commit();
 		} catch (Exception $e) {
