@@ -310,7 +310,8 @@
 				if(res.data.code === 200) {
 					alert(res.data.msg);
 					window.close();
-					window.opener.location.href = "/store/product/prd02";
+					//window.opener.location.href = "/store/product/prd02";
+					window.opener.location.href = "/store/product/prd32";
 				} else if (res.data.code === 400) {
 					alert(res.data.msg);
 				} else {

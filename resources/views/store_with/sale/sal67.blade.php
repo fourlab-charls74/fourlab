@@ -7,7 +7,8 @@
 			<span class="home"></span>
 			<span>/ 경영관리</span>
 			<span>/ 상품별이익현황</span>
-			<span>/ <a href="/store/sale/sal07">이전</a></span>
+			{{-- <!--<span>/ <a href="/store/sale/sal07">이전</a></span>//--> --}}
+			<span>/ <a href="#" onClick="alert('시스템 관리자에게 문의 하십시오.');return false;">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search">

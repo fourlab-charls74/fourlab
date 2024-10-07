@@ -7,7 +7,8 @@
 			<span class="home"></span>
 			<span>/ 경영관리</span>
 			<span>/ 매장별 할인판매 현황</span>
-			<span>/ <a href="/store/sale/sal34">기존</a></span>
+			{{-- <!--<span>/ <a href="/store/sale/sal34">기존</a></span>//--> --}}
+			<span>/ <a href="#" onClick="alert('시스템 관리자에게 문의 하십시오.');return false;">기존</a></span>
 		</div>
 	</div>
 	<form method="get" name="search" id="search">

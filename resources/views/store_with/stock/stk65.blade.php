@@ -7,7 +7,8 @@
 			<span class="home"></span>
 			<span>/ 매장관리</span>
 			<span>/ 매장반품관리(상품)</span>
-			<span>/ <a href="/store/stock/stk35">이전</a></span>
+			{{-- <!--<span>/ <a href="/store/stock/stk35">이전</a></span>//--> --}}
+			<span>/ <a href="#" onClick="alert('시스템 관리자에게 문의 하십시오.');return false;">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search">

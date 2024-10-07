@@ -5,9 +5,10 @@
 		<h3 class="d-inline-flex">[NEW]일별 매출 통계</h3>
 		<div class="d-inline-flex location">
 			<span class="home"></span>
-			<span>/ 경영관리</span>
+			<span>/ 매출통계</span>
 			<span>/ 일별 매출 통계</span>
-			<span>/ <a href="/store/sale/sal24">이전</a></span>
+			{{-- <!--<span>/ <a href="/store/sale/sal24">이전</a></span>//--> --}}
+			<span>/ <a href="#" onClick="alert('시스템 관리자에게 문의 하십시오.');return false;">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search" id="search">

@@ -7,7 +7,8 @@
 			<span class="home"></span>
 			<span>판매관리</span>
 			<span>/ 판매내역조회</span>
-			<span>/ <a href="/store/order/ord06">이전</a></span>
+			{{-- <!--<span>/ <a href="/store/order/ord06">이전</a></span>//--> --}}
+			<span>/ <a href="#" onClick="alert('시스템 관리자에게 문의 하십시오.');return false;">이전</a></span>
 		</div>
 	</div>
 	<form method="get" name="search">
