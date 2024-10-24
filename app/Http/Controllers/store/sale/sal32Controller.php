@@ -190,21 +190,23 @@ class sal32Controller extends Controller
 				sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as recv_amt,
 				sum(w.qty * w.price - if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as discount,
 				avg(w.price) as avg_price,
-				avg(w.wonga) as wonga,
-				sum(w.wonga * w.qty) as sum_wonga,
+				-- avg(w.wonga) as wonga,
+				avg(p.wonga * if(w.ord_state = 30, 1, -1)) as wonga,
+				-- sum(w.wonga * w.qty) as sum_wonga,
+				sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) as sum_wonga,
 
 				( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) as recv_amt_novat,
 				
 				( 
 					sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1
-					- sum(w.wonga * w.qty)
+					- sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty)
 				) as sales_profit,
 				
 				-- sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
 	
-				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
+				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) ) > 0,
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
 				)
 				 as profit_rate,
 
