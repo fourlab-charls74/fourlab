@@ -7,7 +7,7 @@
 		<span class="home"></span>
         <span>/ 영업관리</span>
 		<span>/ 본사수불집계표</span>
-		<span>/ <a href="/store/sale/sal53">신규</a></span>
+		<!--<span>/ <a href="/store/sale/sal53">신규</a></span>//-->
 	</div>
 </div>
 <div id="search-area" class="search_cum_form">
