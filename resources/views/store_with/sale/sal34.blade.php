@@ -7,7 +7,7 @@
 			<span class="home"></span>
 			<span>/ 경영관리</span>
 			<span>/ 매장별 할인판매 현황</span>
-			<span>/ <a href="/store/sale/sal64">신규</a></span>
+			<!--<span>/ <a href="/store/sale/sal64">신규</a></span>//-->
 		</div>
 	</div>
 	<form method="get" name="search" id="search">
