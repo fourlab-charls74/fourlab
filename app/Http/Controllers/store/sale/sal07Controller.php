@@ -189,23 +189,24 @@ class sal07Controller extends Controller
 				sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as recv_amt,
 				sum(w.qty * w.price - if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1)) as discount,
 				avg(w.price) as avg_price,
-				avg(w.wonga) as wonga,
-				sum(w.wonga * w.qty) as sum_wonga,
+				-- avg(w.wonga) as wonga,
+				avg(p.wonga * if(w.ord_state = 30, 1, -1)) as wonga,
+				sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) as sum_wonga,
 				-- sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as sum_wonga,
 
 				( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) as recv_amt_novat,
 				
 				( 
 					sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1
-					- sum(w.wonga * w.qty)
+					- sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty)
 					-- sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1))
 				) as sales_profit,
 				
 				-- sum(w.qty * w.price - w.wonga * w.qty) as sales_profit,
 	
 				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) > 0,
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
-					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(w.wonga * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * 100),
+					(( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * if(w.ord_state = 30, 1, -1) * w.qty) ) / ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) * -100)
 				)
 				/*
 				if( (sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 ) > 0 or ( sum(if(w.ord_state = '30', w.recv_amt, w.recv_amt * -1))/1.1 - sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) ) > 0,
@@ -223,7 +224,7 @@ class sal07Controller extends Controller
 				inner join order_opt o on o.ord_opt_no = w.ord_opt_no and o.ord_state = '30'
 				inner join goods g on o.goods_no = g.goods_no
 				inner join product_code pc on pc.prd_cd = o.prd_cd
-				-- inner join product p on o.prd_cd = p.prd_cd
+				inner join product p on o.prd_cd = p.prd_cd
 				inner join code item on item.code_kind_cd = 'PRD_CD_ITEM' and item.code_id = pc.item
 				left outer join store s on o.store_cd = s.store_cd
 				left outer join brand b on pc.brand = b.br_cd
