@@ -192,8 +192,8 @@ class sal26Controller extends Controller
 							, sum(w.qty)as qty
 							, sum(w.recv_amt) as recv_amt
 							, sum(w.point_apply_amt) as point_amt
-							, sum(w.wonga * w.qty) as wonga
-							-- , sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
+							-- , sum(w.wonga * w.qty) as wonga
+							, sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
 							, sum(w.coupon_apply_amt) as coupon_amt
 							, sum(w.sales_com_fee) as fee_amt
 							, sum(w.dc_apply_amt) as dc_amt
@@ -212,7 +212,7 @@ class sal26Controller extends Controller
 							inner join company c on w.com_id = c.com_id
                             inner join store s on s.store_cd = o.store_cd
                             inner join product_code pc on pc.prd_cd = o.prd_cd
-                            -- inner join product p on o.prd_cd = p.prd_cd
+                            inner join product p on o.prd_cd = p.prd_cd
 						where
 							w.ord_state_date >= '$sdate' 
 							and w.ord_state_date <= '$edate' and w.ord_state in ($ord_state,60,61)

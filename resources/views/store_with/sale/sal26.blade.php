@@ -6,9 +6,9 @@
         <h3 class="d-inline-flex">매장별 매출 통계</h3>
         <div class="d-inline-flex location">
             <span class="home"></span>
-            <span>/ 경영관리</span>
+            <span>/ 매출 통계</span>
             <span>/ 매장별 매출 통계</span>
-			<span>/ <a href="/store/sale/sal56">신규</a></span>
+			<!--<span>/ <a href="/store/sale/sal56">신규</a></span>//-->
         </div>
     </div>
     <form method="get" name="search" id="search">
