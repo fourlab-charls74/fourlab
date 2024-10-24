@@ -124,10 +124,12 @@ class sal08Controller extends Controller
 					, (w.qty * w.price ) as sale_amt
 					, o.recv_amt
 					-- , (w.qty * w.wonga / :vat2) as wonga_amt
-				    , (w.qty * w.wonga) as wonga_amt
+				    , (w.qty * p.wonga * if(w.ord_state = 30, 1, -1)) as wonga_amt
+				    -- , (w.qty * w.wonga) as wonga_amt
 					-- , (w.qty * (w.price - w.wonga)) as margin_amt
 				    -- , (o.recv_amt - (w.qty * w.wonga)) as margin_amt
-					, if(w.ord_state = '30', (o.recv_amt/1.1 - (w.qty * w.wonga)), (o.recv_amt/1.1 - (w.qty * w.wonga * -1)) * -1) as margin_amt    
+					, if(w.ord_state = '30', (o.recv_amt/1.1 - (w.qty * p.wonga)), (o.recv_amt/1.1 - (w.qty * p.wonga)) * -1) as margin_amt    
+					-- , if(w.ord_state = '30', (o.recv_amt/1.1 - (w.qty * w.wonga)), (o.recv_amt/1.1 - (w.qty * w.wonga * -1)) * -1) as margin_amt    
 				     
 					, o.ord_state
 				    , w.ord_state as w_ord_state
@@ -137,6 +139,7 @@ class sal08Controller extends Controller
 				from order_opt o
 					inner join order_opt_wonga w on o.ord_opt_no = w.ord_opt_no
 					inner join product_code pc on pc.prd_cd = o.prd_cd
+					inner join product p on pc.prd_cd = p.prd_cd
 					inner join store s on s.store_cd = o.store_cd
 				    inner join goods g on o.goods_no = g.goods_no
 					left outer join sale_type st on st.sale_kind = o.sale_kind
