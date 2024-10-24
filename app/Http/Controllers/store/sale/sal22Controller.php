@@ -13,43 +13,43 @@ use Exception;
 
 class sal22Controller extends Controller
 {
-    public function index()
+	public function index()
 	{
 
 		$storages	= SLib::getStorage();
 
-        $values = [
-            'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
-            'edate' => date('Y-m-d'),
-            'storage' => $storages
+		$values = [
+			'sdate' => now()->sub(1, 'month')->format('Y-m-d'),
+			'edate' => date('Y-m-d'),
+			'storage' => $storages
 		];
-        return view(Config::get('shop.store.view') . '/sale/sal22', $values);
+		return view(Config::get('shop.store.view') . '/sale/sal22', $values);
 	}
 
 
-    public function search(Request $request)
-    {
-        $sdate = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
-        $edate = $request->input('edate', date('Y-m-d'));
-        $next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
-        $storage_type = $request->input('storage_type', '');
-        $store_cds = $request->input('store_no', []);
-        $prd_cds = $request->input('prd_cd', '');
-        $prd_cd_range_text = $request->input("prd_cd_range", '');
+	public function search(Request $request)
+	{
+		$sdate = $request->input('sdate', now()->sub(1, 'month')->format('Y-m-d'));
+		$edate = $request->input('edate', date('Y-m-d'));
+		$next_edate = date("Y-m-d", strtotime("+1 day", strtotime($edate)));
+		$storage_type = $request->input('storage_type', '');
+		$store_cds = $request->input('store_no', []);
+		$prd_cds = $request->input('prd_cd', '');
+		$prd_cd_range_text = $request->input("prd_cd_range", '');
 
 		$sdate	= str_replace('-','', $sdate);
 		$edate	= str_replace('-','', $edate);
 		$next_edate	= str_replace('-','', $next_edate);
 
-        $where = "";
-        $hst_where = "";
+		$where = "";
+		$hst_where = "";
 
-        if ($storage_type != ''){
+		if ($storage_type != ''){
 			$where .= " and storage.storage_cd = '$storage_type' ";
 			$hst_where .= " and hst.location_cd = '$storage_type' ";
 		}
-		
-        if ($prd_cds != '') {
+
+		if ($prd_cds != '') {
 			$prd_cd = explode(',', $prd_cds);
 			$where .= " and (1!=1";
 			$hst_where .= " and (1!=1";
@@ -63,7 +63,7 @@ class sal22Controller extends Controller
 			//$where .= " and p.prd_cd != ''";
 		}
 
-        // 상품옵션 범위검색
+		// 상품옵션 범위검색
 		$range_opts = ['brand', 'year', 'season', 'gender', 'item', 'opt'];
 		parse_str($prd_cd_range_text, $prd_cd_range);
 		foreach ($range_opts as $opt) {
@@ -76,23 +76,23 @@ class sal22Controller extends Controller
 			}
 		}
 
-        // ordreby
-        $ord = $request->input('ord', 'desc');
-        $ord_field = $request->input('ord_field', 'pss.storage_cd');
-        $orderby = sprintf("order by %s %s", $ord_field, $ord);
-        if($ord_field == 'pss.prd_cd') $orderby .= ", pss.storage_cd";
+		// ordreby
+		$ord = $request->input('ord', 'desc');
+		$ord_field = $request->input('ord_field', 'pss.storage_cd');
+		$orderby = sprintf("order by %s %s", $ord_field, $ord);
+		if($ord_field == 'pss.prd_cd') $orderby .= ", pss.storage_cd";
 
-        // pagination
-        $page = $request->input('page', 1);
-        if ($page < 1 or $page == "") $page = 1;
-        $page_size = $request->input('limit', 500);
-        $startno = ($page - 1) * $page_size;
-        $limit = " limit $startno, $page_size ";
+		// pagination
+		$page = $request->input('page', 1);
+		if ($page < 1 or $page == "") $page = 1;
+		$page_size = $request->input('limit', 500);
+		$startno = ($page - 1) * $page_size;
+		$limit = " limit $startno, $page_size ";
 
-        //전체 데이터 보기(임시)
-        if($page_size == -1)    $limit = "";
+		//전체 데이터 보기(임시)
+		if($page_size == -1)    $limit = "";
 
-        $sql = "
+		$sql = "
             select 
                 pss.storage_cd
                 , storage.storage_nm
@@ -206,15 +206,15 @@ class sal22Controller extends Controller
             $orderby
             $limit
         ";
-        $rows = DB::select($sql);
+		$rows = DB::select($sql);
 
 
-        // pagination
-        $total = 0;
-        $total_data = '';
-        $page_cnt = 0;
-        if($page == 1) {
-            $sql = "
+		// pagination
+		$total = 0;
+		$total_data = '';
+		$page_cnt = 0;
+		if($page == 1) {
+			$sql = "
                 select 
                     count(c.prd_cd) as total, 
                     sum(goods_sh) as goods_sh,
@@ -340,7 +340,7 @@ class sal22Controller extends Controller
 					left outer join (
 						select
 							hst.location_cd as storage_cd, pc.prd_cd_p, hst.prd_cd, 
-							sum(if( hst.stock_state_date <= '$edate', hst.qty, 0)) as qty,
+							sum(if(hst.stock_state_date <= '$edate',hst.qty, 0)) as qty,
 					
 							-- 상품입고
 							sum(if(hst.type = 1 and hst.stock_state_date <= '$edate', hst.qty, 0)) as storage_in_qty,
@@ -351,16 +351,20 @@ class sal22Controller extends Controller
 							-- 이동출고
 							sum(if(hst.type = 16 and hst.qty < 0 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as rt_out_qty,
 							-- 매장출고
-							sum(if(hst.type = 17 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as store_out_qty,
+							sum(if(hst.type = 17 and hst.stock_state_date <= '$edate',
+								if((hst.ord_opt_no > 0 and oo.ord_state = '30') or hst.ord_opt_no = 0, hst.qty, 0), 
+								0
+							)) * -1 as store_out_qty,
 							-- 매장반품
 							sum(if(hst.type = 11 and hst.stock_state_date <= '$edate', hst.qty, 0)) as store_return_qty,
 							-- loss
 							sum(if(hst.type = 14 and hst.stock_state_date <= '$edate', hst.qty, 0)) * -1 as loss_qty,
 							
-							sum(if( hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
+							sum(if(hst.stock_state_date >= '$next_edate', hst.qty, 0)) as next_qty
 						from product_stock_hst hst
 						inner join product_code pc on hst.prd_cd = pc.prd_cd and pc.type = 'N' 
 						inner join storage on storage.storage_cd = hst.location_cd
+						left outer join order_opt oo on hst.ord_opt_no = oo.ord_opt_no
 						where
 							hst.location_type = 'STORAGE'
 							$hst_where  	
@@ -379,12 +383,12 @@ class sal22Controller extends Controller
                 ) as c
             ";
 
-            $row = DB::selectOne($sql);
-            $total_data = $row;
-            $total = $row->total;
-            $page_cnt = (int)(($total - 1) / $page_size) + 1;
-        }
-        
+			$row = DB::selectOne($sql);
+			$total_data = $row;
+			$total = $row->total;
+			$page_cnt = (int)(($total - 1) / $page_size) + 1;
+		}
+
 		return response()->json([
 			'code' => 200,
 			'head' => [
@@ -392,9 +396,9 @@ class sal22Controller extends Controller
 				'page' => $page,
 				'page_cnt' => $page_cnt,
 				'page_total' => count($rows),
-                'total_data' => $total_data
+				'total_data' => $total_data
 			],
 			'body' => $rows,
 		]);
-    }
+	}
 }
