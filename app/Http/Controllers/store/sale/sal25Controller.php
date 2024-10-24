@@ -208,8 +208,8 @@ class sal25Controller extends Controller
 						, sum(w.qty)as qty
 						, sum(w.recv_amt) as recv_amt
 						, sum(w.point_apply_amt) as point_amt
-						, sum(w.wonga * w.qty) as wonga
-						-- , sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
+						-- , sum(w.wonga * w.qty) as wonga
+						, sum(p.wonga * w.qty * if(w.ord_state = 30, 1, -1)) as wonga
 						, sum(w.coupon_apply_amt) as coupon_amt
 						, sum(w.dc_apply_amt) as dc_amt						
 						, sum(w.sales_com_fee) as fee_amt
@@ -226,7 +226,7 @@ class sal25Controller extends Controller
 						inner join goods g on o.goods_no = g.goods_no and o.goods_sub = g.goods_sub
 						left outer join store store on store.store_cd = o.store_cd
 						inner join product_code pc on pc.prd_cd = o.prd_cd
-						-- inner join product p on o.prd_cd = p.prd_cd
+						inner join product p on o.prd_cd = p.prd_cd
 					where
 						w.ord_state_date >= concat('$sdate', '01') 
 						and w.ord_state_date <= concat('$edate', '31') 
