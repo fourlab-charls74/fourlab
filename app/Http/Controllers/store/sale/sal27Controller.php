@@ -249,7 +249,12 @@ class  sal27Controller extends Controller
 					, ifnull(srp.qty, 0) as term_return_qty
 					, (ifnull(psr.qty, 0) - ifnull(srp.qty, 0)) as term_out_qty
 					, (
-						ifnull(pssg.wqty, 0) 
+						ifnull((
+							select sum(wqty) as wqty
+							from product_stock_storage
+							where 1=1 $storage_where1
+								and prd_cd = pc.prd_cd
+						), 0)
 						- 
 						ifnull((
 							select sum(h.qty) as qty
@@ -260,7 +265,13 @@ class  sal27Controller extends Controller
 						), 0)
 					) as term_storage_qty
 					, (
-						ifnull(pss.wqty, 0) 
+						ifnull((
+							select sum(ss.wqty + ss.rqty) as wqty
+							from product_stock_store ss
+								inner join store s on s.store_cd = ss.store_cd
+							where 1=1 $store_where
+								and ss.prd_cd = pc.prd_cd
+						), 0)
 						- 
 						ifnull((
 							select sum(h.qty) as qty
@@ -287,6 +298,7 @@ class  sal27Controller extends Controller
 					order by pc.item, pc.brand, pc.prd_cd_p desc, pc.color, pc.prd_cd desc
 				) pc
 					inner join product_stock ps on ps.prd_cd = pc.prd_cd
+/*
 					left outer join (
 						select prd_cd, sum(wqty) as wqty
 						from product_stock_storage
@@ -300,6 +312,7 @@ class  sal27Controller extends Controller
 						where 1=1 $store_where
 						group by ss.prd_cd
 					) pss on pss.prd_cd = pc.prd_cd
+*/
 					left outer join (
 						select r.prd_cd, sum(r.qty) as qty, min(r.prc_rt) as first_release_date
 						from product_stock_release r
