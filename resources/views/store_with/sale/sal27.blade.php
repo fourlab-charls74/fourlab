@@ -175,6 +175,7 @@
 
 		const pinnedRowData = [{ item: 'total' }];
 		const sumValuesFunc = (params) => params.values.reduce((a,c) => a + ((c || 0) * 1), 0);
+		const LastValuesFunc = (params) => params.values.reduce((a,c) => ((c || 0) * 1), 0);
 
 		const columns = [
 			{ field: "item_nm", headerName: "품목명", rowGroup: true, hide: true },
@@ -226,9 +227,18 @@
 			{ headerName: '컬러명', showRowGroup: 'color_nm', cellRenderer: 'agGroupCellRenderer', width: 130 },
 			{ field: "size", headerName: "사이즈", width: 50, cellClass: 'hd-grid-code' },
 			{ field: "goods_opt", headerName: "옵션", width: 150 },
-			{ field: "goods_sh", headerName: "정상가", width: 80, type: 'currencyType', aggFunc: sumValuesFunc },
-			{ field: "price", headerName: "현재가", width: 80, type: 'currencyType', aggFunc: sumValuesFunc },
-			{ field: "wonga", headerName: "원가", width: 80, type: 'currencyType', aggFunc: sumValuesFunc },
+			{ field: "goods_sh", headerName: "정상가", width: 80, type: 'currencyType', 
+				aggFunc: LastValuesFunc,
+				cellRenderer: (params) => params.node.level >= 2  ? params.value : '',
+			},
+			{ field: "price", headerName: "현재가", width: 80, type: 'currencyType', 
+				aggFunc: LastValuesFunc,
+				cellRenderer: (params) => params.node.level >= 2  ? params.value : '',
+			},
+			{ field: "wonga", headerName: "원가", width: 80, type: 'currencyType', 
+				aggFunc: LastValuesFunc,
+				cellRenderer: (params) => params.node.level >= 2  ? params.value : '',
+			},
 			{ field: "total_in_qty", headerName: "발주량", width: 60, type: 'currencyType', aggFunc: sumValuesFunc },
 			{
 				headerName: "입고",
@@ -381,7 +391,7 @@
 		const updatePinnedRow = () => {
 			const keys = gx.gridOptions.api.getColumnDefs()
 				.reduce((a, c) => (!!c.children && Array.isArray(c.children)) ? a.concat(c.children.concat(c)) : a.concat(c), [])
-				.filter(col => col.type === 'currencyType')
+				.filter(col => col.type === 'currencyType' && (col.field != 'goods_sh' && col.field != 'price' && col.field != 'wonga'))
 				.map(col => col.field);
 			const totals = {};
 

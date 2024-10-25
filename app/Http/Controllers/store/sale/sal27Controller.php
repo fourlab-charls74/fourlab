@@ -188,7 +188,7 @@ class  sal27Controller extends Controller
 						from order_opt_wonga aa 
 						inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
 						where 1=1 
-							$date_where1
+							-- $date_where1
 							and if( aa.ord_state_date <= '20231109', bb.sale_kind is not null, 1=1)	-- 피엘라벤 초기화 특성
 							and aa.ord_state in (30,60,61)
 							and bb.prd_cd = pc.prd_cd
@@ -198,7 +198,7 @@ class  sal27Controller extends Controller
 						from order_opt_wonga aa
 						inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
 						where 1=1 
-							$date_where1
+							-- $date_where1
 							and if( aa.ord_state_date <= '20231109', bb.sale_kind is not null, 1=1)	-- 피엘라벤 초기화 특성
 							and aa.ord_state in (30,60,61)
 							and bb.prd_cd = pc.prd_cd
@@ -208,7 +208,7 @@ class  sal27Controller extends Controller
 						from order_opt_wonga aa
 						inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
 						where 1=1 
-							$date_where1
+							-- $date_where1
 							and if( aa.ord_state_date <= '20231109', bb.sale_kind is not null, 1=1)	-- 피엘라벤 초기화 특성
 							and aa.ord_state in (30,60,61)
 							and bb.prd_cd = pc.prd_cd
@@ -218,7 +218,7 @@ class  sal27Controller extends Controller
 						from order_opt_wonga aa
 						inner join order_opt bb on aa.ord_opt_no = bb.ord_opt_no and bb.ord_state = '30'
 						where 1=1
-							$date_where1
+							-- $date_where1
 							and if( aa.ord_state_date <= '20231109', bb.sale_kind is not null, 1=1)	-- 피엘라벤 초기화 특성
 							and aa.ord_state in (30,60,61)
 							and bb.prd_cd = pc.prd_cd
