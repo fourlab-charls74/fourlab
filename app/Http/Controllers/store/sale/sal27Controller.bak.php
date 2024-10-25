@@ -29,7 +29,7 @@ class  sal27Controller extends Controller
 	public function search(Request $request)
 	{
 		ini_set('memory_limit', -1);
-		
+
 		$sdate = $request->input('sdate', now()->startOfMonth()->sub(2, 'month')->format("Y-m-d"));
 		$edate = $request->input('edate', now()->format("Y-m-d"));
 		$sdate_day = date('Ymd', strtotime($sdate));
@@ -248,29 +248,8 @@ class  sal27Controller extends Controller
 					, ifnull(psr.qty, 0) as term_release_qty
 					, ifnull(srp.qty, 0) as term_return_qty
 					, (ifnull(psr.qty, 0) - ifnull(srp.qty, 0)) as term_out_qty
-					, (
-						ifnull(pssg.wqty, 0) 
-						- 
-						ifnull((
-							select sum(h.qty) as qty
-							from product_stock_hst h
-							where h.location_type = 'STORAGE' $storage_where2
-								$date_where5
-								and h.prd_cd = pc.prd_cd
-						), 0)
-					) as term_storage_qty
-					, (
-						ifnull(pss.wqty, 0) 
-						- 
-						ifnull((
-							select sum(h.qty) as qty
-							from product_stock_hst h
-							inner join store s on s.store_cd = h.location_cd
-							where h.location_type = 'STORE' $store_where2
-								$date_where5
-								and h.prd_cd = pc.prd_cd
-						), 0)
-					) as term_store_qty
+					, (ifnull(pssg.wqty, 0) - ifnull(storage_hst.qty, 0)) as term_storage_qty
+					, (ifnull(pss.wqty, 0) - ifnull(store_hst.qty, 0)) as term_store_qty
 				from (
 					select pc.item, pc.brand, pc.prd_cd, pc.goods_no, pc.color, pc.goods_opt
 						, pc.size
@@ -333,7 +312,6 @@ class  sal27Controller extends Controller
 						where 1=1 $store_where
 						group by p.prd_cd
 					) srp on srp.prd_cd = pc.prd_cd
-/*
 					left outer join (
 						select h.prd_cd, sum(h.qty) as qty
 						from product_stock_hst h
@@ -349,7 +327,6 @@ class  sal27Controller extends Controller
 							$date_where5
 						group by h.prd_cd
 					) store_hst on store_hst.prd_cd = pc.prd_cd
-*/
 			) a
 				left outer join code clr on clr.code_kind_cd = 'PRD_CD_COLOR' and clr.code_id = a.color
 				left outer join code c on c.code_kind_cd = 'PRD_CD_ITEM' and c.code_id = a.item
