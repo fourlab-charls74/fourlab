@@ -485,6 +485,11 @@
         if (cart.filter((c) => c.sale_type === '81').length > 0 && memo === '') {
             return alert("'온라인판매'의 경우, 특이사항에 온라인주문번호 등 해당정보를 반드시 기입해주세요.");
         }
+
+		// 판매유형이 '임직원할인'(14)일 경우, 특이사항에 해당정보를 반드시 기입할 수 있도록 설정
+		if (cart.filter((c) => c.sale_type === '14').length > 0 && memo === '') {
+			return alert("'온라인판매'의 경우, 특이사항에 해당정보를 반드시 기입해주세요.");
+		}
 		
 		if (reservation_yn == 'N') {
 			if (cart.filter((c) => c.sale_type === '81').length > 0) {
