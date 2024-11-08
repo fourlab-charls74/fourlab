@@ -455,8 +455,6 @@ class ord05Controller extends Controller
 								*/
 							}
 						}
-					}else{
-						$pay_result = 0;
 					}
 
 				}else{
