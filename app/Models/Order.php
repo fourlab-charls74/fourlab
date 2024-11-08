@@ -725,9 +725,9 @@ class Order
 							"BUTTON_TYPE" => '1',
 							"BUTTON_INFO" => "주문내역조회^WL^'$domain'/app/mypage/order_list"
 						);
-						//$sms_msg = $sms->MsgReplace($cfg_payment_msg, $msgarr);
+						$sms_msg = $sms->MsgReplace($cfg_payment_msg, $msgarr);
 
-						//$sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
+						$sms->SendAligoSMS( $mobile, $sms_msg, $user_nm );
 
 						/*
 						if($cfg_kakao_yn == 'Y' && $template_code != ''){
