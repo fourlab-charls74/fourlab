@@ -78,8 +78,13 @@ class sal23Controller extends Controller
 		$page = $request->input('page', 1);
 		if ($page < 1 or $page == "") $page = 1;
 		$page_size = $request->input('limit', 500);
+		
 		$startno = ($page - 1) * $page_size;
-		$limit = " limit $startno, $page_size ";
+		
+		if($page_size > 0)
+			$limit = " limit $startno, $page_size ";
+		else
+			$limit = "";
 
 		//전체 데이터 보기(임시)
 		if($page_size == -1)    $limit = "";
