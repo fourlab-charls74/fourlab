@@ -842,6 +842,27 @@ class PosController extends Controller
                 DB::table('order_mst')->where('ord_no', $ord_no)->update($order_mst);
                 DB::table('payment')->where('ord_no', $ord_no)->update($payment);
             }
+			
+			// order_pos 등록/수정 시작
+			$sql_pos	= " select count(*) as total from order_pos op where op.ord_no = :ord_no ";
+			$row_pos	= DB::selectOne($sql_pos, ['ord_no' => $ord_no]);
+			if( $row_pos->total == 0 ){
+				DB::table('order_pos')->insert([
+					'ord_no'	=> $ord_no,
+					'card_amt'	=> $card_amt,
+					'cash_amt'	=> $cash_amt,
+					'point_amt'	=> $point_amt,
+					'store_cd'	=> $store_cd,
+					'ord_date'	=> $ord_date
+				]);
+			}else{
+				DB::table('order_pos')->where('ord_no', $ord_no)->update([
+					'card_amt'	=> $card_amt,
+					'cash_amt'	=> $cash_amt,
+					'point_amt'	=> $point_amt
+				]);
+			}
+			// order_post 등록/수정 종료
 
             // 주문대기건 판매처리 시, 삭제된 상품 처리
             for ($i = 0; $i < count($removed_cart); $i++) {
