@@ -106,10 +106,10 @@ class sal23Controller extends Controller
                 , p.wonga
 
                 -- 이전재고
-                , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) as prev_qty
-                , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.tag_price as prev_tag_price
-                , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.price as prev_price
-                , (ps.qty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.wonga as prev_wonga
+                , (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) as prev_qty
+                , (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.tag_price as prev_tag_price
+                , (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.price as prev_price
+                , (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.wonga as prev_wonga
 
                 -- 상품입고
                 , ifnull(hst.stock_in_qty, 0) as stock_in_qty
@@ -260,10 +260,10 @@ class sal23Controller extends Controller
 						, p.wonga
 		
 						-- 이전재고
-						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) as prev_qty
-						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.tag_price as prev_sh
-						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.price as prev_price
-						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0)) * p.wonga as prev_wonga
+						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) as prev_qty
+						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.tag_price as prev_sh
+						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.price as prev_price
+						, (ps.qty + ps.oqty - ifnull(hst.next_qty, 0) - ifnull(hst.qty, 0) - ifnull(hst.on_qty, 0)) * p.wonga as prev_wonga
 		
 						-- 상품입고
 						, ifnull(hst.stock_in_qty, 0) as stock_in_qty
