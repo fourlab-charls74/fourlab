@@ -511,12 +511,18 @@ class prd06Controller extends Controller
 				
 				//대표창고 버퍼링 처리
 				if( $row->storage_cd == $stock_conf->default_storage_cd && $stock_conf->default_storage_buffer != 0){
-					$row->qty = $row->qty - $stock_conf->default_storage_buffer;
+					if(($row->qty - $stock_conf->default_storage_buffer) < 0)
+						$row->qty	= 0;
+					else
+						$row->qty = $row->qty - $stock_conf->default_storage_buffer;
 				}
 	
 				//온라인창고 버퍼링 처리
 				if( $row->storage_cd == $stock_conf->online_storage_cd && $stock_conf->online_storage_buffer != 0){
-					$row->qty = $row->qty - $stock_conf->online_storage_buffer;
+					if(($row->qty - $stock_conf->online_storage_buffer) < 0)
+						$row->qty	= 0;
+					else
+						$row->qty = $row->qty - $stock_conf->online_storage_buffer;
 					
 					// 재고 감가 시작
 					$sql_exp	= " select prd_cd, exp_cnt from product_stock_exp ";
