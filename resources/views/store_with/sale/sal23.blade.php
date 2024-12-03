@@ -174,7 +174,7 @@
         {field: "color", headerName: "컬러", width: 55, cellStyle: AlignCenter},
         {field: "size", headerName: "사이즈", width: 55, cellStyle: AlignCenter},
         {field: "goods_opt", headerName: "옵션", width: 120},
-        {field: "tag_price", headerName: "정상가", width: 60, type: "currencyType", aggFunc: "first"},
+        {field: "goods_sh", headerName: "정상가", width: 60, type: "currencyType", aggFunc: "first"},
         {field: "price", headerName: "현재가", width: 60, type: "currencyType", aggFunc: "first"},
         {field: "wonga", headerName: "원가", width: 60, type: "currencyType", aggFunc: "first"},
         {
