@@ -132,7 +132,8 @@ class Pay
 
 				// 당일결제건 부분취소 불가
 				//if($now != $appdate) return 2;
-				return 2;
+				//return 2;
+				return -1; //KCP정책 변경으로 인해 변경 241212
 			}
 
 			return 1;
