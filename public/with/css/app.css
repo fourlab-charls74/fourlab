@@ -140,7 +140,7 @@ header .top_inner_box .top_setting_btn li a.mode{background:url(../images/top_le
 
 header .top_inner_box .top_link_btn{float:left;margin-left:20px;}
 header .top_inner_box .top_link_btn li{float:left;}
-header .top_inner_box .top_link_btn li > a{display:block;width:55px;height:70px;padding:8px 15px;}
+header .top_inner_box .top_link_btn li > a{display:block;width:40px;height:70px;padding:8px 10px;}
 header .top_inner_box .top_link_btn li .btn{display:block;height:70px;padding:8px;}
 header .top_inner_box .top_link_btn li .btn.profile_btn{position: relative;padding:0 15px 0 40px;}
 header .top_inner_box .top_link_btn li .btn.profile_btn .img{display:block;width:30px;position: absolute;left:0px;top:50%;margin-top:-15px;}
@@ -748,3 +748,9 @@ footer a:active{color:#fff !important;}
 .setting-grid-col:hover, .setting-grid-col-btn:hover{font-size: 24px;}
 .popover {border: 1px solid #aaa;}
 .popover > .arrow::before {border-left-color: #aaa;border-right-color: #aaa;}
+
+header .top_inner_box .top_link_btn li a.gorocket{display:block;width:40px;height:70px;padding:8px 10px;background:url(../images/gorocket.png) no-repeat center center;}
+header .top_inner_box .top_link_btn li a.gorocket{position: relative;}
+header .top_inner_box .top_link_btn li a.gorocket em{position:absolute;border:1px solid #fff;background:#f09721;width:20px;height:20px;border-radius:10px;color:#fff;text-align:center;line-height:20px;font-size:10px;font-weight:500;
+	right:7.5px;top:40%;transform: translateY(-58%);-webkit-transform: translateY(-58%);
+}

@@ -15,7 +15,8 @@
                 {{--<!-- <li><a href="" class="cart"></a></li> -->--}}
 	            <li><a href="javascript:void(0);" class="sizecode"><i class="bx bx-font-size"></i></a></li>
                 <li><a href="javascript:void(0);" onclick="return openSmsList();" class="mail"></a></li>
-                <li><a href="stk31" class="notice act"></a></li>
+				{{--<li><a href="stk31" class="notice act"></a></li>--}}
+				<li><a href="https://support.gorocket3.ai/login?back_url=https%3A%2F%2Fsupport.gorocket3.ai%2Fprojects%2Ffjallraven" target="_new" class="gorocket act" title="고로켓 고객지원"></a></li>
                 <li>
                     <div class="dropdown">
                         <button type="button" class="profile_btn btn header-item waves-effect notice" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
