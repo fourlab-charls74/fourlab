@@ -106,7 +106,7 @@ class sal33Controller extends Controller
 					, 0 as in_rej_cnt
 				from product_stock_rotation psr
 				where
-					psr.rt >= '$sdate' and psr.rt <= '$edate'
+					psr.rt >= '$sdate' and psr.rt <= '$edate' and psr.del_yn = 'N'
 					$in_where
 				
 				union all
