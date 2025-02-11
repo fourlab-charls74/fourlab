@@ -127,7 +127,7 @@ class sal33Controller extends Controller
 					, if(psr.state = '-10', 1, 0) as in_rej_cnt
 				from product_stock_rotation psr
 				where
-					psr.rt >= '$sdate' and psr.rt <= '$edate'
+					psr.rt >= '$sdate' and psr.rt <= '$edate' and psr.del_yn = 'N'
 					$in_where
 			) rt
 			inner join store s on s.store_cd = rt.store_cd
