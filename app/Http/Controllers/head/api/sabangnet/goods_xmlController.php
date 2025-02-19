@@ -139,14 +139,14 @@ class goods_xmlController extends Controller
 				g.goods_sh as 'GOODS_CONSUMER_PRICE',	 -- TAG(소비자가)
 				(
 					select
-						if(is_option_use = 'Y', group_concat(name separator ','), '단품')
+						if(g.is_option_use = 'Y', group_concat(name separator ','), '단품')
 					from goods_option
 					where goods_no = g.goods_no and goods_sub = g.goods_sub and type = 'basic' and use_yn = 'Y'
 					order by seq
 				) as 'CHAR_1_NM',	 -- 옵션구분1
 				(
 					select
-						if( is_option_use = 'Y',
+						if( g.is_option_use = 'Y',
 							group_concat(concat(SUBSTRING_INDEX(goods_opt, '^', 1),'^^', if(is_unlimited = 'Y', 900, ifnull(good_qty,0)),'^^',ifnull(opt_price,0)) separator ','),
 							concat(goods_opt,'^^', if(is_unlimited = 'Y', 900, good_qty))
 						)
