@@ -21,10 +21,6 @@ class goods_xmlController extends Controller
 
     public function good_view(Request $request)
     {
-
-		error_reporting(E_ALL);  // 모든 에러 보고
-		ini_set('display_errors', 1);  // 화면에 에러 출력
-
         set_time_limit(0);
 
 		// 설정 값 얻기
@@ -291,10 +287,14 @@ class goods_xmlController extends Controller
 		$row->ORIGIN		= sprintf("<![CDATA[%s]]>",$row->ORIGIN);
 		$row->MAKE_YEAR		= sprintf("<![CDATA[%s]]>",$row->MAKE_YEAR);
 		$row->MAKE_DM		= sprintf("<![CDATA[%s]]>",$row->MAKE_DM);
-		$row->CHAR_1_NM		= sprintf("<![CDATA[%s]]>",$row->CHAR_1_NM);
-		$row->CHAR_1_VAL	= sprintf("<![CDATA[%s]]>",$row->CHAR_1_VAL);
-		$row->CHAR_2_NM		= sprintf("<![CDATA[%s]]>",$row->CHAR_2_NM);
-		$row->CHAR_2_VAL	= sprintf("<![CDATA[%s]]>",$row->CHAR_2_VAL);
+//		$row->CHAR_1_NM		= sprintf("<![CDATA[%s]]>",$row->CHAR_1_NM);
+//		$row->CHAR_1_VAL	= sprintf("<![CDATA[%s]]>",$row->CHAR_1_VAL);
+//		$row->CHAR_2_NM		= sprintf("<![CDATA[%s]]>",$row->CHAR_2_NM);
+//		$row->CHAR_2_VAL	= sprintf("<![CDATA[%s]]>",$row->CHAR_2_VAL);
+		$row->CHAR_1_NM		= sprintf("<![CDATA[%s]]>",'');
+		$row->CHAR_1_VAL	= sprintf("<![CDATA[%s]]>",'');
+		$row->CHAR_2_NM		= sprintf("<![CDATA[%s]]>",'');
+		$row->CHAR_2_VAL	= sprintf("<![CDATA[%s]]>",'');
 
 		$row->IMG_PATH		= sprintf("<![CDATA[%s]]>",$row->IMG_PATH);
 		$row->IMG_PATH1		= sprintf("<![CDATA[%s]]>",$row->IMG_PATH1);
