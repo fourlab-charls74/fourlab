@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Models\Conf;
 
+error_reporting(E_ALL);  // 모든 에러 보고
+ini_set('display_errors', 1);  // 화면에 에러 출력
+
 class goods_xmlController extends Controller
 {
     public function index()
