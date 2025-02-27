@@ -471,11 +471,11 @@ class prd06Controller extends Controller
 			//1. 창고 재고 데이터 시작
 			$sql    = "
 				select
-					pss.storage_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, pc.prd_cd_p, pc.year,
+					pss.storage_cd, pss.prd_cd, pc.goods_no, pc.goods_opt, p.price, p.wonga, pc.prd_cd_p, pc.year,
 					-- pss.wqty as qty
 					if( pss.wqty > pss.qty, pss.qty, pss.wqty) as qty
 				from product_stock_storage pss
-				inner join product_code pc on pc.prd_cd = pss.prd_cd
+				inner join product_code pc on pc.prd_cd = pss.prd_cd and pc.type = 'N'
 				inner join product p on pss.prd_cd = p.prd_cd
 				where
 					pss.use_yn = 'Y'
@@ -580,9 +580,9 @@ class prd06Controller extends Controller
 					// 매장 통합버퍼링
 					$sql    = "
 						select
-							'store_all' as store_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, max(p.price) as price, max(p.wonga) as wonga, sum(pss.wqty) as qty, pc.prd_cd_p, pc.year
+							'store_all' as store_cd, pss.prd_cd, pc.goods_no, pc.goods_opt, max(p.price) as price, max(p.wonga) as wonga, sum(pss.wqty) as qty, pc.prd_cd_p, pc.year
 						from product_stock_store pss
-						inner join product_code pc on pc.prd_cd = pss.prd_cd
+						inner join product_code pc on pc.prd_cd = pss.prd_cd and pc.type = 'N'
 						inner join product p on pss.prd_cd = p.prd_cd
 						where
 							pss.use_yn = 'Y'
