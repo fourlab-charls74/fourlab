@@ -638,7 +638,7 @@ class prd06Controller extends Controller
 						select
 							pss.store_cd, pss.prd_cd, pss.goods_no, pc.goods_opt, p.price, p.wonga, pss.wqty as qty, pc.prd_cd_p, pc.year
 						from product_stock_store pss
-						inner join product_code pc on pc.prd_cd = pss.prd_cd
+						inner join product_code pc on pc.prd_cd = pss.prd_cd and pc.type = 'N'
 						inner join product p on pss.prd_cd = p.prd_cd
 						where
 							pss.use_yn = 'Y'
