@@ -420,6 +420,8 @@ class prd06Controller extends Controller
 	// 재고 동기화
 	public function stock_batch()
 	{
+		set_time_limit(0);
+		
 		$code	= "200";
 		$msg	= "";
 		$id		= Auth('head')->user()->id;
@@ -492,7 +494,7 @@ class prd06Controller extends Controller
 
 				if( $row->year == '24' ){
 
-					/**/
+					/*
 					$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
 					$row_chk	= DB::select($sql_24chk);
 
@@ -506,7 +508,7 @@ class prd06Controller extends Controller
 					}
 					
 					if($chk24 > 0) continue;
-					/**/
+					*/
 				}
 				
 				//대표창고 버퍼링 처리
@@ -596,7 +598,7 @@ class prd06Controller extends Controller
 					$cnt	= 0;
 					foreach ($rows as $row) {
 
-						/**/
+						/*
 						if( $row->year == '24' ){
 							$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
 							$row_chk	= DB::select($sql_24chk);
@@ -612,7 +614,7 @@ class prd06Controller extends Controller
 
 							if($chk24 > 0) continue;
 						}
-						/**/
+						*/
 
 						//매장 통합 버퍼링 처리
 						if( $stock_conf->store_tot_buffer != 0){
@@ -649,6 +651,7 @@ class prd06Controller extends Controller
 					$cnt	= 0;
 					foreach ($rows as $row) {
 
+						/*
 						if( $row->year == '24' ){
 							$sql_24chk	= " select prd_cd, prd_cd_p from product_stock_24_yn ";
 							$row_chk	= DB::select($sql_24chk);
@@ -664,6 +667,7 @@ class prd06Controller extends Controller
 
 							if($chk24 > 0) continue;
 						}
+						*/
 
 						//매장 개별 버퍼링 처리
 						if( $store_buffer[$row->store_cd] != 0){
