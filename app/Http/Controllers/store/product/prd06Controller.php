@@ -670,8 +670,8 @@ class prd06Controller extends Controller
 						*/
 
 						//매장 개별 버퍼링 처리
-						if( $store_buffer[$row->store_cd] != 0){
-							$row->qty = $row->qty - $store_buffer[$row->store_cd];
+						if( $store_buffer[strtoupper($row->store_cd)] != 0){
+							$row->qty = $row->qty - $store_buffer[strtoupper($row->store_cd)];
 						}
 	
 						if( $row->qty > 0){
