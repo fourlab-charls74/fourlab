@@ -9,7 +9,7 @@ Login
     @section('content')
     <div class="login_inner">
         <div class="cont">
-            <div class="right_cont" style="background-image:url('/theme/{{config('shop.theme')}}/images/login_fourlab1_bg.jpg');background-size:contain;">
+            <div class="right_cont" style="background-image:url('/theme/{{config('shop.theme')}}/images/login_fourlab2_bg.jpg');background-size:contain;">
                 <dl>
                     <dt>
                         <img src="/theme/{{config('shop.theme')}}/images/fourlab_logo_w.png" style="width:50%;position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);"
