@@ -23,6 +23,7 @@ Login
                     <div class="login_mobile_tit">
                         <img src="/theme/{{config('shop.theme')}}/images/fourlab_logo_w.png" style="width:80%">
                     </div>
+					<div class="txtc pt10 pb10" style="font-family: 'Noto Sans KR';font-size:1.5em;font-weight:bold;color:#202c45;">FourLab Online</div>
                     <ul class="list_input">
                         <li>
                             <div class="input_box">
