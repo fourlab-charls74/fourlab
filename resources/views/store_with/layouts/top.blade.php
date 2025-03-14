@@ -1,7 +1,7 @@
 <header>
     <div class="top_inner_box">
         <div class="d-flex">
-            <div class="logo pc white"><a href="/store" style="background:url('/theme/{{config('shop.theme')}}/images/pc_logo_white.png') no-repeat center center;"></a></div>
+            <div class="logo pc white"><a href="/store" style="background:url('/theme/{{config('shop.theme')}}/images/fourlab_logo_top.png') no-repeat center center;"></a></div>
             <ul class="top_setting_btn">
                 <li><a href="#" class="view" data-toggle="fullscreen"></a></li>
                 <li><a href="#" class="side"></a></li>
